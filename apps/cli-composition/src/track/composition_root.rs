@@ -102,6 +102,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(RequestScopedTrackNextTaskQueryAdapter),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let track_task_counts_service = track_task_counts_service();
     let track_set_override_service =
         Arc::new(usecase::track_lifecycle::track_set_override::TrackSetOverrideInteractor::new(
             Arc::new(RequestScopedTrackOverrideSetAdapter),
@@ -162,6 +163,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         base_merge_service,
         track_add_task_service,
         track_next_task_service,
+        track_task_counts_service,
         track_transition_service,
         track_set_override_service,
         track_clear_override_service,
@@ -361,6 +363,16 @@ impl usecase::track_phase::TrackPhaseService for RequestScopedTrackPhaseAdapter 
     }
 }
 
+pub(crate) fn track_task_counts_service()
+-> std::sync::Arc<dyn usecase::track_lifecycle::track_task_counts::TrackTaskCountsService> {
+    use std::sync::Arc;
+
+    Arc::new(usecase::track_lifecycle::track_task_counts::TrackTaskCountsInteractor::new(
+        Arc::new(RequestScopedTrackTaskCountsQueryAdapter),
+        Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+    ))
+}
+
 struct RequestScopedTrackNextTaskQueryAdapter;
 
 impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNextTaskQueryAdapter {
@@ -379,6 +391,29 @@ impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNext
         let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
         let query = usecase::task_ops::TaskQueryInteractor::new(store);
         usecase::track_lifecycle::TrackNextTaskQueryPort::next_task(&query, track_id, items_dir)
+    }
+}
+
+struct RequestScopedTrackTaskCountsQueryAdapter;
+
+impl usecase::track_lifecycle::TrackTaskCountsQueryPort
+    for RequestScopedTrackTaskCountsQueryAdapter
+{
+    fn task_counts(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        usecase::task_ops::TaskCountsOutput,
+        usecase::track_lifecycle::track_task_counts::TrackTaskCountsError,
+    > {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let query = usecase::task_ops::TaskQueryInteractor::new(store);
+        usecase::track_lifecycle::TrackTaskCountsQueryPort::task_counts(&query, track_id, items_dir)
     }
 }
 

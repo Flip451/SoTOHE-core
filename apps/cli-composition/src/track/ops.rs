@@ -208,23 +208,10 @@ impl TrackCompositionRoot {
         items_dir: PathBuf,
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskQueryService as _;
-
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
-
-        let counts = service
-            .task_counts(track_id, items_dir)
-            .map_err(|e| CompositionError::Usecase(format!("task-counts failed: {e}")))?;
-
-        let total = counts.todo + counts.in_progress + counts.done + counts.skipped;
-        let json = format!(
-            r#"{{"total":{total},"todo":{},"in_progress":{},"done":{},"skipped":{}}}"#,
-            counts.todo, counts.in_progress, counts.done, counts.skipped
-        );
-
-        Ok(CommandOutcome::success(Some(json)))
+        Ok(self.track_driver().handle(cli_driver::track::TrackInput::TaskCounts {
+            items_dir,
+            track_id: Some(track_id),
+        }))
     }
 
     /// Detect the active track ID from the current git branch.

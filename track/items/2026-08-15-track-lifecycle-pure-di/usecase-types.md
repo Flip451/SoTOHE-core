@@ -126,7 +126,7 @@
 | TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🔵 | 🔵 |
 | TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
 | TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🔵 | 🔵 |
-| TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🟡 | 🔵 |
+| TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🔵 | 🔵 |
 | TrackTransitionService | application_service | add | fn execute(&self, command: TrackTransitionCommand) -> Result<TrackTransitionResult, TrackTransitionError> | 🔵 | 🔵 |
 | TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
 | TrackTypeSignalsService | application_service | add | fn execute(&self, command: TrackTypeSignalsCommand) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> | 🔵 | 🔵 |
@@ -158,7 +158,7 @@
 | TrackSetOverrideInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSwitchBaseInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackTaskCountsInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackTaskCountsInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTransitionInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTypeGraphInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -186,7 +186,7 @@
 | TrackLintResult | dto | add | — | 🔵 | 🔵 |
 | TrackSetCommitHashResult | dto | add | — | 🔵 | 🔵 |
 | TrackSetOverrideResult | dto | add | — | 🔵 | 🔵 |
-| TrackTaskCountsResult | dto | add | — | 🟡 | 🔵 |
+| TrackTaskCountsResult | dto | add | — | 🔵 | 🔵 |
 | TrackTypeSignalsResult | dto | add | — | 🔵 | 🔵 |
 | TrackViewsValidateResult | dto | add | — | 🟡 | 🔵 |
 

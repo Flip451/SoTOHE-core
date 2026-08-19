@@ -2718,6 +2718,18 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
+      "for_type": "TrackTaskCountsResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackTaskCountsResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackTaskCountsResult",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "TrackTransitionCommand",
       "trait_ref": "core::fmt::Debug"
     },

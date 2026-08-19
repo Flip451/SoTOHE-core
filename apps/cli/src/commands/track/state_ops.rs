@@ -235,8 +235,19 @@ mod tests {
         let (_root, items_dir, _track_dir) =
             setup_test_track_with_impl_plan(tmp.path(), "test-track");
 
-        let result = execute_task_counts(items_dir, "test-track".to_string());
+        let result = execute_task_counts(items_dir.clone(), "test-track".to_string());
         assert!(result.is_ok(), "expected Ok from task-counts: {result:?}");
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":1,"todo":1,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -247,11 +258,22 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
-        let result = execute_task_counts(items_dir, "test-track".to_string());
+        let result = execute_task_counts(items_dir.clone(), "test-track".to_string());
         assert!(
             result.is_ok(),
             "expected Ok on activated track without impl-plan.json: {result:?}"
         );
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":0,"todo":0,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -281,11 +303,22 @@ mod tests {
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
         let items_dir = tmp.path().join("track").join("items");
 
-        let result = execute_task_counts(items_dir, track_id.to_string());
+        let result = execute_task_counts(items_dir.clone(), track_id.to_string());
         assert!(
             result.is_ok(),
             "planning-only track without impl-plan.json must succeed with zero counts: {result:?}"
         );
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some(track_id.to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":0,"todo":0,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -304,8 +337,44 @@ mod tests {
         let items_dir = tmp.path().join("track").join("items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_task_counts(items_dir, "INVALID ID".to_string());
+        let result = execute_task_counts(items_dir.clone(), "INVALID ID".to_string());
         assert!(result.is_err());
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("INVALID ID".to_string()) });
+        assert_ne!(outcome.exit_code, 0);
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|stderr| stderr.contains("track id")),
+            "invalid track id must fail before execution: {:?}",
+            outcome.stderr
+        );
+        assert_eq!(outcome.stdout, None);
+    }
+
+    #[test]
+    fn test_track_task_counts_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, _track_dir) =
+            setup_test_track_with_impl_plan(tmp.path(), "test-track");
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_owned();
+
+        let cli_exit = execute_task_counts(argv_items_dir.clone(), argv_track_id.clone())
+            .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_owned()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":1,"todo":1,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None, "successful task-counts must not write stderr");
     }
 
     #[test]

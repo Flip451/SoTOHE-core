@@ -467,7 +467,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "566f9e2c0a0752c7e6382dd382affe0e44c670971885330a41c8b81f7f36d41c",
+        "bound_tests_set_hash": "e40aeea36ae694ae6a3e42dcedcb587cf0bdba28c8e87c3b546de238c8842411",
         "declaration_hash": "2c68b4cffca3ff1a48a61cae3e6466a260fab157f0d34fad7bc9259ea5e31051"
       },
       "obligation_id": {
@@ -687,7 +687,7 @@
       },
       "key": {
         "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
-        "bound_tests_set_hash": "cfb22b1fdd2547ec3307df02530be12e908ec6e32e019d76ec1ee3ab99c05a1d",
+        "bound_tests_set_hash": "2c981ac4293196a15918ededde588ac6752ec2b5ca2ce05fe9984b0f435c575b",
         "declaration_hash": "1cf53e284fa122254d5a992e564412a71358a149e2a505fe67cbf2709de3e97a"
       },
       "obligation_id": {
@@ -743,7 +743,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "cfb22b1fdd2547ec3307df02530be12e908ec6e32e019d76ec1ee3ab99c05a1d",
+        "bound_tests_set_hash": "2c981ac4293196a15918ededde588ac6752ec2b5ca2ce05fe9984b0f435c575b",
         "declaration_hash": "1cf53e284fa122254d5a992e564412a71358a149e2a505fe67cbf2709de3e97a"
       },
       "obligation_id": {
@@ -2107,7 +2107,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "616662ba045095c6f8520b93d5b0f2d71395a8de6ae19864c3086c87d9768f29",
+        "bound_tests_set_hash": "21d78ff47df02644bcafd3ade40e49e8b9fdfd20da481688a5c7470f39171cfa",
         "declaration_hash": "c88fc23cc3685536f3fe451ae4b92b04f77fac57ac872fbda363205271be8aae"
       },
       "obligation_id": {
@@ -2343,7 +2343,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "8ef0523ba0bf053a31ea839a7c6f5be58c0ccb6e4a104da12d0f7d4f0d337870",
+        "bound_tests_set_hash": "2d7eef2b647cf15f94080835b668c0ec6c82db8d2b8f43a99c81ee88d3d1a59f",
         "declaration_hash": "238642d3132b553b5d8ab09ecaefa823e26aecf9dd0abffa1af711c25061f2f2"
       },
       "obligation_id": {
@@ -2352,7 +2352,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"git workflow unavailable: git unavailable\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"[ERROR] branch switch failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "citation": "Err(error) => error,",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2737,7 +2737,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "bc231527d73014f536d0fdec7e9b0da99f1af85c26b34b792a6fb690d497ca62",
+        "bound_tests_set_hash": "5e1669da99fa778cc1d87641c1ebc16622035c9b48fa60d5bfbda4c422428498",
         "declaration_hash": "26b5955213bc5343dad56bff132a5605302043ba58914f4f72128d02debf601a"
       },
       "obligation_id": {
@@ -2746,7 +2746,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            result,\n            TrackNextTaskResult::Found { task_id, description, status: TaskStatusKind::Todo }\n                if task_id.as_ref() == \"T002\" && description.as_ref() == \"next work\"\n        )); ... assert_eq!(outcome.exit_code, 0); ... let stdout = outcome.stdout.expect(\"next-task output is printed\");",
+        "citation": "assert!(matches!(\n            result,\n            TrackNextTaskResult::Found { task_id, description, status: TaskStatusKind::Todo }\n                if task_id.as_ref() == \"T002\" && description.as_ref() == \"next work\"\n        ));\n\n        assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.expect(\"next-task output is printed\");\n        assert!(stdout.contains(\"\\\"task_id\\\":\\\"T002\\\"\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2900,6 +2900,123 @@
       },
       "verdict": {
         "citation": "let outcome = lint_call_site_outcome(root, \"test-track\", \"domain\", None);\nassert_eq!(outcome.exit_code, 0);\nassert_eq!(outcome.stdout, None, \"stdout must stay empty on zero violations\");\nassert!(\n    outcome.stderr.as_deref().is_some_and(|stderr| stderr.contains(\"Found 0 violation(s)\")),\n    \"stderr must keep the zero-violation summary: {:?}\",\n    outcome.stderr\n);\nassert_eq!(list_relative_files(root), before, \"track lint must not persist extra files\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_explicit_selection_returns_counts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_missing_plan_returns_zero_counts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_active_selection_uses_resolver"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_query_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_active_selection_failure_maps_to_execution_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTaskCountsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "daaa4ee2643a83b06ae038f9b1d71c11366e53e0db68874b12d8b9fc43443298",
+        "declaration_hash": "b92df4bde4dcf874187f59df4cacb9a30460ece082d413f4acd83d2ee21c9afa"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTaskCountsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let result = interactor\n            .execute(TrackTaskCountsCommand {",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_explicit_selection_returns_counts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_missing_plan_returns_zero_counts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_query_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_task_counts::tests",
+          "test_name": "test_track_task_counts_interactor_active_selection_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_task_counts_valid_input_routes_to_task_counts_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_task_counts_zero_counts_preserves_json_contract"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_task_counts_service_error_maps_to_stderr_and_exit"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::state_ops::tests",
+          "test_name": "test_track_task_counts_call_site_preserves_cli_contract_across_migration"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTaskCountsService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "1a7e82851d0b3557bcecaabf37cd663c5ec00ad56e4ac8786e1dfa019aefeb92",
+        "declaration_hash": "285ab1f1d80ad6f75bb69ef5abd5cbe75d49fd925b7c38aed7d37c861ee38dad"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTaskCountsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(result.total.value(), 10);\n        assert_eq!(result.todo.value(), 2);\n        assert_eq!(result.in_progress.value(), 1);\n        assert_eq!(result.done.value(), 3);\n        assert_eq!(result.skipped.value(), 4); ... assert_eq!(error.to_string(), \"store failed\"); ... assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(),\n            Some(r#\"{\"total\":10,\"todo\":2,\"in_progress\":1,\"done\":3,\"skipped\":4}\"#)\n        );\n        assert_eq!(outcome.stderr, None); ... assert_eq!(outcome.stdout, None);\n        assert_eq!(outcome.stderr.as_deref(), Some(\"[ERROR] store failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

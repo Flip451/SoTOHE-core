@@ -499,6 +499,20 @@
           "hash": "rvw1:sha256:315d048740e6affb3e3aa2b98735ee7069577b93499509031713858ff71ad95e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee0bbd1e2d6145d8b829b98150b96a3d005af1fed2179ca368f668cd1d008519",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T20:28:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee0bbd1e2d6145d8b829b98150b96a3d005af1fed2179ca368f668cd1d008519",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -896,6 +910,20 @@
           "at": "2026-08-19T19:03:28Z",
           "findings": [],
           "hash": "rvw1:sha256:9f653823d1c84f5eab2d1eb8d6ab6384920f3302891a648c05a748f85d40e5bf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ad49abc128b2d78f736a444e07ba9cefba1112e2bbd36fd8917f2661da7876c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:57:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ad49abc128b2d78f736a444e07ba9cefba1112e2bbd36fd8917f2661da7876c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1328,6 +1356,35 @@
           "at": "2026-08-19T19:05:47Z",
           "findings": [],
           "hash": "rvw1:sha256:06d6e134056d3d5e5f9ebe88cec5f6d2527959da5bbc2e9d55060420ebc4eecd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:40Z",
+          "findings": [
+            {
+              "category": "boundary exposure",
+              "file": "apps/cli-driver/src/track_task_counts.rs",
+              "line": 13,
+              "message": "`render_track_task_counts_outcome` is declared `pub`, but the design intent requires this renderer to remain crate-private. This unnecessarily exposes a primary-adapter rendering helper as part of the crate's public API.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba8ee1c19db9ee35435a8e5e4cf335b523f4a603b3ac8d3b41b4658a88247ab2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T19:53:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b27b13cc4009d2210a7c256184b21183c25973b250500305cc7a3524968c72e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T20:02:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b27b13cc4009d2210a7c256184b21183c25973b250500305cc7a3524968c72e7",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2066,6 +2123,20 @@
           "at": "2026-08-19T18:59:30Z",
           "findings": [],
           "hash": "rvw1:sha256:1f2b03f6faccd49e0a5e2c616dec717060d07a29cf6f7e18d6452f88576426e5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f824270abb8f1f2f8bb92eadbfd5cb3201b764581e6013fc5f95f289497c9ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:55:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f824270abb8f1f2f8bb92eadbfd5cb3201b764581e6013fc5f95f289497c9ac",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3402,6 +3473,20 @@
           "hash": "rvw1:sha256:d246878b0c56c63cd7e0667934e99aba66e6a7fd9e2d966bf2fc952b90cb2cc5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e38a0c138955b55b5298ec8f1f9f9c5b4f460ed3a9e71f42737e0304d020b260",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T20:13:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e38a0c138955b55b5298ec8f1f9f9c5b4f460ed3a9e71f42737e0304d020b260",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4079,6 +4164,20 @@
           "hash": "rvw1:sha256:1516a74e1c1d79ae4eccfbd1ad8a6ed25cf7041c6bcc4402427450ed465a0b3e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f4156208553e2120c70b5143e25b5e3695d360eae85c4bca84ea8c18afa2633",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T20:04:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f4156208553e2120c70b5143e25b5e3695d360eae85c4bca84ea8c18afa2633",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4497,6 +4596,20 @@
           "at": "2026-08-19T19:21:36Z",
           "findings": [],
           "hash": "rvw1:sha256:af393a3829667562ac2f321fe8bfc0dc2fc6c241074dc8561921db7cf462edd6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:51:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ecc3145ad391318f1b8333672db01bb6096844d54756981904fd30ceb971df7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T20:04:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ecc3145ad391318f1b8333672db01bb6096844d54756981904fd30ceb971df7",
           "type": "final",
           "verdict": "zero_findings"
         }

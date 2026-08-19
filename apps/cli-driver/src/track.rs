@@ -29,6 +29,7 @@ use usecase::track_lifecycle::track_resolve::TrackResolveService;
 use usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashService;
 use usecase::track_lifecycle::track_set_override::TrackSetOverrideService;
 use usecase::track_lifecycle::track_switch_base::TrackSwitchBaseService;
+use usecase::track_lifecycle::track_task_counts::TrackTaskCountsService;
 use usecase::track_lifecycle::track_transition::TrackTransitionService;
 use usecase::track_lifecycle::{
     RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
@@ -43,6 +44,7 @@ use crate::track_resolve::render_track_resolve_outcome;
 use crate::track_set_commit_hash::render_track_set_commit_hash_outcome;
 use crate::track_set_override::render_track_set_override_outcome;
 use crate::track_switch_base::render_track_switch_base_outcome;
+use crate::track_task_counts::render_track_task_counts_outcome;
 use crate::track_transition::render_track_transition_outcome;
 
 // ---------------------------------------------------------------------------
@@ -271,6 +273,7 @@ pub struct TrackDriver {
     base_merge_service: Arc<dyn BaseMergeService>,
     track_add_task_service: Arc<dyn TrackAddTaskService>,
     track_next_task_service: Arc<dyn TrackNextTaskService>,
+    track_task_counts_service: Arc<dyn TrackTaskCountsService>,
     track_set_override_service: Arc<dyn TrackSetOverrideService>,
     track_clear_override_service: Arc<dyn TrackClearOverrideService>,
     track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
@@ -291,6 +294,7 @@ impl TrackDriver {
         base_merge_service: Arc<dyn BaseMergeService>,
         track_add_task_service: Arc<dyn TrackAddTaskService>,
         track_next_task_service: Arc<dyn TrackNextTaskService>,
+        track_task_counts_service: Arc<dyn TrackTaskCountsService>,
         track_transition_service: Arc<dyn TrackTransitionService>,
         track_set_override_service: Arc<dyn TrackSetOverrideService>,
         track_clear_override_service: Arc<dyn TrackClearOverrideService>,
@@ -309,6 +313,7 @@ impl TrackDriver {
             base_merge_service,
             track_add_task_service,
             track_next_task_service,
+            track_task_counts_service,
             track_set_override_service,
             track_clear_override_service,
             track_set_commit_hash_service,
@@ -404,9 +409,11 @@ impl TrackDriver {
             TrackInput::NextTask { items_dir, track_id } => {
                 render_track_next_task_outcome(&*self.track_next_task_service, items_dir, track_id)
             }
-            TrackInput::TaskCounts { items_dir, track_id } => {
-                service_output_to_outcome(self.service.task_counts(items_dir, track_id))
-            }
+            TrackInput::TaskCounts { items_dir, track_id } => render_track_task_counts_outcome(
+                &*self.track_task_counts_service,
+                items_dir,
+                track_id,
+            ),
             TrackInput::DetectActive { project_root } => {
                 service_output_to_outcome(self.service.detect_active(project_root))
             }
@@ -718,6 +725,9 @@ mod tests {
         TrackSetOverrideCommand, TrackSetOverrideError, TrackSetOverrideResult,
         TrackSetOverrideService,
     };
+    use usecase::track_lifecycle::track_task_counts::{
+        TrackTaskCountsCommand, TrackTaskCountsError, TrackTaskCountsResult, TrackTaskCountsService,
+    };
     use usecase::track_lifecycle::track_transition::{
         TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
     };
@@ -903,6 +913,8 @@ mod tests {
 
     struct UnusedTrackNextTaskService;
 
+    struct UnusedTrackTaskCountsService;
+
     struct UnusedTrackTransitionService;
 
     struct UnusedTrackSetOverrideService;
@@ -920,6 +932,15 @@ mod tests {
             &self,
             _: TrackNextTaskCommand,
         ) -> Result<TrackNextTaskResult, TrackNextTaskError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackTaskCountsService for UnusedTrackTaskCountsService {
+        fn execute(
+            &self,
+            _: TrackTaskCountsCommand,
+        ) -> Result<TrackTaskCountsResult, TrackTaskCountsError> {
             unreachable!()
         }
     }
@@ -1150,6 +1171,7 @@ mod tests {
             service,
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1175,6 +1197,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1216,6 +1239,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1252,6 +1276,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1285,6 +1310,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1328,6 +1354,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1363,6 +1390,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1400,6 +1428,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1445,6 +1474,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service.clone(),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1488,6 +1518,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service,
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1523,6 +1554,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service,
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1543,6 +1575,159 @@ mod tests {
         assert!(stdout.contains("\"status\":null"));
     }
 
+    struct RecordingTrackTaskCountsService {
+        calls: Mutex<Vec<(PathBuf, TrackSelection)>>,
+        result: Result<TrackTaskCountsResult, String>,
+    }
+
+    impl TrackTaskCountsService for RecordingTrackTaskCountsService {
+        fn execute(
+            &self,
+            command: TrackTaskCountsCommand,
+        ) -> Result<TrackTaskCountsResult, TrackTaskCountsError> {
+            self.calls
+                .lock()
+                .expect("command lock is available")
+                .push((command.items_dir.as_path().to_path_buf(), command.track));
+            match &self.result {
+                Ok(result) => Ok(TrackTaskCountsResult {
+                    total: result.total,
+                    todo: result.todo,
+                    in_progress: result.in_progress,
+                    done: result.done,
+                    skipped: result.skipped,
+                }),
+                Err(error) => Err(TrackTaskCountsError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+            }
+        }
+    }
+
+    fn task_counts_result(
+        total: u64,
+        todo: u64,
+        in_progress: u64,
+        done: u64,
+        skipped: u64,
+    ) -> TrackTaskCountsResult {
+        use usecase::track_lifecycle::TaskCount;
+        TrackTaskCountsResult {
+            total: TaskCount::new(total),
+            todo: TaskCount::new(todo),
+            in_progress: TaskCount::new(in_progress),
+            done: TaskCount::new(done),
+            skipped: TaskCount::new(skipped),
+        }
+    }
+
+    fn task_counts_driver(service: Arc<RecordingTrackTaskCountsService>) -> TrackDriver {
+        TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
+            Arc::new(UnusedTrackNextTaskService),
+            service,
+            Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
+            Arc::new(UnusedTrackClearOverrideService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
+        )
+    }
+
+    #[test]
+    fn test_track_driver_task_counts_valid_input_routes_to_task_counts_service() {
+        let service = Arc::new(RecordingTrackTaskCountsService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(task_counts_result(10, 2, 1, 3, 4)),
+        });
+        let driver = task_counts_driver(service.clone());
+
+        let outcome = driver.handle(TrackInput::TaskCounts {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("counts-track".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":10,"todo":2,"in_progress":1,"done":3,"skipped":4}"#)
+        );
+        assert_eq!(outcome.stderr, None);
+        let calls = service.calls.lock().expect("command lock is available");
+        assert_eq!(calls.len(), 1);
+        let (items_dir, track) = calls.first().expect("one task-counts command is recorded");
+        assert_eq!(items_dir, &PathBuf::from("workspace/track/items"));
+        assert!(matches!(
+            track,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "counts-track"
+        ));
+    }
+
+    #[test]
+    fn test_track_driver_task_counts_zero_counts_preserves_json_contract() {
+        let driver = task_counts_driver(Arc::new(RecordingTrackTaskCountsService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(task_counts_result(0, 0, 0, 0, 0)),
+        }));
+
+        let outcome = driver.handle(TrackInput::TaskCounts {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("counts-track".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":0,"todo":0,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
+    }
+
+    #[test]
+    fn test_track_driver_task_counts_service_error_maps_to_stderr_and_exit() {
+        let service = Arc::new(RecordingTrackTaskCountsService {
+            calls: Mutex::new(Vec::new()),
+            result: Err("store failed".to_owned()),
+        });
+        let driver = task_counts_driver(service.clone());
+
+        let outcome = driver.handle(TrackInput::TaskCounts {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("counts-track".to_owned()),
+        });
+
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] store failed"));
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(service.calls.lock().expect("command lock is available").len(), 1);
+    }
+
+    #[test]
+    fn test_track_driver_task_counts_invalid_track_id_returns_failure_without_service_call() {
+        let service = Arc::new(RecordingTrackTaskCountsService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(task_counts_result(0, 0, 0, 0, 0)),
+        });
+        let driver = task_counts_driver(service.clone());
+
+        let outcome = driver.handle(TrackInput::TaskCounts {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("INVALID ID".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(outcome.stderr.expect("validation error is printed").contains("track id"));
+        assert!(service.calls.lock().expect("command lock is available").is_empty());
+    }
+
     #[test]
     fn test_track_driver_branch_create_invalid_items_dir_preserves_error_prefix() {
         let service = Arc::new(RecordingTrackBranchCreateService {
@@ -1559,6 +1744,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1595,6 +1781,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1638,6 +1825,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1672,6 +1860,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1706,6 +1895,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1739,6 +1929,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1776,6 +1967,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1811,6 +2003,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1845,6 +2038,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1878,6 +2072,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1915,6 +2110,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -1952,6 +2148,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -2412,6 +2609,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -2518,6 +2716,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
@@ -2627,6 +2826,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
