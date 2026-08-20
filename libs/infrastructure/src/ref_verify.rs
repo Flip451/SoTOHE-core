@@ -15,7 +15,7 @@ mod selected_check_approved;
 
 use guarded_io::{CacheWriteGuard, atomic_write_guarded_file, read_guarded_text};
 
-use crate::agent_profiles::{AgentProfiles, RoundType};
+use crate::agent_profiles::{AgentProfiles, ResolvedExecution, RoundType};
 use crate::tddd::semantic_verify_codec::{
     CatalogueSpecVerifyCacheDocumentCodec, SpecAdrVerifyCacheDocumentCodec,
 };
@@ -322,9 +322,21 @@ impl AgentRefVerifierAdapter {
         runner: Arc<AgentExecutionRunner>,
         project_root: PathBuf,
     ) -> Self {
+        let process_root = project_root.clone();
         Self {
             profiles,
-            runner: Arc::new(move |resolved, prompt, _capability| runner(resolved, prompt)),
+            runner: Arc::new(move |resolved, prompt, capability| match &resolved {
+                ResolvedExecution::ProviderCli { provider, .. } if provider.as_str() == "grok" => {
+                    crate::ref_verify::process_runner::run_ref_verifier_agent(
+                        &process_root,
+                        resolved,
+                        prompt,
+                        crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA,
+                        capability,
+                    )
+                }
+                _ => runner(resolved, prompt),
+            }),
             project_root,
         }
     }

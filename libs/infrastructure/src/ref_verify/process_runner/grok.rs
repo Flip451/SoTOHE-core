@@ -447,4 +447,82 @@ fi
         .expect("transient envelope failure is retried");
         assert_eq!(result, r#"{"kind":"pass","citation":"retried","reason":null}"#);
     }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_public_adapter_new_uses_invoked_capability_sandbox() {
+        let directory = tempfile::tempdir().expect("temporary directory is created");
+        let prompt_dir = directory.path().join(".harness").join("prompts");
+        fs::create_dir_all(&prompt_dir).expect("prompt directory is created");
+        fs::write(
+            prompt_dir.join("ref-verifier-chain2.md"),
+            "Claim: {{claim}}\nEvidence: {{evidence}}\nTier: {{tier}}",
+        )
+        .expect("prompt template is written");
+        write_grok_skill(directory.path(), "ref-verifier-chain2", "workspace");
+
+        let profile_path = directory.path().join("agent-profiles.json");
+        fs::write(
+            &profile_path,
+            r#"{
+                "schema_version": 1,
+                "providers": {
+                    "grok": {
+                        "label": "Grok CLI",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    }
+                },
+                "capabilities": {
+                    "ref-verifier-chain2": {
+                        "provider": "grok",
+                        "model": "grok-4.6",
+                        "fast_provider": "grok",
+                        "fast_model": "grok-4.6",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "low",
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+                        "execution_mode": "typed-pipeline"
+                    }
+                }
+            }"#,
+        )
+        .expect("profile is written");
+        let profiles = std::sync::Arc::new(
+            AgentProfiles::load(directory.path(), &profile_path).expect("profile loads"),
+        );
+
+        let bin_dir = directory.path().join("bin");
+        fs::create_dir(&bin_dir).expect("fake bin directory is created");
+        install_recording_fake_grok(
+            &bin_dir,
+            r#"{"structured_output":{"result":"{\"kind\":\"pass\",\"citation\":\"chain2 sandbox\",\"reason\":null}"}}"#,
+        );
+        let path = path_with_fake_grok(&bin_dir);
+        let marker = directory.path().join("grok-invocations.log");
+        let runner = super::super::make_ref_verifier_process_runner(directory.path().to_path_buf());
+        let adapter = crate::ref_verify::AgentRefVerifierAdapter::new(
+            profiles,
+            runner,
+            directory.path().to_path_buf(),
+        );
+
+        let result = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+            temp_env::with_var("GROK_REF_VERIFIER_MARKER", Some(marker.as_os_str()), || {
+                usecase::ref_verify::RefVerifierPort::verify_pair(
+                    &adapter,
+                    "claim".to_owned(),
+                    "evidence".to_owned(),
+                    &usecase::ref_verify::RefVerifyCacheScope::CatalogueSpec {
+                        layer: domain::tddd::LayerId::try_new("infrastructure".to_owned())
+                            .expect("layer"),
+                    },
+                    domain::ModelTier::Final,
+                )
+            })
+        })
+        .expect("public adapter pairing launches Grok");
+        assert!(matches!(result, domain::tddd::semantic_verify::SemanticVerdict::Pass { .. }));
+        let recorded = fs::read_to_string(&marker).expect("argv is recorded");
+        assert!(recorded.contains("--sandbox workspace"), "got: {recorded}");
+    }
 }

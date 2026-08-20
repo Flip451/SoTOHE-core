@@ -135,7 +135,17 @@ pub(crate) const CODEX_FULFILLMENT_OUTPUT_SCHEMA: &str = r#"{
 /// `tmp/reviewer-runtime/`.
 #[must_use]
 pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecutionRunner> {
-    make_agent_process_runner(project_root, CODEX_OUTPUT_SCHEMA, "ref-verifier-chain1")
+    Arc::new(move |resolved: ResolvedExecution, prompt: String| {
+        if matches!(
+            &resolved,
+            ResolvedExecution::ProviderCli { provider, .. } if provider.as_str() == "grok"
+        ) {
+            return Err(ref_verify_runner_error(
+                "grok ref-verifier requires a capability identity; AgentRefVerifierAdapter supplies it",
+            ));
+        }
+        run_ref_verifier_agent(&project_root, resolved, prompt, CODEX_OUTPUT_SCHEMA, "")
+    })
 }
 
 /// Build an [`AgentExecutionRunner`] that shares the same subprocess pipeline
@@ -910,6 +920,25 @@ mod tests {
         assert!(
             message.contains("claude") || message.contains("spawn"),
             "expected spawn-failure message, got: {message}"
+        );
+    }
+
+    #[test]
+    fn make_ref_verifier_process_runner_rejects_grok_without_capability_identity() {
+        let dir = tempfile::tempdir().unwrap();
+        let runner = make_ref_verifier_process_runner(dir.path().to_path_buf());
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("grok").unwrap(),
+            model: ModelName::try_new("grok-4.6").unwrap(),
+            effort: ReasoningEffort::High,
+        };
+        let err = runner(resolved, "test prompt".to_owned()).unwrap_err();
+        let RefVerifyError::VerifierPort { message } = err else {
+            panic!("expected VerifierPort, got {err:?}");
+        };
+        assert!(
+            message.contains("capability identity"),
+            "expected capability-identity failure, got: {message}"
         );
     }
 }
