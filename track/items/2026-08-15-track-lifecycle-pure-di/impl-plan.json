@@ -355,6 +355,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "675cd917911dc06fad7eaab68a019c2fe45f915a",
       "depends_on": [
         "T002",
         "T003",
@@ -392,12 +393,13 @@
       "status": "done"
     },
     {
+      "commit_hash": "675cd917911dc06fad7eaab68a019c2fe45f915a",
       "depends_on": [
         "T028"
       ],
       "description": "Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track` and `cargo make ci-track`. [CN-02; AC-06; AC-07]",
       "id": "T029",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

@@ -5,7 +5,7 @@
 
 GO-01 → T001–T033; each independently verifiable command context has its own implementation task, followed by remaining migration and validation.
 
-## Tasks (32/33 resolved)
+## Tasks (33/33 resolved)
 
 ### S1 — Shared wiring
 
@@ -57,5 +57,5 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 - [x] **T031**: In `apps/cli/src/commands/task_contract.rs`, migrate the task-contract resolution call site to the wired `TrackResolution*` boundary and add its focused CLI-behavior regression. [IN-04; CN-01; CN-02; AC-05] (`a051be92848a54dc9361630a4128108e3f88d92a`)
 - [x] **T032**: In `libs/usecase/src/track_lifecycle/` (`TrackBranchStrategyPort`, `TrackSelectionPort`) and `libs/infrastructure/src/track/` (`FsTrackBranchStrategyAdapter`, `GitTrackSelectionAdapter`), migrate branch-strategy and selection access behind the declared ports and add adapter-contract regressions. [IN-01; IN-02; CN-01; CN-02; AC-03] (`1969b5bf9606a34c5e56e6932464262716b72a7c`)
 - [x] **T033**: In `libs/usecase/src/track_lifecycle/` (`TrackMetadataPort`) and `libs/infrastructure/src/track/` (`FsTrackMetadataAdapter`), migrate metadata persistence behind the declared port and add persistence regressions. [IN-01; IN-02; CN-02; AC-03; AC-05] (`3aab67243a6a6e3165c963a46c57b061f95e02a8`)
-- [x] **T028**: In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, replace remaining execution-path references with the wired `TrackDriver` and `TrackTdddDriver` routes and add focused CLI regressions. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-04]
-- [ ] **T029**: Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track` and `cargo make ci-track`. [CN-02; AC-06; AC-07]
+- [x] **T028**: In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, replace remaining execution-path references with the wired `TrackDriver` and `TrackTdddDriver` routes and add focused CLI regressions. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-04] (`675cd917911dc06fad7eaab68a019c2fe45f915a`)
+- [x] **T029**: Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track` and `cargo make ci-track`. [CN-02; AC-06; AC-07] (`675cd917911dc06fad7eaab68a019c2fe45f915a`)
