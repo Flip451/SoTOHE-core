@@ -15,7 +15,7 @@ mod selected_check_approved;
 
 use guarded_io::{CacheWriteGuard, atomic_write_guarded_file, read_guarded_text};
 
-use crate::agent_profiles::{AgentProfiles, ResolvedExecution, RoundType};
+use crate::agent_profiles::{AgentProfiles, RoundType};
 use crate::tddd::semantic_verify_codec::{
     CatalogueSpecVerifyCacheDocumentCodec, SpecAdrVerifyCacheDocumentCodec,
 };
@@ -295,13 +295,9 @@ struct VerdictResponseDto {
     reason: Option<String>,
 }
 
-type CapabilityAwareRunner = dyn Fn(crate::agent_profiles::ResolvedExecution, String, &str) -> Result<String, RefVerifyError>
-    + Send
-    + Sync;
-
 pub struct AgentRefVerifierAdapter {
     profiles: Arc<AgentProfiles>,
-    runner: Arc<CapabilityAwareRunner>,
+    runner: Arc<AgentExecutionRunner>,
     project_root: PathBuf,
 }
 
@@ -320,31 +316,6 @@ impl AgentRefVerifierAdapter {
     pub fn new(
         profiles: Arc<AgentProfiles>,
         runner: Arc<AgentExecutionRunner>,
-        project_root: PathBuf,
-    ) -> Self {
-        let process_root = project_root.clone();
-        Self {
-            profiles,
-            runner: Arc::new(move |resolved, prompt, capability| match &resolved {
-                ResolvedExecution::ProviderCli { provider, .. } if provider.as_str() == "grok" => {
-                    crate::ref_verify::process_runner::run_ref_verifier_agent(
-                        &process_root,
-                        resolved,
-                        prompt,
-                        crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA,
-                        capability,
-                    )
-                }
-                _ => runner(resolved, prompt),
-            }),
-            project_root,
-        }
-    }
-
-    #[must_use]
-    pub(crate) fn with_capability_runner(
-        profiles: Arc<AgentProfiles>,
-        runner: Arc<CapabilityAwareRunner>,
         project_root: PathBuf,
     ) -> Self {
         Self { profiles, runner, project_root }
@@ -413,7 +384,10 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
         };
         let prompt = render_prompt_template(&template_text, &claim, &evidence, tier_str);
 
-        let raw_output = (self.runner)(resolved, prompt, capability)?;
+        let raw_output =
+            crate::ref_verify::process_runner::with_ref_verifier_capability(capability, || {
+                (self.runner)(resolved, prompt)
+            })?;
 
         let dto: VerdictResponseDto =
             extract_json_object_parsed(&raw_output).map_err(|e| RefVerifyError::VerifierPort {

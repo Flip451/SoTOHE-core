@@ -1,16 +1,20 @@
 //! Grok arm for the shared typed-pipeline process runner.
 
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsString;
 use std::path::Path;
+use std::process::{Command, Stdio};
 
 use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::provider_session::ProviderSessionId;
 use usecase::ref_verify::RefVerifyError;
 
 use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
-use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, grok_envelope_bytes_from_stdout};
+use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, collect_grok_stdout_stream};
 
-use super::{nonempty_trimmed, ref_verify_runner_error, run_process};
+use super::{
+    MAX_REF_VERIFY_SESSION_LOG_BYTES, configure_verifier_process_group, io, nonempty_trimmed,
+    ref_verify_runner_error,
+};
 
 /// Builds the Grok argv for a ref-verifier invocation using the canonical
 /// model / effort / resume / sandbox mapping shared by Grok adapters.
@@ -65,9 +69,7 @@ fn run_grok_ref_verifier_once(
         ))
     })?;
     let args = build_grok_ref_verifier_args(model, effort, &sandbox, None, prompt);
-    let outcome = run_process(OsStr::new("grok"), &args, project_root, "grok ref-verifier", None)?;
-    let envelope_bytes = grok_envelope_bytes_from_stdout(outcome.stdout.as_bytes())
-        .ok_or_else(|| ref_verify_runner_error("grok ref-verifier produced no output envelope"))?;
+    let envelope_bytes = run_grok_subprocess(project_root, &args)?;
     let envelope =
         serde_json::from_slice::<GrokOutputEnvelope>(&envelope_bytes).map_err(|error| {
             ref_verify_runner_error(format!("cannot decode Grok ref-verifier envelope: {error}"))
@@ -84,6 +86,56 @@ fn run_grok_ref_verifier_once(
                 "grok ref-verifier structured output is missing a non-empty string result",
             )
         })
+}
+
+fn run_grok_subprocess(project_root: &Path, args: &[OsString]) -> Result<Vec<u8>, RefVerifyError> {
+    let label = "grok ref-verifier";
+    let mut command = Command::new("grok");
+    command
+        .args(args)
+        .current_dir(project_root)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    configure_verifier_process_group(&mut command);
+    let mut child = command.spawn().map_err(|error| {
+        ref_verify_runner_error(format!("failed to spawn {label} 'grok': {error}"))
+    })?;
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| ref_verify_runner_error(format!("{label} stdout was not captured")))?;
+    let stderr = child
+        .stderr
+        .take()
+        .ok_or_else(|| ref_verify_runner_error(format!("{label} stderr was not captured")))?;
+    let stdout_handle = std::thread::spawn(move || collect_grok_stdout_stream(stdout));
+    let stderr_handle = io::spawn_bounded_stderr_reader(stderr, MAX_REF_VERIFY_SESSION_LOG_BYTES);
+    let status = child.wait().map_err(|error| {
+        ref_verify_runner_error(format!("failed to wait on {label} subprocess: {error}"))
+    })?;
+    let stdout = stdout_handle
+        .join()
+        .map_err(|_| ref_verify_runner_error(format!("{label} stdout reader thread panicked")))?
+        .map_err(|error| {
+            ref_verify_runner_error(format!("failed to read {label} stdout: {error}"))
+        })?;
+    let stderr = stderr_handle
+        .join()
+        .map_err(|_| ref_verify_runner_error(format!("{label} stderr reader thread panicked")))?
+        .map_err(|error| {
+            ref_verify_runner_error(format!("failed to read {label} stderr: {error}"))
+        })?;
+    if !status.success() {
+        let stderr_text = String::from_utf8_lossy(&stderr.bytes).into_owned();
+        let tail = io::stderr_tail(&stderr_text, 20, 4096);
+        return Err(ref_verify_runner_error(format!(
+            "{label} exited with non-zero status: {status}; stderr tail: {tail}"
+        )));
+    }
+    stdout
+        .envelope_bytes
+        .ok_or_else(|| ref_verify_runner_error("grok ref-verifier produced no output envelope"))
 }
 
 #[cfg(test)]
@@ -524,5 +576,45 @@ fi
         assert!(matches!(result, domain::tddd::semantic_verify::SemanticVerdict::Pass { .. }));
         let recorded = fs::read_to_string(&marker).expect("argv is recorded");
         assert!(recorded.contains("--sandbox workspace"), "got: {recorded}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_ref_verifier_agent_grok_keeps_envelope_after_verbose_stdout() {
+        let directory = tempfile::tempdir().expect("temporary directory is created");
+        let bin_dir = directory.path().join("bin");
+        fs::create_dir(&bin_dir).expect("fake bin directory is created");
+        write_grok_skill(directory.path(), "ref-verifier-chain1", "read-only");
+        let executable = bin_dir.join("grok");
+        fs::write(
+            &executable,
+            r#"#!/bin/sh
+head -c 5000000 /dev/zero | tr '\0' 'x'
+printf '\n%s\n' '{"structured_output":{"result":"{\"kind\":\"pass\",\"citation\":\"verbose\",\"reason\":null}"}}'
+"#,
+        )
+        .expect("verbose fake grok is written");
+        let mut permissions = fs::metadata(&executable).expect("fake grok metadata").permissions();
+        use std::os::unix::fs::PermissionsExt;
+        permissions.set_mode(0o755);
+        fs::set_permissions(&executable, permissions).expect("fake grok is executable");
+        let path = path_with_fake_grok(&bin_dir);
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("grok".to_owned()).expect("provider is valid"),
+            model: ModelName::try_new("grok-4.6".to_owned()).expect("model is valid"),
+            effort: ReasoningEffort::High,
+        };
+
+        let result = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+            super::super::run_ref_verifier_agent(
+                directory.path(),
+                resolved,
+                "prompt".to_owned(),
+                super::super::CODEX_OUTPUT_SCHEMA,
+                "ref-verifier-chain1",
+            )
+        })
+        .expect("verbose Grok stdout still yields the structured envelope");
+        assert_eq!(result, r#"{"kind":"pass","citation":"verbose","reason":null}"#);
     }
 }

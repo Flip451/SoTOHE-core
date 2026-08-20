@@ -41,11 +41,30 @@
 //! attached to [`RefVerifyError::VerifierPort`] up to 4 KB / 20 lines.
 //! Long verbose headers (telemetry banners) must not bury the actual error.
 
+use std::cell::RefCell;
 use std::ffi::{OsStr, OsString};
-
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
+
+thread_local! {
+    static CURRENT_CAPABILITY: RefCell<Option<String>> = const { RefCell::new(None) };
+}
+
+/// Runs `f` with the active ref-verifier capability identity visible to the
+/// shared process runner. The public runner signature stays `(resolved, prompt)`.
+pub(crate) fn with_ref_verifier_capability<T>(capability: &str, f: impl FnOnce() -> T) -> T {
+    CURRENT_CAPABILITY.with(|slot| {
+        let previous = slot.replace(Some(capability.to_owned()));
+        let result = f();
+        slot.replace(previous);
+        result
+    })
+}
+
+fn current_ref_verifier_capability() -> String {
+    CURRENT_CAPABILITY.with(|slot| slot.borrow().clone().unwrap_or_default())
+}
 
 use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::provider_session::ProviderSessionId;
@@ -74,7 +93,7 @@ pub fn build_grok_ref_verifier_args(
     grok::build_grok_ref_verifier_args(model, effort, sandbox, resume_id, prompt)
 }
 
-const MAX_REF_VERIFY_SESSION_LOG_BYTES: usize = 4 * 1024 * 1024;
+pub(super) const MAX_REF_VERIFY_SESSION_LOG_BYTES: usize = 4 * 1024 * 1024;
 const STDERR_SESSION_LOG_HEADING: &[u8] = b"=== STDERR ===\n";
 const STDERR_SESSION_LOG_TRUNCATED_NOTICE: &[u8] = b"\n[stderr truncated]\n";
 
@@ -135,17 +154,7 @@ pub(crate) const CODEX_FULFILLMENT_OUTPUT_SCHEMA: &str = r#"{
 /// `tmp/reviewer-runtime/`.
 #[must_use]
 pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecutionRunner> {
-    Arc::new(move |resolved: ResolvedExecution, prompt: String| {
-        if matches!(
-            &resolved,
-            ResolvedExecution::ProviderCli { provider, .. } if provider.as_str() == "grok"
-        ) {
-            return Err(ref_verify_runner_error(
-                "grok ref-verifier requires a capability identity; AgentRefVerifierAdapter supplies it",
-            ));
-        }
-        run_ref_verifier_agent(&project_root, resolved, prompt, CODEX_OUTPUT_SCHEMA, "")
-    })
+    make_agent_process_runner(project_root, CODEX_OUTPUT_SCHEMA)
 }
 
 /// Build an [`AgentExecutionRunner`] that shares the same subprocess pipeline
@@ -162,10 +171,10 @@ pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecu
 pub(crate) fn make_agent_process_runner(
     project_root: PathBuf,
     codex_output_schema: &'static str,
-    capability: &'static str,
 ) -> Arc<AgentExecutionRunner> {
     Arc::new(move |resolved: ResolvedExecution, prompt: String| {
-        run_ref_verifier_agent(&project_root, resolved, prompt, codex_output_schema, capability)
+        let capability = current_ref_verifier_capability();
+        run_ref_verifier_agent(&project_root, resolved, prompt, codex_output_schema, &capability)
     })
 }
 
@@ -524,13 +533,13 @@ fn run_process_retryable(
 }
 
 #[cfg(unix)]
-fn configure_verifier_process_group(command: &mut Command) {
+pub(super) fn configure_verifier_process_group(command: &mut Command) {
     use std::os::unix::process::CommandExt as _;
     command.process_group(0);
 }
 
 #[cfg(not(unix))]
-fn configure_verifier_process_group(_command: &mut Command) {}
+pub(super) fn configure_verifier_process_group(_command: &mut Command) {}
 
 #[cfg(unix)]
 #[allow(dead_code)]
@@ -920,25 +929,6 @@ mod tests {
         assert!(
             message.contains("claude") || message.contains("spawn"),
             "expected spawn-failure message, got: {message}"
-        );
-    }
-
-    #[test]
-    fn make_ref_verifier_process_runner_rejects_grok_without_capability_identity() {
-        let dir = tempfile::tempdir().unwrap();
-        let runner = make_ref_verifier_process_runner(dir.path().to_path_buf());
-        let resolved = ResolvedExecution::ProviderCli {
-            provider: ProviderName::try_new("grok").unwrap(),
-            model: ModelName::try_new("grok-4.6").unwrap(),
-            effort: ReasoningEffort::High,
-        };
-        let err = runner(resolved, "test prompt".to_owned()).unwrap_err();
-        let RefVerifyError::VerifierPort { message } = err else {
-            panic!("expected VerifierPort, got {err:?}");
-        };
-        assert!(
-            message.contains("capability identity"),
-            "expected capability-identity failure, got: {message}"
         );
     }
 }

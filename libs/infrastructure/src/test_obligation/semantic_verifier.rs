@@ -154,10 +154,12 @@ fn build_semantic_verifier_runner(
     let inner = crate::ref_verify::process_runner::make_agent_process_runner(
         workspace_root,
         codex_output_schema,
-        capability,
     );
     Arc::new(move |resolved, prompt| {
-        inner(resolved, prompt).map_err(|err| match err {
+        crate::ref_verify::process_runner::with_ref_verifier_capability(capability, || {
+            inner(resolved, prompt)
+        })
+        .map_err(|err| match err {
             RefVerifyError::VerifierPort { message } => semantic_verifier_error(&message),
             other => {
                 semantic_verifier_error(&format!("semantic verifier subprocess failed: {other:?}"))
