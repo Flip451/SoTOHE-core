@@ -3,6 +3,9 @@
 use std::path::PathBuf;
 
 use crate::error::CompositionError;
+use cli_driver::track_resolution::{
+    TrackIdInput, TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome,
+};
 
 use super::shared::CodexReviewOutcome;
 use usecase::review_v2::RunReviewOutput;
@@ -44,7 +47,16 @@ pub(super) fn resolve_track_id_or_branch_write(
     track_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, CompositionError> {
-    crate::TrackCompositionRoot::new().track_resolve_id_for_write(track_id, items_dir.to_path_buf())
+    let track_id = track_id
+        .map(|value| {
+            value.parse::<TrackIdInput>().map_err(|error| {
+                CompositionError::WiringFailed(format!("invalid --track-id: {error}"))
+            })
+        })
+        .transpose()?;
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+        .map_err(|error| CompositionError::WiringFailed(error.message().to_owned()))?;
+    resolve_with_resolution_driver(TrackResolutionInput::WriteFromItems { track_id, items_dir })
 }
 
 /// Resolves the current track ID from the active git branch (`track/<id>`).
@@ -58,25 +70,23 @@ pub(super) fn resolve_track_id_or_branch_write(
 pub(super) fn resolve_track_id_from_branch(
     items_dir: &std::path::Path,
 ) -> Result<String, CompositionError> {
-    // Use the semantic `SystemGitRepo::current_branch` inherent method (T007
-    // "semantic SystemGitRepo current_branch where listed") rather than a raw
-    // `git rev-parse --abbrev-ref HEAD`.
-    use infrastructure::git_cli::SystemGitRepo;
-
-    let project_root = crate::track::resolve_project_root(items_dir)?;
-    let branch = SystemGitRepo::discover_from(&project_root)
-        .and_then(|r| r.current_branch())
-        .map_err(|e| {
-            CompositionError::AdapterInit(format!("failed to detect current branch: {e}"))
-        })?
-        .unwrap_or_default();
-
-    branch.strip_prefix("track/").map(str::to_owned).ok_or_else(|| {
-        CompositionError::WiringFailed(format!(
-            "current branch '{branch}' is not a track branch \
-                 (expected 'track/<id>')"
-        ))
+    resolve_with_resolution_driver(TrackResolutionInput::ReadFromItems {
+        track_id: None,
+        items_dir: TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+            .map_err(|error| CompositionError::WiringFailed(error.message().to_owned()))?,
     })
+}
+
+fn resolve_with_resolution_driver(input: TrackResolutionInput) -> Result<String, CompositionError> {
+    match crate::TrackCompositionRoot::new().track_resolution_driver().resolve(input) {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id.to_string()),
+        TrackResolutionOutcome::Inactive => {
+            Err(CompositionError::AdapterInit("current workspace has no active track".to_owned()))
+        }
+        TrackResolutionOutcome::Failed(error) => {
+            Err(CompositionError::AdapterInit(error.message().to_owned()))
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------

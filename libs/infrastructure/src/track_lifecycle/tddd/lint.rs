@@ -1,0 +1,200 @@
+//! System adapter for the single-layer catalogue-lint port.
+
+use std::path::Path;
+
+use domain::TrackId;
+use usecase::catalogue_lint_workflow::{
+    RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintError, RunCatalogueLintInteractor,
+};
+use usecase::track_lifecycle::tddd::lint::{
+    TrackLintCommand, TrackLintError, TrackLintPort, TrackLintResult,
+};
+
+use crate::tddd::contract_map_adapter::FsCatalogueLoader;
+use crate::tddd::fs_lint_config_loader::FsLintConfigLoader;
+use crate::tddd::syn_primitive_occurrence_scanner::SynPrimitiveOccurrenceScanner;
+
+/// System-backed adapter for single-layer catalogue linting.
+pub struct SystemTrackLintAdapter;
+
+impl TrackLintPort for SystemTrackLintAdapter {
+    fn execute(
+        &self,
+        track_id: TrackId,
+        command: TrackLintCommand,
+    ) -> Result<TrackLintResult, TrackLintError> {
+        let workspace_root = command.workspace_root.as_path();
+        let config_path = resolve_config_path(workspace_root, command.rules_file.as_ref())?;
+        ensure_config_file(&config_path)?;
+
+        let items_dir = workspace_root.join("track/items");
+        let rules_path = workspace_root.join("architecture-rules.json");
+        let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.to_path_buf());
+        let config_loader = FsLintConfigLoader::new(config_path);
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, config_loader, SynPrimitiveOccurrenceScanner);
+        let runner: &dyn RunCatalogueLint = &interactor;
+        let violations = match runner.execute(RunCatalogueLintCommand {
+            track_id: track_id.as_ref().to_owned(),
+            layer_id: command.layer.as_ref().to_owned(),
+            rules: Vec::new(),
+        }) {
+            Ok(violations) => violations,
+            Err(RunCatalogueLintError::ConfigMissing { path }) => {
+                return Err(execution_failed(lint_config_missing_message(&path)));
+            }
+            Err(error) => {
+                return Err(execution_failed(format!("catalogue lint failed: {error}")));
+            }
+        };
+        Ok(TrackLintResult { violations })
+    }
+}
+
+fn resolve_config_path(
+    workspace_root: &Path,
+    rules_file: Option<&usecase::track_lifecycle::tddd::lint::TrackLintRulesFile>,
+) -> Result<std::path::PathBuf, TrackLintError> {
+    let trusted_root =
+        workspace_root.canonicalize().unwrap_or_else(|_| workspace_root.to_path_buf());
+    let Some(rules_file) = rules_file else {
+        return Ok(trusted_root.join(".harness/catalogue-lint/config.json"));
+    };
+    let path = rules_file.as_path();
+    let resolved = if path.is_absolute() { path.to_path_buf() } else { trusted_root.join(path) };
+    let contained = resolved.canonicalize().unwrap_or_else(|_| resolved.clone());
+    if !contained.starts_with(&trusted_root) {
+        return Err(execution_failed(format!(
+            "lint rules file is outside the workspace trusted root: {}",
+            resolved.display()
+        )));
+    }
+    Ok(resolved)
+}
+
+fn ensure_config_file(path: &Path) -> Result<(), TrackLintError> {
+    match path.symlink_metadata() {
+        Ok(metadata) if metadata.file_type().is_symlink() => Err(execution_failed(format!(
+            "refusing to load a symlinked lint config: {}",
+            path.display()
+        ))),
+        Ok(metadata) if metadata.is_file() => Ok(()),
+        Ok(_) => {
+            Err(execution_failed(format!("lint config is not a regular file: {}", path.display())))
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            Err(execution_failed(lint_config_missing_message(path)))
+        }
+        Err(error) => {
+            Err(execution_failed(format!("cannot stat lint config '{}': {error}", path.display())))
+        }
+    }
+}
+
+fn lint_config_missing_message(path: &Path) -> String {
+    format!(
+        "lint config not found at {}. Copy `.harness/catalogue-lint/presets/ddd-strict.json` to that location to enable linting.",
+        path.display()
+    )
+}
+
+fn execution_failed(message: impl Into<String>) -> TrackLintError {
+    TrackLintError::ExecutionFailed(usecase::git_workflow::DiagnosticText::new(message))
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use usecase::track_lifecycle::{TrackSelection, TrackWorkspaceRoot};
+
+    fn command(root: &std::path::Path) -> TrackLintCommand {
+        TrackLintCommand {
+            track: TrackSelection::Explicit(
+                TrackId::try_new("lint-track").expect("track id is valid"),
+            ),
+            workspace_root: TrackWorkspaceRoot::try_new(root.to_path_buf())
+                .expect("workspace root is valid"),
+            layer: domain::tddd::LayerId::try_new("domain".to_owned()).expect("layer is valid"),
+            rules_file: None,
+        }
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_missing_config_returns_execution_error() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        let error = match SystemTrackLintAdapter.execute(
+            TrackId::try_new("lint-track").expect("track id is valid"),
+            command(workspace.path()),
+        ) {
+            Ok(_) => panic!("missing config must fail closed"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("lint config not found"));
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_directory_config_fails_closed() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        std::fs::create_dir_all(workspace.path().join(".harness/catalogue-lint/config.json"))
+            .expect("directory occupies the lint config path");
+        let error = match SystemTrackLintAdapter.execute(
+            TrackId::try_new("lint-track").expect("track id is valid"),
+            command(workspace.path()),
+        ) {
+            Ok(_) => panic!("directory config must fail closed"),
+            Err(error) => error,
+        };
+        assert!(
+            error.to_string().contains("lint config is not a regular file"),
+            "directory config must fail closed: {error}"
+        );
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_symlink_config_fails_closed() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        let config_dir = workspace.path().join(".harness/catalogue-lint");
+        std::fs::create_dir_all(&config_dir).expect("lint config directory exists");
+        let target = config_dir.join("target.json");
+        std::fs::write(&target, r#"{"schema_version":1,"rules":[]}"#)
+            .expect("symlink target is written");
+        std::os::unix::fs::symlink(&target, config_dir.join("config.json"))
+            .expect("lint config symlink is created");
+        let error = match SystemTrackLintAdapter.execute(
+            TrackId::try_new("lint-track").expect("track id is valid"),
+            command(workspace.path()),
+        ) {
+            Ok(_) => panic!("symlinked config must fail closed"),
+            Err(error) => error,
+        };
+        assert!(
+            error.to_string().contains("refusing to load a symlinked lint config"),
+            "symlinked config must fail closed: {error}"
+        );
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_rules_file_outside_workspace_fails_closed() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        let outside = tempfile::tempdir().expect("outside config exists");
+        let rules = outside.path().join("rules.json");
+        std::fs::write(&rules, r#"{"schema_version":1,"rules":[]}"#)
+            .expect("outside rules file is written");
+        let mut command = command(workspace.path());
+        command.rules_file = Some(
+            usecase::track_lifecycle::tddd::lint::TrackLintRulesFile::try_new(rules)
+                .expect("rules file is valid"),
+        );
+        let error = match SystemTrackLintAdapter
+            .execute(TrackId::try_new("lint-track").expect("track id is valid"), command)
+        {
+            Ok(_) => panic!("outside rules file must fail closed"),
+            Err(error) => error,
+        };
+        assert!(
+            error.to_string().contains("outside the workspace trusted root"),
+            "outside rules file must fail closed: {error}"
+        );
+    }
+}

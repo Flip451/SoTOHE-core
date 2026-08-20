@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::fs;
 
 use super::*;
 use usecase::capability_exec::{
@@ -19,194 +19,6 @@ fn load_profiles_result(contents: &str) -> Result<AgentProfiles, AgentProfilesEr
     let path = directory.path().join("agent-profiles.json");
     fs::write(&path, contents).expect("test profile is written");
     AgentProfiles::load(directory.path(), &path)
-}
-
-fn workspace_root() -> &'static Path {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .and_then(Path::parent)
-        .expect("infrastructure crate is nested under the workspace")
-}
-
-fn load_shipped_profile(relative_path: &str) -> AgentProfiles {
-    let root = workspace_root();
-    AgentProfiles::load(root, &root.join(relative_path)).expect("shipped profile loads")
-}
-
-const SHIPPED_PROFILE_PATHS: &[&str] = &[
-    AGENT_PROFILES_PATH,
-    ".harness/config/samples/agent-profiles.default.json",
-    ".harness/config/samples/agent-profiles.claude-heavy.json",
-    ".harness/config/samples/agent-profiles.codex-heavy.json",
-    ".harness/config/samples/agent-profiles.grok-heavy.json",
-];
-
-const TYPED_PIPELINE_VERIFIER_CAPABILITIES: &[&str] = &[
-    "ref-verifier-chain1",
-    "ref-verifier-chain2",
-    "obligation-fulfillment-verifier",
-    "waiver-verifier",
-];
-
-#[derive(Debug, Clone, Copy)]
-struct ShippedDefaultBaseline {
-    capability: &'static str,
-    provider: &'static str,
-    model: Option<&'static str>,
-    fast_provider: Option<&'static str>,
-    fast_model: Option<&'static str>,
-}
-
-// These are the provider/model fields from the previous committed base. The
-// current branch is allowed to change only reviewer.provider and reviewer.model.
-const PREVIOUS_COMMITTED_SHIPPED_DEFAULTS: &[ShippedDefaultBaseline] = &[
-    ShippedDefaultBaseline {
-        capability: "orchestrator",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "spec-designer",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "impl-planner",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "type-designer",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "adr-editor",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "rollback-diagnoser",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "adr-diagnoser",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "implementer",
-        provider: "codex",
-        model: Some("gpt-5.6-luna"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "reviewer",
-        provider: "claude",
-        model: Some("claude-fable-5"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-    ShippedDefaultBaseline {
-        capability: "researcher",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "review-fix-lead",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "dry-checker",
-        provider: "grok",
-        model: Some("grok-4.6"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-    ShippedDefaultBaseline {
-        capability: "dry-fix-lead",
-        provider: "codex",
-        model: Some("gpt-5.6-luna"),
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "pr-reviewer",
-        provider: "codex",
-        model: None,
-        fast_provider: None,
-        fast_model: None,
-    },
-    ShippedDefaultBaseline {
-        capability: "ref-verifier-chain1",
-        provider: "codex",
-        model: Some("gpt-5.6-sol"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-    ShippedDefaultBaseline {
-        capability: "ref-verifier-chain2",
-        provider: "codex",
-        model: Some("gpt-5.6-sol"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-    ShippedDefaultBaseline {
-        capability: "obligation-fulfillment-verifier",
-        provider: "codex",
-        model: Some("gpt-5.6-terra"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-    ShippedDefaultBaseline {
-        capability: "waiver-verifier",
-        provider: "codex",
-        model: Some("gpt-5.6-terra"),
-        fast_provider: Some("codex"),
-        fast_model: Some("gpt-5.6-luna"),
-    },
-];
-
-fn configured_provider(config: &CapabilityConfigDto) -> String {
-    match config.provider_binding() {
-        CapabilityProviderBindingDto::Standard(provider) => {
-            provider.clone().into_domain().as_str().to_owned()
-        }
-        CapabilityProviderBindingDto::CodexCustom(_) => "codex".to_owned(),
-    }
-}
-
-fn configured_model(config: &CapabilityConfigDto) -> Option<String> {
-    config.model().map(|model| model.clone().into_domain().as_str().to_owned())
-}
-
-fn configured_fast_provider(config: &CapabilityConfigDto) -> Option<String> {
-    config.fast_provider().map(|provider| provider.clone().into_domain().as_str().to_owned())
-}
-
-fn configured_fast_model(config: &CapabilityConfigDto) -> Option<String> {
-    config.fast_model().map(|model| model.clone().into_domain().as_str().to_owned())
 }
 
 const CODEX_PROFILE: &str = r#"{
@@ -756,9 +568,12 @@ fn test_committed_profiles_subprocess_entries_resolve_explicit_effort() {
     ));
 }
 
-// The structural tests above keep the general consumer-owned profile contract
-// flexible. The T002 tests below intentionally pin the shipped defaults whose
-// values are part of this track's acceptance contract.
+// NOTE: no test may pin the committed profile's tunable values (provider /
+// model / effort). `.harness/config/agent-profiles.json` is consumer-owned
+// configuration that must be changeable without touching Rust code; tests
+// against the committed file assert only the structural contract (every
+// capability resolves, efforts are valid), as
+// `test_committed_profiles_subprocess_entries_resolve_explicit_effort` does.
 
 #[test]
 fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
@@ -797,8 +612,8 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
                 })
             ));
         }
-        // This remains a structural contract check; the explicit T002 locks
-        // below pin only the shipped values required by this track.
+        // Contract only, not the tunable values — see the NOTE above this
+        // test about never pinning committed-profile configuration.
         for round_type in [RoundType::Fast, RoundType::Final] {
             assert!(matches!(
                 profiles.resolve_execution(&capability("reviewer"), round_type),
@@ -816,104 +631,6 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
                 Ok(ResolvedExecution::ProviderCli { .. })
             ));
         }
-    }
-}
-
-#[test]
-fn test_committed_profile_reviewer_uses_grok_with_codex_fast_round() {
-    let profiles = load_shipped_profile(AGENT_PROFILES_PATH);
-    let config = profiles
-        .resolve_capability(&capability("reviewer"))
-        .expect("committed reviewer profile exists");
-
-    assert_eq!(configured_provider(config), "grok");
-    assert_eq!(configured_model(config).as_deref(), Some("grok-4.6"));
-    assert_eq!(configured_fast_provider(config).as_deref(), Some("codex"));
-    assert_eq!(configured_fast_model(config).as_deref(), Some("gpt-5.6-luna"));
-}
-
-#[test]
-fn test_committed_profile_other_shipped_defaults_match_previous_base() {
-    let profiles = load_shipped_profile(AGENT_PROFILES_PATH);
-    let mut actual_capabilities =
-        profiles.capabilities.keys().map(|name| name.as_str()).collect::<Vec<_>>();
-    actual_capabilities.sort_unstable();
-    let mut expected_capabilities = PREVIOUS_COMMITTED_SHIPPED_DEFAULTS
-        .iter()
-        .map(|entry| entry.capability)
-        .collect::<Vec<_>>();
-    expected_capabilities.sort_unstable();
-    assert_eq!(actual_capabilities, expected_capabilities);
-
-    for expected in PREVIOUS_COMMITTED_SHIPPED_DEFAULTS {
-        let config = profiles
-            .resolve_capability(&capability(expected.capability))
-            .expect("baseline capability exists in committed profile");
-
-        if expected.capability != "reviewer" {
-            assert_eq!(
-                configured_provider(config),
-                expected.provider,
-                "provider changed for {}",
-                expected.capability
-            );
-            assert_eq!(
-                configured_model(config).as_deref(),
-                expected.model,
-                "model changed for {}",
-                expected.capability
-            );
-        }
-        assert_eq!(
-            configured_fast_provider(config).as_deref(),
-            expected.fast_provider,
-            "fast_provider changed for {}",
-            expected.capability
-        );
-        assert_eq!(
-            configured_fast_model(config).as_deref(),
-            expected.fast_model,
-            "fast_model changed for {}",
-            expected.capability
-        );
-    }
-}
-
-#[test]
-fn test_shipped_profiles_keep_verifier_provider_values_non_grok() {
-    for profile_path in SHIPPED_PROFILE_PATHS {
-        let profiles = load_shipped_profile(profile_path);
-        for capability_name in TYPED_PIPELINE_VERIFIER_CAPABILITIES {
-            let config = profiles
-                .resolve_capability(&capability(capability_name))
-                .expect("shipped profile contains every verifier capability");
-
-            assert_ne!(
-                configured_provider(config),
-                "grok",
-                "{profile_path} selects grok for {capability_name}"
-            );
-            assert_ne!(
-                configured_fast_provider(config).as_deref(),
-                Some("grok"),
-                "{profile_path} selects grok fast_provider for {capability_name}"
-            );
-        }
-    }
-}
-
-#[test]
-fn test_shipped_profiles_resolve_pr_reviewer_to_codex_hosted_service() {
-    for profile_path in SHIPPED_PROFILE_PATHS {
-        let profiles = load_shipped_profile(profile_path);
-        let resolved = profiles
-            .resolve_execution(&capability("pr-reviewer"), RoundType::Final)
-            .expect("shipped pr-reviewer resolves");
-
-        assert!(matches!(
-            resolved,
-            ResolvedExecution::HostedService { provider } if provider.as_str() == "codex"
-        ));
     }
 }
 

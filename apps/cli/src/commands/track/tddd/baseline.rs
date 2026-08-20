@@ -1,11 +1,17 @@
-//! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
+//! `sotp track baseline-capture` — capture a TDDD baseline.
 //!
-//! Thin CLI adapter: delegates all orchestration to the composition root in `cli_composition`.
+//! Thin CLI adapter: parses the command values and delegates to the dedicated
+//! Track TDDD primary adapter.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::adr_baseline::TrackIdInput;
+use cli_driver::track_tddd::{
+    TrackLayerInput, TrackSourceWorkspaceInput, TrackTdddBaselineCaptureInput, TrackTdddInput,
+    TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -23,13 +29,24 @@ pub fn execute_baseline_capture(
     source_workspace: Option<PathBuf>,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = TrackCompositionRoot::new()
-        .track_baseline_capture(Some(track_id), workspace_root, source_workspace, layer)
-        .map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let track_id =
+        track_id.parse::<TrackIdInput>().map_err(|error| CliError::Message(error.to_string()))?;
+    let workspace_root =
+        TrackWorkspaceRootInput::try_from(workspace_root).map_err(CliError::Message)?;
+    let source_workspace = source_workspace
+        .map(TrackSourceWorkspaceInput::try_from)
+        .transpose()
+        .map_err(CliError::Message)?;
+    let layer = layer.map(TrackLayerInput::try_from).transpose().map_err(CliError::Message)?;
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::BaselineCapture(TrackTdddBaselineCaptureInput {
+            track_id: Some(track_id),
+            workspace_root,
+            source_workspace,
+            layer,
+        }),
+    );
+    super::super::state_ops::track_driver_outcome_to_result(outcome)
 }
 
 #[cfg(test)]

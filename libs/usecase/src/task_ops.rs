@@ -50,10 +50,11 @@ pub struct TaskOperationOutput {
 ///
 /// Contains the `task_id` and `description` of the next open task so the CLI
 /// can print them without importing domain task types.
-#[derive(Debug)]
 pub struct NextTaskOutput {
     pub task_id: String,
     pub description: String,
+    /// Persisted status kind of the next open task (`todo` / `in_progress`).
+    pub status: String,
 }
 
 /// DTO returned by `TaskQueryService::task_counts`.
@@ -595,6 +596,7 @@ where
         Ok(plan.next_open_task().map(|t| NextTaskOutput {
             task_id: t.id().as_ref().to_owned(),
             description: t.description().to_owned(),
+            status: t.status().kind().to_string(),
         }))
     }
 
@@ -655,6 +657,8 @@ mod tests {
         TrackWriteError, TrackWriter,
     };
 
+    use crate::track_lifecycle::TrackItemsDirectory;
+    use crate::track_lifecycle::TrackTaskTransition;
     use crate::track_resolution::{BranchReadError, BranchReaderPort};
 
     use super::*;
@@ -797,6 +801,119 @@ mod tests {
             Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
             StubVerifier::accepting(),
         )
+    }
+
+    fn assert_task_operation_ports<T>()
+    where
+        T: crate::track_lifecycle::TrackTaskTransitionPort
+            + crate::track_lifecycle::TrackTaskAddPort
+            + crate::track_lifecycle::TrackOverrideSetPort
+            + crate::track_lifecycle::TrackOverrideClearPort,
+    {
+    }
+
+    fn assert_task_query_ports<T>()
+    where
+        T: crate::track_lifecycle::TrackNextTaskQueryPort
+            + crate::track_lifecycle::TrackTaskCountsQueryPort,
+    {
+    }
+
+    #[test]
+    fn test_task_interactors_implement_track_lifecycle_ports() {
+        assert_task_operation_ports::<TaskOperationInteractor<StubStore>>();
+        assert_task_query_ports::<TaskQueryInteractor<StubStore>>();
+    }
+
+    fn lifecycle_items_dir() -> TrackItemsDirectory {
+        TrackItemsDirectory::try_new(PathBuf::from("track/items")).unwrap()
+    }
+
+    #[test]
+    fn test_track_lifecycle_operation_ports_execute_resolved_arguments() {
+        use crate::track_lifecycle::{
+            TrackOverrideClearPort, TrackOverrideSetPort, TrackTaskAddPort, TrackTaskTransitionPort,
+        };
+        use domain::{NonEmptyString, StatusOverrideKind, TaskStatus};
+
+        let store = store_with(plan_of(&[("T001", TaskStatus::Todo)]));
+        let interactor = task_ops_interactor(Arc::clone(&store), None);
+        let track_id = TrackId::try_new("my-track-2026").unwrap();
+
+        let transition =
+            <TaskOperationInteractor<StubStore> as TrackTaskTransitionPort>::transition_task(
+                &interactor,
+                track_id.clone(),
+                lifecycle_items_dir(),
+                TaskId::try_new("T001").unwrap(),
+                TrackTaskTransition::InProgress,
+            )
+            .unwrap();
+        assert_eq!(transitioned(transition).derived_status, "in_progress");
+
+        let added = <TaskOperationInteractor<StubStore> as TrackTaskAddPort>::add_task(
+            &interactor,
+            track_id.clone(),
+            lifecycle_items_dir(),
+            NonEmptyString::try_new("second task").unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+        assert_eq!(added.track_id, "my-track-2026");
+        assert_eq!(added.task_id.as_deref(), Some("T002"));
+
+        let overridden =
+            <TaskOperationInteractor<StubStore> as TrackOverrideSetPort>::set_override(
+                &interactor,
+                track_id.clone(),
+                lifecycle_items_dir(),
+                StatusOverrideKind::Blocked,
+                crate::git_workflow::DiagnosticText::new("waiting on a decision"),
+            )
+            .unwrap();
+        assert_eq!(overridden.derived_status, "blocked");
+
+        let cleared =
+            <TaskOperationInteractor<StubStore> as TrackOverrideClearPort>::clear_override(
+                &interactor,
+                track_id,
+                lifecycle_items_dir(),
+            )
+            .unwrap();
+        assert_eq!(cleared.derived_status, "in_progress");
+        assert_eq!(stored_status(&store, "T001"), TaskStatus::InProgress);
+    }
+
+    #[test]
+    fn test_track_lifecycle_query_ports_use_resolved_track_id() {
+        use crate::track_lifecycle::{TrackNextTaskQueryPort, TrackTaskCountsQueryPort};
+        use domain::TaskStatus;
+
+        let store =
+            store_with(plan_of(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::DonePending)]));
+        let interactor = TaskQueryInteractor::new(Arc::clone(&store));
+
+        let next = <TaskQueryInteractor<StubStore> as TrackNextTaskQueryPort>::next_task(
+            &interactor,
+            TrackId::try_new("my-track-2026").unwrap(),
+            lifecycle_items_dir(),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(next.task_id, "T001");
+        assert_eq!(next.description, "task T001");
+
+        let counts = <TaskQueryInteractor<StubStore> as TrackTaskCountsQueryPort>::task_counts(
+            &interactor,
+            TrackId::try_new("my-track-2026").unwrap(),
+            lifecycle_items_dir(),
+        )
+        .unwrap();
+        assert_eq!(counts.todo, 1);
+        assert_eq!(counts.done, 1);
+        assert_eq!(counts.in_progress, 0);
+        assert_eq!(counts.skipped, 0);
     }
 
     /// The output of a transition that must have happened. A refusal is carried
@@ -957,8 +1074,8 @@ mod tests {
     fn task_query_invalid_track_id_returns_error() {
         let store = Arc::new(StubStore::default());
         let interactor = TaskQueryInteractor::new(Arc::clone(&store));
-        let err = interactor.next_task("".to_owned(), PathBuf::new()).unwrap_err();
-        assert!(matches!(err, TaskOperationError::InvalidTrackId(_)));
+        let result = interactor.next_task("".to_owned(), PathBuf::new());
+        assert!(matches!(result, Err(TaskOperationError::InvalidTrackId(_))));
     }
 
     #[test]

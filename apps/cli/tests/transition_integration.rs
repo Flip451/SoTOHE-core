@@ -671,6 +671,13 @@ fn views_sync_subcommand_renders_plan_and_registry() {
         output.status,
         String::from_utf8_lossy(&output.stderr)
     );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("[OK] Rendered: track/registry.md")
+            || stdout.contains("[OK] Rendered: track/items/demo/plan.md")
+            || stdout.contains("[OK] All views already up to date"),
+        "views sync must preserve stdout contract:\n{stdout}"
+    );
 
     let plan_md = root_dir.path().join("track/items/demo/plan.md");
     assert!(plan_md.is_file(), "plan.md must be rendered at {}", plan_md.display());

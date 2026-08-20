@@ -1,0 +1,718 @@
+{
+  "entries": [
+    {
+      "claim_hash": "b6314a6f6630faa78f643e438257db4353df12155589cd3eef276438ba92d091",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Track context 全体を、外部観測可能な CLI 契約を保ったまま、composition root が配線だけを担う純 DI の実行経路へ収束させて完了する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b6314a6f6630faa78f643e438257db4353df12155589cd3eef276438ba92d091",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Track context 全体を、外部観測可能な CLI 契約を保ったまま、composition root が配線だけを担う純 DI の実行経路へ収束させて完了する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 command 文脈 track は担当実行経路から互換 shim と中間 `*ServiceImpl` への参照・呼出し・逆委譲をすべて除去し、driver → usecase interactor → port の単一路を成立させた時点で完了できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b6314a6f6630faa78f643e438257db4353df12155589cd3eef276438ba92d091",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Track context 全体を、外部観測可能な CLI 契約を保ったまま、composition root が配線だけを担う純 DI の実行経路へ収束させて完了する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "baa96e5f5d4ccc20f73196b97dbd27caf6feb7a35c6ecaf494667a03e2a3796c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Track context の composition root に残る 34 個の public execution methods、3 個の解決 helper、およびそれらが依存する usecase input boundary、primary adapter、CLI command wiring を純 DI 化対象とする。対象には mod.rs、ops.rs、branch_strategy.rs、set_commit_hash.rs、tddd.rs、tddd_catalogue_lint.rs、resolution.rs の command contexts を含める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track の詳細な対象は Phase 3 の実装計画で確定する。依存関係や所有ファイルの重なりが判明した場合は D2 の範囲内で再分割できるが、同一 command 文脈の責務を不自然に分断してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "baa96e5f5d4ccc20f73196b97dbd27caf6feb7a35c6ecaf494667a03e2a3796c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Track context の composition root に残る 34 個の public execution methods、3 個の解決 helper、およびそれらが依存する usecase input boundary、primary adapter、CLI command wiring を純 DI 化対象とする。対象には mod.rs、ops.rs、branch_strategy.rs、set_commit_hash.rs、tddd.rs、tddd_catalogue_lint.rs、resolution.rs の command contexts を含める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は担当する command 文脈について、composition root から次の責務をすべて除去する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "baa96e5f5d4ccc20f73196b97dbd27caf6feb7a35c6ecaf494667a03e2a3796c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Track context の composition root に残る 34 個の public execution methods、3 個の解決 helper、およびそれらが依存する usecase input boundary、primary adapter、CLI command wiring を純 DI 化対象とする。対象には mod.rs、ops.rs、branch_strategy.rs、set_commit_hash.rs、tddd.rs、tddd_catalogue_lint.rs、resolution.rs の command contexts を含める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1・D2 は、純 DI 移行が実際に改修する command 文脈の usecase ポートにのみ適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "09e22855ceacedfae2db0e8d5fec836a89b3e143cf7ae6c3988062452b07de27",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "対象 execution path から composition root 上の command execution logic、CommandOutcome generation、直接 I/O、および usecase から composition root への逆委譲を除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は担当する command 文脈について、composition root から次の責務をすべて除去する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "09e22855ceacedfae2db0e8d5fec836a89b3e143cf7ae6c3988062452b07de27",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "対象 execution path から composition root 上の command execution logic、CommandOutcome generation、直接 I/O、および usecase から composition root への逆委譲を除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。 composition root の公開面に実行メソッド（リクエストを受けて結果を返すメソッド）を置くことを、interactor 呼び出し・driver 呼び出しの別を問わず禁止と明文化する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8851a00bff825ef147a7d2a37f7d5970cbf9143111ea6f386d377bb0908afda",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "対象 CLI subcommand ごとの execution boundary を分離し、primary adapter が command selection と presentation を担い、usecase boundary に未検証 primitive の位置引数または整形済み stdout / stderr 出力を露出させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「サブコマンドの選択（引数解析結果から実行対象を決める分岐）は primary adapter の責務であり、usecase 層にも composition root にも置かない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8851a00bff825ef147a7d2a37f7d5970cbf9143111ea6f386d377bb0908afda",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "対象 CLI subcommand ごとの execution boundary を分離し、primary adapter が command selection と presentation を担い、usecase boundary に未検証 primitive の位置引数または整形済み stdout / stderr 出力を露出させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "文字列整形と exit code への写像は primary adapter（`cli_driver`）が行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1・D2 は、純 DI 移行が実際に改修する command 文脈の usecase ポートにのみ適用する。移行対象外のポートを本決定を理由に改修しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3c20aaa0781c3be3fe4ff68c4fc6e717034e38b12bdcf723f70aeab721096a4f",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "semantic_dup command context と、Leaf commands、Support workflows、Collaboration workflows の composition root および usecase port の純 DI 化は本 track の対象外とする。ただし ADR baseline、review_v2、task_contract の旧 resolution helper 利用 call site の互換適応は IN-04 の範囲で行う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "\"依存関係や所有ファイルの重なりが判明した場合は D2 の範囲内で再分割できるが、同一 command 文脈の責務を不自然に分断してはならない。\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "077bec3765b259edd6671c66596172f193fbd05c0e888b01fd109934ca99958a",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "参照されなくなった compatibility definitions / exports の物理削除、全 composition root の最終適合、関連 lint・文書・export の最終同期、および initiative 全体の完了判定は Final convergence track の対象とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "参照されなくなった互換定義・export の物理削除は Final convergence track が一括して担い、それまでは新規利用を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "077bec3765b259edd6671c66596172f193fbd05c0e888b01fd109934ca99958a",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "参照されなくなった compatibility definitions / exports の物理削除、全 composition root の最終適合、関連 lint・文書・export の最終同期、および initiative 全体の完了判定は Final convergence track の対象とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "最終収束 track は、次の条件がすべて満たされた場合にのみイニシアチブを完了と判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d337a54415c9600b2559fe6ac98a91a5e92320805aa583b6918d193b7972518b",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-04",
+          "section": "out_of_scope",
+          "text_label": "Interactor と Application Service の別 crate への分離、または crate topology の変更は本 track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本イニシアチブでは crate topology を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d62505dc7ed3a0bbf919561f6c8d488fcc3ef2fa2a024193a544b192a91b6401",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "この track は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の migration track の変更を暗黙に前提にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は、単独でレビュー可能であり、CI を green に保ったまま統合できなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d62505dc7ed3a0bbf919561f6c8d488fcc3ef2fa2a024193a544b192a91b6401",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "この track は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の migration track の変更を暗黙に前提にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本イニシアチブでは crate topology を変更しない。Interactor と Application Service は、`libs/usecase` 内の適切な command 文脈 module に配置し、同じ application boundary の中で役割を分離する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9cdc494fc2865d8d008b456606828b2c1c6ae29fe72f6bc2c361296678d4582c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "Track context 全体の composition root の公開面は fully wired driver を引き渡す配線 API だけとなり、34 個の public execution method と 3 個の解決 helper を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。 composition root の公開面に実行メソッド（リクエストを受けて結果を返すメソッド）を置くことを、interactor 呼び出し・driver 呼び出しの別を問わず禁止と明文化する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "入力ポートは 1 ユースケースにつき 1 trait とし、実行メソッドを 1 つだけ持つ。\n\n複数ユースケースを束ねる `*Service` 様式の入力ポートを新設しない。既存のそれは移行時に解体する。\n\nサブコマンドの選択（引数解析結果から実行対象を決める分岐）は primary adapter の責務であり、usecase 層にも composition root にも置かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出力は `Result<結果型, エラー型>` とする。stdout / stderr に相当する整形済み文字列を返す型を usecase の公開面に置かない。\n\n文字列整形と exit code への写像は primary adapter（`cli_driver`）が行う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 command 文脈 track は担当実行経路から互換 shim と中間 `*ServiceImpl` への参照・呼出し・逆委譲をすべて除去し、driver → usecase interactor → port の単一路を成立させた時点で完了できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e2f1542b24de5184695ccaf0499c3cf87d5cb06fcc855a4ab9527e5bf87710a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-15-1302-composition-root-pure-di-port-granularity.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "規則の検査は catalogue lint に委ねる。... lint が検出しない逸脱は reviewer の判断に委ね",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_composition.md` のカテゴリに「composition 上の実行メソッド（interactor / driver いずれの invoke も）」「composition 公開面への domain / usecase 型および内部 role 型の露出」を追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "composition root の公開面規律は、新規の source-level 検査ではなく、既存の catalogue lint で強制する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "455c98a713083de054f6d9fbeec159986731241c483aba63891ba9fbdcbe41ef",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "この slice は、canonical review results の findings block が `findings: zero_findings` を示し、`cargo make ci-track` が成功し、他の未統合 migration track の成果物・変更・実行を前提にせず統合できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は、単独でレビュー可能であり、CI を green に保ったまま統合できなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "455c98a713083de054f6d9fbeec159986731241c483aba63891ba9fbdcbe41ef",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "この slice は、canonical review results の findings block が `findings: zero_findings` を示し、`cargo make ci-track` が成功し、他の未統合 migration track の成果物・変更・実行を前提にせず統合できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

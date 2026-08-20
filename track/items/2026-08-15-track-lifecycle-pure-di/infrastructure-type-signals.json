@@ -1,0 +1,160 @@
+{
+  "baseline_hash": "6709ec503abcc47bf77c2e5ffd3fc5a6e2d6cdd1db18560387994a6071914136",
+  "declaration_hash": "cdc5689c8b527be0647b6df57e174cfa60f5f1299f08328dfa70cea82bcb7fe7",
+  "generated_at": "2026-08-20T07:05:19Z",
+  "head_commit": "182ded3dc69cf5901c08438e925e5a57595287f5",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "usecase::track_lifecycle::TrackBranchStrategyPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsTrackBranchStrategyAdapter"
+    },
+    {
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackMetadataPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsTrackMetadataAdapter"
+    },
+    {
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackViewsPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsTrackViewsAdapter"
+    },
+    {
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackCommitHashPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "GitTrackCommitHashAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::TrackSelectionPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "GitTrackSelectionAdapter"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Default",
+        "usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackBaselineCaptureAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackBaselineGraphAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueImplSignalsAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueLintActiveAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueSpecSignalsAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackContractMapAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackLintAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::resolution_compat::TrackResolutionPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackResolutionAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackSpecElementHashAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackTypeGraphAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "SystemTrackTypeSignalsAdapter"
+    }
+  ]
+}

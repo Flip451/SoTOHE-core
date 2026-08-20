@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "9f5f3b70fcf3085922da562133139db534bb58e4e1057ed4ceae313ac3091b95",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "808180425f07e6fe45d38a33c0e641703f928435e6347ea4737fb3fcc51e15e7",
+      "signal": "blue",
+      "type_name": "TrackCommand"
+    },
+    {
+      "entry_hash": "cb0098d5809ca2d2932893773fed6a8c0001d6fca85aa0716c366856077ce2b6",
+      "signal": "blue",
+      "type_name": "cli::commands::track::tddd::type_signals::execute_type_signals"
+    }
+  ]
+}

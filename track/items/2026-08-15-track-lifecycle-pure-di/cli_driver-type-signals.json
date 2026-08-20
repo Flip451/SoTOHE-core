@@ -1,0 +1,240 @@
+{
+  "baseline_hash": "19468e40ed7a66ddc65e349190b8aa0bb166ed617ce20a4338733089d6783c34",
+  "declaration_hash": "c38579dc9ab85970e34d23706b37b82601fad3904aa433b52bb608d9d7ccf1c0",
+  "generated_at": "2026-08-20T07:05:20Z",
+  "head_commit": "182ded3dc69cf5901c08438e925e5a57595287f5",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "type_name": "TrackDriver"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackItemsDirectoryInput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "TryFrom<String>"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackLayerInput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackLayersInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackLintRulesFileInput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackResolutionDiagnostic"
+    },
+    {
+      "found_items": [
+        "Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "type_name": "TrackResolutionDriver"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TrackResolutionInput"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TrackResolutionOutcome"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "TryFrom<PathBuf>"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackSourceWorkspaceInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackSpecAnchorInput"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddBaselineCaptureInput"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddBaselineGraphInput"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueImplSignalsInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueLintActiveInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueSpecSignalsInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddContractMapInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "type_name": "TrackTdddDriver"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TrackTdddInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddLintInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddSpecElementHashInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddTypeGraphInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTdddTypeSignalsInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphClusterDepthInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphEdgeInput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "TryFrom<PathBuf>"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackWorkspaceRootInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackIdInput"
+    }
+  ]
+}

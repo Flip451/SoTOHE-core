@@ -9,7 +9,7 @@ use cli_driver::track::TrackInput;
 
 use crate::CliError;
 
-pub(super) fn track_driver_outcome_to_result(
+pub(crate) fn track_driver_outcome_to_result(
     outcome: CommandOutcome,
 ) -> Result<ExitCode, CliError> {
     let exit_code = outcome.exit_code;
@@ -235,8 +235,19 @@ mod tests {
         let (_root, items_dir, _track_dir) =
             setup_test_track_with_impl_plan(tmp.path(), "test-track");
 
-        let result = execute_task_counts(items_dir, "test-track".to_string());
+        let result = execute_task_counts(items_dir.clone(), "test-track".to_string());
         assert!(result.is_ok(), "expected Ok from task-counts: {result:?}");
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":1,"todo":1,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -247,11 +258,22 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
-        let result = execute_task_counts(items_dir, "test-track".to_string());
+        let result = execute_task_counts(items_dir.clone(), "test-track".to_string());
         assert!(
             result.is_ok(),
             "expected Ok on activated track without impl-plan.json: {result:?}"
         );
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":0,"todo":0,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -281,11 +303,22 @@ mod tests {
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
         let items_dir = tmp.path().join("track").join("items");
 
-        let result = execute_task_counts(items_dir, track_id.to_string());
+        let result = execute_task_counts(items_dir.clone(), track_id.to_string());
         assert!(
             result.is_ok(),
             "planning-only track without impl-plan.json must succeed with zero counts: {result:?}"
         );
+        assert_eq!(result.unwrap(), ExitCode::from(0));
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some(track_id.to_string()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":0,"todo":0,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None);
     }
 
     #[test]
@@ -304,8 +337,44 @@ mod tests {
         let items_dir = tmp.path().join("track").join("items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_task_counts(items_dir, "INVALID ID".to_string());
+        let result = execute_task_counts(items_dir.clone(), "INVALID ID".to_string());
         assert!(result.is_err());
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("INVALID ID".to_string()) });
+        assert_ne!(outcome.exit_code, 0);
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|stderr| stderr.contains("track id")),
+            "invalid track id must fail before execution: {:?}",
+            outcome.stderr
+        );
+        assert_eq!(outcome.stdout, None);
+    }
+
+    #[test]
+    fn test_track_task_counts_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, _track_dir) =
+            setup_test_track_with_impl_plan(tmp.path(), "test-track");
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_owned();
+
+        let cli_exit = execute_task_counts(argv_items_dir.clone(), argv_track_id.clone())
+            .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::TaskCounts { items_dir, track_id: Some("test-track".to_owned()) });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(r#"{"total":1,"todo":1,"in_progress":0,"done":0,"skipped":0}"#)
+        );
+        assert_eq!(outcome.stderr, None, "successful task-counts must not write stderr");
     }
 
     #[test]
@@ -399,6 +468,56 @@ mod tests {
     }
 
     #[test]
+    fn test_track_set_override_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_owned();
+        let argv_status = "blocked".to_owned();
+        let argv_reason = "migration blocker".to_owned();
+
+        let cli_exit = execute_set_override(
+            argv_items_dir.clone(),
+            argv_track_id.clone(),
+            argv_status.clone(),
+            argv_reason.clone(),
+        )
+        .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+        assert_eq!(argv_status, "blocked");
+        assert_eq!(argv_reason, "migration blocker");
+
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::SetOverride {
+            items_dir: items_dir.clone(),
+            track_id: Some("test-track".to_owned()),
+            status: "blocked".to_owned(),
+            reason: "migration blocker".to_owned(),
+        });
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|stdout| stdout.contains("Override set to 'blocked'")),
+            "stdout must keep the set-override summary: {:?}",
+            outcome.stdout
+        );
+        assert_eq!(outcome.stderr, None, "successful set-override must not write stderr");
+
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            content.contains("\"blocked\""),
+            "metadata.json must contain the override status after set-override:\n{content}"
+        );
+        assert!(
+            content.contains("migration blocker"),
+            "metadata.json must contain the override reason after set-override:\n{content}"
+        );
+    }
+
+    #[test]
     fn test_execute_clear_override_happy_path() {
         // Uses a branchless track fixture so the in-usecase branch guard is
         // skipped. First sets an override, then clears it. Verifies both the
@@ -419,6 +538,52 @@ mod tests {
         assert!(result.is_ok(), "clear-override with branchless track must succeed: {result:?}");
 
         // Verify the override was cleared from metadata.json.
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            !content.contains("\"blocked\""),
+            "metadata.json must not contain override status after clear-override:\n{content}"
+        );
+    }
+
+    #[test]
+    fn test_track_clear_override_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
+        execute_set_override(
+            items_dir.clone(),
+            "test-track".to_string(),
+            "blocked".to_string(),
+            "initial blocker".to_string(),
+        )
+        .expect("set-override must succeed before clear-override test");
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_string();
+        let cli_exit = execute_clear_override(argv_items_dir.clone(), argv_track_id.clone())
+            .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+
+        execute_set_override(
+            items_dir.clone(),
+            "test-track".to_string(),
+            "blocked".to_string(),
+            "initial blocker".to_string(),
+        )
+        .expect("override must be restored before outcome capture");
+        let outcome =
+            TrackCompositionRoot::new().track_driver().handle(TrackInput::ClearOverride {
+                items_dir: items_dir.clone(),
+                track_id: Some("test-track".to_string()),
+            });
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome.stdout.as_deref().is_some_and(|stdout| stdout.contains("Override cleared")),
+            "stdout must keep the cleared-override summary: {:?}",
+            outcome.stdout
+        );
+        assert_eq!(outcome.stderr, None, "successful clear-override must not write stderr");
         let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
         assert!(
             !content.contains("\"blocked\""),

@@ -8,7 +8,7 @@
 pub use domain::tddd::LayerId;
 pub use domain::tddd::test_obligation::ids::DiagnosticMessage;
 pub use domain::tddd::test_obligation::verdict::DetectionRatePercent;
-pub use domain::{NonEmptyString, Timestamp, TrackId, ValidationError};
+pub use domain::{NonEmptyString, SpecElementId, TaskId, Timestamp, TrackId, ValidationError};
 
 pub mod adr_baseline;
 pub mod arch;
@@ -82,6 +82,7 @@ pub mod telemetry;
 pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
+pub mod track_lifecycle;
 pub mod track_phase;
 pub mod track_resolution;
 pub mod track_service;
@@ -100,8 +101,8 @@ pub use telemetry::{
 use std::sync::Arc;
 
 use domain::{
-    CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TaskId,
-    TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
+    CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TrackMetadata,
+    TrackReadError, TrackReader, TrackWriteError, TrackWriter,
 };
 
 /// Persists a track aggregate.

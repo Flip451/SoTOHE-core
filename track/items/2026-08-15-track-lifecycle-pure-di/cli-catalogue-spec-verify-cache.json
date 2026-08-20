@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "808180425f07e6fe45d38a33c0e641703f928435e6347ea4737fb3fcc51e15e7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommand",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cb0098d5809ca2d2932893773fed6a8c0001d6fca85aa0716c366856077ce2b6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::tddd::type_signals::execute_type_signals",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cb0098d5809ca2d2932893773fed6a8c0001d6fca85aa0716c366856077ce2b6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::tddd::type_signals::execute_type_signals",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli",
+  "schema_version": 1
+}

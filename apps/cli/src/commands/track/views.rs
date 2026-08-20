@@ -3,6 +3,9 @@ use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
 use cli_driver::track::TrackInput;
+use cli_driver::track_resolution::{
+    TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -43,7 +46,14 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
 fn detect_active_track_from_branch(project_root: &Path) -> Option<String> {
-    TrackCompositionRoot::new().detect_active_track_from_branch(project_root)
+    let workspace_root = TrackWorkspaceRootInput::try_new(project_root.to_path_buf()).ok()?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::DetectActive { workspace_root })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Some(track_id.to_string()),
+        TrackResolutionOutcome::Inactive | TrackResolutionOutcome::Failed(_) => None,
+    }
 }
 
 #[cfg(test)]
@@ -109,6 +119,15 @@ mod tests {
         }
 
         root
+    }
+
+    #[test]
+    fn test_views_detect_active_uses_resolution_driver() {
+        let source = include_str!("views.rs");
+        let production = source.split("#[cfg(test)]").next().expect("production source");
+        assert!(production.contains("TrackResolutionInput::DetectActive"));
+        assert!(production.contains("track_resolution_driver"));
+        assert!(!production.contains("TrackServiceImpl"));
     }
 
     #[test]
@@ -197,5 +216,111 @@ mod tests {
                 "WRITE guard must pass for matching track-id, got: {msg}"
             );
         }
+    }
+
+    #[test]
+    fn test_execute_views_sync_persists_rendered_views_and_returns_success() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/views-track");
+        let track_dir = root.join("track/items/views-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "views-track",
+  "branch": null,
+  "title": "Views Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap();
+
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("views-track".to_owned()),
+        });
+
+        assert!(result.is_ok(), "matching views sync must succeed: {result:?}");
+        assert!(root.join("track/registry.md").is_file(), "registry.md must persist");
+        assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
+    }
+
+    #[test]
+    fn test_execute_views_validate_preserves_success_cli_contract() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/views-track");
+        std::fs::create_dir_all(root.join("track/items")).unwrap();
+
+        let argv_project_root = root.clone();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+        let result =
+            execute_views(ViewAction::Validate { project_root: argv_project_root.clone() });
+
+        assert!(result.is_ok(), "empty workspace validate must succeed: {result:?}");
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] Track metadata is valid"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root);
+    }
+
+    #[test]
+    fn test_execute_views_validate_preserves_failure_cli_contract() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/bad-track");
+        let track_dir = root.join("track/items/bad-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), "{").unwrap();
+
+        let argv_project_root = root.clone();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+        let result =
+            execute_views(ViewAction::Validate { project_root: argv_project_root.clone() });
+
+        assert!(result.is_err(), "invalid metadata must fail: {result:?}");
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().unwrap_or_default();
+        assert!(
+            stderr.starts_with("[ERROR] track metadata validation failed:"),
+            "stderr must preserve the views-validate failure contract:\n{stderr}"
+        );
+        assert_eq!(outcome.stdout, None);
+        let err_msg = format!("{:?}", result.unwrap_err());
+        assert!(
+            err_msg.contains("track metadata validation failed"),
+            "CLI error must preserve the failure contract, got: {err_msg}"
+        );
+        assert_eq!(argv_project_root, root);
     }
 }

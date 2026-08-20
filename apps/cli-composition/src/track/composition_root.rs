@@ -1,19 +1,12 @@
 //! Per-context composition root for the `track` command family.
 //!
-//! `TrackCompositionRoot` replaces the `CliApp` god-facade for all `track`
-//! subcommands.  The struct is a unit struct because no adapter dependencies
-//! are injected at construction time — each method constructs its own adapters
-//! inline from the arguments it receives (hexagonal composition pattern).
-//!
-//! `CliApp` keeps backward-compatible shim methods in `track/shim.rs` that
-//! construct a `TrackCompositionRoot` and delegate, so all existing call-sites
-//! in `apps/cli` continue to compile without change.
+//! `TrackCompositionRoot` is a unit struct whose public surface only constructs
+//! wired drivers. CLI handlers obtain a driver and invoke `handle` themselves.
 
 /// Composition root for the `track` command family.
 ///
-/// This is a unit struct: no adapter dependencies are injected at construction
-/// time.  All port adapters are wired inside individual methods from the
-/// runtime arguments they receive (in-method composition).
+/// Public methods are driver factories. Port adapters are wired inside the
+/// factory helpers and never invoked from this type.
 pub struct TrackCompositionRoot;
 
 impl TrackCompositionRoot {
@@ -38,14 +31,108 @@ impl TrackCompositionRoot {
     pub fn track_driver(&self) -> cli_driver::track::TrackDriver {
         build_track_driver()
     }
+
+    /// Build the focused TDDD baseline-capture driver.
+    pub fn track_tddd_driver(&self) -> cli_driver::track_tddd::TrackTdddDriver {
+        build_track_tddd_driver()
+    }
+
+    /// Build the compatibility resolution driver used by foreign command
+    /// contexts while the legacy resolution wrappers remain in place.
+    pub fn track_resolution_driver(&self) -> cli_driver::track_resolution::TrackResolutionDriver {
+        use std::sync::Arc;
+
+        let adapter = Arc::new(
+            infrastructure::track_lifecycle::resolution_compat::SystemTrackResolutionAdapter,
+        );
+        let service = Arc::new(
+            usecase::track_lifecycle::resolution_compat::TrackResolutionInteractor::new(adapter),
+        );
+        cli_driver::track_resolution::TrackResolutionDriver::new(service)
+    }
 }
 
 pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
     use std::sync::Arc;
 
-    use super::service_impl::TrackServiceImpl;
-
-    let service = Arc::new(TrackServiceImpl);
+    let track_init_service =
+        Arc::new(usecase::track_lifecycle::track_init::TrackInitInteractor::new(
+            Arc::new(infrastructure::track::FsTrackMetadataAdapter::new()),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
+    let track_transition_service =
+        Arc::new(usecase::track_lifecycle::track_transition::TrackTransitionInteractor::new(
+            Arc::new(RequestScopedTrackTaskTransitionAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
+    let track_archive_service =
+        Arc::new(usecase::track_lifecycle::track_archive::TrackArchiveInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::git_cli::workflow_adapter::FsWorkspaceAdapter::new()),
+        ));
+    let track_branch_create_service =
+        Arc::new(usecase::track_lifecycle::track_branch_create::TrackBranchCreateInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::git_cli::workflow_adapter::FsWorkspaceAdapter::new()),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+        ));
+    let track_branch_switch_service =
+        Arc::new(usecase::track_lifecycle::track_branch_switch::TrackBranchSwitchInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+        ));
+    let track_add_task_service =
+        Arc::new(usecase::track_lifecycle::track_add_task::TrackAddTaskInteractor::new(
+            Arc::new(RequestScopedTrackTaskAddAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
+    let track_next_task_service =
+        Arc::new(usecase::track_lifecycle::track_next_task::TrackNextTaskInteractor::new(
+            Arc::new(RequestScopedTrackNextTaskQueryAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
+    let track_task_counts_service = track_task_counts_service();
+    let track_set_override_service =
+        Arc::new(usecase::track_lifecycle::track_set_override::TrackSetOverrideInteractor::new(
+            Arc::new(RequestScopedTrackOverrideSetAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
+    let track_clear_override_service = Arc::new(
+        usecase::track_lifecycle::track_clear_override::TrackClearOverrideInteractor::new(
+            Arc::new(RequestScopedTrackOverrideClearAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ),
+    );
+    let track_set_commit_hash_service = Arc::new(
+        usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor::new(
+            Arc::new(infrastructure::track::GitTrackCommitHashAdapter::new()),
+        ),
+    );
+    let track_switch_base_service =
+        Arc::new(usecase::track_lifecycle::track_switch_base::TrackSwitchBaseInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+        ));
+    let track_resolve_service =
+        Arc::new(usecase::track_lifecycle::track_resolve::TrackResolveInteractor::new(
+            Arc::new(RequestScopedTrackPhaseAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
+    let track_views_sync_service =
+        Arc::new(usecase::track_lifecycle::track_views_sync::TrackViewsSyncInteractor::new(
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
+    let track_views_validate_service = Arc::new(
+        usecase::track_lifecycle::track_views_validate::TrackViewsValidateInteractor::new(
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ),
+    );
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
             Arc::new(
@@ -66,5 +153,752 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
         base_merge_cleanup,
     ));
-    cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service, base_merge_service)
+    cli_driver::track::TrackDriver::new(
+        track_init_service,
+        track_transition_service,
+        track_branch_switch_service,
+        track_resolve_service,
+        track_views_validate_service,
+        track_views_sync_service,
+        track_add_task_service,
+        track_set_override_service,
+        track_clear_override_service,
+        track_next_task_service,
+        track_task_counts_service,
+        track_archive_service,
+        track_branch_create_service,
+        track_switch_base_service,
+        track_set_commit_hash_service,
+        fixpoint_resolve_service,
+        base_merge_service,
+    )
+}
+
+pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriver {
+    use std::sync::Arc;
+
+    let operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::baseline_capture::SystemTrackBaselineCaptureAdapter,
+    );
+    let resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let service = Arc::new(
+        usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCaptureInteractor::new(
+            operation, resolver,
+        ),
+    );
+    let baseline_graph_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::baseline_graph::SystemTrackBaselineGraphAdapter,
+    );
+    let baseline_graph_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let baseline_graph_service = Arc::new(
+        usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphInteractor::new(
+            baseline_graph_operation,
+            baseline_graph_resolver,
+        ),
+    );
+    let catalogue_impl_signals_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::catalogue_impl_signals::SystemTrackCatalogueImplSignalsAdapter,
+    );
+    let catalogue_impl_signals_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let catalogue_impl_signals_service = Arc::new(
+        usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsInteractor::new(
+            catalogue_impl_signals_operation,
+            catalogue_impl_signals_resolver,
+        ),
+    );
+    let catalogue_spec_signals_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::catalogue_spec_signals::SystemTrackCatalogueSpecSignalsAdapter,
+    );
+    let catalogue_spec_signals_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let catalogue_spec_signals_service = Arc::new(
+        usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsInteractor::new(
+            catalogue_spec_signals_operation,
+            catalogue_spec_signals_resolver,
+        ),
+    );
+    let spec_element_hash_service = Arc::new(
+        usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::spec_element_hash::SystemTrackSpecElementHashAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ),
+    );
+    let catalogue_lint_active_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter,
+    );
+    let catalogue_lint_active_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let catalogue_lint_active_service = Arc::new(
+        usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActiveInteractor::new(
+            catalogue_lint_active_operation,
+            catalogue_lint_active_resolver,
+        ),
+    );
+    let lint_operation =
+        Arc::new(infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter);
+    let lint_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let lint_service = Arc::new(usecase::track_lifecycle::tddd::lint::TrackLintInteractor::new(
+        lint_operation,
+        lint_resolver,
+    ));
+    let contract_map_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::contract_map::SystemTrackContractMapAdapter,
+    );
+    let contract_map_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let contract_map_service =
+        Arc::new(usecase::track_lifecycle::tddd::contract_map::TrackContractMapInteractor::new(
+            contract_map_operation,
+            contract_map_resolver,
+        ));
+    let type_signals_service =
+        Arc::new(usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::type_signals::SystemTrackTypeSignalsAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
+    let type_graph_service =
+        Arc::new(usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::type_graph::SystemTrackTypeGraphAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
+    cli_driver::track_tddd::TrackTdddDriver::new(
+        type_signals_service,
+        type_graph_service,
+        baseline_graph_service,
+        contract_map_service,
+        catalogue_spec_signals_service,
+        spec_element_hash_service,
+        service,
+        lint_service,
+        catalogue_impl_signals_service,
+        catalogue_lint_active_service,
+    )
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory.
+///
+/// T006 reuses `TaskOperationInteractor` as `TrackTaskAddPort`; the store root is
+/// request-scoped, so this wiring helper reconstructs that interactor per call.
+struct RequestScopedTrackTaskAddAdapter;
+
+impl usecase::track_lifecycle::TrackTaskAddPort for RequestScopedTrackTaskAddAdapter {
+    fn add_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+        description: domain::NonEmptyString,
+        section: Option<domain::NonEmptyString>,
+        after: Option<domain::TaskId>,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::track_lifecycle::TrackTaskAddPort::add_task(
+            &interactor,
+            track_id,
+            items_dir,
+            description,
+            section,
+            after,
+        )
+    }
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory
+/// for a task transition.
+struct RequestScopedTrackTaskTransitionAdapter;
+
+impl usecase::track_lifecycle::TrackTaskTransitionPort for RequestScopedTrackTaskTransitionAdapter {
+    fn transition_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+        task_id: domain::TaskId,
+        transition: usecase::track_lifecycle::TrackTaskTransition,
+    ) -> Result<usecase::task_ops::TaskTransitionOutcome, usecase::task_ops::TaskOperationError>
+    {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::track_lifecycle::TrackTaskTransitionPort::transition_task(
+            &interactor,
+            track_id,
+            items_dir,
+            task_id,
+            transition,
+        )
+    }
+}
+
+/// Rebuilds `TrackPhaseInteractor` from the command's items directory.
+///
+/// `TrackPhaseInteractor` captures a store root, so this request-scoped adapter
+/// reconstructs that interactor for each resolve call.
+struct RequestScopedTrackPhaseAdapter;
+
+impl usecase::track_phase::TrackPhaseService for RequestScopedTrackPhaseAdapter {
+    fn resolve(
+        &self,
+        track_id: String,
+        items_dir: std::path::PathBuf,
+    ) -> Result<usecase::track_phase::TrackPhaseOutput, usecase::track_phase::TrackPhaseError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+        usecase::track_phase::TrackPhaseInteractor::new(store).resolve(track_id, items_dir)
+    }
+}
+
+pub(crate) fn track_task_counts_service()
+-> std::sync::Arc<dyn usecase::track_lifecycle::track_task_counts::TrackTaskCountsService> {
+    use std::sync::Arc;
+
+    Arc::new(usecase::track_lifecycle::track_task_counts::TrackTaskCountsInteractor::new(
+        Arc::new(RequestScopedTrackTaskCountsQueryAdapter),
+        Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+    ))
+}
+
+struct RequestScopedTrackNextTaskQueryAdapter;
+
+impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNextTaskQueryAdapter {
+    fn next_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        Option<usecase::task_ops::NextTaskOutput>,
+        usecase::track_lifecycle::track_next_task::TrackNextTaskError,
+    > {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let query = usecase::task_ops::TaskQueryInteractor::new(store);
+        usecase::track_lifecycle::TrackNextTaskQueryPort::next_task(&query, track_id, items_dir)
+    }
+}
+
+struct RequestScopedTrackTaskCountsQueryAdapter;
+
+impl usecase::track_lifecycle::TrackTaskCountsQueryPort
+    for RequestScopedTrackTaskCountsQueryAdapter
+{
+    fn task_counts(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        usecase::task_ops::TaskCountsOutput,
+        usecase::track_lifecycle::track_task_counts::TrackTaskCountsError,
+    > {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let query = usecase::task_ops::TaskQueryInteractor::new(store);
+        usecase::track_lifecycle::TrackTaskCountsQueryPort::task_counts(&query, track_id, items_dir)
+    }
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory
+/// for a clear-override mutation. The port remains request-scoped so the storage root
+/// is never captured in a long-lived composition object.
+struct RequestScopedTrackOverrideClearAdapter;
+
+impl usecase::track_lifecycle::TrackOverrideClearPort for RequestScopedTrackOverrideClearAdapter {
+    fn clear_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::task_ops::TaskOperationService::clear_override(
+            &interactor,
+            usecase::task_ops::ClearOverrideCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+            },
+        )
+    }
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory
+/// for a set-override mutation. The port remains request-scoped so the storage root
+/// is never captured in a long-lived composition object.
+struct RequestScopedTrackOverrideSetAdapter;
+
+impl usecase::track_lifecycle::TrackOverrideSetPort for RequestScopedTrackOverrideSetAdapter {
+    fn set_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+        status: domain::StatusOverrideKind,
+        reason: usecase::git_workflow::DiagnosticText,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::track_lifecycle::TrackOverrideSetPort::set_override(
+            &interactor,
+            track_id,
+            items_dir,
+            status,
+            reason,
+        )
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use cli_driver::track::TrackInput;
+
+    #[test]
+    fn test_track_composition_root_is_wire_only() {
+        let source = include_str!("composition_root.rs");
+        let production = source.split("#[cfg(test)]").next().expect("production source");
+        let mut public_fns: Vec<&str> = production
+            .lines()
+            .filter_map(|line| {
+                let trimmed = line.trim_start();
+                trimmed
+                    .strip_prefix("pub async fn ")
+                    .or_else(|| trimmed.strip_prefix("pub fn "))
+                    .and_then(|rest| rest.split('(').next())
+            })
+            .collect();
+        public_fns.sort_unstable();
+        assert_eq!(
+            public_fns,
+            ["new", "track_driver", "track_resolution_driver", "track_tddd_driver"]
+        );
+        assert!(!production.contains("pub async fn"));
+        assert!(!production.contains("TrackServiceImpl"));
+        assert!(!production.contains("compatibility shim"));
+        assert!(!production.contains(".handle("));
+        assert!(!production.contains(".handle_"));
+        assert!(!production.contains("pub fn track_init"));
+        assert!(!production.contains("pub fn track_resolve_id"));
+
+        let root = TrackCompositionRoot::new();
+        let _track_driver: cli_driver::track::TrackDriver = root.track_driver();
+        let _tddd_driver: cli_driver::track_tddd::TrackTdddDriver = root.track_tddd_driver();
+        let _resolution_driver: cli_driver::track_resolution::TrackResolutionDriver =
+            root.track_resolution_driver();
+        let invalid = TrackInput::Init {
+            items_dir: std::path::PathBuf::from("track/items"),
+            track_id: "../escape".to_owned(),
+            description: "wire-only".to_owned(),
+        };
+        let outcome = _track_driver.handle(invalid);
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.as_ref().is_some_and(|stderr| !stderr.is_empty()));
+    }
+
+    #[test]
+    fn test_track_resolve_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("resolve-regression");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "resolve-regression",
+  "branch": null,
+  "title": "Resolve Regression",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "in_progress"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = Some("resolve-regression".to_owned());
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::Resolve {
+            items_dir: argv_items_dir.clone(),
+            track_id: argv_track_id.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: In Progress\nReason: track has unresolved tasks\nRecommended next command: /track:implement"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+        assert!(!outcome.stdout.as_deref().unwrap_or_default().contains("signal report"));
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_track_id.as_deref(), Some("resolve-regression"));
+    }
+
+    #[test]
+    fn test_track_resolve_blocked_call_site_includes_blocker() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("blocked-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "blocked-track",
+  "branch": null,
+  "title": "Blocked Track",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "status_override": {"status": "blocked", "reason": "waiting on review"},
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::Resolve { items_dir, track_id: Some("blocked-track".to_owned()) });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: Blocked\nReason: waiting on review\nRecommended next command: /track:status\nBlocker: waiting on review"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+    }
+
+    #[test]
+    fn test_track_set_override_active_selection_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/active-track");
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("active-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "active-track",
+  "branch": null,
+  "title": "Active Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = None;
+        let argv_status = "blocked".to_owned();
+        let argv_reason = "active-selection blocker".to_owned();
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::SetOverride {
+            items_dir: argv_items_dir.clone(),
+            track_id: argv_track_id,
+            status: argv_status.clone(),
+            reason: argv_reason.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|stdout| stdout.contains("Override set to 'blocked'"))
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_status, "blocked");
+        assert_eq!(argv_reason, "active-selection blocker");
+        let persisted = std::fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(persisted.contains("\"blocked\""));
+        assert!(persisted.contains("active-selection blocker"));
+    }
+
+    #[test]
+    fn test_track_transition_call_site_persists_status() {
+        let root = tempfile::tempdir().unwrap();
+        let run_git = |args: &[&str]| {
+            let status = std::process::Command::new("git")
+                .args(args)
+                .current_dir(root.path())
+                .status()
+                .expect("git command failed to spawn");
+            assert!(status.success(), "git {args:?} failed with {status}");
+        };
+        run_git(&["init", "-q"]);
+        run_git(&["config", "user.email", "test@example.com"]);
+        run_git(&["config", "user.name", "Test"]);
+        run_git(&["config", "commit.gpgsign", "false"]);
+        run_git(&["commit", "--allow-empty", "-q", "-m", "init", "--no-gpg-sign"]);
+        run_git(&["branch", "-m", "track/synthetic-2026"]);
+        run_git(&["branch", "main"]);
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("synthetic-2026");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "synthetic-2026",
+  "branch": null,
+  "title": "Persist Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    { "id": "T001", "description": "First task", "status": "todo" },
+    { "id": "T002", "description": "Remaining work", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001", "T002"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("batch-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "track_id": "synthetic-2026",
+  "task_estimates": [
+    {"task_id":"T001","scope_estimates":[{"scope":"domain","production_lines":10,"test_lines":5}],"oversize_justification":null},
+    {"task_id":"T002","scope_estimates":[{"scope":"domain","production_lines":10,"test_lines":5}],"oversize_justification":null}
+  ],
+  "batches":[{"id":"B1","task_ids":["T001","T002"]}]
+}"#,
+        )
+        .unwrap();
+        let config_dir = root.path().join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("review-scope.json"),
+            r#"{"version":2,"groups":{"domain":{"patterns":["libs/domain/**"]}},"review_operational":[],"other_track":[],"default_diff_ceiling_lines":500}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            config_dir.join("scope-diff-exclusions.json"),
+            r#"{"schema_version":1,"exclusions":["target/**"]}"#,
+        )
+        .unwrap();
+
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::Transition {
+            items_dir: items_dir.clone(),
+            track_id: Some("synthetic-2026".to_owned()),
+            task_id: "T001".to_owned(),
+            target_status: "in_progress".to_owned(),
+            commit_hash: None,
+        });
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        let persisted = std::fs::read_to_string(track_dir.join("impl-plan.json")).unwrap();
+        assert!(
+            persisted.contains("\"in_progress\""),
+            "transition must persist in_progress:\n{persisted}"
+        );
+        let metadata = std::fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            !metadata.contains("\"status\""),
+            "metadata must not store derived status:\n{metadata}"
+        );
+    }
+
+    #[test]
+    fn test_track_views_sync_call_site_persists_views_and_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/views-track");
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("views-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "views-track",
+  "branch": null,
+  "title": "Views Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let argv_track_id = Some("views-track".to_owned());
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::ViewsSync {
+            project_root: argv_project_root.clone(),
+            track_id: argv_track_id.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        let stdout = outcome.stdout.as_deref().unwrap_or_default();
+        assert!(
+            stdout.contains("[OK] Rendered: track/registry.md")
+                || stdout.contains("[OK] Rendered: track/items/views-track/plan.md")
+                || stdout.contains("[OK] All views already up to date"),
+            "stdout must preserve the views-sync contract:\n{stdout}"
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root.path());
+        assert_eq!(argv_track_id.as_deref(), Some("views-track"));
+        assert!(root.path().join("track/registry.md").is_file(), "registry.md must persist");
+        assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
+    }
+
+    #[test]
+    fn test_track_views_validate_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/views-track");
+        std::fs::create_dir_all(root.path().join("track/items")).unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] Track metadata is valid"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root.path());
+    }
+
+    #[test]
+    fn test_track_views_validate_call_site_preserves_failure_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/bad-track");
+        let track_dir = root.path().join("track/items/bad-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), "{").unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().unwrap_or_default();
+        assert!(
+            stderr.starts_with("[ERROR] track metadata validation failed:"),
+            "stderr must preserve the views-validate failure contract:\n{stderr}"
+        );
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(argv_project_root, root.path());
+    }
 }

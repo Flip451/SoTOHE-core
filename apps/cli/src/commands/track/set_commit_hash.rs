@@ -1,27 +1,32 @@
 //! `sotp track set-commit-hash` — persist the current HEAD SHA to `.commit_hash`.
 
+use std::io::Write;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::adr_baseline::TrackIdInput;
 
 use crate::CliError;
 
 /// Persist the current HEAD SHA to `.commit_hash` for the active track.
 ///
-/// Delegates to `CliApp::track_set_commit_hash`, which encapsulates all domain
-/// type construction and I/O.  On failure the composition layer emits the error
-/// and recovery hint to stderr, and the process exits with a non-zero code.
+/// Delegates to the wired Track primary adapter. The driver owns the presentation
+/// strings; this handler only emits the returned streams and exit code.
 ///
 /// # Errors
 ///
 /// Returns `CliError` when the composition layer itself returns an unexpected
 /// `Err` (distinct from a failure `CommandOutcome`).
 pub fn execute_set_commit_hash(track_id: String) -> Result<ExitCode, CliError> {
-    let app = TrackCompositionRoot::new();
-    let outcome =
-        app.track_set_commit_hash(&track_id).map_err(|e| CliError::Message(e.to_string()))?;
+    let track_id = track_id
+        .parse::<TrackIdInput>()
+        .map_err(|error| CliError::Message(format!("invalid track id: {error}")))?;
+    let outcome = TrackCompositionRoot::new().track_driver().handle_set_commit_hash(track_id);
     if let Some(ref s) = outcome.stdout {
-        println!("{s}");
+        writeln!(std::io::stdout(), "{s}").map_err(CliError::Io)?;
+    }
+    if let Some(ref s) = outcome.stderr {
+        writeln!(std::io::stderr(), "{s}").map_err(CliError::Io)?;
     }
     Ok(ExitCode::from(outcome.exit_code))
 }
