@@ -1,0 +1,496 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args": {
+      "action": "add",
+      "docs": "`build_grok_ref_verifier_args` — grok argv builder. prompt is unconstrained briefing text. AC-01, AC-02, AC-03, IN-01, IN-02, IN-03, CN-02, GO-01.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&usecase::capability_exec::ModelName"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "sandbox",
+          "ty": "&GrokSandbox"
+        },
+        {
+          "name": "resume_id",
+          "ty": "Option<&usecase::provider_session::ProviderSessionId>"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner": {
+      "action": "reference",
+      "docs": "`make_ref_verifier_process_runner` — shared process-runner factory (reference). AC-05, AC-09, IN-04, CN-01, CN-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "std::path::PathBuf"
+        }
+      ],
+      "returns": "std::sync::Arc<AgentExecutionRunner>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "GrokCapabilityDefinition": {
+      "action": "reference",
+      "docs": "`GrokCapabilityDefinition` — grok adapter-definition DTO (reference). capability is path-segment text. AC-03, IN-03, CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "model",
+              "ty": "Option<usecase::capability_exec::ModelName>"
+            },
+            {
+              "name": "sandbox",
+              "ty": "Option<GrokSandbox>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&usecase::capability_exec::ModelName>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "profile_model",
+              "ty": "&usecase::capability_exec::ModelName"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityFailureDetail>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "sandbox",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&GrokSandbox>"
+        }
+      ],
+      "module_path": "capability_exec::grok",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "GrokEnvelopeError": {
+      "action": "reference",
+      "docs": "`GrokEnvelopeError` — envelope-boundary error (reference). AC-04, CN-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProviderFailure",
+            "payload": {
+              "fields": [
+                {
+                  "name": "failure_reason",
+                  "ty": "usecase::capability_exec::CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "grok_common",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "GrokOutputEnvelope": {
+      "action": "reference",
+      "docs": "`GrokOutputEnvelope` — grok envelope DTO (reference). structured_output is opaque JSON. AC-04, IN-03, CN-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Succeeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "structured_output",
+                  "ty": "serde_json::Value"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Failed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "failure_reason",
+                  "ty": "usecase::capability_exec::CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_structured_output",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<serde_json::Value, GrokEnvelopeError>"
+        }
+      ],
+      "module_path": "grok_common",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "GrokSandbox": {
+      "action": "reference",
+      "docs": "`GrokSandbox` — grok --sandbox vocabulary (reference). AC-03, IN-03, CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Workspace",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Strict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ProjectProfile",
+            "payload": {
+              "fields": [
+                "GrokSandboxProfileName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "grok_common",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "GrokSandboxProfileName": {
+      "action": "reference",
+      "docs": "`GrokSandboxProfileName` — grok project-profile name (reference). try_new value is unvalidated constructor input. AC-03, CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, GrokSandboxProfileNameError>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "grok_common",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "GrokSandboxProfileNameError": {
+      "action": "reference",
+      "docs": "`GrokSandboxProfileNameError` — GrokSandboxProfileName constructor error (reference). AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Reserved",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "grok_common",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    },
+    "ResolvedExecution": {
+      "action": "reference",
+      "docs": "`ResolvedExecution` — resolved provider/model/effort descriptor (reference). AC-01, AC-02, IN-01, IN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProviderCli",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "usecase::capability_exec::ProviderName"
+                },
+                {
+                  "name": "model",
+                  "ty": "usecase::capability_exec::ModelName"
+                },
+                {
+                  "name": "effort",
+                  "ty": "usecase::capability_exec::ReasoningEffort"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "HostedService",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "usecase::capability_exec::ProviderName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles::types",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ]
+    }
+  }
+}

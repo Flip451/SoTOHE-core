@@ -1,0 +1,338 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "対象 4 capability のそれぞれについて、provider が grok の profile は、未対応の grok provider として fail-closed せず grok を起動する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "対象 4 capability のそれぞれについて、fast_provider が grok の profile は、未対応の grok provider として fail-closed せず fast 側の grok を起動する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "それら経路での grok 実行が成功したとき、返却は envelope の構造化出力フィールドの値だけである。その値が無い場合は fail-closed し、envelope の失敗理由を出し、テキスト欄を結果として扱わない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-05",
+      "text": "対象 4 capability は、既存の共有 provider-dispatching process runner 上の grok arm 1 本を共有し、それぞれ独立した grok runner を持たない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-06",
+      "text": "変更後も、対象 4 capability の committed agent-profiles.json と sample profile の provider / fast_provider 値は grok を選ばない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-07",
+      "text": "committed の reviewer は provider が grok、model が grok-4.6 であり、fast_provider は codex、fast_model は gpt-5.6-luna のままである。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-08",
+      "text": "pr-reviewer の hosted 経路は今回の CLI 起動契約の外に残り、grok を割り当て不能のままである。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-09",
+      "text": "対象 4 capability は capability exec の起動対象に追加されず、それぞれの typed-pipeline 専用経路から grok を起動する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "AC-10",
+      "text": "committed の agent-profiles.json を設定済み base と比較したとき、reviewer の provider と model 以外の capability shipped default（provider / model / fast_provider / fast_model）に差分が無い。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "対象 4 つの専用経路は専用経路のまま残し、capability exec に合流させない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "これら 4 経路の grok 実行の返却抽出は envelope の構造化出力フィールドに限り、テキスト欄は返却チャネルにしない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-04",
+      "text": "対象 4 capability は共有 process runner の grok arm 1 本を共有する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-05",
+      "text": "対象 4 経路と sample については割り当て可能性だけを提供し、それらの shipped な provider 値は grok に変えない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "CN-06",
+      "text": "shipped default を grok に書き換えるのは committed の reviewer に限る。他 capability の shipped default は変えない。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        },
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        },
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "現在 fail-closed している typed-pipeline 専用経路 4 つについて、provider と fast_provider の両方で grok を割り当て可能にする。起動は既存の grok 写像を共有 runner の grok arm 1 本で行い、専用経路を capability exec に合流させず、対象 4 経路と sample の committed 値は grok に書き換えず、shipped default の書き換えは committed の reviewer provider のみとする。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "agent-profiles.json の provider が grok のとき、次の 4 つの typed-pipeline 専用経路が grok を起動できる: ref-verifier-chain1、ref-verifier-chain2、obligation-fulfillment-verifier、waiver-verifier。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "同じ 4 capability について、fast_provider に grok を書いたときも、未対応 provider として fail-closed しない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。経路ごとの起動契約や例外表は新設しない。返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "対象 4 capability は、既存の共有 provider-dispatching process runner に足す grok arm 1 本を使う。capability ごとの独立した grok 起動経路は持たない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "IN-05",
+        "text": "committed の reviewer は provider を grok、model を grok-4.6 とする。fast_provider と fast_model は現行のまま（codex / gpt-5.6-luna）とする。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "対象 4 つの専用経路を capability exec に合流させることは対象外である。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "pr-reviewer の hosted 経路を grok 割り当て可能にすることは対象外である。hosted 経路は CLI 起動契約の外に残す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-03",
+        "text": "profile 上の全 capability、または grok arm が無い runner すべてへ今回の対象を広げることは対象外である。開集合は上記 4 名前の列挙で閉じる。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-04",
+        "text": "これら 4 経路向けの grok 起動契約や例外表を新設することは対象外である。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-05",
+        "text": "capability ごとに独立した grok runner を持つことは対象外である。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-06",
+        "text": "対象 4 capability について、committed の agent-profiles.json と sample profile の provider / fast_provider 値を grok に書き換えることは対象外である。その採否は設定者の編集に残す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-18-1534-grok-configurable-for-all-capabilities.md"
+          }
+        ],
+        "id": "OS-07",
+        "text": "reviewer 以外の capability の shipped default を grok に指すことは対象外である。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 29,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "欠ける typed-pipeline 専用経路に grok を割り当て可能にする",
+  "version": "1.0"
+}

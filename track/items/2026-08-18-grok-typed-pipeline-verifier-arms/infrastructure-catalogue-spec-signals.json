@@ -1,0 +1,51 @@
+{
+  "catalogue_declaration_hash": "5f339534cec1addd7c8857b32143f2c7990319ad0a96f1038a7cb5ffb568f220",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "28c6f3a72541a575c6fc6fb59ef6522ae5825392b16a3aea880d4181f83fd1b8",
+      "signal": "blue",
+      "type_name": "GrokCapabilityDefinition"
+    },
+    {
+      "entry_hash": "d9cc5eeb3d788ebf5460295639df3ed30525ee7ad9feb7a6129059f3aa6db885",
+      "signal": "blue",
+      "type_name": "GrokEnvelopeError"
+    },
+    {
+      "entry_hash": "62883aea8fe5e6269248cf9d8b2a9c742e24979296f04aa768c5d370cbe63def",
+      "signal": "blue",
+      "type_name": "GrokOutputEnvelope"
+    },
+    {
+      "entry_hash": "56d99d5678dd9e9db2d0093b65f319fcb600d8bea9ce35c07a4803355cf84f4f",
+      "signal": "blue",
+      "type_name": "GrokSandbox"
+    },
+    {
+      "entry_hash": "1196e96e2b7dc495b791a0f493e5a70853cfc78dd561ae5536d9caeb21339282",
+      "signal": "blue",
+      "type_name": "GrokSandboxProfileName"
+    },
+    {
+      "entry_hash": "0586f01f360b7686bd0607eea649cb4f92b6d3267e7cbecdf8556dbcd4c532b7",
+      "signal": "blue",
+      "type_name": "GrokSandboxProfileNameError"
+    },
+    {
+      "entry_hash": "3027710b59a40f29d77b37723eb2edb79df5b26e5968460f7ec239d5091049ab",
+      "signal": "blue",
+      "type_name": "ResolvedExecution"
+    },
+    {
+      "entry_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "signal": "blue",
+      "type_name": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+    },
+    {
+      "entry_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "signal": "blue",
+      "type_name": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner"
+    }
+  ]
+}
