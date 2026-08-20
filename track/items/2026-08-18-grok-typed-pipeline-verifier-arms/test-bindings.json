@@ -1,0 +1,30 @@
+{
+  "track_id": "2026-08-18-grok-typed-pipeline-verifier-arms",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ]
+    }
+  ]
+}

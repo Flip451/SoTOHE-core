@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-18-grok-typed-pipeline-verifier-arms",
+  "title": "欠ける typed-pipeline 専用経路に grok を割り当て可能にする",
+  "branch": "track/2026-08-18-grok-typed-pipeline-verifier-arms",
+  "created_at": "2026-08-18T15:50:05Z",
+  "updated_at": "2026-08-18T15:50:05Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
