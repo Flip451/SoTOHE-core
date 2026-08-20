@@ -268,6 +268,13 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             ),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let type_graph_service =
+        Arc::new(usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::type_graph::SystemTrackTypeGraphAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
     cli_driver::track_tddd::TrackTdddDriver::new(
         service,
         baseline_graph_service,
@@ -278,6 +285,7 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
         lint_service,
         contract_map_service,
         type_signals_service,
+        type_graph_service,
     )
 }
 

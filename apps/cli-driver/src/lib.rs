@@ -55,6 +55,7 @@ mod track_switch_base;
 mod track_task_counts;
 pub mod track_tddd;
 mod track_transition;
+mod track_type_graph;
 mod track_type_signals;
 mod track_views_sync;
 mod track_views_validate;

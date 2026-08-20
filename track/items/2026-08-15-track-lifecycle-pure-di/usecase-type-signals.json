@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
   "declaration_hash": "c020a4d50114b6596523f5e7ac8c753d0ce7845b352e0c377804f884c3c6ca98",
-  "generated_at": "2026-08-19T23:31:13Z",
-  "head_commit": "43cd8a3931062266b06841c5444abb01703c90f3",
+  "generated_at": "2026-08-20T03:27:12Z",
+  "head_commit": "00dae338f96077539ed18d90e927640822ff56f5",
   "schema_version": 4,
   "signals": [
     {
@@ -1329,67 +1329,67 @@
       "type_name": "TrackTransitionService"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "TrackTypeGraphClusterDepth"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTypeGraphCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "enum",
-      "missing_items": [
+      "found_items": [
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
       "type_name": "TrackTypeGraphEdgeSelection"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackTypeGraphError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackTypeGraphService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackTypeGraphInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTypeGraphPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTypeGraphResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTypeGraphService"
     },
     {

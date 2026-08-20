@@ -25,6 +25,24 @@
               "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
             }
           ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_path",
+          "params": [],
+          "receiver": "self",
+          "returns": "std::path::PathBuf",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackWorkspaceRootInput"

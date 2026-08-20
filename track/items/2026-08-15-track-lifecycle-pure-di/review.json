@@ -548,6 +548,49 @@
           "hash": "rvw1:sha256:53a79230abbe9a559a010cb337f82e22ac2a225c1d1816c3973ad9ada8d30044",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:00:45Z",
+          "findings": [
+            {
+              "category": "thin-bin boundary / incorrect dispatch",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 124,
+              "message": "`TypeGraph` still resolves the track ID in `dispatch_track_cmd` before calling `execute_type_graph`. When `--track-id` is omitted, an unavailable/non-track branch returns that resolution error without invoking `handle_type_graph`, so the removed command does not consistently produce the required T008 `catalogue-impl-signals` diagnostic. Pass the optional ID through to the typed driver input and let the driver boundary handle resolution/failure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:515935e2cc2c51003402f7c13d24b1f748f95b4b419ba1f6540b024b925b2cfc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T02:06:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2120aca269a8f3cdadb4a7ed80d9a7fed88718e17781975e0095a8cfe44dca7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:17:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2120aca269a8f3cdadb4a7ed80d9a7fed88718e17781975e0095a8cfe44dca7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:55:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4c5f940bb5d75034fd78a2b200cffdbbdec62f7043cf4cf3d9780c538153622",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T03:09:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4c5f940bb5d75034fd78a2b200cffdbbdec62f7043cf4cf3d9780c538153622",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -994,6 +1037,20 @@
           "at": "2026-08-19T23:18:49Z",
           "findings": [],
           "hash": "rvw1:sha256:cf556055dd89a18f4fc32f173cdf445721372856a5792af95103a1b1f8d1d59b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:00:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bfffe890f58e85122887eabe7767432a77785c5c53749273652022f0c3293e6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:08:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bfffe890f58e85122887eabe7767432a77785c5c53749273652022f0c3293e6b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1540,6 +1597,35 @@
           "at": "2026-08-19T23:29:37Z",
           "findings": [],
           "hash": "rvw1:sha256:522e23f4c9c1be5689baaf4dce9e5f6a21edf195243c1dc14154272c749d5447",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:01:06Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 411,
+              "message": "`TrackTdddDriver` now requires and invokes a `TrackTypeGraphService`, but this service is only a no-op removed-command substitute: every execution returns `RemovedCommand` and the result type is uninhabited. This adds an unnecessary driver dependency and public operation for a command that has no use-case behavior; keep the removed-command handling at the CLI boundary or inject a real use-case service.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3dc627b4044778486f052a4c23c902f5c581179089cd6c1fa83e753bf0f50d0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T02:06:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3dc627b4044778486f052a4c23c902f5c581179089cd6c1fa83e753bf0f50d0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:18:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3dc627b4044778486f052a4c23c902f5c581179089cd6c1fa83e753bf0f50d0",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2329,6 +2415,34 @@
           "hash": "rvw1:sha256:f2c9343d8f74e061b0e35efeb106d7c7c797804c0415e5db99f33c005c0aed84",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T00:48:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76477f0c54b4898bc3447206b1ecbb5ff9bf792fd0839d9ddc682988a2cfe922",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T01:11:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76477f0c54b4898bc3447206b1ecbb5ff9bf792fd0839d9ddc682988a2cfe922",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T01:59:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76477f0c54b4898bc3447206b1ecbb5ff9bf792fd0839d9ddc682988a2cfe922",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:22:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76477f0c54b4898bc3447206b1ecbb5ff9bf792fd0839d9ddc682988a2cfe922",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3088,6 +3202,34 @@
           "hash": "rvw1:sha256:e6fd0460c0ffc75cf6090f9eb410c968853c8c86797fe27bfcc4f7d2963ce149",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:00:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1792267e2929023e606b64f4dfd689bc63a0a96aca8ab3f4aee9b09e4972f77a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:47:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1792267e2929023e606b64f4dfd689bc63a0a96aca8ab3f4aee9b09e4972f77a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T03:13:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9373186040aa077207ecce73e2c477e012c2ab3ce6bb92391bb8e3d9903dfa9e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T03:14:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9373186040aa077207ecce73e2c477e012c2ab3ce6bb92391bb8e3d9903dfa9e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3776,6 +3918,34 @@
           "at": "2026-08-19T23:18:06Z",
           "findings": [],
           "hash": "rvw1:sha256:39090297229a001bf1443c0ae155417cf06b126f532b1725e14b7872f4452b00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T00:48:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:95378c9bc5c53b427669d984e14896c19a389b61f60621a5de3c36663dfeeb37",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T01:11:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f926210e097e003b2801989ef6aa6bf727d11c83a224b68af92afdacb77d8e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T01:59:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f926210e097e003b2801989ef6aa6bf727d11c83a224b68af92afdacb77d8e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:41:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f926210e097e003b2801989ef6aa6bf727d11c83a224b68af92afdacb77d8e8",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4504,6 +4674,20 @@
           "hash": "rvw1:sha256:cece4e6831910f9219fda718f6187e7e4638596b2249ee4bf52af9f090cd6c35",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:00:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:072b0c31f9bed89936b99da30bf1e71776ad55d34c8e55b80d0a9201695bf108",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:09:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:072b0c31f9bed89936b99da30bf1e71776ad55d34c8e55b80d0a9201695bf108",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4986,6 +5170,20 @@
           "at": "2026-08-19T23:15:06Z",
           "findings": [],
           "hash": "rvw1:sha256:1381f50ea62b4201b32e50dda0e9b40419e1c3f63538936b25777edc74e613e5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:00:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dbb7867d331af26f910408f3430eb0b724fffecb76e5b7db37a626f2000a288",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T02:10:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dbb7867d331af26f910408f3430eb0b724fffecb76e5b7db37a626f2000a288",
           "type": "final",
           "verdict": "zero_findings"
         }

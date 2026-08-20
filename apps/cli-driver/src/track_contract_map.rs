@@ -31,7 +31,7 @@ fn input_to_command(input: TrackTdddContractMapInput) -> Result<TrackContractMap
         .map_err(|error| error.to_string())
         .map(TrackSelection::from_input)?;
     let items_dir = input.items_dir.into_usecase().map_err(|error| error.to_string())?;
-    let workspace_root = input.workspace_root.into_usecase()?;
+    let workspace_root = input.workspace_root.into_usecase().map_err(|error| error.to_string())?;
     let layers = input.layers.map(|layers| layers.into_usecase()).unwrap_or(TrackLayerFilter::All);
     Ok(TrackContractMapCommand { track, items_dir, workspace_root, layers })
 }

@@ -210,6 +210,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "00dae338f96077539ed18d90e927640822ff56f5",
       "depends_on": [
         "T001",
         "T015"
@@ -305,7 +306,7 @@
       ],
       "description": "Implement the `TrackTypeGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_graph.rs`; wire `apps/cli/src/commands/track/tddd/graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T026",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "a051be92848a54dc9361630a4128108e3f88d92a",
@@ -349,7 +350,7 @@
       ],
       "description": "In `libs/usecase/src/track_lifecycle/` (`TrackMetadataPort`) and `libs/infrastructure/src/track/` (`FsTrackMetadataAdapter`), migrate metadata persistence behind the declared port and add persistence regressions. [IN-01; IN-02; CN-02; AC-03; AC-05]",
       "id": "T033",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

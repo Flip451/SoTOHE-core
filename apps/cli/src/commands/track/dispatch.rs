@@ -120,20 +120,14 @@ fn dispatch_track_cmd_with_dependencies(
             layer,
             cluster_depth,
             edges,
-        } => {
-            let resolved = resolve_track_id_from_root(track_id, &workspace_root)
-                .map_err(|e| CliError::Message(e.to_string()));
-            resolved.and_then(|tid| {
-                tddd::graph::execute_type_graph(
-                    items_dir,
-                    tid,
-                    workspace_root,
-                    layer,
-                    cluster_depth,
-                    edges,
-                )
-            })
-        }
+        } => tddd::graph::execute_type_graph(
+            items_dir,
+            track_id.unwrap_or_else(|| "removed-command".to_owned()),
+            workspace_root,
+            layer,
+            cluster_depth,
+            edges,
+        ),
         TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
             tddd::type_signals::execute_type_signals(track_id, workspace_root, layer)
         }
@@ -250,5 +244,77 @@ mod tests {
         let error = result.unwrap_err().to_string();
         assert!(error.contains("base merge failed"));
         assert!(!error.contains("base merge completed"));
+    }
+
+    #[test]
+    fn test_execute_type_graph_removed_command_returns_t008_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let argv_items = items_dir.clone();
+        let argv_track_id = Some("test-track".to_owned());
+        let argv_workspace = dir.path().to_path_buf();
+        let argv_layer = Option::<String>::None;
+        let argv_cluster_depth = 0usize;
+        let argv_edges = "methods".to_owned();
+
+        let result = dispatch_track_cmd(TrackCommand::TypeGraph {
+            items_dir: argv_items.clone(),
+            track_id: argv_track_id.clone(),
+            workspace_root: argv_workspace.clone(),
+            layer: argv_layer.clone(),
+            cluster_depth: argv_cluster_depth,
+            edges: argv_edges.clone(),
+        });
+
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("T008"), "error must mention T008: {msg}");
+        assert!(
+            msg.contains("catalogue-impl-signals"),
+            "error must mention the replacement command: {msg}"
+        );
+        assert_eq!(argv_items, items_dir);
+        assert_eq!(argv_track_id.as_deref(), Some("test-track"));
+        assert_eq!(argv_workspace, dir.path());
+        assert_eq!(argv_cluster_depth, 0);
+        assert_eq!(argv_edges, "methods");
+        assert!(
+            !dir.path().join("track/items/test-track").exists(),
+            "removed type-graph command must not persist artifacts"
+        );
+    }
+
+    #[test]
+    fn test_execute_type_graph_rejects_invalid_track_id_before_execution() {
+        let result = dispatch_track_cmd(TrackCommand::TypeGraph {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("../escape".to_owned()),
+            workspace_root: PathBuf::from("workspace"),
+            layer: None,
+            cluster_depth: 0,
+            edges: "methods".to_owned(),
+        });
+
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("invalid track id"), "got: {msg}");
+    }
+
+    #[test]
+    fn test_execute_type_graph_omitted_track_id_still_returns_t008_error() {
+        let result = dispatch_track_cmd(TrackCommand::TypeGraph {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: None,
+            workspace_root: PathBuf::from("workspace"),
+            layer: None,
+            cluster_depth: 0,
+            edges: "methods".to_owned(),
+        });
+
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("T008"), "error must mention T008: {msg}");
+        assert!(
+            msg.contains("catalogue-impl-signals"),
+            "error must mention the replacement command: {msg}"
+        );
     }
 }

@@ -12,5 +12,6 @@ pub mod tddd {
     pub mod contract_map;
     pub mod lint;
     pub mod spec_element_hash;
+    pub mod type_graph;
     pub mod type_signals;
 }

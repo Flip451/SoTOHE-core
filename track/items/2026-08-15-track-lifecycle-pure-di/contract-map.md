@@ -1191,6 +1191,7 @@ subgraph cli_driver["cli_driver"]
     direction TB
     T45_cli_driver_cli_driver_TrackWorkspaceRootInput__self[TrackWorkspaceRootInput]
     T45_cli_driver_cli_driver_TrackWorkspaceRootInput_try_new([try_new])
+    T45_cli_driver_cli_driver_TrackWorkspaceRootInput_into_path([into_path])
   end
   end
 end
@@ -2207,6 +2208,7 @@ class T45_cli_driver_cli_driver_TrackTypeGraphEdgeInput_Impls variant_node
 class T45_cli_driver_cli_driver_TrackTypeGraphEdgeInput_All variant_node
 class T45_cli_driver_cli_driver_TrackTypeGraphEdgeInput__self dto
 class T45_cli_driver_cli_driver_TrackWorkspaceRootInput_try_new method_node
+class T45_cli_driver_cli_driver_TrackWorkspaceRootInput_into_path method_node
 class T45_cli_driver_cli_driver_TrackWorkspaceRootInput__self dto
 class T52_cli_composition_cli_composition_TrackCompositionRoot_new method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_driver method_node

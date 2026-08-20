@@ -508,7 +508,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "ef44ec6c247c923ef68ba35e978f834e1c1ad7197af1cb67b3c082329847a0ad",
+        "bound_tests_set_hash": "a74d8f94122734d30822a824541cbb401391aea502cbd85dac335bd37f0be4da",
         "declaration_hash": "29d49b2efe8ed59d1ecdff49d5633154002c7bd5a39e0811591444c8cd9e08f2"
       },
       "obligation_id": {
@@ -517,7 +517,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"graph failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "citation": "let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\nassert_eq!(error.to_string(), \"branch unavailable\");\n\nassert_eq!(outcome.stderr.as_deref(), Some(\"graph failed\"));\nassert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -631,7 +631,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "7e90c64afc8871be5777f2d23799b5f13bce90bf9feee0e2862369f73240c960",
+        "bound_tests_set_hash": "9643e7355de82252c01435d59039a69f1ea92826883f4233c305526d02c1af88",
         "declaration_hash": "7ebf7aca9c029c4e5ebf96ba0bb0887316826cfca256d425f037e2c1a5c0cf8f"
       },
       "obligation_id": {
@@ -784,7 +784,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "cdf689dc02896e0fcd4fbb30df36d02e5d6bcb4e9a48c5baa741a25b219ee458",
+        "bound_tests_set_hash": "ce24800fc0b4c22d947f7fee7f952433872cca839ac23d15f3867b9e3b2d2f17",
         "declaration_hash": "7bfcd333acb037772abb4b2144e44c8ed735fe0e10eaf74550124e68b7231501"
       },
       "obligation_id": {
@@ -793,7 +793,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(error.to_string(), \"branch unavailable\");\n\nassert_eq!(outcome.stderr.as_deref(), Some(\"capture failed\"));\nassert_eq!(outcome.exit_code, 1);",
+        "citation": "assert_eq!(outcome.stderr.as_deref(), Some(\"capture failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -846,198 +846,6 @@
       "verdict": {
         "citation": "assert_eq!(\n            fs::read_to_string(track_dir.join(\".commit_hash\")).expect(\"commit hash is persisted\"),\n            expected\n        );",
         "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackMetadataPort"
-      },
-      "key": {
-        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "a68d3ef2f629fd2e322608bc8851df6075d8bea7af137d8a6c961f54054121e5"
-      },
-      "obligation_id": {
-        "entry_key": "TrackMetadataPort",
-        "item_identifier": "trait_method:save",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The round-trip persistence assertion verifies that save and find preserve metadata, but does not verify that the execution path has no compatibility shim, ServiceImpl runtime reference/call/reverse delegation, or that it follows the required one-way driver → interactor → port route."
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-05",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackMetadataPort"
-      },
-      "key": {
-        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "a68d3ef2f629fd2e322608bc8851df6075d8bea7af137d8a6c961f54054121e5"
-      },
-      "obligation_id": {
-        "entry_key": "TrackMetadataPort",
-        "item_identifier": "trait_method:save",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The test verifies only direct adapter save/find round-trip persistence; it does not exercise any Track lifecycle command context or establish CLI argument, stdout, stderr, and exit-code parity at its call site."
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackMetadataPort"
-      },
-      "key": {
-        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "d91ec0fea76fc98551a15416a289e0f565d0003078f9b4ae1cb10085f99f9148"
-      },
-      "obligation_id": {
-        "entry_key": "TrackMetadataPort",
-        "item_identifier": "trait_method:find",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The test verifies filesystem save/find round-trip equality, not the absence of compatibility shims, ServiceImpl runtime references/calls/reverse delegation, or the required one-way driver → interactor → port path."
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CN-01",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackMetadataPort"
-      },
-      "key": {
-        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "d91ec0fea76fc98551a15416a289e0f565d0003078f9b4ae1cb10085f99f9148"
-      },
-      "obligation_id": {
-        "entry_key": "TrackMetadataPort",
-        "item_identifier": "trait_method:find",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The test verifies only an adapter save/find round trip; it does not exercise the cited command-context or legacy-resolution call sites, nor assert preservation of their CLI arguments, stdout, stderr, or exit codes."
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "FsTrackMetadataAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "9577681ffc483b7abe033255451665f7b291f5504c8b6b1639d0f40f4ea7b122"
-      },
-      "obligation_id": {
-        "entry_key": "FsTrackMetadataAdapter",
-        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "category": "substitution",
-        "kind": "fail",
-        "reason": "The round-trip assertion verifies filesystem metadata persistence, not the cited boundary promise about presentation-free use-case results and primary-adapter ownership of stdout/stderr formatting and exit-code mapping."
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::track::lifecycle_adapter_tests",
-          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-05",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "FsTrackMetadataAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
-        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "9577681ffc483b7abe033255451665f7b291f5504c8b6b1639d0f40f4ea7b122"
-      },
-      "obligation_id": {
-        "entry_key": "FsTrackMetadataAdapter",
-        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The test only round-trips metadata through FsTrackMetadataAdapter::save/find; it does not exercise any Track lifecycle command context or verify CLI argument handling, stdout, stderr, exit code, or pre-refactor equivalence promised by the anchor."
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
@@ -1911,7 +1719,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "120fcd25858c2341d4fb9198105391db1535837f159f57ab98fca3eaed293d48",
+        "bound_tests_set_hash": "c29e2075caa71b71f936febb13b4125d35b60d533f84712e32a547ee9b64f93d",
         "declaration_hash": "a81580d3a3ad1cd2b37eaf5062b1a1d7b04ba9a3751c31590f002212bd4f0654"
       },
       "obligation_id": {
@@ -1920,7 +1728,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor\n            .execute(command(TrackSelection::Explicit(\n                TrackId::try_new(\"explicit-track\").expect(\"track id is valid\"),\n            )))\n            .expect(\"successful evaluation returns a result\");\n\n        assert!(result.layers.is_empty());\n\n        let error = match interactor.execute(command(TrackSelection::Active)) {\n            Ok(_) => panic!(\"active resolution must fail\"),\n            Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"active track unavailable\");\n\n        assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.expect(\"catalogue report is printed\");",
+        "citation": "let result = interactor\n            .execute(command(TrackSelection::Explicit(\n                TrackId::try_new(\"explicit-track\").expect(\"track id is valid\"),\n            )))\n            .expect(\"successful evaluation returns a result\");\n\n        assert!(result.layers.is_empty());\n\n        let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());\n\n        assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.expect(\"catalogue report is printed\");\n        assert!(stdout.contains(\"## Layer: `usecase`\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1983,7 +1791,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "dc857427c24a420e1127a1a1360fab7733a13a860ce4991ba97f4501a4b02249",
+        "bound_tests_set_hash": "9cc93267b88b5de8ff192ce50e083ca2d30603d74028738ddcad43f312586f73",
         "declaration_hash": "0d666650842299f6c565ad3b95e62b759798e47771359e46607525fa17830a6d"
       },
       "obligation_id": {
@@ -1992,7 +1800,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "`let error = match interactor.execute(command(TrackSelection::Explicit(\n            TrackId::try_new(\"explicit-track\").expect(\"track id is valid\"),\n        ))) {\n            Ok(_) => panic!(\"operation failure must propagate\"),\n            Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"catalogue evaluation failed\");` and `assert_eq!(outcome.stderr.as_deref(), Some(\"signals failed\"));\n        assert_eq!(outcome.exit_code, 1);`",
+        "citation": "Err(error) => error, }; assert_eq!(error.to_string(), \"catalogue evaluation failed\"); ... assert_eq!(outcome.stderr.as_deref(), Some(\"signals failed\")); assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2219,7 +2027,7 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "8d4552a4d9dfaf63bddff62383805fd86a3ac0a60590d7e40302754b9293f4d1",
+        "bound_tests_set_hash": "21ae7cfb5f3cc9fd121ee8648e48b0eec2c485ce28c8b5d78bee9f429a5d6d60",
         "declaration_hash": "98e85bf154c47b36481a85bf28b8d4a63a2d7348705bd9dcc50a56349abc9afc"
       },
       "obligation_id": {
@@ -2228,7 +2036,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"catalogue refresh failed\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"catalogue spec signals failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "citation": "Err(error) => error; }; ... assert_eq!(error.to_string(), \"catalogue refresh failed\"); ... assert_eq!(outcome.stderr.as_deref(), Some(\"catalogue spec signals failed\")); assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4508,6 +4316,154 @@
       },
       "verdict": {
         "citation": "let result = interactor.execute(command()).expect(\"views validate succeeds\");\n\n        assert_eq!(result, TrackViewsValidateResult);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_explicit_selection_forwards_without_resolution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_active_selection_resolves_and_forwards"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_resolution_failure_returns_removed_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_operation_failure_returns_removed_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_command_context_is_presentation_free"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTypeGraphInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "3578d336b4244fc7188a4d1846383664274058834aefd9cd4619b4630cd0001a",
+        "declaration_hash": "1ba87847fa97a4b447f6a4d72e72dc918090826efdd7b86dc16b60aa881f5c34"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTypeGraphInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(!production.contains(\"[OK]\"));\n        assert!(!production.contains(\"[ERROR]\"));\n        assert!(!production.contains(\"CommandOutcome\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_explicit_selection_forwards_without_resolution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_track_type_graph_interactor_resolution_failure_returns_removed_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_type_graph_removed_command_maps_to_failure_outcome"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_type_graph_invalid_items_dir_returns_failure_without_service_call"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_execute_type_graph_removed_command_returns_t008_error"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_execute_type_graph_rejects_invalid_track_id_before_execution"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTypeGraphService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "4ef9312fbb140a52697fcbc06ff463baaaa0f17531cf92dd01636704a9c97d39",
+        "declaration_hash": "800d07a7e224e5b6c97fd319678b88d431aa2ae6a8b41c879822d6a87a568f24"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTypeGraphService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let error = match interactor.execute(command(TrackSelection::Active)) {\n            Ok(_) => panic!(\"active resolution must fail\"),\n            Err(error) => error,\n        };",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_system_track_type_graph_adapter_always_returns_removed_command"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::type_graph::tests",
+          "test_name": "test_system_track_type_graph_adapter_has_no_shim_or_reverse_delegation"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_execute_type_graph_removed_command_returns_t008_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "SystemTrackTypeGraphAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "bound_tests_set_hash": "a42d0a0cf5f725af3ce45329209961a1de7496778c70570e3cfe245a71d5be33",
+        "declaration_hash": "a574df614753f5a850b3db7969de02e35e3df16ead16a523dc87ddc6a3623c0b"
+      },
+      "obligation_id": {
+        "entry_key": "SystemTrackTypeGraphAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(production.contains(\"impl TrackTypeGraphPort for SystemTrackTypeGraphAdapter\"));\n        assert!(!production.contains(\"TrackServiceImpl\"));\n        assert!(!production.contains(\".handle(\"));\n        assert!(!production.contains(\"compatibility shim\"));\n        assert!(!production.contains(\"composition_root\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

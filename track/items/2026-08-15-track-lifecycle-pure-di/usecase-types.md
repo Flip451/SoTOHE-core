@@ -19,8 +19,8 @@
 | TrackSwitchBaseResult | enum | add | Synced, SyncWarning, CheckoutFailed | 🔵 | 🔵 |
 | TrackTaskTransition | enum | add | Todo, InProgress, Done, Skipped | 🔵 | 🔵 |
 | TrackTransitionResult | enum | add | Transitioned, Rejected | 🔵 | 🔵 |
-| TrackTypeGraphEdgeSelection | enum | add | Methods, Fields, Impls, All | 🟡 | 🔵 |
-| TrackTypeGraphResult | enum | add | — | 🟡 | 🔵 |
+| TrackTypeGraphEdgeSelection | enum | add | Methods, Fields, Impls, All | 🔵 | 🔵 |
+| TrackTypeGraphResult | enum | add | — | 🔵 | 🔵 |
 | TrackViewSyncOutcome | enum | add | Synchronized, Warning | 🔵 | 🔵 |
 | TrackViewsScope | enum | add | RegistryOnly, Track | 🔵 | 🔵 |
 | TrackViewsSyncResult | enum | add | AlreadyCurrent, Rendered | 🔵 | 🔵 |
@@ -40,7 +40,7 @@
 | TrackLintRulesFile | value_object | add | — | 🔵 | 🔵 |
 | TrackRenderedLayerCount | value_object | add | — | 🔵 | 🔵 |
 | TrackSourceWorkspace | value_object | add | — | 🔵 | 🔵 |
-| TrackTypeGraphClusterDepth | value_object | add | — | 🟡 | 🔵 |
+| TrackTypeGraphClusterDepth | value_object | add | — | 🔵 | 🔵 |
 | TrackWorkspaceRoot | value_object | add | — | 🔵 | 🔵 |
 | TrackWrittenFileCount | value_object | add | — | 🔵 | 🔵 |
 
@@ -70,7 +70,7 @@
 | TrackSwitchBaseError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTaskCountsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTransitionError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackTypeGraphError | error_type | add | RemovedCommand | 🟡 | 🔵 |
+| TrackTypeGraphError | error_type | add | RemovedCommand | 🔵 | 🔵 |
 | TrackTypeSignalsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackViewsSyncError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackViewsValidateError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
@@ -98,7 +98,7 @@
 | TrackTaskAddPort | secondary_port | add | fn add_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, description: domain::NonEmptyString, section: Option<domain::NonEmptyString>, after: Option<domain::TaskId>) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
 | TrackTaskCountsQueryPort | secondary_port | add | fn task_counts(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory) -> Result<TaskCountsOutput, TrackTaskCountsError> | 🔵 | 🔵 |
 | TrackTaskTransitionPort | secondary_port | add | fn transition_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, task_id: domain::TaskId, transition: TrackTaskTransition) -> Result<TaskTransitionOutcome, TaskOperationError> | 🔵 | 🔵 |
-| TrackTypeGraphPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
+| TrackTypeGraphPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🔵 | 🔵 |
 | TrackTypeSignalsPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackTypeSignalsCommand) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> | 🔵 | 🔵 |
 | TrackViewsPort | secondary_port | add | fn validate(&self, workspace_root: &TrackWorkspaceRoot) -> Result<(), DiagnosticText>, fn sync(&self, workspace_root: &TrackWorkspaceRoot, scope: &TrackViewsScope) -> Result<Vec<RenderedViewPath>, DiagnosticText> | 🔵 | 🔵 |
 
@@ -128,7 +128,7 @@
 | TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🔵 | 🔵 |
 | TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🔵 | 🔵 |
 | TrackTransitionService | application_service | add | fn execute(&self, command: TrackTransitionCommand) -> Result<TrackTransitionResult, TrackTransitionError> | 🔵 | 🔵 |
-| TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
+| TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🔵 | 🔵 |
 | TrackTypeSignalsService | application_service | add | fn execute(&self, command: TrackTypeSignalsCommand) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> | 🔵 | 🔵 |
 | TrackViewsSyncService | application_service | add | fn execute(&self, command: TrackViewsSyncCommand) -> Result<TrackViewsSyncResult, TrackViewsSyncError> | 🔵 | 🔵 |
 | TrackViewsValidateService | application_service | add | fn execute(&self, command: TrackViewsValidateCommand) -> Result<TrackViewsValidateResult, TrackViewsValidateError> | 🔵 | 🔵 |
@@ -160,7 +160,7 @@
 | TrackSwitchBaseInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTaskCountsInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTransitionInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackTypeGraphInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackTypeGraphInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTypeSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackViewsSyncInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackViewsValidateInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -215,7 +215,7 @@
 | TrackSwitchBaseCommand | command | add | — | 🔵 | 🔵 |
 | TrackTaskCountsCommand | command | add | — | 🔵 | 🔵 |
 | TrackTransitionCommand | command | add | — | 🔵 | 🔵 |
-| TrackTypeGraphCommand | command | add | — | 🟡 | 🔵 |
+| TrackTypeGraphCommand | command | add | — | 🔵 | 🔵 |
 | TrackTypeSignalsCommand | command | add | — | 🔵 | 🔵 |
 | TrackViewsSyncCommand | command | add | — | 🔵 | 🔵 |
 | TrackViewsValidateCommand | command | add | — | 🔵 | 🔵 |

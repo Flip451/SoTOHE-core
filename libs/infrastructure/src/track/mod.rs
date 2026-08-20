@@ -658,6 +658,21 @@ mod lifecycle_adapter_tests {
     }
 
     #[test]
+    fn test_fs_track_metadata_find_missing_returns_none() {
+        let root = tempdir().expect("temporary root is created");
+        let items_dir = root.path().join("track/items");
+        fs::create_dir_all(&items_dir).expect("items directory exists");
+        let typed_items = TrackItemsDirectory::try_new(items_dir).expect("items path is valid");
+        let track_id = TrackId::try_new("missing-track").expect("track id is valid");
+
+        let loaded = FsTrackMetadataAdapter::new()
+            .find(&typed_items, &track_id)
+            .expect("missing metadata lookup succeeds");
+
+        assert!(loaded.is_none(), "absent metadata must not be invented");
+    }
+
+    #[test]
     fn test_fs_track_branch_strategy_snapshot_for_track_returns_saved_snapshot() {
         let root = tempdir().expect("temporary root is created");
         let items_dir = root.path().join("track/items");

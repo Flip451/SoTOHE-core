@@ -18,6 +18,6 @@
 | SystemTrackLintAdapter | secondary_adapter | add | impl TrackLintPort | 🔵 | 🔵 |
 | SystemTrackResolutionAdapter | secondary_adapter | add | impl TrackResolutionPort | 🔵 | 🔵 |
 | SystemTrackSpecElementHashAdapter | secondary_adapter | add | impl TrackSpecElementHashPort | 🔵 | 🔵 |
-| SystemTrackTypeGraphAdapter | secondary_adapter | add | impl TrackTypeGraphPort | 🟡 | 🔵 |
+| SystemTrackTypeGraphAdapter | secondary_adapter | add | impl TrackTypeGraphPort | 🔵 | 🔵 |
 | SystemTrackTypeSignalsAdapter | secondary_adapter | add | impl TrackTypeSignalsPort | 🔵 | 🔵 |
 

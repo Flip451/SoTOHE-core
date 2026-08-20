@@ -56,6 +56,12 @@ impl TrackWorkspaceRootInput {
     pub fn into_path(self) -> PathBuf {
         self.value
     }
+
+    /// Builds an input from a derived parent path without re-validating.
+    #[must_use]
+    pub(crate) fn from_derived_items_parent(value: PathBuf) -> Self {
+        Self { value }
+    }
 }
 
 /// Validated `track/items` input for the resolution driver.
@@ -100,7 +106,7 @@ impl TrackItemsDirectoryInput {
 }
 
 impl TrackWorkspaceRootInput {
-    fn into_usecase(self) -> Result<TrackWorkspaceRoot, TrackResolutionDiagnostic> {
+    pub(crate) fn into_usecase(self) -> Result<TrackWorkspaceRoot, TrackResolutionDiagnostic> {
         TrackWorkspaceRoot::try_new(self.value)
             .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
     }

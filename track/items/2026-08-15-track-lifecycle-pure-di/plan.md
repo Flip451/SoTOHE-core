@@ -5,7 +5,7 @@
 
 GO-01 → T001–T033; each independently verifiable command context has its own implementation task, followed by remaining migration and validation.
 
-## Tasks (29/33 resolved)
+## Tasks (31/33 resolved)
 
 ### S1 — Shared wiring
 
@@ -31,7 +31,7 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 - [x] **T013**: Implement the `TrackResolve*` command boundary in `libs/usecase/src/track_lifecycle/track_resolve.rs`; update `apps/cli/src/commands/track/resolve.rs`, the driver, composition wiring, and CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`1ff2cec4`)
 - [x] **T014**: Implement the `TrackTaskCounts*` boundary in `libs/usecase/src/track_lifecycle/track_task_counts.rs`; update the task-counts handler in `apps/cli/src/commands/track/{dispatch.rs,validate.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`c8de1294`)
 - [x] **T015**: Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; integrate `TrackViewsPort` through `apps/cli/src/commands/track/views.rs`, the driver, and composition wiring, with sync and port-contract regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`43cd8a39`)
-- [x] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [x] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`00dae338f96077539ed18d90e927640822ff56f5`)
 
 ### S3 — TDDD command contexts
 
@@ -46,7 +46,7 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 - [x] **T023**: Implement the `TrackLint*` boundary in `libs/usecase/src/track_lifecycle/tddd/lint.rs`; wire the remaining TDDD lint handler in `apps/cli/src/commands/track/tddd/lint.rs` through its driver and composition adapter, with regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`95784f92f7970ee110a4b8aee64599a70ea2cd68`)
 - [x] **T024**: Implement the `TrackContractMap*` boundary in `libs/usecase/src/track_lifecycle/tddd/contract_map.rs`; wire `apps/cli/src/commands/track/tddd/contract_map.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`84cc2b4f4565b483e1f5440970c3519dc8a6f190`)
 - [x] **T025**: Implement the `TrackSpecElementHash*` boundary in `libs/usecase/src/track_lifecycle/tddd/spec_element_hash.rs`; wire `apps/cli/src/commands/track/tddd/spec_element_hash.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b`)
-- [ ] **T026**: Implement the `TrackTypeGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_graph.rs`; wire `apps/cli/src/commands/track/tddd/graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [x] **T026**: Implement the `TrackTypeGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_graph.rs`; wire `apps/cli/src/commands/track/tddd/graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
 ### S4 — Resolution and validation
 
@@ -56,6 +56,6 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 - [x] **T030**: In `apps/cli-composition/src/review_v2/helpers.rs`, migrate the review-v2 resolution call site to the wired `TrackResolution*` boundary and add its focused CLI-behavior regression. [IN-04; CN-01; CN-02; AC-05] (`a051be92848a54dc9361630a4128108e3f88d92a`)
 - [x] **T031**: In `apps/cli/src/commands/task_contract.rs`, migrate the task-contract resolution call site to the wired `TrackResolution*` boundary and add its focused CLI-behavior regression. [IN-04; CN-01; CN-02; AC-05] (`a051be92848a54dc9361630a4128108e3f88d92a`)
 - [x] **T032**: In `libs/usecase/src/track_lifecycle/` (`TrackBranchStrategyPort`, `TrackSelectionPort`) and `libs/infrastructure/src/track/` (`FsTrackBranchStrategyAdapter`, `GitTrackSelectionAdapter`), migrate branch-strategy and selection access behind the declared ports and add adapter-contract regressions. [IN-01; IN-02; CN-01; CN-02; AC-03] (`1969b5bf9606a34c5e56e6932464262716b72a7c`)
-- [ ] **T033**: In `libs/usecase/src/track_lifecycle/` (`TrackMetadataPort`) and `libs/infrastructure/src/track/` (`FsTrackMetadataAdapter`), migrate metadata persistence behind the declared port and add persistence regressions. [IN-01; IN-02; CN-02; AC-03; AC-05]
+- [x] **T033**: In `libs/usecase/src/track_lifecycle/` (`TrackMetadataPort`) and `libs/infrastructure/src/track/` (`FsTrackMetadataAdapter`), migrate metadata persistence behind the declared port and add persistence regressions. [IN-01; IN-02; CN-02; AC-03; AC-05]
 - [ ] **T028**: In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, replace remaining execution-path references with the wired `TrackDriver` and `TrackTdddDriver` routes and add focused CLI regressions. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-04]
 - [ ] **T029**: Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track` and `cargo make ci-track`. [CN-02; AC-06; AC-07]

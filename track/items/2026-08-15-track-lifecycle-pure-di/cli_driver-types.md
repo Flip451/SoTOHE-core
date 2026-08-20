@@ -7,7 +7,7 @@
 | TrackResolutionInput | enum | add | ReadFromItems, ReadFromRoot, WriteFromItems, WriteFromRoot, DetectActive | 🔵 | 🔵 |
 | TrackResolutionOutcome | enum | add | Resolved, Inactive, Failed | 🔵 | 🔵 |
 | TrackTdddInput | enum | add | TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, SpecElementHash, BaselineCapture, Lint, CatalogueImplSignals, CatalogueLintActive | 🟡 | 🔵 |
-| TrackTypeGraphEdgeInput | enum | add | Methods, Fields, Impls, All | 🟡 | 🔵 |
+| TrackTypeGraphEdgeInput | enum | add | Methods, Fields, Impls, All | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -29,10 +29,10 @@
 | TrackTdddContractMapInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddLintInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddSpecElementHashInput | dto | add | — | 🔵 | 🔵 |
-| TrackTdddTypeGraphInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddTypeGraphInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddTypeSignalsInput | dto | add | — | 🔵 | 🔵 |
-| TrackTypeGraphClusterDepthInput | dto | add | — | 🟡 | 🔵 |
-| TrackWorkspaceRootInput | dto | add | — | 🟡 | 🔵 |
+| TrackTypeGraphClusterDepthInput | dto | add | — | 🔵 | 🔵 |
+| TrackWorkspaceRootInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 

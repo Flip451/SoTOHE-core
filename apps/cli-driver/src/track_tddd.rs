@@ -14,36 +14,27 @@ use usecase::track_lifecycle::tddd::catalogue_impl_signals::{
     TrackCatalogueImplSignalsCommand, TrackCatalogueImplSignalsError,
     TrackCatalogueImplSignalsService,
 };
-use usecase::track_lifecycle::tddd::catalogue_lint_active::{
-    TrackCatalogueLintActiveCommand, TrackCatalogueLintActiveService,
-};
+use usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActiveService;
 use usecase::track_lifecycle::tddd::catalogue_spec_signals::{
     TrackCatalogueSpecSignalsCommand, TrackCatalogueSpecSignalsError,
     TrackCatalogueSpecSignalsService,
 };
 use usecase::track_lifecycle::tddd::contract_map::TrackContractMapService;
-use usecase::track_lifecycle::tddd::lint::{
-    TrackLintCommand, TrackLintRulesFile, TrackLintService,
-};
+use usecase::track_lifecycle::tddd::lint::{TrackLintRulesFile, TrackLintService};
 use usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashService;
-use usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsCommand;
+use usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphService;
 use usecase::track_lifecycle::{
     TrackItemsDirectory, TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput,
-    TrackSelection, TrackSourceWorkspace, TrackSpecAnchorSelection, TrackWorkspaceRoot,
+    TrackSelection, TrackSourceWorkspace, TrackSpecAnchorSelection,
 };
 
 use crate::adr_baseline::TrackIdInput;
 use crate::render::CommandOutcome;
-use crate::track_lint::{
-    catalogue_lint_active_error_to_outcome, lint_error_to_outcome,
-    render_catalogue_lint_active_result, render_lint_result,
-};
 use crate::track_resolution::TrackResolutionDiagnostic;
 use crate::track_spec_element_hash::{
     render_track_spec_element_hash_result, spec_element_hash_input_to_command,
     track_spec_element_hash_error_to_outcome,
 };
-use crate::track_type_signals::type_signals_error_to_outcome;
 
 /// Validated `track/items` input for a TDDD command.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -77,7 +68,7 @@ impl TrackItemsDirectoryInput {
             .map(std::path::Path::to_path_buf)
             .filter(|path| !path.as_os_str().is_empty())
             .unwrap_or_else(|| PathBuf::from("."));
-        TrackWorkspaceRootInput { value: root }
+        TrackWorkspaceRootInput::from_derived_items_parent(root)
     }
 
     pub(crate) fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
@@ -114,25 +105,13 @@ impl TrackLayersInput {
     }
 }
 
-/// Validated workspace-root input for a TDDD command.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TrackWorkspaceRootInput {
-    value: PathBuf,
-}
+pub use crate::track_resolution::TrackWorkspaceRootInput;
 
 impl TryFrom<PathBuf> for TrackWorkspaceRootInput {
     type Error = String;
 
     fn try_from(value: PathBuf) -> Result<Self, Self::Error> {
-        TrackWorkspaceRoot::try_new(value.clone())
-            .map(|_| Self { value })
-            .map_err(|error| error.to_string())
-    }
-}
-
-impl TrackWorkspaceRootInput {
-    pub(crate) fn into_usecase(self) -> Result<TrackWorkspaceRoot, String> {
-        TrackWorkspaceRoot::try_new(self.value).map_err(|error| error.to_string())
+        Self::try_new(value).map_err(|error| error.to_string())
     }
 }
 
@@ -185,7 +164,7 @@ impl TrackLayerInput {
         })
     }
 
-    fn into_usecase(self) -> usecase::LayerId {
+    pub(crate) fn into_usecase(self) -> usecase::LayerId {
         self.value
     }
 }
@@ -237,6 +216,74 @@ pub struct TrackTdddCatalogueSpecSignalsInput {
     pub workspace_root: TrackWorkspaceRootInput,
     /// Optional layer filter.
     pub layer: Option<TrackLayerInput>,
+}
+
+/// Track TypeGraph cluster-depth primary-adapter input DTO.
+pub struct TrackTypeGraphClusterDepthInput {
+    value: usize,
+}
+
+impl TrackTypeGraphClusterDepthInput {
+    /// Wraps a cluster-depth value.
+    #[must_use]
+    pub fn new(value: usize) -> Self {
+        Self { value }
+    }
+
+    pub(crate) fn into_usecase(
+        self,
+    ) -> usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphClusterDepth {
+        usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphClusterDepth::new(self.value)
+    }
+}
+
+/// Track TypeGraph edge-selection primary-adapter input DTO.
+pub enum TrackTypeGraphEdgeInput {
+    /// Include method edges.
+    Methods,
+    /// Include field edges.
+    Fields,
+    /// Include impl edges.
+    Impls,
+    /// Include every edge kind.
+    All,
+}
+
+impl TrackTypeGraphEdgeInput {
+    pub(crate) fn into_usecase(
+        self,
+    ) -> usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection {
+        match self {
+            Self::Methods => {
+                usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection::Methods
+            }
+            Self::Fields => {
+                usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection::Fields
+            }
+            Self::Impls => {
+                usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection::Impls
+            }
+            Self::All => {
+                usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection::All
+            }
+        }
+    }
+}
+
+/// Typed primary-adapter input for the removed type-graph command.
+pub struct TrackTdddTypeGraphInput {
+    /// Optional explicit track id; omitted values select the active track.
+    pub track_id: Option<TrackIdInput>,
+    /// Directory containing the track items.
+    pub items_dir: TrackItemsDirectoryInput,
+    /// Workspace containing the track artifacts.
+    pub workspace_root: TrackWorkspaceRootInput,
+    /// Optional layer filter.
+    pub layer: Option<TrackLayerInput>,
+    /// Requested cluster depth.
+    pub cluster_depth: TrackTypeGraphClusterDepthInput,
+    /// Requested edge selection.
+    pub edges: TrackTypeGraphEdgeInput,
 }
 
 /// Typed primary-adapter input for type-signal evaluation.
@@ -292,7 +339,7 @@ impl TrackLintRulesFileInput {
             .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
     }
 
-    fn into_usecase(self) -> Result<TrackLintRulesFile, String> {
+    pub(crate) fn into_usecase(self) -> Result<TrackLintRulesFile, String> {
         TrackLintRulesFile::try_new(self.value).map_err(|error| error.to_string())
     }
 }
@@ -342,6 +389,7 @@ pub struct TrackTdddDriver {
     lint: Arc<dyn TrackLintService>,
     contract_map: Arc<dyn TrackContractMapService>,
     type_signals: Arc<dyn usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsService>,
+    type_graph: Arc<dyn TrackTypeGraphService>,
 }
 
 impl TrackTdddDriver {
@@ -360,6 +408,7 @@ impl TrackTdddDriver {
         type_signals: Arc<
             dyn usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsService,
         >,
+        type_graph: Arc<dyn TrackTypeGraphService>,
     ) -> Self {
         Self {
             baseline_capture,
@@ -371,6 +420,7 @@ impl TrackTdddDriver {
             lint,
             contract_map,
             type_signals,
+            type_graph,
         }
     }
 
@@ -430,14 +480,12 @@ impl TrackTdddDriver {
 
     /// Executes the type-signals input boundary.
     pub fn handle_type_signals(&self, input: TrackTdddTypeSignalsInput) -> CommandOutcome {
-        let command = match type_signals_input_to_command(input) {
-            Ok(command) => command,
-            Err(error) => return CommandOutcome::failure(Some(error)),
-        };
-        self.type_signals
-            .execute(command)
-            .map(|_| CommandOutcome::success(None))
-            .unwrap_or_else(type_signals_error_to_outcome)
+        crate::track_type_signals::render_track_type_signals_outcome(&*self.type_signals, input)
+    }
+
+    /// Executes the removed type-graph input boundary.
+    pub fn handle_type_graph(&self, input: TrackTdddTypeGraphInput) -> CommandOutcome {
+        crate::track_type_graph::render_track_type_graph_outcome(&*self.type_graph, input)
     }
 
     /// Executes the spec-element-hash input boundary.
@@ -457,23 +505,12 @@ impl TrackTdddDriver {
         &self,
         input: TrackTdddCatalogueLintActiveInput,
     ) -> CommandOutcome {
-        let command = match catalogue_lint_active_input_to_command(input) {
-            Ok(command) => command,
-            Err(error) => return CommandOutcome::failure(Some(error)),
-        };
-        self.catalogue_lint_active
-            .execute(command)
-            .map(render_catalogue_lint_active_result)
-            .unwrap_or_else(catalogue_lint_active_error_to_outcome)
+        crate::track_lint::render_catalogue_lint_active_outcome(&*self.catalogue_lint_active, input)
     }
 
     /// Executes the single-layer catalogue-lint input boundary.
     pub fn handle_lint(&self, input: TrackTdddLintInput) -> CommandOutcome {
-        let command = match lint_input_to_command(input) {
-            Ok(command) => command,
-            Err(error) => return CommandOutcome::failure(Some(error)),
-        };
-        self.lint.execute(command).map(render_lint_result).unwrap_or_else(lint_error_to_outcome)
+        crate::track_lint::render_lint_outcome(&*self.lint, input)
     }
 
     /// Executes the contract-map input boundary.
@@ -491,7 +528,7 @@ fn input_to_command(
         .transpose()
         .map_err(|error| error.to_string())
         .map(TrackSelection::from_input)?;
-    let workspace_root = input.workspace_root.into_usecase()?;
+    let workspace_root = input.workspace_root.into_usecase().map_err(|error| error.to_string())?;
     let source_workspace =
         input.source_workspace.map(TrackSourceWorkspaceInput::into_usecase).transpose()?;
     let layer = input
@@ -515,7 +552,7 @@ fn baseline_graph_input_to_command(
         .map_err(|error| error.to_string())
         .map(TrackSelection::from_input)?;
     let items_dir = input.items_dir.into_usecase().map_err(|error| error.to_string())?;
-    let workspace_root = input.workspace_root.into_usecase()?;
+    let workspace_root = input.workspace_root.into_usecase().map_err(|error| error.to_string())?;
     let layers = input.layers.map(TrackLayersInput::into_usecase).unwrap_or(TrackLayerFilter::All);
     Ok(TrackBaselineGraphCommand { track, items_dir, workspace_root, layers })
 }
@@ -545,7 +582,7 @@ fn catalogue_impl_signals_input_to_command(
         .transpose()
         .map_err(|error| error.to_string())
         .map(TrackSelection::from_input)?;
-    let workspace_root = input.workspace_root.into_usecase()?;
+    let workspace_root = input.workspace_root.into_usecase().map_err(|error| error.to_string())?;
     let layer = input
         .layer
         .map(|layer| TrackLayerSelection::One(layer.into_usecase()))
@@ -563,43 +600,12 @@ fn catalogue_spec_signals_input_to_command(
         .map_err(|error| error.to_string())
         .map(TrackSelection::from_input)?;
     let items_dir = input.items_dir.into_usecase().map_err(|error| error.to_string())?;
-    let workspace_root = input.workspace_root.into_usecase()?;
+    let workspace_root = input.workspace_root.into_usecase().map_err(|error| error.to_string())?;
     let layer = input
         .layer
         .map(|layer| TrackLayerSelection::One(layer.into_usecase()))
         .unwrap_or(TrackLayerSelection::All);
     Ok(TrackCatalogueSpecSignalsCommand { track, items_dir, workspace_root, layer })
-}
-
-fn type_signals_input_to_command(
-    input: TrackTdddTypeSignalsInput,
-) -> Result<TrackTypeSignalsCommand, String> {
-    let track = input
-        .track_id
-        .map(|track_id| TrackLifecycleIdInput::try_new(track_id.to_string()))
-        .transpose()
-        .map_err(|error| error.to_string())
-        .map(TrackSelection::from_input)?;
-    let workspace_root = input.workspace_root.into_usecase()?;
-    let layer = input
-        .layer
-        .map(|layer| TrackLayerSelection::One(layer.into_usecase()))
-        .unwrap_or(TrackLayerSelection::All);
-    Ok(TrackTypeSignalsCommand { track, workspace_root, layer })
-}
-
-fn catalogue_lint_active_input_to_command(
-    input: TrackTdddCatalogueLintActiveInput,
-) -> Result<TrackCatalogueLintActiveCommand, String> {
-    let track = input
-        .track_id
-        .map(|track_id| TrackLifecycleIdInput::try_new(track_id.to_string()))
-        .transpose()
-        .map_err(|error| error.to_string())
-        .map(TrackSelection::from_input)?;
-    let workspace_root = input.workspace_root.into_usecase()?;
-    let rules_file = input.rules_file.map(TrackLintRulesFileInput::into_usecase).transpose()?;
-    Ok(TrackCatalogueLintActiveCommand { track, workspace_root, rules_file })
 }
 
 fn render_catalogue_impl_signals_result(
@@ -656,19 +662,6 @@ fn catalogue_spec_signals_error_to_outcome(
     CommandOutcome::failure(Some(error.to_string()))
 }
 
-fn lint_input_to_command(input: TrackTdddLintInput) -> Result<TrackLintCommand, String> {
-    let track = input
-        .track_id
-        .map(|track_id| TrackLifecycleIdInput::try_new(track_id.to_string()))
-        .transpose()
-        .map_err(|error| error.to_string())
-        .map(TrackSelection::from_input)?;
-    let workspace_root = input.workspace_root.into_usecase()?;
-    let layer = input.layer.into_usecase();
-    let rules_file = input.rules_file.map(TrackLintRulesFileInput::into_usecase).transpose()?;
-    Ok(TrackLintCommand { track, workspace_root, layer, rules_file })
-}
-
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unreachable, clippy::unwrap_used)]
 mod tests {
@@ -679,19 +672,24 @@ mod tests {
     use usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphResult;
     use usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsResult;
     use usecase::track_lifecycle::tddd::catalogue_lint_active::{
-        TrackCatalogueLintActiveError, TrackCatalogueLintActiveResult,
-        TrackCatalogueLintLayerResult,
+        TrackCatalogueLintActiveCommand, TrackCatalogueLintActiveError,
+        TrackCatalogueLintActiveResult, TrackCatalogueLintLayerResult,
     };
     use usecase::track_lifecycle::tddd::contract_map::{
         TrackContractMapCommand, TrackContractMapError,
     };
-    use usecase::track_lifecycle::tddd::lint::{TrackLintError, TrackLintResult};
+    use usecase::track_lifecycle::tddd::lint::{TrackLintCommand, TrackLintError, TrackLintResult};
     use usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashCommand;
+    use usecase::track_lifecycle::tddd::type_graph::{
+        TrackTypeGraphCommand, TrackTypeGraphError, TrackTypeGraphService,
+    };
     use usecase::track_lifecycle::tddd::type_signals::{
         TrackTypeSignalsCommand, TrackTypeSignalsError, TrackTypeSignalsResult,
         TrackTypeSignalsService,
     };
     use usecase::track_lifecycle::{TrackRenderedLayerCount, TrackWrittenFileCount};
+
+    use crate::track_lint::{render_catalogue_lint_active_result, render_lint_result};
 
     #[test]
     fn test_track_items_directory_input_try_new_rejects_noncanonical_path() {
@@ -785,6 +783,8 @@ mod tests {
 
     struct UnusedTypeSignalsService;
 
+    struct UnusedTypeGraphService;
+
     impl TrackContractMapService for UnusedTrackContractMapService {
         fn execute(
             &self,
@@ -802,6 +802,18 @@ mod tests {
             &self,
             _: TrackTypeSignalsCommand,
         ) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackTypeGraphService for UnusedTypeGraphService {
+        fn execute(
+            &self,
+            _: TrackTypeGraphCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphResult,
+            TrackTypeGraphError,
+        > {
             unreachable!()
         }
     }
@@ -1005,6 +1017,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -1047,11 +1060,14 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let input = TrackTdddBaselineCaptureInput {
             track_id: None,
-            workspace_root: TrackWorkspaceRootInput { value: PathBuf::from("../escape") },
+            workspace_root: TrackWorkspaceRootInput::from_derived_items_parent(PathBuf::from(
+                "../escape",
+            )),
             source_workspace: None,
             layer: None,
         };
@@ -1079,6 +1095,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -1154,6 +1171,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -1201,6 +1219,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
         let input = TrackTdddBaselineGraphInput {
             track_id: None,
@@ -1234,6 +1253,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -1269,6 +1289,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1322,10 +1343,13 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
         let input = TrackTdddCatalogueImplSignalsInput {
             track_id: None,
-            workspace_root: TrackWorkspaceRootInput { value: PathBuf::from("../escape") },
+            workspace_root: TrackWorkspaceRootInput::from_derived_items_parent(PathBuf::from(
+                "../escape",
+            )),
             layer: None,
         };
 
@@ -1354,6 +1378,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1391,6 +1416,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1429,6 +1455,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
         let input = TrackTdddCatalogueSpecSignalsInput {
             track_id: None,
@@ -1462,6 +1489,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1495,6 +1523,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         )
     }
 
@@ -1568,6 +1597,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         );
 
         let outcome = driver.handle_catalogue_lint_active(catalogue_lint_active_input());
@@ -1635,6 +1665,7 @@ mod tests {
             lint,
             Arc::new(UnusedTrackContractMapService),
             Arc::new(UnusedTypeSignalsService),
+            Arc::new(UnusedTypeGraphService),
         )
     }
 
@@ -1740,6 +1771,7 @@ mod tests {
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
             service,
+            Arc::new(UnusedTypeGraphService),
         )
     }
 
@@ -1776,5 +1808,111 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 1);
         assert_eq!(outcome.stderr.as_deref(), Some("type-signals failed"));
+    }
+
+    struct RecordingTypeGraphService {
+        commands: Mutex<Vec<TrackTypeGraphCommand>>,
+        error: String,
+    }
+
+    impl TrackTypeGraphService for RecordingTypeGraphService {
+        fn execute(
+            &self,
+            command: TrackTypeGraphCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphResult,
+            TrackTypeGraphError,
+        > {
+            self.commands.lock().expect("command lock is available").push(command);
+            Err(TrackTypeGraphError::RemovedCommand(usecase::git_workflow::DiagnosticText::new(
+                &self.error,
+            )))
+        }
+    }
+
+    fn type_graph_input() -> TrackTdddTypeGraphInput {
+        TrackTdddTypeGraphInput {
+            track_id: Some("graph-track".parse().expect("track id is valid")),
+            items_dir: TrackItemsDirectoryInput::try_new(PathBuf::from("workspace/track/items"))
+                .expect("items directory is valid"),
+            workspace_root: workspace_root(),
+            layer: Some(TrackLayerInput::try_new("usecase".to_owned()).expect("layer is valid")),
+            cluster_depth: TrackTypeGraphClusterDepthInput::new(2),
+            edges: TrackTypeGraphEdgeInput::Methods,
+        }
+    }
+
+    fn type_graph_driver(service: Arc<RecordingTypeGraphService>) -> TrackTdddDriver {
+        TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
+            Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
+            Arc::new(UnusedTypeSignalsService),
+            service,
+        )
+    }
+
+    #[test]
+    fn test_track_tddd_driver_type_graph_removed_command_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingTypeGraphService {
+            commands: Mutex::new(Vec::new()),
+            error: "sotp track type-graph is removed in T008. Use `sotp track catalogue-impl-signals` instead."
+                .to_owned(),
+        });
+        let outcome = type_graph_driver(service.clone()).handle_type_graph(type_graph_input());
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some(
+                "sotp track type-graph is removed in T008. Use `sotp track catalogue-impl-signals` instead."
+            )
+        );
+        assert!(outcome.stdout.is_none());
+        let commands = service.commands.lock().expect("command lock is available");
+        assert_eq!(commands.len(), 1);
+        let command = commands.first().expect("one command is recorded");
+        assert!(matches!(
+            &command.track,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "graph-track"
+        ));
+        assert_eq!(command.items_dir.as_path(), std::path::Path::new("workspace/track/items"));
+        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.cluster_depth.value(), 2);
+        assert!(matches!(
+            command.edges,
+            usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphEdgeSelection::Methods
+        ));
+        assert!(
+            matches!(&command.layer, TrackLayerSelection::One(layer) if layer.as_ref() == "usecase")
+        );
+    }
+
+    #[test]
+    fn test_track_tddd_driver_type_graph_invalid_items_dir_returns_failure_without_service_call() {
+        let service = Arc::new(RecordingTypeGraphService {
+            commands: Mutex::new(Vec::new()),
+            error: "unused".to_owned(),
+        });
+        let input = TrackTdddTypeGraphInput {
+            track_id: None,
+            items_dir: TrackItemsDirectoryInput { value: PathBuf::from("../escape") },
+            workspace_root: workspace_root(),
+            layer: None,
+            cluster_depth: TrackTypeGraphClusterDepthInput::new(0),
+            edges: TrackTypeGraphEdgeInput::All,
+        };
+        let outcome = type_graph_driver(service.clone()).handle_type_graph(input);
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.commands.lock().expect("command lock is available").is_empty());
     }
 }
