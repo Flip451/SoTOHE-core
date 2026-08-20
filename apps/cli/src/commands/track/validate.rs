@@ -3,6 +3,10 @@
 use std::path::{Path, PathBuf};
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::adr_baseline::TrackIdInput;
+use cli_driver::track_resolution::{
+    TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
+};
 use thiserror::Error;
 
 /// Typed error for track validation and resolution helpers.
@@ -19,9 +23,10 @@ pub(crate) enum TrackValidateError {
 ///
 /// Returns `TrackValidateError` describing the failure.
 pub(crate) fn validate_track_id_str(value: &str) -> Result<(), TrackValidateError> {
-    TrackCompositionRoot::new()
-        .track_validate_id(value)
-        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
+    value
+        .parse::<TrackIdInput>()
+        .map(|_| ())
+        .map_err(|error| TrackValidateError::Unavailable(error.to_string()))
 }
 
 /// Validates a track branch name string (`track/<valid-track-id>`).
@@ -63,9 +68,23 @@ pub(crate) fn resolve_track_id(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, TrackValidateError> {
-    TrackCompositionRoot::new()
-        .track_resolve_id(explicit_id, items_dir.to_path_buf())
-        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
+    if let Some(value) = explicit_id {
+        return Ok(value);
+    }
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+        .map_err(|error| TrackValidateError::Unavailable(error.to_string()))?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::ReadFromItems { track_id: None, items_dir })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id.to_string()),
+        TrackResolutionOutcome::Inactive => {
+            Err(TrackValidateError::Unavailable("no active track on the current branch".to_owned()))
+        }
+        TrackResolutionOutcome::Failed(diagnostic) => {
+            Err(TrackValidateError::Unavailable(diagnostic.to_string()))
+        }
+    }
 }
 
 /// Resolves a track ID for a READ operation, anchored to `workspace_root`.
@@ -77,9 +96,23 @@ pub(crate) fn resolve_track_id_from_root(
     explicit_id: Option<String>,
     workspace_root: &Path,
 ) -> Result<String, TrackValidateError> {
-    TrackCompositionRoot::new()
-        .track_resolve_id_from_root(explicit_id, workspace_root.to_path_buf())
-        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
+    if let Some(value) = explicit_id {
+        return Ok(value);
+    }
+    let workspace_root = TrackWorkspaceRootInput::try_new(workspace_root.to_path_buf())
+        .map_err(|error| TrackValidateError::Unavailable(error.to_string()))?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::ReadFromRoot { track_id: None, workspace_root })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id.to_string()),
+        TrackResolutionOutcome::Inactive => {
+            Err(TrackValidateError::Unavailable("no active track on the current branch".to_owned()))
+        }
+        TrackResolutionOutcome::Failed(diagnostic) => {
+            Err(TrackValidateError::Unavailable(diagnostic.to_string()))
+        }
+    }
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `items_dir`.
@@ -95,9 +128,27 @@ pub(crate) fn resolve_track_id_for_write(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, TrackValidateError> {
-    TrackCompositionRoot::new()
-        .track_resolve_id_for_write(explicit_id, items_dir.to_path_buf())
-        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
+    let track_id = explicit_id
+        .map(|value| {
+            value
+                .parse::<TrackIdInput>()
+                .map_err(|error| TrackValidateError::Unavailable(error.to_string()))
+        })
+        .transpose()?;
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+        .map_err(|error| TrackValidateError::Unavailable(error.to_string()))?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::WriteFromItems { track_id, items_dir })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id.to_string()),
+        TrackResolutionOutcome::Inactive => {
+            Err(TrackValidateError::Unavailable("no active track on the current branch".to_owned()))
+        }
+        TrackResolutionOutcome::Failed(diagnostic) => {
+            Err(TrackValidateError::Unavailable(diagnostic.to_string()))
+        }
+    }
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
@@ -109,9 +160,27 @@ pub(crate) fn resolve_track_id_from_root_for_write(
     explicit_id: Option<String>,
     workspace_root: &Path,
 ) -> Result<String, TrackValidateError> {
-    TrackCompositionRoot::new()
-        .track_resolve_id_from_root_for_write(explicit_id, workspace_root.to_path_buf())
-        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
+    let track_id = explicit_id
+        .map(|value| {
+            value
+                .parse::<TrackIdInput>()
+                .map_err(|error| TrackValidateError::Unavailable(error.to_string()))
+        })
+        .transpose()?;
+    let workspace_root = TrackWorkspaceRootInput::try_new(workspace_root.to_path_buf())
+        .map_err(|error| TrackValidateError::Unavailable(error.to_string()))?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::WriteFromRoot { track_id, workspace_root })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id.to_string()),
+        TrackResolutionOutcome::Inactive => {
+            Err(TrackValidateError::Unavailable("no active track on the current branch".to_owned()))
+        }
+        TrackResolutionOutcome::Failed(diagnostic) => {
+            Err(TrackValidateError::Unavailable(diagnostic.to_string()))
+        }
+    }
 }
 
 pub(crate) fn resolve_project_root(

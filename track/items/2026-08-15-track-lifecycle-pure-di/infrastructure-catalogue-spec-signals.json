@@ -1,0 +1,86 @@
+{
+  "catalogue_declaration_hash": "cdc5689c8b527be0647b6df57e174cfa60f5f1299f08328dfa70cea82bcb7fe7",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "a98e492cb7cbde5fb6c833863afb12231f5d042b50ab06a62d37377c48f2de9f",
+      "signal": "blue",
+      "type_name": "FsTrackBranchStrategyAdapter"
+    },
+    {
+      "entry_hash": "791708e9208cd0c0791c791b3916cc4fc5ea4a206717c09b2463301cb838f458",
+      "signal": "blue",
+      "type_name": "FsTrackMetadataAdapter"
+    },
+    {
+      "entry_hash": "147b89889215bad3d158f39549052f18d662b9259dd8762ad7b03f9d27a368d2",
+      "signal": "blue",
+      "type_name": "FsTrackViewsAdapter"
+    },
+    {
+      "entry_hash": "b339debd87cd4f8fdf8b6d862c65ea64e6f2410d31a1ac78e121ce1ac7a37411",
+      "signal": "blue",
+      "type_name": "GitTrackCommitHashAdapter"
+    },
+    {
+      "entry_hash": "5e8ce05d9dc3735149bf154ab69ff751f6279fc0431ac290d7d27732dd59e126",
+      "signal": "blue",
+      "type_name": "GitTrackSelectionAdapter"
+    },
+    {
+      "entry_hash": "5075ee698569bcb5bab746c4b8419f5f3ad89a32f2b947e1f2d3890423f87566",
+      "signal": "blue",
+      "type_name": "SystemTrackBaselineCaptureAdapter"
+    },
+    {
+      "entry_hash": "e68a513008caf43acd3d8b1ac8f3bf6d8ac0af8d0b2b85413d63c4bd621598b1",
+      "signal": "blue",
+      "type_name": "SystemTrackBaselineGraphAdapter"
+    },
+    {
+      "entry_hash": "4e820dc0980d9346700cef8b219556aab5f29c3b25d7f3eb19923bdad73e59f0",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueImplSignalsAdapter"
+    },
+    {
+      "entry_hash": "1de5ec9fb0f83635d859d0438a60f1b8df2e12d3244be8ae7555e636439a8190",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueLintActiveAdapter"
+    },
+    {
+      "entry_hash": "46a1aa278226fe09b0e37abde5cb054f2466ef8619e6ad3615136ff714a6b4e4",
+      "signal": "blue",
+      "type_name": "SystemTrackCatalogueSpecSignalsAdapter"
+    },
+    {
+      "entry_hash": "0eb9f6e2cd5bdff9f2edb388c8291854a38eb8405fc28f6a31a122cf03d1078b",
+      "signal": "blue",
+      "type_name": "SystemTrackContractMapAdapter"
+    },
+    {
+      "entry_hash": "bb8ff2c51c54fa44440424d3d7f90f78e7b5c0822d2f0eaa306544aadcc7b092",
+      "signal": "blue",
+      "type_name": "SystemTrackLintAdapter"
+    },
+    {
+      "entry_hash": "01dc8e5f793f421cfa6ea2b879e3dbb66c1a5333dad2349f07eb0a3de6ba1add",
+      "signal": "blue",
+      "type_name": "SystemTrackResolutionAdapter"
+    },
+    {
+      "entry_hash": "4357a000ca44ddbeeef8460749601ba903047a07314b386911db0db5d27bf51c",
+      "signal": "blue",
+      "type_name": "SystemTrackSpecElementHashAdapter"
+    },
+    {
+      "entry_hash": "e99bb77524c8efffb6308dcd85ec843fffac0e425085eb06e671144241358db5",
+      "signal": "blue",
+      "type_name": "SystemTrackTypeGraphAdapter"
+    },
+    {
+      "entry_hash": "a9776942fe7cd561cb13b3db02dee3f9085ed3c8987fb19e5f4542dbe50753b5",
+      "signal": "blue",
+      "type_name": "SystemTrackTypeSignalsAdapter"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 ---
 name: implementer
 sandbox: workspace-write
+grok-sandbox: workspace
 description: Use when Codex is assigned the SoTOHE implementer capability (plan-task implementation on a track branch — source edits, tests, and test-obligation binding authoring). Follows the implementation contract defined in the capability SSoT.
 ---
 

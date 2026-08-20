@@ -1,6 +1,6 @@
 //! `sotp adr-baseline` command boundary.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
@@ -8,6 +8,9 @@ use cli_composition::{AdrBaselineCompositionRoot, TrackCompositionRoot};
 use cli_driver::adr_baseline::{
     AdrBaselineInput, AdrBaselineKindInput, AdrBaselineReasonInput, AdrBaselineSnapshotInput,
     AdrSourceFileNameInput, TrackIdInput,
+};
+use cli_driver::track_resolution::{
+    TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome,
 };
 
 use crate::CliError;
@@ -153,34 +156,44 @@ fn dispatch(cmd: AdrBaselineCommand) -> Result<cli_driver::CommandOutcome, CliEr
             (items_dir, input)
         }
     };
-    let project_root = track_root
-        .track_resolve_project_root(items_dir)
-        .map_err(|error| CliError::Message(error.to_string()))?;
+    let items_dir_input = TrackItemsDirectoryInput::try_new(items_dir.clone())
+        .map_err(|error| CliError::Message(error.message().to_owned()))?;
+    let project_root = items_dir_input.workspace_root().into_path();
     Ok(AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input))
 }
 
 fn resolve_for_write(
     track_root: &TrackCompositionRoot,
     track_id: Option<TrackIdInput>,
-    items_dir: &std::path::Path,
+    items_dir: &Path,
 ) -> Result<TrackIdInput, CliError> {
-    track_root
-        .track_resolve_id_for_write(track_id.map(|id| id.to_string()), items_dir.to_path_buf())
-        .map_err(|error| CliError::Message(error.to_string()))?
-        .parse::<TrackIdInput>()
-        .map_err(|error| CliError::Message(error.to_string()))
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+        .map_err(|error| CliError::Message(error.message().to_owned()))?;
+    match track_root
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::WriteFromItems { track_id, items_dir })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id),
+        TrackResolutionOutcome::Inactive => Err(CliError::Message("no active track".to_owned())),
+        TrackResolutionOutcome::Failed(error) => Err(CliError::Message(error.message().to_owned())),
+    }
 }
 
 fn resolve_for_read(
     track_root: &TrackCompositionRoot,
     track_id: Option<TrackIdInput>,
-    items_dir: &std::path::Path,
+    items_dir: &Path,
 ) -> Result<TrackIdInput, CliError> {
-    track_root
-        .track_resolve_id(track_id.map(|id| id.to_string()), items_dir.to_path_buf())
-        .map_err(|error| CliError::Message(error.to_string()))?
-        .parse::<TrackIdInput>()
-        .map_err(|error| CliError::Message(error.to_string()))
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf())
+        .map_err(|error| CliError::Message(error.message().to_owned()))?;
+    match track_root
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::ReadFromItems { track_id, items_dir })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Ok(track_id),
+        TrackResolutionOutcome::Inactive => Err(CliError::Message("no active track".to_owned())),
+        TrackResolutionOutcome::Failed(error) => Err(CliError::Message(error.message().to_owned())),
+    }
 }
 
 #[cfg(test)]
@@ -274,14 +287,28 @@ mod tests {
         let track_root = TrackCompositionRoot::new();
         let explicit_id: TrackIdInput = "fixture-track".parse().unwrap();
 
-        let resolved = resolve_for_read(
-            &track_root,
-            Some(explicit_id),
-            std::path::Path::new("noncanonical/items-dir"),
-        )
-        .unwrap();
+        let resolved =
+            resolve_for_read(&track_root, Some(explicit_id), Path::new("track/items")).unwrap();
 
         assert_eq!(resolved.as_ref(), "fixture-track");
+    }
+
+    #[test]
+    fn test_adr_baseline_rejects_parent_traversal_with_typed_input_diagnostic() {
+        let items_dir = PathBuf::from("nested/../track/items");
+        let expected =
+            "track items directory must not contain parent traversal: nested/../track/items";
+
+        let input_error = TrackItemsDirectoryInput::try_new(items_dir.clone()).unwrap_err();
+        assert_eq!(input_error.message(), expected);
+
+        let (exit_code, diagnostic) =
+            execute_with_error_chain(AdrBaselineCommand::CheckCommit(AdrBaselineCheckCommitArgs {
+                items_dir,
+                track_id: Some("fixture-track".parse().unwrap()),
+            }));
+        assert_eq!(exit_code, ExitCode::FAILURE);
+        assert_eq!(diagnostic.as_deref(), Some(expected));
     }
 
     #[test]
@@ -332,12 +359,13 @@ mod tests {
             .next()
             .unwrap();
 
-        assert!(write_resolver_source.contains("track_resolve_id_for_write("));
-        assert!(read_resolver_source.contains("track_resolve_id("));
+        assert!(write_resolver_source.contains("TrackResolutionInput::WriteFromItems"));
+        assert!(read_resolver_source.contains("TrackResolutionInput::ReadFromItems"));
         for resolver_source in [write_resolver_source, read_resolver_source] {
-            assert!(resolver_source.contains("items_dir.to_path_buf()"));
-            assert!(resolver_source.contains(".parse::<TrackIdInput>()"));
-            assert!(resolver_source.contains("CliError::Message(error.to_string())"));
+            assert!(resolver_source.contains("track_resolution_driver"));
+            assert!(resolver_source.contains("TrackItemsDirectoryInput::try_new"));
+            assert!(resolver_source.contains("CliError::Message(error.message().to_owned())"));
+            assert!(!resolver_source.contains("track_resolve_id"));
             for forbidden_runtime_path in [
                 "AdrBaselineCompositionRoot",
                 "CommandOutcome",
@@ -375,7 +403,7 @@ mod tests {
         }
         assert!(dispatch_source.contains("resolve_for_write(&track_root, track_id, &items_dir)?"));
         assert!(dispatch_source.contains("resolve_for_read(&track_root, track_id, &items_dir)?"));
-        assert!(dispatch_source.contains("track_resolve_project_root(items_dir)"));
+        assert!(dispatch_source.contains("TrackItemsDirectoryInput::try_new(items_dir.clone())"));
         assert!(!dispatch_source.contains("fn items_dir("));
         assert!(dispatch_source.contains(
             "AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)"
@@ -403,6 +431,7 @@ mod tests {
 
     #[test]
     fn test_adr_baseline_execution_preserves_resolution_error_diagnostic_and_exit_code() {
+        let expected = "--items-dir must point to '<project-root>/track/items'; got fixture/items";
         let (exit_code, diagnostic) =
             execute_with_error_chain(AdrBaselineCommand::CheckCommit(AdrBaselineCheckCommitArgs {
                 items_dir: PathBuf::from("fixture/items"),
@@ -410,10 +439,140 @@ mod tests {
             }));
 
         assert_eq!(exit_code, ExitCode::FAILURE);
+        assert_eq!(diagnostic.as_deref(), Some(expected));
+
+        let input_error =
+            TrackItemsDirectoryInput::try_new(PathBuf::from("fixture/items")).unwrap_err();
+        assert_eq!(input_error.message(), expected);
+    }
+
+    #[test]
+    fn test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence() {
+        use cli_composition::TrackCompositionRoot;
+        use cli_driver::track_resolution::{
+            TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome,
+            TrackWorkspaceRootInput,
+        };
+
+        let expected = "--items-dir must point to '<project-root>/track/items'; got fixture/items";
+        let items_error =
+            TrackItemsDirectoryInput::try_new(PathBuf::from("fixture/items")).unwrap_err();
+        assert_eq!(items_error.message(), expected);
+
+        let (exit_code, diagnostic) =
+            execute_with_error_chain(AdrBaselineCommand::CheckCommit(AdrBaselineCheckCommitArgs {
+                items_dir: PathBuf::from("fixture/items"),
+                track_id: Some("fixture-track".parse().unwrap()),
+            }));
+        assert_eq!(exit_code, ExitCode::FAILURE);
+        assert_eq!(diagnostic.as_deref(), Some(expected));
+
+        let project = tempfile::tempdir().unwrap();
+        let root = project.path();
+        let run_git = |arguments: &[&str]| {
+            let status = Command::new("git").args(arguments).current_dir(root).status().unwrap();
+            assert!(status.success(), "git command failed: git {}", arguments.join(" "));
+        };
+        run_git(&["init"]);
+        run_git(&["config", "user.email", "test@example.com"]);
+        run_git(&["config", "user.name", "Test User"]);
+        fs::create_dir_all(root.join("track/items")).unwrap();
+        fs::create_dir_all(root.join("knowledge/adr")).unwrap();
+        fs::write(root.join("track/items/.keep"), "").unwrap();
+        fs::write(root.join("knowledge/adr/decision.md"), "# Decision\n").unwrap();
+        run_git(&["add", "."]);
+        run_git(&["commit", "-m", "fixture"]);
+        run_git(&["checkout", "-b", "track/input-variants"]);
+
+        let items_dir = TrackItemsDirectoryInput::try_new(root.join("track/items")).unwrap();
+        let workspace_root = TrackWorkspaceRootInput::try_new(root.to_path_buf()).unwrap();
+        let driver = TrackCompositionRoot::new().track_resolution_driver();
+        let resolved = |outcome| match outcome {
+            TrackResolutionOutcome::Resolved(track_id) => track_id.to_string(),
+            other => panic!("expected resolved track, got {other:?}"),
+        };
+
         assert_eq!(
-            diagnostic.as_deref(),
-            Some("--items-dir must point to '<project-root>/track/items'; got fixture/items")
+            resolved(driver.resolve(TrackResolutionInput::ReadFromItems {
+                track_id: None,
+                items_dir: items_dir.clone(),
+            })),
+            "input-variants"
         );
+        assert_eq!(
+            resolved(
+                driver.resolve(TrackResolutionInput::WriteFromItems { track_id: None, items_dir })
+            ),
+            "input-variants"
+        );
+        assert_eq!(
+            resolved(driver.resolve(TrackResolutionInput::ReadFromRoot {
+                track_id: None,
+                workspace_root: workspace_root.clone(),
+            })),
+            "input-variants"
+        );
+        assert_eq!(
+            resolved(driver.resolve(TrackResolutionInput::WriteFromRoot {
+                track_id: None,
+                workspace_root: workspace_root.clone(),
+            })),
+            "input-variants"
+        );
+        assert_eq!(
+            resolved(driver.resolve(TrackResolutionInput::DetectActive { workspace_root })),
+            "input-variants"
+        );
+
+        let outcome = dispatch(AdrBaselineCommand::Snapshot(AdrBaselineSnapshotArgs {
+            items_dir: root.join("track/items"),
+            track_id: Some("input-variants".parse().unwrap()),
+            source: "decision.md".parse().unwrap(),
+            kind: "init".parse().unwrap(),
+            reason: None,
+        }))
+        .unwrap();
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stderr.as_deref(), None);
+        let stdout = outcome.stdout.as_deref().unwrap();
+        assert_eq!(
+            stdout,
+            stdout
+                .strip_prefix("ADR baseline snapshot: SnapshotRecorded")
+                .map(|suffix| format!("ADR baseline snapshot: SnapshotRecorded{suffix}"))
+                .as_deref()
+                .unwrap()
+        );
+        assert!(
+            !stdout.contains('\n'),
+            "snapshot success stdout must stay a single unchanged line"
+        );
+        let ledger =
+            fs::read_to_string(root.join("track/items/input-variants/adr-baseline/ledger.jsonl"))
+                .unwrap();
+        assert!(ledger.contains("\"source\":\"decision.md\""));
+        assert!(ledger.contains("\"kind\":\"init\""));
+    }
+
+    #[test]
+    fn test_track_resolution_input_and_driver_preserve_adr_baseline_cli_contract() {
+        let expected = "--items-dir must point to '<project-root>/track/items'; got fixture/items";
+        let items_dir = match TrackItemsDirectoryInput::try_new(PathBuf::from("fixture/items")) {
+            Ok(_) => {
+                panic!("noncanonical items dir must fail before TrackResolutionDriver::resolve")
+            }
+            Err(error) => error,
+        };
+        assert_eq!(items_dir.message(), expected);
+
+        let (exit_code, diagnostic) =
+            execute_with_error_chain(AdrBaselineCommand::CheckCommit(AdrBaselineCheckCommitArgs {
+                items_dir: PathBuf::from("fixture/items"),
+                track_id: Some("fixture-track".parse().unwrap()),
+            }));
+        assert_eq!(exit_code, ExitCode::FAILURE);
+        assert_eq!(diagnostic.as_deref(), Some(expected));
+        assert_eq!(format!("{exit_code:?}"), format!("{:?}", std::process::ExitCode::FAILURE));
     }
 
     #[test]

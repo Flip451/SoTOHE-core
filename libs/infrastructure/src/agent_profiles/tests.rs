@@ -635,6 +635,41 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
 }
 
 #[test]
+fn test_pr_reviewer_grok_hosted_resolution_is_rejected_by_reviewer_policy() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low"] },
+                "grok": { "label": "Grok CLI", "supported_reasoning_efforts": ["low"] }
+            },
+            "capabilities": {
+                "pr-reviewer": {
+                    "provider": "grok",
+                    "execution_mode": "typed-pipeline"
+                }
+            }
+        }"#,
+    );
+    let resolved = profiles
+        .resolve_execution(&capability("pr-reviewer"), RoundType::Final)
+        .expect("pr-reviewer remains a hosted execution");
+    let provider = match resolved {
+        ResolvedExecution::HostedService { provider } => provider,
+        other => {
+            assert!(
+                matches!(other, ResolvedExecution::HostedService { .. }),
+                "pr-reviewer must not resolve to a provider CLI execution"
+            );
+            return;
+        }
+    };
+
+    assert_eq!(provider.as_str(), "grok");
+    assert!(usecase::pr_review::validate_reviewer_provider(provider.as_str()).is_err());
+}
+
+#[test]
 fn test_resolve_execution_non_pr_reviewer_missing_final_effort_returns_error() {
     let profiles = load_profiles(
         r#"{

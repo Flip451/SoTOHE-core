@@ -516,7 +516,8 @@ cargo make ci-track && \
 bin/sotp review check-approved && \
 bin/sotp ref-verify run && \
 bin/sotp git add-all && \
-bin/sotp ref-verify check-approved && \
+bin/sotp ref-verify check-approved --chain 1 && \
+bin/sotp ref-verify check-approved --chain 2 && \
 bin/sotp test-obligation check && \
 bin/sotp dry check-approved && \
 bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \

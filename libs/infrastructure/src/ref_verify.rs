@@ -384,7 +384,10 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
         };
         let prompt = render_prompt_template(&template_text, &claim, &evidence, tier_str);
 
-        let raw_output = (self.runner)(resolved, prompt)?;
+        let raw_output =
+            crate::ref_verify::process_runner::with_ref_verifier_capability(capability, || {
+                (self.runner)(resolved, prompt)
+            })?;
 
         let dto: VerdictResponseDto =
             extract_json_object_parsed(&raw_output).map_err(|e| RefVerifyError::VerifierPort {

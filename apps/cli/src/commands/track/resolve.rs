@@ -114,4 +114,72 @@ mod tests {
             ExitCode::SUCCESS
         );
     }
+
+    #[test]
+    fn test_track_resolve_blocked_output_includes_blocker_line() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track/items");
+        let track_dir = items_dir.join("blocked-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "blocked-track",
+  "branch": null,
+  "title": "Blocked Track",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "status_override": {"status": "blocked", "reason": "waiting on review"},
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::Resolve {
+            items_dir: items_dir.clone(),
+            track_id: Some("blocked-track".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: Blocked\nReason: waiting on review\nRecommended next command: /track:status\nBlocker: waiting on review"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            execute_resolve(ResolveArgs { items_dir, track_id: Some("blocked-track".to_owned()) })
+                .unwrap(),
+            ExitCode::SUCCESS
+        );
+    }
+
+    #[test]
+    fn test_track_resolve_missing_track_preserves_failure_contract() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::Resolve {
+            items_dir: items_dir.clone(),
+            track_id: Some("missing-track".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("[ERROR] resolve failed: track not found: missing-track")
+        );
+        assert_eq!(outcome.stdout, None);
+        let error =
+            execute_resolve(ResolveArgs { items_dir, track_id: Some("missing-track".to_owned()) })
+                .unwrap_err();
+        assert!(error.to_string().contains("track not found: missing-track"));
+    }
 }

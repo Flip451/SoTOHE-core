@@ -1,50 +1,4 @@
-//! `sotp track set-commit-hash` — persist the current HEAD SHA to `.commit_hash`.
-//!
-//! Encapsulates the `.commit_hash` write operation and failure-recovery hint output.
-//! The underlying persist logic is provided by `review_v2::persist_commit_hash_for_track`.
-
-use crate::CommandOutcome;
-use crate::error::CompositionError;
-use crate::track::composition_root::TrackCompositionRoot;
-
-impl TrackCompositionRoot {
-    /// Persist the current HEAD SHA to `.commit_hash` for the given track.
-    ///
-    /// Delegates to `review_v2::persist_commit_hash_for_track` for all domain type
-    /// construction and I/O operations.  On success, emits a confirmation line on
-    /// stderr and returns `Ok(CommandOutcome::success)`.  On failure, emits the
-    /// error together with a recovery hint and returns `Ok(CommandOutcome::failure)`.
-    ///
-    /// The `track_id` is the string form of the track identifier (e.g.
-    /// `"my-feature-2026"`).  It must pass `domain::TrackId::try_new` validation
-    /// and the current branch must be `track/<track_id>`; both are enforced inside
-    /// `persist_commit_hash_for_track`.
-    ///
-    /// # Errors
-    ///
-    /// Returns `Err` only on unexpected internal failures that prevent even forming
-    /// the outcome (currently not reachable — all failures are returned as
-    /// `Ok(CommandOutcome::failure)`).
-    pub fn track_set_commit_hash(
-        &self,
-        track_id: &str,
-    ) -> Result<CommandOutcome, CompositionError> {
-        match crate::review_v2::persist_commit_hash_for_track(track_id) {
-            Ok(sha) => {
-                eprintln!("[set-commit-hash] Recorded .commit_hash: {sha}");
-                Ok(CommandOutcome::success(Some(format!("Recorded .commit_hash: {sha}"))))
-            }
-            Err(msg) => {
-                eprintln!("[set-commit-hash] ERROR: {msg}");
-                eprintln!(
-                    "[set-commit-hash] Recovery: run `bin/sotp track set-commit-hash` \
-                     to set the v2 diff base manually."
-                );
-                Ok(CommandOutcome::failure(Some(msg)))
-            }
-        }
-    }
-}
+//! Compatibility regressions for `sotp track set-commit-hash`.
 
 // ---------------------------------------------------------------------------
 // Unit tests
@@ -56,6 +10,8 @@ mod tests {
     use std::panic::{AssertUnwindSafe, catch_unwind, resume_unwind};
     use std::path::Path;
     use std::process::Command;
+
+    use cli_driver::adr_baseline::TrackIdInput;
 
     use crate::track::composition_root::TrackCompositionRoot;
 
@@ -100,22 +56,25 @@ mod tests {
     }
 
     #[test]
-    fn test_track_set_commit_hash_with_invalid_track_id_returns_failure_outcome() {
-        // track_id validation happens before any git operation.
-        let app = TrackCompositionRoot::new();
-        let result = app.track_set_commit_hash("../evil");
-        assert!(result.is_ok(), "method must return Ok(outcome), not Err: {result:?}");
-        let outcome = result.unwrap();
-        assert_ne!(outcome.exit_code, 0, "invalid track id must produce failure exit code");
-        let stderr = outcome.stderr.unwrap_or_default();
+    fn test_track_set_commit_hash_with_invalid_track_id_returns_wiring_error() {
+        let error = match "../evil".parse::<TrackIdInput>() {
+            Ok(track_id) => panic!("invalid track id must fail at wiring, got {track_id}"),
+            Err(error) => error,
+        };
+        let message = format!("invalid track id: {error}");
+        assert!(message.contains("invalid track id"), "got: {message}");
         assert!(
-            stderr.contains("invalid track id"),
-            "stderr must mention invalid track id, got: {stderr}"
+            !message.contains("[set-commit-hash] ERROR"),
+            "composition must not template driver presentation: {message}"
+        );
+        assert!(
+            !message.contains("Recovery:"),
+            "composition must not template the driver recovery hint: {message}"
         );
     }
 
     #[test]
-    fn test_track_set_commit_hash_on_correct_branch_writes_commit_hash() {
+    fn test_track_set_commit_hash_call_site_preserves_cli_contract_across_migration() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         seed_track_repo(dir.path());
@@ -123,13 +82,24 @@ mod tests {
         let track_dir = dir.path().join("track").join("items").join("my-track-2026");
         std::fs::create_dir_all(&track_dir).unwrap();
 
+        let argv_track_id = "my-track-2026".to_owned();
         let outcome = from_working_dir(dir.path(), || {
-            let app = TrackCompositionRoot::new();
-            let result = app.track_set_commit_hash("my-track-2026");
-            assert!(result.is_ok(), "method must return Ok(outcome): {result:?}");
-            result.unwrap()
+            let track_id = argv_track_id.parse::<TrackIdInput>().unwrap();
+            TrackCompositionRoot::new().track_driver().handle_set_commit_hash(track_id)
         });
         assert_eq!(outcome.exit_code, 0, "happy path must succeed, stderr: {:?}", outcome.stderr);
+        assert_eq!(argv_track_id, "my-track-2026");
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|stdout| { stdout.contains("Recorded .commit_hash") })
+        );
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|stderr| {
+                stderr.contains("[set-commit-hash] Recorded .commit_hash")
+            })
+        );
 
         let commit_hash_path = track_dir.join(".commit_hash");
         assert!(commit_hash_path.exists(), ".commit_hash must be written on success");

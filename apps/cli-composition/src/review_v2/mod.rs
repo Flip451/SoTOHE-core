@@ -23,10 +23,6 @@ pub use inputs::{ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput}
 // All composition builders, infrastructure-typed helpers, and internal DTOs are
 // pub(crate) — they do not appear on the cli_composition public face (CN-02).
 pub(crate) use briefing::append_scope_briefing_reference_str;
-// Demoted to pub(crate) in T010/F3: the persist helper is consumed only by
-// in-crate callers (review_v2 shim + ReviewCompositionRoot + track set-commit-hash),
-// so it must not appear on the cli_composition public face (CN-02 / AC-04).
-pub(crate) use commit_hash::persist_commit_hash_for_track;
 pub(crate) use scope::{validate_review_group_name_str, validate_track_id_str};
 pub(crate) use shared::CodexReviewOutcome;
 
@@ -3561,6 +3557,19 @@ exit 0
             msg.contains("not a track branch") || msg.contains("main"),
             "expected branch error, got: {msg}"
         );
+    }
+
+    #[test]
+    fn test_review_v2_resolution_call_site_uses_track_resolution_driver() {
+        let source = include_str!("helpers.rs");
+        let resolver_source = source
+            .split("fn resolve_with_resolution_driver")
+            .nth(1)
+            .expect("review-v2 resolution helper must exist");
+
+        assert!(resolver_source.contains("track_resolution_driver"));
+        assert!(resolver_source.contains("TrackResolutionOutcome"));
+        assert!(!resolver_source.contains("track_resolve_id"));
     }
 
     #[test]

@@ -1,26 +1,13 @@
-//! `track` command family — core composition-root impl methods.
+//! `track` command family — core composition-root wiring helpers.
 mod branch_strategy;
 pub mod composition_root;
-mod ops;
 mod resolution;
-pub(crate) mod service_impl;
 mod set_commit_hash;
-mod shim;
 mod tddd;
-use crate::CommandOutcome;
 use crate::error::CompositionError;
-use crate::track::composition_root::TrackCompositionRoot;
+pub use composition_root::TrackCompositionRoot;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-/// Validates a track ID string by delegating to the canonical domain rule.
-///
-/// This is the single slug validator for the `cli_composition` crate; all internal
-/// callers route through here so the rule lives in exactly one place (`domain::TrackId`).
-pub(crate) fn validate_track_id_str(value: &str) -> Result<(), CompositionError> {
-    domain::TrackId::try_new(value)
-        .map(|_| ())
-        .map_err(|e| CompositionError::WiringFailed(e.to_string()))
-}
 /// Resolves `<project-root>/track/items` → `<project-root>`.
 pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, CompositionError> {
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
@@ -41,77 +28,7 @@ pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, Composit
         ))),
     }
 }
-/// Resolve track ID for READ (explicit overrides discovery).
-pub(crate) fn resolve_track_id(
-    explicit_id: Option<String>,
-    items_dir: &Path,
-) -> Result<String, CompositionError> {
-    if let Some(id) = explicit_id {
-        return Ok(id);
-    }
-    let project_root = resolve_project_root(items_dir)?;
-    resolve_track_id_inner(None, &project_root, false)
-}
-/// Resolve track ID for READ, anchored to workspace_root.
-pub(crate) fn resolve_track_id_from_root(
-    explicit_id: Option<String>,
-    workspace_root: &Path,
-) -> Result<String, CompositionError> {
-    resolve_track_id_inner(explicit_id, workspace_root, false)
-}
-/// Resolve track ID for WRITE (branch always read, explicit must match).
-fn resolve_track_id_for_write(
-    explicit_id: Option<String>,
-    items_dir: &Path,
-) -> Result<String, CompositionError> {
-    let project_root = resolve_project_root(items_dir)?;
-    resolve_track_id_inner(explicit_id, &project_root, true)
-}
-fn resolve_track_id_inner(
-    explicit_id: Option<String>,
-    anchor: &Path,
-    write_mode: bool,
-) -> Result<String, CompositionError> {
-    use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
-    if !write_mode {
-        if let Some(id) = explicit_id {
-            return Ok(id);
-        }
-    }
-    // Explicit write IDs still need branch proof; fail closed if git discovery fails.
-    if write_mode {
-        if let Some(ref id) = explicit_id {
-            validate_track_id_str(id)?;
-            let repo =
-                infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
-                    CompositionError::AdapterInit(format!(
-                        "cannot discover git repository from {}: {e} \
-                         (write operations require a git repository)",
-                        anchor.display()
-                    ))
-                })?;
-            let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-            return interactor
-                .resolve_for_write(explicit_id)
-                .map_err(|e| CompositionError::AdapterInit(e.to_string()));
-        }
-    }
-    let repo = infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
-        CompositionError::AdapterInit(format!(
-            "cannot discover git repository from {}: {e}",
-            anchor.display()
-        ))
-    })?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    if write_mode {
-        interactor
-            .resolve_for_write(explicit_id)
-            .map_err(|e| CompositionError::AdapterInit(e.to_string()))
-    } else {
-        interactor.resolve_for_read(None).map_err(|e| CompositionError::AdapterInit(e.to_string()))
-    }
-}
-fn build_branch_reader(
+pub(crate) fn build_branch_reader(
     project_root: &Path,
 ) -> Option<Arc<dyn usecase::track_resolution::BranchReaderPort>> {
     use infrastructure::git_cli::SystemGitRepo;
@@ -124,7 +41,7 @@ fn build_branch_reader(
 /// Wires the task-operation interactor together with the admission
 /// collaborators every transition is judged through and the verifier every
 /// recorded commit hash is checked by.
-fn build_task_operation_interactor(
+pub(crate) fn build_task_operation_interactor(
     store: Arc<infrastructure::track::fs_store::FsTrackStore>,
     branch_reader: Option<Arc<dyn usecase::track_resolution::BranchReaderPort>>,
 ) -> usecase::task_ops::TaskOperationInteractor<infrastructure::track::fs_store::FsTrackStore> {
@@ -137,413 +54,19 @@ fn build_task_operation_interactor(
         Arc::new(infrastructure::commit_record_verifier::GitCommitRecordVerifier::new()),
     )
 }
-fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {
-    match infrastructure::track::render::sync_rendered_views(project_root, Some(track_id)) {
-        Ok(changed) => changed
-            .iter()
-            .map(|path| match path.strip_prefix(project_root) {
-                Ok(rel) => format!("[OK] Rendered: {}", rel.display()),
-                Err(_) => format!("[OK] Rendered: {}", path.display()),
-            })
-            .collect(),
-        Err(err) => {
-            vec![format!("warning: operation persisted but sync-views failed: {err}")]
-        }
-    }
-}
-// The archive rollback helpers (`repo_relative_arg` / `run_git_mv` /
-// `rollback_archive_contents_after_logs_error` / `describe_archive_rollback`)
-// were removed as part of the T006 cutover — the archive orchestration is now
-// entirely inside `usecase::git_workflow::TrackGitInteractor::archive_track`,
-// which composes `GitPrimitivePort::move_path` and `TrackArchiveFsPort` fs
-// primitives without needing composition-root-side rollback plumbing.
-impl TrackCompositionRoot {
-    /// Initialize a new track by writing `metadata.json`.
-    ///
-    /// Creates `track/items/<track_id>/metadata.json` with identity-only content
-    /// (no tasks, no status override) and then syncs rendered views.
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID validation, directory creation, or metadata
-    /// persistence fails.
-    pub fn track_init(
-        &self,
-        items_dir: PathBuf,
-        track_id: String,
-        description: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use domain::TrackWriter as _;
-        use infrastructure::track::fs_store::FsTrackStore;
-
-        validate_track_id_str(&track_id)?;
-
-        let project_root = resolve_project_root(&items_dir)?;
-
-        let id = domain::TrackId::try_new(&track_id)
-            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        let snap = branch_strategy::resolve_branch_strategy_snapshot(&project_root)?;
-        let track = domain::TrackMetadata::new(id, description, None, snap)
-            .map_err(|e| CompositionError::WiringFailed(format!("invalid track metadata: {e}")))?;
-
-        let store = FsTrackStore::new(items_dir);
-        store.save(&track).map_err(|e| CompositionError::Usecase(format!("init failed: {e}")))?;
-
-        infrastructure::track::render::sync_rendered_views(&project_root, Some(&track_id))
-            .map_err(|e| CompositionError::Usecase(format!("sync-views failed: {e}")))?;
-
-        Ok(CommandOutcome::success(None))
-    }
-
-    /// Transition a task to a new status.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_transition(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-        task_id: String,
-        target_status: String,
-        commit_hash: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let repo_dir = items_dir.clone();
-        let project_root = resolve_project_root(&repo_dir)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let branch_reader = build_branch_reader(&project_root);
-        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
-        let cmd = usecase::task_ops::TaskTransitionCommand {
-            items_dir,
-            track_id: effective_track_id.clone(),
-            task_id: task_id.clone(),
-            target_status: target_status.clone(),
-            commit_hash,
-        };
-        let outcome = service
-            .transition_task(cmd)
-            .map_err(|err| CompositionError::Usecase(format!("transition failed: {err}")))?;
-        let output = match outcome {
-            usecase::task_ops::TaskTransitionOutcome::Transitioned(output) => output,
-            // A refused start of work is a verdict, not a failure of the
-            // command: the task stays where it was and the reason is reported.
-            usecase::task_ops::TaskTransitionOutcome::Rejected(rejection) => {
-                return Ok(CommandOutcome::failure(Some(format!(
-                    "[BLOCKED] {task_id}: {rejection}"
-                ))));
-            }
-        };
-        let mut lines = vec![format!(
-            "[OK] {}: transitioned to {} (track status: {})",
-            task_id, target_status, output.derived_status,
-        )];
-        lines.extend(sync_views_to_stdout(&project_root, &output.track_id));
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Switch to an existing track branch.
-    /// # Errors
-    /// Returns `Err` when git discovery or branch switch fails.
-    pub fn track_branch_switch(
-        &self,
-        items_dir: PathBuf,
-        track_id: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        validate_track_id_str(&track_id)?;
-        let project_root = resolve_project_root(&items_dir)?;
-        let id = domain::TrackId::try_new(&track_id)
-            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        branch_strategy::track_git_interactor()
-            .switch_to_track_branch(&project_root, &id)
-            .map(|msg| CommandOutcome::success(Some(msg)))
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))
-    }
-    /// Resolve the current track phase, next command, and blocker.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_resolve(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::track_phase::TrackPhaseService as _;
-        resolve_project_root(&items_dir)?;
-        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let service = usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store));
-        let info = service
-            .resolve(effective_track_id, items_dir)
-            .map_err(|e| CompositionError::Usecase(format!("resolve failed: {e}")))?;
-        let mut lines = vec![
-            format!("Current phase: {}", info.phase),
-            format!("Reason: {}", info.reason),
-            format!("Recommended next command: {}", info.next_command),
-        ];
-        if let Some(blocker) = &info.blocker {
-            lines.push(format!("Blocker: {blocker}"));
-        }
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Validate metadata.json files under the repository.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_views_validate(
-        &self,
-        project_root: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        infrastructure::track::render::validate_track_snapshots(&project_root).map_err(|e| {
-            CompositionError::Infrastructure(format!("track metadata validation failed: {e}"))
-        })?;
-        Ok(CommandOutcome::success(Some("[OK] Track metadata is valid".to_owned())))
-    }
-    /// Render plan.md and registry.md from metadata.json.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_views_sync(
-        &self,
-        project_root: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use usecase::track_resolution::{
-            ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
-        };
-        let resolved_track_id = match track_id {
-            Some(id) => {
-                // WRITE guard: verify explicit id matches the current branch
-                Some(resolve_track_id_inner(Some(id), &project_root, true)?)
-            }
-            None => {
-                // Auto-detect from branch — fall back to None for registry-only mode
-                infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).ok().and_then(
-                    |repo| {
-                        let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-                        interactor.resolve_active_track().ok()
-                    },
-                )
-            }
-        };
-        let changed = infrastructure::track::render::sync_rendered_views(
-            &project_root,
-            resolved_track_id.as_deref(),
-        )
-        .map_err(|e| CompositionError::Infrastructure(format!("sync-views failed: {e}")))?;
-        let lines = if changed.is_empty() {
-            vec!["[OK] All views already up to date".to_owned()]
-        } else {
-            changed
-                .iter()
-                .map(|path| match path.strip_prefix(&project_root) {
-                    Ok(rel) => format!("[OK] Rendered: {}", rel.display()),
-                    Err(_) => format!("[OK] Rendered: {}", path.display()),
-                })
-                .collect()
-        };
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Add a new task to a track.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_add_task(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-        description: String,
-        section: Option<String>,
-        after: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let repo_dir = items_dir.clone();
-        let project_root = resolve_project_root(&repo_dir)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let branch_reader = build_branch_reader(&project_root);
-        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
-        let after_task_id = match after {
-            Some(ref a)
-                if a.strip_prefix('T').is_some_and(|digits| {
-                    !digits.is_empty()
-                        && digits.chars().all(|ch| ch.is_ascii_digit())
-                        && digits.parse::<u64>().is_ok()
-                }) =>
-            {
-                after
-            }
-            Some(ref a) => {
-                return Err(CompositionError::WiringFailed(format!(
-                    "invalid --after value {a:?}: expected T<digits> (e.g. T001)"
-                )));
-            }
-            None => None,
-        };
-        let cmd = usecase::task_ops::AddTaskCommand {
-            items_dir,
-            track_id: effective_track_id.clone(),
-            description: description.clone(),
-            section,
-            after_task_id,
-        };
-        let output = service
-            .add_task(cmd)
-            .map_err(|e| CompositionError::Usecase(format!("add-task failed: {e}")))?;
-        let new_task_id = output.task_id.as_deref().unwrap_or("?");
-        let mut lines = vec![format!(
-            "[OK] Added task {new_task_id}: {description} (track status: {})",
-            output.derived_status
-        )];
-        lines.extend(sync_views_to_stdout(&project_root, &output.track_id));
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Set a status override on a track (blocked/cancelled).
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_set_override(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-        status: String,
-        reason: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let repo_dir = items_dir.clone();
-        let project_root = resolve_project_root(&repo_dir)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let branch_reader = build_branch_reader(&project_root);
-        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
-        let cmd = usecase::task_ops::SetOverrideCommand {
-            items_dir,
-            track_id: effective_track_id.clone(),
-            status: status.clone(),
-            reason,
-        };
-        let output = service
-            .set_override(cmd)
-            .map_err(|e| CompositionError::Usecase(format!("set-override failed: {e}")))?;
-        let mut lines = vec![format!(
-            "[OK] Override set to '{}' (track status: {})",
-            status, output.derived_status
-        )];
-        lines.extend(sync_views_to_stdout(&project_root, &output.track_id));
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Clear a status override on a track.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_clear_override(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let repo_dir = items_dir.clone();
-        let project_root = resolve_project_root(&repo_dir)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let branch_reader = build_branch_reader(&project_root);
-        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
-        let cmd = usecase::task_ops::ClearOverrideCommand {
-            items_dir,
-            track_id: effective_track_id.clone(),
-        };
-        let output = service
-            .clear_override(cmd)
-            .map_err(|e| CompositionError::Usecase(format!("clear-override failed: {e}")))?;
-        let mut lines =
-            vec![format!("[OK] Override cleared (track status: {})", output.derived_status)];
-        lines.extend(sync_views_to_stdout(&project_root, &output.track_id));
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Show the next open task for a track (JSON output).
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_next_task(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::task_ops::TaskQueryService as _;
-        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
-        let next = service
-            .next_task(effective_track_id.clone(), items_dir.clone())
-            .map_err(|e| CompositionError::Usecase(format!("next-task failed: {e}")))?;
-        let payload = match next {
-            Some(task) => {
-                let counts = service.task_counts(effective_track_id, items_dir).map_err(|e| {
-                    CompositionError::Usecase(format!("next-task failed (counts): {e}"))
-                })?;
-                let task_status = if counts.in_progress > 0 { "in_progress" } else { "todo" };
-                serde_json::json!({
-                    "task_id": task.task_id,
-                    "description": task.description,
-                    "status": task_status,
-                })
-            }
-            None => serde_json::json!({
-                "task_id": null,
-                "description": null,
-                "status": null,
-            }),
-        };
-        Ok(CommandOutcome::success(Some(payload.to_string())))
-    }
-    /// Show task status counts for a track (JSON output).
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_task_counts(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
-        self.track_task_counts_resolved(items_dir, effective_track_id)
-    }
-    /// Archive a completed track and preserve gitignored telemetry logs when present.
-    /// # Errors
-    /// Returns `Err` when validation, `git mv`, or the optional `logs/` rename fails.
-    pub fn track_archive(
-        &self,
-        items_dir: PathBuf,
-        track_id: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        validate_track_id_str(&track_id)?;
-        // Anchor discovery to `items_dir` (not the process CWD) so that
-        // absolute `--items-dir <path>` invocations from tests or from a
-        // nested working directory resolve the correct repo root. When
-        // `items_dir` is relative (the CLI default `track/items`),
-        // `resolve_project_root` returns `.`, which then `discover_from`
-        // rehydrates from the current worktree.
-        let project_root_hint = resolve_project_root(&items_dir)?;
-        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(&project_root_hint)
-            .map_err(|e| {
-                CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
-            })?;
-        let project_root = repo.root().to_path_buf();
-        let id = domain::TrackId::try_new(&track_id)
-            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        branch_strategy::track_git_interactor()
-            .archive_track(&project_root, &id)
-            .map(|msg| CommandOutcome::success(Some(msg)))
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))
-    }
-}
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use std::path::{Path, PathBuf};
 
-    use super::{resolve_project_root, resolve_track_id_for_write};
+    use cli_driver::track::TrackInput;
+
+    use cli_driver::adr_baseline::TrackIdInput;
+    use cli_driver::track_resolution::{
+        TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome,
+    };
+
+    use super::resolve_project_root;
     use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
     fn change_to(path: &Path) -> CwdGuard {
@@ -600,13 +123,21 @@ mod tests {
         // (items_dir must end in "track/items") but points to a directory that
         // does not exist, so git discovery returns an error.
         let items_dir = Path::new("/tmp/sotp-test-no-git-repo/track/items");
-        let result = resolve_track_id_for_write(Some("my-track-2026".to_owned()), items_dir);
+        let items_dir = TrackItemsDirectoryInput::try_new(items_dir.to_path_buf()).unwrap();
+        let track_id = Some("my-track-2026".parse::<TrackIdInput>().unwrap());
+        let outcome = crate::TrackCompositionRoot::new()
+            .track_resolution_driver()
+            .resolve(TrackResolutionInput::WriteFromItems { track_id, items_dir });
+        let result = match outcome {
+            TrackResolutionOutcome::Failed(diagnostic) => Err(diagnostic.to_string()),
+            other => Ok(other),
+        };
         assert!(
             result.is_err(),
             "expected Err when git discovery fails with explicit track id, got Ok({:?})",
             result.ok()
         );
-        let msg = result.unwrap_err().to_string();
+        let msg = result.unwrap_err();
         assert!(
             msg.contains("cannot discover git repository")
                 || msg.contains("write operations require a git repository")
@@ -640,14 +171,60 @@ mod tests {
 
         assert!(!items_dir.exists(), "fixture must start without track/items");
 
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_init(items_dir.clone(), "new-track".to_owned(), "New Track".to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: "new-track".to_owned(),
+                description: "New Track".to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         assert!(
             items_dir.join("new-track").join("metadata.json").is_file(),
             "track init must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[test]
+    fn test_track_init_call_site_preserves_cli_contract_for_branch_strategy_adapter() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "adapter-track".to_owned();
+        let argv_description = "Adapter Track".to_owned();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: argv_items_dir.clone(),
+                track_id: argv_track_id.clone(),
+                description: argv_description.clone(),
+            });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_track_id, "adapter-track");
+        assert_eq!(argv_description, "Adapter Track");
+        assert!(
+            items_dir.join("adapter-track").join("metadata.json").is_file(),
+            "branch-strategy adapter call site must persist metadata"
         );
     }
 
@@ -677,9 +254,11 @@ mod tests {
             ("2026-07-01-earlier-track", "Earlier Track"),
             ("2026-07-31-later-track", "Later Track"),
         ] {
-            let outcome = composition
-                .track_init(items_dir.clone(), track_id.to_owned(), title.to_owned())
-                .unwrap();
+            let outcome = composition.track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: track_id.to_owned(),
+                description: title.to_owned(),
+            });
             assert_eq!(outcome.exit_code, 0);
             assert!(
                 items_dir.join(track_id).join("metadata.json").is_file(),
@@ -722,9 +301,12 @@ mod tests {
         .unwrap();
 
         let track_id = "legacy-suffix-track-2026-07-31";
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_init(items_dir.clone(), track_id.to_owned(), "Legacy Suffix Track".to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: track_id.to_owned(),
+                description: "Legacy Suffix Track".to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         assert!(
@@ -758,9 +340,11 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_archive(PathBuf::from("track/items"), track_id.to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Archive {
+                items_dir: PathBuf::from("track/items"),
+                track_id: track_id.to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         let archived_dir = root.join("track").join("archive").join(track_id);
@@ -787,9 +371,11 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_archive(PathBuf::from("track/items"), track_id.to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Archive {
+                items_dir: PathBuf::from("track/items"),
+                track_id: track_id.to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         let archived_dir = root.join("track").join("archive").join(track_id);
@@ -809,11 +395,14 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let err = crate::track::TrackCompositionRoot::new()
-            .track_archive(PathBuf::from("track/items"), "missing-track-2026".to_owned())
-            .unwrap_err()
-            .to_string();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Archive {
+                items_dir: PathBuf::from("track/items"),
+                track_id: "missing-track-2026".to_owned(),
+            });
+        let err = outcome.stderr.as_deref().or(outcome.stdout.as_deref()).unwrap_or_default();
 
+        assert_ne!(outcome.exit_code, 0);
         assert!(err.contains("track directory not found"), "unexpected error: {err}");
         assert!(!root.join("track").join("archive").exists());
     }
@@ -833,11 +422,14 @@ mod tests {
         std::fs::create_dir_all(&subdir).unwrap();
         let _cwd = change_to(&subdir);
 
-        let err = crate::track::TrackCompositionRoot::new()
-            .track_archive(PathBuf::from("track/items"), track_id.to_owned())
-            .unwrap_err()
-            .to_string();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Archive {
+                items_dir: PathBuf::from("track/items"),
+                track_id: track_id.to_owned(),
+            });
+        let err = outcome.stderr.as_deref().or(outcome.stdout.as_deref()).unwrap_or_default();
 
+        assert_ne!(outcome.exit_code, 0);
         assert!(err.contains("git mv failed"), "unexpected error: {err}");
         assert!(track_dir.join("untracked.txt").is_file());
     }

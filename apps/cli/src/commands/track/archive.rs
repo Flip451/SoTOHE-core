@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::track::TrackInput;
 
 use crate::CliError;
 
@@ -21,13 +22,10 @@ use crate::CliError;
 /// Returns `CliError::Message` when the archive operation fails (git mv error,
 /// destination already exists, track not found, etc.).
 pub(super) fn execute_archive(items_dir: PathBuf, track_id: String) -> Result<ExitCode, CliError> {
-    let app = TrackCompositionRoot::new();
-    let outcome =
-        app.track_archive(items_dir, track_id).map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::Archive { items_dir, track_id });
+    super::state_ops::track_driver_outcome_to_result(outcome)
 }
 
 #[cfg(test)]

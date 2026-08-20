@@ -1,0 +1,599 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "FsTrackMetadataAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "FsTrackViewsAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GitTrackCommitHashAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FsTrackMetadataAdapter",
+      "trait_ref": "usecase::track_lifecycle::TrackMetadataPort"
+    },
+    {
+      "for_type": "FsTrackViewsAdapter",
+      "trait_ref": "usecase::track_lifecycle::TrackViewsPort"
+    },
+    {
+      "for_type": "GitTrackCommitHashAdapter",
+      "trait_ref": "usecase::track_lifecycle::TrackCommitHashPort"
+    },
+    {
+      "for_type": "GitTrackSelectionAdapter",
+      "trait_ref": "usecase::track_lifecycle::TrackSelectionPort"
+    },
+    {
+      "for_type": "FsTrackBranchStrategyAdapter",
+      "trait_ref": "usecase::track_lifecycle::TrackBranchStrategyPort"
+    },
+    {
+      "for_type": "SystemTrackTypeSignalsAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort"
+    },
+    {
+      "for_type": "SystemTrackBaselineGraphAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort"
+    },
+    {
+      "for_type": "SystemTrackContractMapAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort"
+    },
+    {
+      "for_type": "SystemTrackCatalogueSpecSignalsAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort"
+    },
+    {
+      "for_type": "SystemTrackSpecElementHashAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort"
+    },
+    {
+      "for_type": "SystemTrackLintAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+    },
+    {
+      "for_type": "SystemTrackCatalogueImplSignalsAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort"
+    },
+    {
+      "for_type": "SystemTrackCatalogueLintActiveAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+    },
+    {
+      "for_type": "SystemTrackResolutionAdapter",
+      "trait_ref": "usecase::track_lifecycle::resolution_compat::TrackResolutionPort"
+    },
+    {
+      "for_type": "SystemTrackTypeGraphAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort"
+    },
+    {
+      "for_type": "FsTrackMetadataAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsTrackViewsAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "GitTrackCommitHashAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Copy"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsTrackBranchStrategyAdapter": {
+      "action": "add",
+      "docs": "Track branch-strategy filesystem adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "FsTrackMetadataAdapter": {
+      "action": "add",
+      "docs": "Track metadata filesystem secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "FsTrackViewsAdapter": {
+      "action": "add",
+      "docs": "Track views filesystem secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "GitTrackCommitHashAdapter": {
+      "action": "add",
+      "docs": "Track commit-hash Git secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "GitTrackSelectionAdapter": {
+      "action": "add",
+      "docs": "Track selection Git adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackBaselineCaptureAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackBaselineCaptureAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::baseline_capture",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackBaselineGraphAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackBaselineGraphAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::baseline_graph",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackCatalogueImplSignalsAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackCatalogueImplSignalsAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::catalogue_impl_signals",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackCatalogueLintActiveAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackCatalogueLintActiveAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::catalogue_lint_active",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackCatalogueSpecSignalsAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackCatalogueSpecSignalsAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::catalogue_spec_signals",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackContractMapAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackContractMapAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::contract_map",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackLintAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackLintAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::lint",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackResolutionAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackResolutionAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::resolution_compat",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackSpecElementHashAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackSpecElementHashAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::spec_element_hash",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackTypeGraphAdapter": {
+      "action": "add",
+      "docs": "System Track TypeGraph secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::type_graph",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "SystemTrackTypeSignalsAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter for the SystemTrackTypeSignalsAdapter operation boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::type_signals",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    }
+  }
+}

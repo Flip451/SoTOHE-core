@@ -28,19 +28,19 @@
     "spec-designer": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "xhigh",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "xhigh",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "high",
+      "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
@@ -52,24 +52,24 @@
     "rollback-diagnoser": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "high",
+      "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "adr-diagnoser": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "high",
+      "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
-      "provider": "codex",
-      "model": "gpt-5.6-luna",
-      "reasoning_effort": "max",
+      "provider": "grok",
+      "model": "grok-4.6",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
-      "provider": "claude",
-      "model": "claude-fable-5",
+      "provider": "grok",
+      "model": "grok-4.6",
       "fast_model": "gpt-5.6-luna",
       "fast_provider": "codex",
       "reasoning_effort": "xhigh",
@@ -79,7 +79,7 @@
     "researcher": {
       "provider": "grok",
       "model": "grok-4.6",
-      "reasoning_effort": "xhigh",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "review-fix-lead": {
@@ -89,12 +89,11 @@
       "execution_mode": "typed-pipeline"
     },
     "dry-checker": {
-      "provider": "grok",
-      "model": "grok-4.6",
-      "fast_provider": "codex",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
       "fast_model": "gpt-5.6-luna",
       "fast_reasoning_effort": "low",
-      "final_reasoning_effort": "xhigh",
+      "final_reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "dry-fix-lead": {

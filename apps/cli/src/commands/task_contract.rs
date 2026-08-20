@@ -20,6 +20,9 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand};
 use cli_composition::{TaskContractCompositionRoot, TrackCompositionRoot};
 use cli_driver::task_contract::TaskContractInput;
+use cli_driver::track_resolution::{
+    TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
+};
 
 use crate::commands::driver_outcome_to_exit;
 
@@ -210,8 +213,14 @@ fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf)
 /// `sotp ref-verify run`, `sotp track views sync`, and other track-aware
 /// commands.
 fn detect_active_track_from_branch_cwd() -> Option<String> {
-    let project_root = std::env::current_dir().ok()?;
-    TrackCompositionRoot::new().detect_active_track_from_branch(&project_root)
+    let workspace_root = TrackWorkspaceRootInput::try_new(std::env::current_dir().ok()?).ok()?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::DetectActive { workspace_root })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Some(track_id.to_string()),
+        TrackResolutionOutcome::Inactive | TrackResolutionOutcome::Failed(_) => None,
+    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -372,5 +381,65 @@ mod tests {
     fn check_non_track_branch_fails_closed() {
         let code = task_contract_check_core(None, None, PathBuf::from("track/items"));
         assert_eq!(code, ExitCode::FAILURE, "non-track branch must fail closed, not silently pass");
+    }
+
+    #[test]
+    fn test_task_contract_auto_resolution_preserves_active_track_id() {
+        use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
+
+        let _lock = process_env_lock().lock().unwrap();
+        let repository = tempfile::tempdir().unwrap();
+        seed_repo(repository.path(), "track/contract-resolution");
+
+        let resolved = run_in_dir(repository.path(), detect_active_track_from_branch_cwd);
+
+        assert_eq!(resolved.as_deref(), Some("contract-resolution"));
+
+        let via_driver = run_in_dir(repository.path(), || {
+            let workspace_root =
+                TrackWorkspaceRootInput::try_new(std::env::current_dir().unwrap()).unwrap();
+            match TrackCompositionRoot::new()
+                .track_resolution_driver()
+                .resolve(TrackResolutionInput::DetectActive { workspace_root })
+            {
+                TrackResolutionOutcome::Resolved(track_id) => Some(track_id.to_string()),
+                TrackResolutionOutcome::Inactive | TrackResolutionOutcome::Failed(_) => None,
+            }
+        });
+        assert_eq!(via_driver.as_deref(), Some("contract-resolution"));
+    }
+
+    #[test]
+    fn test_task_contract_resolution_call_site_uses_track_resolution_driver() {
+        let production_source = include_str!("task_contract.rs")
+            .split("#[cfg(test)]")
+            .next()
+            .expect("production task-contract source must exist");
+        let resolver_source = production_source
+            .split("fn detect_active_track_from_branch_cwd()")
+            .nth(1)
+            .expect("task-contract active-track resolver must exist")
+            .split("\n}\n")
+            .next()
+            .expect("task-contract active-track resolver body must exist");
+
+        assert!(resolver_source.contains("track_resolution_driver"));
+        assert!(resolver_source.contains("TrackResolutionInput::DetectActive"));
+        assert!(!resolver_source.contains("track_resolve_id"));
+    }
+
+    #[test]
+    fn test_track_resolution_input_detect_active_preserves_task_contract_exit() {
+        use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
+
+        let _lock = process_env_lock().lock().unwrap();
+        let repository = tempfile::tempdir().unwrap();
+        seed_repo(repository.path(), "main");
+
+        let resolved = run_in_dir(repository.path(), detect_active_track_from_branch_cwd);
+        assert_eq!(resolved, None);
+
+        let exit = task_contract_coverage_core(resolved, PathBuf::from("track/items"));
+        assert_eq!(exit, ExitCode::FAILURE);
     }
 }

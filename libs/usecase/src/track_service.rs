@@ -22,6 +22,23 @@
 
 use std::path::PathBuf;
 
+use domain::{ImplPlanReader, ImplPlanWriter, TrackReader, TrackWriter};
+
+pub use crate::track_lifecycle::{
+    ProcessExitCode, RenderedViewPath, TaskCount, TrackBranchStrategyPort,
+    TrackCatalogueEntryCount, TrackCatalogueImplLayerResult, TrackCataloguePath,
+    TrackCommitHashPort, TrackDirectoryPath, TrackItemsDirectory, TrackLayerFilter,
+    TrackLayerSelection, TrackLayerSignalResult, TrackLifecycleIdInput, TrackMetadataPort,
+    TrackNextTaskQueryPort, TrackOverrideClearPort, TrackOverrideSetPort, TrackSelection,
+    TrackSelectionPort, TrackSourceWorkspace, TrackSpecAnchorSelection, TrackTaskAddPort,
+    TrackTaskCountsQueryPort, TrackTaskTransition, TrackTaskTransitionPort, TrackViewSyncOutcome,
+    TrackViewsPort, TrackViewsScope, TrackWorkspaceRoot, TrackWrittenFileCount,
+};
+
+use crate::task_ops::{
+    TaskOperationInteractor, TaskOperationService, TaskQueryInteractor, TaskQueryService,
+};
+
 // ── Output DTO ────────────────────────────────────────────────────────────────
 
 /// Unified output DTO for all `track` subcommands.
@@ -144,4 +161,155 @@ pub trait TrackService: Send + Sync {
         workspace_root: PathBuf,
         rules_file: Option<PathBuf>,
     ) -> TrackCommandOutput;
+}
+
+impl<S> TrackTaskTransitionPort for TaskOperationInteractor<S>
+where
+    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
+{
+    fn transition_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+        task_id: domain::TaskId,
+        transition: crate::track_lifecycle::TrackTaskTransition,
+    ) -> Result<crate::task_ops::TaskTransitionOutcome, crate::task_ops::TaskOperationError> {
+        let (target_status, commit_hash) = match transition {
+            crate::track_lifecycle::TrackTaskTransition::Todo => ("todo".to_owned(), None),
+            crate::track_lifecycle::TrackTaskTransition::InProgress => {
+                ("in_progress".to_owned(), None)
+            }
+            crate::track_lifecycle::TrackTaskTransition::Done { commit_hash } => {
+                ("done".to_owned(), commit_hash.map(|hash| hash.to_string()))
+            }
+            crate::track_lifecycle::TrackTaskTransition::Skipped => ("skipped".to_owned(), None),
+        };
+        <Self as TaskOperationService>::transition_task(
+            self,
+            crate::task_ops::TaskTransitionCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+                task_id: task_id.as_ref().to_owned(),
+                target_status,
+                commit_hash,
+            },
+        )
+    }
+}
+
+impl<S> TrackTaskAddPort for TaskOperationInteractor<S>
+where
+    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
+{
+    fn add_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+        description: domain::NonEmptyString,
+        section: Option<domain::NonEmptyString>,
+        after: Option<domain::TaskId>,
+    ) -> Result<crate::task_ops::TaskOperationOutput, crate::task_ops::TaskOperationError> {
+        <Self as TaskOperationService>::add_task(
+            self,
+            crate::task_ops::AddTaskCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+                description: description.as_ref().to_owned(),
+                section: section.map(|value| value.as_ref().to_owned()),
+                after_task_id: after.map(|value| value.as_ref().to_owned()),
+            },
+        )
+    }
+}
+
+impl<S> TrackOverrideSetPort for TaskOperationInteractor<S>
+where
+    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
+{
+    fn set_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+        status: domain::StatusOverrideKind,
+        reason: crate::git_workflow::DiagnosticText,
+    ) -> Result<crate::task_ops::TaskOperationOutput, crate::task_ops::TaskOperationError> {
+        <Self as TaskOperationService>::set_override(
+            self,
+            crate::task_ops::SetOverrideCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+                status: status.to_string(),
+                reason: reason.as_str().to_owned(),
+            },
+        )
+    }
+}
+
+impl<S> TrackOverrideClearPort for TaskOperationInteractor<S>
+where
+    S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
+{
+    fn clear_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<crate::task_ops::TaskOperationOutput, crate::task_ops::TaskOperationError> {
+        <Self as TaskOperationService>::clear_override(
+            self,
+            crate::task_ops::ClearOverrideCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+            },
+        )
+    }
+}
+
+impl<S> TrackNextTaskQueryPort for TaskQueryInteractor<S>
+where
+    S: TrackReader + ImplPlanReader + Send + Sync,
+{
+    fn next_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        Option<crate::task_ops::NextTaskOutput>,
+        crate::track_lifecycle::track_next_task::TrackNextTaskError,
+    > {
+        <Self as TaskQueryService>::next_task(
+            self,
+            track_id.as_ref().to_owned(),
+            items_dir.as_path().to_path_buf(),
+        )
+        .map_err(|error| {
+            crate::track_lifecycle::track_next_task::TrackNextTaskError::ExecutionFailed(
+                crate::git_workflow::DiagnosticText::new(error.to_string()),
+            )
+        })
+    }
+}
+
+impl<S> TrackTaskCountsQueryPort for TaskQueryInteractor<S>
+where
+    S: TrackReader + ImplPlanReader + Send + Sync,
+{
+    fn task_counts(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: crate::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        crate::task_ops::TaskCountsOutput,
+        crate::track_lifecycle::track_task_counts::TrackTaskCountsError,
+    > {
+        <Self as TaskQueryService>::task_counts(
+            self,
+            track_id.as_ref().to_owned(),
+            items_dir.as_path().to_path_buf(),
+        )
+        .map_err(|error| {
+            crate::track_lifecycle::track_task_counts::TrackTaskCountsError::ExecutionFailed(
+                crate::git_workflow::DiagnosticText::new(error.to_string()),
+            )
+        })
+    }
 }

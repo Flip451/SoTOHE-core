@@ -1,0 +1,57 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+      "declaration_hash": "7334ccb87064ac972cc302c7c673298bcaef02006a3feae53cf2926a58b20048",
+      "id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
+  "track_id": "2026-08-18-grok-typed-pipeline-verifier-arms"
+}

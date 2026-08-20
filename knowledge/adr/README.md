@@ -139,6 +139,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
 | [composition root 規範を純 DI に確定し、実践側の逸脱を解消する](2026-07-23-0111-composition-root-pure-di-realignment.md) | Proposed | 2026-07-23 |
 | [Composition root 純 DI 化を単一改善イニシアチブと複数独立 track で完遂する](2026-07-23-1318-composition-root-pure-di-migration-initiative.md) | Proposed | 2026-07-23 |
+| [純 DI 化における usecase 契約の粒度を確定する](2026-08-15-1302-composition-root-pure-di-port-granularity.md) | Proposed | 2026-08-15 |
 | [DDD・Clean Architectureに整合する型配置と境界依存の再調整](2026-07-24-1001-architecture-pattern-placement-guard-realignment.md) | Proposed | 2026-07-24 |
 | [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
@@ -265,6 +266,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [capability routing を中華系プロバイダーへ拡張可能にする](2026-08-02-0151-multi-provider-capability-routing.md) | Proposed | 2026-08-02 |
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 | [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
+| [欠ける typed-pipeline 専用経路に grok を割り当て可能にする](2026-08-18-1534-grok-configurable-for-all-capabilities.md) | Proposed | 2026-08-18 |
 
 ### テスト・CI ツーリング
 

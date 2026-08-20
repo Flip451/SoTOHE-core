@@ -6,6 +6,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::adr_baseline::TrackIdInput;
+use cli_driver::track_tddd::{
+    TrackLayerInput, TrackTdddCatalogueImplSignalsInput, TrackTdddInput, TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -13,19 +17,29 @@ use crate::CliError;
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the underlying `CliApp` composition fails.
+/// Returns `CliError` when the underlying Track TDDD boundary fails.
 pub fn execute_catalogue_impl_signals(
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = TrackCompositionRoot::new()
-        .track_catalogue_impl_signals(Some(track_id), workspace_root, layer)
-        .map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let track_id = track_id
+        .parse::<TrackIdInput>()
+        .map_err(|error| CliError::Message(format!("invalid track id: {error}")))?;
+    let workspace_root =
+        TrackWorkspaceRootInput::try_from(workspace_root).map_err(CliError::Message)?;
+    let layer = layer
+        .map(TrackLayerInput::try_from)
+        .transpose()
+        .map_err(|error| CliError::Message(error.to_string()))?;
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::CatalogueImplSignals(TrackTdddCatalogueImplSignalsInput {
+            track_id: Some(track_id),
+            workspace_root,
+            layer,
+        }),
+    );
+    super::emit_driver_outcome!(outcome, &mut std::io::stdout(), &mut std::io::stderr())
 }
 
 #[cfg(test)]
@@ -103,5 +117,35 @@ mod tests {
         assert!(result.is_err(), "symlinked track/items must return Err");
         let msg = format!("{}", result.unwrap_err());
         assert!(msg.contains("symlink guard"), "error message must mention symlink guard: {msg}");
+    }
+
+    #[test]
+    fn test_execute_catalogue_impl_signals_success_report_emits_stdout_and_zero_exit() {
+        let outcome = cli_driver::CommandOutcome::success(Some("catalogue report".to_owned()));
+        let mut stdout = Vec::new();
+        let mut stderr = Vec::new();
+
+        let result = super::super::emit_driver_outcome!(outcome, &mut stdout, &mut stderr);
+
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+        assert_eq!(String::from_utf8(stdout).unwrap(), "catalogue report\n");
+        assert!(stderr.is_empty());
+    }
+
+    #[test]
+    fn test_execute_catalogue_impl_signals_red_report_emits_stdout_and_failure_exit() {
+        let outcome = cli_driver::CommandOutcome {
+            stdout: Some("## Layer: usecase\n🔴 Red".to_owned()),
+            stderr: None,
+            exit_code: 1,
+        };
+        let mut stdout = Vec::new();
+        let mut stderr = Vec::new();
+
+        let result = super::super::emit_driver_outcome!(outcome, &mut stdout, &mut stderr);
+
+        assert_eq!(result.unwrap(), ExitCode::FAILURE);
+        assert!(String::from_utf8(stdout).unwrap().contains("🔴 Red"));
+        assert!(stderr.is_empty());
     }
 }
