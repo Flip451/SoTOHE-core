@@ -14567,6 +14567,294 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCompositionRoot"
+      },
+      "key": {
+        "anchor_text_hash": "dfd1abe0ce90514889e15d537c565c3fe4762ce8abee9dfbad4e872503a5c86d",
+        "declaration_hash": "3c6bf252a9623da4378fdb53a8c8b01a4f927b893863e63c5991887b83856d4b",
+        "waived_reason_hash": "71fe4093ed787d685dd0050d39599dd44a81ea02828097b6af878e3438f8345b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCompositionRoot",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "declaration_hash": "89f15e81aa46fba5c21acdb82d4dfe46a09812ce248da1c54ebac87072639c71",
+        "waived_reason_hash": "c1ff5d89221e93c53524bfc1f766ea3d5618a711659f384f66a0e145e8bec27d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "b4afbfe5e445b63cc0f7a4c97c078929360bdc7e37b5550e2f5a5ce04d2b543a",
+        "waived_reason_hash": "5f132ae52fd688fa71e9759b5911e5a66507e5c8fc0e7be3e9ee05cce64c3cbb"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Track lifecycle primary-adapter boundary.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "dfd1abe0ce90514889e15d537c565c3fe4762ce8abee9dfbad4e872503a5c86d",
+        "declaration_hash": "fda47941e3166fc8197adcfe425f6ea546d9fadeaad6a55e7c655abeb4dbd635",
+        "waived_reason_hash": "54a96fb332828bcb27b70a611553dab23186be182fcc4191c7caa052b80f75e5"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "6b275bde4ec0731813a6261263bf775d7f9dbed2031ae9b25c1df1f14dfd8b1c",
+        "declaration_hash": "5f73dcceeb9a7fdd1203edda3b7c5db6d64dbeebc88af07a7620480e65be4d04",
+        "waived_reason_hash": "55b98b666eead7e6bdb689dd4368e4323f79f21e72b55e3bfc4941fe76e65859"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "この track は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の migration track の変更を暗黙に前提にしない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddDriver"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "declaration_hash": "6c9e948ff592a52046912bf1ef1a677e0f9ed5a52fd62fdd9aa9c20c7e84c4f0",
+        "waived_reason_hash": "8a7fe04ca85b0c45313fdad662ce33a2a9fe148e9cd037b37beaac86e56081c0"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddDriver",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackTdddDriver primary-adapter boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddDriver"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "cb7b035fb50ea95ab0377691f4e75636557cad2c06afcc0073ecef809906ce60",
+        "waived_reason_hash": "de929273f1df90c2d1084fa20d9cec0176ab56865aae7f2720b3f866fb2071d1"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddDriver",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackTdddDriver primary-adapter boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddDriver"
+      },
+      "key": {
+        "anchor_text_hash": "dfd1abe0ce90514889e15d537c565c3fe4762ce8abee9dfbad4e872503a5c86d",
+        "declaration_hash": "793d97604d852e0de307e9f5cc688dfdcf7b80588bf5f53a9bd95a42e95b85d6",
+        "waived_reason_hash": "ac49c2a8d18a10843b2d83e51f5c88d7b474c1b26bf68c7b8dedebefa48d1ec6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddDriver",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddInput"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "7227fc654ec4a3b77d6fd90323aa8aa16e7b25a31c79535b1f6a44d1bed746c1",
+        "waived_reason_hash": "6a5369929f7f0105d7475d902672cbba572e07bb5d65016bf4d3c33ea44fcfcb"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddInput",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"TrackTdddInput typed primary-adapter input DTO.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddInput"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "7c6bb7de0e734492f8a5ddfd03d85a1099f7d4f1a4c820147de1f5bbdf32010a",
+        "waived_reason_hash": "a6ede9120c99086cdf1101bd2459b4db4942528f68ad3404a3e1b26ae9b3c28b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddInput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackTdddInput typed primary-adapter input DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddInput"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "f25d00d6cec30ca43226030c07b0853071489f4615fa726d46a22e40d0865e4a",
+        "waived_reason_hash": "764d0d171b21acf1a55ffeb0aaf06b77c908948eb47ac168e801fa7f02ccd9d7"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "「TrackTdddInput typed primary-adapter input DTO.」",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "GitTrackCommitHashAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "declaration_hash": "30178237290eea1565462dcf4e6152d6b84969055df0c4e7c11e4cfddd81d992",
+        "waived_reason_hash": "b8115df34fef11021e2660ee1b7e2909b1ab2806144f027cf6aa020fb09cc05f"
+      },
+      "obligation_id": {
+        "entry_key": "GitTrackCommitHashAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackCommitHashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "Synchronous Track commit-hash secondary port; adapter-owned blocking Git I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

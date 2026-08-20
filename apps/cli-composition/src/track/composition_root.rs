@@ -1,19 +1,12 @@
 //! Per-context composition root for the `track` command family.
 //!
-//! `TrackCompositionRoot` replaces the `CliApp` god-facade for all `track`
-//! subcommands.  The struct is a unit struct because no adapter dependencies
-//! are injected at construction time — each method constructs its own adapters
-//! inline from the arguments it receives (hexagonal composition pattern).
-//!
-//! `CliApp` keeps backward-compatible shim methods in `track/shim.rs` that
-//! construct a `TrackCompositionRoot` and delegate, so all existing call-sites
-//! in `apps/cli` continue to compile without change.
+//! `TrackCompositionRoot` is a unit struct whose public surface only constructs
+//! wired drivers. CLI handlers obtain a driver and invoke `handle` themselves.
 
 /// Composition root for the `track` command family.
 ///
-/// This is a unit struct: no adapter dependencies are injected at construction
-/// time.  All port adapters are wired inside individual methods from the
-/// runtime arguments they receive (in-method composition).
+/// Public methods are driver factories. Port adapters are wired inside the
+/// factory helpers and never invoked from this type.
 pub struct TrackCompositionRoot;
 
 impl TrackCompositionRoot {
@@ -61,8 +54,6 @@ impl TrackCompositionRoot {
 
 pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
     use std::sync::Arc;
-
-    use super::service_impl::TrackServiceImpl;
 
     let track_init_service =
         Arc::new(usecase::track_lifecycle::track_init::TrackInitInteractor::new(
@@ -142,7 +133,6 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
         ),
     );
-    let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
             Arc::new(
@@ -165,23 +155,22 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
     ));
     cli_driver::track::TrackDriver::new(
         track_init_service,
-        track_archive_service,
-        track_branch_create_service,
-        track_branch_switch_service,
-        service,
-        fixpoint_resolve_service,
-        base_merge_service,
-        track_add_task_service,
-        track_next_task_service,
-        track_task_counts_service,
         track_transition_service,
+        track_branch_switch_service,
+        track_resolve_service,
+        track_views_validate_service,
+        track_views_sync_service,
+        track_add_task_service,
         track_set_override_service,
         track_clear_override_service,
-        track_set_commit_hash_service,
+        track_next_task_service,
+        track_task_counts_service,
+        track_archive_service,
+        track_branch_create_service,
         track_switch_base_service,
-        track_resolve_service,
-        track_views_sync_service,
-        track_views_validate_service,
+        track_set_commit_hash_service,
+        fixpoint_resolve_service,
+        base_merge_service,
     )
 }
 
@@ -276,16 +265,16 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
     cli_driver::track_tddd::TrackTdddDriver::new(
-        service,
-        baseline_graph_service,
-        catalogue_impl_signals_service,
-        catalogue_spec_signals_service,
-        spec_element_hash_service,
-        catalogue_lint_active_service,
-        lint_service,
-        contract_map_service,
         type_signals_service,
         type_graph_service,
+        baseline_graph_service,
+        contract_map_service,
+        catalogue_spec_signals_service,
+        spec_element_hash_service,
+        service,
+        lint_service,
+        catalogue_impl_signals_service,
+        catalogue_lint_active_service,
     )
 }
 
@@ -510,6 +499,48 @@ impl usecase::track_lifecycle::TrackOverrideSetPort for RequestScopedTrackOverri
 mod tests {
     use super::*;
     use cli_driver::track::TrackInput;
+
+    #[test]
+    fn test_track_composition_root_is_wire_only() {
+        let source = include_str!("composition_root.rs");
+        let production = source.split("#[cfg(test)]").next().expect("production source");
+        let mut public_fns: Vec<&str> = production
+            .lines()
+            .filter_map(|line| {
+                let trimmed = line.trim_start();
+                trimmed
+                    .strip_prefix("pub async fn ")
+                    .or_else(|| trimmed.strip_prefix("pub fn "))
+                    .and_then(|rest| rest.split('(').next())
+            })
+            .collect();
+        public_fns.sort_unstable();
+        assert_eq!(
+            public_fns,
+            ["new", "track_driver", "track_resolution_driver", "track_tddd_driver"]
+        );
+        assert!(!production.contains("pub async fn"));
+        assert!(!production.contains("TrackServiceImpl"));
+        assert!(!production.contains("compatibility shim"));
+        assert!(!production.contains(".handle("));
+        assert!(!production.contains(".handle_"));
+        assert!(!production.contains("pub fn track_init"));
+        assert!(!production.contains("pub fn track_resolve_id"));
+
+        let root = TrackCompositionRoot::new();
+        let _track_driver: cli_driver::track::TrackDriver = root.track_driver();
+        let _tddd_driver: cli_driver::track_tddd::TrackTdddDriver = root.track_tddd_driver();
+        let _resolution_driver: cli_driver::track_resolution::TrackResolutionDriver =
+            root.track_resolution_driver();
+        let invalid = TrackInput::Init {
+            items_dir: std::path::PathBuf::from("track/items"),
+            track_id: "../escape".to_owned(),
+            description: "wire-only".to_owned(),
+        };
+        let outcome = _track_driver.handle(invalid);
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.as_ref().is_some_and(|stderr| !stderr.is_empty()));
+    }
 
     #[test]
     fn test_track_resolve_call_site_preserves_cli_contract() {

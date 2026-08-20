@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackItemsDirectoryInput, TrackLayersInput, TrackTdddBaselineGraphInput,
+    TrackItemsDirectoryInput, TrackLayersInput, TrackTdddBaselineGraphInput, TrackTdddInput,
     TrackWorkspaceRootInput,
 };
 
@@ -35,8 +35,13 @@ pub fn execute_baseline_graph(
         .map(TrackLayersInput::try_new)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_baseline_graph(
-        TrackTdddBaselineGraphInput { track_id: Some(track_id), items_dir, workspace_root, layers },
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::BaselineGraph(TrackTdddBaselineGraphInput {
+            track_id: Some(track_id),
+            items_dir,
+            workspace_root,
+            layers,
+        }),
     );
     super::super::state_ops::track_driver_outcome_to_result(outcome)
 }

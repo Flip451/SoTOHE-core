@@ -1,25 +1,4 @@
-//! Compatibility entry point for `sotp track set-commit-hash`.
-
-use crate::CommandOutcome;
-use crate::error::CompositionError;
-use crate::track::composition_root::TrackCompositionRoot;
-
-impl TrackCompositionRoot {
-    /// Delegate the legacy composition call to the wired primary-adapter driver.
-    ///
-    /// # Errors
-    ///
-    pub fn track_set_commit_hash(
-        &self,
-        track_id: &str,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let input =
-            track_id.parse::<cli_driver::adr_baseline::TrackIdInput>().map_err(|error| {
-                CompositionError::WiringFailed(format!("invalid track id: {error}"))
-            })?;
-        Ok(self.track_driver().handle_set_commit_hash(input))
-    }
-}
+//! Compatibility regressions for `sotp track set-commit-hash`.
 
 // ---------------------------------------------------------------------------
 // Unit tests
@@ -31,6 +10,8 @@ mod tests {
     use std::panic::{AssertUnwindSafe, catch_unwind, resume_unwind};
     use std::path::Path;
     use std::process::Command;
+
+    use cli_driver::adr_baseline::TrackIdInput;
 
     use crate::track::composition_root::TrackCompositionRoot;
 
@@ -76,13 +57,11 @@ mod tests {
 
     #[test]
     fn test_track_set_commit_hash_with_invalid_track_id_returns_wiring_error() {
-        let app = TrackCompositionRoot::new();
-        let result = app.track_set_commit_hash("../evil");
-        let error = match result {
-            Ok(outcome) => panic!("invalid track id must fail at wiring, got {outcome:?}"),
+        let error = match "../evil".parse::<TrackIdInput>() {
+            Ok(track_id) => panic!("invalid track id must fail at wiring, got {track_id}"),
             Err(error) => error,
         };
-        let message = error.to_string();
+        let message = format!("invalid track id: {error}");
         assert!(message.contains("invalid track id"), "got: {message}");
         assert!(
             !message.contains("[set-commit-hash] ERROR"),
@@ -105,10 +84,8 @@ mod tests {
 
         let argv_track_id = "my-track-2026".to_owned();
         let outcome = from_working_dir(dir.path(), || {
-            let app = TrackCompositionRoot::new();
-            let result = app.track_set_commit_hash(&argv_track_id);
-            assert!(result.is_ok(), "method must return Ok(outcome): {result:?}");
-            result.unwrap()
+            let track_id = argv_track_id.parse::<TrackIdInput>().unwrap();
+            TrackCompositionRoot::new().track_driver().handle_set_commit_hash(track_id)
         });
         assert_eq!(outcome.exit_code, 0, "happy path must succeed, stderr: {:?}", outcome.stderr);
         assert_eq!(argv_track_id, "my-track-2026");

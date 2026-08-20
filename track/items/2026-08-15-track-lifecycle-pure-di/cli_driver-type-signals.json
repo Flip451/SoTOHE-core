@@ -1,14 +1,14 @@
 {
   "baseline_hash": "f80a049a51ead3f8c296d234a9293ee6422ea2945e5aa12f45cbcd7aeac48346",
   "declaration_hash": "c38579dc9ab85970e34d23706b37b82601fad3904aa433b52bb608d9d7ccf1c0",
-  "generated_at": "2026-08-20T03:27:16Z",
-  "head_commit": "00dae338f96077539ed18d90e927640822ff56f5",
+  "generated_at": "2026-08-20T05:46:48Z",
+  "head_commit": "3aab67243a6a6e3165c963a46c57b061f95e02a8",
   "schema_version": 4,
   "signals": [
     {
       "found_type": true,
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackDriver"
     },
     {
@@ -172,13 +172,13 @@
     {
       "found_type": true,
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddDriver"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddInput"
     },
     {

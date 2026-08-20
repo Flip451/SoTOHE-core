@@ -8,7 +8,8 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackLayerInput, TrackLintRulesFileInput, TrackTdddLintInput, TrackWorkspaceRootInput,
+    TrackLayerInput, TrackLintRulesFileInput, TrackTdddInput, TrackTdddLintInput,
+    TrackWorkspaceRootInput,
 };
 
 use crate::CliError;
@@ -35,12 +36,9 @@ pub fn execute_lint(
         .map(TrackLintRulesFileInput::try_new)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_lint(TrackTdddLintInput {
-        track_id: Some(track_id),
-        workspace_root,
-        layer,
-        rules_file,
-    });
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::Lint(
+        TrackTdddLintInput { track_id: Some(track_id), workspace_root, layer, rules_file },
+    ));
     let mut stdout = std::io::stdout();
     let mut stderr = std::io::stderr();
     crate::commands::track::tddd::emit_driver_outcome!(outcome, &mut stdout, &mut stderr)
@@ -169,12 +167,9 @@ mod tests {
             .map(TrackLintRulesFileInput::try_new)
             .transpose()
             .expect("rules file is valid");
-        TrackCompositionRoot::new().track_tddd_driver().handle_lint(TrackTdddLintInput {
-            track_id: Some(track_id),
-            workspace_root,
-            layer,
-            rules_file,
-        })
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::Lint(
+            TrackTdddLintInput { track_id: Some(track_id), workspace_root, layer, rules_file },
+        ))
     }
 
     #[test]

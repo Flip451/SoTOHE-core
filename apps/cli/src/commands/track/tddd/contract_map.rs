@@ -18,7 +18,8 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackItemsDirectoryInput, TrackLayersInput, TrackTdddContractMapInput, TrackWorkspaceRootInput,
+    TrackItemsDirectoryInput, TrackLayersInput, TrackTdddContractMapInput, TrackTdddInput,
+    TrackWorkspaceRootInput,
 };
 
 use crate::CliError;
@@ -47,8 +48,13 @@ pub fn execute_contract_map(
         .map(TrackLayersInput::try_new)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_contract_map(
-        TrackTdddContractMapInput { track_id: Some(track_id), items_dir, workspace_root, layers },
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::ContractMap(TrackTdddContractMapInput {
+            track_id: Some(track_id),
+            items_dir,
+            workspace_root,
+            layers,
+        }),
     );
     super::emit_command_outcome(&outcome, &mut io::stdout(), &mut io::stderr())
 }
@@ -179,14 +185,14 @@ mod tests {
             .expect("items directory is valid");
         let workspace_root =
             TrackWorkspaceRootInput::try_from(root.to_path_buf()).expect("workspace is valid");
-        TrackCompositionRoot::new().track_tddd_driver().handle_contract_map(
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::ContractMap(
             TrackTdddContractMapInput {
                 track_id: Some(track_id),
                 items_dir,
                 workspace_root,
                 layers: None,
             },
-        )
+        ))
     }
 
     #[test]

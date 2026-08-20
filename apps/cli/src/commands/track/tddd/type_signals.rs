@@ -5,7 +5,9 @@ use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
-use cli_driver::track_tddd::{TrackLayerInput, TrackTdddTypeSignalsInput, TrackWorkspaceRootInput};
+use cli_driver::track_tddd::{
+    TrackLayerInput, TrackTdddInput, TrackTdddTypeSignalsInput, TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -28,9 +30,9 @@ pub fn execute_type_signals(
         .map(TrackLayerInput::try_from)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new()
-        .track_tddd_driver()
-        .handle_type_signals(TrackTdddTypeSignalsInput { track_id, workspace_root, layer });
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::TypeSignals(TrackTdddTypeSignalsInput { track_id, workspace_root, layer }),
+    );
     super::emit_driver_outcome!(outcome, &mut std::io::stdout(), &mut std::io::stderr())
 }
 
@@ -97,13 +99,13 @@ mod tests {
         let workspace_root =
             TrackWorkspaceRootInput::try_from(root.to_path_buf()).expect("workspace is valid");
         let layer = TrackLayerInput::try_from("domain".to_owned()).expect("layer is valid");
-        TrackCompositionRoot::new().track_tddd_driver().handle_type_signals(
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::TypeSignals(
             TrackTdddTypeSignalsInput {
                 track_id: Some(track_id),
                 workspace_root,
                 layer: Some(layer),
             },
-        )
+        ))
     }
 
     #[cfg(unix)]

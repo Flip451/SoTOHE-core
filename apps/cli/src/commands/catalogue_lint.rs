@@ -25,7 +25,8 @@ use clap::{Args, Subcommand};
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackLintRulesFileInput, TrackTdddCatalogueLintActiveInput, TrackWorkspaceRootInput,
+    TrackLintRulesFileInput, TrackTdddCatalogueLintActiveInput, TrackTdddInput,
+    TrackWorkspaceRootInput,
 };
 
 // ── sotp catalogue-lint ─────────────────────────────────────────────────────
@@ -117,8 +118,12 @@ pub fn execute_check_active_track(args: CatalogueLintCheckActiveTrackArgs) -> Ex
             return ExitCode::FAILURE;
         }
     };
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_catalogue_lint_active(
-        TrackTdddCatalogueLintActiveInput { track_id, workspace_root, rules_file },
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::CatalogueLintActive(TrackTdddCatalogueLintActiveInput {
+            track_id,
+            workspace_root,
+            rules_file,
+        }),
     );
     let mut stdout = std::io::stdout();
     let mut stderr = std::io::stderr();
@@ -336,9 +341,9 @@ mod tests {
             Ok(rules_file) => rules_file,
             Err(error) => return CommandOutcome::failure(Some(error.to_string())),
         };
-        TrackCompositionRoot::new().track_tddd_driver().handle_catalogue_lint_active(
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::CatalogueLintActive(
             TrackTdddCatalogueLintActiveInput { track_id, workspace_root, rules_file },
-        )
+        ))
     }
 
     fn run_migrated_call_site(

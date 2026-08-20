@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackLayerInput, TrackTdddCatalogueImplSignalsInput, TrackWorkspaceRootInput,
+    TrackLayerInput, TrackTdddCatalogueImplSignalsInput, TrackTdddInput, TrackWorkspaceRootInput,
 };
 
 use crate::CliError;
@@ -32,8 +32,12 @@ pub fn execute_catalogue_impl_signals(
         .map(TrackLayerInput::try_from)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_catalogue_impl_signals(
-        TrackTdddCatalogueImplSignalsInput { track_id: Some(track_id), workspace_root, layer },
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::CatalogueImplSignals(TrackTdddCatalogueImplSignalsInput {
+            track_id: Some(track_id),
+            workspace_root,
+            layer,
+        }),
     );
     super::emit_driver_outcome!(outcome, &mut std::io::stdout(), &mut std::io::stderr())
 }

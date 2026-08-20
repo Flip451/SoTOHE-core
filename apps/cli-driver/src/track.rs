@@ -1,7 +1,7 @@
 //! `track` command family — primary adapter driver.
 //!
-//! `TrackDriver` holds an injected [`usecase::track_service::TrackService`]
-//! and exposes `handle(input) -> CommandOutcome`.
+//! `TrackDriver` holds the wired command-context services and exposes
+//! `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -37,7 +37,6 @@ use usecase::track_lifecycle::{
     RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
     TrackSelection, TrackViewSyncOutcome,
 };
-use usecase::track_service::TrackService;
 
 use crate::render::CommandOutcome;
 use crate::track_base_merge::render_base_merge_result;
@@ -211,8 +210,8 @@ pub struct BaseMergeInput {
 
 /// Render a [`FixpointResolveDriverOutcome`] into a [`CommandOutcome`].
 ///
-/// Reproduces the exact text contract previously produced by
-/// `cli_composition::track::fixpoint_resolve::format_fixpoint_step`:
+/// Reproduces the exact text contract previously produced by the
+/// track fixpoint-resolve formatter:
 /// - `RunDfp` → `"run-dfp"`
 /// - `RunRfp { scopes }` → `"run-rfp scopes=<s1>,<s2>..."` (scopes already
 ///   sorted by the usecase layer)
@@ -239,15 +238,13 @@ fn render_fixpoint_resolve_outcome(outcome: FixpointResolveDriverOutcome) -> Com
 
 /// Primary adapter driver for the `track` command family.
 ///
-/// Holds the incremental Init service and the compatibility track service;
-/// exposes `handle(input) -> CommandOutcome`.
+/// Holds the wired command-context services and exposes `handle(input) -> CommandOutcome`.
 pub struct TrackDriver {
     track_init_service: Arc<dyn TrackInitService>,
     track_transition_service: Arc<dyn TrackTransitionService>,
     track_archive_service: Arc<dyn TrackArchiveService>,
     track_branch_create_service: Arc<dyn TrackBranchCreateService>,
     track_branch_switch_service: Arc<dyn TrackBranchSwitchService>,
-    service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
     track_add_task_service: Arc<dyn TrackAddTaskService>,
@@ -266,44 +263,42 @@ impl TrackDriver {
     /// Create a new `TrackDriver` with the given services.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        track_init_service: Arc<dyn TrackInitService>,
-        track_archive_service: Arc<dyn TrackArchiveService>,
-        track_branch_create_service: Arc<dyn TrackBranchCreateService>,
-        track_branch_switch_service: Arc<dyn TrackBranchSwitchService>,
-        service: Arc<dyn TrackService>,
+        track_init: Arc<dyn TrackInitService>,
+        track_transition: Arc<dyn TrackTransitionService>,
+        track_branch_switch: Arc<dyn TrackBranchSwitchService>,
+        track_resolve: Arc<dyn TrackResolveService>,
+        track_views_validate: Arc<dyn TrackViewsValidateService>,
+        track_views_sync: Arc<dyn TrackViewsSyncService>,
+        track_add_task: Arc<dyn TrackAddTaskService>,
+        track_set_override: Arc<dyn TrackSetOverrideService>,
+        track_clear_override: Arc<dyn TrackClearOverrideService>,
+        track_next_task: Arc<dyn TrackNextTaskService>,
+        track_task_counts: Arc<dyn TrackTaskCountsService>,
+        track_archive: Arc<dyn TrackArchiveService>,
+        track_branch_create: Arc<dyn TrackBranchCreateService>,
+        track_switch_base: Arc<dyn TrackSwitchBaseService>,
+        track_set_commit_hash: Arc<dyn TrackSetCommitHashService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
-        track_add_task_service: Arc<dyn TrackAddTaskService>,
-        track_next_task_service: Arc<dyn TrackNextTaskService>,
-        track_task_counts_service: Arc<dyn TrackTaskCountsService>,
-        track_transition_service: Arc<dyn TrackTransitionService>,
-        track_set_override_service: Arc<dyn TrackSetOverrideService>,
-        track_clear_override_service: Arc<dyn TrackClearOverrideService>,
-        track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
-        track_switch_base_service: Arc<dyn TrackSwitchBaseService>,
-        track_resolve_service: Arc<dyn TrackResolveService>,
-        track_views_sync_service: Arc<dyn TrackViewsSyncService>,
-        track_views_validate_service: Arc<dyn TrackViewsValidateService>,
     ) -> Self {
         Self {
-            track_init_service,
-            track_transition_service,
-            track_archive_service,
-            track_branch_create_service,
-            track_branch_switch_service,
-            service,
+            track_init_service: track_init,
+            track_transition_service: track_transition,
+            track_archive_service: track_archive,
+            track_branch_create_service: track_branch_create,
+            track_branch_switch_service: track_branch_switch,
             fixpoint_resolve_service,
             base_merge_service,
-            track_add_task_service,
-            track_next_task_service,
-            track_task_counts_service,
-            track_set_override_service,
-            track_clear_override_service,
-            track_set_commit_hash_service,
-            track_switch_base_service,
-            track_resolve_service,
-            track_views_sync_service,
-            track_views_validate_service,
+            track_add_task_service: track_add_task,
+            track_next_task_service: track_next_task,
+            track_task_counts_service: track_task_counts,
+            track_set_override_service: track_set_override,
+            track_clear_override_service: track_clear_override,
+            track_set_commit_hash_service: track_set_commit_hash,
+            track_switch_base_service: track_switch_base,
+            track_resolve_service: track_resolve,
+            track_views_sync_service: track_views_sync,
+            track_views_validate_service: track_views_validate,
         }
     }
 
@@ -402,9 +397,6 @@ impl TrackDriver {
                 items_dir,
                 track_id,
             ),
-            TrackInput::DetectActive { project_root } => {
-                CommandOutcome::from_track_command_output(self.service.detect_active(project_root))
-            }
             TrackInput::FixpointResolve { track_id, current_branch, items_dir } => {
                 let outcome =
                     self.fixpoint_resolve_service.fixpoint_resolve(FixpointResolveDriverInput {
@@ -417,15 +409,12 @@ impl TrackDriver {
             TrackInput::SwitchBase { project_root } => {
                 render_track_switch_base_outcome(&*self.track_switch_base_service, project_root)
             }
-            TrackInput::CatalogueLintCheckActiveTrack { track_id, workspace_root, rules_file } => {
-                CommandOutcome::from_track_command_output(
-                    self.service.catalogue_lint_check_active_track(
-                        track_id,
-                        workspace_root,
-                        rules_file,
-                    ),
-                )
-            }
+            TrackInput::DetectActive { project_root: _ } => CommandOutcome::failure(Some(
+                "detect-active is served by TrackResolutionDriver".to_owned(),
+            )),
+            TrackInput::CatalogueLintCheckActiveTrack { .. } => CommandOutcome::failure(Some(
+                "catalogue-lint check-active-track is served by TrackTdddDriver".to_owned(),
+            )),
         }
     }
 }
@@ -689,6 +678,52 @@ mod tests {
     use super::*;
     use std::sync::Mutex;
 
+    #[test]
+    fn test_track_driver_production_has_no_shim_or_reverse_delegation() {
+        let source = include_str!("track.rs");
+        let production =
+            source.split("#[cfg(test)]").next().expect("production source precedes tests");
+        assert!(production.contains("pub fn handle"));
+        assert!(production.contains("CommandOutcome"));
+        assert!(production.contains("TrackInput"));
+        assert!(!production.contains("TrackServiceImpl"));
+        assert!(!production.contains("ServiceImpl"));
+        assert!(!production.contains("compatibility shim"));
+        assert!(!production.contains("composition_root"));
+        assert!(!production.contains("cli_composition"));
+        assert!(!production.contains("TrackCompositionRoot"));
+        assert!(!production.contains(".handle("));
+        for needle in [
+            "track_init_service",
+            "track_transition_service",
+            "track_archive_service",
+            "track_branch_create_service",
+            "track_branch_switch_service",
+            "fixpoint_resolve_service",
+            "track_add_task_service",
+            "track_next_task_service",
+            "track_task_counts_service",
+            "track_set_override_service",
+            "track_clear_override_service",
+            "track_set_commit_hash_service",
+            "track_switch_base_service",
+            "track_resolve_service",
+            "track_views_sync_service",
+            "track_views_validate_service",
+            "base_merge_service",
+            "TrackInput::Transition",
+            "TrackInput::SetOverride",
+            "TrackInput::ClearOverride",
+            "TrackInput::FixpointResolve",
+            "TrackInput::Resolve",
+            "TrackInput::ViewsSync",
+            "TrackInput::ViewsValidate",
+            "TrackInput::SwitchBase",
+        ] {
+            assert!(production.contains(needle), "missing injected one-way path {needle}");
+        }
+    }
+
     use domain::{
         BaseMergeDirection, BranchStrategySnapshot, CommitHash, MergeMethod, NonEmptyString,
         TrackBranch, TrackId, TrackMetadata,
@@ -721,10 +756,6 @@ mod tests {
     use usecase::track_lifecycle::track_transition::{
         TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
     };
-    use usecase::track_service::TrackCommandOutput;
-
-    struct UnusedTrackService;
-
     struct UnusedTrackInitService;
 
     struct UnusedTrackArchiveService;
@@ -1077,79 +1108,6 @@ mod tests {
         }
     }
 
-    impl TrackService for UnusedTrackService {
-        fn init(&self, _: PathBuf, _: String, _: String) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn transition(
-            &self,
-            _: PathBuf,
-            _: Option<String>,
-            _: String,
-            _: String,
-            _: Option<String>,
-        ) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn resolve(&self, _: PathBuf, _: Option<String>) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn branch_create(&self, _: PathBuf, _: String) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn branch_switch(&self, _: PathBuf, _: String) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn views_validate(&self, _: PathBuf) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn views_sync(&self, _: PathBuf, _: Option<String>) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn add_task(
-            &self,
-            _: PathBuf,
-            _: Option<String>,
-            _: String,
-            _: Option<String>,
-            _: Option<String>,
-        ) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn set_override(
-            &self,
-            _: PathBuf,
-            _: Option<String>,
-            _: String,
-            _: String,
-        ) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn clear_override(&self, _: PathBuf, _: Option<String>) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn next_task(&self, _: PathBuf, _: Option<String>) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn task_counts(&self, _: PathBuf, _: Option<String>) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn archive(&self, _: PathBuf, _: String) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn detect_active(&self, _: PathBuf) -> TrackCommandOutput {
-            unreachable!()
-        }
-        fn catalogue_lint_check_active_track(
-            &self,
-            _: Option<String>,
-            _: PathBuf,
-            _: Option<PathBuf>,
-        ) -> TrackCommandOutput {
-            unreachable!()
-        }
-    }
-
     struct UnusedFixpointResolveService;
 
     impl FixpointResolveDriverService for UnusedFixpointResolveService {
@@ -1182,23 +1140,22 @@ mod tests {
     fn base_merge_driver<T: BaseMergeService + 'static>(service: Arc<T>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            service,
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            service,
         )
     }
 
@@ -1210,23 +1167,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             service.clone(),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1254,23 +1210,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             service.clone(),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1293,23 +1248,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             service.clone(),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1329,23 +1283,22 @@ mod tests {
             Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            service.clone(),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            service.clone(),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1375,23 +1328,22 @@ mod tests {
             Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            service.clone(),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            service.clone(),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1413,23 +1365,22 @@ mod tests {
             Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            service.clone(),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            service.clone(),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1453,23 +1404,22 @@ mod tests {
             Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            service.clone(),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            service.clone(),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1501,23 +1451,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            service.clone(),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            service.clone(),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1547,23 +1496,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            service,
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            service,
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1585,23 +1533,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            service,
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            service,
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1665,23 +1612,22 @@ mod tests {
     fn task_counts_driver(service: Arc<RecordingTrackTaskCountsService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            service,
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            service,
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 
@@ -1779,23 +1725,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1818,23 +1763,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1864,23 +1808,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1901,23 +1844,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1938,23 +1880,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            service,
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            service,
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1974,23 +1915,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2014,23 +1954,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2052,23 +1991,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            service.clone(),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2089,23 +2027,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            service,
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            service,
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2125,23 +2062,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            service.clone(),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            service.clone(),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2165,23 +2101,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            service.clone(),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            service.clone(),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2205,23 +2140,22 @@ mod tests {
         });
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            service,
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            service,
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2668,23 +2602,22 @@ mod tests {
     fn set_commit_hash_driver(service: Arc<RecordingTrackSetCommitHashService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            service,
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            service,
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 
@@ -2777,23 +2710,22 @@ mod tests {
     fn switch_base_driver(service: Arc<RecordingTrackSwitchBaseService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             service,
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 
@@ -2889,23 +2821,22 @@ mod tests {
     fn resolve_driver(service: Arc<RecordingTrackResolveService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            service,
+            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            service,
-            Arc::new(UnusedTrackViewsSyncService),
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 
@@ -3001,23 +2932,22 @@ mod tests {
     fn views_sync_driver(service: Arc<RecordingTrackViewsSyncService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsValidateService),
+            service,
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            service,
-            Arc::new(UnusedTrackViewsValidateService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 
@@ -3097,23 +3027,22 @@ mod tests {
     fn views_validate_driver(service: Arc<RecordingTrackViewsValidateService>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
-            Arc::new(UnusedTrackArchiveService),
-            Arc::new(UnusedTrackBranchCreateService),
-            Arc::new(UnusedTrackBranchSwitchService),
-            Arc::new(UnusedTrackService),
-            Arc::new(UnusedFixpointResolveService),
-            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
-            Arc::new(UnusedTrackAddTaskService),
-            Arc::new(UnusedTrackNextTaskService),
-            Arc::new(UnusedTrackTaskCountsService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackResolveService),
+            service,
+            Arc::new(UnusedTrackViewsSyncService),
+            Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
-            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackSwitchBaseService),
-            Arc::new(UnusedTrackResolveService),
-            Arc::new(UnusedTrackViewsSyncService),
-            service,
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
         )
     }
 

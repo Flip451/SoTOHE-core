@@ -3,6 +3,9 @@ use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
 use cli_driver::track::TrackInput;
+use cli_driver::track_resolution::{
+    TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -43,7 +46,14 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
 fn detect_active_track_from_branch(project_root: &Path) -> Option<String> {
-    TrackCompositionRoot::new().detect_active_track_from_branch(project_root)
+    let workspace_root = TrackWorkspaceRootInput::try_new(project_root.to_path_buf()).ok()?;
+    match TrackCompositionRoot::new()
+        .track_resolution_driver()
+        .resolve(TrackResolutionInput::DetectActive { workspace_root })
+    {
+        TrackResolutionOutcome::Resolved(track_id) => Some(track_id.to_string()),
+        TrackResolutionOutcome::Inactive | TrackResolutionOutcome::Failed(_) => None,
+    }
 }
 
 #[cfg(test)]
@@ -109,6 +119,15 @@ mod tests {
         }
 
         root
+    }
+
+    #[test]
+    fn test_views_detect_active_uses_resolution_driver() {
+        let source = include_str!("views.rs");
+        let production = source.split("#[cfg(test)]").next().expect("production source");
+        assert!(production.contains("TrackResolutionInput::DetectActive"));
+        assert!(production.contains("track_resolution_driver"));
+        assert!(!production.contains("TrackServiceImpl"));
     }
 
     #[test]

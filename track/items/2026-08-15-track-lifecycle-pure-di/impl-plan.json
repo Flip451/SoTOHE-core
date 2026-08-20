@@ -301,6 +301,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "3aab67243a6a6e3165c963a46c57b061f95e02a8",
       "depends_on": [
         "T001"
       ],
@@ -345,6 +346,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "3aab67243a6a6e3165c963a46c57b061f95e02a8",
       "depends_on": [
         "T001"
       ],
@@ -387,7 +389,7 @@
       ],
       "description": "In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, replace remaining execution-path references with the wired `TrackDriver` and `TrackTdddDriver` routes and add focused CLI regressions. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-04]",
       "id": "T028",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

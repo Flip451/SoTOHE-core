@@ -1,106 +1,30 @@
-//! Public resolution façade for the `track` command family.
-//!
-//! Wraps the private `resolve_track_id*` helpers in `track/mod.rs` as
-//! `TrackCompositionRoot` methods so that `apps/cli` callers never need to
-//! import infra/usecase directly.
-
-use std::path::PathBuf;
-
-use crate::error::CompositionError;
-use crate::track::composition_root::TrackCompositionRoot;
-
-use super::{
-    resolve_project_root, resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
-    resolve_track_id_inner, validate_track_id_str,
-};
-
-impl TrackCompositionRoot {
-    /// Resolve a track ID for a READ operation, anchored to `items_dir`.
-    ///
-    /// When `explicit_id` is `Some`, it is returned as-is (git discovery skipped).
-    /// When `None`, the current branch is used to derive the track ID.
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] on failure.
-    pub fn track_resolve_id(
-        &self,
-        explicit_id: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<String, CompositionError> {
-        resolve_track_id(explicit_id, &items_dir)
-    }
-
-    /// Resolve a track ID for a READ operation, anchored to `workspace_root`.
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] on failure.
-    pub fn track_resolve_id_from_root(
-        &self,
-        explicit_id: Option<String>,
-        workspace_root: PathBuf,
-    ) -> Result<String, CompositionError> {
-        resolve_track_id_from_root(explicit_id, &workspace_root)
-    }
-
-    /// Resolve a track ID for a WRITE operation, anchored to `items_dir`.
-    ///
-    /// Branch is always read; explicit ID must match the branch-derived ID.
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] on failure.
-    pub fn track_resolve_id_for_write(
-        &self,
-        explicit_id: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<String, CompositionError> {
-        resolve_track_id_for_write(explicit_id, &items_dir)
-    }
-
-    /// Resolve a track ID for a WRITE operation, anchored to `workspace_root`.
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] on failure.
-    pub fn track_resolve_id_from_root_for_write(
-        &self,
-        explicit_id: Option<String>,
-        workspace_root: PathBuf,
-    ) -> Result<String, CompositionError> {
-        resolve_track_id_inner(explicit_id, &workspace_root, true)
-    }
-
-    /// Validate a track ID string (lowercase slug format).
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] when the slug format is invalid.
-    pub fn track_validate_id(&self, value: &str) -> Result<(), CompositionError> {
-        validate_track_id_str(value)
-    }
-
-    /// Resolve the project root from an items_dir path (`<root>/track/items`).
-    ///
-    /// # Errors
-    /// Returns [`CompositionError`] when the path structure is not canonical.
-    pub fn track_resolve_project_root(
-        &self,
-        items_dir: PathBuf,
-    ) -> Result<PathBuf, CompositionError> {
-        resolve_project_root(&items_dir)
-    }
-}
+//! Compatibility resolution tests for the `track` command family.
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
+    use cli_driver::track_resolution::{
+        TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome,
+    };
+
+    fn resolve_active_from_items(items_dir: std::path::PathBuf) -> String {
+        let items_dir = TrackItemsDirectoryInput::try_new(items_dir).unwrap();
+        match crate::TrackCompositionRoot::new()
+            .track_resolution_driver()
+            .resolve(TrackResolutionInput::ReadFromItems { track_id: None, items_dir })
+        {
+            TrackResolutionOutcome::Resolved(track_id) => track_id.to_string(),
+            other => panic!("expected resolved track, got {other:?}"),
+        }
+    }
+
     #[test]
     fn test_track_resolve_id_date_prefixed_branch_returns_opaque_id() {
         let root = tempfile::tempdir().unwrap();
         let track_id = "2026-07-31-date-prefixed-track";
         crate::test_support::seed_repo(root.path(), &format!("track/{track_id}"));
 
-        let resolved = crate::TrackCompositionRoot::new()
-            .track_resolve_id(None, root.path().join("track").join("items"))
-            .unwrap();
-
+        let resolved = resolve_active_from_items(root.path().join("track").join("items"));
         assert_eq!(resolved, track_id);
     }
 
@@ -110,10 +34,7 @@ mod tests {
         let track_id = "legacy-suffix-track-2026-07-31";
         crate::test_support::seed_repo(root.path(), &format!("track/{track_id}"));
 
-        let resolved = crate::TrackCompositionRoot::new()
-            .track_resolve_id(None, root.path().join("track").join("items"))
-            .unwrap();
-
+        let resolved = resolve_active_from_items(root.path().join("track").join("items"));
         assert_eq!(resolved, track_id);
     }
 }

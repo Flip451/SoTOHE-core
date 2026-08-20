@@ -6,7 +6,7 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackItemsDirectoryInput, TrackLayerInput, TrackTdddTypeGraphInput,
+    TrackItemsDirectoryInput, TrackLayerInput, TrackTdddInput, TrackTdddTypeGraphInput,
     TrackTypeGraphClusterDepthInput, TrackTypeGraphEdgeInput, TrackWorkspaceRootInput,
 };
 
@@ -50,15 +50,15 @@ pub fn execute_type_graph(
             return Err(CliError::Message(format!("invalid type-graph edges '{other}'")));
         }
     };
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_type_graph(
-        TrackTdddTypeGraphInput {
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::TypeGraph(TrackTdddTypeGraphInput {
             track_id: Some(track_id),
             items_dir,
             workspace_root,
             layer,
             cluster_depth: TrackTypeGraphClusterDepthInput::new(cluster_depth),
             edges,
-        },
+        }),
     );
     super::emit_driver_outcome!(outcome, &mut std::io::stdout(), &mut std::io::stderr())
 }

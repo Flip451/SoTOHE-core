@@ -591,6 +591,71 @@
           "hash": "rvw1:sha256:c4c5f940bb5d75034fd78a2b200cffdbbdec62f7043cf4cf3d9780c538153622",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:04:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16fb9aba1f2fd4b464a0fb650c33e85fe591bffa2f599699f3f5f711a70709ca",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:20:27Z",
+          "findings": [
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/validate.rs",
+              "line": 87,
+              "message": "Omitted-id READ/WRITE resolution now forwards TrackResolutionOutcome::Failed via diagnostic.to_string(). SystemTrackResolutionAdapter emits strings such as `track resolution error: not on a track branch (on 'main'); provide an explicit track-id` and `WRITE guard mismatch: explicit track-id '…' does not match the branch-derived track-id '…'`. The replaced TrackCompositionRoot::track_resolve_id* path wrapped GitTrackSelectionAdapter failures as `cannot discover git repository from {anchor}: active track resolution failed: …`. Track commands that still go through these helpers (next-task, lint, baseline-capture, views --track-id, and other dispatch call sites) therefore change stderr contrary to CN-01. Restore the legacy diagnostic at the resolution driver/adapter boundary; do not re-wrap strings in this bin helper.",
+              "severity": "P1"
+            },
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/validate.rs",
+              "line": 72,
+              "message": "validate_track_id_str and the explicit-id arms of resolve_track_id / resolve_track_id_from_root now parse TrackIdInput and prefix `invalid track id: `. The previous composition helpers returned explicit READ ids as-is with no validation, and WRITE/validate_track_id_str failures used the domain Display (`track id '…' must be a lowercase slug`) with no prefix. Invalid `--track-id` therefore changes stderr and failure location: for example next-task used to reach the driver, which strips this prefix to keep `[ERROR] track id '…'`. Keep the explicit READ short-circuit unvalidated, and emit the legacy domain text for invalid slugs from the typed-input boundary rather than synthesizing a new prefix here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:16fb9aba1f2fd4b464a0fb650c33e85fe591bffa2f599699f3f5f711a70709ca",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T05:22:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:83125a3df3d1b463323cab029345e80af227ac7789552aec321adfb8d7988f70",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:24:28Z",
+          "findings": [
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/validate.rs",
+              "line": 86,
+              "message": "`resolve_track_id`, `resolve_track_id_from_root`, `resolve_track_id_for_write`, and `resolve_track_id_from_root_for_write` re-render `TrackResolutionOutcome::Failed` in the bin as `cannot discover git repository from {anchor}: active track resolution failed: {diagnostic}`. That is presentation logic the thin-bin role forbids (`architecture-rules.json`: cli may only parse, obtain a wired driver, and emit). It also fails CN-01: items-dir helpers use `items_dir` as `{anchor}` instead of the project root the old composition helper used; git-discovery failures from `SystemTrackResolutionAdapter` already start with `cannot discover git repository from …`, so the CLI doubles the prefix; non-track-branch text becomes `track resolution error:` rather than the legacy `track resolution failed:`; WRITE mismatch text inserts `the branch-derived`. Emit the driver diagnostic unchanged, and restore the legacy wording at the resolution driver/adapter boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:83125a3df3d1b463323cab029345e80af227ac7789552aec321adfb8d7988f70",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T05:30:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0386cd8e256fb4185718f71c12d2dae5c348ebc6ae2b938b65bc908245e2d56a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:32:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0386cd8e256fb4185718f71c12d2dae5c348ebc6ae2b938b65bc908245e2d56a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1051,6 +1116,49 @@
           "at": "2026-08-20T02:08:43Z",
           "findings": [],
           "hash": "rvw1:sha256:bfffe890f58e85122887eabe7767432a77785c5c53749273652022f0c3293e6b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:04:42Z",
+          "findings": [
+            {
+              "category": "architecture violation",
+              "file": "apps/cli-composition/src/track/composition_root.rs",
+              "line": 285,
+              "message": "Composition defines request-scoped implementations of usecase secondary ports (`RequestScopedTrackTaskAddAdapter`, transition/phase/query/override variants) and injects them into production interactors. This violates the scope constraint that port implementations belong in `libs/infrastructure` and that composition must use catalogued System adapters; move these adapters out of `cli_composition`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca98f15cbb8a03797f676250ba3750a02fa27d233ab5fa3f13881b623013c2b9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T05:09:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca98f15cbb8a03797f676250ba3750a02fa27d233ab5fa3f13881b623013c2b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:15:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca98f15cbb8a03797f676250ba3750a02fa27d233ab5fa3f13881b623013c2b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:33:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3517450a51be1a688c07387143857c2227cb40347fbe2a63c1de649a0889f8b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:34:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3517450a51be1a688c07387143857c2227cb40347fbe2a63c1de649a0889f8b9",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1626,6 +1734,42 @@
           "at": "2026-08-20T02:18:34Z",
           "findings": [],
           "hash": "rvw1:sha256:e3dc627b4044778486f052a4c23c902f5c581179089cd6c1fa83e753bf0f50d0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:04:03Z",
+          "findings": [
+            {
+              "category": "logic error",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 412,
+              "message": "`DetectActive` now ignores `project_root` and always returns successful empty stdout instead of invoking an injected usecase. This silently reports success without performing the requested operation.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture violation",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 415,
+              "message": "`CatalogueLintCheckActiveTrack` remains a public `TrackInput` arm but no longer invokes any injected usecase; it always returns a hard-coded routing error. Remove the stale arm or route it through the injected TDDD usecase so the driver boundary remains functional and one-way.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a91f0ec65f3da8a8e57a08a6a0392ee71c4b27d80e6faa1059f44c5d7fb73c4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T05:08:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6779d01f9844829c5ef698ad2d7679dc9cbec58610b84e3352dc0c368ae64069",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:15:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6779d01f9844829c5ef698ad2d7679dc9cbec58610b84e3352dc0c368ae64069",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2441,6 +2585,20 @@
           "at": "2026-08-20T02:22:44Z",
           "findings": [],
           "hash": "rvw1:sha256:76477f0c54b4898bc3447206b1ecbb5ff9bf792fd0839d9ddc682988a2cfe922",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:03:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ad96c52d8c2ef3c24ffb846144aa44dc8229765c71b27623f019485e5e63395",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:13:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ad96c52d8c2ef3c24ffb846144aa44dc8229765c71b27623f019485e5e63395",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3946,6 +4104,49 @@
           "at": "2026-08-20T02:41:45Z",
           "findings": [],
           "hash": "rvw1:sha256:4f926210e097e003b2801989ef6aa6bf727d11c83a224b68af92afdacb77d8e8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:03:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0828876e7bfae9a104b2dc810f8c883c7b50bc9f1158095e845341b9ef233bf6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:17:43Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 723,
+              "message": "The TrackTdddDriver × AC-02 voluntary binding covers only BaselineCapture and BaselineGraph success tests. TrackTdddDriver::handle selects among ten TrackTdddInput variants, and existing same-module tests already exercise TypeSignals, TypeGraph, CatalogueSpecSignals, SpecElementHash, Lint, CatalogueImplSignals, and CatalogueLintActive through driver.handle. AC-02 requires command selection at this primary adapter for each TDDD subcommand; two arms cannot discharge that universal claim. Bind the existing per-command handle tests (at least one routing test per remaining variant), matching the TrackResolutionDriver × IN-04 variant-routing precedent.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 726,
+              "message": "The TrackTdddDriver × AC-05 voluntary binding claims CLI argv/stdout/stderr/exit/persist parity for this driver, but the adjacent CN-01 waiver (line 727) states TrackTdddDriver is not a CLI command context and those observables belong to apps/cli TDDD handlers. TrackDriver waived AC-05 for that same reason. The bound evidence is also incomplete: the two driver tests assert CommandOutcome mapping, not CLI identity, and the only call-site tests are the two type_signals tests. Existing TDDD call-site tests test_track_spec_element_hash_call_site_preserves_cli_contract_across_migration, test_track_lint_call_site_preserves_cli_contract_across_migration, and test_track_contract_map_call_site_preserves_cli_contract_across_migration are omitted. Either waive AC-05 in the same self-contained form as TrackDriver × AC-05 / TrackTdddDriver × CN-01, or bind the remaining TDDD call-site contract tests so each TDDD command context is evidenced.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0828876e7bfae9a104b2dc810f8c883c7b50bc9f1158095e845341b9ef233bf6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-20T05:29:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f10c646baab6aa3e46e0ab9cab5a943a2e5f0bc4afabbd1db2a5875ebaab902d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-20T05:30:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f10c646baab6aa3e46e0ab9cab5a943a2e5f0bc4afabbd1db2a5875ebaab902d",
           "type": "final",
           "verdict": "zero_findings"
         }

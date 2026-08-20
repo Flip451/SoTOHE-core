@@ -8,7 +8,7 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackItemsDirectoryInput, TrackSpecAnchorInput, TrackTdddSpecElementHashInput,
+    TrackItemsDirectoryInput, TrackSpecAnchorInput, TrackTdddInput, TrackTdddSpecElementHashInput,
 };
 
 use crate::CliError;
@@ -36,9 +36,10 @@ pub fn execute_spec_element_hash(
         .map(TrackSpecAnchorInput::try_new)
         .transpose()
         .map_err(|error| CliError::Message(error.to_string()))?;
-    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_spec_element_hash(
-        TrackTdddSpecElementHashInput { track_id: Some(track_id), items_dir, anchor },
-    );
+    let outcome =
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::SpecElementHash(
+            TrackTdddSpecElementHashInput { track_id: Some(track_id), items_dir, anchor },
+        ));
     super::super::state_ops::track_driver_outcome_to_result(outcome)
 }
 
@@ -203,9 +204,9 @@ mod tests {
             .map(|value| TrackSpecAnchorInput::try_new(value.to_owned()))
             .transpose()
             .expect("anchor is valid");
-        TrackCompositionRoot::new().track_tddd_driver().handle_spec_element_hash(
+        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddInput::SpecElementHash(
             TrackTdddSpecElementHashInput { track_id: Some(track_id), items_dir, anchor },
-        )
+        ))
     }
 
     #[test]

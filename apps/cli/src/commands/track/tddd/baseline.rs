@@ -9,7 +9,7 @@ use std::process::ExitCode;
 use cli_composition::TrackCompositionRoot;
 use cli_driver::adr_baseline::TrackIdInput;
 use cli_driver::track_tddd::{
-    TrackLayerInput, TrackSourceWorkspaceInput, TrackTdddBaselineCaptureInput,
+    TrackLayerInput, TrackSourceWorkspaceInput, TrackTdddBaselineCaptureInput, TrackTdddInput,
     TrackWorkspaceRootInput,
 };
 
@@ -38,13 +38,14 @@ pub fn execute_baseline_capture(
         .transpose()
         .map_err(CliError::Message)?;
     let layer = layer.map(TrackLayerInput::try_from).transpose().map_err(CliError::Message)?;
-    let outcome =
-        TrackCompositionRoot::new().track_tddd_driver().handle(TrackTdddBaselineCaptureInput {
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle(
+        TrackTdddInput::BaselineCapture(TrackTdddBaselineCaptureInput {
             track_id: Some(track_id),
             workspace_root,
             source_workspace,
             layer,
-        });
+        }),
+    );
     super::super::state_ops::track_driver_outcome_to_result(outcome)
 }
 
