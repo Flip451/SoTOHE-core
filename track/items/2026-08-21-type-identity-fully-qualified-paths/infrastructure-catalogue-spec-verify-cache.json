@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCrateCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "428c009c0dd3daafbf567098898649f8df53201bbab7ea24895e2e82e46f7f72",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCrateCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCrateCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdf45db2c98d78627e35adce6e7abc3eb0607d005aecae576f0aa5c0f85c60a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

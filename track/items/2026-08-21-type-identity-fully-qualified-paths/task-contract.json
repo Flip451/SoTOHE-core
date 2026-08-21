@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-21-type-identity-fully-qualified-paths",
+  "entries": {
+    "T001": [],
+    "T002": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueEntryKey"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "FullyQualifiedItemPath"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueSchemaVersion"
+      }
+    ],
+    "T004": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "DeletionRecord"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "InherentImplDeclV2"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TraitRefScope"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CatalogueToExtendedCrateCodecError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NewTypeGraphCodecError"
+      }
+    ],
+    "T005": [],
+    "T006": [],
+    "T007": [],
+    "T008": [],
+    "T009": [],
+    "T010": [],
+    "T011": [],
+    "T012": [],
+    "T013": [],
+    "T014": [],
+    "T015": [],
+    "T016": [],
+    "T017": []
+  }
+}

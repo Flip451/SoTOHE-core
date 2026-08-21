@@ -1,0 +1,558 @@
+{
+  "entries": [
+    {
+      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueDocument",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueDocument",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueDocument",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueEntryKey",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueEntryKey",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3b1dab2843287aafde567c4478c9f28800346e337ec8443669390920673d3f9f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueEntryKey",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueEntryKey",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fcb845e94f97d6039a3bf70568b509148f3f6dc8db7d2bc5542058e24201319a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueSchemaVersion",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d71d9ce04d8a4e9aea2aca92cd9616dce996733265c48b8fb6b085bcf244213c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "catalogue 文書の schema_version を任意の数値一般と区別される schema version の値として扱い、既存の受理 version 意味論、数値としての読出し、および外部 JSON の数値表現を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue 文書の schema_version を任意の数値一般と区別される schema version の値として扱い、既存の受理 version 意味論、数値としての読出し、および外部 JSON の数値表現を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "claim_origin": {
+        "data": {
+          "entry_key": "DeletionRecord",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "claim_origin": {
+        "data": {
+          "entry_key": "DeletionRecord",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FullyQualifiedItemPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FullyQualifiedItemPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FullyQualifiedItemPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FullyQualifiedItemPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FullyQualifiedItemPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b3971bb83fe227bf7ae34cbeff0d21662c2c6110f84a4c6182b08b98d198fbc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "InherentImplDeclV2",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b3971bb83fe227bf7ae34cbeff0d21662c2c6110f84a4c6182b08b98d198fbc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "InherentImplDeclV2",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NewTypeGraphCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "428c009c0dd3daafbf567098898649f8df53201bbab7ea24895e2e82e46f7f72",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NewTypeGraphCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NewTypeGraphCodecError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdf45db2c98d78627e35adce6e7abc3eb0607d005aecae576f0aa5c0f85c60a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TraitRefScope",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TraitRefScope",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TraitRefScope",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

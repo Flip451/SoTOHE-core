@@ -1,0 +1,46 @@
+{
+  "catalogue_declaration_hash": "d75ee352a288df3564a1d9a6a4c06e298235ffdfa373507d3ed2902fa84a639f",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "signal": "blue",
+      "type_name": "CatalogueDocument"
+    },
+    {
+      "entry_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "signal": "blue",
+      "type_name": "CatalogueEntryKey"
+    },
+    {
+      "entry_hash": "fcb845e94f97d6039a3bf70568b509148f3f6dc8db7d2bc5542058e24201319a",
+      "signal": "blue",
+      "type_name": "CatalogueSchemaVersion"
+    },
+    {
+      "entry_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "signal": "blue",
+      "type_name": "DeletionRecord"
+    },
+    {
+      "entry_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "signal": "blue",
+      "type_name": "FullyQualifiedItemPath"
+    },
+    {
+      "entry_hash": "7b3971bb83fe227bf7ae34cbeff0d21662c2c6110f84a4c6182b08b98d198fbc",
+      "signal": "blue",
+      "type_name": "InherentImplDeclV2"
+    },
+    {
+      "entry_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "signal": "blue",
+      "type_name": "NewTypeGraphCodecError"
+    },
+    {
+      "entry_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "signal": "blue",
+      "type_name": "TraitRefScope"
+    }
+  ]
+}

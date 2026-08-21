@@ -1,0 +1,50 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "delete",
+      "for_type": "CatalogueToExtendedCrateCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "CatalogueToExtendedCrateCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "delete",
+      "for_type": "CatalogueToExtendedCrateCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "delete",
+      "for_type": "domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError",
+      "trait_ref": "core::convert::From<CatalogueToExtendedCrateCodecError>"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogueToExtendedCrateCodecError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "tddd::catalogue_to_extended_crate_codec_error",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    }
+  }
+}

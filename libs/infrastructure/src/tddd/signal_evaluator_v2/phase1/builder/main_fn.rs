@@ -65,10 +65,14 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     }
 
     // --- Step 1: Build B identity maps ---
-    let b_types = build_type_trait_identity_map(b);
+    let b_types = build_type_trait_identity_map(b)?;
     let b_fns = build_function_identity_map(b, rustdoc_root);
 
     // --- Step 2: Seed S with all B items as implicit Reference ---
+    //
+    // `b_types` is keyed by the complete `Crate::paths` identity, so same-name
+    // items in different modules are independent entries rather than a single
+    // short-name winner.
     for b_id in b_types.values() {
         if let Some(b_item) = b.index.get(b_id) {
             let path = b.paths.get(b_id).map(|ps| ps.path.clone());
@@ -142,7 +146,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
 
     // --- Step 3: Build A identity maps ---
     let (a_krate, a_item_actions) = a.into_parts();
-    let a_types = build_type_trait_identity_map(&a_krate);
+    let a_types = build_type_trait_identity_map(&a_krate)?;
     let a_fns = build_function_identity_map(&a_krate, rustdoc_root);
 
     // --- Pre-step (A-side): Build A-wide Id remap (T008, IN-10) ---
@@ -314,8 +318,8 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                 if a_ps.crate_id != 0 {
                     return None;
                 }
-                let name = a_ps.path.last()?.as_str();
-                let s_id = state.s_type_name_to_id.get(name)?;
+                let identity_key = a_ps.path.join("::");
+                let s_id = state.s_type_identity_to_id.get(&identity_key)?;
                 Some((a_id, *s_id))
             })
             .collect();
@@ -492,8 +496,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     let d_root_id = state.alloc_id();
 
     // Build root module item for S.
-    let mut s_top_ids: Vec<Id> =
-        state.s_type_name_to_id.values().chain(state.s_fn_path_to_id.values()).copied().collect();
+    let mut s_top_ids: Vec<Id> = state
+        .s_type_identity_to_id
+        .values()
+        .chain(state.s_fn_path_to_id.values())
+        .copied()
+        .collect();
     s_top_ids.sort_by_key(|id| id.0);
     let s_root_item = make_root_module_item(s_root_id, crate_name.clone(), s_top_ids);
     state.s_index.insert(s_root_id, s_root_item);
@@ -511,8 +519,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     let s = ExtendedCrate::new(s_krate, state.s_actions);
 
     // Build root module item for D.
-    let mut d_top_ids: Vec<Id> =
-        state.d_type_name_to_id.values().chain(state.d_fn_path_to_id.values()).copied().collect();
+    let mut d_top_ids: Vec<Id> = state
+        .d_type_identity_to_id
+        .values()
+        .chain(state.d_fn_path_to_id.values())
+        .copied()
+        .collect();
     d_top_ids.sort_by_key(|id| id.0);
     let d_root_item = make_root_module_item(d_root_id, crate_name.clone(), d_top_ids);
     state.d_index.insert(d_root_id, d_root_item);

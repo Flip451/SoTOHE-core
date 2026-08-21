@@ -117,6 +117,20 @@
           "hash": "rvw1:sha256:ef9a6d578713352a57ff53d8e50d51cc2887a5281797d03af4058e065c8b38af",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T07:12:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e71fccb3f2e35ae11d64fae405adc2fd55898cc2165623991d076b6cb9f64757",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T07:16:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e71fccb3f2e35ae11d64fae405adc2fd55898cc2165623991d076b6cb9f64757",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -140,6 +154,121 @@
           "at": "2026-08-21T02:09:35Z",
           "findings": [],
           "hash": "rvw1:sha256:dd514a787a7418b7751c1f671d192367a68647136708522b7f677c62ae10dd58",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-21T10:15:19Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 164,
+              "message": "T011 is not executable as written: it says to add a “dedicated cross-surface integration fixture” but names no target file, module, or symbol. An executor must invent where the fixture belongs; specify the concrete target and retain the cited AC anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 164,
+              "message": "T011 bundles independently verifiable behavior units—cross-surface resolution, signals/contract-map, three lint rules, obligation derivation, task-contract attribution, writer round trips, and preservation checks—under one task. Split these into separately executable tasks before implementation, with the corresponding AC-01…AC-09 anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/batch-plan.json",
+              "line": 170,
+              "message": "B6 unnecessarily serializes T008. After B3, T008 is ready; its infrastructure estimate (90 production + 100 test) can join B5 with T006 and T007 (320 production and 320 test total), and it has a distinct target (test-obligation derivation) from those tasks. Likewise, T007 is ready after B3 and can join B4 with T005/T009 within the ceilings. Move the tasks or document a concrete write-ownership conflict.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 17,
+              "message": "The plan contains upstream behavior-contract restatements prohibited by `.harness/policies/no-upstream-restatement.md`, rather than only target + operation + anchor: `plan.sections` `catalogue-resolution` restates numeric wire preservation and fail-closed resolution, while T003, T004, T005, T006, T007, T008, T009, T010, and T011 restate expected behavior such as no short-name fallback, diagnostic contents, preserved labels/wire formats, and fail-closed attribution. Remove those prose clauses and retain the concrete targets, operations, and anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:68ba7fa0df5211da315a1b3328a2cee48f79fa66dc11f8c0a9d248199edab3fc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T10:28:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94d11e0f4fd53764750e1c5db7c161e738b5f425f325aaf01445cc67bec073d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:43:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbc90d8a9b9f230c447df83ee45c53433cfa422794268a8081706bcfc4604bdb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:46:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f579fa89c8515d588ff6b489e35bed049edd58fd219bd5242af92b362eb7282d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:57:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f579fa89c8515d588ff6b489e35bed049edd58fd219bd5242af92b362eb7282d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-21T10:27:40Z",
+          "findings": [
+            {
+              "category": "non-fail-closed identity construction",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 173,
+              "message": "`build_type_trait_identity_map` はローカルの型/trait に `Crate::paths` エントリがない場合、エラーにせず単にスキップしています。これにより Phase 1 で A/B の action 対象や S seed から型が静かに脱落し、Phase 2 でも欠落したまま gate が通る可能性があります。完全修飾 identity を必須とする fail-closed 方針に従い、欠落を typed error として拒否してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a945b01825d67ab06d0890dc255537f608b45867c3b6160703d72c35716ae8a2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T10:35:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1be1172ed5981e6f78bd2c02a097000b1b013f503375cdb41a2aa02a41d21bde",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:47:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1be1172ed5981e6f78bd2c02a097000b1b013f503375cdb41a2aa02a41d21bde",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:48:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1be1172ed5981e6f78bd2c02a097000b1b013f503375cdb41a2aa02a41d21bde",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T11:01:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1be1172ed5981e6f78bd2c02a097000b1b013f503375cdb41a2aa02a41d21bde",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -203,6 +332,299 @@
           "at": "2026-08-21T04:35:35Z",
           "findings": [],
           "hash": "rvw1:sha256:b138ccc390d88fce6d2ec71c5e9e5c95f7931281ac9b2e81d28252a85d681505",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:14:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8027366266c609b323af9c6d51c47c22a665f6bc167611adfcb618372d22f58e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:46:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8027366266c609b323af9c6d51c47c22a665f6bc167611adfcb618372d22f58e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T10:57:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8027366266c609b323af9c6d51c47c22a665f6bc167611adfcb618372d22f58e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-21T05:04:51Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+              "line": 51,
+              "message": "AC-05 is not deterministically observable: it bundles many independent surfaces and only requires them to handle the identity model “consistently,” without defining checks or expected outcomes for each surface. This leaves Phase 3 unable to establish criterion satisfaction without inventing the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7d020ad9a16885e286d5e2379181cbf3d4606af39056bc625a1442f3cb1da91b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T05:08:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:538ced03e73cc4e54ce10f188d0b2e88fe3285031462c56491d9c5bd7d28d2e2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T05:10:59Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+              "line": 31,
+              "message": "AC-03 は「複数候補に一致し、完全修飾パスの併記がない」だけで必ず失敗すると定めていますが、IN-04 と ADR D1 は文脈を含めても一意に解決できない場合だけを fail-closed の対象にしています。このままでは、文脈から一意に解決できる宣言まで拒否する、ADR より厳しい挙動が acceptance criterion になります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:538ced03e73cc4e54ce10f188d0b2e88fe3285031462c56491d9c5bd7d28d2e2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T05:14:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:88d74f3aa0d5291d3b1b5adda1ffc10ef18f02328587d9aa34d383294f32dce0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T05:19:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad926b8360d15697d5c9ec306439d764c86df98cb0a64be63c3e3bd961c55bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T05:21:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad926b8360d15697d5c9ec306439d764c86df98cb0a64be63c3e3bd961c55bb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T07:20:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2f25d674ea0ebc3db271bbf85a9eee2c2c928b05a565302cd39c6d60673a7c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T07:22:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2f25d674ea0ebc3db271bbf85a9eee2c2c928b05a565302cd39c6d60673a7c9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-21T07:39:12Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 348,
+              "message": "`domain::CatalogueDocument` の `docs` が、spec/ADR の同名併存・完全修飾キー・functions の維持という契約を本文で再記述しています。上流契約は anchor 参照に留め、詳細な挙動の再掲を削除してください。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 665,
+              "message": "`domain::CatalogueEntryKey` の `docs` が、短名既定・crate-qualified path による曖昧性解消・既存 function path 維持という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 738,
+              "message": "`domain::CatalogueSchemaVersion` の `docs` が、値オブジェクト化、u32 wire 表現、validation owner という delta ADR/spec の設計判断を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 762,
+              "message": "`domain::DeletionRecord` の `docs` が、type/trait deletion の完全修飾 identity と function path 維持という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 839,
+              "message": "`domain::FullyQualifiedItemPath` の `docs` が、rustdoc paths を権威とする identity と layer 非依存性という ADR/spec の設計根拠を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 879,
+              "message": "`domain::InherentImplDeclV2` の `docs` が、同名型間の impl 誤結合を防ぐという spec の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1019,
+              "message": "`domain::NewTypeGraphCodecError` の `docs` が、fail-closed、未解決対象の保持、候補列挙、lossy summary 回避という spec のエラー契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1077,
+              "message": "`domain::TraitRefScope` の `docs` が、self-crate/workspace trait の完全修飾 identity と bare tail name 回避という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 32,
+              "message": "`infrastructure::CatalogueToExtendedCrateCodecError` の `docs` が、fail-closed 診断、typed target、rustdoc candidate 保持、短名衝突非圧縮という spec のエラー契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a959e3e200020b793ab802b606173a6c4032a01ec11a949250730126f777b12d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T07:40:32Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 348,
+              "message": "`domain::CatalogueDocument` の `docs` が、spec/ADR の同名併存・完全修飾キー・functions の維持という契約を本文で再記述しています。上流契約は anchor 参照に留め、詳細な挙動の再掲を削除してください。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 665,
+              "message": "`domain::CatalogueEntryKey` の `docs` が、短名既定・crate-qualified path による曖昧性解消・既存 function path 維持という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 738,
+              "message": "`domain::CatalogueSchemaVersion` の `docs` が、値オブジェクト化、u32 wire 表現、validation owner という delta ADR/spec の設計判断を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 762,
+              "message": "`domain::DeletionRecord` の `docs` が、type/trait deletion の完全修飾 identity と function path 維持という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 839,
+              "message": "`domain::FullyQualifiedItemPath` の `docs` が、rustdoc paths を権威とする identity と layer 非依存性という ADR/spec の設計根拠を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 879,
+              "message": "`domain::InherentImplDeclV2` の `docs` が、同名型間の impl 誤結合を防ぐという spec の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1019,
+              "message": "`domain::NewTypeGraphCodecError` の `docs` が、fail-closed、未解決対象の保持、候補列挙、lossy summary 回避という spec のエラー契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1077,
+              "message": "`domain::TraitRefScope` の `docs` が、self-crate/workspace trait の完全修飾 identity と bare tail name 回避という上流契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 32,
+              "message": "`infrastructure::CatalogueToExtendedCrateCodecError` の `docs` が、fail-closed 診断、typed target、rustdoc candidate 保持、短名衝突非圧縮という spec のエラー契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a959e3e200020b793ab802b606173a6c4032a01ec11a949250730126f777b12d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T07:54:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e10bbfce5ea7d073f33a24e3f7c5b4e3ed1ea04e094949d1d38741f1afc2193f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T09:01:43Z",
+          "findings": [
+            {
+              "category": "SoT integrity / spec_refs off-topic",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 362,
+              "message": "`domain::CatalogueDocument::new` and `schema_version` change the schema-version API from `u32` to `CatalogueSchemaVersion`, but neither cites `IN-05`, the spec element that requires that value object. In particular, `schema_version` cites only identity/key anchors `IN-01` and `CO-02`, which are unrelated to this signature change.",
+              "severity": "P1"
+            },
+            {
+              "category": "SoT integrity / action incoherent with baseline",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 687,
+              "message": "`domain::CatalogueEntryKey::try_new` is marked `action: modify`, but its declared `try_new(String) -> Result<Self, ValidationError>` signature is identical to the frozen rustdoc baseline. The new `PartialOrd`/`Ord` implementations are separate trait-impl additions and do not make this method a modification; classify the method as `reference` unless its public signature actually changes.",
+              "severity": "P1"
+            },
+            {
+              "category": "DRY / duplicated structural declaration",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 30,
+              "message": "`domain::NewTypeGraphCodecError` and `infrastructure::CatalogueToExtendedCrateCodecError` declare the same three variants, equivalent payloads, no methods, and the same failure semantics, while retaining a conversion between them. The catalogues document no layer-specific invariant or information that distinguishes the infrastructure error, so this duplicates the error contract across neighbouring layers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e10bbfce5ea7d073f33a24e3f7c5b4e3ed1ea04e094949d1d38741f1afc2193f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T09:14:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d5dec52589d92807c0e59294a86779b0c8200f999311f940d4287f8ff44f5a69",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T09:18:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d5dec52589d92807c0e59294a86779b0c8200f999311f940d4287f8ff44f5a69",
           "type": "final",
           "verdict": "zero_findings"
         }

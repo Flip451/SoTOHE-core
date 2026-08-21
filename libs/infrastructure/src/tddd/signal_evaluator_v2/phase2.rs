@@ -3,11 +3,11 @@
 //! Builds identity sets for S, D, and C, then evaluates each item against
 //! the signal table (ADR 3 D3) to produce `ThreeWaySignal`s.
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 
 use domain::tddd::catalogue_v2::ItemAction;
-use domain::tddd::{SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal};
-use rustdoc_types::Crate;
+use domain::tddd::{Phase1Error, SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal};
+use rustdoc_types::{Crate, Id};
 
 use super::structural_eq::items_structurally_equal;
 use super::{
@@ -22,17 +22,18 @@ pub(super) fn phase2_evaluate(
     d: &Crate,
     c: &Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
-) -> ThreeWayEvaluationReport {
+) -> Result<ThreeWayEvaluationReport, Phase1Error> {
     let s_krate = s.krate();
 
     // Derive the crate name from C's root item so that rustdoc local-trait paths
     // (`my_crate::MyTrait`) can be normalized to match codec paths (`crate::MyTrait`).
     let crate_name = c.index.get(&c.root).and_then(|item| item.name.as_deref()).unwrap_or("");
 
-    // Build identity sets.
-    // Phase 2 uses short-name keys for types/traits, matching the `ThreeWaySignal`
-    // domain contract (item_name = short name for types/traits; FunctionPath for functions).
-    let s_types = build_type_trait_identity_map(s_krate);
+    // Build identity sets. Type/trait maps use complete paths; the signal label
+    // is reduced to a short name only when that short name is unambiguous across
+    // S, D, and C. This keeps existing reports readable without allowing the
+    // display label to decide identity.
+    let s_types = build_type_trait_identity_map(s_krate)?;
     let s_fns = build_function_identity_map(s_krate, rustdoc_root);
 
     // S inherits B-seeded impl blocks whose trait paths are in rustdoc format
@@ -44,10 +45,10 @@ pub(super) fn phase2_evaluate(
     // now places each TraitImplDeclV2 into S according to its own declared action,
     // so B-side impls cannot shadow A-side impls for the same identity key.
     let s_impls = build_impl_identity_map(s_krate, crate_name);
-    let d_types = build_type_trait_identity_map(d);
+    let d_types = build_type_trait_identity_map(d)?;
     let d_fns = build_function_identity_map(d, rustdoc_root);
     let d_impls = build_impl_identity_map(d, crate_name);
-    let c_types = build_type_trait_identity_map(c);
+    let c_types = build_type_trait_identity_map(c)?;
     let c_fns = build_function_identity_map(c, rustdoc_root);
     let c_impls = build_impl_identity_map(c, crate_name);
 
@@ -97,11 +98,17 @@ pub(super) fn phase2_evaluate(
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(name.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                region,
+            ));
         } else {
             // Item in S \ C.
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(name.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                region,
+            ));
         }
     }
 
@@ -181,10 +188,16 @@ pub(super) fn phase2_evaluate(
     for name in d_types.keys() {
         if c_types.contains_key(name.as_str()) {
             // D ∩ C: delete in progress.
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::DIntersectC,
+            ));
         } else {
             // D \ C: delete achieved.
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::DMinusC));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::DMinusC,
+            ));
         }
     }
 
@@ -232,7 +245,10 @@ pub(super) fn phase2_evaluate(
         s_types.keys().chain(d_types.keys()).map(String::as_str).collect();
     for name in c_types.keys() {
         if !s_union_d_types.contains(name.as_str()) {
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::CMinusSUnionD));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::CMinusSUnionD,
+            ));
         }
     }
 
@@ -273,7 +289,24 @@ pub(super) fn phase2_evaluate(
         }
     }
 
-    ThreeWayEvaluationReport::new(signals)
+    Ok(ThreeWayEvaluationReport::new(signals))
+}
+
+/// Returns the report label for a type/trait identity.
+///
+/// A short label is retained for the normal, unambiguous case. If two distinct
+/// fully-qualified identities share that short name, the full identity remains
+/// in the report so the output cannot merge the two targets after the evaluator
+/// has kept them separate internally.
+fn type_signal_name(identity_key: &str, identity_maps: &[&BTreeMap<String, Id>]) -> String {
+    let short_name = identity_key.rsplit("::").next().unwrap_or(identity_key);
+    let matching_identities: HashSet<&str> = identity_maps
+        .iter()
+        .flat_map(|map| map.keys().map(String::as_str))
+        .filter(|candidate| candidate.rsplit("::").next().unwrap_or(candidate) == short_name)
+        .collect();
+
+    if matching_identities.len() > 1 { identity_key.to_owned() } else { short_name.to_owned() }
 }
 
 /// Strips generic args from the trait part of an impl identity key.

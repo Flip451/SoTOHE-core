@@ -110,6 +110,132 @@ fn extended_crate_with_struct(
     ExtendedCrate::new(krate, actions)
 }
 
+/// A baseline may contain same-name public types under different modules. The
+/// Phase 1 seed must retain both full-path identities because another baseline
+/// item can refer specifically to either one by its rustdoc Id.
+#[test]
+fn test_phase1_duplicate_type_paths_seed_both_targets_without_dangling_id() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::Path as RdPath;
+
+    let crate_name = "fixture";
+    let root_id = Id(0);
+    let holder_id = Id(1);
+    let module_a_type_id = Id(2);
+    let module_b_type_id = Id(3);
+    let field_id = Id(4);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![holder_id, module_a_type_id, module_b_type_id]),
+    );
+    index.insert(
+        holder_id,
+        make_item(
+            holder_id,
+            Some("Holder"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![field_id], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        ),
+    );
+    index.insert(
+        field_id,
+        make_item(
+            field_id,
+            Some("selected"),
+            ItemEnum::StructField(Type::ResolvedPath(RdPath {
+                path: "module_b::SameName".to_string(),
+                id: module_b_type_id,
+                args: None,
+            })),
+        ),
+    );
+    index.insert(module_a_type_id, struct_item(module_a_type_id, "SameName"));
+    index.insert(module_b_type_id, struct_item(module_b_type_id, "SameName"));
+
+    paths.insert(
+        holder_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Holder".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        module_a_type_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "module_a".to_string(), "SameName".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        module_b_type_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "module_b".to_string(), "SameName".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    let baseline = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let catalogue = ExtendedCrate::new(empty_crate(), BTreeMap::new());
+
+    let (s, _d) = phase1_build_s_and_d(catalogue, &baseline)
+        .expect("same-name types with distinct paths must both be seeded into S");
+
+    let same_name_paths: Vec<Vec<String>> = s
+        .krate()
+        .paths
+        .values()
+        .filter(|summary| summary.path.last().is_some_and(|name| name == "SameName"))
+        .map(|summary| summary.path.clone())
+        .collect();
+    assert_eq!(same_name_paths.len(), 2, "both module-qualified types must remain in S");
+    assert!(same_name_paths.contains(&vec![
+        crate_name.to_string(),
+        "module_a".to_string(),
+        "SameName".to_string(),
+    ]));
+    assert!(same_name_paths.contains(&vec![
+        crate_name.to_string(),
+        "module_b".to_string(),
+        "SameName".to_string(),
+    ]));
+
+    let holder_field = s
+        .krate()
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::StructField(Type::ResolvedPath(path))
+                if item.name.as_deref() == Some("selected") =>
+            {
+                Some(path)
+            }
+            _ => None,
+        })
+        .expect("the reference-bearing field must be present in S");
+    assert!(
+        s.krate().index.contains_key(&holder_field.id),
+        "the remapped field reference must resolve to the module_b target in S"
+    );
+}
+
 fn simple_fn_item(id: Id, fn_name: &str, is_async: bool) -> Item {
     make_item(
         id,
@@ -789,6 +915,20 @@ fn test_phase1_error_dangling_id_after_delete_yields_dangling_id_error() {
 // -----------------------------------------------------------------------
 // Identity boundary tests
 // -----------------------------------------------------------------------
+
+#[test]
+fn test_type_identity_map_missing_paths_entry_returns_typed_error() {
+    let mut krate = simple_crate_with_struct("fixture", "MissingPath");
+    krate.paths.remove(&Id(1));
+
+    let error = super::build_type_trait_identity_map(&krate)
+        .expect_err("a local type without an authoritative path must fail closed");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)));
+    let message = error.to_string();
+    assert!(message.contains("MissingPath"));
+    assert!(message.contains("Crate::paths"));
+}
 
 #[test]
 fn test_function_identity_uses_function_path() {

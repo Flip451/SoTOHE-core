@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "ee7aaf4d43ace200c1b8143c70f3b323d77dcbb371b188c9db977029a1f79cd4",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCrateCodecError"
+    }
+  ]
+}

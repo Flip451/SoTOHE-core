@@ -1,0 +1,557 @@
+{
+  "entries": [
+    {
+      "claim_hash": "9551e8ee6903d1f54d19b71e6645ecdac41c591fdb57c5c0bd62cafe25ad24c7",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "型シグナル評価で型・トレイトを rustdoc の paths を権威とする完全修飾パスで識別し、短名の衝突によって別の対象が同一視されないようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "型・トレイトを識別する下記の経路では、rustdoc の `paths` を権威とする完全修飾パスをキーに用いる。短名は表示や入力の表記として残り得ても、型・トレイトの識別を決める権威にはしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "02bbf2423ad562f10731a76d34e4413610836f3a68580d286f61da6477b9cf21",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "catalogue 利用者が短名を通常の宣言として使い続けつつ、同一 crate 内の同名型・同名トレイトを一つの catalogue で区別して表現・評価できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue における型・トレイトの宣言は短名を既定とし、完全修飾パスを任意に併記できるようにする。評価器はこの宣言を完全修飾パスへ解決してから識別に用いる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue における型・トレイトの宣言は短名を既定とし、完全修飾パスを任意に併記できるようにする。評価器はこの宣言を完全修飾パスへ解決してから識別に用いる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "評価器の型・トレイト identity map、名前から id への対応、型参照の解決、impl の self 型とトレイト、generic 引数の構造比較、型シグナル出力の owner 結合、contract-map の node / edge 解決。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b1dab2843287aafde567c4478c9f28800346e337ec8443669390920673d3f9f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「catalogue-lint の `ReferencedRoleConstraint`、`FieldElementUniqueAcrossEntries`、`NoExternalReferenceInMethods`。いずれも現在は module を照合せず、同名を同一視し得る。」および「test-obligation derive の trait role index、task-contract と pre-review gate の `CatalogueEntryKey`、および `sotp catalog add` / `cite` と `import` が書き込む entry key。これらは短名を前提にしているため、完全修飾パスへの解決と同名併存に追従させる。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "428c009c0dd3daafbf567098898649f8df53201bbab7ea24895e2e82e46f7f72",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。…完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d71d9ce04d8a4e9aea2aca92cd9616dce996733265c48b8fb6b085bcf244213c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "catalogue 文書の schema_version を任意の数値一般と区別される schema version の値として扱い、既存の受理 version 意味論、数値としての読出し、および外部 JSON の数値表現を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "bfed25c087355aaaf7108d391032dc7b42ed26a53ac0c834981a51e7b0f38a5e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0100-catalogue-schema-version-value-object.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue 文書の `schema_version` は、schema version を表す専用の値オブジェクトで保持し、任意の数値一般とは区別する。この値オブジェクトは既存の schema version 数値を保持・公開できるものとし、codec と検証はその値を用いて既存の受理 version 意味論を維持する。\n\n外部 JSON における `schema_version` の表現は従来どおり数値とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eba9cc77b56365666598992ccd5810da51da9fd6dc8ed194c4a04ac318f74ff4",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "次の面は変更しない。`functions` の key と cross-crate 参照の catalogue 表記はすでに完全修飾パスであり、`sotp catalog import --type` の rustdoc 側照合も crate・module・name の完全一致で短名 fallback を持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e53a73893ebc79cec73cc137486c6e87bc2537e2907d38121dca51fe93477036",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "raw rustdoc baseline の wire format と、rustdoc paths を基準とする baseline-graph renderer は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "次の面は変更しない。`functions` の key と cross-crate 参照の catalogue 表記はすでに完全修飾パスであり、`sotp catalog import --type` の rustdoc 側照合も crate・module・name の完全一致で短名 fallback を持たない。baseline-graph renderer は rustdoc の `paths` を基準にし、`catalog check` と catalogue-spec refs は section と entry key の hash を検査して TypeRef を解決しない。raw rustdoc baseline の wire format も変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "98738a5fe224971469e63bc800ce729cff399549173c0db0a60ff62609b5c038",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "通常の renderer 表示ラベルと非曖昧時の診断表示は短名のまま保ち、型名または TypeRef を解決しない指定の lint・anchor・検索機能は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "renderer の表示ラベルと通常の診断メッセージは表示のみなので短名のまま残す。… cataloguelint の `KindLayerConstraint`、test-obligation の anchor、`dup-check` と `find-similar`、spec 側からの catalogue 逆参照も、型名または TypeRef を解決しないため対象外とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7df981516524bbbe8415e91740b5875f0052f63761ad4f70d965002ed882a8c4",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-04",
+          "section": "out_of_scope",
+          "text_label": "同名宣言を表す catalogue の具体的な宣言形式をこの behavioral contract で固定せず、重複側の改名や同名禁止 lint を恒久的な解決策にはしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同じ crate 内の同名型・同名トレイトを 1 つの catalogue で同時に表現できなければならないが、その宣言形式の具体設計はこの ADR では固定しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "型・トレイトを識別する下記の経路では、rustdoc の `paths` を権威とする完全修飾パスをキーに用いる。短名は表示や入力の表記として残り得ても、型・トレイトの識別を決める権威にはしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d20863b8ad3b000c57731a290000b21e7ff63b6864c8869937b974d3d44e58bb",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue の型・トレイト宣言は短名を既定とし、完全修飾パスは必要な場合にのみ併記可能とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue における型・トレイトの宣言は短名を既定とし、完全修飾パスを任意に併記できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3f7e79ff8a8666124289415875b75bc6aa7746ed3021e677658b6f039dfed022",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "曖昧または未解決の識別は成功や推測ではなく fail-closed とし、利用者が解消に必要な対象情報を診断から得られるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。利用者は完全修飾パスの併記によって曖昧さを解消できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f9d8bcbcc19aeaa1c49683c7ce9b8685b15e186f7b81e9fdd8b4e3ca1ac7c538",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "D1 が列挙する変更面は単一の fallback 修正に縮約せず、相互に独立した変更単位として段階的に実施して整合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "この決定で変更する面は次のとおりである。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型・同名トレイトを 1 つの catalogue で同時に表現できなければならない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue における型・トレイトの宣言は短名を既定とし、完全修飾パスを任意に併記できるようにする。評価器はこの宣言を完全修飾パスへ解決してから識別に用いる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdf45db2c98d78627e35adce6e7abc3eb0607d005aecae576f0aa5c0f85c60a9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。短い名前だけのキーへ暗黙に戻してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「trait_impls」の「trait_ref」と「for_type」、「inherent_impls」の「type_name」、および in-crate TypeRef 全般。」「同一 crate 内の同名型・同名トレイトを 1 つの catalogue で同時に表現できなければならない」「完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b82bc6249444d3e7b6e818aee135a7c283487d7087684cf176a75486e2e7640b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "同じ fixture の型シグナル出力と contract-map を検査すると、owner、node、edge が対応する完全修飾パスごとに別々に生成され、片方の対象の出力へ他方の同名型が結合されない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "評価器の型・トレイト identity map、名前から id への対応、型参照の解決、impl の self 型とトレイト、generic 引数の構造比較、型シグナル出力の owner 結合、contract-map の node / edge 解決。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4ad200911eb44bff1a869c34cc679db2cf49f2587a296fc2c57847d60ce15996",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、各参照は対応する完全修飾パスの entry に対して個別に判定され、別の同名 entry があることだけを理由に対象を取り違えない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の `ReferencedRoleConstraint`、`FieldElementUniqueAcrossEntries`、`NoExternalReferenceInMethods`。いずれも現在は module を照合せず、同名を同一視し得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型・同名トレイトを 1 つの catalogue で同時に表現できなければならない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ffe12d56a4ad5d5625f1787e6e8fcbc2aad2d5b3dfe71650a14b247cc2de743c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "functions key、cross-crate catalogue 表記、raw rustdoc baseline wire format、および D1 で対象外とした表示・検査面の既存の振る舞いは維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "次の面は変更しない。`functions` の key と cross-crate 参照の catalogue 表記はすでに完全修飾パスであり、`sotp catalog import --type` の rustdoc 側照合も crate・module・name の完全一致で短名 fallback を持たない。baseline-graph renderer は rustdoc の `paths` を基準にし、`catalog check` と catalogue-spec refs は section と entry key の hash を検査して TypeRef を解決しない。raw rustdoc baseline の wire format も変更しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

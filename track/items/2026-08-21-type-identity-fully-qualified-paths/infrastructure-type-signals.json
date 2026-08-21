@@ -1,0 +1,29 @@
+{
+  "baseline_hash": "7fc8bc2545db16d70c3b8b4a79992bb3541f1859b9387e8364df357328075369",
+  "declaration_hash": "ee7aaf4d43ace200c1b8143c70f3b323d77dcbb371b188c9db977029a1f79cd4",
+  "generated_at": "2026-08-21T11:07:44Z",
+  "head_commit": "910385eee03edccff5e205a18a9f00b43cd0e443",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "unknown",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "CatalogueToExtendedCrateCodecError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "unknown",
+      "missing_items": [
+        "From<CatalogueToExtendedCrateCodecError>"
+      ],
+      "signal": "yellow",
+      "type_name": "NewTypeGraphCodecError"
+    }
+  ]
+}
