@@ -1,0 +1,212 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-21T01:23:46Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the required briefing, scope-specific severity policy, current diff, and ADR file were not readable because local shell execution failed with a sandbox namespace error.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b8e136a08ec0f8715bd8d0d8312af51e035a3d5518d6147ccaf6e2ed2b0cd31a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T01:27:55Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed because the read-only shell failed before execution (`bwrap: No permissions to create new namespace`), so the required policy, briefing, current diff, and ADR file could not be inspected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b8e136a08ec0f8715bd8d0d8312af51e035a3d5518d6147ccaf6e2ed2b0cd31a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T01:35:28Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md",
+              "line": 25,
+              "message": "D1 は「すべての解決経路」を完全修飾パス化し、「列挙済み」の compiler-internal trait だけを fallback とする、と無限定な実装範囲・集合を約束していますが、その列挙の権威、保守方法、または保守可能性への解決（既存権威への委譲／保守的 over-approximation／深さ見積り付き strict 実装）が本文にも Consequences にも記録されていません。開集合のままでは実装範囲と fallback 集合が収束しません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b8e136a08ec0f8715bd8d0d8312af51e035a3d5518d6147ccaf6e2ed2b0cd31a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T01:53:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bd3150b17522674c2824b81cd3721f172154b1bcf560282625c9b4385c838505",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T02:05:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bd3150b17522674c2824b81cd3721f172154b1bcf560282625c9b4385c838505",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T03:14:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:276d5abc3fbe46ee322e47d5218597d180aaefbfda84f6209b90b8a9327f0984",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T03:17:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:276d5abc3fbe46ee322e47d5218597d180aaefbfda84f6209b90b8a9327f0984",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:04:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94e1de14e8484b253c0b02bace16ac828439f6052219fdfb104556d6a81b6871",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:07:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94e1de14e8484b253c0b02bace16ac828439f6052219fdfb104556d6a81b6871",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:34:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4dac9f9fb858e0f593af31305dba7e66532108b7443d066e5f6df41f75dcfb55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:37:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4dac9f9fb858e0f593af31305dba7e66532108b7443d066e5f6df41f75dcfb55",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:47:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef9a6d578713352a57ff53d8e50d51cc2887a5281797d03af4058e065c8b38af",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:50:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef9a6d578713352a57ff53d8e50d51cc2887a5281797d03af4058e065c8b38af",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-21T01:55:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53fe163b0d3547aede242618fd27c27c53289571b5efe188a86a99a8bf8200a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T02:03:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd514a787a7418b7751c1f671d192367a68647136708522b7f677c62ae10dd58",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T02:09:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd514a787a7418b7751c1f671d192367a68647136708522b7f677c62ae10dd58",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-21T04:10:22Z",
+          "findings": [
+            {
+              "category": "provenance",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/research/2026-08-21-short-name-identity-survey.md",
+              "line": 51,
+              "message": "The note claims the researcher output is saved with the dispatcher trailer removed, but line 51 still contains `CAPABILITY_EXEC_OUTCOME: executed`, which is dispatcher metadata and violates the stated provenance format.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2b4d2d5b8f6de0bb12cad3e40b14240cf0bfe46754ff483505b4c8c806a2e16b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T04:12:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd1259f330961221a6d0617f36e2053e539a71286c1c230366f640877d439175",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T04:23:56Z",
+          "findings": [
+            {
+              "category": "provenance",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/research/2026-08-21-short-name-identity-survey.md",
+              "line": 3,
+              "message": "The preface claims the researcher output is “verbatim except for the dispatcher trailer,” but the briefing states that work-machine absolute paths were also rewritten as repository-relative paths. This inaccurate provenance claim obscures an orchestrator-applied transformation; list both exceptions explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dd1259f330961221a6d0617f36e2053e539a71286c1c230366f640877d439175",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T04:31:59Z",
+          "findings": [
+            {
+              "category": "provenance",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/research/2026-08-21-short-name-identity-survey.md",
+              "line": 94,
+              "message": "The follow-up survey claims the dispatcher trailer was removed, but `CAPABILITY_EXEC_OUTCOME: executed` remains appended to the final paragraph. Remove this dispatcher metadata so the saved output matches its stated provenance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:874b1594f87b9e7fd76c950a09764470cbb3367df874e852119da1a26f105e44",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T04:35:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b138ccc390d88fce6d2ec71c5e9e5c95f7931281ac9b2e81d28252a85d681505",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

@@ -3,73 +3,95 @@
   "providers": {
     "claude": {
       "label": "Claude Code",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+      "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
     },
     "codex": {
       "label": "Codex CLI",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+      "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
     },
     "gemini": {
       "label": "Gemini CLI",
-      "supported_reasoning_efforts": ["low", "medium", "high"]
+      "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high"
+      ]
     },
     "grok": {
       "label": "Grok CLI",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+      "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
     }
   },
   "capabilities": {
     "orchestrator": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
       "reasoning_effort": "medium",
       "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
-      "provider": "grok",
-      "model": "grok-4.6",
-      "reasoning_effort": "xhigh",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "rollback-diagnoser": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
       "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "adr-diagnoser": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
       "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
-      "provider": "grok",
-      "model": "grok-4.6",
-      "reasoning_effort": "medium",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
       "fast_model": "gpt-5.6-luna",
       "fast_provider": "codex",
       "reasoning_effort": "xhigh",
@@ -77,15 +99,15 @@
       "execution_mode": "typed-pipeline"
     },
     "researcher": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "review-fix-lead": {
-      "provider": "grok",
-      "model": "grok-4.6",
-      "reasoning_effort": "xhigh",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "dry-checker": {

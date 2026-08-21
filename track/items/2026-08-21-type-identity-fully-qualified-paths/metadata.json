@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-21-type-identity-fully-qualified-paths",
+  "title": "型シグナル評価の型識別を完全修飾パスで行う",
+  "branch": "track/2026-08-21-type-identity-fully-qualified-paths",
+  "created_at": "2026-08-21T01:17:44Z",
+  "updated_at": "2026-08-21T01:17:44Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
