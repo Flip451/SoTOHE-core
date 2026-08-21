@@ -323,6 +323,51 @@ fn test_type_ref_display_fromstr_roundtrip() {
 }
 
 // ---------------------------------------------------------------------------
+// FullyQualifiedItemPath
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_fully_qualified_item_path_new_stores_components() {
+    let crate_name = CrateName::new("domain_core").unwrap();
+    let module_path: ModulePath = "user::input".parse().unwrap();
+    let name = Identifier::new("Input").unwrap();
+
+    let path = FullyQualifiedItemPath::new(crate_name.clone(), module_path.clone(), name.clone());
+
+    assert_eq!(path.crate_name(), &crate_name);
+    assert_eq!(path.module_path(), &module_path);
+    assert_eq!(path.name(), &name);
+}
+
+#[test]
+fn test_fully_qualified_item_path_orders_by_full_path() {
+    let crate_name = CrateName::new("domain_core").unwrap();
+    let first = FullyQualifiedItemPath::new(
+        crate_name.clone(),
+        "a".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+    let second = FullyQualifiedItemPath::new(
+        crate_name,
+        "b".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+
+    assert!(first < second);
+}
+
+#[test]
+fn test_fully_qualified_item_path_display_includes_crate_module_and_name() {
+    let path = FullyQualifiedItemPath::new(
+        CrateName::new("domain_core").unwrap(),
+        "user::input".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+
+    assert_eq!(path.to_string(), "domain_core::user::input::Input");
+}
+
+// ---------------------------------------------------------------------------
 // FunctionPath
 // ---------------------------------------------------------------------------
 

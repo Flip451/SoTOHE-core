@@ -1,4 +1,4 @@
-//! Serde DTO types for [`CatalogueDocument`] wire format (schema_version = 4).
+//! Serde DTO types for [`CatalogueDocument`] wire format (schema_version = 5).
 //!
 //! All types in this module are infrastructure-private (`pub(super)`).
 //! The domain layer is serialization-free.
@@ -26,7 +26,7 @@ pub(super) struct SchemaVersionProbe {
 // Top-level document DTO
 // ---------------------------------------------------------------------------
 
-/// Top-level catalogue document wire format (schema_version = 4).
+/// Top-level catalogue document wire format (schema_version = 5).
 ///
 /// The `types`, `traits`, and `functions` fields are **required** (they must be
 /// present as JSON objects even when empty). Omitting any of them is a decode

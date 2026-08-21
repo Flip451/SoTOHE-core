@@ -739,7 +739,7 @@ fn method_anchor_ownership_catalogue() -> CatalogueDocument {
         )
     };
     let mut catalogue = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("usecase").unwrap(),
         LayerId::try_new("usecase").unwrap(),
     );
@@ -825,7 +825,7 @@ fn empty_spec_doc() -> SpecDocument {
 
 fn money_catalogue() -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -897,7 +897,7 @@ fn money_catalogue() -> CatalogueDocument {
 
 fn empty_catalogue() -> CatalogueDocument {
     CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     )
@@ -935,7 +935,7 @@ fn catalogue_with_type_entries(
     entries: Vec<(&str, TypeEntry)>,
 ) -> CatalogueDocument {
     let mut catalogue = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new(layer).unwrap(),
     );

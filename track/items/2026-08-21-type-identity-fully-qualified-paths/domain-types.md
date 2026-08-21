@@ -11,9 +11,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueEntryKey | value_object | modify | — | 🟡 | 🔵 |
-| CatalogueSchemaVersion | value_object | add | — | 🟡 | 🔵 |
-| FullyQualifiedItemPath | value_object | add | — | 🟡 | 🔵 |
+| CatalogueEntryKey | value_object | modify | — | 🔵 | 🔵 |
+| CatalogueSchemaVersion | value_object | add | — | 🔵 | 🔵 |
+| FullyQualifiedItemPath | value_object | add | — | 🔵 | 🔵 |
 | InherentImplDeclV2 | value_object | modify | — | 🟡 | 🔵 |
 
 ## Error Types

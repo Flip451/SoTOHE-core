@@ -78,7 +78,7 @@
     {
       "description": "Add the Phase 2 `CatalogueEntryKey` and `FullyQualifiedItemPath` changes in `libs/domain/src/tddd/{semantic_verify.rs,catalogue_v2/identifiers.rs,catalogue_v2/identifiers_tests.rs}` with construction, ordering, and display tests; keep the change additive until T004. [IN-01; OS-04; CO-01; CO-02; CO-04; AC-01; AC-02]",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -86,7 +86,7 @@
       ],
       "description": "Add `CatalogueSchemaVersion` in `libs/domain/src/tddd/catalogue_v2/document.rs`, migrate its document accessors there, and update `libs/infrastructure/src/tddd/catalogue_document_codec/{dto.rs,encode.rs,decode.rs,validate.rs,mod.rs}` with focused domain and codec tests. [IN-05; CO-04; AC-09]",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

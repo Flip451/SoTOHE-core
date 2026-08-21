@@ -641,7 +641,11 @@ mod tests {
     }
 
     fn empty_doc(crate_name: &str) -> CatalogueDocument {
-        CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
+        CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new(crate_name).unwrap(),
+            layer(crate_name),
+        )
     }
 
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {

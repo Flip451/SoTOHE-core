@@ -207,7 +207,7 @@ mod tests {
         inherent_methods: Vec<MethodDeclaration>,
     ) -> CatalogueDocument {
         let mut catalogue = CatalogueDocument::new(
-            5,
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -308,7 +308,7 @@ mod tests {
     #[test]
     fn test_orphan_inherent_impl_fails_closed() {
         let mut catalogue = CatalogueDocument::new(
-            5,
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );

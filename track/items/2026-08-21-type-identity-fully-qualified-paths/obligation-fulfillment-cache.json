@@ -1,4 +1,87 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_fully_qualified_item_path_orders_by_full_path"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_fully_qualified_item_path_display_includes_crate_module_and_name"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "FullyQualifiedItemPath"
+      },
+      "key": {
+        "anchor_text_hash": "69bb3fcaafa976c784f98c65b8764f07c5f0ae4bb040e6af6c06f7cea622cf1b",
+        "bound_tests_set_hash": "6d1e97f2170f73c19baf344fd9122b412d877aa25cb52f7c14fa0a8a0510e264",
+        "declaration_hash": "fd172d440db1dd1ba6c65fd624f8e47eb2f4c5819d10c1b69091d9bec57460a3"
+      },
+      "obligation_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(first < second);\nassert_eq!(path.to_string(), \"domain_core::user::input::Input\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::document::tests",
+          "test_name": "test_catalogue_schema_version_preserves_zero_without_validation_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::document::tests",
+          "test_name": "test_catalogue_document_schema_version_accessor_returns_value_object"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_pins_schema_version_to_current_codec_version"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_schema_version_zero_returns_existing_unsupported_schema_version"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueSchemaVersion"
+      },
+      "key": {
+        "anchor_text_hash": "c6d4f0d36eb05214ff0e57b0edaa525b578e2a7b2ab8e03ebc71d76c967adc29",
+        "bound_tests_set_hash": "f23a2626db776abac6cb0b343489bd2ac30deac162d659536d5529384c92b040",
+        "declaration_hash": "b6358dc9e3ce9ca8c9df98cbc258d6173f93bb18b0a3d0098c4407aa5a7cabe6"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueSchemaVersion",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(version.value(), 0); ... assert_eq!(doc.schema_version().value(), 7); ... assert!(value[\"schema_version\"].is_number()); ... CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 0, expected: 5 }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
   "track_id": "2026-08-21-type-identity-fully-qualified-paths"
 }

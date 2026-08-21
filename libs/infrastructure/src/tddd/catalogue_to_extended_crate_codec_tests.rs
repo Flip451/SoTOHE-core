@@ -26,7 +26,7 @@ use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 fn make_doc(crate_name: &str) -> CatalogueDocument {
     CatalogueDocument::new(
-        2,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new("domain").expect("static valid"),
     )

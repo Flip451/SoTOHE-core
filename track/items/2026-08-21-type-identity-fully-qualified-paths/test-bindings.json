@@ -1,1 +1,147 @@
-{"track_id": "2026-08-21-type-identity-fully-qualified-paths", "records": []}
+{
+  "track_id": "2026-08-21-type-identity-fully-qualified-paths",
+  "records": [
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "This entry only constructs a path from already-validated crate, module, and item components and exposes access, ordering, and display. IN-01's resolution of catalogue declarations, impls, and in-crate TypeRefs is not independently verifiable at this value object's construction boundary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "reason": "Evaluator identity-map, TypeRef resolution, owner joining, and contract-map consumers are owned by later implementation tasks T005, T006, and T011; T002 only adds the catalogue-domain identity value object and cannot truthfully establish those consumer behaviors."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "CO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_fully_qualified_item_path_orders_by_full_path"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_fully_qualified_item_path_display_includes_crate_module_and_name"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "This entry stores a path after callers supply its crate, module, and item components; it does not declare catalogue type/trait coexistence or evaluator lookup. AC-01's distinction between same-named targets is therefore not independently observable from this value object's construction, accessors, ordering, or display."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "reason": "This entry accepts already-validated path components and exposes no short-name resolver or TypeRef conversion. AC-02's unique short-name and in-crate TypeRef resolution is not independently verifiable from this value object's declaration."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CatalogueEntryKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "This entry only validates non-empty caller-supplied text and exposes it with ordering; it neither resolves catalogue declarations or TypeRefs nor establishes their identity. IN-01's resolution behavior is not independently verifiable at this construction boundary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CatalogueEntryKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "CatalogueEntryKey declares only validation, string access, and ordering for a caller-supplied identifier. IN-03 specifies downstream lint, derive, attribution, and writer behavior; this construction-boundary entry exposes no independently verifiable lookup, attribution, or writing behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CatalogueEntryKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "This entry is only a validated text wrapper for a caller-supplied key. AC-01's same-named type/trait distinction requires catalogue and evaluator behavior that is not independently observable from this value object's construction, access, or ordering."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CatalogueEntryKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "CatalogueEntryKey exposes only validation, access, and ordering of caller-supplied text. AC-08's same-name preservation and non-substitution claim is observable in downstream indexing, attribution, and catalogue-writing operations, not independently at this value object's construction boundary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::document::tests",
+          "test_name": "test_catalogue_schema_version_preserves_zero_without_validation_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::document::tests",
+          "test_name": "test_catalogue_document_schema_version_accessor_returns_value_object"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_pins_schema_version_to_current_codec_version"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_schema_version_zero_returns_existing_unsupported_schema_version"
+        }
+      ]
+    }
+  ]
+}

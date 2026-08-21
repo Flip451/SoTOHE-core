@@ -1436,7 +1436,11 @@ mod tests {
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let doc = CatalogueDocument::new(3, crate_name, layer);
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         assert!(doc.inherent_impls().is_empty());
     }
 
@@ -1447,7 +1451,11 @@ mod tests {
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
 
         let type_name = TypeName::new("Email").unwrap();
         doc.push_inherent_impl(InherentImplDeclV2 {

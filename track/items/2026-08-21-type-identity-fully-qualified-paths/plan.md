@@ -5,20 +5,20 @@
 
 GO-01 -> T001, T002, T004, T005, T006, T011, T012; GO-02 -> T002, T004, T007, T008, T009, T010, T011, T013, T014, T015, T016, T017.
 
-## Tasks (1/17 resolved)
+## Tasks (3/17 resolved)
 
 ### identity-foundation — Fully-qualified identity foundation
 
 > Review the existing `libs/infrastructure/src/tddd/signal_evaluator_v2/` bootstrap diff and add the Phase 2 catalogue-domain identity types under `libs/domain/src/tddd/`. [IN-01; IN-02; CO-01; CO-02; CO-04; AC-01; AC-02; AC-05]
 
 - [x] **T001**: Review the existing uncommitted bootstrap diff in `libs/infrastructure/src/tddd/signal_evaluator_v2/{mod.rs,phase1/builder/main_fn.rs,phase1/child_items.rs,phase1/state.rs,phase2.rs,tests.rs}`, apply only review corrections, and run the module tests; do not recreate the bootstrap. [IN-02; CO-01; CO-04; AC-02; AC-05]
-- [ ] **T002**: Add the Phase 2 `CatalogueEntryKey` and `FullyQualifiedItemPath` changes in `libs/domain/src/tddd/{semantic_verify.rs,catalogue_v2/identifiers.rs,catalogue_v2/identifiers_tests.rs}` with construction, ordering, and display tests; keep the change additive until T004. [IN-01; OS-04; CO-01; CO-02; CO-04; AC-01; AC-02]
+- [x] **T002**: Add the Phase 2 `CatalogueEntryKey` and `FullyQualifiedItemPath` changes in `libs/domain/src/tddd/{semantic_verify.rs,catalogue_v2/identifiers.rs,catalogue_v2/identifiers_tests.rs}` with construction, ordering, and display tests; keep the change additive until T004. [IN-01; OS-04; CO-01; CO-02; CO-04; AC-01; AC-02]
 
 ### catalogue-resolution — Catalogue representation and resolution
 
 > Migrate the catalogue document aggregate, schema-version value object, document codecs, and local resolver in their named domain and infrastructure modules. [IN-01; IN-04; IN-05; OS-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-09]
 
-- [ ] **T003**: Add `CatalogueSchemaVersion` in `libs/domain/src/tddd/catalogue_v2/document.rs`, migrate its document accessors there, and update `libs/infrastructure/src/tddd/catalogue_document_codec/{dto.rs,encode.rs,decode.rs,validate.rs,mod.rs}` with focused domain and codec tests. [IN-05; CO-04; AC-09]
+- [x] **T003**: Add `CatalogueSchemaVersion` in `libs/domain/src/tddd/catalogue_v2/document.rs`, migrate its document accessors there, and update `libs/infrastructure/src/tddd/catalogue_document_codec/{dto.rs,encode.rs,decode.rs,validate.rs,mod.rs}` with focused domain and codec tests. [IN-05; CO-04; AC-09]
 - [ ] **T004**: Migrate catalogue keys and local references in `libs/domain/src/tddd/catalogue_v2/{document.rs,entries.rs,deletions.rs,traits.rs}` and `new_typegraph_codec_error.rs`; migrate the codec and resolver in `libs/infrastructure/src/tddd/{catalogue_to_extended_crate_codec.rs,catalogue_to_extended_crate_codec/**,catalogue_document_codec/**}`, remove `catalogue_to_extended_crate_codec_error.rs`, and add resolver tests. [IN-01; IN-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-05]
 
 ### evaluation-consumers — Evaluator and contract-map consumers

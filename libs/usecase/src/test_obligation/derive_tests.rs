@@ -407,7 +407,7 @@ fn value_object_entry(action: ItemAction, invariants: Vec<InvariantDecl>) -> Typ
 
 fn catalogue_with_type(name: &str, entry: TypeEntry) -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -416,7 +416,11 @@ fn catalogue_with_type(name: &str, entry: TypeEntry) -> CatalogueDocument {
 }
 
 fn empty_catalogue(crate_name: &str, layer: &str) -> CatalogueDocument {
-    CatalogueDocument::new(5, CrateName::new(crate_name).unwrap(), LayerId::try_new(layer).unwrap())
+    CatalogueDocument::new(
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new(layer).unwrap(),
+    )
 }
 
 fn secondary_port_catalogue(
@@ -1509,7 +1513,7 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
     // IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0.
     let path = PathBuf::from("infrastructure-types.json");
     let mut doc = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("infrastructure").unwrap(),
         LayerId::try_new("infrastructure").unwrap(),
     );
@@ -1676,7 +1680,7 @@ fn test_trait_impl_declaration_hash_includes_resolved_port_contract() {
 fn test_trait_impl_unsupported_axis_yields_zero_even_with_minimum() {
     let path = PathBuf::from("infrastructure-types.json");
     let mut doc = CatalogueDocument::new(
-        5,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
         CrateName::new("infrastructure").unwrap(),
         LayerId::try_new("infrastructure").unwrap(),
     );

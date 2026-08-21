@@ -1,8 +1,8 @@
 {
   "baseline_hash": "3a7b153f588d16bfc4e188a5e27516a106ae356d574bc834f4c72d395d66ccf3",
   "declaration_hash": "d75ee352a288df3564a1d9a6a4c06e298235ffdfa373507d3ed2902fa84a639f",
-  "generated_at": "2026-08-21T11:07:36Z",
-  "head_commit": "910385eee03edccff5e205a18a9f00b43cd0e443",
+  "generated_at": "2026-08-21T14:09:57Z",
+  "head_commit": "f1cab59d4232128ff6c9f0dc865cf74e75de7518",
   "schema_version": 4,
   "signals": [
     {
@@ -18,9 +18,7 @@
       "type_name": "CatalogueDocument"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -30,7 +28,9 @@
         "PartialEq",
         "PartialOrd"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "CatalogueSchemaVersion"
     },
     {
@@ -40,9 +40,7 @@
       "type_name": "InherentImplDeclV2"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -52,7 +50,9 @@
         "PartialEq",
         "PartialOrd"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "FullyQualifiedItemPath"
     },
     {
@@ -68,13 +68,13 @@
       "type_name": "NewTypeGraphCodecError"
     },
     {
-      "found_type": true,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Ord",
         "PartialOrd"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "CatalogueEntryKey"
     }
   ]

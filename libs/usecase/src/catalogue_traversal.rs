@@ -139,7 +139,11 @@ pub(crate) mod tests {
     pub(crate) fn empty_v3_doc(name: &str) -> CatalogueDocument {
         let crate_name = CrateName::new(name).unwrap();
         let layer_id = LayerId::try_new(name).unwrap();
-        CatalogueDocument::new(3, crate_name, layer_id)
+        CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer_id,
+        )
     }
 
     fn type_entry() -> TypeEntry {

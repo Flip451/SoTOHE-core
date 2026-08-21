@@ -503,7 +503,11 @@ mod tests {
     ) -> CatalogueDocument {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         let entry = TypeEntry::new(
             action,
             DataRole::value_object(),
@@ -540,7 +544,11 @@ mod tests {
     ) -> CatalogueDocument {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         for (name, action, spec_refs, informal_grounds) in entries {
             let entry = TypeEntry::new(
                 action,

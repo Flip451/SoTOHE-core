@@ -35,6 +35,35 @@ use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use crate::tddd::layer_id::LayerId;
 
 // ---------------------------------------------------------------------------
+// CatalogueSchemaVersion — schema-version value object
+// ---------------------------------------------------------------------------
+
+/// The schema version carried by a catalogue document.
+///
+/// The numeric representation is deliberately kept at the construction and
+/// infrastructure boundaries. Once stored in a [`CatalogueDocument`], the
+/// value has a type distinct from unrelated numeric values while preserving
+/// the existing version semantics, including zero.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct CatalogueSchemaVersion {
+    value: u32,
+}
+
+impl CatalogueSchemaVersion {
+    /// Creates a schema-version value from its numeric representation.
+    #[must_use]
+    pub fn new(value: u32) -> Self {
+        Self { value }
+    }
+
+    /// Returns the numeric representation used by the catalogue wire format.
+    #[must_use]
+    pub fn value(self) -> u32 {
+        self.value
+    }
+}
+
+// ---------------------------------------------------------------------------
 // CatalogueDocumentError — validation error
 // ---------------------------------------------------------------------------
 
@@ -115,8 +144,8 @@ pub enum CatalogueDocumentError {
 /// - identifier format validation (via `FromStr` / `TryFrom`)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatalogueDocument {
-    /// Format version; currently `3` for the v2 schema.
-    schema_version: u32,
+    /// Format version for this catalogue document.
+    schema_version: CatalogueSchemaVersion,
     /// The crate this catalogue describes.
     crate_name: CrateName,
     /// The architectural layer identifier (e.g. `"domain"`, `"usecase"`, `"infrastructure"`).
@@ -157,7 +186,11 @@ pub struct CatalogueDocument {
 impl CatalogueDocument {
     /// Creates a new empty `CatalogueDocument`.
     #[must_use]
-    pub fn new(schema_version: u32, crate_name: CrateName, layer: LayerId) -> Self {
+    pub fn new(
+        schema_version: CatalogueSchemaVersion,
+        crate_name: CrateName,
+        layer: LayerId,
+    ) -> Self {
         Self {
             schema_version,
             crate_name,
@@ -173,7 +206,7 @@ impl CatalogueDocument {
 
     /// The catalogue schema format version.
     #[must_use]
-    pub fn schema_version(&self) -> u32 {
+    pub fn schema_version(&self) -> CatalogueSchemaVersion {
         self.schema_version
     }
 
@@ -340,8 +373,12 @@ mod tests {
     #[test]
     fn test_catalogue_document_new_creates_empty_document() {
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
-        assert_eq!(doc.schema_version(), 2);
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name.clone(),
+            layer_domain(),
+        );
+        assert_eq!(doc.schema_version().value(), 2);
         assert_eq!(doc.crate_name(), &crate_name);
         assert_eq!(doc.layer(), &layer_domain());
         assert!(doc.types().is_empty());
@@ -352,15 +389,40 @@ mod tests {
     #[test]
     fn test_catalogue_document_with_usecase_layer() {
         let crate_name = CrateName::new("usecase").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name.clone(), layer_usecase());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name.clone(),
+            layer_usecase(),
+        );
         assert_eq!(doc.layer(), &layer_usecase());
     }
 
     #[test]
     fn test_catalogue_document_with_infrastructure_layer() {
         let crate_name = CrateName::new("infrastructure").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name.clone(), layer_infrastructure());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name.clone(),
+            layer_infrastructure(),
+        );
         assert_eq!(doc.layer(), &layer_infrastructure());
+    }
+
+    #[test]
+    fn test_catalogue_schema_version_preserves_zero_without_validation_error() {
+        let version = CatalogueSchemaVersion::new(0);
+
+        assert_eq!(version.value(), 0);
+    }
+
+    #[test]
+    fn test_catalogue_document_schema_version_accessor_returns_value_object() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let version = CatalogueSchemaVersion::new(7);
+        let doc = CatalogueDocument::new(version, crate_name, layer_domain());
+
+        assert_eq!(doc.schema_version(), version);
+        assert_eq!(doc.schema_version().value(), 7);
     }
 
     // -----------------------------------------------------------------------
@@ -370,7 +432,11 @@ mod tests {
     #[test]
     fn test_catalogue_document_types_btreemap_stores_type_entry() {
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         let type_name = TypeName::new("UserId").unwrap();
         doc.insert_type(type_name.clone(), make_simple_type_entry());
         assert_eq!(doc.types().len(), 1);
@@ -380,7 +446,11 @@ mod tests {
     #[test]
     fn test_catalogue_document_functions_btreemap_stores_function_entry() {
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name.clone(),
+            layer_domain(),
+        );
         let fn_path =
             FunctionPath::at_root(crate_name.clone(), FunctionName::new("register_user").unwrap());
         doc.insert_function(fn_path.clone(), make_simple_function_entry());
@@ -392,7 +462,11 @@ mod tests {
     fn test_catalogue_document_btreemaps_use_deterministic_order() {
         // BTreeMap ensures sorted key iteration — verify type key order.
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         doc.insert_type(TypeName::new("ZOrder").unwrap(), make_simple_type_entry());
         doc.insert_type(TypeName::new("AUser").unwrap(), make_simple_type_entry());
         doc.insert_type(TypeName::new("MItem").unwrap(), make_simple_type_entry());
@@ -407,7 +481,11 @@ mod tests {
     #[test]
     fn test_validate_filename_with_matching_stem_returns_ok() {
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         // "domain-types.json" → stem = "domain"
         assert!(doc.validate_filename("domain").is_ok());
     }
@@ -415,7 +493,11 @@ mod tests {
     #[test]
     fn test_validate_filename_with_mismatched_stem_returns_crate_name_mismatch_error() {
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         // "usecase-types.json" stem "usecase" does not match crate_name "domain"
         let err = doc.validate_filename("usecase").unwrap_err();
         assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
@@ -424,7 +506,11 @@ mod tests {
     #[test]
     fn test_validate_filename_with_empty_stem_returns_crate_name_mismatch_error() {
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         let err = doc.validate_filename("").unwrap_err();
         assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
     }
@@ -432,7 +518,11 @@ mod tests {
     #[test]
     fn test_validate_filename_with_underscore_crate_name_succeeds() {
         let crate_name = CrateName::new("domain_core").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         // "domain_core-types.json" → stem = "domain_core"
         assert!(doc.validate_filename("domain_core").is_ok());
     }
@@ -441,7 +531,11 @@ mod tests {
     fn test_validate_filename_with_full_filename_returns_mismatch() {
         // The caller should pass only the stem, not the full filename.
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name, layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name,
+            layer_domain(),
+        );
         // Passing the full filename "domain-types.json" should fail (not equal to "domain").
         let err = doc.validate_filename("domain-types.json").unwrap_err();
         assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
@@ -500,7 +594,11 @@ mod tests {
         use crate::tddd::catalogue_v2::identifiers::CrateName;
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let doc = CatalogueDocument::new(3, crate_name, layer);
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         assert!(doc.trait_impls().is_empty());
     }
 
@@ -511,7 +609,11 @@ mod tests {
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
 
         // Case A: external trait + self-crate type
         let impl_a = TraitImplDeclV2::new(
@@ -536,7 +638,11 @@ mod tests {
     fn test_catalogue_document_deletions_defaults_to_empty_and_stores_records() {
         use crate::tddd::catalogue_v2::deletions::DeletionRecord;
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(5, crate_name, layer_domain());
+        let mut doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+            crate_name,
+            layer_domain(),
+        );
         assert!(doc.deletions().is_empty(), "new() must default deletions to empty");
         doc.push_deletion(DeletionRecord::Type {
             name: TypeName::new("OldType").unwrap(),
@@ -553,7 +659,11 @@ mod tests {
         // This is a structural property — there is no way to have multiple crates
         // in one document at the type level (ADR 1 D6).
         let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+            crate_name.clone(),
+            layer_domain(),
+        );
         assert_eq!(doc.crate_name(), &crate_name);
         // No "other crate name" field — the invariant is structural.
         let _ = doc.layer();

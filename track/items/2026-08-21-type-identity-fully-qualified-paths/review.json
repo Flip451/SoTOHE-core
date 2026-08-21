@@ -134,6 +134,86 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-21T13:58:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:030b7f57f3cca6067c265f0d1df7f06a7dd5d17009de4c70bf5feea81a7bb13d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T14:01:50Z",
+          "findings": [
+            {
+              "category": "consumer-ownership violation",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 436,
+              "message": "This still hard-fails CI on consumer-owned profile choices. `AgentProfiles::resolve_execution` explicitly permits the Fast tier to fall back to the Final model when `fast_model` is omitted, so a valid customization using the same model for both tiers fails `assert_ne!`; the capability-presence assertions likewise enforce the committed consumer configuration. Remove this committed-profile conformance test or move the tier-resolution checks to the existing self-contained fixture test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030b7f57f3cca6067c265f0d1df7f06a7dd5d17009de4c70bf5feea81a7bb13d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T14:06:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3258f179d9e0edea5d654994edc8381c0e1fb0035968f1d681edb24dd5906e1d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T14:06:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3258f179d9e0edea5d654994edc8381c0e1fb0035968f1d681edb24dd5906e1d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T14:08:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3258f179d9e0edea5d654994edc8381c0e1fb0035968f1d681edb24dd5906e1d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-21T12:08:18Z",
+          "findings": [
+            {
+              "category": "primitive obsession",
+              "file": "libs/domain/src/tddd/catalogue_v2/document.rs",
+              "line": 189,
+              "message": "`CatalogueDocument::new` still accepts raw `u32` and performs the wrapping internally, while the domain type contract declares `schema_version: CatalogueSchemaVersion`. This leaves the aggregate construction API primitive-based and structurally mismatched; make the constructor accept `CatalogueSchemaVersion` and wrap only at the numeric infrastructure boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c02051c39c736cd5b9cd22639e919a98b5612627fe07e86c404367d86fb61537",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T12:28:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:373a20cee3b6e0761da0f02985f8e327534fffa8b0e7b470a77ef055d9fdee19",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T12:33:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:373a20cee3b6e0761da0f02985f8e327534fffa8b0e7b470a77ef055d9fdee19",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -154,6 +234,20 @@
           "at": "2026-08-21T02:09:35Z",
           "findings": [],
           "hash": "rvw1:sha256:dd514a787a7418b7751c1f671d192367a68647136708522b7f677c62ae10dd58",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T13:58:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8706bed94fa4ff8c4095e23a21310a76363090610e1303cc8bb5395c5d97846",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T14:02:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8706bed94fa4ff8c4095e23a21310a76363090610e1303cc8bb5395c5d97846",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -224,6 +318,13 @@
           "hash": "rvw1:sha256:f579fa89c8515d588ff6b489e35bed049edd58fd219bd5242af92b362eb7282d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T12:34:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e60913187928471496c806484fd98fddd087ed42761f3710e6ecb3acfce445d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -269,6 +370,13 @@
           "at": "2026-08-21T11:01:36Z",
           "findings": [],
           "hash": "rvw1:sha256:1be1172ed5981e6f78bd2c02a097000b1b013f503375cdb41a2aa02a41d21bde",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T12:33:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4631949d1dd7ff953b6ad6332257e1c08c0c8b0422c41db3d8550dc6839de2cf",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -353,6 +461,27 @@
           "at": "2026-08-21T10:57:40Z",
           "findings": [],
           "hash": "rvw1:sha256:8027366266c609b323af9c6d51c47c22a665f6bc167611adfcb618372d22f58e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T12:34:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:460c23a58ef1523f3e124a3963bfc0394cbbd19dd81d50a1da13b82654e97843",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T13:58:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d08a86e63e74454913ce3c8a9388f9e76b44dffc1bd49abd7b11314d20e8a709",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T14:02:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d08a86e63e74454913ce3c8a9388f9e76b44dffc1bd49abd7b11314d20e8a709",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -625,6 +754,24 @@
           "at": "2026-08-21T09:18:43Z",
           "findings": [],
           "hash": "rvw1:sha256:d5dec52589d92807c0e59294a86779b0c8200f999311f940d4287f8ff44f5a69",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-21T12:36:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17df0aecafa8340d2c662a6d1db37459af1e4686863b8673876b5fac6a36b3a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T12:41:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17df0aecafa8340d2c662a6d1db37459af1e4686863b8673876b5fac6a36b3a7",
           "type": "final",
           "verdict": "zero_findings"
         }

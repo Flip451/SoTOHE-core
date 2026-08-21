@@ -2440,7 +2440,11 @@ mod tests {
         use crate::tddd::catalogue_v2::identifiers::CrateName;
 
         let layer_id = layer("domain");
-        let doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer_id.clone());
+        let doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer_id.clone(),
+        );
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::NoPublicField,
@@ -2510,7 +2514,11 @@ mod tests {
     use crate::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 
     fn make_doc(layer_name: &str) -> CatalogueDocument {
-        CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer(layer_name))
+        CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer(layer_name),
+        )
     }
 
     /// Wrap a single `CatalogueDocument` in a `BTreeMap` keyed by its layer and
@@ -5013,8 +5021,11 @@ mod tests {
             make_type_entry(DataRole::DomainEvent),
         );
 
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
@@ -5061,8 +5072,11 @@ mod tests {
 
         let domain_doc = make_doc("domain");
         // domain layer has NO OrderPlaced at all; usecase has it as ValueObject (wrong)
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry(DataRole::value_object()),
@@ -5115,8 +5129,11 @@ mod tests {
             }),
         );
 
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("MyDto").unwrap(),
             make_type_entry_with_methods(
@@ -5161,15 +5178,18 @@ mod tests {
         let driver_layer = layer("cli_driver");
 
         let mut infrastructure_doc = CatalogueDocument::new(
-            3,
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
         infrastructure_doc
             .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
 
-        let mut driver_doc =
-            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        let mut driver_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("cli_driver").unwrap(),
+            driver_layer.clone(),
+        );
         driver_doc.insert_type(
             TypeName::new("OrderDriver").unwrap(),
             make_type_entry_with_methods(
@@ -5209,15 +5229,18 @@ mod tests {
         let usecase_layer = layer("usecase");
 
         let mut infrastructure_doc = CatalogueDocument::new(
-            3,
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
         infrastructure_doc
             .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
 
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_trait(
             TraitName::new("OrderService").unwrap(),
             make_trait_entry_with_methods(
@@ -5257,15 +5280,18 @@ mod tests {
         let driver_layer = layer("cli_driver");
 
         let mut infrastructure_doc = CatalogueDocument::new(
-            3,
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
         infrastructure_doc
             .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
 
-        let mut driver_doc =
-            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        let mut driver_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("cli_driver").unwrap(),
+            driver_layer.clone(),
+        );
         driver_doc.insert_type(
             TypeName::new("OrderDriver").unwrap(),
             make_type_entry_with_methods(
@@ -5313,15 +5339,18 @@ mod tests {
         let driver_layer = layer("cli_driver");
 
         let mut infrastructure_doc = CatalogueDocument::new(
-            3,
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
         infrastructure_doc
             .insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
 
-        let mut driver_doc =
-            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        let mut driver_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("cli_driver").unwrap(),
+            driver_layer.clone(),
+        );
         driver_doc.insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
         driver_doc.insert_type(
             TypeName::new("OrderDriver").unwrap(),
@@ -5367,8 +5396,11 @@ mod tests {
     fn test_no_layer_in_method_signature_unknown_forbidden_layer_returns_error() {
         let driver_layer = layer("cli_driver");
         let missing_layer = layer("infrastructure");
-        let driver_doc =
-            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        let driver_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("cli_driver").unwrap(),
+            driver_layer.clone(),
+        );
         let all = BTreeMap::from([(driver_layer.clone(), driver_doc)]);
         let rule = CatalogueLinterRule::new(
             RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
@@ -5432,8 +5464,11 @@ mod tests {
         domain_doc.insert_type(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
 
         // usecase layer: PlaceOrder.handles references "domain::OrderPlaced"
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
@@ -5504,8 +5539,11 @@ mod tests {
         // so that sig_type_contains_entry resolves via Rule 1 (qualified layer match)
         // without calling find_in_catalogue — making the eval.rs outer filter the
         // decisive guard.
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("MyDto").unwrap(),
             make_type_entry_with_methods(
@@ -5577,8 +5615,11 @@ mod tests {
         // "domain::OrderPlaced" so that sig_type_contains_entry resolves via
         // Rule 1 (qualified layer match) without calling find_in_catalogue —
         // making the eval.rs outer cat.types().iter() filter the decisive guard.
-        let mut usecase_doc =
-            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        let mut usecase_doc = CatalogueDocument::new(
+            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            usecase_layer.clone(),
+        );
         usecase_doc.insert_type(
             TypeName::new("MyUseCase").unwrap(),
             make_type_entry_with_methods(

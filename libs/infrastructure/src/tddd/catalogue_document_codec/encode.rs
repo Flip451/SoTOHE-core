@@ -3,14 +3,15 @@
 use std::collections::{BTreeMap, btree_map::Entry};
 
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
+use domain::tddd::catalogue_v2::document::{CatalogueDocument, CatalogueSchemaVersion};
 use domain::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, DeletionRecord, InvariantDecl, MethodDeclaration,
-    MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, DeletionRecord, InvariantDecl, MethodDeclaration, MethodGenericParam,
+    ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
@@ -99,8 +100,9 @@ pub(super) fn domain_to_dto(
         doc.inherent_impls().iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     let trait_impls =
         doc.trait_impls().iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let schema_version = CatalogueSchemaVersion::new(SCHEMA_VERSION).value();
     Ok(CatalogueDocumentDto {
-        schema_version: SCHEMA_VERSION,
+        schema_version,
         crate_name: doc.crate_name().as_str().to_owned(),
         layer: doc.layer().as_ref().to_owned(),
         types,

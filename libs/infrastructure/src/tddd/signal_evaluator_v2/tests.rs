@@ -3790,7 +3790,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
-        2,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new("domain").expect("static"),
     );
@@ -4039,7 +4039,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
-        2,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new("domain").expect("static"),
     );
@@ -4639,7 +4639,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
-        2,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new("domain").expect("static"),
     );

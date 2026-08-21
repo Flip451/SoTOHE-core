@@ -1,4 +1,197 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "FullyQualifiedItemPath"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "declaration_hash": "c2ca4b423a54496e77add9b8bfbea857155ca7184afd3e609fedb0f41da3e411",
+        "waived_reason_hash": "0351fa161c4953d341fb584d912a3605bcab42dfdad98808bbfd68f718f9df14"
+      },
+      "obligation_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "FullyQualifiedItemPath"
+      },
+      "key": {
+        "anchor_text_hash": "31efb3c5d7646d506c1ebcf69bdb397956354b9e755351b9663d2666a0d581fa",
+        "declaration_hash": "983b375dc3c2bced8879c72eb143abf02002f53aaddb612bbb0a836b8a005472",
+        "waived_reason_hash": "da58f14536da1d56bf27ae60bbc071538bbd2f80800cb11b80d44eb0a640d6d2"
+      },
+      "obligation_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "FullyQualifiedItemPath"
+      },
+      "key": {
+        "anchor_text_hash": "a3cde6357866fdfff10d8b4c1390c3bae314145cdec3919a68f8373180469126",
+        "declaration_hash": "984b91410244b59335c4bd5e277d9be50f7b4bfc469fc2ab49d8c9782a116ec4",
+        "waived_reason_hash": "a3f590b2e4ff23c2aa2958e0178c4d287b3e3f2c695702b1dd3dd9f68b7b2f86"
+      },
+      "obligation_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"評価器はそれぞれを異なる完全修飾パスの対象として扱う\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "FullyQualifiedItemPath"
+      },
+      "key": {
+        "anchor_text_hash": "b40140082798a221b551613fab8c059c19f25c0afc425b5e45d9bd9157d82299",
+        "declaration_hash": "d4326d9366a5669cee351dc3547357fae91a6f9507af9a7a113650b9c4358ba2",
+        "waived_reason_hash": "b863ea8e1433723b7b8aa389ff7dc31dbd2353e4bba3fe65274c6ef825294db9"
+      },
+      "obligation_id": {
+        "entry_key": "FullyQualifiedItemPath",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueEntryKey"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "declaration_hash": "7bfc09f8f880568909d23863ec9eec8e3404f7bbec9fd556d260ab1f7a6d316a",
+        "waived_reason_hash": "586ebde94b8955ec7b741b46bca6d6f22fcd236989ec8bad4b40072a7d0f6131"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueEntryKey",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Catalogue entry-key value object; construction-boundary text representation.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueEntryKey"
+      },
+      "key": {
+        "anchor_text_hash": "a3e448e19e89d13fbd30bf3539c09958839e40a79193729d3282ee409edca758",
+        "declaration_hash": "ee158a2aa8cf3c8d0cfd9bdf177cde18050a38c6c697731d3f2ad9a6b3f3c2dc",
+        "waived_reason_hash": "0ddfc39ab051a3dca0ad1cb26ff2dbc359bf02baeb4587aca20cee140a1d541c"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueEntryKey",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Catalogue entry-key value object; construction-boundary text representation.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueEntryKey"
+      },
+      "key": {
+        "anchor_text_hash": "a3cde6357866fdfff10d8b4c1390c3bae314145cdec3919a68f8373180469126",
+        "declaration_hash": "6215fc8fe2e8636f58cec6882d10774ed5056ce7c4e798b8005e8ae0157ca6d2",
+        "waived_reason_hash": "99f239bc021173dbe5c6634b4889c1b663eafe098de5d6aaed6c79f9fa55b837"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueEntryKey",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueEntryKey"
+      },
+      "key": {
+        "anchor_text_hash": "8a0bd8c691f7683dec9480847b1b325f8adcbc5d709075150f0bb3ccdef462c5",
+        "declaration_hash": "5594139209ea36b76a30975d62ea439512acaf1596e925bfaf7eaa429440b72b",
+        "waived_reason_hash": "bd5ad617ffd69edd6374723778bd5c3a9faa8e624bb1e247e19ba72f92b6c1d8"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueEntryKey",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "「二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない」",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
   "track_id": "2026-08-21-type-identity-fully-qualified-paths"
 }

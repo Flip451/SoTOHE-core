@@ -2353,7 +2353,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     use rustdoc_types::ItemEnum;
 
     let mut doc = CatalogueDocument::new(
-        2,
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );

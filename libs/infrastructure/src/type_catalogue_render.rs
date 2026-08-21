@@ -617,7 +617,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         let entry = TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -776,7 +780,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         let plain_entry = TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -827,7 +835,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         doc.insert_type(
             TypeName::new("AType").unwrap(),
             TypeEntry::new(
@@ -874,7 +886,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         doc.insert_type(
             TypeName::new("UserAccount").unwrap(),
             TypeEntry::new(
@@ -934,7 +950,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("usecase".to_owned()).unwrap();
         let crate_name = CrateName::new("usecase").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name.clone(),
+            layer,
+        );
         let fn_path =
             FunctionPath::at_root(crate_name, FunctionName::new("register_user").unwrap());
         doc.insert_function(
@@ -993,7 +1013,11 @@ mod tests {
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer,
+        );
         doc.insert_type(
             TypeName::new("UserRegistered").unwrap(),
             TypeEntry::new(

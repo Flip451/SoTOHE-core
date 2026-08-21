@@ -350,7 +350,7 @@ mod tests {
 
     fn catalogue(layer: &str, action: ItemAction) -> CatalogueDocument {
         let mut document = CatalogueDocument::new(
-            5,
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
             CrateName::new(layer).unwrap(),
             LayerId::try_new(layer).unwrap(),
         );

@@ -270,7 +270,11 @@ include_function_roles = []
         let adapter = ContractMapRendererAdapter::new(path);
         let layer = LayerId::try_new("domain").unwrap();
         let crate_name = CrateName::new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
         doc.insert_type(
             TypeName::new("UnstyledValue").unwrap(),
             TypeEntry::new(
@@ -316,7 +320,11 @@ include_function_roles = []
         let rendered_layer = LayerId::try_new("domain").unwrap();
         let excluded_layer = LayerId::try_new("usecase").unwrap();
         let crate_name = CrateName::new("usecase").unwrap();
-        let mut excluded_catalogue = CatalogueDocument::new(3, crate_name, excluded_layer);
+        let mut excluded_catalogue = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            excluded_layer,
+        );
         excluded_catalogue.insert_type(
             TypeName::new("UnstyledBoundaryValue").unwrap(),
             TypeEntry::new(
@@ -382,7 +390,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare `PayloadType` so that the variant payload edge target resolves.
         // This is necessary for the edge-config lookup to be triggered (CN-02).
@@ -502,7 +514,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Module-level type (creates layer → module → entry nesting).
         doc.insert_type(
@@ -612,8 +628,16 @@ include_function_roles = []
         let crate_b = CrateName::new("crate_b").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
 
-        let mut doc_a = CatalogueDocument::new(3, crate_a.clone(), layer.clone());
-        let mut doc_b = CatalogueDocument::new(3, crate_b.clone(), layer.clone());
+        let mut doc_a = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_a.clone(),
+            layer.clone(),
+        );
+        let mut doc_b = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_b.clone(),
+            layer.clone(),
+        );
 
         doc_a.insert_trait(TraitName::new("TraitA").unwrap(), make_empty_trait_entry());
         doc_b.insert_trait(TraitName::new("TraitB").unwrap(), make_empty_trait_entry());
@@ -637,7 +661,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Root entry (module_path = [])
         doc.insert_type(
@@ -705,7 +733,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         let transitions = TypestateTransitions::new(vec![MethodName::new("approve").unwrap()]);
         let marker = TypestateMarker::new(TypeName::new("ReviewMachine").unwrap(), transitions);
@@ -783,7 +815,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         doc.insert_type(
             TypeName::new("Email").unwrap(),
@@ -864,7 +900,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         let tuple_variant = VariantDecl::tuple(
             VariantName::new("Some").unwrap(),
@@ -908,7 +948,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare `ErrorMessage` as a catalogue type so the variant payload edge resolves.
         doc.insert_type(
@@ -975,7 +1019,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare `Email` as a catalogue type so the field edge target resolves.
         doc.insert_type(
@@ -1032,7 +1080,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         let field =
             FieldDecl::new(FieldName::new("secret").unwrap(), TypeRef::new("SecretKey").unwrap());
@@ -1080,7 +1132,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare both target types so that positional edges can be resolved.
         for type_name in ["UserId", "GroupId"] {
@@ -1157,7 +1213,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare the alias target so the alias_of edge resolves.
         doc.insert_type(
@@ -1216,7 +1276,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         for name in ["T", "RawId"] {
             doc.insert_type(
@@ -1295,7 +1359,11 @@ include_function_roles = []
 
         let t_crate = CrateName::new("T").unwrap();
         let t_layer = LayerId::try_new("usecase").unwrap();
-        let mut t_doc = CatalogueDocument::new(3, t_crate, t_layer.clone());
+        let mut t_doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            t_crate,
+            t_layer.clone(),
+        );
         t_doc.insert_type(
             TypeName::new("Item").unwrap(),
             TypeEntry::new(
@@ -1317,7 +1385,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
         doc.insert_type(
             TypeName::new("UserId").unwrap(),
             TypeEntry::new(
@@ -1363,7 +1435,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         for name in ["T", "RawId"] {
             doc.insert_type(
@@ -1436,7 +1512,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name.clone(),
+            layer.clone(),
+        );
 
         // Add a trait to the catalogue so it appears in the trait index.
         doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
@@ -1486,8 +1566,16 @@ include_function_roles = []
 
         let l1 = LayerId::try_new("core").unwrap();
         let l2 = LayerId::try_new("api").unwrap();
-        let doc1 = CatalogueDocument::new(3, CrateName::new("core").unwrap(), l1.clone());
-        let doc2 = CatalogueDocument::new(3, CrateName::new("api").unwrap(), l2.clone());
+        let doc1 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("core").unwrap(),
+            l1.clone(),
+        );
+        let doc2 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("api").unwrap(),
+            l2.clone(),
+        );
 
         let result = adapter.render(&[doc1, doc2], &[l1, l2], &opts);
         assert!(result.is_ok(), "2-layer config must succeed: {result:?}");
@@ -1509,9 +1597,21 @@ include_function_roles = []
         let l2 = LayerId::try_new("usecase").unwrap();
         let l3 = LayerId::try_new("infrastructure").unwrap();
 
-        let doc1 = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), l1.clone());
-        let doc2 = CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), l2.clone());
-        let doc3 = CatalogueDocument::new(3, CrateName::new("infra").unwrap(), l3.clone());
+        let doc1 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            l1.clone(),
+        );
+        let doc2 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("usecase").unwrap(),
+            l2.clone(),
+        );
+        let doc3 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("infra").unwrap(),
+            l3.clone(),
+        );
 
         let result = adapter.render(&[doc1, doc2, doc3], &[l1, l2, l3], &opts);
         assert!(result.is_ok(), "3-layer config must succeed: {result:?}");
@@ -1526,8 +1626,16 @@ include_function_roles = []
 
         let l1 = LayerId::try_new("alpha").unwrap();
         let l2 = LayerId::try_new("beta").unwrap();
-        let doc1 = CatalogueDocument::new(3, CrateName::new("alpha").unwrap(), l1.clone());
-        let doc2 = CatalogueDocument::new(3, CrateName::new("beta").unwrap(), l2.clone());
+        let doc1 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("alpha").unwrap(),
+            l1.clone(),
+        );
+        let doc2 = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("beta").unwrap(),
+            l2.clone(),
+        );
 
         let result = adapter.render(&[doc1, doc2], &[l1, l2], &opts).unwrap();
         let text = result.content().as_ref();
@@ -1553,13 +1661,16 @@ include_function_roles = []
         let infra_layer = LayerId::try_new("infrastructure").unwrap();
 
         // domain catalogue: declares MyPort trait.
-        let mut domain_doc =
-            CatalogueDocument::new(3, CrateName::new("domain").unwrap(), domain_layer.clone());
+        let mut domain_doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            domain_layer.clone(),
+        );
         domain_doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
 
         // infrastructure catalogue: declares MyAdapter type + cross-crate trait impl.
         let mut infra_doc = CatalogueDocument::new(
-            3,
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("infrastructure").unwrap(),
             infra_layer.clone(),
         );
@@ -1607,8 +1718,11 @@ include_function_roles = []
             let opts = ContractMapRenderOptions::default();
 
             let layer = LayerId::try_new("domain").unwrap();
-            let mut doc =
-                CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+            let mut doc = CatalogueDocument::new(
+                domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+                CrateName::new("domain").unwrap(),
+                layer.clone(),
+            );
             doc.insert_type(
                 TypeName::new("MyType").unwrap(),
                 TypeEntry::new(
@@ -1652,7 +1766,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Deleted trait — must be absent from output and trait index.
         doc.insert_trait(
@@ -1725,7 +1843,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name.clone(),
+            layer.clone(),
+        );
 
         let fn_path =
             FunctionPath::at_root(crate_name.clone(), FunctionName::new("removed_fn").unwrap());
@@ -1768,7 +1890,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // `name: String` — `String` is not a catalogue entry; edge must be silently skipped.
         let field =
@@ -1818,7 +1944,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Method with param `w: W` and return `L` — generic params, no declared target.
         let method_with_generic_params = MethodDeclaration::new(
@@ -1880,7 +2010,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Type that is being deleted.
         doc.insert_type(
@@ -1952,7 +2086,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("infrastructure").unwrap();
         let layer = LayerId::try_new("infrastructure").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Declare both result variants as catalogue types.
         for type_name in ["ContractMapContent", "ContractMapRendererError"] {
@@ -2047,7 +2185,11 @@ include_function_roles = []
 
             let crate_name = CrateName::new("domain").unwrap();
             let layer = LayerId::try_new("domain").unwrap();
-            let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+            let mut doc = CatalogueDocument::new(
+                domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+                crate_name,
+                layer.clone(),
+            );
 
             doc.insert_type(
                 TypeName::new(target_type).unwrap(),
@@ -2130,7 +2272,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         // Method with `Vec<String>` and `Option<T>` params — neither String nor T is declared.
         let method = MethodDeclaration::new(
@@ -2209,7 +2355,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("infrastructure").unwrap();
         let layer = LayerId::try_new("infrastructure").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name.clone(),
+            layer.clone(),
+        );
 
         // Declare a trait that will be the impl target.
         doc.insert_trait(TraitName::new("ContractMapRenderer").unwrap(), make_empty_trait_entry());
@@ -2325,7 +2475,11 @@ include_function_roles = []
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            crate_name,
+            layer.clone(),
+        );
 
         doc.insert_type(
             TypeName::new("MyType").unwrap(),
@@ -2400,7 +2554,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_trait_all_type_ref_positions_emit_trait_edges() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
 
         for trait_name in [
             "DeclaredPort",
@@ -2569,7 +2727,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_external_trait_silently_skips_edge() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
         let method = MethodDeclaration::new(
             MethodName::new("inspect").unwrap(),
             Some(SelfReceiver::SharedRef),
@@ -2599,7 +2761,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_same_name_type_and_trait_resolve_separately() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
         doc.insert_type(TypeName::new("Foo").unwrap(), make_plain_struct_entry(vec![], vec![]));
         doc.insert_trait(TraitName::new("Foo").unwrap(), make_empty_trait_entry());
         doc.insert_type(
@@ -2639,7 +2805,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_multiple_bounds_resolve_declared_traits_only() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
         for trait_name in ["DeclaredPort", "DeclaredMarker"] {
             doc.insert_trait(TraitName::new(trait_name).unwrap(), make_empty_trait_entry());
         }
@@ -2676,7 +2846,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_generic_and_associated_types_emit_deduplicated_edges() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
         doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
         for type_name in ["GenericType", "AssociatedType"] {
             doc.insert_type(
@@ -2710,7 +2884,11 @@ include_function_roles = []
     #[test]
     fn test_contract_map_dyn_self_crate_prefixes_resolve_to_trait() {
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
         doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
         doc.insert_type(
             TypeName::new("Owner").unwrap(),
@@ -2745,8 +2923,11 @@ include_function_roles = []
     fn test_contract_map_trait_impl_shared_resolver_preserves_and_extends_resolution() {
         let domain_layer = LayerId::try_new("domain").unwrap();
         let adapter_layer = LayerId::try_new("infrastructure").unwrap();
-        let mut domain_doc =
-            CatalogueDocument::new(3, CrateName::new("domain").unwrap(), domain_layer.clone());
+        let mut domain_doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            domain_layer.clone(),
+        );
         domain_doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
         for type_name in ["CrateAdapter", "SelfAdapter", "SuperAdapter", "BareAdapter"] {
             domain_doc.insert_type(
@@ -2766,8 +2947,11 @@ include_function_roles = []
             ));
         }
 
-        let mut adapter_doc =
-            CatalogueDocument::new(3, CrateName::new("adapter").unwrap(), adapter_layer.clone());
+        let mut adapter_doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("adapter").unwrap(),
+            adapter_layer.clone(),
+        );
         adapter_doc.insert_type(
             TypeName::new("CrossAdapter").unwrap(),
             make_plain_struct_entry(vec![], vec![]),

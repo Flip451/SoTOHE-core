@@ -500,6 +500,58 @@ impl AsRef<str> for TypeRef {
 }
 
 // ---------------------------------------------------------------------------
+// FullyQualifiedItemPath — full-path identity for catalogue type and trait entries
+// ---------------------------------------------------------------------------
+
+/// Fully qualified identity for a catalogue type or trait entry.
+///
+/// The identity is composed of the crate name, module path, and declared item
+/// name.  Keeping the components typed prevents a short name from being used
+/// as the identity when two items share that name in different modules.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct FullyQualifiedItemPath {
+    crate_name: CrateName,
+    module_path: ModulePath,
+    name: Identifier,
+}
+
+impl FullyQualifiedItemPath {
+    /// Creates a fully qualified item path from validated path components.
+    #[must_use]
+    pub fn new(crate_name: CrateName, module_path: ModulePath, name: Identifier) -> Self {
+        Self { crate_name, module_path, name }
+    }
+
+    /// Returns the crate name component.
+    #[must_use]
+    pub fn crate_name(&self) -> &CrateName {
+        &self.crate_name
+    }
+
+    /// Returns the module path component.
+    #[must_use]
+    pub fn module_path(&self) -> &ModulePath {
+        &self.module_path
+    }
+
+    /// Returns the declared item name component.
+    #[must_use]
+    pub fn name(&self) -> &Identifier {
+        &self.name
+    }
+}
+
+impl fmt::Display for FullyQualifiedItemPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.crate_name, f)?;
+        if !self.module_path.is_root() {
+            write!(f, "::{}", self.module_path)?;
+        }
+        write!(f, "::{}", self.name)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // FunctionPath — full-path key for FunctionEntry BTreeMap
 // ---------------------------------------------------------------------------
 
