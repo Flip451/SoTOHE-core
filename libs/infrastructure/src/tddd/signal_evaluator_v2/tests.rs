@@ -5,7 +5,9 @@
 use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::catalogue_v2::ItemAction;
-use domain::tddd::{ExtendedCrate, Phase1Error, SignalEvaluatorPort, SignalRegion};
+use domain::tddd::{
+    CatalogueToExtendedCratePort, ExtendedCrate, Phase1Error, SignalEvaluatorPort, SignalRegion,
+};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, FunctionHeader, FunctionSignature, Generics, Id, Item, ItemEnum,
     ItemKind, ItemSummary, Module, Struct, StructKind, Target, Type, Visibility,
@@ -28,6 +30,57 @@ fn empty_crate() -> Crate {
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     }
+}
+
+fn encode_catalogue_doc(
+    doc: domain::tddd::catalogue_v2::CatalogueDocument,
+) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+    let mut paths = HashMap::new();
+    let mut next_id = 1;
+    for (key, entry) in doc.types() {
+        let mut path = vec![doc.crate_name().as_str().to_owned()];
+        path.extend(
+            entry.module_path().segments().iter().map(|segment| segment.as_str().to_owned()),
+        );
+        path.push(key.as_str().rsplit("::").next().unwrap_or(key.as_str()).to_owned());
+        paths.insert(Id(next_id), ItemSummary { crate_id: 0, path, kind: ItemKind::Struct });
+        next_id += 1;
+    }
+    for (key, entry) in doc.traits() {
+        let mut path = vec![doc.crate_name().as_str().to_owned()];
+        path.extend(
+            entry.module_path().segments().iter().map(|segment| segment.as_str().to_owned()),
+        );
+        path.push(key.as_str().rsplit("::").next().unwrap_or(key.as_str()).to_owned());
+        paths.insert(Id(next_id), ItemSummary { crate_id: 0, path, kind: ItemKind::Trait });
+        next_id += 1;
+    }
+    for (path, kind) in [
+        (vec!["std", "vec", "Vec"], ItemKind::Struct),
+        (vec!["std", "clone", "Clone"], ItemKind::Trait),
+        (vec!["core", "fmt", "Display"], ItemKind::Trait),
+    ] {
+        paths.insert(
+            Id(next_id),
+            ItemSummary { crate_id: 0, path: path.into_iter().map(str::to_owned).collect(), kind },
+        );
+        next_id += 1;
+    }
+    let authoritative = Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: HashMap::new(),
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new().encode(
+        doc,
+        &authoritative,
+        &authoritative,
+    )
 }
 
 fn empty_generics() -> Generics {
@@ -3772,21 +3825,19 @@ fn test_t043_hrtb_function_pointer_binders_preserved() {
 /// verifies the full A-codec → evaluator pipeline.
 #[test]
 fn test_impl_block_generics_symmetric_compare_blue() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::TypeEntry;
     use domain::tddd::catalogue_v2::methods::MethodGenericParam;
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
     use rustdoc_types::{
         GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
         WherePredicate,
     };
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -3809,7 +3860,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
     );
 
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -3830,7 +3881,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
     // Also register the local trait "MyTrait" (needed for local trait id resolution).
     use domain::tddd::catalogue_v2::entries::TraitEntry;
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3847,7 +3898,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
         ),
     );
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // Verify A-side actually encoded impl_generics: the codec must emit a trait Impl item
     // with non-empty `generics.params` — a Blue signal alone cannot prove this because the
@@ -4022,20 +4073,16 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 /// so the existing Blue evaluation is retained.
 #[test]
 fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
-    use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName,
-    };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath};
     use rustdoc_types::{
         GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
         WherePredicate,
     };
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -4051,7 +4098,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         TraitImplDeclV2::new(CatTypeRef::new("MyTrait").unwrap(), CatTypeRef::new("Foo").unwrap());
 
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -4070,7 +4117,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
     );
     doc.push_trait_impl(trait_impl);
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -4087,7 +4134,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         ),
     );
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // Verify A-side emits empty generics for old catalogue (impl_generics: []).
     // Without this check the test would pass even if the codec started emitting non-empty
@@ -4625,17 +4672,15 @@ fn test_t009_for_external_impl_for_is_not_overwritten_with_self_crate_id() {
 #[test]
 #[allow(clippy::panic)]
 fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
     use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -4646,7 +4691,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
 
     // Declare `MyTrait` (self-crate trait, Add).
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -4665,7 +4710,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
 
     // Declare `SelfType` (self-crate type, Add).
     doc.insert_type(
-        TypeName::new("SelfType").unwrap(),
+        CatalogueEntryKey::try_new("SelfType".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -4695,7 +4740,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
         TypeRef::new("SelfType").unwrap(),
     ));
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // B: empty baseline.
     let b = empty_crate();

@@ -1,6 +1,294 @@
 {
   "entries": [
     {
+      "claim_hash": "0e2a6ca369af2a088f604fd39351c91d0598738a4e3a7b1a4aa9bf506ff12656",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CanonicalTypeIdentity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e2a6ca369af2a088f604fd39351c91d0598738a4e3a7b1a4aa9bf506ff12656",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CanonicalTypeIdentity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e2a6ca369af2a088f604fd39351c91d0598738a4e3a7b1a4aa9bf506ff12656",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CanonicalTypeIdentity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "428c009c0dd3daafbf567098898649f8df53201bbab7ea24895e2e82e46f7f72",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3f7e79ff8a8666124289415875b75bc6aa7746ed3021e677658b6f039dfed022",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "曖昧または未解決の識別は成功や推測ではなく fail-closed とし、利用者が解消に必要な対象情報を診断から得られるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "曖昧または未解決の識別は成功や推測ではなく fail-closed とし、利用者が解消に必要な対象情報を診断から得られるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdf45db2c98d78627e35adce6e7abc3eb0607d005aecae576f0aa5c0f85c60a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
       "claim_origin": {
         "data": {

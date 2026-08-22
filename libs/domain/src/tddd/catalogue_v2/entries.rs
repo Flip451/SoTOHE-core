@@ -24,6 +24,7 @@ use crate::tddd::catalogue_v2::methods::{
 // `MethodDeclaration`, `InherentImplDeclV2`, and now also `TraitEntry`
 // (ADR `2026-05-18-1223` D2 / IN-07).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 // ---------------------------------------------------------------------------
 // AssocTypeDecl — associated type declaration in a trait
@@ -565,23 +566,60 @@ pub struct InherentImplDeclV2 {
     ///
     /// Multiple `InherentImplDeclV2` entries with the same `type_name` represent
     /// multiple inherent impl blocks for that single struct in the source.
-    pub type_name: TypeName,
+    pub(crate) type_name: CatalogueEntryKey,
 
     /// Impl-block-level generic type parameters (type parameters only; lifetimes
     /// and const parameters are out of scope per D2 / IN-05).
     ///
     /// Empty Vec when the impl block is not generic (the common case).
-    pub impl_generics: Vec<MethodGenericParam>,
+    pub(crate) impl_generics: Vec<MethodGenericParam>,
 
     /// Impl-block-level where-clause predicates applied to `impl_generics`.
     ///
     /// Empty Vec when there are no impl-level where predicates.
-    pub impl_where_predicates: Vec<WherePredicateDecl>,
+    pub(crate) impl_where_predicates: Vec<WherePredicateDecl>,
 
     /// Method declarations inside this impl block.
     ///
     /// Empty Vec when the impl block contains no methods.
-    pub methods: Vec<MethodDeclaration>,
+    pub(crate) methods: Vec<MethodDeclaration>,
+}
+
+impl InherentImplDeclV2 {
+    /// Creates an inherent implementation declaration.
+    #[must_use]
+    pub fn new(
+        type_name: CatalogueEntryKey,
+        impl_generics: Vec<MethodGenericParam>,
+        impl_where_predicates: Vec<WherePredicateDecl>,
+        methods: Vec<MethodDeclaration>,
+    ) -> Self {
+        Self { type_name, impl_generics, impl_where_predicates, methods }
+    }
+
+    /// Returns the catalogue key of the implemented type.
+    #[must_use]
+    pub fn type_name(&self) -> &CatalogueEntryKey {
+        &self.type_name
+    }
+
+    /// Returns the implementation-level generic parameters.
+    #[must_use]
+    pub fn impl_generics(&self) -> &[MethodGenericParam] {
+        &self.impl_generics
+    }
+
+    /// Returns the implementation-level where predicates.
+    #[must_use]
+    pub fn impl_where_predicates(&self) -> &[WherePredicateDecl] {
+        &self.impl_where_predicates
+    }
+
+    /// Returns the methods declared by the implementation.
+    #[must_use]
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -599,6 +637,7 @@ mod tests {
     };
     use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
     use crate::tddd::catalogue_v2::variants::FieldDecl;
+    use crate::tddd::semantic_verify::CatalogueEntryKey;
 
     // -----------------------------------------------------------------------
     // TypeEntry
@@ -1342,13 +1381,13 @@ mod tests {
         );
 
         let impl_block_a = InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_a.clone()],
         };
         let impl_block_b = InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_b.clone()],
@@ -1356,8 +1395,14 @@ mod tests {
 
         // Both blocks share the same type_name, representing two inherent impl blocks
         // for `Email` in the source code.
-        assert_eq!(impl_block_a.type_name, type_name);
-        assert_eq!(impl_block_b.type_name, type_name);
+        assert_eq!(
+            impl_block_a.type_name,
+            CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap()
+        );
+        assert_eq!(
+            impl_block_b.type_name,
+            CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap()
+        );
         assert_eq!(impl_block_a.methods.len(), 1);
         assert_eq!(impl_block_b.methods.len(), 1);
         assert_eq!(impl_block_a.methods[0].name.as_str(), "as_str");
@@ -1384,13 +1429,16 @@ mod tests {
             operator: BoundOp::Bound,
         };
         let impl_block = InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![generic_param],
             impl_where_predicates: vec![where_pred],
             methods: vec![],
         };
 
-        assert_eq!(impl_block.type_name, type_name);
+        assert_eq!(
+            impl_block.type_name,
+            CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap()
+        );
         assert_eq!(impl_block.impl_generics.len(), 1);
         assert_eq!(impl_block.impl_generics[0].name.as_str(), "T");
         assert_eq!(impl_block.impl_where_predicates.len(), 1);
@@ -1402,7 +1450,7 @@ mod tests {
     fn test_inherent_impl_decl_v2_default_fields_are_empty_vecs() {
         let type_name = TypeName::new("Foo").unwrap();
         let impl_block = InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
@@ -1416,7 +1464,7 @@ mod tests {
     fn test_inherent_impl_decl_v2_equality_by_all_fields() {
         let type_name = TypeName::new("Foo").unwrap();
         let a = InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
@@ -1459,21 +1507,27 @@ mod tests {
 
         let type_name = TypeName::new("Email").unwrap();
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: type_name.clone(),
+            type_name: CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
 
         assert_eq!(doc.inherent_impls().len(), 2);
-        assert_eq!(doc.inherent_impls()[0].type_name, type_name);
-        assert_eq!(doc.inherent_impls()[1].type_name, type_name);
+        assert_eq!(
+            doc.inherent_impls()[0].type_name,
+            CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap()
+        );
+        assert_eq!(
+            doc.inherent_impls()[1].type_name,
+            CatalogueEntryKey::try_new(type_name.as_str().to_owned()).unwrap()
+        );
     }
 
     // -----------------------------------------------------------------------

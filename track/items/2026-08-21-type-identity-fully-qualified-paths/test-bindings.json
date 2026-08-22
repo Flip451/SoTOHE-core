@@ -2,6 +2,102 @@
   "track_id": "2026-08-21-type-identity-fully-qualified-paths",
   "records": [
     {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "CO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ]
+    },
+    {
       "kind": "waiver",
       "edge_id": {
         "entry_key": "FullyQualifiedItemPath",
@@ -140,6 +236,242 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
           "test_name": "test_decode_schema_version_zero_returns_existing_unsupported_schema_version"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_same_short_name_in_different_modules_resolves_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_unique_short_names_resolve_incrate_type_and_trait_refs_to_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_inherent_impl_unique_short_name_resolves_to_qualified_entry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_args"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DeletionRecord",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DeletionRecord",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "InherentImplDeclV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "InherentImplDeclV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TraitRefScope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::traits::tests",
+          "test_name": "test_trait_ref_scope_workspace_for_each_member_crate"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TraitRefScope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TraitRefScope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::traits::tests",
+          "test_name": "test_trait_ref_scope_preserves_qualified_same_name_paths"
         }
       ]
     }

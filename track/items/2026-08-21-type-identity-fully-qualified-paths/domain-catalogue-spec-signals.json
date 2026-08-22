@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "d75ee352a288df3564a1d9a6a4c06e298235ffdfa373507d3ed2902fa84a639f",
+  "catalogue_declaration_hash": "60594b9229083c26058592ccf10115e608574113a7c824d3de05df1b334783d0",
   "schema_version": 1,
   "signals": [
     {
@@ -18,7 +18,7 @@
       "type_name": "CatalogueSchemaVersion"
     },
     {
-      "entry_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "entry_hash": "7bf1b5b45546398a11c86983797bb31975093533ccc09d8c82cccbed2ec14d62",
       "signal": "blue",
       "type_name": "DeletionRecord"
     },
@@ -41,6 +41,11 @@
       "entry_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
       "signal": "blue",
       "type_name": "TraitRefScope"
+    },
+    {
+      "entry_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCratePort"
     }
   ]
 }

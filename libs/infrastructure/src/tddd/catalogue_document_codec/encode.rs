@@ -69,20 +69,20 @@ pub(super) fn domain_to_dto(
     // deterministically.
     for record in doc.deletions() {
         match record {
-            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
+            DeletionRecord::Type { name, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut types,
                     "type",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                    tombstone_dto(spec_refs, informal_grounds),
                 )?;
             }
-            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
+            DeletionRecord::Trait { name, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut traits,
                     "trait",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                    tombstone_dto(spec_refs, informal_grounds),
                 )?;
             }
             DeletionRecord::Function { path, spec_refs, informal_grounds } => {
@@ -90,7 +90,7 @@ pub(super) fn domain_to_dto(
                     &mut functions,
                     "function",
                     path.to_string(),
-                    tombstone_dto(String::new(), spec_refs, informal_grounds),
+                    tombstone_dto(spec_refs, informal_grounds),
                 )?;
             }
         }
@@ -113,20 +113,17 @@ pub(super) fn domain_to_dto(
     })
 }
 
-/// Build a grounded deletion tombstone DTO for a removed entry.
-///
-/// `module_path` is the crate-relative module of a type / trait deletion, or the
-/// empty string for a crate-root item or a function (whose module lives in the
-/// map key). `ModulePath::root()` renders as the empty string, which the DTO
-/// omits from JSON.
+// ---------------------------------------------------------------------------
+// Entry converters
+// ---------------------------------------------------------------------------
+
 fn tombstone_dto(
-    module_path: String,
     spec_refs: &[domain::SpecRef],
     informal_grounds: &[domain::InformalGroundRef],
 ) -> TombstoneDto {
     TombstoneDto {
         action: "delete".to_owned(),
-        module_path,
+        module_path: String::new(),
         spec_refs: spec_refs_to_dtos(spec_refs),
         informal_grounds: informal_grounds_to_dtos(informal_grounds),
     }
@@ -152,10 +149,6 @@ fn insert_tombstone<T>(
         }),
     }
 }
-
-// ---------------------------------------------------------------------------
-// Entry converters
-// ---------------------------------------------------------------------------
 
 pub(super) fn type_entry_to_dto(
     entry_name: &str,
@@ -594,21 +587,21 @@ pub(super) fn inherent_impl_to_dto(
     decl: &InherentImplDeclV2,
 ) -> Result<InherentImplDeclDto, CatalogueDocumentCodecError> {
     let generic_names =
-        decl.impl_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
-    validate_generic_params_for_encode("inherent_impl", &decl.impl_generics, &[])?;
+        decl.impl_generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("inherent_impl", decl.impl_generics(), &[])?;
     let impl_where_predicates = decl
-        .impl_where_predicates
+        .impl_where_predicates()
         .iter()
         .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
     let methods = decl
-        .methods
+        .methods()
         .iter()
         .map(|method| method_decl_to_dto_with_outer_generics(method, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(InherentImplDeclDto {
-        type_name: decl.type_name.as_str().to_owned(),
-        impl_generics: method_generic_params_to_dtos(&decl.impl_generics),
+        type_name: decl.type_name().as_str().to_owned(),
+        impl_generics: method_generic_params_to_dtos(decl.impl_generics()),
         impl_where_predicates,
         methods,
     })

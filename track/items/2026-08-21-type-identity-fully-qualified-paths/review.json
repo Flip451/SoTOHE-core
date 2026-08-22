@@ -211,6 +211,107 @@
           "hash": "rvw1:sha256:373a20cee3b6e0761da0f02985f8e327534fffa8b0e7b470a77ef055d9fdee19",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T18:27:10Z",
+          "findings": [
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 200,
+              "message": "`CatalogueEntryKey` only rejects empty text, so `trait_ref_scope` now classifies malformed workspace paths such as `domain::bad-name` as `Workspace` instead of fail-closed `External` (the previous `CrateName`/`TraitName` validation rejected invalid segments). Validate each path segment before constructing the workspace key.",
+              "severity": "P1"
+            },
+            {
+              "category": "logic error",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 639,
+              "message": "With fully qualified catalogue keys enabled, a valid type-alias key such as `domain::models::Order` reaches this code and `TypeName::new` rejects it, causing the entire catalogue lint to return `InvalidRuleConfig` before checking alias generics. The alias diagnostic should preserve the qualified key or derive a validated display name without rejecting the catalogue entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a6be39515750c909a54cbda8d06b8573cd2d9daf50868e61d2d225bf04645fcd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T21:14:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ec35da5d23be6c6e9e91f4300630bc0e6ebcf3896cad562961705e7823a99959",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:22:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ec35da5d23be6c6e9e91f4300630bc0e6ebcf3896cad562961705e7823a99959",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T22:56:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:51482f46a708ca7d846b8c2956f8eab9596200c6e87ee42542bfc1b41e87cbcd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:01:33Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 543,
+              "message": "The new public fallible identity conversions do not test their documented malformed-segment behavior. `from_catalogue_entry_key` has only success cases, while `from_fully_qualified_key` tests only a bare key; invalid terminal/intermediate paths such as `domain::bad-name` or `domain::::Port` are uncovered. Add error-case tests asserting fail-closed `IdentifierError` results.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:51482f46a708ca7d846b8c2956f8eab9596200c6e87ee42542bfc1b41e87cbcd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:08:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b158c62ccd9dfb3af40595e41b4ee3a52db56e3259a013fe01bca0672b7c991",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T09:26:11Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "Repository inspection is blocked: repeated direct shell reads fail before execution because the sandbox cannot open `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` on the read-only filesystem. The current severity policy, briefing, files, and diff therefore could not be re-read, so a valid review verdict cannot be produced.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:f3daef7eb5c51ab37cb4869a2aaece1c0477017e1590114998b40c61836ae883",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T09:40:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3daef7eb5c51ab37cb4869a2aaece1c0477017e1590114998b40c61836ae883",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T12:11:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:214245c72ee9cf3c99ede71bd35bef95820283445743a6cae53b988838a6f40a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T12:20:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:214245c72ee9cf3c99ede71bd35bef95820283445743a6cae53b988838a6f40a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -325,6 +426,115 @@
           "hash": "rvw1:sha256:0e60913187928471496c806484fd98fddd087ed42761f3710e6ecb3acfce445d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T02:12:39Z",
+          "findings": [
+            {
+              "category": "open-set covering task",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 64,
+              "message": "T004 adds a new domain `parse_type_ref`/canonical rewrite path without declaring delegation to the existing `libs/infrastructure/src/tddd/type_ref_parser` authority (`syn::Type` and `syn::TypeParamBound`), and no task targets that module to retire its prelude/generic-bound alias normalization. The executor must therefore either invent a second Rust type grammar or leave normalization outside the choke point. Amend T004 to delegate syntax parsing to the existing authority and explicitly remove the superseded alias logic. If the Phase 2 ownership of `parse_type_ref` prevents that boundary, route the mismatch to `type-designer`.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 70,
+              "message": "T005 is still `todo` but combines two independently verifiable units with non-overlapping targets: evaluator/impl/generic resolution (`AC-02`, `AC-05`) and type-signal owner plus contract-map node/edge resolution (`AC-06`). Split these into separate tasks, both consuming the T004 canonical boundary; this preserves centralized normalization while giving each behavior its own focused validation boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 82,
+              "message": "T011 is `todo` and consolidates independently verifiable behavior units across all four scopes: canonical codec/resolver cases (`AC-01`–`AC-05`, `OS-04`), evaluator/contract-map cases (`AC-05`, `AC-06`, `OS-03`), linter cases (`AC-07`), obligation/attribution/catalog-writer cases (`AC-08`, `OS-01`), and preservation cases (`AC-09`, `OS-01`–`OS-03`). Split these validation units by anchor and make each depend on its corresponding consumer task; sharing the canonical fixture/boundary does not require one task to own every assertion surface.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a6701323c8529292af79e4151fa42e6201f8f17db8a19c59a3ada645a8b75612",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T04:41:45Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 64,
+              "message": "T004 assigns incompatible operations to `catalogue_document_codec/**`: it first says catalogue `TypeRef`/`ModulePath` remain loose notation, then includes that codec in the targets to “resolve against rustdoc paths and `syn`.” The briefing’s user decision reserves reconciliation for implementation matching and requires the document codec to accept the notation as written. An executor must invent which rule governs this target. State explicitly that `catalogue_document_codec/**` only preserves/serializes loose notation, while `canonical_type_identity.rs` and the implementation-matching codec own resolution.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 76,
+              "message": "Several task clauses restate upstream behavior instead of relying on their anchors: T006 says “preserving short display labels,” T008 says “preserve exact-match import and non-resolving surfaces,” T012 says “proving identities do not cross-join and normal display labels stay short,” T013 repeats preservation of non-resolving surfaces, and T014 repeats exact-match `catalog import --type`. Under `.harness/policies/no-upstream-restatement.md`, retain the targets and validation operations but cite OS-01/OS-03 and AC-06/AC-09 rather than reproducing their expected behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b53ae015914c53adf2a7716d1586a4f1750b210a2f1049ddbcf94da2c084da5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T04:53:49Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 76,
+              "message": "The task descriptions and `task-coverage.json` make contradictory task↔spec claims. Unrecorded description citations are T006→OS-01; T008→AC-06; T012→OS-01/AC-09; T013→OS-01/AC-06/AC-09; and T014→OS-03/AC-06/AC-09. Several are also semantically implausible—for example, T013 only targets catalogue-lint tests, so it cannot own AC-06’s type-signal/contract-map behavior or OS-01’s functions/cross-crate/import surfaces. Executors must either ignore contractual anchors or invent work outside the named targets. Remove irrelevant citations and add task-coverage relations only for anchors genuinely owned by each task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:db5464a89094ec0f1a02b754fe93de4cf1a2335068e1c1ed5b6670e8ecff193a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T04:57:58Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/task-contract.json",
+              "line": 13,
+              "message": "T004 still omits the `infrastructure / NewTypeGraphCodecError` attribution. The current infrastructure type-signal document contains this blue, found reference entry, and T004 is the convergence task for the reconciliation function that uses it. Reference entries also require attribution under the impl-plan severity policy, so add `{\"layer\":\"infrastructure\",\"entry_key\":\"NewTypeGraphCodecError\"}` to T004.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6bb55137ad92bb75c3b54689c44345c57285dced296982c6185dcd0345e0e0f7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T05:01:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:534f6babb109682e18a81261383034349bdb2c3ce652beb3c10f578cd067a72d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T07:32:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e2e15b26ecdbfab270fb38ac178d414afda8c6ded619efb7d7e0a04e1970614",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T09:00:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d2fc82610db4067581d9f895efece74264df722b1c77dff189f0ec454f68baff",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T13:38:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2acf42e2700fb5668873a7f36f58cf7f40aec604b6da75f19085285a99c4b9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -377,6 +587,334 @@
           "at": "2026-08-21T12:33:53Z",
           "findings": [],
           "hash": "rvw1:sha256:4631949d1dd7ff953b6ad6332257e1c08c0c8b0422c41db3d8550dc6839de2cf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:17:09Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 224,
+              "message": "完全修飾された map key と DTO の module_path の整合性を検証していません。例えば key が `domain::a::Thing` で module_path が `b` の入力を受理し、encoder は ID を `a::Thing` として割り当てる一方、`Crate::paths` は `b::Thing` として登録します。以後の TypeRef 解決・rustdoc path identity・signal 比較が不一致になり得るため、live type/trait の decode 境界で key から導出した module path と DTO module_path が一致することを fail-closed で検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0c14c5b29f45daf1c899b29b2f0d426fc4d4d4b03d70d1f2d56d52da5fa1811b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T21:50:43Z",
+          "findings": [
+            {
+              "category": "serde codec break",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 140,
+              "message": "完全修飾された削除 tombstone key に `module_path` が併記された場合、`tombstone_key` は key を優先して `module_path` を黙って破棄します。例えば `domain::a::Thing` と `module_path: b` を受理し、再エンコード時に不一致を失わせるため、live entry に追加した fail-closed 整合性検証と同様に拒否してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e89b35396ddeb138f8610251ab7364706e48faeae080f58e64067483a7cf579",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T21:57:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16c54167d0577588b094425c7293cb0997b0cece666653d27f088d96b925ab44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T22:55:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:33cc4a4ac5fcbe997df528e735b757b699ee8fba6467ea790f5a793aea014ed5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:10:18Z",
+          "findings": [
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 212,
+              "message": "live entry が `a::Thing`、delete tombstone が `domain::a::Thing` のように同一 canonical identity を別表記で持つ場合、この分岐は live entry の ID を再利用します。その後 deletion encoder が同じ `index` と `item_actions` を Delete で上書きするため、live 宣言がエラーなしで消失します。既存 alias を検出した時点で typed collision error にしてください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "line": 163,
+              "message": "fail-closed resolver を generic rewrite より先に `?` で確定しているため、宣言済み generic `T` を含む `Option<T>` などの parameter/return type が `UnresolvedIdentifier(T)` になります。同じ問題が method 側の分岐と、impl generic を渡さない `resolve_trait_ref_for_top_level` の `Trait<T>` にもあります。generic context がある場合は最初から generic-aware parser を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 565,
+              "message": "inherent impl の対象を `local_path_to_id` の完全一致だけで検索しているため、唯一の宣言が `a::Thing` で `inherent_impls.type_name` が短名 `Thing` の正当な catalogue を未宣言として拒否します。複数候補の場合も候補一覧付き AmbiguousIdentifier になりません。短名・完全修飾パス共通の fail-closed resolver を通してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 203,
+              "message": "通常の parser は bare prelude 名 `String` を `std::string::String` に canonicalize しますが、曖昧性検査は preserving-spelling marker にしか適用されていません。このため別 module に同名の local `String` が複数あっても、bare `String` が候補列挙エラーにならず std 型へ暗黙解決されます。canonicalize 前の短名候補を検査してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "input_validation",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 53,
+              "message": "`CatalogueEntryKey::try_new` は空文字しか拒否せず、追加された validator も module segments だけを検証して最終 item segment を捨てています。そのため `Bad Name` や `domain::bad-name` の type/trait/tombstone key が JSON boundary を通過します。`FullyQualifiedItemPath`/`Identifier` を使い、最終 segment も decode 時に検証してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "serde_codec",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 48,
+              "message": "JSON encode 側は catalogue key と entry.module_path の整合性を検証せず、そのまま map key を出力しています。例えば key `domain::a::Thing` と module_path `b` の in-memory documentを正常に serialize し、その出力を同じ codec が decode 時に拒否します。type/trait DTO を生成する前に decode/ExtendedCrate encoder と同じ identity validation を適用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:33cc4a4ac5fcbe997df528e735b757b699ee8fba6467ea790f5a793aea014ed5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:44:26Z",
+          "findings": [
+            {
+              "category": "serde_codec",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 52,
+              "message": "raw key が異なっても同一 identity になる宣言を codec が拒否していません。例えば `a::Thing` と `domain::a::Thing`（双方 module_path=`a`）、またはその live/delete 組合せは StrictMap を通過し、同じ `FullyQualifiedItemPath` を二重に持つ `CatalogueDocument` になります。ExtendedCrate encoder を通らない renderer/linter もこの不正状態を受け取るため、decode/encode 時に canonical identity の重複を fail-closed で拒否してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "line": 368,
+              "message": "曖昧な std-prelude 短名の事前検査は TypeRef parser にだけ適用され、通常の generic-bound parser には適用されていません。異なる module に local trait `Clone` が複数ある状態で bound `T: Clone` を処理すると、`parse_generic_bound_with_generics` が `std::clone::Clone` に canonicalizeし、候補列挙エラーではなく std trait として成功します。bound 構文にも同じ fail-closed ambiguity 検査を適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 610,
+              "message": "新しい public codec error paths の回帰テストが不足しています。`CatalogueDocumentCodec` には invalid final key segment、encode 時の qualified-key/module mismatch、canonical alias collision の decode/encode cases がなく、free-function の `Option<T>` 等も method 側しか検証されていません。各 public encode/decode 経路の happy/error case を scoped tests に固定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1eab4516e0aa1d69ee547777a0557c54a89b0ae3f5391c68f4929384a02221b6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:57:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a24c8ce34040cce61dd03bb54eafd78bc7bf161c679daf67e6a7f905759e0ca",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:58:34Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 212,
+              "message": "canonical identity 検証の追加で production module が 716 行になり、700 行上限を超えています。実測でも `bin/sotp verify module-size` がこのファイルを `[error] ... 716 lines (max 700)` として失敗するため、現在の変更は CI gate を通過できません。identity helper を sibling module へ抽出してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a24c8ce34040cce61dd03bb54eafd78bc7bf161c679daf67e6a7f905759e0ca",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T10:05:29Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。すべての shell 読み取りが `bwrap: No permissions to create a new namespace` で失敗したため、必須の severity policy、briefing、CURRENT files、CURRENT diff を検査できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:3c97fd4b1e4121fbde407a068c26f21b964cb0506347fb1e7ed8ac8d1bae3fce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T10:12:18Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。最初に必須 policy を読む shell 呼び出しから、sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock: Read-only file system` で失敗しました。そのため briefing、CURRENT files、CURRENT diff を検査できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:3c97fd4b1e4121fbde407a068c26f21b964cb0506347fb1e7ed8ac8d1bae3fce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T10:25:47Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
+              "line": 131,
+              "message": "`resolution_paths` は baseline/current rustdoc の authoritative path 専用ですが、external marker の生成時に synthetic summary を追加しています。その後の `reconcile_type_ref_identity` はこの追加済み path を参照するため、authoritative crates に存在しない `ghost::Missing` でも parser が external crate を登録すると正準化に成功します。未解決を fail-closed にする契約を迂回するため、synthetic output paths と authoritative resolution paths を分離してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 502,
+              "message": "qualified path の候補選択が exact rustdoc path より local module suffix を優先しています。`domain::serde::Serialize` と external `serde::Serialize` が両方存在する場合、TypeRef `serde::Serialize` は syn parser 上 external path なのに local typeへ黙って解決されます。cross-crate 表記を取り違えないよう exact path を優先するか、少なくとも両候補を曖昧として fail-closed にしてください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 116,
+              "message": "baseline/current path の重複判定が path segments だけを見て kind/namespace を無視しています。baseline に Function `domain::Thing`、current に型 `domain::Thing` が別 ID で存在すると current の型 summary が捨てられ、後続の type-only canonicalizer は Function を除外して正当な型を unresolved とします。非型 path が型 identity を消さないよう namespace を含めて重複判定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "input_validation",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 143,
+              "message": "`Type::Infer` を rustdoc path と照合せず canonical identity `\"_\"` として成功させています。`_` は具体的な型 identity を持たず、同モジュールの canonical renderer も canonical spelling なしとして扱っています。未解決 placeholder が正準形を取得しないよう `InvalidTypeRef` または `UnresolvedIdentifier` で fail-closed にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3c97fd4b1e4121fbde407a068c26f21b964cb0506347fb1e7ed8ac8d1bae3fce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T11:08:54Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 policy の最初の読み取りから sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock: Read-only file system` で失敗し、briefing、CURRENT files、CURRENT diff を検査できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:e3a2d2d5a15ab8b90df742a4a1127f674bb0138735775f19a905b4e6b7bc3302",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T11:13:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 63,
+              "message": "canonical resolver が `UnresolvedIdentifier` を返しても、raw prefix が登録済み external crate または prelude 名なら `Ok(None)` に戻す open-world fallback が残っています。通常 TypeRef は末尾の再照合で止まりますが、`for<'a> ghost::Trait` のような HRTB bound は `parse_syn_type` が失敗して再照合をスキップするため、authoritative rustdoc paths に存在しない trait が synthetic external として成功します。ここでは canonical error をそのまま伝播し、raw prefix fallback を撤去してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 116,
+              "message": "baseline/current の重複キーを `(path, ItemKind)` にしたため、同一 type identity が Struct→Enum などに変化した場合は両 summary が残ります。bare `Thing` の曖昧性検査は summary 件数を数えるので、同じ `domain::Thing` を2候補として誤って AmbiguousIdentifier にします。Function と型は分離しつつ、型同士は同一 namespace identity として deduplicate してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 636,
+              "message": "production code が 717 行になり、700 行上限を超えています。実測でも `bin/sotp verify module-size` が `libs/infrastructure/src/verify/catalogue_spec_signals.rs: 717 lines (max 700)` で失敗するため、現在の差分は CI gate を通過できません。raw-key/identity helper を sibling module へ抽出してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3a2d2d5a15ab8b90df742a4a1127f674bb0138735775f19a905b4e6b7bc3302",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T11:27:07Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signal_keys.rs",
+              "line": 32,
+              "message": "delete identity の組み立てが segment の位置ではなく文字列値で打ち切られます。例えば raw key `Thing::nested::Thing`（module_path 省略）は最初の `Thing` で `take_while` が停止し、正しい `crate::Thing::nested::Thing` ではなく `crate::Thing` になります。また bare key が crate 名と同じ場合も line 32 で既に完全修飾済みと誤判定します。末尾 segment を index で除外し、crate prefix 判定は少なくとも複数 segment の qualified key に限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e943b6ecf2b1c92c2415285a7048412d72cdff9cb86fd940eacb70a47d7496c7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T11:34:34Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signal_keys.rs",
+              "line": 32,
+              "message": "delete identity の組み立てが segment の位置ではなく文字列値で打ち切られます。例えば raw key `Thing::nested::Thing`（module_path 省略）は最初の `Thing` で `take_while` が停止し、正しい `crate::Thing::nested::Thing` ではなく `crate::Thing` になります。また bare key が crate 名と同じ場合も line 32 で既に完全修飾済みと誤判定します。末尾 segment を index で除外し、crate prefix 判定は複数 segment の qualified key に限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e943b6ecf2b1c92c2415285a7048412d72cdff9cb86fd940eacb70a47d7496c7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T11:44:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72fa7227ea40b8fbdbaf6b1a7ecdc88109f4876ad2093a57ec77cd693cd7788",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T12:11:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ded65e78516b5ad7e80b5bb9323ba910072d082dcb4d075d65324faf6bfe6b42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T12:25:01Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 policy の最初の読み取りから sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock: Read-only file system` で失敗し、briefing、CURRENT files、CURRENT diff を検査できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:55b80d8615543fa588f52f82ef0954dacacb37f5bb2dc4002af38ea8a091d5b2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T12:28:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55b80d8615543fa588f52f82ef0954dacacb37f5bb2dc4002af38ea8a091d5b2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T13:08:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0bbb26bf2e7fe4af2e3397f6ce0b6611b1e888771a4a46f64de02f63b7c9df6b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -482,6 +1020,72 @@
           "at": "2026-08-21T14:02:08Z",
           "findings": [],
           "hash": "rvw1:sha256:d08a86e63e74454913ce3c8a9388f9e76b44dffc1bd49abd7b11314d20e8a709",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:46:24Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 181,
+              "message": "The AC-01 binding points only to a test with two same-named types in different modules and fully qualified field references; it does not exercise same-name type/trait coexistence or evaluator identity distinction required by AC-01.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 198,
+              "message": "The AC-02 binding points to a test using fully qualified TypeRefs, so it does not verify unique short-name resolution or in-crate TypeRef conversion required by AC-02.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3f7d5ee6ac2194690cbd4ea21395aa2cda172e74c0b72bf3a2a3c7da46b0156b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:56:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:14965657614f644edc3dcb46e2ae2d992f3003c26e01d9e25f9a46631de2deeb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T13:23:31Z",
+          "findings": [
+            {
+              "category": "provenance",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 260,
+              "message": "The CatalogueDocument × IN-01 binding includes `test_encode_decode_round_trip_preserves_deletions_and_live_entries`, but that test only round-trips loose `LiveType`/`GoneType` records and checks counts/equality. It never exercises the anchor’s required fully qualified resolution of catalogue declarations, impls, or in-crate TypeRefs. Remove this unrelated test from the binding; the verifier pass does not establish its relevance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b14ec1472ef71bc4ec0b15b1a11600e7c2632609055999800ddec9c535b719f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T13:28:43Z",
+          "findings": [
+            {
+              "category": "generated/hash consistency",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 251,
+              "message": "The CatalogueDocument × IN-01 test set was changed, but its frozen fulfillment verdict still contains the removed round-trip test and the old `bound_tests_set_hash`. `bin/sotp test-obligation check --track-id 2026-08-21-type-identity-fully-qualified-paths` now fails with `TestChanged` drift, so the briefing’s 38-edge pass no longer describes the current bindings. Re-run the sanctioned evaluation to regenerate the fulfillment cache, then re-run `check`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e43d5320b3cec9b0a5952e31c188fbaafaab0f2d9afe05224e87a2055a178cf4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T13:36:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e43d5320b3cec9b0a5952e31c188fbaafaab0f2d9afe05224e87a2055a178cf4",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -756,6 +1360,270 @@
           "hash": "rvw1:sha256:d5dec52589d92807c0e59294a86779b0c8200f999311f940d4287f8ff44f5a69",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:49:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b72801f5dd50e689da6833e6fdeea9f54313764322cb53e9fa0877b7e1624a0e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:54:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b72801f5dd50e689da6833e6fdeea9f54313764322cb53e9fa0877b7e1624a0e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:44:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d8bd9d1e624bb15a545a2a36546bcbc159f06776dcc7a14231182fe9a8a5734",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T23:50:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d8bd9d1e624bb15a545a2a36546bcbc159f06776dcc7a14231182fe9a8a5734",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T00:56:10Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 189,
+              "message": "`domain::CanonicalTypePath::try_new` accepts an undifferentiated `TypeRef`, so callers can pass either the original expression or a caller-rewritten expression before supplying `generic_params`. The contract therefore does not make rewrite/classification ordering unrepresentable or reserve it to the canonicalization boundary. Use a distinct unclassified/parser-owned input state so only this constructor can perform the transition.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 248,
+              "message": "`domain::CanonicalTypePath::as_type_ref` exposes the canonical value as `&TypeRef`; because `TypeRef` has its own equality, ordering, and hashing surface, callers can again compare canonical output directly with arbitrary raw representations. This defeats the type-level guarantee that identity comparisons are `CanonicalTypePath`-to-`CanonicalTypePath`; keep raw rendering behind a display/diagnostic-only surface that cannot participate in identity comparison.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 517,
+              "message": "`domain::CanonicalTypePath`'s `docs` restate the upstream behavioral contract—single-boundary conversion, generic classification order, recursive rustdoc resolution, fail-closed behavior, and equality semantics—instead of leaving those behaviors to the IN/CO/AC anchors. Preserve only the concise type identity and domain-placement rationale and rely on `spec_refs`, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a2484a6a40de1c9021b394e98fceb4f7a7ad7e207731e84dc3af1706154b9e1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:10:58Z",
+          "findings": [
+            {
+              "category": "review infrastructure blocker",
+              "file": null,
+              "line": null,
+              "message": "Review execution is blocked: every repository read failed because the sandbox could not open its synthetic bubblewrap registry lock on the read-only filesystem. The current briefing, diff, and scope file therefore could not be inspected, so no valid code verdict can be issued. Re-run this review after the sandbox is repaired; this is not a source-code finding.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:682124323c7c8b297df73768184016b9adb9bebd3a640f47cd6e195dba318fb9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:14:24Z",
+          "findings": [
+            {
+              "category": "review infrastructure blocker",
+              "file": null,
+              "line": null,
+              "message": "Review execution remains blocked: both direct repository-read attempts failed before the current severity policy, briefing, diff, and scope file could be inspected because the sandbox cannot open its synthetic bubblewrap registry lock on the read-only filesystem. No valid source verdict can be issued until the sandbox is repaired; this is not a code finding.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:73e8cf77e52b6e6e125308c0bacb620680d46d29df73bca9409b7f24f0181a69",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:18:00Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 556,
+              "message": "`domain::UnclassifiedTypeRef` has only a stripped private tuple field, no inherent constructor or conversion, and no declared free-function construction path, while `CanonicalTypePath::try_new` requires it by value. Consequently no external parser/caller can construct the only accepted pre-canonical state, making the canonicalization boundary unusable. Declare a single parser-owned transition into `UnclassifiedTypeRef` that preserves the pre-rewrite state distinction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:73e8cf77e52b6e6e125308c0bacb620680d46d29df73bca9409b7f24f0181a69",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:37:13Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 253,
+              "message": "`domain::UnclassifiedTypeRef::from_parser` is an unrestricted public wrapper around `TypeRef`, so callers can pass an already rewritten expression and label it “unclassified.” The illegal post-rewrite-as-unclassified state remains constructible, and callers still control whether generic rewriting occurs before `CanonicalTypePath::try_new`. Make this transition consume a parser-owned output/token type or otherwise seal construction to the pre-rewrite parser boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5fec93b32b075591d1b40d3478fb3f641bcd9461f5ad7b358cc50a1bdbc524d0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:44:34Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 636,
+              "message": "`domain::ParsedTypeRef` is now the required input to `UnclassifiedTypeRef::from_parser`, but it has a stripped private tuple field and no declared constructor, conversion, parser function, or port that can produce it. The legal parser-output state is therefore still unconstructible, so the canonicalization boundary remains unusable; declare the actual parser-owned operation that creates this token without exposing an arbitrary post-rewrite wrapping path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dd804295bb70f95c40c252fccfb18cbfef78e296c5d030e9a97aa2019322e9f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:50:56Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 15,
+              "message": "`domain::tddd::canonical_type_path::parse_type_ref` is parser-only and receives no crate or rustdoc-resolution context, so it can produce `InvalidTypeRef` but cannot structurally produce `NewTypeGraphCodecError::AmbiguousIdentifier` or `UnresolvedIdentifier`. Returning the operation-wide enum forces callers to handle two unreachable variants; use a narrow parse error or document/encode a justified producible subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "unconstructible error variant (dead vocabulary)",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1381,
+              "message": "`domain::NewTypeGraphCodecError::InvalidTypeRef(TypeRef, DiagnosticMessage)` cannot represent failure for raw parser input such as an empty string: `parse_type_ref` possesses only `&str`, while `TypeRef` itself rejects empty input, so the required payload cannot be constructed at that failure point. Give the parse error a raw-source value object/payload or narrow the parser input so every failure carries a valid `TypeRef`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ac34b3fb4d86e25d9eb99dc328c1c95a13f6f649abe1cf3e5f83543906e46baf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T01:57:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90aa50e007b5394eadf78f80fee6fc02d6b5baa11b6cbbd652cfb1c35078799a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T02:30:55Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 189,
+              "message": "`domain::CanonicalTypePath::try_new` again accepts an undifferentiated `TypeRef` as `source`. Injecting `TypeRefSyntaxParserPort` only controls parsing after entry; callers can still apply generic rewriting first and pass the rewritten expression, so the illegal post-rewrite-as-source state and ordering freedom remain representable. Restore a parser-owned pre-rewrite input state or otherwise combine parsing and canonicalization behind a boundary that callers cannot enter with a rewritten `TypeRef`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bde9afdb822a73b99b5a58b1a926905e1614d2283cb08544f31a65d77da5871b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T02:47:56Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1352,
+              "message": "`domain::ParsedTypeRef` is a stripped struct with no declared constructor or conversion, yet the infrastructure `SynTypeRefSyntaxParserAdapter` must construct it to implement `TypeRefSyntaxParserPort::parse`. A trait return type does not grant an external crate access to private fields, so the adapter cannot satisfy the port contract. Declare a domain-owned construction path that accepts only the parser-produced representation and does not reopen arbitrary `TypeRef` wrapping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:30a6dc31979459bf2b29bd7caceab2449f9ac1e08e105037d6e55c25b9040101",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T03:01:39Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 563,
+              "message": "`domain::TypeRefSyntaxParserPort::parse` uses the same raw `TypeRef` type for both input and output. An already rewritten expression can still be supplied as `source`, and any caller can invoke the public port directly and compare its `TypeRef` result without passing through `ParsedTypeRef` or `CanonicalTypePath`. The subsequent wrapper therefore does not enforce either rewrite ordering or canonical-only identity comparison. Return a distinct non-comparable parser product (with a domain-owned sanctioned construction path) instead of raw `TypeRef`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8d05cbe76e150f2753cf337868a79c5f598227a11b1035652c6e2cb866fceab0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T04:15:25Z",
+          "findings": [
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 72,
+              "message": "`infrastructure::CanonicalTypeIdentity::as_str` is a new public method but declares no `spec_refs`, leaving this raw-view surface ungrounded even though the surrounding type and canonicalization function cite IN-01/IN-02/CO-01. Add the directly relevant spec anchors to the method declaration so the added API participates in the catalogue→spec contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e899c193e4e74fe754214c3e38bbeca784a1e0d1988581ddb00388cd4c5c53e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T04:25:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a100f18dc8428cb7473ce9abf6c5a7eff57d6c5b705e138a19465c2f454d059",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T07:25:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35c6921e6b116bd45051f627864cc83e093c11a0e2c3e727f3fcf02f09bea847",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T08:45:20Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 396,
+              "message": "`domain::CatalogueToExtendedCratePort::encode` already exists in the frozen baseline with only the `doc` parameter; this declaration changes its signature by adding `baseline` and `current`, but omits `action`, which defaults to `add`. Mark the method `action: modify` so the catalogue accurately describes the baseline API mutation.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 396,
+              "message": "`domain::CatalogueToExtendedCratePort::encode` is the load-bearing modified method that enforces authoritative rustdoc-path inputs, but its method declaration has no `spec_refs`. Ground the method itself in the relevant CO-01/IN-02/AC-05 anchors rather than relying only on the parent trait's references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c4c85e525e3446b5e0897caa85ea7a681b221c9ed2b947a435dc4c3413a3ec38",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T08:55:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5ac26d4d069c44ee1d361ab127ac4c93d121fb4756e6f12ca871ee8f769a3b2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -772,6 +1640,146 @@
           "at": "2026-08-21T12:41:45Z",
           "findings": [],
           "hash": "rvw1:sha256:17df0aecafa8340d2c662a6d1db37459af1e4686863b8673876b5fac6a36b3a7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:15:23Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 377,
+              "message": "Trait derivation now resolves fully qualified trait identities, but declaration/hash lookup strips workspace-qualified refs to the bare final name. For catalogue keys such as `infrastructure::alpha::SharedPort`, lookup returns `None`, causing downstream obligation verification to hash an empty declaration and mark valid derived obligations stale/unfulfilled.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f45ecaf4b832b8f2895a3a0a0f13bed9f72537b28ae5d3dd39e6574368ef429",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T21:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2943ed89a6d1dacfc109337ade7ab1ced6788f96b06273ef2e4ef7f8c442025",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T21:51:56Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/usecase/src/test_obligation/derive/trait_roles.rs",
+              "line": 84,
+              "message": "`catalogue_trait_identity` and `fully_qualified_ref_identity` parse catalogue keys and decide the canonical fully qualified identity inside the usecase layer; the same domain decision is duplicated in `test_obligation/mod.rs` with different failure semantics. This identity conversion belongs on `CatalogueEntryKey`, `FullyQualifiedItemPath`, or `CatalogueDocument`, leaving usecase to orchestrate the domain operation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20ab6de3662bde26ed70c052280e90525613acf95effb16c28168fc72d194868",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T22:55:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1a7560f1ae70b49122263d3e2343fc0640bd3ad3dad0875a3d850191a68b6fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-21T22:59:54Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 374,
+              "message": "Derivation deliberately accepts repeated copies of the same fully qualified trait identity (and workspace lookup takes the first match), but declaration/hash reconstruction returns `None` on any second match. If the same identity appears in multiple supplied catalogues, derive freezes an obligation using the first declaration while check/evaluate reconstruct an empty declaration and mark the fresh obligation stale. Reuse the typed trait-role resolver or make duplicate handling identical.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e1a7560f1ae70b49122263d3e2343fc0640bd3ad3dad0875a3d850191a68b6fa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:09:12Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 364,
+              "message": "Self-crate derivation resolves a bare trait against the global `trait_roles` index across every supplied catalogue, but declaration/hash reconstruction searches only `impl_catalogue.traits()`. If one catalogue contains the trait and another same-crate catalogue contains its impl, derive emits the obligation while check/evaluate cannot reconstruct its declaration and mark it stale. Search all same-crate catalogues here or reuse the derivation resolver.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c80c33daa81294ae571e0f6595758969ef42fa46c19ee427f46abf13a28b721",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-21T23:17:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:982f1f3c67d2d4d5d3b8a12ea47d40c59b0d5ae5a53ea71ecadf96c3a9864b75",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T09:27:27Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: repository reads repeatedly failed because the sandbox could not open its synthetic bubblewrap mount-registry lock on the read-only filesystem. Retry the reviewer; no code verdict was issued.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:6ca3585b15d622a43f774556d506615ef1a5bab61c1b408c53d93d9e4dd86c17",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T09:38:51Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed after three retries: repository reads fail before execution because the sandbox cannot open its synthetic bubblewrap mount-registry lock on the read-only filesystem. No code verdict was issued; the reviewer environment must be repaired or restarted.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:6ca3585b15d622a43f774556d506615ef1a5bab61c1b408c53d93d9e4dd86c17",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T10:28:38Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 284,
+              "message": "The new codec contract depends on receiving the authoritative baseline and current rustdoc crates in the correct order, but every usecase codec test double ignores both arguments. The tests still pass if this call forwards the same crate twice, swaps the arguments, or supplies synthesized crates, which would break canonical identity resolution. Add a recording codec with distinguishable baseline/current fixtures and assert both are forwarded unchanged in order.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6ca3585b15d622a43f774556d506615ef1a5bab61c1b408c53d93d9e4dd86c17",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T10:53:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e2735f1b65fba473611b7d5fea8f79ec928821c845953f7cd24049193907d196",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T12:12:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e2735f1b65fba473611b7d5fea8f79ec928821c845953f7cd24049193907d196",
           "type": "final",
           "verdict": "zero_findings"
         }

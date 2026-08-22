@@ -218,13 +218,6 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             })?;
 
             // --- Step 2: Convert CatalogueDocument → ExtendedCrate (A) ---
-            let extended_a = self.ext_crate_codec.encode(doc).map_err(|e| {
-                CatalogueImplSignalsError::ExtendedCrateConversion(
-                    typed_layer_id.clone(),
-                    diagnostic(e.to_string()),
-                )
-            })?;
-
             // --- Step 3: Load baseline (TypeGraph B) ---
             // Guard: validate that baseline_file is a plain filename (no `..` or
             // directory separators) for the same reason as catalogue_file above.
@@ -282,6 +275,14 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             let current_c =
                 self.rustdoc_crate_port.capture_current(&target_crate, features).map_err(|e| {
                     CatalogueImplSignalsError::SchemaExport(
+                        typed_layer_id.clone(),
+                        diagnostic(e.to_string()),
+                    )
+                })?;
+
+            let extended_a =
+                self.ext_crate_codec.encode(doc, &baseline_b, &current_c).map_err(|e| {
+                    CatalogueImplSignalsError::ExtendedCrateConversion(
                         typed_layer_id.clone(),
                         diagnostic(e.to_string()),
                     )

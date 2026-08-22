@@ -1,15 +1,15 @@
 //! `EncoderState` methods for encoding `TypeEntry` variants (unit struct, tuple struct,
 //! plain struct, enum, type alias) and enum variant payloads.
 
+use domain::tddd::NewTypeGraphCodecError;
 use domain::tddd::catalogue_v2::entries::TypeEntry;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
-use domain::tddd::catalogue_v2::{MethodDeclaration, MethodGenericParam, TypeName};
+use domain::tddd::catalogue_v2::{CatalogueEntryKey, MethodDeclaration, MethodGenericParam};
 use rustdoc_types::{Id, ItemEnum, ItemKind, Struct, StructKind, TypeAlias, Variant, VariantKind};
-
-use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
 
 use super::encoder::EncoderState;
 use super::helpers::{make_impl, make_item, resolved_path_type};
+use super::{entry_item_name, invalid_type_ref};
 
 impl EncoderState {
     /// Shared finalization for struct-like type entries.
@@ -21,10 +21,10 @@ impl EncoderState {
     fn encode_struct_item_with_inherent_impl(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
         struct_kind: StructKind,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
@@ -44,13 +44,13 @@ impl EncoderState {
         let method_ids = self.encode_method_items(
             &methods,
             true,
-            type_name.as_str(),
+            entry_item_name(type_name),
             &module_path,
             &generic_names,
         )?;
 
         let impl_id = self.alloc_id();
-        let for_type = resolved_path_type(type_id, type_name.as_str());
+        let for_type = resolved_path_type(type_id, entry_item_name(type_name));
         self.index.insert(
             impl_id,
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
@@ -58,12 +58,12 @@ impl EncoderState {
 
         let struct_item = make_item(
             type_id,
-            Some(type_name.as_str().to_string()),
+            Some(entry_item_name(type_name).to_string()),
             docs,
             ItemEnum::Struct(Struct { kind: struct_kind, generics, impls: vec![impl_id] }),
         );
         self.index.insert(type_id, struct_item);
-        self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
+        self.register_path(type_id, ItemKind::Struct, entry_item_name(type_name), &module_path);
         Ok(())
     }
 
@@ -71,9 +71,9 @@ impl EncoderState {
     pub(super) fn encode_unit_struct(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         self.encode_struct_item_with_inherent_impl(type_id, type_name, entry, StructKind::Unit)
     }
 
@@ -81,11 +81,11 @@ impl EncoderState {
     pub(super) fn encode_tuple_struct(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
         fields: Vec<domain::tddd::catalogue_v2::identifiers::TypeRef>,
         has_stripped_fields: bool,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
@@ -133,13 +133,13 @@ impl EncoderState {
         let method_ids = self.encode_method_items(
             &methods,
             true,
-            type_name.as_str(),
+            entry_item_name(type_name),
             &module_path,
             &generic_names,
         )?;
 
         let impl_id = self.alloc_id();
-        let for_type = resolved_path_type(type_id, type_name.as_str());
+        let for_type = resolved_path_type(type_id, entry_item_name(type_name));
         self.index.insert(
             impl_id,
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
@@ -147,12 +147,12 @@ impl EncoderState {
 
         let struct_item = make_item(
             type_id,
-            Some(type_name.as_str().to_string()),
+            Some(entry_item_name(type_name).to_string()),
             docs,
             ItemEnum::Struct(Struct { kind: struct_kind, generics, impls: vec![impl_id] }),
         );
         self.index.insert(type_id, struct_item);
-        self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
+        self.register_path(type_id, ItemKind::Struct, entry_item_name(type_name), &module_path);
         Ok(())
     }
 
@@ -164,12 +164,12 @@ impl EncoderState {
     pub(super) fn encode_plain_struct(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
         fields: Vec<FieldDecl>,
         has_stripped_fields: bool,
         _typestate: Option<domain::tddd::catalogue_v2::composite::TypestateMarker>,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         // Encode named fields → StructField items. Field types must resolve
         // type-declaration-level generics (ADR `2026-07-02-1345` D6) so that a
         // field like `value: T` in `struct Foo<T> { value: T }` encodes as
@@ -200,10 +200,10 @@ impl EncoderState {
     pub(super) fn encode_enum(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
         variants: Vec<VariantDecl>,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
@@ -239,14 +239,14 @@ impl EncoderState {
         let method_ids = self.encode_method_items(
             &methods,
             true,
-            type_name.as_str(),
+            entry_item_name(type_name),
             &module_path,
             &generic_names,
         )?;
 
         // Inherent Impl block.
         let impl_id = self.alloc_id();
-        let for_type = resolved_path_type(type_id, type_name.as_str());
+        let for_type = resolved_path_type(type_id, entry_item_name(type_name));
         self.index.insert(
             impl_id,
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
@@ -255,7 +255,7 @@ impl EncoderState {
         // Enum item.
         let enum_item = make_item(
             type_id,
-            Some(type_name.as_str().to_string()),
+            Some(entry_item_name(type_name).to_string()),
             docs,
             ItemEnum::Enum(rustdoc_types::Enum {
                 generics,
@@ -265,7 +265,7 @@ impl EncoderState {
             }),
         );
         self.index.insert(type_id, enum_item);
-        self.register_path(type_id, ItemKind::Enum, type_name.as_str(), &module_path);
+        self.register_path(type_id, ItemKind::Enum, entry_item_name(type_name), &module_path);
         Ok(())
     }
 
@@ -273,11 +273,11 @@ impl EncoderState {
     pub(super) fn encode_type_alias(
         &mut self,
         type_id: Id,
-        type_name: &TypeName,
+        type_name: &CatalogueEntryKey,
         entry: &TypeEntry,
         target: domain::tddd::catalogue_v2::TypeRef,
         alias_generics: &[MethodGenericParam],
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
@@ -286,11 +286,10 @@ impl EncoderState {
         // catalogues retain their pre-extension encoding. Both locations cannot be populated:
         // that would make the encoded declaration depend on an undocumented precedence rule.
         if !alias_generics.is_empty() && !entry.generics().is_empty() {
-            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                type_ref: type_name.as_str().to_owned(),
-                reason: "type alias generic declarations must not appear in both the entry and kind payload"
-                    .to_owned(),
-            });
+            return Err(invalid_type_ref(
+                entry_item_name(type_name),
+                "type alias generic declarations must not appear in both the entry and kind payload",
+            ));
         }
         let declared_generics =
             if alias_generics.is_empty() { entry.generics() } else { alias_generics };
@@ -302,13 +301,13 @@ impl EncoderState {
         // tolerance, spec OUT-01), so the alias-specific gate lives here.
         for name in &generic_names {
             if !crate::tddd::type_ref_parser::is_plain_generic_param_name(name) {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: type_name.as_str().to_owned(),
-                    reason: format!(
+                return Err(invalid_type_ref(
+                    entry_item_name(type_name),
+                    format!(
                         "alias generic parameter name `{name}` must be a plain non-keyword Rust \
                          identifier"
                     ),
-                });
+                ));
             }
         }
         let generics = self.build_where_form_generics_preserving_spelling(
@@ -327,12 +326,12 @@ impl EncoderState {
         let method_ids = self.encode_method_items(
             &methods,
             true,
-            type_name.as_str(),
+            entry_item_name(type_name),
             &module_path,
             &generic_names,
         )?;
         let impl_id = self.alloc_id();
-        let for_type = resolved_path_type(type_id, type_name.as_str());
+        let for_type = resolved_path_type(type_id, entry_item_name(type_name));
         self.index.insert(
             impl_id,
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
@@ -340,12 +339,12 @@ impl EncoderState {
 
         let alias_item = make_item(
             type_id,
-            Some(type_name.as_str().to_string()),
+            Some(entry_item_name(type_name).to_string()),
             docs,
             ItemEnum::TypeAlias(TypeAlias { type_: target_ty, generics }),
         );
         self.index.insert(type_id, alias_item);
-        self.register_path(type_id, ItemKind::TypeAlias, type_name.as_str(), &module_path);
+        self.register_path(type_id, ItemKind::TypeAlias, entry_item_name(type_name), &module_path);
         Ok(())
     }
 
@@ -360,7 +359,7 @@ impl EncoderState {
         &mut self,
         payload: VariantPayload,
         generic_names: &[&str],
-    ) -> Result<VariantKind, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<VariantKind, NewTypeGraphCodecError> {
         match payload {
             VariantPayload::Unit => Ok(VariantKind::Plain),
             VariantPayload::Tuple(type_refs) => {

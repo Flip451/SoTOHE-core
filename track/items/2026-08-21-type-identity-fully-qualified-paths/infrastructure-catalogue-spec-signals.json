@@ -1,7 +1,17 @@
 {
-  "catalogue_declaration_hash": "ee7aaf4d43ace200c1b8143c70f3b323d77dcbb371b188c9db977029a1f79cd4",
+  "catalogue_declaration_hash": "3f456af44b0ca25824d9123f817a7328fbfa6a0eff22da24b132263c742bb9d4",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "0e2a6ca369af2a088f604fd39351c91d0598738a4e3a7b1a4aa9bf506ff12656",
+      "signal": "blue",
+      "type_name": "CanonicalTypeIdentity"
+    },
+    {
+      "entry_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+    },
     {
       "entry_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
       "signal": "blue",

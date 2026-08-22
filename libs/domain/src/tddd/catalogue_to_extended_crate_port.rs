@@ -19,6 +19,7 @@
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::extended_crate::ExtendedCrate;
 use crate::tddd::new_typegraph_codec_error::NewTypeGraphCodecError;
+use rustdoc_types::Crate;
 
 /// Secondary port: converts a `CatalogueDocument` into an `ExtendedCrate`.
 ///
@@ -32,15 +33,21 @@ use crate::tddd::new_typegraph_codec_error::NewTypeGraphCodecError;
 /// `TypeRef` that cannot be parsed as a valid Rust type, or if two catalogue
 /// entries share the same short type name within the same document.
 pub trait CatalogueToExtendedCratePort: Send + Sync {
-    /// Encodes a `CatalogueDocument` into an `ExtendedCrate` (TypeGraph A).
+    /// Encodes a `CatalogueDocument` into an `ExtendedCrate` (TypeGraph A) using
+    /// authoritative baseline and current rustdoc paths for identity resolution.
     ///
     /// # Errors
     ///
     /// Returns `Err(NewTypeGraphCodecError::InvalidTypeRef)` when a `TypeRef`
-    /// string in `doc` fails `syn` parsing.
+    /// string in `doc` fails `syn` parsing or cannot be reconciled with the
+    /// authoritative rustdoc paths.
     ///
-    /// Returns `Err(NewTypeGraphCodecError::AmbiguousTypeName)` when two types
-    /// in `doc.types` share the same short name (would cause colliding
-    /// `rustdoc_types::Id` keys).
-    fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError>;
+    /// Returns `Err(NewTypeGraphCodecError::AmbiguousIdentifier)` when a short
+    /// identifier resolves to more than one fully-qualified catalogue entry.
+    fn encode(
+        &self,
+        doc: CatalogueDocument,
+        baseline: &Crate,
+        current: &Crate,
+    ) -> Result<ExtendedCrate, NewTypeGraphCodecError>;
 }

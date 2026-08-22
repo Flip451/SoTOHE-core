@@ -156,6 +156,7 @@ fn missing_role_style_warnings(
 mod tests {
     use super::*;
     use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::CatalogueEntryKey;
     use domain::tddd::catalogue_v2::composite::{
         StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
     };
@@ -163,8 +164,8 @@ mod tests {
         FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
     };
     use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, FunctionName, FunctionPath, MethodName, ModulePath, TraitName,
-        TypeName, TypeRef, VariantName,
+        CrateName, FieldName, FunctionName, FunctionPath, MethodName, ModulePath, TypeName,
+        TypeRef, VariantName,
     };
     use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
     use domain::tddd::catalogue_v2::roles::{
@@ -276,7 +277,7 @@ include_function_roles = []
             layer.clone(),
         );
         doc.insert_type(
-            TypeName::new("UnstyledValue").unwrap(),
+            CatalogueEntryKey::try_new("UnstyledValue".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -326,7 +327,7 @@ include_function_roles = []
             excluded_layer,
         );
         excluded_catalogue.insert_type(
-            TypeName::new("UnstyledBoundaryValue").unwrap(),
+            CatalogueEntryKey::try_new("UnstyledBoundaryValue".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -399,7 +400,7 @@ include_function_roles = []
         // Declare `PayloadType` so that the variant payload edge target resolves.
         // This is necessary for the edge-config lookup to be triggered (CN-02).
         doc.insert_type(
-            TypeName::new("PayloadType").unwrap(),
+            CatalogueEntryKey::try_new("PayloadType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -422,7 +423,7 @@ include_function_roles = []
             vec![TypeRef::new("PayloadType").unwrap()],
         );
         doc.insert_type(
-            TypeName::new("MyEnum").unwrap(),
+            CatalogueEntryKey::try_new("MyEnum".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -522,7 +523,7 @@ include_function_roles = []
 
         // Module-level type (creates layer → module → entry nesting).
         doc.insert_type(
-            TypeName::new("ModuleType").unwrap(),
+            CatalogueEntryKey::try_new("ModuleType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -542,7 +543,7 @@ include_function_roles = []
 
         // Root-level trait (creates layer → entry nesting without module subgraph).
         doc.insert_trait(
-            TraitName::new("RootTrait").unwrap(),
+            CatalogueEntryKey::try_new("RootTrait".to_owned()).unwrap(),
             TraitEntry::new(
                 ItemAction::Add,
                 ContractRole::SecondaryPort,
@@ -639,8 +640,14 @@ include_function_roles = []
             layer.clone(),
         );
 
-        doc_a.insert_trait(TraitName::new("TraitA").unwrap(), make_empty_trait_entry());
-        doc_b.insert_trait(TraitName::new("TraitB").unwrap(), make_empty_trait_entry());
+        doc_a.insert_trait(
+            CatalogueEntryKey::try_new("TraitA".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
+        doc_b.insert_trait(
+            CatalogueEntryKey::try_new("TraitB".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
 
         let index = render::build_trait_index(&[doc_a, doc_b]);
         assert!(index.contains_key(&("crate_a".to_string(), "TraitA".to_string())));
@@ -669,7 +676,7 @@ include_function_roles = []
 
         // Root entry (module_path = [])
         doc.insert_type(
-            TypeName::new("RootType").unwrap(),
+            CatalogueEntryKey::try_new("RootType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -689,7 +696,7 @@ include_function_roles = []
 
         // Non-root entry
         doc.insert_type(
-            TypeName::new("ModuleType").unwrap(),
+            CatalogueEntryKey::try_new("ModuleType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -757,7 +764,7 @@ include_function_roles = []
         );
 
         doc.insert_type(
-            TypeName::new("Pending").unwrap(),
+            CatalogueEntryKey::try_new("Pending".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -777,7 +784,7 @@ include_function_roles = []
 
         // Declare `Approved` as a catalogue type so the transition edge target resolves.
         doc.insert_type(
-            TypeName::new("Approved").unwrap(),
+            CatalogueEntryKey::try_new("Approved".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -822,7 +829,7 @@ include_function_roles = []
         );
 
         doc.insert_type(
-            TypeName::new("Email").unwrap(),
+            CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -868,18 +875,18 @@ include_function_roles = []
             None,
         );
 
-        doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Email").unwrap(),
-            impl_generics: vec![],
-            impl_where_predicates: vec![],
-            methods: vec![m1],
-        });
-        doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Email").unwrap(),
-            impl_generics: vec![],
-            impl_where_predicates: vec![],
-            methods: vec![m2],
-        });
+        doc.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            vec![m1],
+        ));
+        doc.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            vec![m2],
+        ));
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
         let output = result.content().as_ref();
@@ -913,7 +920,7 @@ include_function_roles = []
         let unit_variant = VariantDecl::unit(VariantName::new("None").unwrap());
 
         doc.insert_type(
-            TypeName::new("Option").unwrap(),
+            CatalogueEntryKey::try_new("Option".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -956,7 +963,7 @@ include_function_roles = []
 
         // Declare `ErrorMessage` as a catalogue type so the variant payload edge resolves.
         doc.insert_type(
-            TypeName::new("ErrorMessage").unwrap(),
+            CatalogueEntryKey::try_new("ErrorMessage".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -982,7 +989,7 @@ include_function_roles = []
             VariantDecl::struct_variant(VariantName::new("Error").unwrap(), vec![field]);
 
         doc.insert_type(
-            TypeName::new("AppError").unwrap(),
+            CatalogueEntryKey::try_new("AppError".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::ErrorType,
@@ -1027,7 +1034,7 @@ include_function_roles = []
 
         // Declare `Email` as a catalogue type so the field edge target resolves.
         doc.insert_type(
-            TypeName::new("Email").unwrap(),
+            CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1048,7 +1055,7 @@ include_function_roles = []
         let field =
             FieldDecl::new(FieldName::new("email").unwrap(), TypeRef::new("Email").unwrap());
         doc.insert_type(
-            TypeName::new("User").unwrap(),
+            CatalogueEntryKey::try_new("User".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -1089,7 +1096,7 @@ include_function_roles = []
         let field =
             FieldDecl::new(FieldName::new("secret").unwrap(), TypeRef::new("SecretKey").unwrap());
         doc.insert_type(
-            TypeName::new("Config").unwrap(),
+            CatalogueEntryKey::try_new("Config".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::Dto,
@@ -1141,7 +1148,7 @@ include_function_roles = []
         // Declare both target types so that positional edges can be resolved.
         for type_name in ["UserId", "GroupId"] {
             doc.insert_type(
-                TypeName::new(type_name).unwrap(),
+                CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::value_object(),
@@ -1161,7 +1168,7 @@ include_function_roles = []
         }
 
         doc.insert_type(
-            TypeName::new("Pair").unwrap(),
+            CatalogueEntryKey::try_new("Pair".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1221,7 +1228,7 @@ include_function_roles = []
 
         // Declare the alias target so the alias_of edge resolves.
         doc.insert_type(
-            TypeName::new("RawId").unwrap(),
+            CatalogueEntryKey::try_new("RawId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1240,7 +1247,7 @@ include_function_roles = []
         );
 
         doc.insert_type(
-            TypeName::new("UserId").unwrap(),
+            CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1284,7 +1291,7 @@ include_function_roles = []
 
         for name in ["T", "RawId"] {
             doc.insert_type(
-                TypeName::new(name).unwrap(),
+                CatalogueEntryKey::try_new(name.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::value_object(),
@@ -1304,7 +1311,7 @@ include_function_roles = []
         }
 
         doc.insert_type(
-            TypeName::new("UserId").unwrap(),
+            CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1365,7 +1372,7 @@ include_function_roles = []
             t_layer.clone(),
         );
         t_doc.insert_type(
-            TypeName::new("Item").unwrap(),
+            CatalogueEntryKey::try_new("Item".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1391,7 +1398,7 @@ include_function_roles = []
             layer.clone(),
         );
         doc.insert_type(
-            TypeName::new("UserId").unwrap(),
+            CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1443,7 +1450,7 @@ include_function_roles = []
 
         for name in ["T", "RawId"] {
             doc.insert_type(
-                TypeName::new(name).unwrap(),
+                CatalogueEntryKey::try_new(name.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::value_object(),
@@ -1463,7 +1470,7 @@ include_function_roles = []
         }
 
         doc.insert_type(
-            TypeName::new("UserId").unwrap(),
+            CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1519,11 +1526,14 @@ include_function_roles = []
         );
 
         // Add a trait to the catalogue so it appears in the trait index.
-        doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
 
         // Add a type.
         doc.insert_type(
-            TypeName::new("MyAdapter").unwrap(),
+            CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::SecondaryAdapter,
@@ -1666,7 +1676,10 @@ include_function_roles = []
             CrateName::new("domain").unwrap(),
             domain_layer.clone(),
         );
-        domain_doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
+        domain_doc.insert_trait(
+            CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
 
         // infrastructure catalogue: declares MyAdapter type + cross-crate trait impl.
         let mut infra_doc = CatalogueDocument::new(
@@ -1675,7 +1688,7 @@ include_function_roles = []
             infra_layer.clone(),
         );
         infra_doc.insert_type(
-            TypeName::new("MyAdapter").unwrap(),
+            CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::SecondaryAdapter,
@@ -1724,7 +1737,7 @@ include_function_roles = []
                 layer.clone(),
             );
             doc.insert_type(
-                TypeName::new("MyType").unwrap(),
+                CatalogueEntryKey::try_new("MyType".to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::value_object(),
@@ -1774,7 +1787,7 @@ include_function_roles = []
 
         // Deleted trait — must be absent from output and trait index.
         doc.insert_trait(
-            TraitName::new("RemovedTrait").unwrap(),
+            CatalogueEntryKey::try_new("RemovedTrait".to_owned()).unwrap(),
             TraitEntry::new(
                 ItemAction::Delete,
                 ContractRole::SecondaryPort,
@@ -1794,7 +1807,7 @@ include_function_roles = []
         // A type that tries to impl the deleted trait — the trait_impl edge must be skipped
         // (deleted trait is absent from the trait index).
         doc.insert_type(
-            TypeName::new("MyAdapter").unwrap(),
+            CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::SecondaryAdapter,
@@ -1900,7 +1913,7 @@ include_function_roles = []
         let field =
             FieldDecl::new(FieldName::new("name").unwrap(), TypeRef::new("String").unwrap());
         doc.insert_type(
-            TypeName::new("Product").unwrap(),
+            CatalogueEntryKey::try_new("Product".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -1965,7 +1978,7 @@ include_function_roles = []
             None,
         );
         doc.insert_type(
-            TypeName::new("Converter").unwrap(),
+            CatalogueEntryKey::try_new("Converter".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::domain_service(),
@@ -2018,7 +2031,7 @@ include_function_roles = []
 
         // Type that is being deleted.
         doc.insert_type(
-            TypeName::new("OldToken").unwrap(),
+            CatalogueEntryKey::try_new("OldToken".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Delete,
                 DataRole::value_object(),
@@ -2040,7 +2053,7 @@ include_function_roles = []
         let field =
             FieldDecl::new(FieldName::new("token").unwrap(), TypeRef::new("OldToken").unwrap());
         doc.insert_type(
-            TypeName::new("Session").unwrap(),
+            CatalogueEntryKey::try_new("Session".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -2095,7 +2108,7 @@ include_function_roles = []
         // Declare both result variants as catalogue types.
         for type_name in ["ContractMapContent", "ContractMapRendererError"] {
             doc.insert_type(
-                TypeName::new(type_name).unwrap(),
+                CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::value_object(),
@@ -2129,7 +2142,7 @@ include_function_roles = []
             None,
         );
         doc.insert_type(
-            TypeName::new("ContractMapRenderer").unwrap(),
+            CatalogueEntryKey::try_new("ContractMapRenderer".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::domain_service(),
@@ -2192,7 +2205,7 @@ include_function_roles = []
             );
 
             doc.insert_type(
-                TypeName::new(target_type).unwrap(),
+                CatalogueEntryKey::try_new(target_type.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::entity().unwrap(),
@@ -2227,7 +2240,7 @@ include_function_roles = []
                 None,
             );
             doc.insert_type(
-                TypeName::new(owner_type).unwrap(),
+                CatalogueEntryKey::try_new(owner_type.to_owned()).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
                     DataRole::domain_service(),
@@ -2302,7 +2315,7 @@ include_function_roles = []
             None,
         );
         doc.insert_type(
-            TypeName::new("Store").unwrap(),
+            CatalogueEntryKey::try_new("Store".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::domain_service(),
@@ -2362,7 +2375,10 @@ include_function_roles = []
         );
 
         // Declare a trait that will be the impl target.
-        doc.insert_trait(TraitName::new("ContractMapRenderer").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("ContractMapRenderer".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
 
         // Declare an adapter with a constructor method returning Self.
         let new_method = MethodDeclaration::new(
@@ -2379,7 +2395,7 @@ include_function_roles = []
             None,
         );
         doc.insert_type(
-            TypeName::new("ContractMapRendererAdapter").unwrap(),
+            CatalogueEntryKey::try_new("ContractMapRendererAdapter".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::SecondaryAdapter,
@@ -2482,7 +2498,7 @@ include_function_roles = []
         );
 
         doc.insert_type(
-            TypeName::new("MyType").unwrap(),
+            CatalogueEntryKey::try_new("MyType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -2499,7 +2515,10 @@ include_function_roles = []
                 vec![],
             ),
         );
-        doc.insert_trait(TraitName::new("MyTrait").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
         let output = result.content().as_ref();
@@ -2569,7 +2588,10 @@ include_function_roles = []
             "FunctionReturnPort",
             "MethodParamPort",
         ] {
-            doc.insert_trait(TraitName::new(trait_name).unwrap(), make_empty_trait_entry());
+            doc.insert_trait(
+                CatalogueEntryKey::try_new(trait_name.to_owned()).unwrap(),
+                make_empty_trait_entry(),
+            );
         }
 
         let factory_method = MethodDeclaration::new(
@@ -2589,11 +2611,11 @@ include_function_roles = []
             None,
         );
         doc.insert_trait(
-            TraitName::new("Factory").unwrap(),
+            CatalogueEntryKey::try_new("Factory".to_owned()).unwrap(),
             make_trait_entry_with_methods(vec![factory_method]),
         );
         doc.insert_type(
-            TypeName::new("FieldOwner").unwrap(),
+            CatalogueEntryKey::try_new("FieldOwner".to_owned()).unwrap(),
             make_plain_struct_entry(
                 vec![FieldDecl::new(
                     FieldName::new("port").unwrap(),
@@ -2603,7 +2625,7 @@ include_function_roles = []
             ),
         );
         doc.insert_type(
-            TypeName::new("VariantOwner").unwrap(),
+            CatalogueEntryKey::try_new("VariantOwner".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -2623,7 +2645,7 @@ include_function_roles = []
             ),
         );
         doc.insert_type(
-            TypeName::new("AliasOwner").unwrap(),
+            CatalogueEntryKey::try_new("AliasOwner".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -2746,7 +2768,7 @@ include_function_roles = []
             None,
         );
         doc.insert_trait(
-            TraitName::new("Inspector").unwrap(),
+            CatalogueEntryKey::try_new("Inspector".to_owned()).unwrap(),
             make_trait_entry_with_methods(vec![method]),
         );
 
@@ -2766,10 +2788,16 @@ include_function_roles = []
             CrateName::new("domain").unwrap(),
             layer.clone(),
         );
-        doc.insert_type(TypeName::new("Foo").unwrap(), make_plain_struct_entry(vec![], vec![]));
-        doc.insert_trait(TraitName::new("Foo").unwrap(), make_empty_trait_entry());
         doc.insert_type(
-            TypeName::new("Owner").unwrap(),
+            CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
+            make_plain_struct_entry(vec![], vec![]),
+        );
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
             make_plain_struct_entry(
                 vec![
                     FieldDecl::new(FieldName::new("plain").unwrap(), TypeRef::new("Foo").unwrap()),
@@ -2811,10 +2839,13 @@ include_function_roles = []
             layer.clone(),
         );
         for trait_name in ["DeclaredPort", "DeclaredMarker"] {
-            doc.insert_trait(TraitName::new(trait_name).unwrap(), make_empty_trait_entry());
+            doc.insert_trait(
+                CatalogueEntryKey::try_new(trait_name.to_owned()).unwrap(),
+                make_empty_trait_entry(),
+            );
         }
         doc.insert_type(
-            TypeName::new("Owner").unwrap(),
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
             make_plain_struct_entry(
                 vec![FieldDecl::new(
                     FieldName::new("ports").unwrap(),
@@ -2851,15 +2882,18 @@ include_function_roles = []
             CrateName::new("domain").unwrap(),
             layer.clone(),
         );
-        doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("DeclaredPort".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
         for type_name in ["GenericType", "AssociatedType"] {
             doc.insert_type(
-                TypeName::new(type_name).unwrap(),
+                CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(),
                 make_plain_struct_entry(vec![], vec![]),
             );
         }
         doc.insert_type(
-            TypeName::new("Owner").unwrap(),
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
             make_plain_struct_entry(
                 vec![FieldDecl::new(
                     FieldName::new("port").unwrap(),
@@ -2889,9 +2923,12 @@ include_function_roles = []
             CrateName::new("domain").unwrap(),
             layer.clone(),
         );
-        doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("DeclaredPort".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
         doc.insert_type(
-            TypeName::new("Owner").unwrap(),
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
             make_plain_struct_entry(
                 vec![
                     FieldDecl::new(
@@ -2928,10 +2965,13 @@ include_function_roles = []
             CrateName::new("domain").unwrap(),
             domain_layer.clone(),
         );
-        domain_doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        domain_doc.insert_trait(
+            CatalogueEntryKey::try_new("DeclaredPort".to_owned()).unwrap(),
+            make_empty_trait_entry(),
+        );
         for type_name in ["CrateAdapter", "SelfAdapter", "SuperAdapter", "BareAdapter"] {
             domain_doc.insert_type(
-                TypeName::new(type_name).unwrap(),
+                CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(),
                 make_plain_struct_entry(vec![], vec![]),
             );
         }
@@ -2953,11 +2993,11 @@ include_function_roles = []
             adapter_layer.clone(),
         );
         adapter_doc.insert_type(
-            TypeName::new("CrossAdapter").unwrap(),
+            CatalogueEntryKey::try_new("CrossAdapter".to_owned()).unwrap(),
             make_plain_struct_entry(vec![], vec![]),
         );
         adapter_doc.insert_type(
-            TypeName::new("ExternalAdapter").unwrap(),
+            CatalogueEntryKey::try_new("ExternalAdapter".to_owned()).unwrap(),
             make_plain_struct_entry(vec![], vec![]),
         );
         adapter_doc.push_trait_impl(TraitImplDeclV2::new(

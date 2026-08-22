@@ -20,7 +20,7 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, It
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, DeletionRecord, InherentImplDeclV2, MethodDeclaration,
     MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
-    TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+    TypeEntry, TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
@@ -860,7 +860,7 @@ fn money_catalogue() -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     doc.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -878,8 +878,7 @@ fn money_catalogue() -> CatalogueDocument {
         ),
     );
     doc.push_deletion(DeletionRecord::Type {
-        name: TypeName::new("OldMoney").unwrap(),
-        module_path: ModulePath::root(),
+        name: CatalogueEntryKey::try_new("OldMoney".to_owned()).unwrap(),
         spec_refs: vec![SpecRef::new(
             PathBuf::from("spec.json"),
             SpecElementId::try_new("AC-01").unwrap(),
@@ -904,7 +903,7 @@ fn money_catalogue_in_layer(
         LayerId::try_new(layer).unwrap(),
     );
     doc.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             action,
             DataRole::value_object(),
@@ -931,7 +930,7 @@ fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     doc.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             role,
@@ -990,7 +989,7 @@ fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("TestPort").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
         TraitEntry::new(
             action,
             ContractRole::SecondaryPort,
@@ -1019,7 +1018,7 @@ fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("TestPort").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -1043,7 +1042,7 @@ fn trait_impl_catalogue() -> CatalogueDocument {
     let entry_refs =
         vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())];
     catalogue.insert_trait(
-        TraitName::new("MyPort").unwrap(),
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Reference,
             ContractRole::SecondaryPort,
@@ -1590,7 +1589,7 @@ fn test_cited_anchor_ids_includes_method_only_refs() {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("TestPort").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -1622,7 +1621,7 @@ fn test_cited_anchor_ids_skips_reference_method_refs() {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("TestPort").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -1676,7 +1675,7 @@ fn test_cited_anchor_ids_skips_delete_method_refs() {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("TestPort").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -1723,7 +1722,7 @@ fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_type(
-        TypeName::new("Compute").unwrap(),
+        CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::domain_service(),
@@ -1748,12 +1747,12 @@ fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
 #[test]
 fn test_cited_anchor_ids_includes_inherent_method_only_refs() {
     let mut catalogue = money_catalogue();
-    catalogue.push_inherent_impl(InherentImplDeclV2 {
-        type_name: TypeName::new("Money").unwrap(),
-        impl_generics: vec![],
-        impl_where_predicates: vec![],
-        methods: vec![covering_method("amount", "AC-03")],
-    });
+    catalogue.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![covering_method("amount", "AC-03")],
+    ));
     let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
     assert!(cited.contains(&"IN-05".to_owned()));
     assert!(cited.contains(&"AC-03".to_owned()));
@@ -1762,12 +1761,12 @@ fn test_cited_anchor_ids_includes_inherent_method_only_refs() {
 #[test]
 fn test_cited_anchor_ids_skips_inherent_methods_on_delete_owner() {
     let mut catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Delete);
-    catalogue.push_inherent_impl(InherentImplDeclV2 {
-        type_name: TypeName::new("Money").unwrap(),
-        impl_generics: vec![],
-        impl_where_predicates: vec![],
-        methods: vec![covering_method("amount", "AC-04")],
-    });
+    catalogue.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![covering_method("amount", "AC-04")],
+    ));
     let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
     assert!(!cited.contains(&"IN-05".to_owned()));
     assert!(!cited.contains(&"AC-04".to_owned()));
@@ -1776,8 +1775,10 @@ fn test_cited_anchor_ids_skips_inherent_methods_on_delete_owner() {
 #[test]
 fn test_obligation_declaration_text_uses_target_section_for_same_key() {
     let mut catalogue = money_catalogue();
-    catalogue
-        .insert_trait(TraitName::new("Money").unwrap(), trait_entry(ContractRole::SecondaryPort));
+    catalogue.insert_trait(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort),
+    );
     let entry_key = entry_key();
     let obligation = TestObligation::new(
         TestObligationId::new(
@@ -1839,13 +1840,73 @@ fn test_obligation_declaration_text_with_relative_catalogue_identity_matches_anc
 }
 
 #[test]
+fn test_obligation_declaration_text_with_workspace_qualified_trait_resolves_declaration() {
+    let mut impl_catalogue = money_catalogue_with_role(DataRole::value_object());
+    impl_catalogue.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("infrastructure::alpha::SharedPort").unwrap(),
+        TypeRef::new("Money").unwrap(),
+    ));
+
+    let mut trait_catalogue = CatalogueDocument::new(
+        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        CrateName::new("infrastructure").unwrap(),
+        LayerId::try_new("infrastructure").unwrap(),
+    );
+    trait_catalogue.insert_trait(
+        CatalogueEntryKey::try_new("infrastructure::alpha::SharedPort".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let entry_key = entry_key();
+    let obligation = TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::Contract,
+            TestObligationItemIdentifier::try_new(
+                "trait_impl:infrastructure::alpha::SharedPort".to_owned(),
+            )
+            .unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Traits,
+            entry_key,
+        ),
+        TargetEntryRoleKind::TraitImpl(ContractRole::SecondaryPort),
+        TestObligationBrief::try_new("cover workspace trait impl".to_owned()).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([0u8; 32])),
+        vec![anchor()],
+    );
+
+    let declaration =
+        obligation_declaration_text(&[impl_catalogue, trait_catalogue], &obligation).unwrap();
+
+    assert!(declaration.contains("trait_impl:"));
+    assert!(declaration.contains("trait_declaration:"));
+    assert!(declaration.contains("SecondaryPort"));
+}
+
+#[test]
 fn test_obligation_declaration_text_freezes_inherent_impl_for_inherent_only_method() {
     let mut catalogue = money_catalogue();
-    catalogue.push_inherent_impl(InherentImplDeclV2 {
-        type_name: TypeName::new("Money").unwrap(),
-        impl_generics: vec![],
-        impl_where_predicates: vec![],
-        methods: vec![MethodDeclaration::new(
+    catalogue.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![MethodDeclaration::new(
             MethodName::new("compute").unwrap(),
             Some(SelfReceiver::SharedRef),
             vec![],
@@ -1858,7 +1919,7 @@ fn test_obligation_declaration_text_freezes_inherent_impl_for_inherent_only_meth
             ItemAction::Add,
             None,
         )],
-    });
+    ));
     let entry_key = entry_key();
     let obligation = TestObligation::new(
         TestObligationId::new(

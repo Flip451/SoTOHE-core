@@ -1904,8 +1904,9 @@ mod tests {
         use domain::tddd::catalogue_v2::CatalogueDocument;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
-        use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+        use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath};
         use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::semantic_verify::CatalogueEntryKey;
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
@@ -1915,7 +1916,7 @@ mod tests {
             layer,
         );
         doc.insert_type(
-            TypeName::new("TrackId").unwrap(),
+            CatalogueEntryKey::try_new("TrackId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),

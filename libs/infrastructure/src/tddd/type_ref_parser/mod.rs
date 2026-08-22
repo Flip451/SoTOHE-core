@@ -39,6 +39,7 @@ mod precise_capture;
 // Re-exports — public surface of this module
 // ---------------------------------------------------------------------------
 
+pub(crate) use canonical_render::{render_bound, render_type};
 pub(crate) use constants::{STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID};
 pub(crate) use generic_tokens::is_plain_generic_param_name;
 pub(crate) use helpers::{core_canonical_path, std_canonical_path};

@@ -204,11 +204,11 @@ fn type_surface_types<'a>(
     for inherent_impl in catalogue
         .inherent_impls()
         .iter()
-        .filter(|inherent_impl| inherent_impl.type_name.as_str() == type_name)
+        .filter(|inherent_impl| inherent_impl.type_name().as_str() == type_name)
     {
         types.extend(generic_bound_types(
-            inherent_impl.impl_generics.as_slice(),
-            inherent_impl.impl_where_predicates.as_slice(),
+            inherent_impl.impl_generics(),
+            inherent_impl.impl_where_predicates(),
         ));
     }
     for trait_impl in trait_impls_for_type(catalogue, type_name) {

@@ -10,8 +10,8 @@ use domain::tddd::catalogue_v2::entries::{
 };
 use domain::tddd::catalogue_v2::roles::{FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    BoundOp, DocString, MethodDeclaration, MethodGenericParam, MethodName, ParamDeclaration,
-    ParamName, SelfReceiver, TypeName, TypeRef, WherePredicateDecl,
+    BoundOp, CatalogueEntryKey, DocString, MethodDeclaration, MethodGenericParam, MethodName,
+    ParamDeclaration, ParamName, SelfReceiver, TypeRef, WherePredicateDecl,
 };
 
 use std::str::FromStr;
@@ -289,7 +289,7 @@ pub(super) fn inherent_impl_from_dto(
     // Keep a str reference alive for the error context closures below.
     let type_name_str = dto.type_name.as_str();
 
-    let type_name = TypeName::new(type_name_str)
+    let type_name = CatalogueEntryKey::try_new(type_name_str.to_owned())
         .map_err(|e| err(type_name_str, format!("invalid type_name: {e}")))?;
 
     let impl_generics = method_generics_from_dtos(type_name_str, dto.impl_generics)?;
@@ -307,7 +307,7 @@ pub(super) fn inherent_impl_from_dto(
         .map(|m| method_decl_from_dto_with_outer_generics(type_name_str, m, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(InherentImplDeclV2 { type_name, impl_generics, impl_where_predicates, methods })
+    Ok(InherentImplDeclV2::new(type_name, impl_generics, impl_where_predicates, methods))
 }
 
 pub(super) fn function_entry_from_dto(

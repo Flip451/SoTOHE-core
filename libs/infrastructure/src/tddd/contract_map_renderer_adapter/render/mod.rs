@@ -169,8 +169,8 @@ pub(super) fn render_mermaid(
                 Vec<&domain::tddd::catalogue_v2::methods::MethodDeclaration>,
             > = BTreeMap::new();
             for impl_decl in doc.inherent_impls() {
-                let tn = impl_decl.type_name.as_str().to_string();
-                for m in &impl_decl.methods {
+                let tn = impl_decl.type_name().as_str().to_string();
+                for m in impl_decl.methods() {
                     inherent_methods.entry(tn.clone()).or_default().push(m);
                 }
             }

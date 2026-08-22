@@ -193,7 +193,7 @@
       }
     },
     {
-      "claim_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "claim_hash": "7bf1b5b45546398a11c86983797bb31975093533ccc09d8c82cccbed2ec14d62",
       "claim_origin": {
         "data": {
           "entry_key": "DeletionRecord",
@@ -217,7 +217,7 @@
       }
     },
     {
-      "claim_hash": "67909159c44445d7b45babd2513444313a6e2bedb9932e117ef53a609af03646",
+      "claim_hash": "7bf1b5b45546398a11c86983797bb31975093533ccc09d8c82cccbed2ec14d62",
       "claim_origin": {
         "data": {
           "entry_key": "DeletionRecord",
@@ -549,6 +549,78 @@
       },
       "verdict": {
         "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
         "kind": "pass"
       }
     }

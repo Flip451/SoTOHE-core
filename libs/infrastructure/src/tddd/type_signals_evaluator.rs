@@ -300,9 +300,6 @@ fn evaluate_and_write(
             .or_insert_with(Vec::new)
             .push(function_role_kind_tag(entry.role()));
     }
-    let extended = CatalogueToExtendedCrateCodec::new().encode(catalogue).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!("cannot convert catalogue: {error}"))
-    })?;
     reject_type_signals_path(baseline_path, trusted_items_root, "baseline")?;
     let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
@@ -310,6 +307,11 @@ fn evaluate_and_write(
     let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
         EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
     })?;
+    let extended = CatalogueToExtendedCrateCodec::new()
+        .encode(catalogue, &baseline, &current)
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!("cannot convert catalogue: {error}"))
+        })?;
     let report = SignalEvaluatorV2::with_workspace_root(workspace_root.to_path_buf())
         .evaluate(extended, baseline, current)
         .map_err(|error| {

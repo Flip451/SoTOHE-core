@@ -8,9 +8,10 @@ use super::{CatalogueLinterError, FreeText, RoleKind, RolePayloadField, RuleTarg
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
 use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
-use crate::tddd::catalogue_v2::identifiers::{FunctionPath, TraitName, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{FunctionPath, TypeRef};
 use crate::tddd::catalogue_v2::methods::MethodDeclaration;
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 // ---------------------------------------------------------------------------
 // Entry filtering helpers
@@ -43,7 +44,7 @@ pub(super) fn target_matches(target: &RuleTarget, role: RoleKind) -> bool {
 pub(super) fn type_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
-) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
+) -> impl Iterator<Item = (&'a CatalogueEntryKey, &'a TypeEntry)> {
     catalogue.types().iter().filter(move |(_name, entry)| {
         entry.action() != ItemAction::Delete
             && entry.action() != ItemAction::Reference
@@ -66,7 +67,7 @@ pub(super) fn type_entries_for_target<'a>(
 pub(super) fn trait_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
-) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
+) -> impl Iterator<Item = (&'a CatalogueEntryKey, &'a TraitEntry)> {
     catalogue.traits().iter().filter(move |(_name, entry)| {
         entry.action() != ItemAction::Delete
             && entry.action() != ItemAction::Reference
@@ -124,8 +125,8 @@ pub(super) fn collect_methods_for_type<'a>(
         catalogue
             .inherent_impls()
             .iter()
-            .filter(|impl_| impl_.type_name.as_str() == type_name)
-            .flat_map(|impl_| impl_.methods.iter()),
+            .filter(|impl_| impl_.type_name().as_str() == type_name)
+            .flat_map(|impl_| impl_.methods().iter()),
     ) {
         if let Some(existing) = seen_names.get(method.name.as_str()) {
             if *existing != method {

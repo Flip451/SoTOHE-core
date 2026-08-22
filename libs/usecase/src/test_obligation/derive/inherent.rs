@@ -37,14 +37,14 @@ pub(super) fn derive_inherent_impl_obligations(
     }
 
     for inherent in catalogue.inherent_impls() {
-        let type_name = inherent.type_name.as_str();
+        let type_name = inherent.type_name().as_str();
         let Some((_, type_entry)) =
             catalogue.types().iter().find(|(name, _)| name.as_str() == type_name)
         else {
             return Err(diag(&format!("inherent impl refers to unknown type '{type_name}'")));
         };
         let seen = seen_by_type.entry(type_name.to_owned()).or_default();
-        let methods = unique_inherent_methods(type_name, &inherent.methods, seen)?;
+        let methods = unique_inherent_methods(type_name, inherent.methods(), seen)?;
         if methods.is_empty() {
             continue;
         }
@@ -125,9 +125,9 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
     use domain::tddd::catalogue_v2::{
         CatalogueDocument, CrateName, InherentImplDeclV2, MethodDeclaration, MethodName,
-        ModulePath, SelfReceiver, StructKind, StructShape, TypeEntry, TypeKindV2, TypeName,
-        TypeRef,
+        ModulePath, SelfReceiver, StructKind, StructShape, TypeEntry, TypeKindV2, TypeRef,
     };
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::test_obligation::ids::DiagnosticMessage;
     use domain::tddd::test_obligation::obligations::TestObligation;
     use domain::tddd::test_obligation::projection::RoleObligationItemsProjector;
@@ -211,13 +211,13 @@ mod tests {
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
-        catalogue.insert_type(TypeName::new("Compute").unwrap(), entry);
-        catalogue.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Compute").unwrap(),
-            impl_generics: vec![],
-            impl_where_predicates: vec![],
-            methods: inherent_methods,
-        });
+        catalogue.insert_type(CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(), entry);
+        catalogue.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            inherent_methods,
+        ));
         catalogue
     }
 
@@ -312,12 +312,12 @@ mod tests {
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
-        catalogue.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Missing").unwrap(),
-            impl_generics: vec![],
-            impl_where_predicates: vec![],
-            methods: vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
-        });
+        catalogue.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Missing".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
+        ));
         assert!(derive(&catalogue).is_err());
     }
 }

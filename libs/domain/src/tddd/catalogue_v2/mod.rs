@@ -53,10 +53,12 @@ pub use entries::{
 };
 
 pub use identifiers::{
-    AssocConstName, CrateName, DocString, FieldName, FunctionName, FunctionPath, Identifier,
-    IdentifierError, InvariantName, MethodName, ModulePath, ParamName, RustExpression,
-    RustExpressionError, TraitName, TypeName, TypeRef, VariantName,
+    AssocConstName, CrateName, DocString, FieldName, FullyQualifiedItemPath, FunctionName,
+    FunctionPath, Identifier, IdentifierError, InvariantName, MethodName, ModulePath, ParamName,
+    RustExpression, RustExpressionError, TraitName, TypeName, TypeRef, VariantName,
 };
+
+pub use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 pub use methods::{
     BoundOp, MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,

@@ -510,7 +510,7 @@ mod tests {
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::TypeEntry;
     use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeRef,
     };
     use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
@@ -520,6 +520,7 @@ mod tests {
     use domain::tddd::primitive_occurrence_scanner::{
         PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError,
     };
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
     use mockall::mock;
 
     use super::*;
@@ -651,7 +652,7 @@ mod tests {
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
         let mut doc = empty_doc(crate_name);
         doc.insert_type(
-            TypeName::new("SentinelType").unwrap(),
+            CatalogueEntryKey::try_new("SentinelType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1273,7 +1274,7 @@ mod tests {
     fn test_forbid_primitive_in_types_named_field_and_type_alias_target() {
         let mut doc = empty_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1297,7 +1298,7 @@ mod tests {
             ),
         );
         doc.insert_type(
-            TypeName::new("Description").unwrap(),
+            CatalogueEntryKey::try_new("Description".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1395,7 +1396,7 @@ mod tests {
     fn test_execute_composition_root_pure_di_detects_execution_method() {
         let mut composition_catalogue = empty_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method(
@@ -1432,7 +1433,7 @@ mod tests {
     fn test_execute_composition_root_pure_di_detects_prohibited_public_role_exposure() {
         let mut composition_catalogue = empty_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method("username", Some(SelfReceiver::SharedRef), vec![], "domain::Username")],
@@ -1440,7 +1441,7 @@ mod tests {
         );
         let mut domain_catalogue = empty_doc("domain");
         domain_catalogue.insert_type(
-            TypeName::new("Username").unwrap(),
+            CatalogueEntryKey::try_new("Username".to_owned()).unwrap(),
             type_entry_with_methods(DataRole::value_object(), vec![]),
         );
         let composition_layer = composition_catalogue.layer().clone();
@@ -1471,7 +1472,7 @@ mod tests {
     fn test_execute_composition_root_pure_di_allows_primary_adapter_surface() {
         let mut composition_catalogue = empty_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![
@@ -1487,7 +1488,7 @@ mod tests {
         );
         let mut driver_catalogue = empty_doc("cli_driver");
         driver_catalogue.insert_type(
-            TypeName::new("GreetingDriver").unwrap(),
+            CatalogueEntryKey::try_new("GreetingDriver".to_owned()).unwrap(),
             type_entry_with_methods(DataRole::PrimaryAdapter, vec![]),
         );
         let composition_layer = composition_catalogue.layer().clone();

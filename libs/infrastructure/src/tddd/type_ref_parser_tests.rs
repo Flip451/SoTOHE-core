@@ -2347,10 +2347,10 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     use domain::tddd::catalogue_v2::roles::{ContractRole, ItemAction};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
     use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
-    use rustdoc_types::ItemEnum;
+    use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, ItemKind, ItemSummary, Target};
 
     let mut doc = CatalogueDocument::new(
         domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
@@ -2358,7 +2358,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         LayerId::try_new("domain").unwrap(),
     );
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -2384,7 +2384,27 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     );
     doc.push_trait_impl(trait_impl);
 
-    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let mut paths = std::collections::HashMap::new();
+    paths.insert(
+        rustdoc_types::Id(1),
+        ItemSummary {
+            crate_id: 0,
+            path: vec!["domain".to_owned(), "MyTrait".to_owned()],
+            kind: ItemKind::Trait,
+        },
+    );
+    let authoritative = Crate {
+        root: rustdoc_types::Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths,
+        external_crates: std::collections::HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let encoded =
+        CatalogueToExtendedCrateCodec::new().encode(doc, &authoritative, &authoritative).unwrap();
     let for_type = encoded
         .krate()
         .index

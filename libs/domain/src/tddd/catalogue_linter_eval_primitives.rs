@@ -317,12 +317,12 @@ fn collect_type_entry_slots(
         for impl_decl in catalogue
             .inherent_impls()
             .iter()
-            .filter(|decl| decl.type_name.as_str() == entry_name.as_str())
+            .filter(|decl| decl.type_name().as_str() == entry_name.as_str())
         {
             push_generic_and_where_slots(
                 &entry_name,
-                &impl_decl.impl_generics,
-                &impl_decl.impl_where_predicates,
+                impl_decl.impl_generics(),
+                impl_decl.impl_where_predicates(),
                 bound_filter,
                 slots,
             );

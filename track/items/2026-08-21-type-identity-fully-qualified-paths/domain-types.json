@@ -5,6 +5,7 @@
     {
       "methods": [
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -23,7 +24,6 @@
             }
           ],
           "returns": "Self",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "CO-01",
@@ -36,13 +36,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "crate_name",
           "params": [],
           "receiver": "&self",
           "returns": "&CrateName",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "CO-01",
@@ -55,13 +55,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "module_path",
           "params": [],
           "receiver": "&self",
           "returns": "&ModulePath",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "CO-01",
@@ -74,13 +74,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "name",
           "params": [],
           "receiver": "&self",
           "returns": "&Identifier",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "CO-01",
@@ -88,6 +88,52 @@
             },
             {
               "anchor": "AC-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_catalogue_entry_key",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            },
+            {
+              "name": "declared_module_path",
+              "ty": "&ModulePath"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_fully_qualified_key",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
@@ -98,6 +144,7 @@
     {
       "methods": [
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -108,7 +155,6 @@
             }
           ],
           "returns": "Self",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-05",
@@ -117,13 +163,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "value",
           "params": [],
           "receiver": "self",
           "returns": "u32",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-05",
@@ -341,7 +387,73 @@
       "trait_ref": "core::error::Error"
     }
   ],
-  "traits": {},
+  "traits": {
+    "CatalogueToExtendedCratePort": {
+      "action": "modify",
+      "docs": "Secondary port for catalogue graph encoding.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "encode",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "CatalogueDocument"
+            },
+            {
+              "name": "baseline",
+              "ty": "&rustdoc_types::Crate"
+            },
+            {
+              "name": "current",
+              "ty": "&rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
   "types": {
     "CatalogueDocument": {
       "action": "modify",
@@ -357,6 +469,7 @@
       },
       "methods": [
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -375,7 +488,6 @@
             }
           ],
           "returns": "Self",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -392,13 +504,13 @@
           ]
         },
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "schema_version",
           "params": [],
           "receiver": "&self",
           "returns": "CatalogueSchemaVersion",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-05",
@@ -407,31 +519,31 @@
           ]
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "crate_name",
           "params": [],
           "receiver": "&self",
-          "returns": "&CrateName",
-          "action": "reference"
+          "returns": "&CrateName"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "layer",
           "params": [],
           "receiver": "&self",
-          "returns": "&LayerId",
-          "action": "reference"
+          "returns": "&LayerId"
         },
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "types",
           "params": [],
           "receiver": "&self",
           "returns": "&BTreeMap<CatalogueEntryKey, TypeEntry>",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -444,13 +556,13 @@
           ]
         },
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "traits",
           "params": [],
           "receiver": "&self",
           "returns": "&BTreeMap<CatalogueEntryKey, TraitEntry>",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -463,42 +575,43 @@
           ]
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "functions",
           "params": [],
           "receiver": "&self",
-          "returns": "&BTreeMap<FunctionPath, FunctionEntry>",
-          "action": "reference"
+          "returns": "&BTreeMap<FunctionPath, FunctionEntry>"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "inherent_impls",
           "params": [],
           "receiver": "&self",
-          "returns": "&[InherentImplDeclV2]",
-          "action": "reference"
+          "returns": "&[InherentImplDeclV2]"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "trait_impls",
           "params": [],
           "receiver": "&self",
-          "returns": "&[TraitImplDeclV2]",
-          "action": "reference"
+          "returns": "&[TraitImplDeclV2]"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "deletions",
           "params": [],
           "receiver": "&self",
-          "returns": "&[DeletionRecord]",
-          "action": "reference"
+          "returns": "&[DeletionRecord]"
         },
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "insert_type",
@@ -514,7 +627,6 @@
           ],
           "receiver": "&mut self",
           "returns": "()",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -531,6 +643,7 @@
           ]
         },
         {
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "insert_trait",
@@ -546,7 +659,6 @@
           ],
           "receiver": "&mut self",
           "returns": "()",
-          "action": "modify",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -563,6 +675,7 @@
           ]
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "insert_function",
@@ -577,10 +690,10 @@
             }
           ],
           "receiver": "&mut self",
-          "returns": "()",
-          "action": "reference"
+          "returns": "()"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "push_inherent_impl",
@@ -591,10 +704,10 @@
             }
           ],
           "receiver": "&mut self",
-          "returns": "()",
-          "action": "reference"
+          "returns": "()"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "push_trait_impl",
@@ -605,10 +718,10 @@
             }
           ],
           "receiver": "&mut self",
-          "returns": "()",
-          "action": "reference"
+          "returns": "()"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "push_deletion",
@@ -619,10 +732,10 @@
             }
           ],
           "receiver": "&mut self",
-          "returns": "()",
-          "action": "reference"
+          "returns": "()"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "validate_filename",
@@ -633,8 +746,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), CatalogueDocumentError>",
-          "action": "reference"
+          "returns": "Result<(), CatalogueDocumentError>"
         }
       ],
       "module_path": "tddd::catalogue_v2::document",
@@ -674,6 +786,7 @@
       },
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
@@ -683,17 +796,16 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, ValidationError>",
-          "action": "reference"
+          "returns": "Result<Self, ValidationError>"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "as_str",
           "params": [],
           "receiver": "&self",
-          "returns": "&str",
-          "action": "reference"
+          "returns": "&str"
         }
       ],
       "module_path": "tddd::semantic_verify",
@@ -754,55 +866,82 @@
             "name": "Type",
             "payload": {
               "fields": [
-                "CatalogueEntryKey",
-                "Vec<SpecRef>",
-                "Vec<InformalGroundRef>"
+                {
+                  "name": "name",
+                  "ty": "CatalogueEntryKey"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "Trait",
             "payload": {
               "fields": [
-                "CatalogueEntryKey",
-                "Vec<SpecRef>",
-                "Vec<InformalGroundRef>"
+                {
+                  "name": "name",
+                  "ty": "CatalogueEntryKey"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "Function",
             "payload": {
               "fields": [
-                "FunctionPath",
-                "Vec<SpecRef>",
-                "Vec<InformalGroundRef>"
+                {
+                  "name": "path",
+                  "ty": "FunctionPath"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]
       },
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "spec_refs",
           "params": [],
           "receiver": "&self",
-          "returns": "&[SpecRef]",
-          "action": "reference"
+          "returns": "&[SpecRef]"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "informal_grounds",
           "params": [],
           "receiver": "&self",
-          "returns": "&[InformalGroundRef]",
-          "action": "reference"
+          "returns": "&[InformalGroundRef]"
         }
       ],
       "module_path": "tddd::catalogue_v2::deletions",
@@ -874,6 +1013,7 @@
       },
       "methods": [
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -896,7 +1036,6 @@
             }
           ],
           "returns": "Self",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -909,13 +1048,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "type_name",
           "params": [],
           "receiver": "&self",
           "returns": "&CatalogueEntryKey",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -928,13 +1067,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "impl_generics",
           "params": [],
           "receiver": "&self",
           "returns": "&[MethodGenericParam]",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -947,13 +1086,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "impl_where_predicates",
           "params": [],
           "receiver": "&self",
           "returns": "&[WherePredicateDecl]",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-01",
@@ -966,13 +1105,13 @@
           ]
         },
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "methods",
           "params": [],
           "receiver": "&self",
           "returns": "&[MethodDeclaration]",
-          "action": "add",
           "spec_refs": [
             {
               "anchor": "IN-01",

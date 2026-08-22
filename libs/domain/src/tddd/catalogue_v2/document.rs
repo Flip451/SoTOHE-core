@@ -17,8 +17,8 @@
 //! ## Language × Entry-type constraint
 //!
 //! The three-BTreeMap structure enforces the Language axis at schema level (ADR 1 D1 / CN-01):
-//! - `types: BTreeMap<TypeName, TypeEntry>` — Language = DataType
-//! - `traits: BTreeMap<TraitName, TraitEntry>` — Language = Contract
+//! - `types: BTreeMap<CatalogueEntryKey, TypeEntry>` — Language = DataType
+//! - `traits: BTreeMap<CatalogueEntryKey, TraitEntry>` — Language = Contract
 //! - `functions: BTreeMap<FunctionPath, FunctionEntry>` — Language = Function
 //!
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
@@ -30,9 +30,10 @@ use crate::tddd::catalogue_v2::deletions::DeletionRecord;
 use crate::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
-use crate::tddd::catalogue_v2::identifiers::{CrateName, FunctionPath, TraitName, TypeName};
+use crate::tddd::catalogue_v2::identifiers::{CrateName, FunctionPath};
 use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use crate::tddd::layer_id::LayerId;
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 // ---------------------------------------------------------------------------
 // CatalogueSchemaVersion — schema-version value object
@@ -151,9 +152,9 @@ pub struct CatalogueDocument {
     /// The architectural layer identifier (e.g. `"domain"`, `"usecase"`, `"infrastructure"`).
     layer: LayerId,
     /// Type entries (struct / enum / type alias declarations).
-    types: BTreeMap<TypeName, TypeEntry>,
+    types: BTreeMap<CatalogueEntryKey, TypeEntry>,
     /// Trait entries (trait declarations).
-    traits: BTreeMap<TraitName, TraitEntry>,
+    traits: BTreeMap<CatalogueEntryKey, TraitEntry>,
     /// Function entries (free function declarations).
     functions: BTreeMap<FunctionPath, FunctionEntry>,
     /// Inherent impl block declarations (one entry per impl block).
@@ -224,13 +225,13 @@ impl CatalogueDocument {
 
     /// Type entries (struct / enum / type alias declarations).
     #[must_use]
-    pub fn types(&self) -> &BTreeMap<TypeName, TypeEntry> {
+    pub fn types(&self) -> &BTreeMap<CatalogueEntryKey, TypeEntry> {
         &self.types
     }
 
     /// Trait entries (trait declarations).
     #[must_use]
-    pub fn traits(&self) -> &BTreeMap<TraitName, TraitEntry> {
+    pub fn traits(&self) -> &BTreeMap<CatalogueEntryKey, TraitEntry> {
         &self.traits
     }
 
@@ -259,12 +260,12 @@ impl CatalogueDocument {
     }
 
     /// Inserts a type entry under `name`.
-    pub fn insert_type(&mut self, name: TypeName, entry: TypeEntry) {
+    pub fn insert_type(&mut self, name: CatalogueEntryKey, entry: TypeEntry) {
         self.types.insert(name, entry);
     }
 
     /// Inserts a trait entry under `name`.
-    pub fn insert_trait(&mut self, name: TraitName, entry: TraitEntry) {
+    pub fn insert_trait(&mut self, name: CatalogueEntryKey, entry: TraitEntry) {
         self.traits.insert(name, entry);
     }
 
@@ -298,8 +299,11 @@ impl CatalogueDocument {
     ///
     /// Returns `CatalogueDocumentError::CrateNameMismatch` when the `crate_name` field
     /// does not equal `filename_stem`.
-    pub fn validate_filename(&self, filename_stem: &str) -> Result<(), CatalogueDocumentError> {
-        if self.crate_name.as_str() == filename_stem {
+    pub fn validate_filename(
+        &self,
+        filename_stem: &CrateName,
+    ) -> Result<(), CatalogueDocumentError> {
+        if self.crate_name == *filename_stem {
             Ok(())
         } else {
             Err(CatalogueDocumentError::CrateNameMismatch)
@@ -437,7 +441,7 @@ mod tests {
             crate_name,
             layer_domain(),
         );
-        let type_name = TypeName::new("UserId").unwrap();
+        let type_name = CatalogueEntryKey::try_new("UserId".to_owned()).unwrap();
         doc.insert_type(type_name.clone(), make_simple_type_entry());
         assert_eq!(doc.types().len(), 1);
         assert!(doc.types().contains_key(&type_name));
@@ -467,9 +471,18 @@ mod tests {
             crate_name,
             layer_domain(),
         );
-        doc.insert_type(TypeName::new("ZOrder").unwrap(), make_simple_type_entry());
-        doc.insert_type(TypeName::new("AUser").unwrap(), make_simple_type_entry());
-        doc.insert_type(TypeName::new("MItem").unwrap(), make_simple_type_entry());
+        doc.insert_type(
+            CatalogueEntryKey::try_new("ZOrder".to_owned()).unwrap(),
+            make_simple_type_entry(),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("AUser".to_owned()).unwrap(),
+            make_simple_type_entry(),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("MItem".to_owned()).unwrap(),
+            make_simple_type_entry(),
+        );
         let keys: Vec<_> = doc.types().keys().map(|k| k.as_str()).collect();
         assert_eq!(keys, vec!["AUser", "MItem", "ZOrder"]);
     }
@@ -487,7 +500,7 @@ mod tests {
             layer_domain(),
         );
         // "domain-types.json" → stem = "domain"
-        assert!(doc.validate_filename("domain").is_ok());
+        assert!(doc.validate_filename(&CrateName::new("domain").unwrap()).is_ok());
     }
 
     #[test]
@@ -499,20 +512,15 @@ mod tests {
             layer_domain(),
         );
         // "usecase-types.json" stem "usecase" does not match crate_name "domain"
-        let err = doc.validate_filename("usecase").unwrap_err();
+        let err = doc.validate_filename(&CrateName::new("usecase").unwrap()).unwrap_err();
         assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
     }
 
     #[test]
-    fn test_validate_filename_with_empty_stem_returns_crate_name_mismatch_error() {
-        let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(
-            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
-            crate_name,
-            layer_domain(),
-        );
-        let err = doc.validate_filename("").unwrap_err();
-        assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
+    fn test_validate_filename_rejects_an_empty_stem_at_construction() {
+        // `validate_filename` takes a `CrateName`, so an empty stem cannot reach it:
+        // the identifier newtype refuses to hold one.
+        assert!(CrateName::new("").is_err());
     }
 
     #[test]
@@ -524,21 +532,15 @@ mod tests {
             layer_domain(),
         );
         // "domain_core-types.json" → stem = "domain_core"
-        assert!(doc.validate_filename("domain_core").is_ok());
+        assert!(doc.validate_filename(&CrateName::new("domain_core").unwrap()).is_ok());
     }
 
     #[test]
-    fn test_validate_filename_with_full_filename_returns_mismatch() {
-        // The caller should pass only the stem, not the full filename.
-        let crate_name = CrateName::new("domain").unwrap();
-        let doc = CatalogueDocument::new(
-            crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
-            crate_name,
-            layer_domain(),
-        );
-        // Passing the full filename "domain-types.json" should fail (not equal to "domain").
-        let err = doc.validate_filename("domain-types.json").unwrap_err();
-        assert_eq!(err, CatalogueDocumentError::CrateNameMismatch);
+    fn test_validate_filename_rejects_a_full_filename_at_construction() {
+        // The caller passes the stem, not the filename. A full filename is not a
+        // valid identifier, so it cannot be turned into the `CrateName` the method
+        // requires.
+        assert!(CrateName::new("domain-types.json").is_err());
     }
 
     // -----------------------------------------------------------------------
@@ -645,8 +647,7 @@ mod tests {
         );
         assert!(doc.deletions().is_empty(), "new() must default deletions to empty");
         doc.push_deletion(DeletionRecord::Type {
-            name: TypeName::new("OldType").unwrap(),
-            module_path: ModulePath::root(),
+            name: CatalogueEntryKey::try_new("OldType".to_owned()).unwrap(),
             spec_refs: vec![],
             informal_grounds: vec![],
         });

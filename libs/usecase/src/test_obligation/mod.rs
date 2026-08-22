@@ -36,7 +36,9 @@ use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2, TraitRefScope};
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, FullyQualifiedItemPath, TraitImplDeclV2, TraitRefScope,
+};
 use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::obligations::TestObligation;
@@ -294,8 +296,8 @@ fn declaration_for_obligation_in<'a>(
             return Some(type_text);
         }
         for inherent in catalogue.inherent_impls() {
-            if inherent.type_name.as_str() == type_name
-                && inherent.methods.iter().any(|method| method.name().as_str() == method_name)
+            if inherent.type_name().as_str() == type_name
+                && inherent.methods().iter().any(|method| method.name().as_str() == method_name)
             {
                 return Some(format!("type: {type_text}\ninherent_impl: {inherent:?}"));
             }
@@ -356,36 +358,56 @@ fn trait_declaration_text_for_impl(
     impl_declaration: &TraitImplDeclV2,
 ) -> Option<String> {
     let scope = impl_declaration.trait_ref_scope();
-    let (crate_name, trait_name) = match scope {
-        TraitRefScope::SelfCrate { bare_name } => {
-            return trait_entry_declaration_text(impl_catalogue, bare_name.as_str());
+    match scope {
+        TraitRefScope::SelfCrate(key) => {
+            let mut found: Option<(FullyQualifiedItemPath, String)> = None;
+            for catalogue in catalogues {
+                if catalogue.crate_name() != impl_catalogue.crate_name() {
+                    continue;
+                }
+                for (entry_key, entry) in catalogue.traits() {
+                    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+                        catalogue.crate_name(),
+                        entry_key,
+                        entry.module_path(),
+                    )
+                    .ok()?;
+                    if identity.name().as_str() != key.as_str() {
+                        continue;
+                    }
+                    if let Some((found_identity, _)) = &found {
+                        if found_identity != &identity {
+                            return None;
+                        }
+                        continue;
+                    }
+                    found = Some((identity, format!("{entry:?}")));
+                }
+            }
+            found.map(|(_, declaration)| declaration)
         }
-        TraitRefScope::Workspace { crate_name, bare_name } => (crate_name, bare_name),
-        TraitRefScope::External => return None,
-    };
-
-    let mut found = None;
-    for catalogue in catalogues {
-        if catalogue.crate_name() != &crate_name {
-            continue;
+        TraitRefScope::Workspace(key) => {
+            let mut found = None;
+            for catalogue in catalogues {
+                for (entry_key, entry) in catalogue.traits() {
+                    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+                        catalogue.crate_name(),
+                        entry_key,
+                        entry.module_path(),
+                    )
+                    .ok()?;
+                    if identity.to_string() != key.as_str() {
+                        continue;
+                    }
+                    if found.is_none() {
+                        found = Some(format!("{entry:?}"));
+                    }
+                }
+            }
+            found
         }
-        let Some(declaration) = trait_entry_declaration_text(catalogue, trait_name.as_str()) else {
-            continue;
-        };
-        if found.is_some() {
-            return None;
-        }
-        found = Some(declaration);
+        TraitRefScope::External => None,
     }
-    found
-}
-
-fn trait_entry_declaration_text(catalogue: &CatalogueDocument, name: &str) -> Option<String> {
-    catalogue
-        .traits()
-        .iter()
-        .find(|(trait_name, _)| trait_name.as_str() == name)
-        .map(|(_, entry)| format!("{entry:?}"))
 }
 
 /// Returns the artifact identity for a catalogue path.
@@ -444,13 +466,13 @@ pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> 
             push_method_cited_anchor_ids(&mut ids, entry.methods());
         }
         for inherent in catalogue.inherent_impls() {
-            let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+            let Some(owner) = catalogue.types().get(inherent.type_name()) else {
                 continue;
             };
             if !cited_action(owner.action()) {
                 continue;
             }
-            push_method_cited_anchor_ids(&mut ids, &inherent.methods);
+            push_method_cited_anchor_ids(&mut ids, inherent.methods());
         }
     }
     ids

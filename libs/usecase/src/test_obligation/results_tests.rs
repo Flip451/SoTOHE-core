@@ -15,7 +15,6 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
 use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TypeEntry, TypeKindV2,
-    TypeName,
 };
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::binding::{
@@ -435,7 +434,7 @@ fn status_catalogue() -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1167,7 +1166,7 @@ fn test_results_does_not_report_unbound_anchorless_obligation_as_missing() {
         LayerId::try_new("domain").unwrap(),
     );
     catalogue.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),

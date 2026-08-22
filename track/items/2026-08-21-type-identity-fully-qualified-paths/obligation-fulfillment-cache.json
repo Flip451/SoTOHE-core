@@ -3,6 +3,606 @@
     {
       "bound_tests": [
         {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "69bb3fcaafa976c784f98c65b8764f07c5f0ae4bb040e6af6c06f7cea622cf1b",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "de7bbc192974bc7145da7059c49c03136f6714e2fa5cffc92b3dd20184c18c54"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().paths[&alpha_id].path, [\"domain\", \"alpha\", \"Input\"]);\n    assert_eq!(encoded.krate().paths[&beta_id].path, [\"domain\", \"beta\", \"Input\"]);\n    assert_eq!(encoded.krate().paths[&alpha_port_id].path, [\"domain\", \"alpha\", \"Port\"]);\n    assert_eq!(encoded.krate().paths[&beta_port_id].path, [\"domain\", \"beta\", \"Port\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "31efb3c5d7646d506c1ebcf69bdb397956354b9e755351b9663d2666a0d581fa",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "de7bbc192974bc7145da7059c49c03136f6714e2fa5cffc92b3dd20184c18c54"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(trait_impl_records.contains(&(\n        \"domain::alpha::Port\".to_owned(),\n        alpha_port_id,\n        alpha_id,\n        alpha_id,\n    )));\n    assert!(trait_impl_records.contains(&(\n        \"domain::beta::Port\".to_owned(),\n        beta_port_id,\n        beta_id,\n        beta_id,\n    )));\n    for (trait_ref_path, trait_id, argument_id, for_id) in &trait_impl_records {\n        assert_ne!(*trait_id, Id(UNRESOLVED_CRATE_ID));\n        assert_ne!(*argument_id, Id(UNRESOLVED_CRATE_ID));\n        assert_ne!(*for_id, Id(UNRESOLVED_CRATE_ID));\n        assert_eq!(\n            encoded.krate().paths[trait_id].path,\n            trait_ref_path.split(\"::\").map(str::to_owned).collect::<Vec<_>>(),\n            \"emitted trait_ref ID must resolve to its fully qualified rustdoc path\"\n        );\n    }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "2cdd8465a6b4287845ab1e4d7011f1372431cd3af76d6d0e9fe9cdf279a93cc7",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "de7bbc192974bc7145da7059c49c03136f6714e2fa5cffc92b3dd20184c18c54"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(trait_impl_records.len(), 2, \"both trait_impls must remain distinct\");\n    assert!(trait_impl_records.contains(&(\"domain::alpha::Port\".to_owned(), alpha_port_id, alpha_id, alpha_id,)));\n    assert!(trait_impl_records.contains(&(\"domain::beta::Port\".to_owned(), beta_port_id, beta_id, beta_id,)));\n...\n    assert_eq!(inherent_impl_for_ids.len(), 2);\n    assert!(inherent_impl_for_ids.contains(&alpha_id));\n    assert!(inherent_impl_for_ids.contains(&beta_id));\n    assert!(inherent_impl_for_ids.iter().all(|id| *id != Id(UNRESOLVED_CRATE_ID)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(alpha.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "31efb3c5d7646d506c1ebcf69bdb397956354b9e755351b9663d2666a0d581fa",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(identity.as_str(), \"std::option::Option<T>\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "ffdf5a73d71a0b86bf211d3d2f1b01730d5c5a01efb570a700f51f13f1c1314e",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = canonical(\"Thing\", &rustdoc_paths, &[]).expect_err(\"name is ambiguous\");\n        let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {\n            panic!(\"expected ambiguous identifier\");\n        };\n        assert_eq!(identifier.as_str(), \"Thing\");\n        let candidates = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();\n        assert_eq!(candidates, vec![\"domain::a::Thing\", \"domain::b::Thing\"]); ... let error = canonical(\"external::Missing\", &rustdoc_paths, &[])\n            .expect_err(\"unresolved qualified path must fail closed\");\n        assert!(matches!(error, NewTypeGraphCodecError::UnresolvedIdentifier(_)));\n        assert!(error.to_string().contains(\"external::Missing\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "69bb3fcaafa976c784f98c65b8764f07c5f0ae4bb040e6af6c06f7cea622cf1b",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(identity.as_str(), \"std::option::Option<T>\"); ... assert_eq!(alpha.as_str(), \"domain::alpha::Shared\"); assert_eq!(beta.as_str(), \"domain::beta::Shared\"); assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\"); ... let error = canonical(\"Thing\", &rustdoc_paths, &[]).expect_err(\"name is ambiguous\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "ab73e7047ac8561c8ea5b317cd6290c8ae02112d4a3c1282ead31b39d21a0087",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = canonical(\"Thing\", &rustdoc_paths, &[]).expect_err(\"name is ambiguous\");\n        let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {\n            panic!(\"expected ambiguous identifier\");\n        };\n        assert_eq!(identifier.as_str(), \"Thing\");\n        let candidates = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();\n        assert_eq!(candidates, vec![\"domain::a::Thing\", \"domain::b::Thing\"]); ... let error = canonical(\"external::Missing\", &rustdoc_paths, &[])\n            .expect_err(\"unresolved qualified path must fail closed\");\n        assert!(matches!(error, NewTypeGraphCodecError::UnresolvedIdentifier(_)));\n        assert!(error.to_string().contains(\"external::Missing\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "b40140082798a221b551613fab8c059c19f25c0afc425b5e45d9bd9157d82299",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let identity =\n            canonical(\"Option<T>\", &rustdoc_paths, &[\"T\"]).expect(\"generic type resolves\");\n        assert_eq!(identity.as_str(), \"std::option::Option<T>\");\n\n        assert_eq!(alpha.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "595c02ffc43e10a5f1dcf2cde13c7fb50fa6e09f86050cc8552de1bdbd6f594c",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = canonical(\"Thing\", &rustdoc_paths, &[]).expect_err(\"name is ambiguous\");\n        let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {\n            panic!(\"expected ambiguous identifier\");\n        };\n        assert_eq!(identifier.as_str(), \"Thing\");\n        let candidates = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();\n        assert_eq!(candidates, vec![\"domain::a::Thing\", \"domain::b::Thing\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "a241c59822095d214c364a2065e9cc438916c7c0e8f1c663d946962c43936191",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = canonical(\"external::Missing\", &rustdoc_paths, &[])\n            .expect_err(\"unresolved qualified path must fail closed\");\n        assert!(matches!(error, NewTypeGraphCodecError::UnresolvedIdentifier(_)));\n        assert!(error.to_string().contains(\"external::Missing\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_generic_parameter_and_nested_generic_are_rewritten_together"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_unresolved_qualified_name_does_not_use_unrelated_path_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "2cdd8465a6b4287845ab1e4d7011f1372431cd3af76d6d0e9fe9cdf279a93cc7",
+        "bound_tests_set_hash": "c08d8d2bb8630131634e9ffb3c0db66bc5f74d29519528d2d27e691b32765ca3",
+        "declaration_hash": "1dd396f992222f4e1f4c16a55fe7ab4a27a5c57211e8927a511e9602848ecdf9"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(identity.as_str(), \"std::option::Option<T>\");\n\n        assert_eq!(alpha.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CanonicalTypeIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "69bb3fcaafa976c784f98c65b8764f07c5f0ae4bb040e6af6c06f7cea622cf1b",
+        "bound_tests_set_hash": "b86ceba09cbeae5b8a2039de6fb4aefd97bab34a8f35856db4ae8dbc75bbafe4",
+        "declaration_hash": "33a613897d52f29a68d3530d88e7c2525f97fa48e7c72a9b73f29f81c09bc558"
+      },
+      "obligation_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(alpha.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CanonicalTypeIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "b86ceba09cbeae5b8a2039de6fb4aefd97bab34a8f35856db4ae8dbc75bbafe4",
+        "declaration_hash": "eb1f376f959b4b1c321cc5f2e6d2462daef40a3bb22af13068dba42bd217a502"
+      },
+      "obligation_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(alpha.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_incrate_duplicate_names_remain_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CanonicalTypeIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "31efb3c5d7646d506c1ebcf69bdb397956354b9e755351b9663d2666a0d581fa",
+        "bound_tests_set_hash": "b86ceba09cbeae5b8a2039de6fb4aefd97bab34a8f35856db4ae8dbc75bbafe4",
+        "declaration_hash": "1baa84bd603657c0cd80f4e22e26b5a0fed7fb54231f7eaf8f45eeb995ca2b00"
+      },
+      "obligation_id": {
+        "entry_key": "CanonicalTypeIdentity",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(alpha, beta, \"fully qualified in-crate paths must remain distinct identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
           "test_name": "test_fully_qualified_item_path_orders_by_full_path"
@@ -31,7 +631,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(first < second);\nassert_eq!(path.to_string(), \"domain_core::user::input::Input\");",
+        "citation": "assert!(first < second); assert_eq!(path.to_string(), \"domain_core::user::input::Input\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -77,7 +677,425 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(version.value(), 0); ... assert_eq!(doc.schema_version().value(), 7); ... assert!(value[\"schema_version\"].is_number()); ... CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 0, expected: 5 }",
+        "citation": "assert_eq!(version.value(), 0); ... assert_eq!(value[\"schema_version\"].as_u64(), Some(u64::from(SCHEMA_VERSION))); assert!(value[\"schema_version\"].is_number()); ... assert_eq!(decoded.schema_version().value(), SCHEMA_VERSION); ... assert!(matches!(\n            err,\n            CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 0, expected: 5 }\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_same_short_name_in_different_modules_resolves_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueDocument"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "142cfdb695eb8f44b2fe32607bf21ac29afdccb8e9ff89d867767dba647ff5fb",
+        "declaration_hash": "d53d06bcc58aa0e92e0e60a3d7f3385d2c19062ec4fae77d102ee3afcb944a7f"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueDocument",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(field_type_ids, vec![alpha_id, beta_id]); ... assert_eq!(trait_impl_records.len(), 2, \"both trait_impls must remain distinct\"); ... assert_eq!(inherent_impl_for_ids.len(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueDocument"
+      },
+      "key": {
+        "anchor_text_hash": "a3cde6357866fdfff10d8b4c1390c3bae314145cdec3919a68f8373180469126",
+        "bound_tests_set_hash": "3577e57927e8edf80d1de05644cc40d949658bcc9dba2db2ae80ea49acf4f51c",
+        "declaration_hash": "dff482d51bb450240daf30a0e3ccac240226acc64a84d35fbfa58a0c6b866227"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueDocument",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(type_id, trait_id);\n\n    let identities =\n        crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(encoded.krate()).unwrap();\n    assert_eq!(identities.get(\"domain::alpha::SharedName\"), Some(&type_id));\n    assert_eq!(identities.get(\"domain::beta::SharedName\"), Some(&trait_id));\n    assert_eq!(identities.len(), 2, \"the evaluator must retain both full-path identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_unique_short_names_resolve_incrate_type_and_trait_refs_to_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_inherent_impl_unique_short_name_resolves_to_qualified_entry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_args"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueDocument"
+      },
+      "key": {
+        "anchor_text_hash": "b40140082798a221b551613fab8c059c19f25c0afc425b5e45d9bd9157d82299",
+        "bound_tests_set_hash": "99fb471c4cf6f9bb2b2dd1afe03ec783aaeaceb16a3e3809a6738619ee767a4e",
+        "declaration_hash": "6ddaa000ec236b70fe228d0913b93de4c061ad5d6a59ba4e9bb5cd70bb77fd6c"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueDocument",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(field_path.id, unique_type_id);\n    assert_eq!(encoded.krate().paths[&field_path.id].path, [\"domain\", \"alpha\", \"UniqueType\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "DeletionRecord"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "69f43fbfdb3c8a1c8e2b2bfadba0d39a625dc68c670e0fcb7db38551860690c0",
+        "declaration_hash": "dc9df25419968c50e7eff7aa019e088a2d49f866d757e0cd148a61f5793edecc"
+      },
+      "obligation_id": {
+        "entry_key": "DeletionRecord",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(type_deletion_keys, vec![\"alpha::GoneType\", \"beta::GoneType\"]); ... assert_eq!(trait_deletion_keys, vec![\"alpha::GoneTrait\", \"beta::GoneTrait\"]); ... assert_ne!(alpha_id, beta_id); ... assert_ne!(alpha_trait_id, beta_trait_id);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "DeletionRecord"
+      },
+      "key": {
+        "anchor_text_hash": "8a0bd8c691f7683dec9480847b1b325f8adcbc5d709075150f0bb3ccdef462c5",
+        "bound_tests_set_hash": "69f43fbfdb3c8a1c8e2b2bfadba0d39a625dc68c670e0fcb7db38551860690c0",
+        "declaration_hash": "9921fb8f6b35a2d36a77dc4872fb5e8319ef2fa0a72c9c027d3fa01cffbcc32e"
+      },
+      "obligation_id": {
+        "entry_key": "DeletionRecord",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(alpha_id, beta_id);\n    assert_ne!(alpha_trait_id, beta_trait_id);\n    assert_eq!(encoded.krate().paths[&alpha_id].path, [\"domain\", \"alpha\", \"GoneType\"]);\n    assert_eq!(encoded.krate().paths[&beta_id].path, [\"domain\", \"beta\", \"GoneType\"]);\n    assert_eq!(encoded.krate().paths[&alpha_trait_id].path, [\"domain\", \"alpha\", \"GoneTrait\"]);\n    assert_eq!(encoded.krate().paths[&beta_trait_id].path, [\"domain\", \"beta\", \"GoneTrait\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "InherentImplDeclV2"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "66aeb933ba396a903de59b7df7e0f0be0f7d3c1dc976c6afc434fedab596baf0"
+      },
+      "obligation_id": {
+        "entry_key": "InherentImplDeclV2",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(identities.get(\"domain::alpha::Port\"), Some(&alpha_port_id));\n    assert_eq!(identities.get(\"domain::beta::Port\"), Some(&beta_port_id));\n\n    assert_eq!(field_type_ids, vec![alpha_id, beta_id]);\n    assert!(field_type_ids.iter().all(|id| *id != Id(UNRESOLVED_CRATE_ID)));\n\n    assert_eq!(trait_impl_records.len(), 2, \"both trait_impls must remain distinct\");\n    assert!(trait_impl_records.contains(&(\n        \"domain::alpha::Port\".to_owned(),\n        alpha_port_id,\n        alpha_id,\n        alpha_id,\n    )));\n    assert!(trait_impl_records.contains(&(\n        \"domain::beta::Port\".to_owned(),\n        beta_port_id,\n        beta_id,\n        beta_id,\n    )));\n\n    assert_eq!(inherent_impl_for_ids.len(), 2);\n    assert!(inherent_impl_for_ids.contains(&alpha_id));\n    assert!(inherent_impl_for_ids.contains(&beta_id));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "InherentImplDeclV2"
+      },
+      "key": {
+        "anchor_text_hash": "2cdd8465a6b4287845ab1e4d7011f1372431cd3af76d6d0e9fe9cdf279a93cc7",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "d85e9bfefa6638f4ac68e31e1018053a065ddcf20478c7679fe499fd1ce9f761"
+      },
+      "obligation_id": {
+        "entry_key": "InherentImplDeclV2",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(inherent_impl_for_ids.len(), 2);\n    assert!(inherent_impl_for_ids.contains(&alpha_id));\n    assert!(inherent_impl_for_ids.contains(&beta_id));\n    assert!(inherent_impl_for_ids.iter().all(|id| *id != Id(UNRESOLVED_CRATE_ID)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "ffdf5a73d71a0b86bf211d3d2f1b01730d5c5a01efb570a700f51f13f1c1314e",
+        "bound_tests_set_hash": "6dcbdecef176f8617af470ee9ccab32644270fd0d3bd691101c19e169993a6dd",
+        "declaration_hash": "c73876904eefa7702770797f69055513bf3ee0839ce52a6e28b560e76ef80801"
+      },
+      "obligation_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        error,\n        domain::tddd::NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)\n            if type_ref.as_str() == \"DomainError\"\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "595c02ffc43e10a5f1dcf2cde13c7fb50fa6e09f86050cc8552de1bdbd6f594c",
+        "bound_tests_set_hash": "e334d2119965a0554c2e39fb9cc24414a22272f648028b12791197dad2e773c1",
+        "declaration_hash": "80192b10fb70f425e05d225ece74220b86cd00c105fd0acddc0b3fe4830d7d98"
+      },
+      "obligation_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = encode_doc(doc).unwrap_err();\n    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {\n        panic!(\"expected AmbiguousIdentifier, got {error:?}\");\n    };\n    assert_eq!(identifier.as_str(), \"Input\");\n    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();\n    assert_eq!(candidate_paths, vec![\"domain::a::Input\", \"domain::b::Input\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "a241c59822095d214c364a2065e9cc438916c7c0e8f1c663d946962c43936191",
+        "bound_tests_set_hash": "6dcbdecef176f8617af470ee9ccab32644270fd0d3bd691101c19e169993a6dd",
+        "declaration_hash": "063e08bb62afed042a11b3a3a0b03bba41834cb6fc7e66e5babb4adf580c3f40"
+      },
+      "obligation_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = encode_doc(doc).unwrap_err();\n    assert!(matches!(\n        error,\n        domain::tddd::NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)\n            if type_ref.as_str() == \"DomainError\"\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::traits::tests",
+          "test_name": "test_trait_ref_scope_workspace_for_each_member_crate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "TraitRefScope"
+      },
+      "key": {
+        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
+        "bound_tests_set_hash": "7643670e3f9cf4cb3cde2b445ceac15c444b81d9302118a212dc0d069196b5f6",
+        "declaration_hash": "d307ec24cfdfd5f0c0078d553347f9f6c52518247e4c234206160cfea2c5d2a8"
+      },
+      "obligation_id": {
+        "entry_key": "TraitRefScope",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n                decl.trait_ref_scope(),\n                TraitRefScope::Workspace(key) if key.as_str() == format!(\"{crate_id}::Bar\")\n            ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "TraitRefScope"
+      },
+      "key": {
+        "anchor_text_hash": "2cdd8465a6b4287845ab1e4d7011f1372431cd3af76d6d0e9fe9cdf279a93cc7",
+        "bound_tests_set_hash": "575949b6ff9cfff40c061dac0c5536d339824230a274217c11174b4de86a1725",
+        "declaration_hash": "b5506428cb7db36ba624111c2c29c63aeaf167452b2f6adf38b1c56eaa05b3bb"
+      },
+      "obligation_id": {
+        "entry_key": "TraitRefScope",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(field_type_ids, vec![alpha_id, beta_id]); ... assert!(trait_impl_records.contains(&(\"domain::alpha::Port\".to_owned(), alpha_port_id, alpha_id, alpha_id,))); ... assert!(trait_impl_records.contains(&(\"domain::beta::Port\".to_owned(), beta_port_id, beta_id, beta_id,))); ... assert!(inherent_impl_for_ids.contains(&alpha_id)); ... assert!(inherent_impl_for_ids.contains(&beta_id));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::traits::tests",
+          "test_name": "test_trait_ref_scope_preserves_qualified_same_name_paths"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "TraitRefScope"
+      },
+      "key": {
+        "anchor_text_hash": "8a0bd8c691f7683dec9480847b1b325f8adcbc5d709075150f0bb3ccdef462c5",
+        "bound_tests_set_hash": "cad80cc1139f73bf135ef7652b5d10e4ddcf6634c1f644724cb2c9c2a95bd0b8",
+        "declaration_hash": "957051bf50019c638a81ab9dd1b0629ca3362183510c9aed1c5f4eeb9a4df1dd"
+      },
+      "obligation_id": {
+        "entry_key": "TraitRefScope",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(alpha_key.as_str(), \"domain::alpha::Shared\");\n        assert_eq!(beta_key.as_str(), \"domain::beta::Shared\");\n        assert_ne!(alpha_key, beta_key, \"same short names must retain distinct qualified keys\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

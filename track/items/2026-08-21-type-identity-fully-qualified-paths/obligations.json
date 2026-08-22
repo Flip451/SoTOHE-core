@@ -1,4 +1,93 @@
 {
-  "obligations": [],
+  "obligations": [
+    {
+      "brief": "Author a contract test covering 'trait_method:encode' of CatalogueToExtendedCratePort",
+      "declaration_hash": "72ede2a6af4f1c5534a94cfc454037fc06ab005eb9077dd4a0d89cbfb54c021b",
+      "id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+      "declaration_hash": "9d2c1a8aed7e2f51e056f3f35ef06f9ed796750b969a45bad58662f2138bdd5d",
+      "id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
   "track_id": "2026-08-21-type-identity-fully-qualified-paths"
 }

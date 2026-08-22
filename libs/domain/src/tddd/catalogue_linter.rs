@@ -25,9 +25,9 @@
 //! `knowledge/adr/2026-04-14-1531-…` forbids serde inside `libs/domain`;
 //! codec / serde support lives in the infrastructure codec.
 
-use crate::tddd::catalogue_v2::identifiers::TypeRef;
+use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::identifiers::{TypeName, TypeRef};
 use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
-use crate::tddd::catalogue_v2::{CatalogueDocument, TypeKindV2};
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::primitive_occurrence_scanner::{
     PrimitiveName, PrimitiveOccurrencePosition, PrimitiveOccurrenceScanError,
@@ -393,6 +393,111 @@ pub enum CatalogueLinterRuleError {
 }
 
 // ---------------------------------------------------------------------------
+// CatalogueLintViolation — value object produced when a rule fires
+// ---------------------------------------------------------------------------
+
+/// A single violation produced when a catalogue linter rule fires against an
+/// entry.
+///
+/// All fields are private; read access is via accessor methods.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CatalogueLintViolation {
+    rule_kind: &'static str,
+    entry_name: String,
+    message: String,
+}
+
+impl CatalogueLintViolation {
+    /// Creates a new `CatalogueLintViolation`.
+    ///
+    /// `rule_kind` is the discriminant name from
+    /// [`CatalogueLinterRuleKind::discriminant_name`].
+    ///
+    /// All three parameters are required; no validation is performed because
+    /// violations are constructed only by a trusted linter implementation.
+    #[must_use]
+    pub fn new(
+        rule_kind: &'static str,
+        entry_name: impl Into<String>,
+        message: impl Into<String>,
+    ) -> Self {
+        Self { rule_kind, entry_name: entry_name.into(), message: message.into() }
+    }
+
+    /// Returns the discriminant name of the rule kind that generated this
+    /// violation.
+    #[must_use]
+    pub fn rule_kind(&self) -> &'static str {
+        self.rule_kind
+    }
+
+    /// Returns the catalogue entry name that triggered the violation.
+    #[must_use]
+    pub fn entry_name(&self) -> &str {
+        &self.entry_name
+    }
+
+    /// Returns the human-readable violation message.
+    #[must_use]
+    pub fn message(&self) -> &str {
+        &self.message
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CatalogueLinterError — error type for evaluate_catalogue_lint failures
+// ---------------------------------------------------------------------------
+
+/// Errors returned by [`evaluate_catalogue_lint`].
+#[derive(Debug, thiserror::Error)]
+pub enum CatalogueLinterError {
+    /// A type alias declares the same generic parameter name more than once.
+    ///
+    /// Generic parameter names form an ordered, unique declaration in Rust;
+    /// accepting duplicates would admit an invalid alias into the catalogue
+    /// and make downstream comparison ambiguous.
+    #[error("type alias '{alias_name}' declares duplicate generic parameter '{parameter_name}'")]
+    DuplicateTypeAliasGenericParameter {
+        /// Name of the alias containing the duplicate declaration.
+        alias_name: TypeName,
+        /// Name repeated by the alias declaration.
+        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
+    },
+
+    /// A type alias declares a generic parameter name that cannot be used as a
+    /// declaration in the catalogue's Rust-facing representation.
+    #[error("type alias '{alias_name}' declares invalid generic parameter '{parameter_name}'")]
+    InvalidTypeAliasGenericParameterName {
+        /// Name of the alias containing the invalid declaration.
+        alias_name: TypeName,
+        /// Name rejected at the alias declaration boundary.
+        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
+    },
+
+    /// A type alias declares generic parameters in both the kind payload and
+    /// the legacy entry-level payload.
+    #[error("type alias '{alias_name}' declares generic parameters in both alias payloads")]
+    ConflictingTypeAliasGenericParameters {
+        /// Name of the alias containing the conflicting declarations.
+        alias_name: TypeName,
+    },
+
+    /// The linter rule configuration is invalid and prevents execution.
+    #[error("invalid linter rule configuration: {0}")]
+    InvalidRuleConfig(FreeText),
+
+    /// The `all_catalogues` map does not contain an entry for the requested
+    /// `target_layer_id`.
+    #[error("unknown target layer '{layer_id}': not found in all_catalogues")]
+    UnknownLayer { layer_id: LayerId },
+
+    /// A [`crate::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner`]
+    /// call made while evaluating `ForbidPrimitiveInTypes` failed.
+    #[error(transparent)]
+    ScanFailed(#[from] PrimitiveOccurrenceScanError),
+}
+
+// ---------------------------------------------------------------------------
 // CatalogueLinterRule — value object
 // ---------------------------------------------------------------------------
 
@@ -508,111 +613,6 @@ impl CatalogueLinterRule {
 }
 
 // ---------------------------------------------------------------------------
-// CatalogueLintViolation — value object produced when a rule fires
-// ---------------------------------------------------------------------------
-
-/// A single violation produced when a catalogue linter rule fires against an
-/// entry.
-///
-/// All fields are private; read access is via accessor methods.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CatalogueLintViolation {
-    rule_kind: &'static str,
-    entry_name: String,
-    message: String,
-}
-
-impl CatalogueLintViolation {
-    /// Creates a new `CatalogueLintViolation`.
-    ///
-    /// `rule_kind` is the discriminant name from
-    /// [`CatalogueLinterRuleKind::discriminant_name`].
-    ///
-    /// All three parameters are required; no validation is performed because
-    /// violations are constructed only by a trusted linter implementation.
-    #[must_use]
-    pub fn new(
-        rule_kind: &'static str,
-        entry_name: impl Into<String>,
-        message: impl Into<String>,
-    ) -> Self {
-        Self { rule_kind, entry_name: entry_name.into(), message: message.into() }
-    }
-
-    /// Returns the discriminant name of the rule kind that generated this
-    /// violation.
-    #[must_use]
-    pub fn rule_kind(&self) -> &'static str {
-        self.rule_kind
-    }
-
-    /// Returns the catalogue entry name that triggered the violation.
-    #[must_use]
-    pub fn entry_name(&self) -> &str {
-        &self.entry_name
-    }
-
-    /// Returns the human-readable violation message.
-    #[must_use]
-    pub fn message(&self) -> &str {
-        &self.message
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CatalogueLinterError — error type for evaluate_catalogue_lint failures
-// ---------------------------------------------------------------------------
-
-/// Errors returned by [`evaluate_catalogue_lint`].
-#[derive(Debug, thiserror::Error)]
-pub enum CatalogueLinterError {
-    /// A type alias declares the same generic parameter name more than once.
-    ///
-    /// Generic parameter names form an ordered, unique declaration in Rust;
-    /// accepting duplicates would admit an invalid alias into the catalogue
-    /// and make downstream comparison ambiguous.
-    #[error("type alias '{alias_name}' declares duplicate generic parameter '{parameter_name}'")]
-    DuplicateTypeAliasGenericParameter {
-        /// Name of the alias containing the duplicate declaration.
-        alias_name: crate::tddd::catalogue_v2::identifiers::TypeName,
-        /// Name repeated by the alias declaration.
-        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
-    },
-
-    /// A type alias declares a generic parameter name that cannot be used as a
-    /// declaration in the catalogue's Rust-facing representation.
-    #[error("type alias '{alias_name}' declares invalid generic parameter '{parameter_name}'")]
-    InvalidTypeAliasGenericParameterName {
-        /// Name of the alias containing the invalid declaration.
-        alias_name: crate::tddd::catalogue_v2::identifiers::TypeName,
-        /// Name rejected at the alias declaration boundary.
-        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
-    },
-
-    /// A type alias declares generic parameters in both the kind payload and
-    /// the legacy entry-level payload.
-    #[error("type alias '{alias_name}' declares generic parameters in both alias payloads")]
-    ConflictingTypeAliasGenericParameters {
-        /// Name of the alias containing the conflicting declarations.
-        alias_name: crate::tddd::catalogue_v2::identifiers::TypeName,
-    },
-
-    /// The linter rule configuration is invalid and prevents execution.
-    #[error("invalid linter rule configuration: {0}")]
-    InvalidRuleConfig(FreeText),
-
-    /// The `all_catalogues` map does not contain an entry for the requested
-    /// `target_layer_id`.
-    #[error("unknown target layer '{layer_id}': not found in all_catalogues")]
-    UnknownLayer { layer_id: LayerId },
-
-    /// A [`crate::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner`]
-    /// call made while evaluating `ForbidPrimitiveInTypes` failed.
-    #[error(transparent)]
-    ScanFailed(#[from] PrimitiveOccurrenceScanError),
-}
-
-// ---------------------------------------------------------------------------
 // Internal helper functions and evaluation logic (split into submodules)
 // ---------------------------------------------------------------------------
 
@@ -628,53 +628,8 @@ mod eval_primitives;
 #[path = "catalogue_linter_eval_layer_signature.rs"]
 mod eval_layer_signature;
 
-fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScanner>(
-    catalogue: &CatalogueDocument,
-    scanner: &S,
-) -> Result<(), CatalogueLinterError> {
-    for (alias_name, entry) in catalogue.types() {
-        let TypeKindV2::TypeAlias { generics, .. } = entry.kind() else {
-            continue;
-        };
-        if !generics.is_empty() && !entry.generics().is_empty() {
-            return Err(CatalogueLinterError::ConflictingTypeAliasGenericParameters {
-                alias_name: alias_name.clone(),
-            });
-        }
-        let generics = if generics.is_empty() { entry.generics() } else { generics };
-
-        let mut seen = std::collections::BTreeSet::new();
-        for generic in generics {
-            if !is_valid_type_alias_generic_parameter_name(generic.name.as_str()) {
-                return Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
-                    alias_name: alias_name.clone(),
-                    parameter_name: generic.name.clone(),
-                });
-            }
-            if !seen.insert(generic.name.clone()) {
-                return Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {
-                    alias_name: alias_name.clone(),
-                    parameter_name: generic.name.clone(),
-                });
-            }
-
-            for bound in &generic.bounds {
-                let probe =
-                    PrimitiveName::new("__sotp_catalogue_lint_syntax_probe").map_err(|_| {
-                        CatalogueLinterError::InvalidRuleConfig(FreeText::new(
-                            "catalogue lint syntax probe is invalid",
-                        ))
-                    })?;
-                scanner.scan(
-                    bound.clone(),
-                    NonEmptyVec::new(probe, vec![]),
-                    PrimitiveOccurrencePosition::Bound,
-                )?;
-            }
-        }
-    }
-    Ok(())
-}
+#[path = "catalogue_linter_validation.rs"]
+mod validation;
 
 fn is_valid_type_alias_generic_parameter_name(name: &str) -> bool {
     generic::is_plain_generic_identifier(name)
@@ -693,7 +648,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
     scanner: &S,
 ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
     for catalogue in all_catalogues.values() {
-        validate_type_alias_generic_parameters(catalogue, scanner)?;
+        validation::validate_type_alias_generic_parameters(catalogue, scanner)?;
     }
     eval::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner)
 }
@@ -705,7 +660,7 @@ mod tests {
     use crate::tddd::catalogue_v2::roles::{FunctionRole, NonEmptyVec};
     use crate::tddd::layer_id::LayerId;
     use crate::tddd::primitive_occurrence_scanner::{
-        PrimitiveOccurrenceReport, PrimitiveOccurrenceScanner,
+        PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError, PrimitiveOccurrenceScanner,
     };
 
     fn layer(name: &str) -> LayerId {
@@ -997,7 +952,7 @@ mod tests {
     fn test_composition_root_pure_di_happy_path_allows_primary_adapter_accessor() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![
@@ -1008,7 +963,7 @@ mod tests {
         );
         let mut driver_catalogue = make_doc("cli_driver");
         driver_catalogue.insert_type(
-            TypeName::new("GreetingDriver").unwrap(),
+            CatalogueEntryKey::try_new("GreetingDriver".to_owned()).unwrap(),
             make_type_entry(DataRole::PrimaryAdapter),
         );
         let mut all_catalogues = std::collections::BTreeMap::new();
@@ -1036,7 +991,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_execution_method() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method_with_params(
@@ -1072,7 +1027,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_prohibited_public_role_exposure() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method_shared_ref_no_params("username", "domain::Username")],
@@ -1080,7 +1035,7 @@ mod tests {
         );
         let mut domain_catalogue = make_doc("domain");
         domain_catalogue.insert_type(
-            TypeName::new("Username").unwrap(),
+            CatalogueEntryKey::try_new("Username".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()),
         );
         let mut all_catalogues = std::collections::BTreeMap::new();
@@ -1110,7 +1065,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_prohibited_public_field_exposure() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::CompositionRoot,
                 plain_struct_kind(vec![field_decl("interactor", "usecase::GreetUser")]),
@@ -1118,7 +1073,7 @@ mod tests {
         );
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_type(
-            TypeName::new("GreetUser").unwrap(),
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
             make_type_entry(DataRole::Interactor),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1155,21 +1110,21 @@ mod tests {
             operator: BoundOp::Bound,
         }];
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::CompositionRoot, vec![accessor]),
         );
         let mut driver_catalogue = make_doc("cli_driver");
         driver_catalogue.insert_type(
-            TypeName::new("GreetingDriver").unwrap(),
+            CatalogueEntryKey::try_new("GreetingDriver".to_owned()).unwrap(),
             make_type_entry(DataRole::PrimaryAdapter),
         );
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_type(
-            TypeName::new("GreetUser").unwrap(),
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
             make_type_entry(DataRole::Interactor),
         );
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry(ContractRole::ApplicationService),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1200,7 +1155,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_execution_methods_from_trait_impls() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
@@ -1209,7 +1164,7 @@ mod tests {
         ));
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry_with_methods(
                 ContractRole::ApplicationService,
                 vec![method_with_params(
@@ -1242,7 +1197,7 @@ mod tests {
     fn test_composition_root_pure_di_allows_fallible_local_wiring_apis() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![
@@ -1255,12 +1210,12 @@ mod tests {
             ),
         );
         composition_catalogue.insert_type(
-            TypeName::new("CompositionError").unwrap(),
+            CatalogueEntryKey::try_new("CompositionError".to_owned()).unwrap(),
             make_type_entry(DataRole::ErrorType),
         );
         let mut driver_catalogue = make_doc("cli_driver");
         driver_catalogue.insert_type(
-            TypeName::new("GreetingDriver").unwrap(),
+            CatalogueEntryKey::try_new("GreetingDriver".to_owned()).unwrap(),
             make_type_entry(DataRole::PrimaryAdapter),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1283,7 +1238,7 @@ mod tests {
     fn test_composition_root_pure_di_allows_constructor_wiring_inputs() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method_with_params("new", None, vec![("workspace", "PathBuf")], "Self")],
@@ -1307,7 +1262,7 @@ mod tests {
     fn test_composition_root_pure_di_allows_named_construction_factories() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method_with_params(
@@ -1319,7 +1274,7 @@ mod tests {
             ),
         );
         composition_catalogue.insert_type(
-            TypeName::new("CompositionError").unwrap(),
+            CatalogueEntryKey::try_new("CompositionError".to_owned()).unwrap(),
             make_type_entry(DataRole::ErrorType),
         );
         let all_catalogues = all_catalogues_single(&composition_catalogue);
@@ -1340,7 +1295,7 @@ mod tests {
     fn test_composition_root_pure_di_allows_known_non_execution_trait_impls() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         for trait_ref in [
@@ -1375,7 +1330,7 @@ mod tests {
     fn test_composition_root_pure_di_allows_primary_adapter_builder_inputs() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::CompositionRoot,
                 vec![method_with_params(
@@ -1388,7 +1343,7 @@ mod tests {
         );
         let mut driver_catalogue = make_doc("cli_driver");
         driver_catalogue.insert_type(
-            TypeName::new("GreetingDriver").unwrap(),
+            CatalogueEntryKey::try_new("GreetingDriver".to_owned()).unwrap(),
             make_type_entry(DataRole::PrimaryAdapter),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1411,7 +1366,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_roles_in_type_and_impl_bounds() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::CompositionRoot,
@@ -1429,7 +1384,7 @@ mod tests {
             ),
         );
         composition_catalogue.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_name: CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![WherePredicateDecl {
                 lhs: TypeRef::new("T").unwrap(),
@@ -1440,11 +1395,11 @@ mod tests {
         });
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_type(
-            TypeName::new("GreetUser").unwrap(),
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
             make_type_entry(DataRole::Interactor),
         );
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry(ContractRole::ApplicationService),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1474,7 +1429,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_roles_in_enum_and_alias_shapes() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("EnumCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("EnumCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::CompositionRoot,
                 TypeKindV2::Enum {
@@ -1486,7 +1441,7 @@ mod tests {
             ),
         );
         composition_catalogue.insert_type(
-            TypeName::new("AliasCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("AliasCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::CompositionRoot,
                 TypeKindV2::TypeAlias {
@@ -1497,7 +1452,7 @@ mod tests {
         );
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_type(
-            TypeName::new("GreetUser").unwrap(),
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
             make_type_entry(DataRole::Interactor),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1529,7 +1484,7 @@ mod tests {
     fn test_composition_root_pure_di_detects_role_in_type_alias_generic_bound() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("AliasCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("AliasCompositionRoot".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::CompositionRoot,
                 TypeKindV2::TypeAlias {
@@ -1543,7 +1498,7 @@ mod tests {
         );
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry(ContractRole::ApplicationService),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -1568,7 +1523,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("PairAlias").unwrap(),
+            CatalogueEntryKey::try_new("PairAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1599,7 +1554,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_bound_only_type_alias_generic_parameter_is_accepted() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("MaybeSizedAlias").unwrap(),
+            CatalogueEntryKey::try_new("MaybeSizedAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1627,7 +1582,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("LegacyAlias").unwrap(),
+            CatalogueEntryKey::try_new("LegacyAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
@@ -1647,7 +1602,7 @@ mod tests {
         for malformed_bound in ["<T>", " ", "!!!", "T +", "Vec<", "A::"] {
             let mut catalogue = make_doc("domain");
             catalogue.insert_type(
-                TypeName::new("MalformedAlias").unwrap(),
+                CatalogueEntryKey::try_new("MalformedAlias".to_owned()).unwrap(),
                 make_type_entry_with_kind(
                     DataRole::value_object(),
                     TypeKindV2::TypeAlias {
@@ -1687,7 +1642,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("BlankBoundAlias").unwrap(),
+            CatalogueEntryKey::try_new("BlankBoundAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1721,7 +1676,7 @@ mod tests {
         let target_catalogue = make_doc("domain");
         let mut invalid_catalogue = make_doc("usecase");
         invalid_catalogue.insert_type(
-            TypeName::new("DuplicateAlias").unwrap(),
+            CatalogueEntryKey::try_new("DuplicateAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1750,10 +1705,41 @@ mod tests {
     }
 
     #[test]
+    fn test_evaluate_catalogue_lint_derives_validated_display_name_for_qualified_alias_key() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::models::Order".to_owned()).unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Box<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("type").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
+                alias_name,
+                parameter_name,
+            }) if alias_name.as_str() == "Order" && parameter_name.as_str() == "type"
+        ));
+    }
+
+    #[test]
     fn test_evaluate_catalogue_lint_rejects_duplicate_legacy_type_alias_generic_parameter() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("LegacyDuplicateAlias").unwrap(),
+            CatalogueEntryKey::try_new("LegacyDuplicateAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1789,7 +1775,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("ConflictingAlias").unwrap(),
+            CatalogueEntryKey::try_new("ConflictingAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1826,7 +1812,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("KeywordAlias").unwrap(),
+            CatalogueEntryKey::try_new("KeywordAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1878,7 +1864,7 @@ mod tests {
         ] {
             let mut catalogue = make_doc("domain");
             catalogue.insert_type(
-                TypeName::new("ReservedAlias").unwrap(),
+                CatalogueEntryKey::try_new("ReservedAlias".to_owned()).unwrap(),
                 make_type_entry_with_kind(
                     DataRole::value_object(),
                     TypeKindV2::TypeAlias {
@@ -1910,7 +1896,7 @@ mod tests {
     fn test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
-            TypeName::new("WildcardAlias").unwrap(),
+            CatalogueEntryKey::try_new("WildcardAlias".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -1941,7 +1927,7 @@ mod tests {
     fn test_composition_root_pure_di_checks_reference_trait_impl_method_surface() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         composition_catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
@@ -1953,7 +1939,7 @@ mod tests {
         ));
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             TraitEntry::new(
                 ItemAction::Reference,
                 ContractRole::ApplicationService,
@@ -1996,7 +1982,7 @@ mod tests {
     fn test_composition_root_pure_di_checks_trait_impl_declaration_surface() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         composition_catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
@@ -2011,11 +1997,11 @@ mod tests {
         ));
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_type(
-            TypeName::new("GreetUser").unwrap(),
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
             make_type_entry(DataRole::Interactor),
         );
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry(ContractRole::ApplicationService),
         );
         let mut all_catalogues = BTreeMap::new();
@@ -2045,7 +2031,7 @@ mod tests {
     fn test_composition_root_pure_di_rejects_unresolved_trait_impl_surface() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
@@ -2072,7 +2058,7 @@ mod tests {
     fn test_composition_root_pure_di_ignores_trait_impls_for_wrapper_types() {
         let mut composition_catalogue = make_doc("cli_composition");
         composition_catalogue.insert_type(
-            TypeName::new("GreetingCompositionRoot").unwrap(),
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
         );
         composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
@@ -2081,7 +2067,7 @@ mod tests {
         ));
         let mut usecase_catalogue = make_doc("usecase");
         usecase_catalogue.insert_trait(
-            TraitName::new("ApplicationService").unwrap(),
+            CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry_with_methods(
                 ContractRole::ApplicationService,
                 vec![method_with_params(
@@ -2260,7 +2246,7 @@ mod tests {
         // rather than silently treating every Entity as a violation (D19 fail-closed).
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyEntity").unwrap(),
+            CatalogueEntryKey::try_new("MyEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::entity().unwrap()),
         );
         let rule = CatalogueLinterRule::new(
@@ -2289,7 +2275,7 @@ mod tests {
         // evaluator must return InvalidRuleConfig (D19 fail-closed).
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyUseCase").unwrap(),
+            CatalogueEntryKey::try_new("MyUseCase".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase { handles: vec![] }),
         );
         let rule = CatalogueLinterRule::new(
@@ -2317,7 +2303,7 @@ mod tests {
         // be false positives if those entries were present.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyService").unwrap(),
+            CatalogueEntryKey::try_new("MyService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
             }),
@@ -2346,7 +2332,7 @@ mod tests {
         // accepted because roles that never carry "emits" would silently pass.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyService").unwrap(),
+            CatalogueEntryKey::try_new("MyService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
         let rule = CatalogueLinterRule::new(
@@ -2501,7 +2487,7 @@ mod tests {
     };
     use crate::tddd::catalogue_v2::identifiers::{
         CrateName, FieldName, FunctionName, FunctionPath, InvariantName, MethodName, ModulePath,
-        ParamName, TraitName, TypeName, TypeRef, VariantName,
+        ParamName, TypeRef, VariantName,
     };
     use crate::tddd::catalogue_v2::methods::{
         BoundOp, MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
@@ -2512,6 +2498,7 @@ mod tests {
     };
     use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use crate::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
+    use crate::tddd::semantic_verify::CatalogueEntryKey;
 
     fn make_doc(layer_name: &str) -> CatalogueDocument {
         CatalogueDocument::new(
@@ -2721,11 +2708,11 @@ mod tests {
         let rule_kind = kind.discriminant_name();
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -2761,7 +2748,7 @@ mod tests {
         // DomainService with emits: [] → FieldEmpty "emits" → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyService").unwrap(),
+            CatalogueEntryKey::try_new("MyService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
         let violations = run_rule(
@@ -2777,7 +2764,7 @@ mod tests {
         // DomainService with emits: ["OrderPlaced"] → FieldEmpty "emits" → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyService").unwrap(),
+            CatalogueEntryKey::try_new("MyService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
             }),
@@ -2799,7 +2786,7 @@ mod tests {
         // target would otherwise iterate no entries and return success.
         let mut doc = make_doc("domain");
         doc.insert_trait(
-            TraitName::new("OrderRepo").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepo".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
             }),
@@ -2834,7 +2821,7 @@ mod tests {
         // UseCase with handles: ["OrderCommand"] → FieldNonEmpty "handles" → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyUseCase").unwrap(),
+            CatalogueEntryKey::try_new("MyUseCase".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderCommand").unwrap()],
             }),
@@ -2852,7 +2839,7 @@ mod tests {
         // UseCase with handles: [] → FieldNonEmpty "handles" → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyUseCase").unwrap(),
+            CatalogueEntryKey::try_new("MyUseCase".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase { handles: vec![] }),
         );
         let violations = run_rule(
@@ -2872,7 +2859,7 @@ mod tests {
         // target would otherwise iterate no entries and return success.
         let mut doc = make_doc("domain");
         doc.insert_trait(
-            TraitName::new("OrderRepo").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepo".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
             }),
@@ -2907,7 +2894,7 @@ mod tests {
         // EventPolicy in domain layer → permitted_layers: [domain] → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyEventPolicy").unwrap(),
+            CatalogueEntryKey::try_new("MyEventPolicy".to_owned()).unwrap(),
             make_type_entry(DataRole::EventPolicy {
                 reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
             }),
@@ -2928,7 +2915,7 @@ mod tests {
         for disallowed_layer in ["usecase", "infrastructure"] {
             let mut doc = make_doc(disallowed_layer);
             doc.insert_type(
-                TypeName::new("MyEventPolicy").unwrap(),
+                CatalogueEntryKey::try_new("MyEventPolicy".to_owned()).unwrap(),
                 make_type_entry(DataRole::EventPolicy {
                     reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
                 }),
@@ -2990,11 +2977,11 @@ mod tests {
         // AggregateRoot emits→["OrderPlaced"] where OrderPlaced is DomainEvent → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainEvent),
         );
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3019,14 +3006,14 @@ mod tests {
         // AggregateRoot emits→["OrderEntity"] where OrderEntity is Entity (not DomainEvent) → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3064,7 +3051,7 @@ mod tests {
         // Add a Repository trait entry so the rule has at least one candidate entry
         // to iterate if the pre-check were absent.
         doc.insert_trait(
-            TraitName::new("OrderRepo").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepo".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
             }),
@@ -3098,7 +3085,7 @@ mod tests {
         // ValueObject with PartialEq + Eq in trait_impls → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()),
         );
         doc.push_trait_impl(TraitImplDeclV2::new(
@@ -3127,7 +3114,7 @@ mod tests {
         // ValueObject with only PartialEq (missing Eq) → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()),
         );
         doc.push_trait_impl(TraitImplDeclV2::new(
@@ -3159,7 +3146,7 @@ mod tests {
         // ValueObject method returns "String" (not Entity) → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_shared_ref_no_params("as_str", "String")],
@@ -3183,14 +3170,14 @@ mod tests {
         // ValueObject method returns "OrderEntity" which is Entity → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_shared_ref_no_params("entity_ref", "OrderEntity")],
@@ -3213,13 +3200,19 @@ mod tests {
     fn test_primary_adapter_signature_allows_usecase_boundary_contracts() {
         let mut doc = make_doc("cli_driver");
         doc.insert_type(
-            TypeName::new("CreateCommand").unwrap(),
+            CatalogueEntryKey::try_new("CreateCommand".to_owned()).unwrap(),
             make_type_entry(DataRole::Command),
         );
-        doc.insert_type(TypeName::new("LookupQuery").unwrap(), make_type_entry(DataRole::Query));
-        doc.insert_type(TypeName::new("CreateResponse").unwrap(), make_type_entry(DataRole::Dto));
         doc.insert_type(
-            TypeName::new("CreateDriver").unwrap(),
+            CatalogueEntryKey::try_new("LookupQuery".to_owned()).unwrap(),
+            make_type_entry(DataRole::Query),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("CreateResponse".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("CreateDriver".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::PrimaryAdapter,
                 vec![method_with_params(
@@ -3254,14 +3247,14 @@ mod tests {
     fn test_primary_adapter_signature_rejects_entity_and_aggregate_root_exposure() {
         let mut doc = make_doc("cli_driver");
         doc.insert_type(
-            TypeName::new("Order").unwrap(),
+            CatalogueEntryKey::try_new("Order".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("Orders").unwrap(),
+            CatalogueEntryKey::try_new("Orders".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3271,7 +3264,7 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("OrderDriver").unwrap(),
+            CatalogueEntryKey::try_new("OrderDriver".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::PrimaryAdapter,
                 vec![method_with_params(
@@ -3318,7 +3311,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3348,7 +3341,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3381,7 +3374,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3422,7 +3415,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3455,7 +3448,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3482,7 +3475,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3512,7 +3505,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(CatalogueEntryKey::try_new("Order".to_owned()).unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -3534,7 +3527,7 @@ mod tests {
         // Two AggregateRoots with disjoint exclusive_members → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("AggA").unwrap(),
+            CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3544,7 +3537,7 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("AggB").unwrap(),
+            CatalogueEntryKey::try_new("AggB".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3571,7 +3564,7 @@ mod tests {
         // Two AggregateRoots sharing "EntityA" → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("AggA").unwrap(),
+            CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3581,7 +3574,7 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("AggB").unwrap(),
+            CatalogueEntryKey::try_new("AggB".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3636,7 +3629,7 @@ mod tests {
         // silently seeing an empty refs slice.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3680,7 +3673,7 @@ mod tests {
         // RuleTarget::all_roles includes roles that do not carry exclusive_members.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
 
@@ -3718,7 +3711,7 @@ mod tests {
         // AggA with exclusive_member EntityA; no other type references EntityA in methods → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("AggA").unwrap(),
+            CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3728,7 +3721,7 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("EntityA").unwrap(),
+            CatalogueEntryKey::try_new("EntityA".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
                 vec![method_shared_ref_no_params("id", "EntityAId")],
@@ -3736,7 +3729,7 @@ mod tests {
         );
         // EntityA method returns "EntityAId" — not a reference to EntityA → pass
         doc.insert_type(
-            TypeName::new("AnotherService").unwrap(),
+            CatalogueEntryKey::try_new("AnotherService".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainService { emits: vec![] },
                 vec![method_shared_ref_no_params("do_work", "String")],
@@ -3760,7 +3753,7 @@ mod tests {
         // AggA exclusive_member EntityA; ExternalService has method referencing EntityA → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("AggA").unwrap(),
+            CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3770,7 +3763,7 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("EntityA").unwrap(),
+            CatalogueEntryKey::try_new("EntityA".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3778,7 +3771,7 @@ mod tests {
         );
         // ExternalService references EntityA in its method signature (violation of boundary)
         doc.insert_type(
-            TypeName::new("ExternalService").unwrap(),
+            CatalogueEntryKey::try_new("ExternalService".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainService { emits: vec![] },
                 vec![method_shared_ref_no_params("illegal_ref", "EntityA")],
@@ -3808,7 +3801,7 @@ mod tests {
         // its inherent impl references EntityA. The rule must scan both method sources.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("AggA").unwrap(),
+            CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3818,18 +3811,18 @@ mod tests {
             }),
         );
         doc.insert_type(
-            TypeName::new("EntityA").unwrap(),
+            CatalogueEntryKey::try_new("EntityA".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("ExternalService").unwrap(),
+            CatalogueEntryKey::try_new("ExternalService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("ExternalService").unwrap(),
+            type_name: CatalogueEntryKey::try_new("ExternalService".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_shared_ref_no_params("illegal_ref", "EntityA")],
@@ -3861,7 +3854,7 @@ mod tests {
         // silently building an empty aggregate boundary set.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -3908,7 +3901,7 @@ mod tests {
         // DomainEvent with Unit struct → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_kind(DataRole::DomainEvent, unit_struct_kind()),
         );
         let violations = run_rule(
@@ -3925,7 +3918,7 @@ mod tests {
         let mut doc = make_doc("domain");
         let kind = plain_struct_kind(vec![field_decl("order_id", "OrderId")]);
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_kind(DataRole::DomainEvent, kind),
         );
         let violations = run_rule(
@@ -4186,7 +4179,7 @@ mod tests {
             method_shared_ref_no_params("signature_string", "String"),
         ];
         domain_doc.insert_type(
-            TypeName::new("MethodDeclaration").unwrap(),
+            CatalogueEntryKey::try_new("MethodDeclaration".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Modify,
                 DataRole::value_object(),
@@ -4217,11 +4210,13 @@ mod tests {
             ));
         }
 
-        let method_entry =
-            match domain_doc.types().get(&TypeName::new("MethodDeclaration").unwrap()) {
-                Some(entry) => entry,
-                None => panic!("active catalogue fixture must contain MethodDeclaration"),
-            };
+        let method_entry = match domain_doc
+            .types()
+            .get(&CatalogueEntryKey::try_new("MethodDeclaration".to_owned()).unwrap())
+        {
+            Some(entry) => entry,
+            None => panic!("active catalogue fixture must contain MethodDeclaration"),
+        };
         assert_eq!(method_entry.action(), ItemAction::Modify);
         assert_eq!(method_entry.methods().len(), 14);
 
@@ -4250,7 +4245,7 @@ mod tests {
         // invalid entry and require each selected rule to report its sentinel.
         let mut sentinel_doc = make_doc("domain");
         sentinel_doc.insert_type(
-            TypeName::new("MethodDeclaration").unwrap(),
+            CatalogueEntryKey::try_new("MethodDeclaration".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Modify,
                 DataRole::value_object(),
@@ -4373,7 +4368,7 @@ mod tests {
         // DomainEvent with &self method → ForbiddenMethodReceiver "&mut self" → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_shared_ref_no_params("event_id", "EventId")],
@@ -4394,7 +4389,7 @@ mod tests {
         // DomainEvent with &mut self method → ForbiddenMethodReceiver "&mut self" → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_exclusive_ref_no_params("mutate", "()")],
@@ -4428,19 +4423,19 @@ mod tests {
         // The rule must detect the violation sourced from the inherent impl.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()), // methods: vec![]
         );
         // The method lives in an inherent impl, not in TypeEntry::methods.
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Money").unwrap(),
+            type_name: CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_with_params(
@@ -4477,12 +4472,12 @@ mod tests {
         // The ForbiddenMethodReceiver rule must detect the violation from the impl block.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainEvent), // methods: vec![]
         );
         // The &mut self method lives in an inherent impl, not in TypeEntry::methods.
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("OrderPlaced").unwrap(),
+            type_name: CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
@@ -4516,14 +4511,14 @@ mod tests {
         // duplicate source representations must not double-report one Rust method.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_exclusive_ref_no_params("set_payload", "()")],
             ),
         );
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("OrderPlaced").unwrap(),
+            type_name: CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
@@ -4549,14 +4544,14 @@ mod tests {
         // for the same Rust method in `inherent_impls`.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_shared_ref_no_params("set_payload", "()")],
             ),
         );
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("OrderPlaced").unwrap(),
+            type_name: CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![method_exclusive_ref_no_params("set_payload", "()")],
@@ -4592,7 +4587,7 @@ mod tests {
         // Entity without PartialEq/Eq trait_impls → 2 violations
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -4623,7 +4618,7 @@ mod tests {
         // AggregateRoot with PartialEq + Eq → no violations
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
         doc.push_trait_impl(TraitImplDeclV2::new(
@@ -4659,9 +4654,12 @@ mod tests {
     fn test_ac16_aggregate_boundary_exclusive_members_must_be_entities() {
         // AggregateRoot exclusive_member is a ValueObject (not Entity) → 1 violation
         let mut doc = make_doc("domain");
-        doc.insert_type(TypeName::new("Price").unwrap(), make_type_entry(DataRole::value_object()));
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("Price".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -4688,14 +4686,14 @@ mod tests {
         // AggregateRoot shared_value_objects includes Entity → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderLine").unwrap(),
+            CatalogueEntryKey::try_new("OrderLine".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -4725,14 +4723,14 @@ mod tests {
         // ValueObject method param is an Entity → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_with_params(
@@ -4775,11 +4773,11 @@ mod tests {
         // Repository TraitEntry with aggregate → AggregateRoot: no violation.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
         doc.insert_trait(
-            TraitName::new("OrderRepository").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepository".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
             }),
@@ -4800,14 +4798,14 @@ mod tests {
         // Repository TraitEntry with aggregate → Entity (wrong role): 1 violation.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderItem").unwrap(),
+            CatalogueEntryKey::try_new("OrderItem".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
         doc.insert_trait(
-            TraitName::new("OrderItemRepository").unwrap(),
+            CatalogueEntryKey::try_new("OrderItemRepository".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderItem").unwrap(),
             }),
@@ -4846,11 +4844,11 @@ mod tests {
         // EventPolicy reacts_to references a UseCase (wrong role) → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("PlaceOrderUseCase").unwrap(),
+            CatalogueEntryKey::try_new("PlaceOrderUseCase".to_owned()).unwrap(),
             make_type_entry(DataRole::use_case()),
         );
         doc.insert_type(
-            TypeName::new("OrderPolicy").unwrap(),
+            CatalogueEntryKey::try_new("OrderPolicy".to_owned()).unwrap(),
             make_type_entry(DataRole::EventPolicy {
                 reacts_to: NonEmptyVec::new(TypeRef::new("PlaceOrderUseCase").unwrap(), vec![]),
             }),
@@ -4880,7 +4878,7 @@ mod tests {
         // EventPolicy with &mut self method → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPolicy").unwrap(),
+            CatalogueEntryKey::try_new("OrderPolicy".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::EventPolicy {
                     reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
@@ -4904,13 +4902,13 @@ mod tests {
         // EventPolicy method param is a Repository role (TraitEntry) → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_trait(
-            TraitName::new("OrderRepo").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepo".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
             }),
         );
         doc.insert_type(
-            TypeName::new("OrderPolicy").unwrap(),
+            CatalogueEntryKey::try_new("OrderPolicy".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::EventPolicy {
                     reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
@@ -4947,7 +4945,7 @@ mod tests {
         // ValueObject with &mut self method → 1 violation
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_exclusive_ref_no_params("set_amount", "()")],
@@ -4970,7 +4968,7 @@ mod tests {
         let mut doc = make_doc("domain");
         let kind = plain_struct_kind(vec![field_decl("amount", "i64")]);
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(DataRole::value_object(), kind),
         );
         let violations = run_rule(
@@ -4986,7 +4984,10 @@ mod tests {
     fn test_ac20_value_object_equality_trait_required() {
         // ValueObject without PartialEq → 1 violation
         let mut doc = make_doc("domain");
-        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::ValueObject]),
@@ -5017,7 +5018,7 @@ mod tests {
 
         let mut domain_doc = make_doc("domain");
         domain_doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainEvent),
         );
 
@@ -5027,7 +5028,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("PlaceOrder").unwrap(),
+            CatalogueEntryKey::try_new("PlaceOrder".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
             }),
@@ -5078,11 +5079,11 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()),
         );
         usecase_doc.insert_type(
-            TypeName::new("PlaceOrder").unwrap(),
+            CatalogueEntryKey::try_new("PlaceOrder".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderPlaced").unwrap()],
             }),
@@ -5123,7 +5124,8 @@ mod tests {
 
         let mut domain_doc = make_doc("domain");
         domain_doc.insert_trait(
-            crate::tddd::catalogue_v2::identifiers::TraitName::new("OrderRepo").unwrap(),
+            crate::tddd::semantic_verify::CatalogueEntryKey::try_new("OrderRepo".to_owned())
+                .unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
             }),
@@ -5135,7 +5137,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("MyDto").unwrap(),
+            CatalogueEntryKey::try_new("MyDto".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_with_params(
@@ -5182,8 +5184,10 @@ mod tests {
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
-        infrastructure_doc
-            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+        infrastructure_doc.insert_type(
+            CatalogueEntryKey::try_new("StoredOrderDto".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
 
         let mut driver_doc = CatalogueDocument::new(
             crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
@@ -5191,7 +5195,7 @@ mod tests {
             driver_layer.clone(),
         );
         driver_doc.insert_type(
-            TypeName::new("OrderDriver").unwrap(),
+            CatalogueEntryKey::try_new("OrderDriver".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::PrimaryAdapter,
                 vec![method_with_params(
@@ -5233,8 +5237,10 @@ mod tests {
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
-        infrastructure_doc
-            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+        infrastructure_doc.insert_type(
+            CatalogueEntryKey::try_new("StoredOrderDto".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
 
         let mut usecase_doc = CatalogueDocument::new(
             crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
@@ -5242,7 +5248,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_trait(
-            TraitName::new("OrderService").unwrap(),
+            CatalogueEntryKey::try_new("OrderService".to_owned()).unwrap(),
             make_trait_entry_with_methods(
                 ContractRole::ApplicationService,
                 vec![method_with_params(
@@ -5284,8 +5290,10 @@ mod tests {
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
-        infrastructure_doc
-            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+        infrastructure_doc.insert_type(
+            CatalogueEntryKey::try_new("StoredOrderDto".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
 
         let mut driver_doc = CatalogueDocument::new(
             crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
@@ -5293,7 +5301,7 @@ mod tests {
             driver_layer.clone(),
         );
         driver_doc.insert_type(
-            TypeName::new("OrderDriver").unwrap(),
+            CatalogueEntryKey::try_new("OrderDriver".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::PrimaryAdapter,
                 vec![
@@ -5343,17 +5351,22 @@ mod tests {
             CrateName::new("infrastructure").unwrap(),
             infrastructure_layer.clone(),
         );
-        infrastructure_doc
-            .insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
+        infrastructure_doc.insert_type(
+            CatalogueEntryKey::try_new("SharedDto".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
 
         let mut driver_doc = CatalogueDocument::new(
             crate::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
             CrateName::new("cli_driver").unwrap(),
             driver_layer.clone(),
         );
-        driver_doc.insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
         driver_doc.insert_type(
-            TypeName::new("OrderDriver").unwrap(),
+            CatalogueEntryKey::try_new("SharedDto".to_owned()).unwrap(),
+            make_type_entry(DataRole::Dto),
+        );
+        driver_doc.insert_type(
+            CatalogueEntryKey::try_new("OrderDriver".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::PrimaryAdapter,
                 vec![
@@ -5461,7 +5474,10 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.insert_type(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
+        domain_doc.insert_type(
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
+            deleted_entry,
+        );
 
         // usecase layer: PlaceOrder.handles references "domain::OrderPlaced"
         let mut usecase_doc = CatalogueDocument::new(
@@ -5470,7 +5486,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("PlaceOrder").unwrap(),
+            CatalogueEntryKey::try_new("PlaceOrder".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
             }),
@@ -5533,7 +5549,10 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.insert_trait(TraitName::new("OrderRepo").unwrap(), deleted_trait);
+        domain_doc.insert_trait(
+            CatalogueEntryKey::try_new("OrderRepo".to_owned()).unwrap(),
+            deleted_trait,
+        );
 
         // usecase layer: MyDto method param uses the qualified form "domain::OrderRepo"
         // so that sig_type_contains_entry resolves via Rule 1 (qualified layer match)
@@ -5545,7 +5564,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("MyDto").unwrap(),
+            CatalogueEntryKey::try_new("MyDto".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_with_params(
@@ -5609,7 +5628,10 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.insert_type(TypeName::new("OrderPlaced").unwrap(), deleted_type);
+        domain_doc.insert_type(
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
+            deleted_type,
+        );
 
         // usecase layer: MyUseCase method return type uses the qualified form
         // "domain::OrderPlaced" so that sig_type_contains_entry resolves via
@@ -5621,7 +5643,7 @@ mod tests {
             usecase_layer.clone(),
         );
         usecase_doc.insert_type(
-            TypeName::new("MyUseCase").unwrap(),
+            CatalogueEntryKey::try_new("MyUseCase".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::UseCase { handles: vec![] },
                 vec![method_shared_ref_no_params("last_event", "domain::OrderPlaced")],
@@ -5658,7 +5680,7 @@ mod tests {
         // PartialEq impl entry is Delete-marked.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyValue").unwrap(),
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
             make_type_entry(DataRole::value_object()),
         );
 
@@ -5719,7 +5741,10 @@ mod tests {
                 vec![],
                 vec![],
             );
-            doc.insert_type(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+            doc.insert_type(
+                CatalogueEntryKey::try_new("DeletedValue".to_owned()).unwrap(),
+                deleted_entry,
+            );
 
             let violations = run_rule(
                 &doc,
@@ -5753,7 +5778,10 @@ mod tests {
                 vec![],
                 vec![],
             );
-            doc.insert_type(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+            doc.insert_type(
+                CatalogueEntryKey::try_new("DeletedValue".to_owned()).unwrap(),
+                deleted_entry,
+            );
 
             let violations = run_rule(
                 &doc,
@@ -5791,7 +5819,10 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("ReferencedValue").unwrap(), reference_entry);
+        doc.insert_type(
+            CatalogueEntryKey::try_new("ReferencedValue".to_owned()).unwrap(),
+            reference_entry,
+        );
         // Deliberately no TraitImplDeclV2 pushed to doc.trait_impls: a
         // Reference entry's trait impls are not restated in this catalogue.
 
@@ -5825,7 +5856,7 @@ mod tests {
         // Err(InvalidRuleConfig) rather than silently treating the field as empty.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("MyService").unwrap(),
+            CatalogueEntryKey::try_new("MyService".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
             }),
@@ -5858,11 +5889,11 @@ mod tests {
         // violations.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderPlaced").unwrap(),
+            CatalogueEntryKey::try_new("OrderPlaced".to_owned()).unwrap(),
             make_type_entry(DataRole::DomainEvent),
         );
         doc.insert_type(
-            TypeName::new("PlaceOrder").unwrap(),
+            CatalogueEntryKey::try_new("PlaceOrder".to_owned()).unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderPlaced").unwrap()],
             }),
@@ -5892,7 +5923,7 @@ mod tests {
         // ReferencedRoleConstraint must reject it instead of silently checking no refs.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Order").unwrap(),
+            CatalogueEntryKey::try_new("Order".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![invariant_decl("is_valid")],
@@ -5927,7 +5958,7 @@ mod tests {
         // evaluate zero refs for ReferencedRoleConstraint.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderEntity").unwrap(),
+            CatalogueEntryKey::try_new("OrderEntity".to_owned()).unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
@@ -5960,7 +5991,7 @@ mod tests {
         // SpecificationPort does not carry "aggregate"; only Repository does.
         let mut doc = make_doc("domain");
         doc.insert_trait(
-            TraitName::new("OrderSpecPort").unwrap(),
+            CatalogueEntryKey::try_new("OrderSpecPort".to_owned()).unwrap(),
             make_trait_entry(ContractRole::SpecificationPort),
         );
         let rule = CatalogueLinterRule::new(
@@ -6041,11 +6072,11 @@ mod tests {
         // reporting zero violations.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("OrderAgg").unwrap(),
+            CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
         doc.insert_trait(
-            TraitName::new("OrderRepository").unwrap(),
+            CatalogueEntryKey::try_new("OrderRepository".to_owned()).unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
             }),
@@ -6108,7 +6139,7 @@ mod tests {
             shared_value_objects: vec![TypeRef::new("Money").unwrap()],
             emits: vec![],
         });
-        doc.insert_type(TypeName::new("OrderAgg").unwrap(), order_agg);
+        doc.insert_type(CatalogueEntryKey::try_new("OrderAgg".to_owned()).unwrap(), order_agg);
 
         // Delete-action aggregate: also has exclusive_members=[OrderLine],
         // shared_value_objects=[Money], and a method that references OrderLine.
@@ -6135,14 +6166,17 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("DeletedAgg").unwrap(), deleted_agg);
+        doc.insert_type(CatalogueEntryKey::try_new("DeletedAgg".to_owned()).unwrap(), deleted_agg);
 
         // ExternalEntry: references OrderLine (exclusive member) — should be a violation.
         let external_entry = make_type_entry_with_methods(
             DataRole::value_object(),
             vec![method_shared_ref_no_params("get_line", "OrderLine")],
         );
-        doc.insert_type(TypeName::new("ExternalEntry").unwrap(), external_entry);
+        doc.insert_type(
+            CatalogueEntryKey::try_new("ExternalEntry".to_owned()).unwrap(),
+            external_entry,
+        );
 
         // ExternalEntry2: references Money (shared_value_object of active OrderAgg) —
         // inside the boundary, so no violation expected.
@@ -6150,7 +6184,10 @@ mod tests {
             DataRole::value_object(),
             vec![method_shared_ref_no_params("get_money", "Money")],
         );
-        doc.insert_type(TypeName::new("ExternalEntry2").unwrap(), external_entry2);
+        doc.insert_type(
+            CatalogueEntryKey::try_new("ExternalEntry2".to_owned()).unwrap(),
+            external_entry2,
+        );
 
         let violations = run_rule(
             &doc,
@@ -6189,7 +6226,7 @@ mod tests {
     fn test_forbid_primitive_in_types_detects_named_field_occurrence() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6218,7 +6255,7 @@ mod tests {
     fn test_forbid_primitive_in_types_no_violation_when_primitive_absent() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "Decimal")]),
@@ -6245,7 +6282,7 @@ mod tests {
         // each carrying a String — both must be classified as VariantField.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("PaymentEvent").unwrap(),
+            CatalogueEntryKey::try_new("PaymentEvent".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::DomainEvent,
                 TypeKindV2::Enum {
@@ -6284,7 +6321,7 @@ mod tests {
     fn test_forbid_primitive_in_types_detects_type_alias_target_occurrence() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Description").unwrap(),
+            CatalogueEntryKey::try_new("Description".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
@@ -6311,7 +6348,7 @@ mod tests {
     fn test_forbid_primitive_in_types_detects_type_alias_generic_bound_occurrence() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Description").unwrap(),
+            CatalogueEntryKey::try_new("Description".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 TypeKindV2::TypeAlias {
@@ -6341,7 +6378,7 @@ mod tests {
     fn test_forbid_primitive_in_types_detects_param_and_return_on_type_method() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
                 vec![method_with_params(
@@ -6394,7 +6431,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_trait(TraitName::new("Checker").unwrap(), trait_entry);
+        doc.insert_trait(CatalogueEntryKey::try_new("Checker".to_owned()).unwrap(), trait_entry);
 
         let violations = run_rule(
             &doc,
@@ -6484,7 +6521,7 @@ mod tests {
             ..method_shared_ref_no_params("do_thing", "()")
         };
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
@@ -6582,7 +6619,7 @@ mod tests {
             ..method_shared_ref_no_params("do_thing", "()")
         };
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
@@ -6623,7 +6660,7 @@ mod tests {
             ..method_shared_ref_no_params("do_thing", "()")
         };
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
@@ -6657,7 +6694,7 @@ mod tests {
         // it must not be reported.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6685,7 +6722,7 @@ mod tests {
         // selects Entity must skip a ValueObject entry entirely.
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6715,7 +6752,7 @@ mod tests {
         // root already loops over layers).
         let mut domain_doc = make_doc("domain");
         domain_doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6723,7 +6760,7 @@ mod tests {
         );
         let mut usecase_doc = make_doc("usecase");
         usecase_doc.insert_type(
-            TypeName::new("MoneyDto").unwrap(),
+            CatalogueEntryKey::try_new("MoneyDto".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6767,7 +6804,7 @@ mod tests {
         // once per layer; layers not in the rule's own list are skipped).
         let mut domain_doc = make_doc("domain");
         domain_doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6828,7 +6865,7 @@ mod tests {
     fn test_forbid_primitive_in_types_scan_failed_propagates_as_catalogue_linter_error() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
                 plain_struct_kind(vec![field_decl("amount", "String")]),
@@ -6881,7 +6918,7 @@ mod tests {
             ..method_shared_ref_no_params("do_thing", "()")
         };
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
@@ -6934,7 +6971,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_trait(TraitName::new("Checker").unwrap(), trait_entry);
+        doc.insert_trait(CatalogueEntryKey::try_new("Checker".to_owned()).unwrap(), trait_entry);
 
         let all = all_catalogues_single(&doc);
         let target_layer = doc.layer().clone();
@@ -6983,7 +7020,7 @@ mod tests {
             ..method_shared_ref_no_params("do_thing", "()")
         };
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
@@ -7019,7 +7056,7 @@ mod tests {
     fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_generic_bound() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -7065,7 +7102,7 @@ mod tests {
     fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_where_predicate() {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Money").unwrap(),
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -7121,9 +7158,12 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_generic_bound() {
         let mut doc = make_doc("domain");
-        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Money").unwrap(),
+            type_name: CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             impl_generics: vec![MethodGenericParam {
                 name: ParamName::new("T").unwrap(),
                 bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
@@ -7159,9 +7199,12 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_where_predicate() {
         let mut doc = make_doc("domain");
-        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
         doc.push_inherent_impl(InherentImplDeclV2 {
-            type_name: TypeName::new("Money").unwrap(),
+            type_name: CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![WherePredicateDecl {
                 lhs: TypeRef::new("T").unwrap(),
