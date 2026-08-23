@@ -13,6 +13,10 @@ use crate::tddd::primitive_occurrence_scanner::{
 
 use super::{CatalogueLinterError, FreeText};
 
+fn is_valid_type_alias_generic_parameter_name(name: &str) -> bool {
+    super::generic::is_plain_generic_identifier(name)
+}
+
 pub(super) fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScanner>(
     catalogue: &CatalogueDocument,
     scanner: &S,
@@ -31,7 +35,7 @@ pub(super) fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScann
 
         let mut seen = std::collections::BTreeSet::new();
         for generic in generics {
-            if !super::is_valid_type_alias_generic_parameter_name(generic.name.as_str()) {
+            if !is_valid_type_alias_generic_parameter_name(generic.name.as_str()) {
                 return Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
                     alias_name: alias_name.clone(),
                     parameter_name: generic.name.clone(),

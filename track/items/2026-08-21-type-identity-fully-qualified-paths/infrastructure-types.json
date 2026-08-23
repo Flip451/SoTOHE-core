@@ -3,7 +3,7 @@
   "functions": {
     "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref": {
       "action": "add",
-      "docs": "Infrastructure-owned reconciliation choke point; placement depends on syn and rustdoc path data.",
+      "docs": "Stable infrastructure adapter entry point for Rust type parsing, rustdoc-universe construction, and domain identity-resolution delegation.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -70,6 +70,7 @@
     {
       "methods": [
         {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "as_str",
@@ -137,13 +138,27 @@
     {
       "for_type": "CanonicalTypeIdentity",
       "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
+      "trait_ref": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter",
+      "trait_ref": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
     }
   ],
   "traits": {},
   "types": {
     "CanonicalTypeIdentity": {
       "action": "add",
-      "docs": "Infrastructure reconciliation value; placement depends on syn and rustdoc path data.",
+      "docs": "Infrastructure representation of a canonical Rust type expression after domain identity resolution.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -188,6 +203,148 @@
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter": {
+      "action": "add",
+      "docs": "Syn-backed adapter for TypeRefPathExtractorPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_ref_parser",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter": {
+      "action": "modify",
+      "docs": "System secondary adapter for active-track catalogue linting with an injected parser-authoritative TypeRef path extractor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "extractor",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_linter::TypeRefPathExtractorPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-07",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "track_lifecycle::tddd::catalogue_lint_active",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter": {
+      "action": "modify",
+      "docs": "System secondary adapter for single-layer catalogue linting with an injected parser-authoritative TypeRef path extractor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "extractor",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_linter::TypeRefPathExtractorPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-07",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "track_lifecycle::tddd::lint",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "OS-01",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]

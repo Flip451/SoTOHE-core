@@ -1,6 +1,90 @@
 {
   "obligations": [
     {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+      "declaration_hash": "cb85694aa31b0c7bcca5747cdfe26b3659a467112422cd7adcb692f5fb1d27ec",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "OS-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+      "declaration_hash": "40e3ff7b6e595929c800bae8b1879a18e0a33b5c6ff1382be63542e0fb38dab7",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
       "brief": "Author a contract test covering 'trait_method:encode' of CatalogueToExtendedCratePort",
       "declaration_hash": "72ede2a6af4f1c5534a94cfc454037fc06ab005eb9077dd4a0d89cbfb54c021b",
       "id": {
@@ -33,8 +117,100 @@
       }
     },
     {
+      "brief": "Author a contract test covering 'trait_method:extract' of domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+      "declaration_hash": "e7bd2e10ae41d21f8afe4053b481a4dfc0bd99020c445b8484c4a08fddda4d9f",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+        "item_identifier": "trait_method:extract",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "OS-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort' of std::sync::Arc<T>",
+      "declaration_hash": "f23c23f3978f874a73c14bc7ff77893b2a5dd6665f2804828212574982cb9bfd",
+      "id": {
+        "entry_key": "std::sync::Arc<T>",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "OS-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "std::sync::Arc<T>",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+      "declaration_hash": "861eda31a47e0b0deacbdc0e085063496655269c2882c04eb3d4632d5b5ca0c1",
+      "id": {
+        "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
-      "declaration_hash": "9d2c1a8aed7e2f51e056f3f35ef06f9ed796750b969a45bad58662f2138bdd5d",
+      "declaration_hash": "acecebec9346dca2121cba0e8cea6b8da2635d51bc87193a1d40b3421ca76852",
       "id": {
         "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
         "item_identifier": "entry",
@@ -86,6 +262,38 @@
       "target_role": {
         "kind": "function_role",
         "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort' of infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
+      "declaration_hash": "c6c7a98cf77da866b5e430ce88507bbd7c5223e366a3e49e7959cb59534d6f81",
+      "id": {
+        "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "OS-01",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
+        "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
       }
     }
   ],

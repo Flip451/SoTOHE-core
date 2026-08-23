@@ -27,6 +27,7 @@
 
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::identifiers::{TypeName, TypeRef};
+use crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError;
 use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::primitive_occurrence_scanner::{
@@ -41,12 +42,53 @@ use crate::tddd::primitive_occurrence_scanner::{
 #[path = "catalogue_linter_role.rs"]
 mod role;
 
-#[path = "catalogue_linter_generic.rs"]
-mod generic;
-
 /// Re-export so that consumers of `catalogue_linter` see `RoleKind` at the
 /// expected path without knowing about the `role` submodule.
 pub use role::RoleKind;
+
+// ---------------------------------------------------------------------------
+// TypeRef path extraction port and products
+// ---------------------------------------------------------------------------
+
+/// Parser-produced classification of one path within a catalogue `TypeRef`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ExtractedTypeRefPath {
+    /// A path that denotes a catalogue identity directly.
+    Reference(TypeRef),
+    /// A generic constructor whose inner paths must be visited separately.
+    GenericConstructor(TypeRef),
+}
+
+/// Failure returned by the parser-authoritative TypeRef path extractor.
+#[derive(Debug, PartialEq, Eq, thiserror::Error)]
+pub enum TypeRefPathExtractionError {
+    /// The TypeRef could not be parsed by the infrastructure parser authority.
+    #[error("invalid TypeRef path expression `{0}`")]
+    InvalidTypeRef(TypeRef),
+}
+
+/// Secondary port for parser-authoritative TypeRef path extraction.
+pub trait TypeRefPathExtractorPort: Send + Sync {
+    /// Extracts catalogue-reference paths from one TypeRef.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TypeRefPathExtractionError::InvalidTypeRef`] when the supplied
+    /// TypeRef cannot be parsed by the adapter's Rust syntax authority.
+    fn extract(
+        &self,
+        type_ref: &TypeRef,
+    ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError>;
+}
+
+impl<T: TypeRefPathExtractorPort + ?Sized> TypeRefPathExtractorPort for std::sync::Arc<T> {
+    fn extract(
+        &self,
+        type_ref: &TypeRef,
+    ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+        self.as_ref().extract(type_ref)
+    }
+}
 
 // ---------------------------------------------------------------------------
 // RuleTarget — rule application target selector
@@ -495,6 +537,14 @@ pub enum CatalogueLinterError {
     /// call made while evaluating `ForbidPrimitiveInTypes` failed.
     #[error(transparent)]
     ScanFailed(#[from] PrimitiveOccurrenceScanError),
+
+    /// The injected TypeRef path extractor could not parse a TypeRef.
+    #[error(transparent)]
+    PathExtractionFailed(#[from] TypeRefPathExtractionError),
+
+    /// A catalogue identity could not be resolved in the declared-entry universe.
+    #[error(transparent)]
+    IdentityResolutionFailed(#[from] CatalogueIdentityResolutionError),
 }
 
 // ---------------------------------------------------------------------------
@@ -628,12 +678,8 @@ mod eval_primitives;
 #[path = "catalogue_linter_eval_layer_signature.rs"]
 mod eval_layer_signature;
 
-#[path = "catalogue_linter_validation.rs"]
-mod validation;
-
-fn is_valid_type_alias_generic_parameter_name(name: &str) -> bool {
-    generic::is_plain_generic_identifier(name)
-}
+#[path = "catalogue_linter_entrypoint.rs"]
+mod entrypoint;
 
 /// Evaluate catalogue-lint rules after validating every alias generic declaration.
 ///
@@ -641,16 +687,14 @@ fn is_valid_type_alias_generic_parameter_name(name: &str) -> bool {
 /// catalogue invariant that each alias generic parameter name occurs once and
 /// each alias bound is syntactically valid in every catalogue available to the
 /// evaluator.
-pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
+pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtractorPort>(
     rules: &[CatalogueLinterRule],
     all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>,
     target_layer_id: &LayerId,
     scanner: &S,
+    extractor: &E,
 ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
-    for catalogue in all_catalogues.values() {
-        validation::validate_type_alias_generic_parameters(catalogue, scanner)?;
-    }
-    eval::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner)
+    entrypoint::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner, extractor)
 }
 
 #[cfg(test)]
@@ -700,6 +744,59 @@ mod tests {
             }
             Ok(PrimitiveOccurrenceReport::new(occurrences))
         }
+    }
+
+    struct StubTypeRefPathExtractor;
+
+    impl TypeRefPathExtractorPort for StubTypeRefPathExtractor {
+        fn extract(
+            &self,
+            type_ref: &TypeRef,
+        ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+            if type_ref.as_str() == "(" {
+                return Err(TypeRefPathExtractionError::InvalidTypeRef(type_ref.clone()));
+            }
+            Ok(vec![ExtractedTypeRefPath::Reference(type_ref.clone())])
+        }
+    }
+
+    #[test]
+    fn test_arc_type_ref_path_extractor_delegates_extract_result() {
+        let type_ref = TypeRef::new("OrderPlaced".to_owned()).unwrap();
+        let direct = StubTypeRefPathExtractor;
+        let direct_paths = direct.extract(&type_ref).unwrap();
+        let wrapped: std::sync::Arc<dyn TypeRefPathExtractorPort> =
+            std::sync::Arc::new(StubTypeRefPathExtractor);
+
+        let wrapped_paths = wrapped.extract(&type_ref).unwrap();
+
+        assert_eq!(wrapped_paths, direct_paths);
+        assert_eq!(wrapped_paths, vec![ExtractedTypeRefPath::Reference(type_ref)]);
+
+        let invalid_type_ref = TypeRef::new("(".to_owned()).unwrap();
+        let direct_error = direct.extract(&invalid_type_ref);
+        let wrapped_error = wrapped.extract(&invalid_type_ref);
+
+        assert_eq!(wrapped_error, direct_error);
+        assert_eq!(
+            wrapped_error,
+            Err(TypeRefPathExtractionError::InvalidTypeRef(invalid_type_ref))
+        );
+    }
+
+    fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
+        rules: &[CatalogueLinterRule],
+        all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>,
+        target_layer_id: &LayerId,
+        scanner: &S,
+    ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
+        super::evaluate_catalogue_lint(
+            rules,
+            all_catalogues,
+            target_layer_id,
+            scanner,
+            &StubTypeRefPathExtractor,
+        )
     }
 
     /// Test double for [`PrimitiveOccurrenceScanner`]: always fails with
@@ -1768,6 +1865,341 @@ mod tests {
                 alias_name,
                 parameter_name,
             }) if alias_name.as_str() == "LegacyDuplicateAlias" && parameter_name.as_str() == "T"
+        ));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_entry_rejects_duplicate_alias_generics_directly() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("DirectEntryAlias".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("Vec<T>").unwrap(), generics: vec![] },
+                vec![],
+                vec![
+                    MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
+                    MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
+                ],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result = super::evaluate_catalogue_lint(
+            &[],
+            &all_catalogues,
+            &target_layer,
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        );
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {
+                alias_name,
+                parameter_name,
+            }) if alias_name.as_str() == "DirectEntryAlias" && parameter_name.as_str() == "T"
+        ));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed() {
+        struct IdentityFixtureExtractor;
+
+        impl TypeRefPathExtractorPort for IdentityFixtureExtractor {
+            fn extract(
+                &self,
+                type_ref: &TypeRef,
+            ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+                let reference = |value: &str| {
+                    ExtractedTypeRefPath::Reference(TypeRef::new(value.to_owned()).unwrap())
+                };
+                let wrapped = |value: &str| {
+                    vec![
+                        ExtractedTypeRefPath::GenericConstructor(
+                            TypeRef::new("std::ghost::UnknownWrapper".to_owned()).unwrap(),
+                        ),
+                        reference(value),
+                    ]
+                };
+
+                match type_ref.as_str() {
+                    "std::ghost::UnknownWrapper<&mut domain::alpha::Event>"
+                    | "std::ghost::UnknownWrapper<&'static domain::alpha::Event>" => {
+                        Ok(wrapped("domain::alpha::Event"))
+                    }
+                    "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>"
+                    | "*const domain::alpha::Entity" => Ok(wrapped("domain::alpha::Entity")),
+                    "std::ghost::UnknownWrapper<*const domain::beta::Entity>" => {
+                        Ok(wrapped("domain::beta::Entity"))
+                    }
+                    "domain::beta::Event" => Ok(vec![reference("domain::beta::Event")]),
+                    "Entity" => Ok(vec![reference("Entity")]),
+                    "Event" => Ok(vec![reference("Event")]),
+                    "domain::missing::Event" => Ok(vec![reference("domain::missing::Event")]),
+                    "(" => Err(TypeRefPathExtractionError::InvalidTypeRef(type_ref.clone())),
+                    _ => Err(TypeRefPathExtractionError::InvalidTypeRef(type_ref.clone())),
+                }
+            }
+        }
+
+        let module = |name: &str| ModulePath::from_segments(vec![name.to_owned()]).unwrap();
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        let aggregate_entry = |module_path: &str, member: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::AggregateRoot {
+                    identity: identity_accessor("id"),
+                    invariants: vec![],
+                    exclusive_members: vec![TypeRef::new(member.to_owned()).unwrap()],
+                    shared_value_objects: vec![],
+                    emits: vec![],
+                },
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Entity".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Entity".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::AggregateA".to_owned()).unwrap(),
+            aggregate_entry("alpha", "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::AggregateB".to_owned()).unwrap(),
+            aggregate_entry("beta", "std::ghost::UnknownWrapper<*const domain::beta::Entity>"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::AggregateAmbiguous".to_owned()).unwrap(),
+            aggregate_entry("alpha", "Entity"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseValid".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new(
+                            "std::ghost::UnknownWrapper<&mut domain::alpha::Event>".to_owned(),
+                        )
+                        .unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseWrongRole".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::beta::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseAmbiguous".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("Event".to_owned()).unwrap()] },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseUnresolved".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::missing::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseExtractionFailure".to_owned())
+                .unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("(".to_owned()).unwrap()] },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::ExternalService".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::DomainService { emits: vec![] },
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![method_shared_ref_no_params(
+                    "read_entity",
+                    "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>",
+                )],
+                vec![],
+                vec![],
+                module("alpha"),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let rules = vec![
+            CatalogueLinterRule::new(
+                RuleTarget::new(vec![RoleKind::UseCase]),
+                CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                    target_field: RolePayloadField::Handles,
+                    expected_role: RoleKind::DomainEvent,
+                },
+            )
+            .unwrap(),
+            CatalogueLinterRule::new(
+                RuleTarget::new(vec![RoleKind::AggregateRoot]),
+                CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                    target_field: RolePayloadField::ExclusiveMembers,
+                },
+            )
+            .unwrap(),
+            CatalogueLinterRule::new(
+                RuleTarget::new(vec![RoleKind::AggregateRoot]),
+                CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                    target_field: RolePayloadField::ExclusiveMembers,
+                },
+            )
+            .unwrap(),
+        ];
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = catalogue.layer().clone();
+        let violations = super::evaluate_catalogue_lint(
+            &rules,
+            &all_catalogues,
+            &target_layer,
+            &StubPrimitiveScanner,
+            &IdentityFixtureExtractor,
+        )
+        .unwrap();
+
+        let role_violations: Vec<_> = violations
+            .iter()
+            .filter(|violation| violation.rule_kind() == "ReferencedRoleConstraint")
+            .collect();
+        assert!(
+            !role_violations
+                .iter()
+                .any(|violation| { violation.entry_name() == "domain::alpha::UseCaseValid" })
+        );
+        assert!(role_violations.iter().any(|violation| {
+            violation.entry_name() == "domain::alpha::UseCaseWrongRole"
+                && violation.message().contains("DomainEvent")
+        }));
+        assert!(
+            role_violations.iter().any(|violation| {
+                violation.message().contains("FullyQualifiedItemPath")
+                    && violation.message().contains("alpha")
+                    && violation.message().contains("beta")
+            }),
+            "ambiguous identity diagnostic: {role_violations:?}"
+        );
+        assert!(
+            role_violations
+                .iter()
+                .any(|violation| violation.message().contains("domain::missing::Event"))
+        );
+        assert!(role_violations.iter().any(|violation| {
+            violation.entry_name() == "domain::alpha::UseCaseExtractionFailure"
+                && violation.message().contains("invalid TypeRef path expression")
+                && violation.message().contains("(")
+        }));
+
+        let unique_violations: Vec<_> = violations
+            .iter()
+            .filter(|violation| violation.rule_kind() == "FieldElementUniqueAcrossEntries")
+            .collect();
+        assert!(
+            unique_violations.iter().any(|violation| {
+                violation.entry_name() == "domain::alpha::AggregateAmbiguous"
+                    && violation.message().contains("FullyQualifiedItemPath")
+                    && violation.message().contains("alpha")
+                    && violation.message().contains("beta")
+            }),
+            "unique identity diagnostics: {unique_violations:?}"
+        );
+        assert!(!unique_violations.iter().any(|violation| {
+            violation.entry_name() == "domain::alpha::AggregateA"
+                || violation.entry_name() == "domain::beta::AggregateB"
+        }));
+
+        let external_violations: Vec<_> = violations
+            .iter()
+            .filter(|violation| violation.rule_kind() == "NoExternalReferenceInMethods")
+            .collect();
+        assert_eq!(external_violations.len(), 2);
+        assert!(external_violations.iter().any(|violation| {
+            violation.message().contains("domain::alpha::Entity")
+                && violation.message().contains("domain::alpha::ExternalService")
+        }));
+        assert!(external_violations.iter().any(|violation| {
+            violation.message().contains("FullyQualifiedItemPath")
+                && violation.message().contains("alpha")
+                && violation.message().contains("beta")
+        }));
+
+        let invalid_rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Invariants,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let invalid_result = super::evaluate_catalogue_lint(
+            &[invalid_rule],
+            &all_catalogues,
+            &target_layer,
+            &StubPrimitiveScanner,
+            &IdentityFixtureExtractor,
+        );
+        assert!(matches!(
+            invalid_result,
+            Err(CatalogueLinterError::InvalidRuleConfig(message))
+                if message.as_str().contains("invariants")
         ));
     }
 
@@ -3527,6 +3959,14 @@ mod tests {
         // Two AggregateRoots with disjoint exclusive_members → no violation
         let mut doc = make_doc("domain");
         doc.insert_type(
+            CatalogueEntryKey::try_new("EntityA".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("EntityB".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.insert_type(
             CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -3563,6 +4003,10 @@ mod tests {
     fn test_field_element_unique_across_entries_violation_when_overlap() {
         // Two AggregateRoots sharing "EntityA" → 1 violation
         let mut doc = make_doc("domain");
+        doc.insert_type(
+            CatalogueEntryKey::try_new("EntityA".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
         doc.insert_type(
             CatalogueEntryKey::try_new("AggA".to_owned()).unwrap(),
             make_type_entry(DataRole::AggregateRoot {
@@ -6130,6 +6574,18 @@ mod tests {
         //   (b) DeletedAgg is not scanned in the other_entry.methods loop — if it were,
         //       a second violation for OrderAgg / DeletedAgg would fire.
         let mut doc = make_doc("domain");
+
+        // All referenced members must be declared identities. The rule is
+        // deliberately fail-closed for an unresolved member, so these fixture
+        // entries keep the test focused on deleted-entry filtering.
+        doc.insert_type(
+            CatalogueEntryKey::try_new("OrderLine".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
 
         // Active aggregate: exclusive_members = [OrderLine], shared_value_objects = [Money]
         let order_agg = make_type_entry(DataRole::AggregateRoot {

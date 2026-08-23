@@ -131,6 +131,46 @@
           "hash": "rvw1:sha256:e71fccb3f2e35ae11d64fae405adc2fd55898cc2165623991d076b6cb9f64757",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T20:12:30Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md",
+              "line": 26,
+              "message": "D1 は catalogue-lint に対し、任意にネストし得る「有効な型式」から catalogue identity を「正確に抽出」し、Consequences でも identity 解決を「完全に扱う」と約束しています。しかし、lint 側について既存 authority への委譲、保守的 over-approximation、または深さ見積りを伴う strict implementation のいずれを採るかが記録されていません。Chain ③ に対する syn / rustdoc paths の指定は lint 側の開集合義務を解決しないため、実装深度が未確定です。D1 に採用する resolution を記録してください。これは選択肢の裁定を伴う新しい決定が必要です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:147613a4eb2790e80c051b6c82bd7e8a88ed46a78d0a12b60db9934c7afd54ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:26:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f962d4705896dfb8a2986d6f7476b26ac3669c708c289dfd5f16c260af6c517",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-22T15:11:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b4dab9d9fac26b063bb3485ab5207eeb9dcd8681189685367c2da87eeac88a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T18:55:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b4dab9d9fac26b063bb3485ab5207eeb9dcd8681189685367c2da87eeac88a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -176,6 +216,13 @@
           "at": "2026-08-21T14:08:44Z",
           "findings": [],
           "hash": "rvw1:sha256:3258f179d9e0edea5d654994edc8381c0e1fb0035968f1d681edb24dd5906e1d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T05:08:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd57819a063fa174f5340b49d057212f4082d4efa19a1711b677efbbd15e2f67",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -310,6 +357,406 @@
           "at": "2026-08-22T12:20:19Z",
           "findings": [],
           "hash": "rvw1:sha256:214245c72ee9cf3c99ede71bd35bef95820283445743a6cae53b988838a6f40a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T14:24:13Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 59,
+              "message": "A fully qualified reference that misses the exact-key lookup falls through to the legacy short-name resolver. For example, if short-key `Shared` exists, `domain::wrong::Shared` can resolve as that entry, allowing `ReferencedRoleConstraint` to pass an unresolved or wrong-module reference instead of failing closed as AC-04/CO-01 require.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 75,
+              "message": "`explicit_catalogue_entry_key` examines only the outer type before `<`. Thus `Vec<domain::alpha::Shared>` returns no explicit key, and the legacy resolver cannot find a collision-resolving full entry key such as `domain::alpha::Shared`. Valid fully qualified references inside generic TypeRefs are consequently reported as role violations.",
+              "severity": "P0"
+            },
+            {
+              "category": "broken_invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 576,
+              "message": "The uniqueness rule now keys on raw TypeRef spelling rather than resolved identity. Because T004 intentionally preserves loose TypeRef notation, two aggregates can name the same exclusive member as `Entity` and `domain::alpha::Entity` and evade `FieldElementUniqueAcrossEntries`. Both forms must be canonicalized before comparison.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 666,
+              "message": "`NoExternalReferenceInMethods` searches method signatures using the complete spelling of the exclusive-member reference. A member declared as `domain::alpha::Entity` is therefore not detected when an external method uses the valid unique short form `Entity`; the aggregate-boundary violation silently passes. Declaration and signature references must be resolved to canonical identities, with ambiguous or unresolved names failing closed.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:4052f04dd03f1e282526353a9078e4ab740d56059a704ea242736db135bf4060",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T14:45:17Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 116,
+              "message": "Qualified resolution only searches catalogue keys that already contain `::` and never combines a normal short key with its entry `module_path`. A valid reference such as `domain::alpha::Shared` therefore cannot resolve an otherwise unique short-key declaration `Shared` in module `alpha`, causing `ReferencedRoleConstraint` to reject it and the identity rules to use a different spelling instead of the canonical identity required by AC-02/AC-07.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 124,
+              "message": "`bare_name_in_type_ref` performs a boundary-delimited substring match, so a key `domain::alpha::Shared` is also considered resolved inside `wrong::domain::alpha::Shared`. The latter is a different qualified path, but the linter attributes it to `domain::alpha::Shared` and can incorrectly pass a role constraint instead of failing closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 66,
+              "message": "When the new resolver rejects an ambiguous bare name, `resolve_type_role` retries the legacy short-name resolver. With entries `Shared` and `domain::beta::Shared`, bare `Shared` has two candidates, yet the fallback selects the exact short-key entry and may pass `ReferencedRoleConstraint`; AC-03 requires this ambiguity to fail closed without short-name fallback.",
+              "severity": "P0"
+            },
+            {
+              "category": "typestate_gap",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 212,
+              "message": "On resolution failure, `catalogue_identity_key_for_rule` wraps the raw non-empty TypeRef as a `CatalogueEntryKey`; that constructor only checks non-emptiness, so ambiguous or nonexistent references never produce the advertised error. `FieldElementUniqueAcrossEntries` and `NoExternalReferenceInMethods` consequently operate on invented identities—for example, `Entity` and `domain::alpha::Entity` can still bypass canonical comparison when the declaration uses the default short key.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 801,
+              "message": "`NoExternalReferenceInMethods` resolves each complete parameter or return expression to only one key. If a signature contains multiple qualified catalogue types, such as `Result<domain::alpha::Entity, domain::errors::DomainError>`, `qualified_keys_in_type_ref` returns no key and the comparison silently misses the exclusive `Entity` reference. The rule must inspect all canonical identities contained in a signature rather than require the entire TypeRef to denote one entry.",
+              "severity": "P0"
+            },
+            {
+              "category": "error_handling",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 440,
+              "message": "Ambiguity is represented only as `None`, discarding the candidate paths. When two fully qualified `Shared` entries exist and a bare `Shared` reference cannot resolve, the emitted violation merely says that the expected role was not declared; it does not enumerate the candidates as AC-03/CO-03 require, so users cannot identify the ambiguity to correct.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:52df1fae6ec7a4ce8a7f196ef20d723e360568c1f19cc7e62ffeedb1e1d5f5b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T14:53:02Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 59,
+              "message": "When an explicitly qualified key is absent, resolution falls through to the legacy tail-name lookup. For a short-key entry `Shared` in module `alpha`, `domain::beta::Shared` can therefore resolve as that entry, so `ReferencedRoleConstraint` accepts a wrong or unresolved module path instead of failing closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 75,
+              "message": "`explicit_catalogue_entry_key` examines only the outer type before `<`. Thus `Vec<domain::alpha::Shared>` does not attempt an exact lookup of the qualified generic argument; the legacy resolver then searches for short key `Shared` and cannot find a collision-resolving key `domain::alpha::Shared`, producing a false role violation.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 59,
+              "message": "Bare references still delegate to the legacy role-consensus resolver, which treats multiple non-target entries with the same short name and same role as unambiguous. A bare `SharedEvent` can therefore pass when two catalogues declare different `SharedEvent` identities; AC-03/CO-03 require multiple identity candidates to fail closed regardless of whether their roles happen to match.",
+              "severity": "P0"
+            },
+            {
+              "category": "broken_invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 576,
+              "message": "The uniqueness rule uses raw TypeRef spelling as its key. Because loose notation remains supported, two aggregates can identify the same exclusive member as `Entity` and `domain::alpha::Entity` and evade `FieldElementUniqueAcrossEntries`. References must be resolved to canonical catalogue identities before comparison.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 666,
+              "message": "`NoExternalReferenceInMethods` compares the complete spelling of an exclusive-member reference against method signatures. If the member is declared as `domain::alpha::Entity` and an external method uses the valid unique short form `Entity`, the occurrence is missed and the aggregate-boundary violation passes. Both sides must be resolved to canonical identities, with ambiguous names failing closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "error_handling",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 323,
+              "message": "Ambiguous resolution is collapsed to `None`, and the resulting `ReferencedRoleConstraint` message only reports a role mismatch. It does not enumerate the candidate fully qualified paths as AC-03 requires, leaving users without the information needed to disambiguate the reference.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4052f04dd03f1e282526353a9078e4ab740d56059a704ea242736db135bf4060",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T17:36:34Z",
+          "findings": [
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 179,
+              "message": "Once any token in a TypeRef resolves, all unresolved tokens are discarded. For example, `(domain::events::OrderPlaced, domain::events::Missing)` returns only `OrderPlaced`; `ReferencedRoleConstraint` can then pass and the uniqueness rule proceeds without reporting the unresolved fully qualified `Missing` path. AC-04/CO-03 require every unresolved in-crate identity to fail closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 86,
+              "message": "The `std` alias fallback compares only the first module segment and terminal name, ignoring all intermediate modules. Consequently `std::collections::hash_map::Entry` can resolve to `alloc::collections::btree::map::Entry` when that is the sole candidate, or become spuriously ambiguous when both entry types are present. Qualified identities must not be conflated this way.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 102,
+              "message": "After an exact qualified lookup misses, every multi-segment path is retried as a local module path. If `domain` is a known workspace crate but `domain::beta::Event` is absent, the reference can silently resolve to `usecase::domain::beta::Event` when the catalogue crate is `usecase`. This violates the documented exact semantics for crate-qualified paths and AC-04's fail-closed requirement.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:46c99a3796c0ea6e0923a44f6b02bfea70529ecac3c804d4f12e5bbfca721201",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T17:54:39Z",
+          "findings": [
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 188,
+              "message": "Unresolved bare sibling paths are still discarded whenever another token resolves. For example, `(OrderPlaced, MissingEvent)` resolves only `OrderPlaced`, so `ReferencedRoleConstraint` and the aggregate identity rules can pass without reporting the missing type. Bare wrappers may need special treatment, but arbitrary unresolved bare type paths must fail closed under CO-03.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 88,
+              "message": "The tightened `std` alias comparison breaks standard re-exports whose rustdoc defining module differs from their public `std` module. In particular, `std::str::FromStr` must resolve to `core::str::traits::FromStr`, but the code requires module `str` to equal `str::traits` and then rejects the known `std` crate path as unresolved. This regresses canonicalization of a supported prelude trait.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e5fdff09d9fd33ca014d1a290025e31690c0057637cbe65f971d248c0b75a823",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T18:03:14Z",
+          "findings": [
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 177,
+              "message": "Any unresolved path followed by `<` is exempted as a generic wrapper, including explicit qualified identities. Thus `domain::missing::Envelope<OrderPlaced>` ignores the unresolved `domain::missing::Envelope`, returns only the resolved inner `OrderPlaced`, and can pass all three identity-sensitive rules. Qualified generic constructors must still fail closed under AC-04/CO-03; only known external wrappers should be exempted.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:0f655e88153a570ce0faf14c7a238bb0519e65aad10e84f67130fc58a0ebb5c1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T18:10:02Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 266,
+              "message": "Qualified standard-library wrappers are categorically rejected by the wrapper exemption. Consequently `std::vec::Vec<OrderPlaced>` reports unresolved `std::vec::Vec` while the equivalent `Vec<OrderPlaced>` succeeds, even though cross-crate TypeRef notation is unchanged and both spellings are valid. Recognized `std`/`core`/`alloc` wrapper paths should be exempted without also exempting missing workspace-qualified constructors.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e0539baa33984ab3023759bde6202577e7e1e571980f3da61f088188070e4333",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T18:17:57Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 140,
+              "message": "The path extractor treats every ASCII identifier as a type path, including Rust syntax markers and lifetime names. Consequently valid references such as `&mut OrderPlaced`, `*const OrderPlaced`, or `&'static OrderPlaced` fail on unresolved `mut`, `const`, or `static` before the declared type is considered. The removed resolver explicitly supported these forms; extraction must be syntax-aware or exclude non-path tokens.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 314,
+              "message": "The external-wrapper exemption is a closed hardcoded list, so valid fully qualified generic wrappers outside it regress. For example, `std::cell::Cell<OrderPlaced>` or `std::mem::MaybeUninit<OrderPlaced>` now fails on the wrapper path even though the previous generic resolver reached the inner declared identity and cross-crate TypeRef notation is out of scope for behavioral change.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b258e36d544c602c4fcf61ecd6e6abb6a6c5173d809285edbc844ab365ff28db",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T19:23:42Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 140,
+              "message": "The handwritten extractor still treats non-type identifiers in valid Rust type syntax as catalogue paths. For example, `unsafe extern \"C\" fn(OrderPlaced)` fails on `unsafe`/`extern`/`C`, and `[OrderPlaced; CAPACITY]` fails on the const expression `CAPACITY`, instead of resolving `OrderPlaced`. A keyword list cannot distinguish paths from ABI literals, const expressions, and other syntax; extraction must be syntax-aware.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 345,
+              "message": "Any generic constructor rooted at `std`, `core`, or `alloc` is accepted as an external wrapper without validating the remaining path. Thus a misspelled fully qualified identity such as `std::vecc::Vec<OrderPlaced>` is ignored and the rule succeeds using only `OrderPlaced`, violating AC-04/CO-03 fail-closed semantics. Standard wrapper paths need authoritative validation rather than root-only classification.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:34ec80f3be7e7d44d22754ec3b0c6c9830fb854f66bbc5a744c8012922c28e90",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T04:15:35Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: every filesystem command failed before the required policy, briefing, current diff, and scoped files could be read because the sandbox mount registry lock is on a read-only filesystem. No code verdict was produced; rerun this review after the sandbox is restored.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:8d405fd977acd8c5a186022278c8883ab3564d0d6ef9e093f3aa52443f56b7ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T04:16:28Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "Review remains blocked before adjudication: the filesystem sandbox still cannot start because its synthetic mount-registry lock is on a read-only filesystem. Therefore the required policy, briefing, current diff, and newly scoped files could not be read. Rerun after the sandbox is repaired.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:8d405fd977acd8c5a186022278c8883ab3564d0d6ef9e093f3aa52443f56b7ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T06:28:39Z",
+          "findings": [
+            {
+              "category": "fail_closed_violation",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 122,
+              "message": "The generic-constructor guard swallows every resolver error, including `AmbiguousIdentifier`. If the catalogue declares `alpha::Page` and `beta::Page`, an extracted `GenericConstructor(\"Page\")` from `Page<OrderPlaced>` is treated as an external wrapper and the linter succeeds using only `OrderPlaced`, instead of reporting both `Page` candidates. Only unresolved external constructors may be ignored; catalogue-universe ambiguity must always fail closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 148,
+              "message": "Standard re-export matching requires the public module segments to be a literal prefix of the rustdoc definition module. Valid nested re-exports whose module names change cannot resolve: `std::collections::hash_map::Entry` does not match its definition path under `collections::hash::map::Entry` (and similarly for `btree_map` versus `btree::map`). The existing test only rejects the wrong btree candidate and never proves the correct hash candidate resolves, so valid fully qualified standard paths fail canonicalization.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:adcfd4d49f1fded597f14738bae2a6cd677e4a9ae40b9b6f6adb6ec673964e9e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T06:40:59Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 164,
+              "message": "Standard re-export normalization handles `hash_map` and `btree_map` renames but omits the equivalent set namespaces. A valid path such as `std::collections::hash_set::Iter` cannot match its rustdoc definition identity `alloc::collections::hash::set::Iter` (likewise `btree_set` versus `btree::set`), so canonicalization fails for valid fully qualified standard-library paths. Extend the namespace mapping and cover both set re-exports.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b53f0b7df87c92d70117a37860203160292db415b019db9fb944d6956b8f2fad",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T06:52:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0d05f02aef64292c5c7290049866400f958b6b0d9263ef711f00db519d56791",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T10:11:58Z",
+          "findings": [
+            {
+              "category": "logic_error",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 53,
+              "message": "`normalize_lookup` rewrites `crate::` but not the parser-preserved `self::` and `super::` prefixes. Consequently, a declared `domain::port::Port` referenced as `self::port::Port` is searched as a literal `domain::self::port::Port` and rejected as unresolved. This causes the migrated identity-sensitive rules to reject valid in-crate TypeRefs; normalize relative prefixes according to the established crate-relative policy or provide module context.",
+              "severity": "P1"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 218,
+              "message": "`is_external_generic_root` classifies the original path without removing a leading `::`. For an unresolved constructor such as `::domain::missing::Wrapper<domain::events::Event>`, `split_once` produces an empty root, so the known `domain` crate is misclassified as external and the constructor error is ignored; the nested event can then resolve and let the lint pass. Classify the normalized path so unresolved identities in known catalogue crates remain fail-closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 198,
+              "message": "`signature_contains_identity` suppresses an unresolved reference whenever its terminal name differs from the exclusive member currently being compared. Thus a method signature containing an explicitly known-catalogue path such as `domain::missing::Customer` can yield `Ok(false)` for an `OrderLine` boundary and let `NoExternalReferenceInMethods` return no violation, contrary to the requirement that unresolved catalogue identities fail closed. Distinguish genuinely external paths from unresolved paths rooted in known catalogue crates before swallowing the error.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:32b238904316f4c854187ac7583aa69ddf8006c5e21c9bbc7da5a0a7a1cba977",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T10:12:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:32b238904316f4c854187ac7583aa69ddf8006c5e21c9bbc7da5a0a7a1cba977",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T10:59:45Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 76,
+              "message": "`self::` and `super::` are rewritten as crate-root paths, although their meaning depends on the referring item's module. For example, from `domain::orders::detail`, `super::Entity` denotes `domain::orders::Entity`, but this code can resolve `domain::Entity` instead, binding lint/codec checks to the wrong same-named declaration. Without module context, these prefixes must fail closed rather than be normalized like `crate::`.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 112,
+              "message": "Standard-library alias matching accepts any definition whose module begins with the requested public namespace. With a universe containing only `alloc::collections::btree::map::Entry`, `std::collections::Entry` is therefore accepted even though that public path does not exist. This violates authoritative-universe/fail-closed resolution; restrict aliases to proven public re-export shapes and add a negative truncated-namespace regression.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d26170f35d5bd4be2d3d8c7bddf58a5d0d6e681cb614b04de530846ad6d30a97",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T11:16:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d78f255be47042feb3096171ece9a4d11805865dcee2c19b31422a18a2dbce3b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -533,6 +980,129 @@
           "at": "2026-08-22T13:38:09Z",
           "findings": [],
           "hash": "rvw1:sha256:1f2acf42e2700fb5668873a7f36f58cf7f40aec604b6da75f19085285a99c4b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T16:27:46Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/task-contract.json",
+              "line": 28,
+              "message": "T008 explicitly makes `canonicalize_catalogue_type_ref` converge on the final adapter shape by delegating identity resolution to the new domain resolver, but T008 is attributed only to the domain resolver. Add T008 as an owner of `infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref`; the existing T004 attribution may remain because ownership is many-to-many.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 111,
+              "message": "T008 restates AC-03’s behavior in the clause “failing closed and listing fully qualified candidates on ambiguity.” Under `.harness/policies/no-upstream-restatement.md`, retain the concrete resolver/linter operations and the AC-03 citation, but remove this prose restatement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:06715d60ad2bf47c1a0ae37effa802eea40d32d1c3ddee389cf62f8ee39bd48e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T16:40:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5610fd01b5cbcbd683f76128bfb55f4392e1037f1640bdcfe77af9d609dd23a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T21:52:17Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/task-contract.json",
+              "line": 28,
+              "message": "T008 is the convergence task for the modified `usecase::catalogue_lint_workflow::RunCatalogueLintInteractor`—its extractor dependency, constructor, and `RunCatalogueLint` implementation are required by T008’s composition-root wiring—but `task-contract.json` contains no usecase attribution. The newly catalogued `action: reference` entry `RunCatalogueLint` is also unowned. Attribute both usecase entries to T008, or to another task that explicitly converges them.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 112,
+              "message": "T008 again restates upstream behavior in full prose, including “external-wrapper spelling remains Chain ③ validation” and “Preserve ambiguity as a fail-closed error with all candidate fully qualified paths…”. These duplicate IN-03/IN-04/AC-03/AC-07/OS-01. Under `.harness/policies/no-upstream-restatement.md`, retain the concrete targets and operations and rely on the anchor citations for expected behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "open-set covering task",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 112,
+              "message": "T008 requires the domain resolver to normalize the open set of public standard-library re-export spellings (“such as `std::iter::Iterator`, `std::ops::Deref`, and `std::ops::FnOnce`”) to rustdoc identities. Its delegation to `type_ref_parser` covers syntax extraction, not re-export name resolution, and neither T008 nor the upstream D1 delegates this mapping to compiler/rustdoc re-export metadata or declares a conservative approximation or bounded implementation depth. Ground this operation in an authoritative resolver or explicitly record the approximation/depth before implementing another hand-maintained alias table.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bbeaa565f24ffd2795045946f456a7b61fa1ed998821fa4b070bbbe082538435",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T22:00:12Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 112,
+              "message": "T008 names the target `libs/infrastructure/src/tddd/type_ref_parser.rs::SynTypeRefPathExtractorAdapter`, but `type_ref_parser` is an existing directory module whose root is `libs/infrastructure/src/tddd/type_ref_parser/mod.rs`; no `type_ref_parser.rs` exists, and creating it alongside the directory module would conflict. Point the task at the actual `mod.rs` or a concrete new child module so the executor does not have to invent the adapter’s location.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:314595738bed28099544fea9e489d66e4295c016652ff4cd8079a5994e64403c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T22:02:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39977c84019e120542a8ea53f7ff1f887c4267cf94767aa089726d66b52d406a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T03:47:46Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/impl-plan.json",
+              "line": 112,
+              "message": "T008 now owns the extractor-aware shapes of `TrackLintPort`, `TrackCatalogueLintActivePort`, `SystemTrackLintAdapter`, and `SystemTrackCatalogueLintActiveAdapter` in `task-contract.json`, and those infrastructure adapters are modified by the current T008 implementation, but the task description names only `apps/cli-composition` for wiring and never identifies these track-lifecycle modules or symbols. An executor would have to discover this additional boundary. Add the concrete usecase/infrastructure track-lifecycle targets and the extractor-wiring operation to T008.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d1720a890992925b356c00aa45f6243a61fcd6d93e506553fac5c3f5fc9a3390",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T03:51:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05e4d60347555344e0bb15895c23706b8e66ee548d0d41c8065d4338bb391784",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T08:00:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b75c4c9435a308738346a1075077e7f3eb7beb92186d086639ec20798364e6c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T10:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ff928a08b776a57166ed740786a3e01dae406baedab77f6dc27e76fbe5346c9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T10:56:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:389111735d29a2fd10978b78981fd25ba6e939b34df10b2bd84ff4f44dfbed43",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -917,6 +1487,437 @@
           "hash": "rvw1:sha256:0bbb26bf2e7fe4af2e3397f6ce0b6611b1e888771a4a46f64de02f63b7c9df6b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T15:22:50Z",
+          "findings": [
+            {
+              "category": "input_validation",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_add.rs",
+              "line": 142,
+              "message": "`CatalogueEntryKey::try_new` only checks for non-empty text, so replacing `TypeName`/`TraitName` removes Rust-identifier validation. Inputs such as `domain::::Port`, `domain::bad-name`, or `Bad Name` now make `catalog add` report success and persist keys that canonical identity resolution later rejects; inherent impls also receive the unchecked value as `type_name`. Validate every optional path segment and the terminal item at this adapter boundary while continuing to allow both short and qualified forms.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:07844f9145b78d998ef6747668d651f3aee9665480d7d2c849fd5ae9041df310",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T18:36:45Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 346,
+              "message": "`parse_type_ref_with_generics` rewrites prelude names such as `Iterator` to `std::iter::Iterator`, while rustdoc identifies the definition as `core::iter::traits::iterator::Iterator`. After this delegation, the shared resolver only supports exact module matches plus a small collection/`FromStr` alias table, so valid expressions involving `Iterator`, `Deref`, `FnOnce`, `Drop`, and similar parser-known prelude items now return `UnresolvedIdentifier` despite their authoritative paths being present. Preserve complete prelude-to-rustdoc definition reconciliation and add regression coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c8ea00d6b8482c06c19b9bfead197d9a0dc7aa5c18676fa7ae9ee443c7fbae7e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T19:36:28Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 severity policy の最初の読み取りを3回再試行しましたが、sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` を read-only filesystem 上で開けず、毎回実行前に失敗しました。そのため briefing、CURRENT file list、CURRENT diff、対象ファイルを再読できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:c8ea00d6b8482c06c19b9bfead197d9a0dc7aa5c18676fa7ae9ee443c7fbae7e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T19:46:36Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 severity policy の最初の読み取りを3回再試行しましたが、sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` を read-only filesystem 上で開けず、毎回実行前に失敗しました。そのため briefing、CURRENT file list、CURRENT diff、対象ファイルを再読できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:d2b13be4b28870d6bd5ce732fe13487b93c5bbb0fe26072138b89c2a2ac7f3b8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T19:47:29Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 severity policy の最初の読み取りを3回再試行しましたが、sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` を read-only filesystem 上で開けず、毎回実行前に失敗しました。そのため briefing、CURRENT file list、CURRENT diff、対象ファイルを再読できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:d2b13be4b28870d6bd5ce732fe13487b93c5bbb0fe26072138b89c2a2ac7f3b8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:00:14Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 84,
+              "message": "`unique_resolved_id` now accepts every unique external short-name match as the parser’s local-resolution result. For example, with only `anyhow::Result` in the authoritative universe, bare `Result<T, E>` is silently canonicalized as `anyhow::Result<T, E>` instead of retaining the standard-prelude meaning or failing closed. This bypasses the existing requirement that non-standard cross-crate references remain qualified and can compare against the wrong type. Restrict this shortcut to catalogue-crate identities and recognized `std`/`core`/`alloc` prelude definitions.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 343,
+              "message": "The added regression test repairs only bare prelude spellings. An explicit valid path such as `std::iter::Iterator` bypasses `unique_resolved_id` and is delegated directly, but the rustdoc universe identifies it as `core::iter::traits::iterator::Iterator` and the shared resolver lacks that alias. Consequently explicit `std::iter::Iterator`, `std::ops::Deref`, `std::ops::FnOnce`, and similar paths now return `UnresolvedIdentifier`, regressing the previous prelude reconciliation. Preserve public `std`-path to rustdoc-definition aliases and cover explicit spellings.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d2b13be4b28870d6bd5ce732fe13487b93c5bbb0fe26072138b89c2a2ac7f3b8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:29:27Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 85,
+              "message": "`unique_resolved_id` collapses every resolver error to `None`. When a prelude spelling has multiple local candidates—for example `domain::a::String` and `domain::b::String`—the parser then rewrites bare `String` to the standard-library spelling; if `alloc::string::String` is present, canonicalization silently selects it instead of returning `AmbiguousIdentifier` with the two local candidates. Preserve the raw spelling when ambiguity is entirely local, or perform the ambiguity check before prelude rewriting.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 351,
+              "message": "`is_allowed_short_name` treats any `core`/`alloc`/`std` identity whose terminal name appears in `STD_PRELUDE_TYPES` as the corresponding prelude item, without validating its module. With a universe containing only `core::fmt::Result`, bare `Result` is therefore silently canonicalized to that formatting alias rather than failing because `core::result::Result` is absent. Validate the complete standard-library definition path, not only crate and short name.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 337,
+              "message": "Explicit public standard-library paths still bypass the new bare-name shortcut. For example, `std::iter::Iterator` reaches `resolve_catalogue_identity` directly, but the authoritative rustdoc identity is `core::iter::traits::iterator::Iterator` and the shared resolver lacks that alias; the same applies to paths such as `std::ops::Deref` and `std::ops::FnOnce`. These valid qualified spellings now return `UnresolvedIdentifier`. Preserve public `std`-path to rustdoc-definition reconciliation and add explicit-path tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0fa1097e0b7ac85169b7506168048dacbc44302cb4975264e8637178b2e6ac48",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:32:57Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 84,
+              "message": "Removing the catalogue-crate guard lets any unique external short-name identity satisfy the parser’s local-resolution callback. For example, with only `anyhow::Result` or `core::fmt::Result` in the authoritative universe, bare `Result<T, E>` is silently canonicalized to that unrelated identity rather than the standard prelude definition or a fail-closed error. Cross-crate references must remain qualified; restrict this shortcut to catalogue-local identities and verified standard-library prelude definitions.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 343,
+              "message": "Explicit public standard-library paths still bypass the bare-name shortcut. `std::iter::Iterator` reaches `resolve_catalogue_identity` directly, but rustdoc identifies it as `core::iter::traits::iterator::Iterator` and the shared resolver lacks that alias; similarly for paths such as `std::ops::Deref` and `std::ops::FnOnce`. These valid qualified spellings now return `UnresolvedIdentifier`. Preserve public `std`-path to rustdoc-definition reconciliation and add explicit-path tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d2b13be4b28870d6bd5ce732fe13487b93c5bbb0fe26072138b89c2a2ac7f3b8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T04:30:56Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_lint_active.rs",
+              "line": 57,
+              "message": "The active-track adapter uses `rules_file` verbatim instead of resolving and confining it beneath `workspace_root`. An absolute path can therefore read any regular JSON file outside the trusted workspace, and a relative override is resolved against the process CWD rather than the selected workspace. Apply the same canonical trusted-root containment logic used by `SystemTrackLintAdapter::resolve_config_path` before constructing the loader.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 86,
+              "message": "The extractor overrides only `visit_type_path`, but `syn` represents paths in `dyn Trait` and `impl Trait` bounds as `TraitBound.path`, visited through `visit_path` rather than `visit_type_path`. Expressions such as `dyn domain::ports::Port` therefore yield no extracted identity, causing identity rules either to report a spurious unresolved type or silently miss a method reference. Extract trait-bound paths explicitly and add `dyn`/`impl Trait` coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 348,
+              "message": "Standard-library re-export reconciliation remains incomplete. Bare or explicit `std::iter::IntoIterator`, `DoubleEndedIterator`, and `ExactSizeIterator` are parser-supported prelude paths, but rustdoc identifies them under nested `core::iter::traits::*` modules that the shared resolver does not alias. They consequently return `UnresolvedIdentifier` despite authoritative identities being present. Preserve aliases for the full existing prelude surface, not only `Iterator`, `Deref`, and `Fn*`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6f1f4f28ecac9fb106b3e2eba3cc9abfac09b49a73f7f0252474791fe54c5cff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T04:40:56Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 348,
+              "message": "Standard-library re-export reconciliation is still incomplete. `STD_PRELUDE_TYPES` includes `IntoIterator`, `DoubleEndedIterator`, and `ExactSizeIterator`, so bare forms are rewritten to `std::iter::*`; explicit forms reach the same resolver. Rustdoc identifies these traits under nested `core::iter::traits::{collect,double_ended,exact_size}` modules, but the shared alias table only covers `Iterator`. These valid existing spellings therefore return `UnresolvedIdentifier`. Preserve aliases for the full prelude surface and add bare plus explicit-path tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7fa80757ce2b907301eb6dc4f29fc9038ad4709f8e0ce509ebea8b24e85d9ec5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T07:02:48Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを実行できませんでした。必須 severity policy の最初の読み取りを3回再試行しましたが、sandbox が `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` を read-only filesystem 上で開けず、毎回実行前に失敗しました。そのため briefing、CURRENT file list、CURRENT diff、対象ファイルを再読できていません。sandbox 実行環境を復旧して再実行してください。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:08e8c3bd149d8635a3033f17c1862d3b91e9380f54e20c669503094bdcdcf02b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T07:18:02Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/canonical_type_identity.rs",
+              "line": 348,
+              "message": "`unique_resolved_id` の crate guard は parser callback にしか効きません。非 prelude の bare 名（例: `Error`）は raw spelling のまま最終 pass に到達し、ここで全 crate の universe を渡すため、local 候補がなく `anyhow::Error` だけが存在すると、それへ黙って canonicalize されます。cross-crate TypeRef は修飾必須なので、最終 pass でも bare 名を catalogue crate または検証済み standard-prelude identity に限定してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 48,
+              "message": "短い impl owner が複数の完全修飾 key に一致すると `resolve` は `None` を返しますが、`resolve_or_raw` は曖昧性と未解決を区別せず短名へ戻します。例えば `alpha::Shared` と `beta::Shared` がある場合、impl signal は unknown owner `Shared` に格納され、後段では両 qualified entry が既定の Blue として追加されます。候補付きで fail-closed にするか、qualified owner を保持して別々に結合してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 373,
+              "message": "collision 用 `next_id` が未使用であることを確認せず挿入しています。例えば baseline の最大 ID が 10、current に新規 ID 11 と baseline ID 5 に衝突する別 summary があり、ID 11 が先に走査されると、後者を ID 11 へ挿入して前者を上書きします。`HashMap` の走査順により authoritative path が非決定的に欠落するため、両 map で未使用の ID を割り当ててください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 52,
+              "message": "Mermaid ID の生成が非単射です。例えば同一 layer/crate の合法な key `domain::alpha::Shared` と root key `domain__alpha__Shared` は、sanitize 後の文字列と長さが同一になり、同じ type node ID を生成します。別 identity の node と edge が Mermaid 上で合流するため、raw component ごとの可逆な length-prefix または衝突耐性のある encoding を使用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08e8c3bd149d8635a3033f17c1862d3b91e9380f54e20c669503094bdcdcf02b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T07:47:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 197,
+              "message": "曖昧 owner の Yellow は `or_insert_with` の初期値にしか適用されません。実 evaluator は type signals を impl signals より先に出すため、両 qualified owner は既に Blue で `acc` に存在し、この closure は実行されません。その後 Blue の短名 impl signal が両 owner にコピーされても Blue のままになり、片方にしかない impl を双方で達成済みとして gate が通り得ます。既存 entry に対しても `ambiguous` を無条件に `worse_signal(..., Yellow)` で反映してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 46,
+              "message": "qualified report label の exact alias/canonical lookup が失敗した後も terminal short nameへ fallback しています。例えば catalogue に `domain::alpha::Shared` と `domain::beta::Shared` があり、current 側に未宣言の `domain::gamma::Shared` があると、その qualified extra signal が alpha/beta の双方へ誤帰属します。`::` を含む入力は exact lookup の失敗時点で未解決として保持し、short fallback は bare label に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/node_index.rs",
+              "line": 107,
+              "message": "`syn::Path::leading_colon` は `::` token ですが、ここでは `:` を1文字だけ挿入して `:external::Port` を構築しています。trait_impl などから直接渡された有効な absolute TypeRef `::external::Port` が resolver に一致せず、contract-map edge が黙って欠落します。先頭には `::` 全体を復元してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs",
+              "line": 136,
+              "message": "AST collector が absolute path の leading `::` を candidate 名から捨てています。例えば current crate に `domain::T::Item` がある状態で `::T::Item` を参照すると、外部 crate `T` の absolute pathではなく local module path `domain::T::Item` として解決され、誤った edgeを生成します。`is_absolute` を generic-shadow判定だけでなく identity lookup にも反映してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 123,
+              "message": "type/trait/function ID は injective encoding に直りましたが、layer/module subgraph ID は依然 `sanitize` による非単射です。どちらも有効な `LayerId` である `my-gateway` と `my_gateway` は同じ layer subgraph IDになり、Mermaid 上で別 layer の親グラフが衝突します。module ID も component 境界を `_` で連結するため同様です。これらにも identity component encoding を適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
+              "line": 91,
+              "message": "AC-08/T012 の adapter fixture が同名併存を再現していません。add は `AdapterEntry`、import は `RemovedEntry` なので、実装が terminal short name 単位で上書き・衝突してもこのテストでは検出できません。同じ tail（例: `alpha::Shared` と `beta::Shared`）を add/import し、両 raw key が同時に保存され cite が指定側だけを更新することを検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c0625800ddddbbecdc18f82900e07e4435b68f589daa2e0d285b282e2c3548e5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T10:11:26Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 134,
+              "message": "`action: add` の型・trait が baseline/current rustdoc の双方にまだ存在しない場合、ここで `UnresolvedIdentifier` となります。identity index は evaluator より先に構築されるため、本来の `SMinusC_Add`（Yellow）を生成できず type-signals コマンド自体が失敗します。未実装 entry は catalogue identity の alias を保持したまま evaluator へ渡す必要があります。",
+              "severity": "P0"
+            },
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 69,
+              "message": "identity index が live な `types()` / `traits()` だけを列挙し、`catalogue.deletions()` の型・trait tombstone を除外しています。新しい import は完全修飾 delete key を書きますが、Phase 2 が一意な identity を短名で報告すると元の key に戻せず、signal が短名かつ `unknown` として永続化されて task-contract/Chain ③ の entry-key join が壊れます。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 120,
+              "message": "trait-impl owner の短名 alias を declaration alias と同じ map に追加しているため、完全修飾された local entry と同名の external orphan-impl owner があるだけで、通常の型 signal まで複数候補になります。その結果、正しく実装済みの local entry が Yellow になり、無関係な external `unknown` signal も生成されます。declaration と impl-owner の alias lookup を分離してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "input_validation",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 97,
+              "message": "新しい完全修飾 key の構築が、空 segment を除去する `parse_type_path` をそのまま信頼しています。このため `domain::::Foo` のような不正入力が `domain::Foo` として受理され、特に delete import は rustdoc 解決なしで別 identity の tombstone を書き込みます。`verb_add` と同様に元入力の全 segment を検証してから正規 key を作る必要があります。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:1baae32317e83110bb7e3a7bb0e2cc64acc9b90c7ee27942b8443b816f10f507",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T11:06:56Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 155,
+              "message": "完全修飾された generic impl owner を declaration key に結合できません。例えば宣言 key が `domain::alpha::Wrapper`、`for_type` が `domain::alpha::Wrapper<T>` の場合、canonical 値には `<T>` が残るため `canonical_to_keys` lookup が失敗します。さらに raw owner は `::` を含むため declaration fallback も無効になり、impl signal が `domain::alpha::Wrapper<T>` という別の unknown entry に保存され、正規 declaration も Yellow になります。owner の外側の canonical identity を declaration key と照合してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 106,
+              "message": "`visit_type_path` は `qself` を持つ qualified path 全体を先に catalogue reference として記録します。例えば `<domain::alpha::Wrapper as domain::ports::Port>::Output` では、存在しない `domain::ports::Port::Output` が最初の reference になり、resolver が失敗してから `Wrapper` や `Port` に到達できません。そのため有効な Rust TypeRef が identity-sensitive lint で誤って拒否されます。`qself` では self type と trait prefix を個別に抽出し、associated item の末尾を identity として扱わないでください。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "line": 67,
+              "message": "entry key が完全修飾表記になった一方、表示ラベル生成はその raw key に `module_path` を再度付加しています。正当な `key: domain::alpha::Shared` / `module_path: alpha` は `alpha::domain::alpha::Shared` と表示され、実在しない identity を contract-map に出力します。node ID/index には完全修飾 key を使いつつ、ラベルには key の terminal name を渡してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:83556b6cbc5399628701a83f030e89d6b0db2338d6a3b7892a2829036586df6b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T11:26:17Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/lint.rs",
+              "line": 78,
+              "message": "既定 config path は `trusted_root.join(...)` のまま返され、最終パスの containment 検証も中間 symlink の拒否も行われません。例えば workspace 内の `.harness` を外部ディレクトリへの symlink にすると、後続の `symlink_metadata` は末端の通常ファイルだけを確認するため、workspace 外の gate 設定を `FsLintConfigLoader` が読み込みます。`scope_config_loader.rs` と同様に全コンポーネントの symlink を拒否し、canonicalized path が trusted root 内であることを確認してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 80,
+              "message": "`insert_entry` は raw key の重複しか検査しないため、短名既定の既存 entry と新しい完全修飾 import が同一 canonical identity でも書き込みに成功します。例えば既存の `types.LayerId` が `module_path: tddd` のとき、`domain::tddd::LayerId` の import は第二の key を追加して成功を返し、後続 codec の alias guard が拒否する壊れた catalogue を残します。書き込み前に既存 key と module_path から identity を構築し、同一 identity を typed duplicate error にしてください。",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 155,
+              "message": "generic owner の修正は rustdoc path が存在する場合だけ有効です。未実装の `action: add` 宣言 `domain::new::Added` と `for_type: domain::new::Added<T>` では canonicalization が許容された `UnresolvedIdentifier` となり、fallback は raw 値に `::` があるため base declaration を検索しません。その結果、impl alias は `domain::new::Added<T>` という別 entry に結合され、正規 entry と unknown entry の双方が Yellow になります。canonicalization が未解決でも outer generic suffix を除いた qualified identity を exact declaration lookup に使用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c36a7699ca61aca70f69b4dc07b853a2b819618d134a692c91882e7f5ed035a7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T11:48:54Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 126,
+              "message": "semantic duplicate check now parses `module_path` for every existing bare-key entry before checking whether its terminal name could match the imported type. `catalog add` intentionally creates bare draft entries whose `module_path` is a `$todo` object, so an unrelated draft such as `Foo` prevents importing `domain::tddd::LayerId` with `SchemaInvalid`, even though their names prove they cannot be the same identity. Skip entries with a different terminal name before requiring a concrete module path; retain fail-closed handling when the names can collide.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 155,
+              "message": "raw-owner fallback is applied even when canonicalization succeeded and proved the owner is external. If the catalogue has local `domain::other::Thing` stored under key `other::Thing`, while authoritative rustdoc paths also contain external `other::Thing`, an impl owner `other::Thing` canonicalizes to the external identity, misses `canonical_to_keys`, then this fallback binds it to the local raw-key declaration. Only use raw fallback for the explicitly allowed unresolved Add/Delete case; a resolved canonical identity with no declaration match must remain an external owner.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:17cad423ea03e3befdd6c17265f303e1d3f6a9d166790750b277c6c49eb52d68",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T11:56:24Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 60,
+              "message": "impl signal の候補解決が exact impl alias と declaration の raw alias を常に合成するため、canonical owner を保持しても同名 local entry へ再び誤帰属します。例えば local `domain::other::Thing` の raw key が `other::Thing` で、外部 owner `other::Thing` の impl alias も存在すると、`other::Thing: LocalTrait` は local/external の双方へコピーされ Yellow になります。impl signal では exact impl alias を優先し、それが無い場合だけ declaration alias へ fallback してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:329a76566da2c0b6692046f3fbbcb8bedd8418a50af7838e295d0522fea47e87",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T12:03:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:df47a31586e345523f0a63d346e1e2ae50d216efa26b4ebe20636212e86ad493",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1088,6 +2089,49 @@
           "hash": "rvw1:sha256:e43d5320b3cec9b0a5952e31c188fbaafaab0f2d9afe05224e87a2055a178cf4",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T00:50:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e68885f6926222367af3cb86a35656880183d1a20cf670c01781437f98135e51",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T04:07:40Z",
+          "findings": [
+            {
+              "category": "gate",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 769,
+              "message": "Cross-scope dependency: this new Arc fulfillment cannot pass the required gate. `bin/sotp test-obligation check` fails with `entry 'std::sync::Arc<T>' in layer 'domain' has no task attribution`; T008 currently attributes `Arc`, while the obligation and binding use `std::sync::Arc<T>`. Align the task-attribution key/normalization and rerun the check.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 777,
+              "message": "The sole test bound as Arc contract-conformance evidence exercises only the successful result from an infallible stub. Because `TypeRefPathExtractorPort::extract` returns `Result`, an Arc implementation that swallowed or changed inner errors would still pass this evidence. Add and bind an error-propagation case using a failing extractor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fe1dbd500aa1c7b31045870765b0615e10593f2224d9341fc162dde3e5aa5b65",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T08:54:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1dbd500aa1c7b31045870765b0615e10593f2224d9341fc162dde3e5aa5b65",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T12:29:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:be2ce398ef5fb52085f1aa05a2d88565ba24ddf18586ac5bd993900b48f6426f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1162,6 +2206,43 @@
           "at": "2026-08-21T07:22:57Z",
           "findings": [],
           "hash": "rvw1:sha256:a2f25d674ea0ebc3db271bbf85a9eee2c2c928b05a565302cd39c6d60673a7c9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T20:37:21Z",
+          "findings": [
+            {
+              "category": "review_incomplete",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: every local shell read failed before execution because the sandbox could not create `/tmp/codex-bwrap-synthetic-mount-targets-1000/lock` on the read-only filesystem. Consequently, the required briefing, current `spec.json`, and current diff were not inspected; returning `zero_findings` would be invalid.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:8c7c101c3ac62936e381cde0ab866c071228cd594a090b309527a9e7b40de0be",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:41:01Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+              "line": 79,
+              "message": "AC-07 は「曖昧または未解決」の両方で候補の完全修飾パスを示すよう要求していますが、IN-04 は候補列挙を曖昧な短名に限定し、未解決時は未解決対象を診断する契約です。CO-03 も AC-07 側の要件を繰り返しており、候補が存在しない未解決 identity の診断要件を一意に導出できません。元 ADR の D1 と delta ADR の D1 にも同じ不一致があるため、ADR owner / guardian lane での解消が必要です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c7c101c3ac62936e381cde0ab866c071228cd594a090b309527a9e7b40de0be",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T20:46:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2536b6ea9a2aab4a8f570e0d3e5b8c1bfedfb3d96a801384a1160ec510160982",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1624,6 +2705,181 @@
           "hash": "rvw1:sha256:a5ac26d4d069c44ee1d361ab127ac4c93d121fb4756e6f12ca871ee8f769a3b2",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T16:12:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84797ca7c1870882ea9838729fcc3d2a5d940604166f2a2489663da5e0bc7eae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T21:15:07Z",
+          "findings": [
+            {
+              "category": "lossy_boundary_downgrade",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 45,
+              "message": "`domain::tddd::catalogue_linter::evaluate_catalogue_lint` は `TypeRefPathExtractorPort` と `resolve_catalogue_identity` の失敗を受け取る契約になった一方、戻り値は既存の `CatalogueLinterError` のままで、同 ErrorType または `CatalogueLintViolation` の companion `action: modify` がありません。frozen baseline の `CatalogueLinterError` は `PrimitiveOccurrenceScanError` しか構造化して運べず、violation は文字列しか持たないため、`TypeRefPathExtractionError` と `NewTypeGraphCodecError::AmbiguousIdentifier` の `NonEmptyVec<FullyQualifiedItemPath>` は誤った variant へ写すか文字列化するしかなく、構造化候補を保持する codec 側との lossy boundary downgrade になります。抽出失敗と identity 解決失敗を保持する variant/conversion、または同等の typed carrier を catalogue に宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 64,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` の docs は「caller-extracted path」「deduplicated identity set」「Rust parsing remains adapter-owned」という delta ADR D1／改訂 spec の責務分担を文として再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、docs は短い symbol-purpose 名詞句に留め、挙動と層境界は既存の `spec_refs` だけで参照してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9d62f1cd44b5cd29854670ea798d855f69298862e9978ef41e89e3419c70c565",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T21:26:39Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1496,
+              "message": "`domain::tddd::catalogue_linter::CatalogueLinterError` の `action: modify` が frozen baseline の既存 shape を保持していません。`DuplicateTypeAliasGenericParameter`、`InvalidTypeAliasGenericParameterName`、`ConflictingTypeAliasGenericParameters`、`UnknownLayer` は baseline では名前付き field を持つ struct variant ですが、現在の catalogue はすべて tuple variant として宣言しています。今回の契約は `PathExtractionFailed` と `IdentityResolutionFailed` の追加であり、既存 variant の tuple 化は無関係な破壊的 API 変更になります。既存 4 variant を field 名付き `kind: struct` で再現し、新規 variant だけを追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f38d360d19ed9861994c9a4740115014eeccbe9aa0918490bc30db04f2d84b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-22T21:36:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a4e0d62d27e1a9271f83b1aba5cc0781976d2d23d1d62914646f282f1b2a74c0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T00:42:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53f29c4207c25cd6b8f8c5ba165b2d5ea1c3153af6176829dfd631a5f4ad9fb5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T02:23:41Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 254,
+              "message": "`infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter::new` is declared `action: modify`, but the frozen infrastructure rustdoc baseline contains no inherent impl or `new` method for this existing adapter. The extractor-taking constructor is a newly introduced public method and must be `action: add`; the enclosing adapter remains `modify`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/infrastructure-types.json",
+              "line": 310,
+              "message": "`infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter::new` is declared `action: modify`, but the frozen infrastructure rustdoc baseline contains no inherent impl or `new` method for this adapter. Classify the new extractor-taking constructor as `action: add` while retaining `action: modify` on the existing adapter type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dfc8bbfa3f7a88fa99b24e992f6a76cd5e06daacd5384302f46c952e5a2aa732",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T02:33:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a48a6767951e7ab5b2e665c46dd1886148d6a648be738e6b6b970aadfcff9c49",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T08:59:47Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 59,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` still returns the broad `NewTypeGraphCodecError`, although it receives an already-extracted `TypeRef` and can only produce `AmbiguousIdentifier` or `UnresolvedIdentifier`. `InvalidTypeRef(TypeRef, DiagnosticMessage)` belongs to parsing, is separately represented by `TypeRefPathExtractionError`, and cannot be constructed here. Use a narrower resolution error or document and enforce the producible subset before conversion.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1516,
+              "message": "`domain::tddd::catalogue_linter::CatalogueLintViolation` is a `reference` entry, but all four listed baseline methods (`new`, `rule_kind`, `entry_name`, and `message`) omit `action`; the v5 codec defaults each omission to `add`. This falsely declares unchanged baseline methods as new API. Mark the methods `reference` (and preserve their complete baseline signatures, including `Into<String>` bounds) or omit the method declarations according to the intended reference contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:544ff1bde19990973d9f95743e48c945045f10eb06e75982008923c61efc4701",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T09:31:38Z",
+          "findings": [
+            {
+              "category": "review_infrastructure",
+              "file": null,
+              "line": null,
+              "message": "Review blocked: every local filesystem command failed before execution because the sandbox could not create its bwrap namespace. Therefore the required briefing, current file contents, and current diff could not be inspected, so a valid types-scope verdict cannot be issued.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:544ff1bde19990973d9f95743e48c945045f10eb06e75982008923c61efc4701",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T09:40:17Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 81,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` receives an already-formed `TypeRef` and can only produce `AmbiguousIdentifier` or `UnresolvedIdentifier`; `NewTypeGraphCodecError::InvalidTypeRef` belongs to parsing and is structurally unreachable here. Introduce a resolution-specific error instead of forcing callers to handle an impossible variant.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1516,
+              "message": "`domain::tddd::catalogue_linter::CatalogueLintViolation` is a `reference` entry, but its four unchanged baseline methods (`new`, `rule_kind`, `entry_name`, and `message`) omit `action`, which defaults each method to `add`. Mark these methods `reference` and retain their complete baseline signatures.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:544ff1bde19990973d9f95743e48c945045f10eb06e75982008923c61efc4701",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T10:08:00Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 81,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` receives an already extracted `TypeRef` and has no parser collaborator, so it can produce only `AmbiguousIdentifier` or `UnresolvedIdentifier`. Returning `NewTypeGraphCodecError` also exposes the structurally unreachable `InvalidTypeRef` parsing variant. Use a resolution-specific error type or explicitly narrow the contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+              "line": 1516,
+              "message": "`domain::tddd::catalogue_linter::CatalogueLintViolation` is declared `reference`, but its four unchanged baseline methods omit `action`, which defaults each method to `add`. Their signatures are also incomplete—for example, `new` declares bare `impl Into` instead of `impl Into<String>`. Mark the methods `reference` and preserve their complete baseline signatures.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:544ff1bde19990973d9f95743e48c945045f10eb06e75982008923c61efc4701",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T10:50:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81ebda61ec9b129cb2e1e6771fa1b64729d3063c39b6a52a99fcbbe3dcce4c98",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1780,6 +3036,42 @@
           "at": "2026-08-22T12:12:11Z",
           "findings": [],
           "hash": "rvw1:sha256:e2735f1b65fba473611b7d5fea8f79ec928821c845953f7cd24049193907d196",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T14:58:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01d10748006b13bb06859fbe8d014e124e8ec9b4d372fb87f59ee51bbb15022d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-22T18:50:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01d10748006b13bb06859fbe8d014e124e8ec9b4d372fb87f59ee51bbb15022d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-23T04:51:06Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを完了できませんでした。必須の severity policy、briefing、対象ファイル、CURRENT diff を読み込む全 shell command が `bwrap: No permissions to create a new namespace` で失敗しています。sandbox を復旧後に再実行してください。未検査のため `zero_findings` とは判定できません。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:9caedfb641e9ec48c08765701ca3a68c734942dcedc17df6253068042b031828",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-23T04:56:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9caedfb641e9ec48c08765701ca3a68c734942dcedc17df6253068042b031828",
           "type": "final",
           "verdict": "zero_findings"
         }

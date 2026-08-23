@@ -1,8 +1,283 @@
 {
   "crate_name": "usecase",
   "functions": {},
+  "inherent_impls": [
+    {
+      "impl_generics": [
+        {
+          "bounds": [
+            "domain::tddd::catalogue_ports::CatalogueLoader"
+          ],
+          "name": "L"
+        },
+        {
+          "bounds": [
+            "LintConfigLoader"
+          ],
+          "name": "C"
+        },
+        {
+          "bounds": [
+            "domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner"
+          ],
+          "name": "S"
+        },
+        {
+          "bounds": [
+            "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+          ],
+          "name": "E"
+        }
+      ],
+      "methods": [
+        {
+          "action": "modify",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "loader",
+              "ty": "L"
+            },
+            {
+              "name": "config_loader",
+              "ty": "C"
+            },
+            {
+              "name": "scanner",
+              "ty": "S"
+            },
+            {
+              "name": "extractor",
+              "ty": "E"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-07",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ],
+          "where_predicates": []
+        }
+      ],
+      "type_name": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+    }
+  ],
   "layer": "usecase",
   "schema_version": 5,
-  "traits": {},
-  "types": {}
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+      "impl_generics": [
+        {
+          "bounds": [
+            "domain::tddd::catalogue_ports::CatalogueLoader",
+            "Send",
+            "Sync"
+          ],
+          "name": "L"
+        },
+        {
+          "bounds": [
+            "LintConfigLoader",
+            "Send",
+            "Sync"
+          ],
+          "name": "C"
+        },
+        {
+          "bounds": [
+            "domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner",
+            "Send",
+            "Sync"
+          ],
+          "name": "S"
+        },
+        {
+          "bounds": [
+            "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+            "Send",
+            "Sync"
+          ],
+          "name": "E"
+        }
+      ],
+      "trait_ref": "RunCatalogueLint"
+    }
+  ],
+  "traits": {
+    "RunCatalogueLint": {
+      "action": "reference",
+      "docs": "Application service interface for catalogue lint execution.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "RunCatalogueLintCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::tddd::catalogue_linter::CatalogueLintViolation>, RunCatalogueLintError>"
+        }
+      ],
+      "module_path": "catalogue_lint_workflow",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort": {
+      "action": "reference",
+      "docs": "Secondary port for the blocking active-track catalogue-lint operation.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "command",
+              "ty": "TrackCatalogueLintActiveCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError>"
+        }
+      ],
+      "module_path": "track_lifecycle::tddd::catalogue_lint_active",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "usecase::track_lifecycle::tddd::lint::TrackLintPort": {
+      "action": "reference",
+      "docs": "Secondary port for the blocking single-layer catalogue-lint operation.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "command",
+              "ty": "TrackLintCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TrackLintResult, TrackLintError>"
+        }
+      ],
+      "module_path": "track_lifecycle::tddd::lint",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor": {
+      "action": "modify",
+      "docs": "Catalogue-lint interactor with injected loader, config, primitive scanner, and TypeRef path extractor dependencies.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    }
+  }
 }

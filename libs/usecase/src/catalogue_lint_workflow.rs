@@ -18,7 +18,7 @@
 use domain::TrackId;
 use domain::tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
-    RoleKind, RolePayloadField, RuleTarget, evaluate_catalogue_lint,
+    RoleKind, RolePayloadField, RuleTarget, TypeRefPathExtractorPort, evaluate_catalogue_lint,
 };
 use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
 use domain::tddd::catalogue_v2::identifiers::TypeRef;
@@ -256,32 +256,40 @@ pub trait RunCatalogueLint: Send + Sync {
 /// 2. `command.rules` empty → load from `config_loader.load()`.
 ///    - [`LintConfigLoaderError::MissingFile`] → [`RunCatalogueLintError::ConfigMissing`].
 ///    - Other load errors → [`RunCatalogueLintError::ConfigInvalid`].
-pub struct RunCatalogueLintInteractor<
+pub struct RunCatalogueLintInteractor<L, C, S, E>
+where
     L: CatalogueLoader,
     C: LintConfigLoader,
     S: PrimitiveOccurrenceScanner,
-> {
+    E: TypeRefPathExtractorPort,
+{
     loader: L,
     config_loader: C,
     scanner: S,
+    extractor: E,
 }
 
-impl<L: CatalogueLoader, C: LintConfigLoader, S: PrimitiveOccurrenceScanner>
-    RunCatalogueLintInteractor<L, C, S>
+impl<L, C, S, E> RunCatalogueLintInteractor<L, C, S, E>
+where
+    L: CatalogueLoader,
+    C: LintConfigLoader,
+    S: PrimitiveOccurrenceScanner,
+    E: TypeRefPathExtractorPort,
 {
     /// Creates a new interactor wrapping the supplied catalogue loader,
-    /// config loader, and primitive-occurrence scanner.
+    /// config loader, primitive-occurrence scanner, and TypeRef path extractor.
     #[must_use]
-    pub fn new(loader: L, config_loader: C, scanner: S) -> Self {
-        Self { loader, config_loader, scanner }
+    pub fn new(loader: L, config_loader: C, scanner: S, extractor: E) -> Self {
+        Self { loader, config_loader, scanner, extractor }
     }
 }
 
-impl<
+impl<L, C, S, E> RunCatalogueLint for RunCatalogueLintInteractor<L, C, S, E>
+where
     L: CatalogueLoader + Send + Sync,
     C: LintConfigLoader + Send + Sync,
     S: PrimitiveOccurrenceScanner + Send + Sync,
-> RunCatalogueLint for RunCatalogueLintInteractor<L, C, S>
+    E: TypeRefPathExtractorPort,
 {
     fn execute(
         &self,
@@ -330,7 +338,13 @@ impl<
         // Pass all catalogues so that cross-layer role references
         // (e.g. `UseCase.handles: ["domain::OrderPlaced"]`) are resolved
         // correctly against every enabled layer, not just the target layer.
-        let violations = evaluate_catalogue_lint(&rules, &catalogues, target_layer, &self.scanner)?;
+        let violations = evaluate_catalogue_lint(
+            &rules,
+            &catalogues,
+            target_layer,
+            &self.scanner,
+            &self.extractor,
+        )?;
 
         Ok(violations)
     }
@@ -513,7 +527,7 @@ mod tests {
         CrateName, FieldName, MethodName, ModulePath, ParamName, TypeRef,
     };
     use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
-    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
+    use domain::tddd::catalogue_v2::roles::{DataRole, IdentityAccessor, ItemAction, NonEmptyVec};
     use domain::tddd::catalogue_v2::variants::FieldDecl;
     use domain::tddd::catalogue_v2::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::layer_id::LayerId;
@@ -555,6 +569,20 @@ mod tests {
                 occurrences.insert(position, found);
             }
             Ok(PrimitiveOccurrenceReport::new(occurrences))
+        }
+    }
+
+    struct StubExtractor;
+
+    impl TypeRefPathExtractorPort for StubExtractor {
+        fn extract(
+            &self,
+            _type_ref: &TypeRef,
+        ) -> Result<
+            Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
+            domain::tddd::catalogue_linter::TypeRefPathExtractionError,
+        > {
+            Ok(Vec::new())
         }
     }
 
@@ -783,12 +811,306 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_ok(), "expected Ok, got: {result:?}");
         assert_eq!(result.unwrap(), vec![]);
+    }
+
+    #[test]
+    fn test_execute_returns_catalogue_lint_violations_from_injected_dependencies() {
+        let (order, catalogues) = three_layer_result("domain");
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .with(mockall::predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
+        let command = RunCatalogueLintCommand {
+            track_id: "my-track".to_owned(),
+            layer_id: "domain".to_owned(),
+            rules: vec![LintRuleSpec {
+                target_roles: vec!["ValueObject".to_owned()],
+                kind: LintRuleKind::FieldNonEmpty { target_field: RolePayloadField::Invariants },
+            }],
+        };
+
+        let violations = interactor.execute(command).expect("lint execution succeeds");
+
+        assert_eq!(violations.len(), 1);
+        assert_eq!(violations[0].entry_name(), "SentinelType");
+        assert_eq!(violations[0].rule_kind(), "FieldNonEmpty");
+    }
+
+    #[test]
+    fn test_execute_identity_rules_resolve_wrappers_and_fail_closed() {
+        struct IdentityAwareExtractor;
+
+        impl TypeRefPathExtractorPort for IdentityAwareExtractor {
+            fn extract(
+                &self,
+                type_ref: &TypeRef,
+            ) -> Result<
+                Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
+                domain::tddd::catalogue_linter::TypeRefPathExtractionError,
+            > {
+                use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
+
+                let reference = |value: &str| {
+                    ExtractedTypeRefPath::Reference(TypeRef::new(value.to_owned()).unwrap())
+                };
+                let wrapped = |value: &str| {
+                    vec![
+                        ExtractedTypeRefPath::GenericConstructor(
+                            TypeRef::new("std::ghost::UnknownWrapper".to_owned()).unwrap(),
+                        ),
+                        reference(value),
+                    ]
+                };
+
+                match type_ref.as_str() {
+                    "std::ghost::UnknownWrapper<&mut domain::alpha::Event>" => {
+                        Ok(wrapped("domain::alpha::Event"))
+                    }
+                    "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>"
+                    | "*const domain::alpha::Entity" => Ok(wrapped("domain::alpha::Entity")),
+                    "std::ghost::UnknownWrapper<*const domain::beta::Entity>" => {
+                        Ok(wrapped("domain::beta::Entity"))
+                    }
+                    "domain::beta::Event" => Ok(vec![reference("domain::beta::Event")]),
+                    "Entity" => Ok(vec![reference("Entity")]),
+                    "Event" => Ok(vec![reference("Event")]),
+                    "domain::missing::Event" => Ok(vec![reference("domain::missing::Event")]),
+                    _ => Err(
+                        domain::tddd::catalogue_linter::TypeRefPathExtractionError::InvalidTypeRef(
+                            type_ref.clone(),
+                        ),
+                    ),
+                }
+            }
+        }
+
+        let (order, mut catalogues) = three_layer_result("domain");
+        let domain_layer = layer("domain");
+        let catalogue = catalogues.get_mut(&domain_layer).expect("domain catalogue exists");
+        let module = |name: &str| ModulePath::from_segments(vec![name.to_owned()]).unwrap();
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        let aggregate_entry = |module_path: &str, member: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::AggregateRoot {
+                    identity: IdentityAccessor::new(MethodName::new("id").unwrap()),
+                    invariants: vec![],
+                    exclusive_members: vec![TypeRef::new(member.to_owned()).unwrap()],
+                    shared_value_objects: vec![],
+                    emits: vec![],
+                },
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Entity".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Entity".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::AggregateA".to_owned()).unwrap(),
+            aggregate_entry("alpha", "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::AggregateB".to_owned()).unwrap(),
+            aggregate_entry("beta", "std::ghost::UnknownWrapper<*const domain::beta::Entity>"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::AggregateAmbiguous".to_owned()).unwrap(),
+            aggregate_entry("alpha", "Entity"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseValid".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new(
+                            "std::ghost::UnknownWrapper<&mut domain::alpha::Event>".to_owned(),
+                        )
+                        .unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseWrongRole".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::beta::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseAmbiguous".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("Event".to_owned()).unwrap()] },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseUnresolved".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::missing::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::ExternalService".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::DomainService { emits: vec![] },
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![method(
+                    "read_entity",
+                    Some(domain::tddd::catalogue_v2::roles::SelfReceiver::SharedRef),
+                    vec![],
+                    "std::ghost::UnknownWrapper<&'static domain::alpha::Entity>",
+                )],
+                vec![],
+                vec![],
+                module("alpha"),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let rules = vec![
+            LintRuleSpec {
+                target_roles: vec!["UseCase".to_owned()],
+                kind: LintRuleKind::ReferencedRoleConstraint {
+                    target_field: RolePayloadField::Handles,
+                    expected_role: RoleKind::DomainEvent,
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["AggregateRoot".to_owned()],
+                kind: LintRuleKind::FieldElementUniqueAcrossEntries {
+                    target_field: RolePayloadField::ExclusiveMembers,
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["AggregateRoot".to_owned()],
+                kind: LintRuleKind::NoExternalReferenceInMethods {
+                    target_field: RolePayloadField::ExclusiveMembers,
+                },
+            },
+        ];
+        let interactor = RunCatalogueLintInteractor::new(
+            {
+                let mut loader = MockLoader::new();
+                loader
+                    .expect_load_all()
+                    .with(mockall::predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
+                    .times(1)
+                    .returning(move |_| Ok((order.clone(), catalogues.clone())));
+                loader
+            },
+            StubMissingConfigLoader,
+            StubScanner,
+            IdentityAwareExtractor,
+        );
+        let violations = interactor
+            .execute(RunCatalogueLintCommand {
+                track_id: "my-track".to_owned(),
+                layer_id: "domain".to_owned(),
+                rules,
+            })
+            .expect("identity-sensitive lint execution succeeds");
+
+        assert!(!violations.iter().any(|violation| {
+            violation.rule_kind() == "ReferencedRoleConstraint"
+                && violation.entry_name() == "domain::alpha::UseCaseValid"
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.rule_kind() == "ReferencedRoleConstraint"
+                && violation.message().contains("FullyQualifiedItemPath")
+                && violation.message().contains("alpha")
+                && violation.message().contains("beta")
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.rule_kind() == "ReferencedRoleConstraint"
+                && violation.message().contains("domain::missing::Event")
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.rule_kind() == "FieldElementUniqueAcrossEntries"
+                && violation.message().contains("FullyQualifiedItemPath")
+                && violation.message().contains("alpha")
+                && violation.message().contains("beta")
+        }));
+        assert_eq!(
+            violations
+                .iter()
+                .filter(|violation| violation.rule_kind() == "NoExternalReferenceInMethods")
+                .count(),
+            2
+        );
+        assert!(violations.iter().any(|violation| {
+            violation.rule_kind() == "NoExternalReferenceInMethods"
+                && violation.message().contains("domain::alpha::Entity")
+                && violation.message().contains("domain::alpha::ExternalService")
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.rule_kind() == "NoExternalReferenceInMethods"
+                && violation.message().contains("FullyQualifiedItemPath")
+                && violation.message().contains("alpha")
+                && violation.message().contains("beta")
+        }));
     }
 
     // ------------------------------------------------------------------
@@ -802,8 +1124,12 @@ mod tests {
             Err(CatalogueLoaderError::LayerDiscoveryFailed { reason: "boom".to_owned() })
         });
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(
@@ -825,8 +1151,12 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd("my-track", "presentation")); // not in set
 
         match result {
@@ -1101,8 +1431,12 @@ mod tests {
         // Insert the target back so it compiles; we won't hit load_all anyway.
         let _ = (order, catalogues);
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader2, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader2,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let bad_cmd = RunCatalogueLintCommand {
             track_id: "my-track".to_owned(),
             layer_id: "domain".to_owned(),
@@ -1130,8 +1464,12 @@ mod tests {
         // Re-check the execute() order: track_id parse → rules check → if empty: config load → load_all.
         // So load_all IS NOT called when config is missing — loader times(0) is correct.
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd_no_rules("my-track", "domain"));
 
         match result {
@@ -1151,8 +1489,12 @@ mod tests {
         let mut loader = MockLoader::new();
         loader.expect_load_all().times(0);
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubParseErrorConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubParseErrorConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd_no_rules("my-track", "domain"));
 
         assert!(
@@ -1177,7 +1519,8 @@ mod tests {
 
         let config_loader = StubSuccessConfigLoader { rules: vec![no_public_field_rule_spec()] };
 
-        let interactor = RunCatalogueLintInteractor::new(loader, config_loader, StubScanner);
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, config_loader, StubScanner, StubExtractor);
         let result = interactor.execute(cmd_no_rules("my-track", "domain"));
 
         assert!(result.is_ok(), "expected Ok when config provides rules, got: {result:?}");
@@ -1197,8 +1540,12 @@ mod tests {
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
         // StubNeverCalledConfigLoader panics if load() is invoked.
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubNeverCalledConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubNeverCalledConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
         // cmd() provides non-empty rules via CLI, so config_loader must not be called.
         let result = interactor.execute(cmd("my-track", "domain"));
 
@@ -1241,8 +1588,12 @@ mod tests {
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
 
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, PanicIfCalledScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            PanicIfCalledScanner,
+            StubExtractor,
+        );
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(
@@ -1329,8 +1680,14 @@ mod tests {
         )
         .unwrap();
 
-        let violations =
-            evaluate_catalogue_lint(&[rule], &catalogues, &target_layer, &StubScanner).unwrap();
+        let violations = evaluate_catalogue_lint(
+            &[rule],
+            &catalogues,
+            &target_layer,
+            &StubScanner,
+            &StubExtractor,
+        )
+        .unwrap();
 
         assert_eq!(
             violations.len(),
@@ -1417,8 +1774,12 @@ mod tests {
             .expect_load_all()
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
 
         let violations = interactor
             .execute(composition_root_command())
@@ -1456,8 +1817,12 @@ mod tests {
             .expect_load_all()
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
 
         let violations = interactor
             .execute(composition_root_command())
@@ -1503,8 +1868,12 @@ mod tests {
             .expect_load_all()
             .times(1)
             .returning(move |_| Ok((order.clone(), catalogues.clone())));
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            StubExtractor,
+        );
 
         let violations = interactor
             .execute(composition_root_command())

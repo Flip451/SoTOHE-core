@@ -81,7 +81,8 @@ pub struct CatalogAddArgs {
     #[arg(long, value_enum)]
     pub kind: CatalogKindArg,
 
-    /// Entry name.
+    /// Catalogue entry key. Use a short name by default, or an explicitly
+    /// qualified key when same-named declarations must coexist.
     #[arg(long)]
     pub name: String,
 
@@ -153,7 +154,8 @@ pub struct CatalogImportArgs {
     #[arg(long)]
     pub layer: String,
 
-    /// Rust path of the type to import (rustdoc-resolved).
+    /// Rust path of the type to import (rustdoc-resolved). The crate/module/name
+    /// path is retained as the written catalogue entry key.
     #[arg(long = "type")]
     pub type_path: String,
 
@@ -181,7 +183,7 @@ pub struct CatalogCiteArgs {
     #[arg(long)]
     pub layer: String,
 
-    /// Entry name to append anchors to.
+    /// Catalogue entry key to append anchors to; qualified keys are preserved.
     #[arg(long)]
     pub entry: String,
 
@@ -368,5 +370,76 @@ fn action_to_select(action: CatalogActionArg) -> CatalogImportSelect {
         CatalogActionArg::Reference => CatalogImportSelect::Reference,
         CatalogActionArg::Modify => CatalogImportSelect::Modify,
         CatalogActionArg::Delete => CatalogImportSelect::Delete,
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
+mod tests {
+    use clap::Parser;
+
+    use super::*;
+
+    #[derive(Debug, Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        command: CatalogCommand,
+    }
+
+    #[test]
+    fn test_catalog_cli_preserves_qualified_entry_keys_across_writer_verbs() {
+        let add = TestCli::try_parse_from([
+            "catalog",
+            "add",
+            "--layer",
+            "domain",
+            "--kind",
+            "struct",
+            "--name",
+            "domain::alpha::Shared",
+            "--role",
+            "ValueObject",
+        ])
+        .unwrap()
+        .command;
+        assert!(matches!(
+            add,
+            CatalogCommand::Add(CatalogAddArgs { name, .. })
+                if name == "domain::alpha::Shared"
+        ));
+
+        let import = TestCli::try_parse_from([
+            "catalog",
+            "import",
+            "--layer",
+            "domain",
+            "--type",
+            "domain::beta::Shared",
+        ])
+        .unwrap()
+        .command;
+        assert!(matches!(
+            import,
+            CatalogCommand::Import(CatalogImportArgs { type_path, .. })
+                if type_path == "domain::beta::Shared"
+        ));
+
+        let cite = TestCli::try_parse_from([
+            "catalog",
+            "cite",
+            "--layer",
+            "domain",
+            "--entry",
+            "domain::alpha::Shared",
+            "--anchor",
+            "AC-07",
+        ])
+        .unwrap()
+        .command;
+        assert!(matches!(
+            cite,
+            CatalogCommand::Cite(CatalogCiteArgs { entry, .. })
+                if entry == "domain::alpha::Shared"
+        ));
     }
 }

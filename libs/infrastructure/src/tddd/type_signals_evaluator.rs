@@ -1,6 +1,6 @@
 //! Per-layer type-signal evaluation with conservative rustdoc reuse.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -21,7 +21,7 @@ use freshness::{RustdocJsonPathProvider, decide_reuse_for_recorded_document};
 use inputs::{
     read_head_commit, read_utf8_file_limited, verify_evaluation_inputs_unchanged, worktree_is_clean,
 };
-use signal_builder::build_type_signals_from_report;
+use signal_builder::{build_type_signal_identity_index, build_type_signals_from_report};
 use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag};
 
 #[cfg(feature = "test-helpers")]
@@ -307,6 +307,10 @@ fn evaluate_and_write(
     let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
         EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
     })?;
+    let identity_paths =
+        merge_rustdoc_paths(&baseline, &current).map_err(EvaluateSignalsError::evaluation)?;
+    let identity_index = build_type_signal_identity_index(&catalogue, &identity_paths)
+        .map_err(EvaluateSignalsError::evaluation)?;
     let extended = CatalogueToExtendedCrateCodec::new()
         .encode(catalogue, &baseline, &current)
         .map_err(|error| {
@@ -335,7 +339,7 @@ fn evaluate_and_write(
     let document = TypeSignalsDocument::new(
         generated_at,
         TypeSignalsCacheKey::new(declaration_hash, head_commit, baseline_hash),
-        build_type_signals_from_report(report.iter(), &kinds),
+        build_type_signals_from_report(report.iter(), &kinds, &identity_index),
     );
     let encoded = type_signals_codec::encode(&document).map_err(|error| {
         EvaluateSignalsError::cache_write(format!("cannot encode type signals: {error}"))
@@ -346,6 +350,42 @@ fn evaluate_and_write(
         EvaluateSignalsError::cache_write(format!("cannot write type signals: {error}"))
     })?;
     Ok(ExitCode::SUCCESS)
+}
+
+/// Combines the frozen baseline and current rustdoc path tables for the
+/// producer-side identity join. Baseline-only delete entries must remain
+/// canonicalizable, while independently assigned rustdoc ids must not make a
+/// same-path item ambiguous.
+fn merge_rustdoc_paths(
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> Result<HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>, String> {
+    let mut paths = baseline.paths.clone();
+    let mut used_ids =
+        baseline.paths.keys().chain(current.paths.keys()).map(|id| id.0).collect::<BTreeSet<_>>();
+    let mut next_id = used_ids.iter().copied().max().unwrap_or(0).saturating_add(1);
+
+    for (id, summary) in &current.paths {
+        if paths
+            .values()
+            .any(|existing| existing.path == summary.path && existing.kind == summary.kind)
+        {
+            continue;
+        }
+        if paths.contains_key(id) {
+            let Some(remap_id) =
+                (next_id..=u32::MAX).find(|candidate| !used_ids.contains(candidate))
+            else {
+                return Err("cannot merge rustdoc paths: no unused item id remains".to_owned());
+            };
+            paths.insert(rustdoc_types::Id(remap_id), summary.clone());
+            used_ids.insert(remap_id);
+            next_id = remap_id.saturating_add(1);
+        } else {
+            paths.insert(*id, summary.clone());
+        }
+    }
+    Ok(paths)
 }
 
 fn reject_type_signals_path(
@@ -398,6 +438,46 @@ mod tests {
             r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
             rustdoc_types::FORMAT_VERSION
         )
+    }
+
+    fn rustdoc_crate_with_paths(
+        paths: HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>,
+    ) -> rustdoc_types::Crate {
+        rustdoc_types::Crate {
+            root: rustdoc_types::Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: HashMap::new(),
+            paths,
+            external_crates: HashMap::new(),
+            target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+            format_version: rustdoc_types::FORMAT_VERSION,
+        }
+    }
+
+    fn struct_summary(path: &[&str]) -> rustdoc_types::ItemSummary {
+        rustdoc_types::ItemSummary {
+            crate_id: 0,
+            path: path.iter().map(|segment| (*segment).to_owned()).collect(),
+            kind: rustdoc_types::ItemKind::Struct,
+        }
+    }
+
+    #[test]
+    fn test_merge_rustdoc_paths_allocates_id_unused_by_baseline_and_current() {
+        let baseline = rustdoc_crate_with_paths(HashMap::from([
+            (rustdoc_types::Id(5), struct_summary(&["domain", "Baseline"])),
+            (rustdoc_types::Id(10), struct_summary(&["domain", "MaxBaseline"])),
+        ]));
+        let current = rustdoc_crate_with_paths(HashMap::from([
+            (rustdoc_types::Id(11), struct_summary(&["domain", "Current"])),
+            (rustdoc_types::Id(5), struct_summary(&["domain", "Collision"])),
+        ]));
+
+        let merged = merge_rustdoc_paths(&baseline, &current).unwrap();
+
+        assert_eq!(merged.get(&rustdoc_types::Id(11)).unwrap().path, ["domain", "Current"]);
+        assert_eq!(merged.get(&rustdoc_types::Id(12)).unwrap().path, ["domain", "Collision"]);
     }
 
     fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {

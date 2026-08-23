@@ -6,7 +6,8 @@ use std::str::FromStr;
 
 use domain::tddd::catalog_gen::{CatalogEntryKind, CatalogEntryName};
 use domain::tddd::catalogue_linter::FreeText;
-use domain::tddd::catalogue_v2::{FunctionPath, TraitName, TypeName};
+use domain::tddd::catalogue_v2::{FunctionPath, Identifier};
+use domain::tddd::semantic_verify::CatalogueEntryKey;
 use serde_json::Value;
 use usecase::catalog_gen::{CatalogAddCommand, CatalogError, CatalogWriteReport};
 
@@ -104,8 +105,8 @@ fn append_top_level_declarations(
 ///
 /// - Function entries must be crate-qualified (`<crate>::…::<fn_name>`) so the
 ///   codec's cross-crate function-path guard accepts the key.
-/// - Type entries validate through `TypeName`.
-/// - Trait entries validate through `TraitName`.
+/// - Type and trait entries validate through the loose `CatalogueEntryKey`
+///   boundary, which accepts an optional fully qualified path.
 fn validate_entry_name(
     kind: CatalogEntryKind,
     name: &str,
@@ -114,9 +115,9 @@ fn validate_entry_name(
     match kind {
         CatalogEntryKind::Function => validate_function_name(name, crate_name),
         CatalogEntryKind::Struct | CatalogEntryKind::Enum | CatalogEntryKind::TypeAlias => {
-            validate_type_name(name)
+            validate_catalogue_entry_key(name)
         }
-        CatalogEntryKind::Trait => validate_trait_name(name),
+        CatalogEntryKind::Trait => validate_catalogue_entry_key(name),
     }
 }
 
@@ -134,18 +135,22 @@ fn validate_function_name(name: &str, crate_name: &str) -> Result<(), CatalogErr
     )))
 }
 
-/// A type entry name must validate through `TypeName`.
-fn validate_type_name(name: &str) -> Result<(), CatalogError> {
-    TypeName::new(name.to_owned())
-        .map(|_| ())
-        .map_err(|err| name_error(format!("entry name `{name}` must be a valid TypeName: {err}")))
-}
-
-/// A trait entry name must validate through `TraitName`.
-fn validate_trait_name(name: &str) -> Result<(), CatalogError> {
-    TraitName::new(name.to_owned())
-        .map(|_| ())
-        .map_err(|err| name_error(format!("entry name `{name}` must be a valid TraitName: {err}")))
+/// A type or trait entry key is catalogue notation and may include its
+/// crate/module qualification. Structural identity resolution remains outside
+/// this draft writer; each path segment must still be a valid catalogue
+/// identifier so an invalid key cannot be persisted for later resolution.
+fn validate_catalogue_entry_key(name: &str) -> Result<(), CatalogError> {
+    let key = CatalogueEntryKey::try_new(name.to_owned()).map_err(|err| {
+        name_error(format!("entry name `{name}` must be a valid CatalogueEntryKey: {err}"))
+    })?;
+    for segment in key.as_str().split("::") {
+        Identifier::new(segment.to_owned()).map_err(|err| {
+            name_error(format!(
+                "entry name `{name}` contains invalid path segment `{segment}`: {err}"
+            ))
+        })?;
+    }
+    Ok(())
 }
 
 /// Build a [`CatalogError::ParseFragment`] for a rejected entry name.
@@ -316,21 +321,58 @@ mod tests {
         assert!(matches!(err, CatalogError::ParseFragment { .. }));
     }
 
-    // Finding 4: a type name carrying path segments is rejected — type keys must
-    // be bare identifiers.
+    // Fully qualified type keys are accepted so same-named declarations can
+    // coexist in one catalogue.
     #[test]
-    fn test_add_entry_type_rejects_qualified_name() {
+    fn test_add_entry_type_accepts_qualified_name() {
         let temp = tempfile::tempdir().unwrap();
         let path = seed_catalogue(temp.path());
-        let err = add_entry_to_file(
+        let report = add_entry_to_file(
             &path,
             temp.path(),
             &struct_command("foo::Bar"),
             "spec.json",
             &anchors(),
         )
-        .unwrap_err();
-        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+        .unwrap();
+        assert_eq!(report.entry_key, "foo::Bar");
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(written["types"].get("foo::Bar").is_some());
+    }
+
+    #[test]
+    fn test_add_entry_qualified_name_keeps_inherent_impl_target_qualified() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut command = struct_command("domain::models::Bar");
+        command.inherent_methods = vec!["fn value(&self) -> u32".to_owned()];
+
+        add_entry_to_file(&path, temp.path(), &command, "spec.json", &anchors()).unwrap();
+
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        assert_eq!(
+            written["inherent_impls"][0]["type_name"],
+            serde_json::json!("domain::models::Bar")
+        );
+    }
+
+    #[test]
+    fn test_add_entry_rejects_invalid_qualified_name_segments() {
+        for invalid_name in ["domain::::Port", "domain::bad-name", "Bad Name"] {
+            let temp = tempfile::tempdir().unwrap();
+            let path = seed_catalogue(temp.path());
+            let err = add_entry_to_file(
+                &path,
+                temp.path(),
+                &struct_command(invalid_name),
+                "spec.json",
+                &anchors(),
+            )
+            .unwrap_err();
+            assert!(matches!(err, CatalogError::ParseFragment { .. }));
+        }
     }
 
     // A draft whose top-level `trait_impls` is a `$todo` hole (not an array)

@@ -249,7 +249,7 @@ fn derive_type_obligations(
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.types() {
         let method_axes_only = !is_derivable(entry.action());
-        let entry_key = catalogue_key(name.as_str())?;
+        let entry_key = name.clone();
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Types,
@@ -303,7 +303,7 @@ fn derive_trait_obligations(
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.traits() {
         let method_axes_only = !is_derivable(entry.action());
-        let entry_key = catalogue_key(name.as_str())?;
+        let entry_key = name.clone();
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Traits,

@@ -93,12 +93,12 @@
       }
     },
     {
-      "claim_hash": "3b1dab2843287aafde567c4478c9f28800346e337ec8443669390920673d3f9f",
+      "claim_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
       "claim_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。"
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
         },
         "kind": "spec_element"
       },
@@ -111,17 +111,40 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「catalogue-lint の `ReferencedRoleConstraint`、`FieldElementUniqueAcrossEntries`、`NoExternalReferenceInMethods`。いずれも現在は module を照合せず、同名を同一視し得る。」および「test-obligation derive の trait role index、task-contract と pre-review gate の `CatalogueEntryKey`、および `sotp catalog add` / `cite` と `import` が書き込む entry key。これらは短名を前提にしているため、完全修飾パスへの解決と同名併存に追従させる。」",
+        "citation": "「catalogue-lint の `ReferencedRoleConstraint`、`FieldElementUniqueAcrossEntries`、`NoExternalReferenceInMethods`。いずれも現在は module を照合せず、同名を同一視し得る。」\n\n「test-obligation derive の trait role index、task-contract と pre-review gate の `CatalogueEntryKey`、および `sotp catalog add` / `cite` と `import` が書き込む entry key。これらは短名を前提にしているため、完全修飾パスへの解決と同名併存に追従させる。」\n\n「完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。短い名前だけのキーへ暗黙に戻してはならない。」",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "428c009c0dd3daafbf567098898649f8df53201bbab7ea24895e2e82e46f7f72",
+      "claim_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "この universe 内で catalogue identity が曖昧または未解決である場合、lint は候補の完全修飾パスを含む診断を出して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "be343b3030ffbcf9bca3545dce9ba9edcfa7ad3be1619232165e03f21b86fafa",
       "claim_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "短名が一意に解決できない宣言と完全修飾パスを解決できない対象を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。"
+          "text_label": "catalogue-lint では、短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。外部 wrapper の綴りを含む Rust 型式全体の妥当性と、その実装上の identity 解決は Chain ③ の実装突合で検証する。"
         },
         "kind": "spec_element"
       },
@@ -134,7 +157,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。…完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。",
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "be343b3030ffbcf9bca3545dce9ba9edcfa7ad3be1619232165e03f21b86fafa",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "catalogue-lint では、短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。外部 wrapper の綴りを含む Rust 型式全体の妥当性と、その実装上の identity 解決は Chain ③ の実装突合で検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "この universe 内で catalogue identity が曖昧または未解決である場合、lint は候補の完全修飾パスを含む診断を出して fail-closed とする。外部 wrapper の綴りを含む Rust 型式全体の妥当性は catalogue-lint の検証対象に含めない。",
         "kind": "pass"
       }
     },
@@ -162,12 +208,12 @@
       }
     },
     {
-      "claim_hash": "eba9cc77b56365666598992ccd5810da51da9fd6dc8ed194c4a04ac318f74ff4",
+      "claim_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
       "claim_origin": {
         "data": {
           "element_id": "OS-01",
           "section": "out_of_scope",
-          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。"
+          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
         },
         "kind": "spec_element"
       },
@@ -181,6 +227,29 @@
       },
       "verdict": {
         "citation": "次の面は変更しない。`functions` の key と cross-crate 参照の catalogue 表記はすでに完全修飾パスであり、`sotp catalog import --type` の rustdoc 側照合も crate・module・name の完全一致で短名 fallback を持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "外部 wrapper の綴りを含む Rust 型式全体の妥当性は catalogue-lint の検証対象に含めない。",
         "kind": "pass"
       }
     },
@@ -300,12 +369,12 @@
       }
     },
     {
-      "claim_hash": "3f7e79ff8a8666124289415875b75bc6aa7746ed3021e677658b6f039dfed022",
+      "claim_hash": "b308aa0378ece54bda08e9d855aabb455c4f8caeb8c034386093357cfbc8870a",
       "claim_origin": {
         "data": {
           "element_id": "CO-03",
           "section": "constraint",
-          "text_label": "曖昧または未解決の識別は成功や推測ではなく fail-closed とし、利用者が解消に必要な対象情報を診断から得られるようにする。"
+          "text_label": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。"
         },
         "kind": "spec_element"
       },
@@ -318,7 +387,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。利用者は完全修飾パスの併記によって曖昧さを解消できる。",
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b308aa0378ece54bda08e9d855aabb455c4f8caeb8c034386093357cfbc8870a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の universe は catalogue の宣言 entry 集合とする。この universe 内で catalogue identity が曖昧または未解決である場合、lint は候補の完全修飾パスを含む診断を出して fail-closed とする。外部 wrapper の綴りを含む Rust 型式全体の妥当性は catalogue-lint の検証対象に含めない。",
         "kind": "pass"
       }
     },
@@ -415,12 +507,12 @@
       }
     },
     {
-      "claim_hash": "cdf45db2c98d78627e35adce6e7abc3eb0607d005aecae576f0aa5c0f85c60a9",
+      "claim_hash": "44fdd756465c38ed4d0bc578cb9263911fa8d7b6a000cb7b7c52457a53ee218f",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "完全修飾パスを解決できない対象では、その対象を示す診断とともに評価が失敗し、暗黙の短名キーへの復帰は起きない。"
+          "text_label": "Chain ③ の実装突合は、外部 wrapper の綴りを含む Rust 型式全体を syn と rustdoc paths で妥当性検証し、完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ、暗黙の短名キーへ復帰させない。"
         },
         "kind": "spec_element"
       },
@@ -434,6 +526,29 @@
       },
       "verdict": {
         "citation": "完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。短い名前だけのキーへ暗黙に戻してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44fdd756465c38ed4d0bc578cb9263911fa8d7b6a000cb7b7c52457a53ee218f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Chain ③ の実装突合は、外部 wrapper の綴りを含む Rust 型式全体を syn と rustdoc paths で妥当性検証し、完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ、暗黙の短名キーへ復帰させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。したがって、`std::vecc::Vec<OrderPlaced>` のような型式は、外部 path の誤りも含めて Chain ③ で不成立として扱う。",
         "kind": "pass"
       }
     },
@@ -484,12 +599,12 @@
       }
     },
     {
-      "claim_hash": "4ad200911eb44bff1a869c34cc679db2cf49f2587a296fc2c57847d60ce15996",
+      "claim_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
       "claim_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、各参照は対応する完全修飾パスの entry に対して個別に判定され、別の同名 entry があることだけを理由に対象を取り違えない。"
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
         },
         "kind": "spec_element"
       },
@@ -502,7 +617,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "catalogue-lint の `ReferencedRoleConstraint`、`FieldElementUniqueAcrossEntries`、`NoExternalReferenceInMethods`。いずれも現在は module を照合せず、同名を同一視し得る。",
+        "citation": "短名の宣言が複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない場合は、候補の完全修飾パスを列挙して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4d72f2d80fecc8fcedf1cf2016493c4ff78a3bc3796a6924cdbc1afa15bfbb55",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の universe は catalogue の宣言 entry 集合とする。この universe 内で catalogue identity が曖昧または未解決である場合、lint は候補の完全修飾パスを含む診断を出して fail-closed とする。",
         "kind": "pass"
       }
     },

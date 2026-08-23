@@ -1,5 +1,26 @@
 {
-  "catalogue_declaration_hash": "13b2812e7d20c49659aa60475c46bc175c9a37692430e6cb0e4c6fad98ac92d8",
+  "catalogue_declaration_hash": "d8c22bf27498fa3d6d1b60bac32e8d23d9d4ee81510cf06db5a39e09a589d0ee",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "fb83b40d5cab047c20522e4ccb3a84159b5f2820ae997a86d988fe257b585d96",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+    },
+    {
+      "entry_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "signal": "blue",
+      "type_name": "RunCatalogueLint"
+    },
+    {
+      "entry_hash": "663032fb05df2a9f6d5d79dc5b1899b2da296d9055882fad9d9d43e0997fb97b",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+    },
+    {
+      "entry_hash": "6abf0b2e3aba7753b5950546f13edea255256482bab9394f3a295e2ba79881c7",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+    }
+  ]
 }

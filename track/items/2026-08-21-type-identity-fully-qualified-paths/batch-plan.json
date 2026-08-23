@@ -49,10 +49,9 @@
     {
       "task_id": "T008",
       "scope_estimates": [
-        {"scope": "domain", "production_lines": 30, "test_lines": 40},
-        {"scope": "usecase", "production_lines": 35, "test_lines": 45},
-        {"scope": "infrastructure", "production_lines": 40, "test_lines": 50},
-        {"scope": "cli", "production_lines": 50, "test_lines": 60}
+        {"scope": "domain", "production_lines": 150, "test_lines": 80},
+        {"scope": "infrastructure", "production_lines": 60, "test_lines": 40},
+        {"scope": "cli_composition", "production_lines": 20, "test_lines": 15}
       ],
       "oversize_justification": null
     },

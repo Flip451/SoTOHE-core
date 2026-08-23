@@ -129,7 +129,7 @@
         "entry_key": "CatalogueEntryKey"
       },
       "key": {
-        "anchor_text_hash": "a3e448e19e89d13fbd30bf3539c09958839e40a79193729d3282ee409edca758",
+        "anchor_text_hash": "fca57a33faf1121d5ed07aca79b144cd3fa7a1d360ef4b58723c207c10fbda63",
         "declaration_hash": "ee158a2aa8cf3c8d0cfd9bdf177cde18050a38c6c697731d3f2ad9a6b3f3c2dc",
         "waived_reason_hash": "0ddfc39ab051a3dca0ad1cb26ff2dbc359bf02baeb4587aca20cee140a1d541c"
       },
@@ -139,7 +139,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Catalogue entry-key value object; construction-boundary text representation.",
+        "citation": "DocString(\"Catalogue entry-key value object; construction-boundary text representation.\")",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

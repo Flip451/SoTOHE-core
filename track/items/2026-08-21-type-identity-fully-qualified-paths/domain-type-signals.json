@@ -1,10 +1,51 @@
 {
   "baseline_hash": "3a7b153f588d16bfc4e188a5e27516a106ae356d574bc834f4c72d395d66ccf3",
-  "declaration_hash": "60594b9229083c26058592ccf10115e608574113a7c824d3de05df1b334783d0",
-  "generated_at": "2026-08-22T13:38:51Z",
-  "head_commit": "0c9b8613f4c21bce7aab1ebfc12cb36feab15a0d",
+  "declaration_hash": "ab4126589f2bd4b706bd584feff0af27afab6d888e8869dfc1c6c5397892b133",
+  "generated_at": "2026-08-23T12:31:38Z",
+  "head_commit": "36243a3d690559c944bc77e651416f1f04e1399f",
   "schema_version": 4,
   "signals": [
+    {
+      "found_items": [
+        "From<CatalogueIdentityResolutionError>",
+        "From<TypeRefPathExtractionError>"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLinterError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+    },
     {
       "found_type": true,
       "kind_tag": "secondary_port",
@@ -62,6 +103,20 @@
       "type_name": "FullyQualifiedItemPath"
     },
     {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CatalogueIdentityResolutionError"
+    },
+    {
       "found_type": true,
       "kind_tag": "enum",
       "signal": "blue",
@@ -82,6 +137,33 @@
       "kind_tag": "value_object",
       "signal": "blue",
       "type_name": "CatalogueEntryKey"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+    },
+    {
+      "found_items": [
+        "TypeRefPathExtractorPort"
+      ],
+      "found_type": true,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "std::sync::Arc<T>"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLintViolation"
     }
   ]
 }

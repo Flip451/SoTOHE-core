@@ -1,5 +1,7 @@
 # 観測ログ
 
+> **この観測ログにおける User 発言の扱い**: 本ログに記録された User の裁定・指摘・承認は、track 進行中のセッション会話における実際の発言を orchestrator が記録したものである。ログ単体では検証できないため、内容に疑義がある場合は当該セッションの transcript を参照すること。ADR / spec など SoT artifact 側では、User の発言と orchestrator の導出を明示的に区別して記載している。
+
 ## 2026-08-22: identity 正規化の分散が非収束の根因だった
 
 ### 経緯
@@ -77,3 +79,26 @@ B2 の review を scope 並列で回したところ、「reviewer が起動前�
 対処 (この track 内): rustdoc を走らせる工程 (review local の gate、calc-impl-catalog、test-obligation evaluate) は 1 本ずつ直列に回す。fixer の並列はファイル競合がなければ可。
 
 提案 (別 track): layer 別に `--target-dir` / `CARGO_TARGET_DIR` を分けるか、rustdoc 出力を layer 別ディレクトリへ退避してから読む。
+
+## 2026-08-23: orchestrator が裁定に無い制約を追加していた (訂正)
+
+User の裁定は「catalogue の `TypeRef` / `ModulePath` はゆるく評価され、Rust 表現としての正しさは実装との突合時に保証されればよい」というもので、これは **catalogue の型が何を検証するか** の話だった。
+
+orchestrator はここから「したがって正準化のコードは infrastructure に 1 箇所だけ置き、domain には置かない」という **配置の制約** を導出し、以降の type-designer / impl-planner / implementer / reviewer への briefing に書き続けた。これは裁定に含まれていない追加制約であり、導出の飛躍である (User 指摘 2026-08-23)。
+
+処方箋が要求しているのは「正規化を経路ごとに分散させない = 単一の通過点を通す」ことだけで、**通過点がどの層に住むか**は指定していない。
+
+### この誤りが引き起こしたこと
+
+T008 の domain scope review が catalogue-lint の 3 規則 (`FieldElementUniqueAcrossEntries` / `NoExternalReferenceInMethods` / `ReferencedRoleConstraint`) について「raw 表記を比較しており、`Entity` と `domain::alpha::Entity` で同一型を二重宣言して規則を回避できる」と指摘した。これは正しい指摘だが、追加制約の下では「domain の lint が identity 解決を必要とするのに、解決コードは infrastructure にしか置けない」という解けない状態になり、rollback-diagnoser は `routing_target: adr` (入力箱 ADR D1 が lint の実行時点・供給境界を決めていない) を返した。
+
+制約を外せば ADR 改訂も lint gate の実行時点変更も不要である。
+
+### 採用する設計 (User 承認 2026-08-23)
+
+identity 解決の中核 (参照の宣言表記 + 既知 identity の宇宙 → 解決済み identity / 曖昧 (候補列挙) / 未解決) を domain に置き、単一の通過点とする。宇宙は呼び出し側が供給する:
+
+- codec / 評価器: rustdoc の `paths` を宇宙として供給 (infrastructure)
+- catalogue-lint: その catalogue が宣言している entry の集合を宇宙として供給
+
+これで通過点は 1 つのまま、lint も codec も同じ解決を通る。曖昧時の候補列挙 (ADR D1 / spec AC-03) もその 1 箇所に実装される。

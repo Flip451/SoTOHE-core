@@ -1,14 +1,29 @@
 {
-  "catalogue_declaration_hash": "3f456af44b0ca25824d9123f817a7328fbfa6a0eff22da24b132263c742bb9d4",
+  "catalogue_declaration_hash": "18316abfe4fea52e155351c28f0803152dab44a3a29ced56d4c81c0b3b14f616",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "0e2a6ca369af2a088f604fd39351c91d0598738a4e3a7b1a4aa9bf506ff12656",
+      "entry_hash": "7c1d44b13f7c156b687ba62853822c6659abfe83d5770ac106005164237b632b",
       "signal": "blue",
       "type_name": "CanonicalTypeIdentity"
     },
     {
-      "entry_hash": "7563b23fe285d22ee9c6a513dd7b5c835370ddc97840174fd5a8e1c3dbd5e618",
+      "entry_hash": "1bfa12426c1430bdd5b37b7ffcc8ad11646f20b48ddfe3e4d436660b177de9de",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
+    },
+    {
+      "entry_hash": "3b436fecc985310fd6319ae747f0963417e1efecf18f2d58bfc32e96310f495f",
+      "signal": "blue",
+      "type_name": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter"
+    },
+    {
+      "entry_hash": "310c710691091a38577ca210b2c9df82c1023dd53fb185518f0fdcbd43db9105",
+      "signal": "blue",
+      "type_name": "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter"
+    },
+    {
+      "entry_hash": "583161f93a609a96b948a1db21a48a2bfcaffeb301609282fcc6f9fbc69f796f",
       "signal": "blue",
       "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
     },

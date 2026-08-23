@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "60594b9229083c26058592ccf10115e608574113a7c824d3de05df1b334783d0",
+  "catalogue_declaration_hash": "ab4126589f2bd4b706bd584feff0af27afab6d888e8869dfc1c6c5397892b133",
   "schema_version": 1,
   "signals": [
     {
@@ -11,6 +11,11 @@
       "entry_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
       "signal": "blue",
       "type_name": "CatalogueEntryKey"
+    },
+    {
+      "entry_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "signal": "blue",
+      "type_name": "CatalogueIdentityResolutionError"
     },
     {
       "entry_hash": "fcb845e94f97d6039a3bf70568b509148f3f6dc8db7d2bc5542058e24201319a",
@@ -43,9 +48,44 @@
       "type_name": "TraitRefScope"
     },
     {
+      "entry_hash": "d9f66897560bbb3f7017b679b6f2ecaecdcd220e1dd09fb18d2f515a16c10dad",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLintViolation"
+    },
+    {
+      "entry_hash": "c99322d186174fb6141a02e504504989b2b3d4159e03c059e45c45e5ce019777",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLinterError"
+    },
+    {
+      "entry_hash": "3ddf92b5cac31caae51fc0dfad92b9f40bf72cb614d4a5953f365a0fdb2cc096",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+    },
+    {
+      "entry_hash": "72a2313dea82f73c8493111f631b80223ab17f7c0d2161daa77f7ee100b1d565",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+    },
+    {
       "entry_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
       "signal": "blue",
       "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "entry_hash": "f523d116c82854dd51e542915e19a7b1e92da5d8f4f465584383971bf7bb5ba4",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+    },
+    {
+      "entry_hash": "8f2f92388b5081c61776d9acc5df100da889ea8ced53ca17d9d059256ae8f0e9",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "entry_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
     }
   ]
 }

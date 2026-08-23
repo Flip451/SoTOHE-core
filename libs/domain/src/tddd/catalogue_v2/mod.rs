@@ -33,6 +33,7 @@ pub mod deletions;
 pub mod document;
 pub mod entries;
 pub mod identifiers;
+pub mod identity_resolution;
 pub mod methods;
 pub mod roles;
 pub mod traits;

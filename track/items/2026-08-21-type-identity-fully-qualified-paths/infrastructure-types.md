@@ -6,6 +6,14 @@
 |------|------|--------|---------|--------|----------|
 | CanonicalTypeIdentity | value_object | add | — | 🔵 | 🔵 |
 
+## Secondary Adapters
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter | secondary_adapter | add | — | 🔵 | 🔵 |
+| infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter | secondary_adapter | modify | — | 🔵 | 🔵 |
+| infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter | secondary_adapter | modify | — | 🔵 | 🔵 |
+
 ## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |

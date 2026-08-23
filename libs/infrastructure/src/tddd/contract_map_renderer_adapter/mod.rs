@@ -650,9 +650,9 @@ include_function_roles = []
         );
 
         let index = render::build_trait_index(&[doc_a, doc_b]);
-        assert!(index.contains_key(&("crate_a".to_string(), "TraitA".to_string())));
-        assert!(index.contains_key(&("crate_b".to_string(), "TraitB".to_string())));
-        assert!(!index.contains_key(&("crate_a".to_string(), "TraitB".to_string())));
+        assert!(index.resolve("TraitA", "crate_a").is_some());
+        assert!(index.resolve("TraitB", "crate_b").is_some());
+        assert!(index.resolve("TraitB", "crate_a").is_none());
     }
 
     // -----------------------------------------------------------------------
@@ -721,7 +721,10 @@ include_function_roles = []
         assert!(output.contains("RootType"), "must mention RootType: {output}");
         assert!(output.contains("ModuleType"), "must mention ModuleType: {output}");
         // Module subgraph for 'user' must appear.
-        assert!(output.contains("domain_module_user"), "must have module subgraph: {output}");
+        assert!(
+            output.contains("_4_75736572[\"domain::user\"]"),
+            "must have encoded module subgraph: {output}"
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -1677,7 +1680,7 @@ include_function_roles = []
             domain_layer.clone(),
         );
         domain_doc.insert_trait(
-            CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("domain::tddd::MyPort".to_owned()).unwrap(),
             make_empty_trait_entry(),
         );
 
@@ -2781,6 +2784,53 @@ include_function_roles = []
     }
 
     #[test]
+    fn test_contract_map_qualified_duplicate_module_types_resolve_to_distinct_nodes() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(
+            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
+            CrateName::new("domain").unwrap(),
+            layer.clone(),
+        );
+        for key in ["domain::alpha::Shared", "domain::beta::Shared"] {
+            doc.insert_type(
+                CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+                make_plain_struct_entry(vec![], vec![]),
+            );
+        }
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
+            make_plain_struct_entry(
+                vec![
+                    FieldDecl::new(
+                        FieldName::new("alpha").unwrap(),
+                        TypeRef::new("domain::alpha::Shared").unwrap(),
+                    ),
+                    FieldDecl::new(
+                        FieldName::new("beta").unwrap(),
+                        TypeRef::new("domain::beta::Shared").unwrap(),
+                    ),
+                ],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "Owner");
+        for (field, target_name) in
+            [("alpha", "domain::alpha::Shared"), ("beta", "domain::beta::Shared")]
+        {
+            assert_edge_count(
+                &rendered,
+                &owner,
+                "--o",
+                Some(field),
+                &render::type_rep_node_id("domain", "domain", target_name),
+                1,
+            );
+        }
+    }
+
+    #[test]
     fn test_contract_map_dyn_same_name_type_and_trait_resolve_separately() {
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(
@@ -2924,7 +2974,7 @@ include_function_roles = []
             layer.clone(),
         );
         doc.insert_trait(
-            CatalogueEntryKey::try_new("DeclaredPort".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("domain::port::DeclaredPort".to_owned()).unwrap(),
             make_empty_trait_entry(),
         );
         doc.insert_type(
@@ -2950,7 +3000,7 @@ include_function_roles = []
 
         let rendered = render_and_scan(&[doc], &[layer]);
         let owner = render::type_rep_node_id("domain", "domain", "Owner");
-        let target = render::trait_rep_node_id("domain", "domain", "DeclaredPort");
+        let target = render::trait_rep_node_id("domain", "domain", "domain::port::DeclaredPort");
         for field_name in ["crate_port", "self_port", "super_port"] {
             assert_edge_count(&rendered, &owner, "--o", Some(field_name), &target, 1);
         }
@@ -2966,7 +3016,7 @@ include_function_roles = []
             domain_layer.clone(),
         );
         domain_doc.insert_trait(
-            CatalogueEntryKey::try_new("DeclaredPort".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("domain::port::DeclaredPort".to_owned()).unwrap(),
             make_empty_trait_entry(),
         );
         for type_name in ["CrateAdapter", "SelfAdapter", "SuperAdapter", "BareAdapter"] {
@@ -3010,7 +3060,7 @@ include_function_roles = []
         ));
 
         let rendered = render_and_scan(&[domain_doc, adapter_doc], &[domain_layer, adapter_layer]);
-        let target = render::trait_rep_node_id("domain", "domain", "DeclaredPort");
+        let target = render::trait_rep_node_id("domain", "domain", "domain::port::DeclaredPort");
         for source in [
             render::type_rep_node_id("domain", "domain", "CrateAdapter"),
             render::type_rep_node_id("domain", "domain", "SelfAdapter"),

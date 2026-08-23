@@ -1,0 +1,246 @@
+{
+  "entries": [
+    {
+      "claim_hash": "fb83b40d5cab047c20522e4ccb3a84159b5f2820ae997a86d988fe257b585d96",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fb83b40d5cab047c20522e4ccb3a84159b5f2820ae997a86d988fe257b585d96",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RunCatalogueLint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RunCatalogueLint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "663032fb05df2a9f6d5d79dc5b1899b2da296d9055882fad9d9d43e0997fb97b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "663032fb05df2a9f6d5d79dc5b1899b2da296d9055882fad9d9d43e0997fb97b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "663032fb05df2a9f6d5d79dc5b1899b2da296d9055882fad9d9d43e0997fb97b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
+      "evidence_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6abf0b2e3aba7753b5950546f13edea255256482bab9394f3a295e2ba79881c7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6abf0b2e3aba7753b5950546f13edea255256482bab9394f3a295e2ba79881c7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6abf0b2e3aba7753b5950546f13edea255256482bab9394f3a295e2ba79881c7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
+      "evidence_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}
