@@ -142,11 +142,7 @@ pub(super) fn minimal_catalogue_doc(crate_name: &str) -> CatalogueDocument {
     use domain::tddd::catalogue_v2::CrateName;
     let layer = LayerId::try_new(crate_name).unwrap();
     let name = CrateName::new(crate_name).unwrap();
-    CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
-        name,
-        layer,
-    )
+    CatalogueDocument::new(3, name, layer)
 }
 
 pub(super) fn stub_binding(layer_id: &str) -> TdddLayerBinding {

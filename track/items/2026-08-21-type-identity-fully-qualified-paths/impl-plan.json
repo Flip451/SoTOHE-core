@@ -3,7 +3,7 @@
     "sections": [
       {
         "description": [
-          "Retain the committed bootstrap, identity-key, and schema-version work without reopening its task boundaries. [IN-01; IN-02; IN-05; CO-01; CO-02; CO-04; AC-01; AC-02; AC-05; AC-09]"
+          "Retain the committed bootstrap and fully qualified identity-key work without reopening its task boundaries. T003 records settled history for the superseded schema-version value-object delta only; the accepted raw-u32 restoration is current work in T015. [IN-01; IN-02; CO-01; CO-02; AC-01; AC-02; AC-05]"
         ],
         "id": "committed-foundation",
         "task_ids": [
@@ -15,7 +15,7 @@
       },
       {
         "description": [
-          "Complete the in-flight catalogue migration through the infrastructure-owned Rust parsing and rustdoc-universe adapter boundary while catalogue domain values remain loose notation. [IN-01; IN-02; IN-04; OS-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-05]"
+          "Retain the committed canonical passage point across the catalogue document codec, rustdoc-path identity adapter, domain catalogue keys, and catalogue-to-extended-crate boundary. [IN-01; IN-02; IN-04; OS-02; CO-01; CO-02; CO-03; AC-01; AC-02; AC-03; AC-04; AC-05; AC-06]"
         ],
         "id": "canonical-passage-point",
         "task_ids": [
@@ -25,7 +25,7 @@
       },
       {
         "description": [
-          "Complete the shared domain identity-resolution choke point, make the infrastructure parser/rustdoc adapter delegate to it, and route independently reviewable evaluator, signal/contract-map, and catalogue-tooling consumers through those canonical semantics without competing path-local resolution branches. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-03; CO-01; CO-02; CO-03; CO-04; AC-02; AC-03; AC-04; AC-05; AC-06; AC-07; AC-08; AC-09]"
+          "Retain the domain identity resolver, catalogue-lint workflow foundation, track-lifecycle ports/adapters, catalogue tooling, and composition-root wiring settled in T008; complete evaluator consumers in T005 and signal/contract-map consumers in T006. The redesigned extraction/evaluation contract is current DonePending work in T013. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-03; CO-01; CO-02; CO-03; AC-02; AC-03; AC-04; AC-05; AC-06; AC-07]"
         ],
         "id": "canonical-consumers",
         "task_ids": [
@@ -37,9 +37,9 @@
       },
       {
         "description": [
-          "Verify each acceptance anchor at its independently reviewable boundary without introducing a competing resolution path outside the shared domain choke point; Rust syntax parsing and rustdoc-universe construction remain adapter-owned. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-05; AC-06; AC-07; AC-08; AC-09]"
+          "Complete the anchored validation in T011-T014. T013 owns the redesigned domain extraction/evaluation contract, syn-backed adapter update, usecase propagation, focused tests, and obligation bindings within B3. T015 remains in B4 solely for raw-u32 schema-version restoration and infrastructure codec-error source reconciliation with focused preservation tests. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; CO-01; CO-02; CO-03; AC-01; AC-02; AC-03; AC-04; AC-05; AC-06; AC-07]"
         ],
-        "id": "anchored-validation",
+        "id": "anchored-validation-and-reconciliation",
         "task_ids": [
           "T011",
           "T012",
@@ -47,24 +47,24 @@
           "T014",
           "T015"
         ],
-        "title": "Anchor-specific canonical identity validation"
+        "title": "Anchored validation and source reconciliation"
       }
     ],
     "summary": [
-      "GO-01 -> T001, T002, T004, T005, T006, T008, T011, T012; GO-02 -> T002, T004, T008, T011, T013, T014, T015."
+      "GO-01 -> T001, T002, T004, T005, T006, T008, T011, T012, T014, T015; GO-02 -> T004, T005, T006, T008, T011, T012, T013, T015."
     ]
   },
   "schema_version": 2,
   "tasks": [
     {
       "commit_hash": "0c9b8613f4c21bce7aab1ebfc12cb36feab15a0d",
-      "description": "Review the existing uncommitted bootstrap diff in `libs/infrastructure/src/tddd/signal_evaluator_v2/{mod.rs,phase1/builder/main_fn.rs,phase1/child_items.rs,phase1/state.rs,phase2.rs,tests.rs}`, apply only review corrections, and run the module tests; do not recreate the bootstrap. [IN-02; CO-01; CO-04; AC-02; AC-05]",
+      "description": "Review the existing uncommitted bootstrap diff in `libs/infrastructure/src/tddd/signal_evaluator_v2/{mod.rs,phase1/builder/main_fn.rs,phase1/child_items.rs,phase1/state.rs,phase2.rs,tests.rs}`, apply only review corrections, and run the module tests; do not recreate the bootstrap. [IN-02; CO-01; AC-02; AC-05]",
       "id": "T001",
       "status": "done"
     },
     {
       "commit_hash": "0c9b8613f4c21bce7aab1ebfc12cb36feab15a0d",
-      "description": "Add the Phase 2 `CatalogueEntryKey` and `FullyQualifiedItemPath` changes in `libs/domain/src/tddd/{semantic_verify.rs,catalogue_v2/identifiers.rs,catalogue_v2/identifiers_tests.rs}` with construction, ordering, and display tests; keep the change additive until T004. [IN-01; OS-04; CO-01; CO-02; CO-04; AC-01; AC-02]",
+      "description": "Add the Phase 2 `CatalogueEntryKey` and `FullyQualifiedItemPath` changes in `libs/domain/src/tddd/{semantic_verify.rs,catalogue_v2/identifiers.rs,catalogue_v2/identifiers_tests.rs}` with construction, ordering, and display tests; keep the change additive until T004. [IN-01; CO-01; CO-02; AC-01; AC-02]",
       "id": "T002",
       "status": "done"
     },
@@ -73,7 +73,7 @@
       "depends_on": [
         "T002"
       ],
-      "description": "Add `CatalogueSchemaVersion` in `libs/domain/src/tddd/catalogue_v2/document.rs`, migrate its document accessors there, and update `libs/infrastructure/src/tddd/catalogue_document_codec/{dto.rs,encode.rs,decode.rs,validate.rs,mod.rs}` with focused domain and codec tests. [IN-05; CO-04; AC-09]",
+      "description": "Preserve the settled B1 commit record for the superseded schema-version value-object delta without treating it as current design, coverage, or catalogue work; T015 owns restoration to the accepted raw-u32 contract.",
       "id": "T003",
       "status": "done"
     },
@@ -83,7 +83,7 @@
         "T002",
         "T003"
       ],
-      "description": "Continue the existing T004 diff as remaining work only: keep catalogue `TypeRef` and `ModulePath` values as loose notation; limit `libs/infrastructure/src/tddd/catalogue_document_codec/**` to accepting, preserving, and serializing that notation as written; make `libs/infrastructure/src/tddd/canonical_type_identity.rs` and the implementation-matching codec in `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs` and `catalogue_to_extended_crate_codec/**` the sole owners of reconciliation against rustdoc paths and `syn`; converge the port on the single `encode` method and leave no `encode_with_rustdoc_paths`; change the codec path input / `EncoderState.paths` construction so `canonicalize_catalogue_type_ref` receives the authoritative baseline and current rustdoc `paths` supplied by the evaluator instead of a path map synthesized only from catalogue declarations, including existing non-catalogued identities such as `domain::tddd::catalogue_v2::identifiers::CrateName`; preserve the captured baseline as-is and do not recapture it; complete the `CatalogueEntryKey` migrations in `libs/domain/src/tddd/catalogue_v2/{document.rs,entries.rs,deletions.rs,traits.rs}` and `new_typegraph_codec_error.rs`; discard the superseded domain-side passage-point additions, remove obsolete `canonicalize` / `canonical_path` alias branches in these domain and infrastructure targets, and preserve every existing public type and function `module_path`. [IN-01; IN-02; IN-04; OS-02; OS-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-05]",
+      "description": "Retain the settled T004 canonical passage-point work. In `libs/infrastructure/src/tddd/catalogue_document_codec/**`, preserve catalogue `TypeRef` and `ModulePath` notation; in `libs/infrastructure/src/tddd/canonical_type_identity.rs`, `catalogue_to_extended_crate_codec.rs`, and `catalogue_to_extended_crate_codec/**`, use evaluator-supplied authoritative baseline/current rustdoc `paths` without recapturing the baseline; retain the `encode` port convergence and `CatalogueEntryKey` migrations in `libs/domain/src/tddd/catalogue_v2/{document.rs,entries.rs,deletions.rs,traits.rs}`; remove obsolete short-name alias branches and preserve public `module_path` declarations. [IN-01; IN-02; IN-04; OS-02; CO-01; CO-02; CO-03; AC-01; AC-02; AC-03; AC-04; AC-05; AC-06]",
       "id": "T004",
       "status": "done"
     },
@@ -92,59 +92,61 @@
         "T001",
         "T004"
       ],
-      "description": "Migrate evaluator impl and generic resolution in `libs/infrastructure/src/tddd/signal_evaluator_v2/{mod.rs,phase1/**,impl_identity.rs,resolve_type.rs,structural_eq.rs,generics_eq/**,tests.rs}` to consume the canonical identities produced by T004; wire the already captured baseline rustdoc `paths` and the current rustdoc `paths` into the A-side implementation-matching codec so its canonicalizer does not rely on catalogue-only paths; before action-contradiction evaluation, resolve each short-name `action: delete` tombstone against the baseline rustdoc paths and compare the resulting fully qualified identity (for example `infrastructure::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError`) rather than the short spelling; fail closed on ambiguous or unresolved tombstones, preserve the captured baseline without recapturing it, remove obsolete path-local `canonicalize` / `canonical_path` comparison and rewrite branches in those targets, and keep existing public `module_path` identities unchanged. [IN-02; IN-04; OS-02; CO-01; CO-03; CO-04; AC-02; AC-03; AC-04; AC-05]",
+      "description": "Migrate evaluator impl and generic resolution in `libs/infrastructure/src/tddd/signal_evaluator_v2/{mod.rs,phase1/**,impl_identity.rs,resolve_type.rs,structural_eq.rs,generics_eq/**,tests.rs}` to consume T004 identities; pass the captured baseline and current rustdoc `paths` to the A-side codec without recapturing the baseline; replace short-name `action: delete` tombstone comparison with baseline-path lookup and fully qualified identity comparison, including ambiguous/unresolved tombstone errors; remove path-local short-name comparison and rewrite branches, and preserve public `module_path` identities. [IN-02; IN-04; OS-02; CO-01; CO-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
         "T001",
         "T004"
       ],
-      "description": "Migrate type-signal owner joining and contract-map node/edge resolution in `libs/infrastructure/src/tddd/{type_signals_evaluator.rs,type_signals_evaluator/**,contract_map_adapter.rs,contract_map_renderer_adapter/**}` to consume the canonical identities produced by T004; remove obsolete path-local `canonicalize` / `canonical_path` alias branches in those targets, and do not edit existing public `module_path` declarations. [IN-02; OS-03; CO-01; CO-04; AC-06; AC-09]",
+      "description": "Migrate type-signal owner joining and contract-map node/edge resolution in `libs/infrastructure/src/tddd/{type_signals_evaluator.rs,type_signals_evaluator/**,contract_map_adapter.rs,contract_map_renderer_adapter/**}` to consume the canonical identities produced by T004; remove obsolete path-local short-name alias branches in those targets, and do not edit existing public `module_path` declarations. [IN-02; OS-03; CO-01; AC-06; AC-07]",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "aac77f0159e3e1858bbc7e09362fdd0ea07bc6c8",
       "depends_on": [
         "T004"
       ],
-      "description": "Continue the existing T008 diff as remaining work only. In `libs/domain/src/tddd/{catalogue_linter.rs,catalogue_linter_eval.rs,catalogue_v2/identity_resolution.rs}`, implement the declared `TypeRefPathExtractorPort`, `ExtractedTypeRefPath`, `TypeRefPathExtractionError`, `CatalogueLinterError`, `evaluate_catalogue_lint`, and `resolve_catalogue_identity`; update `libs/usecase/src/catalogue_lint_workflow.rs` for extractor injection in `RunCatalogueLintInteractor` and `RunCatalogueLint`, and update `libs/usecase/src/track_lifecycle/tddd/{lint.rs,catalogue_lint_active.rs}` so `TrackLintPort` and `TrackCatalogueLintActivePort` carry that extractor through the workflow; add `libs/infrastructure/src/tddd/type_ref_parser/mod.rs::SynTypeRefPathExtractorAdapter` using the existing parser, update `libs/infrastructure/src/track_lifecycle/tddd/{lint.rs,catalogue_lint_active.rs}` so `SystemTrackLintAdapter` and `SystemTrackCatalogueLintActiveAdapter` supply it, and wire the composition root through `apps/cli-composition`; make `libs/infrastructure/src/tddd/canonical_type_identity.rs::canonicalize_catalogue_type_ref` call the domain resolver with the authoritative rustdoc `paths` universe. Replace hand-written path extraction and raw comparisons in `FieldElementUniqueAcrossEntries`, `NoExternalReferenceInMethods`, and `ReferencedRoleConstraint` with port extraction and resolver calls over catalogue entries; emit ambiguous candidate paths from the resolver, route bare references through it, and resolve `std::iter::Iterator`, `std::ops::Deref`, and `std::ops::FnOnce` through authoritative rustdoc `paths` identities bounded by the supplied universe, with no caller-local alias tables. Add the domain/infrastructure `action: add` entries before catalogue-to-extended-crate signal gates; update `libs/usecase/src/test_obligation/derive/{mod.rs,derive_tests.rs}`, `libs/usecase/src/pre_review_gate{.rs,/helpers.rs}`, `libs/infrastructure/src/tddd/catalog_gen/{verb_add.rs,verb_cite.rs,verb_import.rs,json_build.rs,adapter_tests.rs}`, and `apps/cli/src/commands/{task_contract.rs,catalog.rs}` for fully qualified catalogue entry keys; remove path-local `canonicalize` / `canonical_path` handling from those targets and do not edit existing public `module_path` declarations. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-03; CO-01; CO-02; CO-03; CO-04; AC-02; AC-03; AC-04; AC-07; AC-08; AC-09]",
+      "description": "Retain the settled T008 foundation at concrete targets: `domain::tddd::catalogue_v2::identity_resolution::{resolve_catalogue_identity,CatalogueIdentityResolutionError}`, `infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref`, the catalogue-lint workflow and track-lifecycle port/adapter wiring, composition-root wiring, and `apps/cli/src/commands/catalog.rs` catalogue-entry tooling. Preserve fully qualified resolution, standard-library path handling, the independent catalogue-lint and Chain 3 responsibility boundary, candidate-path diagnostics, and public `module_path` declarations. T013 owns the current redesigned extraction/evaluation contract and its propagation. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-03; CO-01; CO-02; CO-03; AC-02; AC-03; AC-04; AC-05; AC-06; AC-07]",
       "id": "T008",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "depends_on": [
-        "T004"
+        "T004",
+        "T008"
       ],
-      "description": "Add canonical codec/resolver regression cases in `libs/infrastructure/src/tddd/{canonical_type_identity.rs,catalogue_to_extended_crate_codec_tests.rs}` for duplicate declarations, unique short-name resolution, ambiguous candidate diagnostics, unresolved targets, impl/generic/in-crate references, public standard-library re-exports including `std::iter::Iterator`, `std::ops::Deref`, and `std::ops::FnOnce`, and the unfixed declaration-form boundary; assert that Rust parsing and rustdoc-universe construction remain in the infrastructure adapter while identity resolution and re-export normalization pass through the shared domain resolver added by T008. [IN-01; IN-04; OS-04; CO-01; CO-02; CO-03; CO-04; AC-01; AC-02; AC-03; AC-04; AC-05]",
+      "description": "Add canonical codec/resolver regression cases in `libs/infrastructure/src/tddd/{canonical_type_identity.rs,catalogue_to_extended_crate_codec_tests.rs}` for duplicate declarations, unique short-name resolution, ambiguous candidate diagnostics, unresolved targets, impl/generic/in-crate references, public standard-library re-exports, and the unfixed declaration-form boundary; cover adapter parsing/rustdoc-path input and delegation to the T008 domain resolver. [IN-01; IN-04; OS-02; CO-01; CO-02; CO-03; AC-01; AC-02; AC-03; AC-04; AC-05]",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
         "T005",
         "T006"
       ],
-      "description": "Add duplicate-module fixture assertions for evaluator impl/generic resolution, type-signal owners, and contract-map nodes/edges in `libs/infrastructure/src/tddd/{signal_evaluator_v2/tests.rs,type_signals_evaluator.rs,contract_map_renderer_adapter/**}`; run the focused test modules. [IN-02; OS-03; CO-01; CO-04; AC-02; AC-05; AC-06]",
+      "description": "Add one duplicate-module integration fixture and assertion suite across `libs/infrastructure/src/tddd/{signal_evaluator_v2/tests.rs,type_signals_evaluator.rs,contract_map_renderer_adapter/**}` covering evaluator impl/generic resolution, type-signal owner joins, and contract-map node/edge resolution; run the focused test modules as one validation unit. [IN-02; OS-03; CO-01; AC-02; AC-05; AC-06; AC-07]",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
         "T008"
       ],
-      "description": "Add independent duplicate-name fixture coverage for `ReferencedRoleConstraint`, `FieldElementUniqueAcrossEntries`, and `NoExternalReferenceInMethods` in `libs/domain/src/tddd/catalogue_linter.rs`, including candidate-path diagnostics for ambiguous bare references, unresolved-target diagnostics, and extraction through external wrappers without validating the wrapper spelling; run the focused linter tests. [IN-03; IN-04; OS-01; OS-03; CO-01; CO-03; CO-04; AC-03; AC-07]",
+      "description": "Revise the DonePending B3 implementation to the converged TypeRef inspection contract. In `libs/domain/src/tddd/catalogue_linter.rs`, carry active type/lifetime/const parameter context into extraction and update the domain evaluation operations. Update `libs/infrastructure/src/tddd/type_ref_parser/mod.rs` and `libs/infrastructure/src/tddd/type_ref_parser_tests.rs` for syntax-only extraction, propagate the revised contract through `libs/usecase/src/catalogue_lint_workflow.rs` and existing track-lifecycle/composition wiring, retain duplicate-name/candidate/unresolved/external-wrapper coverage, and author or repair the obligation bindings for the redesigned domain, infrastructure, and usecase entries. [IN-03; IN-04; OS-01; OS-03; CO-01; CO-02; CO-03; AC-03; AC-04; AC-05; AC-07]",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
         "T008"
       ],
-      "description": "Add independent duplicate-name fixture coverage for test-obligation role indexing, task-contract/pre-review attribution, and catalog add/cite/import entry-key writes in `libs/usecase/src/test_obligation/derive/derive_tests.rs`, `libs/usecase/src/pre_review_gate.rs`, `libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs`, and `apps/cli/src/commands/{task_contract.rs,catalog.rs}`; run the focused derivation, gate, adapter, and command tests. [IN-03; OS-01; CO-01; CO-02; CO-04; AC-08]",
+      "description": "Add independent duplicate-name fixture coverage for test-obligation role indexing, task-contract/pre-review attribution, and catalog add/cite/import entry-key writes in `libs/usecase/src/test_obligation/derive_tests.rs`, `libs/usecase/src/pre_review_gate.rs`, `libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs`, and `apps/cli/src/commands/{task_contract.rs,catalog.rs}`; run the focused derivation, gate, adapter, and command tests. [IN-02; OS-01; CO-01; AC-07]",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -154,9 +156,9 @@
         "T006",
         "T008"
       ],
-      "description": "Add preservation-only regression assertions for functions keys, cross-crate catalogue notation, raw rustdoc baseline wire format, baseline-graph rendering, short display labels, and the D1-excluded inspection surfaces in `libs/infrastructure/src/tddd/{catalogue_document_codec/mod.rs,baseline_rustdoc_codec.rs,baseline_graph_renderer_adapter/mod.rs,catalog_gen/adapter_tests.rs}`, `libs/domain/src/tddd/catalogue_linter.rs`, `libs/usecase/src/test_obligation/derive/derive_tests.rs`, and `apps/cli/src/commands/catalog.rs`; run the focused modules and `cargo make ci-track`. [OS-01; OS-02; OS-03; CO-04; AC-09]",
+      "description": "Restore `libs/domain/src/tddd/catalogue_v2/document.rs` and `libs/infrastructure/src/tddd/catalogue_document_codec/**` to the converged `CatalogueDocument` raw-u32 schema-version representation and remove the rejected `CatalogueSchemaVersion` domain newtype, retaining the existing wire-version behavior through focused tests. Reconcile `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs`, `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/**`, and `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs` by restoring the source-only `CatalogueToExtendedCrateCodecError` `Debug`/`Display`/`Error` baseline surface and `NewTypeGraphCodecError: From<CatalogueToExtendedCrateCodecError>` conversion while preserving baseline/current rustdoc `paths` graph behavior. Add or retain only the focused catalogue-document version and codec-error preservation tests for this restoration, then run those modules and `cargo make ci-track`; T013 owns all redesigned linter, usecase, adapter, and obligation work. [IN-04; CO-03; AC-03; AC-06]",
       "id": "T015",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

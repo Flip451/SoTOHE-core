@@ -2,6 +2,8 @@
 
 use std::collections::HashMap;
 
+use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
+use domain::tddd::catalogue_v2::identifiers::ParamName;
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, Id, Path, Type,
 };
@@ -48,6 +50,36 @@ fn parse_generic_projection(s: &str, generic_params: &[&str]) -> Type {
     let mut emitted = |_name: String| 1_u32;
     parse_type_ref_with_generics(s, &no_local, 100, &HashMap::new(), &mut emitted, generic_params)
         .unwrap()
+}
+
+#[test]
+fn test_extract_type_ref_path_context_classifies_lifetime_and_const_parameters() {
+    let adapter = SynTypeRefPathExtractorAdapter;
+    let type_ref = domain::tddd::catalogue_v2::identifiers::TypeRef::new(
+        "std::vec::Vec<&'a T, [u8; N]>".to_owned(),
+    )
+    .unwrap();
+    let type_parameters = vec![ParamName::new("T").unwrap()];
+    let lifetime_parameters = vec![ParamName::new("a").unwrap()];
+    let const_parameters = vec![ParamName::new("N").unwrap()];
+
+    let occurrences = adapter
+        .extract(&type_ref, &type_parameters, &lifetime_parameters, &const_parameters)
+        .unwrap();
+
+    assert!(
+        occurrences.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap(),))
+    );
+    assert!(
+        occurrences
+            .contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap(),))
+    );
+    assert!(
+        occurrences.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap(),))
+    );
+    assert!(!occurrences.iter().any(|occurrence| {
+        matches!(occurrence, ExtractedTypeRefPath::Path(path) if path.as_str() == "T" || path.as_str() == "N")
+    }));
 }
 
 // -----------------------------------------------------------------------
@@ -2353,7 +2385,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, ItemKind, ItemSummary, Target};
 
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+        2,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );

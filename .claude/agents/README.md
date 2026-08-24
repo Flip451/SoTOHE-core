@@ -26,7 +26,7 @@ One file per `provider: claude` capability. `orchestrator` has no file — it is
 
 The four retuned delegate-in-host Claude lanes — `impl-planner`, `researcher` (in the Claude-heavy profile), `rollback-diagnoser`, and `adr-diagnoser` — use `high` effort. The diagnosers produce high-leverage verdicts, while the planner and researcher produce small structured outputs. The typed-pipeline verifier lanes are configured separately in `.harness/config/agent-profiles.json` and are not represented by these Claude adapter files.
 
-`dry-fix-lead.md` is present but dormant: `capabilities.dry-fix-lead` routes to codex, and `cargo make track-local-dry-fix` implements only the codex provider path, so a Claude resolution fails closed rather than reaching the file. It declares no `effort:` for that reason. Unlike `review-fix-lead`, the dry wrapper has no subagent-dispatch sentinel; adding one spans usecase, infrastructure, cli-composition, and cli-driver, and is deliberately left as separate work.
+`dry-fix-lead.md` is present but dormant: `capabilities.dry-fix-lead` routes to codex, and `cargo make track-local-dry-fix` contains codex and grok provider paths. The grok path is admitted only when the dry-fix-lead adapter declares `grok-sandbox`; without that declaration, a Grok resolution fails closed. A Claude resolution also fails closed rather than reaching this file. It declares no `effort:` for that reason. Unlike `review-fix-lead`, the dry wrapper has no subagent-dispatch sentinel; adding one spans usecase, infrastructure, cli-composition, and cli-driver, and is deliberately left as separate work.
 
 ## Capabilities with no agent file
 
@@ -45,6 +45,6 @@ These resolve to a non-Claude provider or to the host, and are never dispatched 
 
 Never invoke these agents directly through the Agent tool. Direct invocation bypasses provider and model resolution. The canonical route is `bin/sotp capability exec <capability> --host <host> --briefing-file <path>`.
 
-`review-fix-lead` is the exception: dispatch it through `cargo make track-local-review-fix`, which resolves the profile and, on a Claude resolution, emits a subagent-dispatch sentinel for the caller to act on. `cargo make track-local-dry-fix` has no such sentinel — it executes the codex provider directly and fails closed on any other resolution, which is why `dry-fix-lead` stays on codex.
+`review-fix-lead` is the exception: dispatch it through `cargo make track-local-review-fix`, which resolves the profile and, on a Claude resolution, emits a subagent-dispatch sentinel for the caller to act on. `cargo make track-local-dry-fix` has no such sentinel — it executes the codex provider directly or the grok provider only after `grok-sandbox` admission, and fails closed on any other resolution (including claude), which is why `dry-fix-lead` stays on codex.
 
 `.harness/config/agent-profiles.json` is the routing SSoT. `.harness/config/samples/agent-profiles.*.json` hold alternative provider mixes.

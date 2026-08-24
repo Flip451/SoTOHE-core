@@ -37,7 +37,7 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use domain::tddd::catalogue_v2::document::{CatalogueDocument, CatalogueSchemaVersion};
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use serde::{Deserialize, de};
 use thiserror::Error;
 
@@ -245,7 +245,7 @@ impl CatalogueDocumentCodec {
     ) -> Result<CatalogueDocument, CatalogueDocumentCodecError> {
         // Phase 1: check schema_version before full parse.
         let version_probe: SchemaVersionProbe = serde_json::from_str(json)?;
-        validate_schema_version(CatalogueSchemaVersion::new(version_probe.schema_version))?;
+        validate_schema_version(version_probe.schema_version)?;
 
         // Phase 2: full parse.
         let dto: dto::CatalogueDocumentDto = serde_json::from_str(json)?;
@@ -454,11 +454,7 @@ mod tests {
         );
         let crate_name = CrateName::new("usecase".to_string()).unwrap();
         let layer = LayerId::try_new("usecase").unwrap();
-        let mut doc = CatalogueDocument::new(
-            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(4),
-            crate_name.clone(),
-            layer,
-        );
+        let mut doc = CatalogueDocument::new(4, crate_name.clone(), layer);
         let fn_name = FunctionName::new(function_name).unwrap();
         let path = FunctionPath::at_root(crate_name, fn_name);
         doc.insert_function(path, entry);
@@ -469,7 +465,7 @@ mod tests {
     fn test_decode_minimal_v5_json_succeeds() {
         let json = minimal_v5_json("domain", "domain");
         let doc = CatalogueDocumentCodec::decode(&json, "domain").unwrap();
-        assert_eq!(doc.schema_version().value(), 5);
+        assert_eq!(doc.schema_version(), 5);
         assert_eq!(doc.crate_name().as_str(), "domain");
         assert!(doc.types().is_empty());
     }
@@ -478,11 +474,7 @@ mod tests {
     fn test_encode_pins_schema_version_to_current_codec_version() {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let doc = CatalogueDocument::new(
-            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
-            crate_name,
-            layer,
-        );
+        let doc = CatalogueDocument::new(3, crate_name, layer);
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
@@ -490,7 +482,7 @@ mod tests {
         assert_eq!(value["schema_version"].as_u64(), Some(u64::from(SCHEMA_VERSION)));
         assert!(value["schema_version"].is_number());
         let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
-        assert_eq!(decoded.schema_version().value(), SCHEMA_VERSION);
+        assert_eq!(decoded.schema_version(), SCHEMA_VERSION);
     }
 
     #[test]
@@ -712,7 +704,7 @@ mod tests {
     #[test]
     fn test_encode_preserves_qualified_key_and_module_path_mismatch_as_written() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -738,7 +730,7 @@ mod tests {
     #[test]
     fn test_encode_preserves_distinct_catalogue_key_spellings() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -1414,7 +1406,7 @@ mod tests {
     #[test]
     fn test_encode_type_alias_rejects_token_equivalent_duplicate_relaxed_bounds() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -1575,7 +1567,7 @@ mod tests {
     #[test]
     fn test_encode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -1610,7 +1602,7 @@ mod tests {
     #[test]
     fn test_encode_type_alias_with_duplicate_legacy_generic_names_returns_invalid_entry_error() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -1642,7 +1634,7 @@ mod tests {
     #[test]
     fn test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );
@@ -1677,7 +1669,7 @@ mod tests {
     #[test]
     fn test_encode_type_alias_with_invalid_generic_bound_returns_invalid_entry_error() {
         let mut doc = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(SCHEMA_VERSION),
+            SCHEMA_VERSION,
             CrateName::new("domain").unwrap(),
             LayerId::try_new("domain").unwrap(),
         );

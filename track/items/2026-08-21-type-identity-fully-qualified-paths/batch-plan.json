@@ -72,7 +72,10 @@
     {
       "task_id": "T013",
       "scope_estimates": [
-        {"scope": "domain", "production_lines": 0, "test_lines": 60}
+        {"scope": "domain", "production_lines": 150, "test_lines": 140},
+        {"scope": "usecase", "production_lines": 20, "test_lines": 20},
+        {"scope": "infrastructure", "production_lines": 15, "test_lines": 10},
+        {"scope": "cli_composition", "production_lines": 10, "test_lines": 0}
       ],
       "oversize_justification": null
     },
@@ -88,10 +91,8 @@
     {
       "task_id": "T015",
       "scope_estimates": [
-        {"scope": "domain", "production_lines": 0, "test_lines": 50},
-        {"scope": "usecase", "production_lines": 0, "test_lines": 35},
-        {"scope": "infrastructure", "production_lines": 0, "test_lines": 80},
-        {"scope": "cli", "production_lines": 0, "test_lines": 35}
+        {"scope": "domain", "production_lines": 25, "test_lines": 25},
+        {"scope": "infrastructure", "production_lines": 35, "test_lines": 60}
       ],
       "oversize_justification": null
     }

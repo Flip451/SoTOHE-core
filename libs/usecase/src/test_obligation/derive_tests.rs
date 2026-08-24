@@ -408,7 +408,7 @@ fn value_object_entry(action: ItemAction, invariants: Vec<InvariantDecl>) -> Typ
 
 fn catalogue_with_type(name: &str, entry: TypeEntry) -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -417,11 +417,7 @@ fn catalogue_with_type(name: &str, entry: TypeEntry) -> CatalogueDocument {
 }
 
 fn empty_catalogue(crate_name: &str, layer: &str) -> CatalogueDocument {
-    CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
-        CrateName::new(crate_name).unwrap(),
-        LayerId::try_new(layer).unwrap(),
-    )
+    CatalogueDocument::new(5, CrateName::new(crate_name).unwrap(), LayerId::try_new(layer).unwrap())
 }
 
 fn secondary_port_catalogue(
@@ -1531,7 +1527,7 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
     // IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0.
     let path = PathBuf::from("infrastructure-types.json");
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("infrastructure").unwrap(),
         LayerId::try_new("infrastructure").unwrap(),
     );
@@ -1742,7 +1738,7 @@ fn test_trait_impl_declaration_hash_includes_resolved_port_contract() {
 fn test_trait_impl_unsupported_axis_yields_zero_even_with_minimum() {
     let path = PathBuf::from("infrastructure-types.json");
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("infrastructure").unwrap(),
         LayerId::try_new("infrastructure").unwrap(),
     );
@@ -1884,6 +1880,70 @@ fn test_trait_role_index_rejects_ambiguous_bare_same_name_trait() {
         *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
             && obligation.id().entry_key().as_str() == "AmbiguousAdapter"
     }));
+}
+
+#[test]
+fn test_trait_role_index_attributes_same_name_traits_across_catalogue_crates() {
+    let domain_path = PathBuf::from("domain-types.json");
+    let usecase_path = PathBuf::from("usecase-types.json");
+    let infrastructure_path = PathBuf::from("infrastructure-types.json");
+
+    let mut domain_doc = empty_catalogue("domain", "domain");
+    domain_doc.insert_trait(
+        CatalogueEntryKey::try_new("domain::alpha::SharedPort".to_owned()).unwrap(),
+        trait_entry_in_module(ContractRole::SecondaryPort, "IN-06", "alpha"),
+    );
+
+    let mut usecase_doc = empty_catalogue("usecase", "usecase");
+    usecase_doc.insert_trait(
+        CatalogueEntryKey::try_new("usecase::beta::SharedPort".to_owned()).unwrap(),
+        trait_entry_in_module(ContractRole::SecondaryPort, "IN-99", "beta"),
+    );
+
+    let mut infrastructure_doc = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure_doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::alpha::SharedPort").unwrap(),
+        TypeRef::new("infrastructure::alpha::AlphaAdapter").unwrap(),
+    ));
+    infrastructure_doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("usecase::beta::SharedPort").unwrap(),
+        TypeRef::new("infrastructure::beta::BetaAdapter").unwrap(),
+    ));
+
+    let (interactor, sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (domain_path.clone(), domain_doc),
+            (usecase_path.clone(), usecase_doc),
+            (infrastructure_path.clone(), infrastructure_doc),
+        ],
+    );
+
+    interactor.execute(&command(vec![domain_path, usecase_path, infrastructure_path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let conformance: HashMap<_, _> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .map(|obligation| {
+            (
+                obligation.id().entry_key().as_str().to_owned(),
+                obligation.spec_refs()[0].element_id().to_owned(),
+            )
+        })
+        .collect();
+
+    assert_eq!(conformance.len(), 2);
+    assert_eq!(
+        conformance.get("infrastructure::alpha::AlphaAdapter").map(String::as_str),
+        Some("IN-06")
+    );
+    assert_eq!(
+        conformance.get("infrastructure::beta::BetaAdapter").map(String::as_str),
+        Some("IN-99")
+    );
 }
 
 #[test]

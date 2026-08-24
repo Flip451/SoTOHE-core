@@ -1,33 +1,26 @@
-//! TypeRef → `rustdoc_types::Type` conversion using the `syn` crate.
+//! TypeRef syntax parsing and extraction using the `syn` crate.
 //!
-//! Converts a `domain::tddd::catalogue_v2::TypeRef` string (e.g.
-//! `"Result<Option<User>, DomainError>"`) into the equivalent
-//! `rustdoc_types::Type` representation.
+//! The module also contains the existing TypeRef-to-rustdoc conversion helpers,
+//! while [`SynTypeRefPathExtractorAdapter`] is deliberately syntax-only.
 //!
 //! ## Responsibilities
 //!
 //! * Parse the string via `syn::parse_str::<syn::Type>()`.
-//! * Walk the `syn::Type` AST recursively and produce `rustdoc_types::Type`.
-//! * Resolve each identifier against:
-//!   1. Rust primitive names → `Type::Primitive`.
-//!   2. The `Self` keyword → `Type::ResolvedPath` with sentinel `Id(0)`.
-//!   3. std prelude allowlist → `Type::ResolvedPath`.
-//!   4. Known identifiers with a crate prefix (e.g. `"domain_core::UserId"`) → external crate.
-//!   5. Identifiers declared in the current catalogue (looked up via a closure).
-//!   6. Anything else → an "unresolved marker" using sentinel crate_id `u32::MAX`.
+//! * Walk the `syn::Type` AST recursively and produce complete syntactic
+//!   occurrences for the domain linter.
+//! * Keep catalogue-vs-external membership classification in the domain layer.
 //!
 //! ## Unresolved marker
 //!
-//! Per ADR 2 D10, the A codec is open-world: identifiers that are not known at
-//! codec time are recorded as unresolved markers rather than rejected.
-//! Closed-world validation occurs in Phase 1 (Signal evaluator).
+//! The existing rustdoc conversion path remains open-world; the linter
+//! extraction path fails closed when syntax inspection cannot complete.
 //!
 //! (CN-08 / spec.json IN-09 / ADR 2 D9 / D10 / D11)
 
 use domain::tddd::catalogue_linter::{
     ExtractedTypeRefPath, TypeRefPathExtractionError, TypeRefPathExtractorPort,
 };
-use domain::tddd::catalogue_v2::identifiers::TypeRef;
+use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
 use quote::ToTokens;
 use syn::visit::{self, Visit};
 
@@ -65,54 +58,213 @@ impl TypeRefPathExtractorPort for SynTypeRefPathExtractorAdapter {
     fn extract(
         &self,
         type_ref: &TypeRef,
+        type_parameters: &[ParamName],
+        lifetime_parameters: &[ParamName],
+        const_parameters: &[ParamName],
     ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
-        let syntax = parse_syn_type(type_ref.as_str())
-            .map_err(|_| TypeRefPathExtractionError::InvalidTypeRef(type_ref.clone()))?;
-        let mut visitor = TypeRefPathVisitor { paths: Vec::new(), invalid: false };
+        let syntax = parse_syn_type(type_ref.as_str()).map_err(|_| {
+            TypeRefPathExtractionError::UnsupportedSyntax { location: type_ref.clone() }
+        })?;
+        let mut visitor = TypeRefPathVisitor {
+            paths: Vec::new(),
+            type_parameters,
+            lifetime_parameters,
+            const_parameters,
+            location: type_ref.clone(),
+            depth: 0,
+            resources: 0,
+            error: None,
+        };
         visitor.visit_type(&syntax);
-        if visitor.invalid {
-            return Err(TypeRefPathExtractionError::InvalidTypeRef(type_ref.clone()));
-        }
-        Ok(visitor.paths)
+        visitor.error.map_or(Ok(visitor.paths), Err)
     }
 }
 
-struct TypeRefPathVisitor {
+const MAX_INSPECTION_DEPTH: usize = 32;
+const MAX_INSPECTION_RESOURCES: usize = 512;
+
+struct TypeRefPathVisitor<'a> {
     paths: Vec<ExtractedTypeRefPath>,
-    invalid: bool,
+    type_parameters: &'a [ParamName],
+    lifetime_parameters: &'a [ParamName],
+    const_parameters: &'a [ParamName],
+    location: TypeRef,
+    depth: usize,
+    resources: usize,
+    error: Option<TypeRefPathExtractionError>,
 }
 
-impl TypeRefPathVisitor {
+impl TypeRefPathVisitor<'_> {
+    fn enter_node(&mut self) -> bool {
+        if self.error.is_some() {
+            return false;
+        }
+        self.resources = self.resources.saturating_add(1);
+        if self.resources > MAX_INSPECTION_RESOURCES {
+            self.error = Some(TypeRefPathExtractionError::ResourceLimitExceeded {
+                location: self.location.clone(),
+            });
+            return false;
+        }
+        self.depth = self.depth.saturating_add(1);
+        if self.depth > MAX_INSPECTION_DEPTH {
+            self.error = Some(TypeRefPathExtractionError::DepthLimitExceeded {
+                location: self.location.clone(),
+            });
+            self.depth = self.depth.saturating_sub(1);
+            return false;
+        }
+        true
+    }
+
+    fn leave_node(&mut self) {
+        self.depth = self.depth.saturating_sub(1);
+    }
+
+    fn unsupported(&mut self) {
+        if self.error.is_none() {
+            self.error = Some(TypeRefPathExtractionError::UnsupportedSyntax {
+                location: self.location.clone(),
+            });
+        }
+    }
+
+    fn push(&mut self, occurrence: ExtractedTypeRefPath) {
+        if self.error.is_some() {
+            return;
+        }
+        self.resources = self.resources.saturating_add(1);
+        if self.resources > MAX_INSPECTION_RESOURCES {
+            self.error = Some(TypeRefPathExtractionError::ResourceLimitExceeded {
+                location: self.location.clone(),
+            });
+            return;
+        }
+        self.paths.push(occurrence);
+    }
+
+    fn push_param(&mut self, occurrence: ExtractedTypeRefPath) {
+        self.push(occurrence);
+    }
+
     fn record_path(&mut self, path: &syn::Path) {
-        let path_text = path_head(path);
-        let is_generic = path
-            .segments
-            .iter()
-            .any(|segment| !matches!(&segment.arguments, syn::PathArguments::None));
-        match TypeRef::new(path_text) {
-            Ok(type_ref) => {
-                if is_generic {
-                    self.paths.push(ExtractedTypeRefPath::GenericConstructor(type_ref));
+        let first = path.segments.first().map(|segment| ident_text(&segment.ident));
+        let rooted_in_type_parameter = first.as_deref().is_some_and(|name| {
+            name == "Self" || self.type_parameters.iter().any(|param| param.as_str() == name)
+        });
+        if rooted_in_type_parameter {
+            if let Some(name) = first.and_then(|name| ParamName::new(name).ok()) {
+                self.push_param(ExtractedTypeRefPath::TypeParameter(name));
+            } else {
+                self.unsupported();
+                return;
+            }
+            for segment in path.segments.iter().skip(1) {
+                if let Ok(name) = ParamName::new(ident_text(&segment.ident)) {
+                    self.push_param(ExtractedTypeRefPath::AssociatedItemLabel(name));
                 } else {
-                    self.paths.push(ExtractedTypeRefPath::Reference(type_ref));
+                    self.unsupported();
+                    return;
                 }
             }
-            Err(_) => self.invalid = true,
+            return;
         }
+
+        let path_text = path_head(path);
+        match TypeRef::new(path_text) {
+            Ok(type_ref) => self.push(ExtractedTypeRefPath::Path(type_ref)),
+            Err(_) => self.unsupported(),
+        }
+    }
+
+    fn record_declared_const_parameter(&mut self, path: &syn::Path) -> bool {
+        if path.segments.len() != 1 {
+            return false;
+        }
+        let Some(segment) = path.segments.first() else {
+            self.unsupported();
+            return true;
+        };
+        if !matches!(&segment.arguments, syn::PathArguments::None) {
+            return false;
+        }
+        let name = ident_text(&segment.ident);
+        if !self.const_parameters.iter().any(|param| param.as_str() == name) {
+            return false;
+        }
+        match ParamName::new(name) {
+            Ok(name) => self.push_param(ExtractedTypeRefPath::ConstParameter(name)),
+            Err(_) => self.unsupported(),
+        }
+        true
+    }
+
+    fn record_unbraced_const_argument(&mut self, ty: &syn::Type) -> bool {
+        let syn::Type::Path(type_path) = ty else {
+            return false;
+        };
+        if type_path.qself.is_some() {
+            return false;
+        }
+        self.record_declared_const_parameter(&type_path.path)
+    }
+
+    fn record_associated_label(&mut self, ident: &syn::Ident) {
+        match ParamName::new(ident_text(ident)) {
+            Ok(name) => self.push_param(ExtractedTypeRefPath::AssociatedItemLabel(name)),
+            Err(_) => self.unsupported(),
+        }
+    }
+
+    fn record_expr_path(&mut self, path: &syn::Path) {
+        // Expression paths name values, not catalogue types.  Keep declared
+        // const parameters as their exclusive occurrence, but do not emit
+        // imported constants/functions as catalogue identities.  The default
+        // visitor still traverses qself and path generic arguments, so nested
+        // type occurrences remain visible to the extractor.
+        let _ = self.record_declared_const_parameter(path);
     }
 }
 
-impl<'ast> Visit<'ast> for TypeRefPathVisitor {
+impl<'ast, 'ctx> Visit<'ast> for TypeRefPathVisitor<'ctx> {
+    fn visit_type(&mut self, node: &'ast syn::Type) {
+        if !self.enter_node() {
+            return;
+        }
+        match node {
+            syn::Type::Macro(_) | syn::Type::Infer(_) | syn::Type::Verbatim(_) => {
+                self.unsupported();
+            }
+            _ => visit::visit_type(self, node),
+        }
+        self.leave_node();
+    }
+
+    fn visit_expr(&mut self, node: &'ast syn::Expr) {
+        if !self.enter_node() {
+            return;
+        }
+        match node {
+            syn::Expr::Macro(_) | syn::Expr::Infer(_) | syn::Expr::Verbatim(_) => {
+                self.unsupported();
+            }
+            _ => visit::visit_expr(self, node),
+        }
+        self.leave_node();
+    }
+
     fn visit_type_path(&mut self, node: &'ast syn::TypePath) {
+        if self.error.is_some() {
+            return;
+        }
         let qself_position = node.qself.as_ref().map(|qself| qself.position);
         if let Some(position) = qself_position {
             visit::visit_type_path(self, node);
             if position > 0 {
-                let trait_path = syn::Path {
-                    leading_colon: node.path.leading_colon,
-                    segments: node.path.segments.iter().take(position).cloned().collect(),
-                };
-                self.record_path(&trait_path);
+                self.record_path_prefix(&node.path, position);
+            }
+            for segment in node.path.segments.iter().skip(position) {
+                self.record_associated_label(&segment.ident);
             }
         } else {
             self.record_path(&node.path);
@@ -123,6 +275,77 @@ impl<'ast> Visit<'ast> for TypeRefPathVisitor {
     fn visit_trait_bound(&mut self, node: &'ast syn::TraitBound) {
         self.record_path(&node.path);
         visit::visit_trait_bound(self, node);
+    }
+
+    fn visit_lifetime(&mut self, node: &'ast syn::Lifetime) {
+        let name = ident_text(&node.ident);
+        let declared = self.lifetime_parameters.iter().any(|param| param.as_str() == name);
+        if declared || (name != "static" && name != "_") {
+            if let Ok(name) = ParamName::new(name) {
+                self.push_param(ExtractedTypeRefPath::LifetimeParameter(name));
+            } else {
+                self.unsupported();
+            }
+        } else {
+            // Built-in/elided lifetimes are syntax, not declared catalogue
+            // parameters and therefore have no domain identity to classify.
+        }
+    }
+
+    fn visit_expr_path(&mut self, node: &'ast syn::ExprPath) {
+        self.record_expr_path(&node.path);
+        visit::visit_expr_path(self, node);
+    }
+
+    fn visit_generic_argument(&mut self, node: &'ast syn::GenericArgument) {
+        if let syn::GenericArgument::Type(ty) = node {
+            // `syn` represents an unbraced `Buffer<N>` argument as a type
+            // path.  The active const-parameter context is authoritative for
+            // this otherwise ambiguous single-segment spelling.
+            if self.record_unbraced_const_argument(ty) {
+                return;
+            }
+        }
+        match node {
+            syn::GenericArgument::AssocType(assoc) => self.record_associated_label(&assoc.ident),
+            syn::GenericArgument::AssocConst(assoc) => {
+                self.record_associated_label(&assoc.ident);
+            }
+            syn::GenericArgument::Constraint(constraint) => {
+                self.record_associated_label(&constraint.ident);
+            }
+            _ => {}
+        }
+        if self.error.is_none() {
+            visit::visit_generic_argument(self, node);
+        }
+    }
+
+    fn visit_path_arguments(&mut self, node: &'ast syn::PathArguments) {
+        if !self.enter_node() {
+            return;
+        }
+        visit::visit_path_arguments(self, node);
+        self.leave_node();
+    }
+}
+
+impl TypeRefPathVisitor<'_> {
+    fn record_path_prefix(&mut self, path: &syn::Path, end: usize) {
+        let mut rendered = String::new();
+        if path.leading_colon.is_some() {
+            rendered.push_str("::");
+        }
+        for (index, segment) in path.segments.iter().take(end).enumerate() {
+            if index > 0 {
+                rendered.push_str("::");
+            }
+            rendered.push_str(&ident_text(&segment.ident));
+        }
+        match TypeRef::new(rendered) {
+            Ok(type_ref) => self.push(ExtractedTypeRefPath::Path(type_ref)),
+            Err(_) => self.unsupported(),
+        }
     }
 }
 
@@ -135,10 +358,14 @@ fn path_head(path: &syn::Path) -> String {
         if index > 0 {
             rendered.push_str("::");
         }
-        let ident = segment.ident.to_token_stream().to_string();
-        rendered.push_str(ident.strip_prefix("r#").unwrap_or(&ident));
+        rendered.push_str(&ident_text(&segment.ident));
     }
     rendered
+}
+
+fn ident_text(ident: &syn::Ident) -> String {
+    let ident = ident.to_token_stream().to_string();
+    ident.strip_prefix("r#").unwrap_or(&ident).to_owned()
 }
 
 // ---------------------------------------------------------------------------
@@ -156,59 +383,85 @@ mod path_extractor_tests {
     use super::*;
     use domain::tddd::catalogue_linter::{
         CatalogueLinterRule, CatalogueLinterRuleKind, ExtractedTypeRefPath, RoleKind,
-        RolePayloadField, RuleTarget, evaluate_catalogue_lint,
+        RolePayloadField, RuleTarget, TypeRefPathExtractionError, evaluate_catalogue_lint,
     };
-    use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FullyQualifiedItemPath, Identifier, ModulePath,
-    };
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, ParamName};
+
+    fn type_ref(source: &str) -> TypeRef {
+        TypeRef::new(source.to_owned()).expect("non-empty TypeRef")
+    }
+
+    fn extract(
+        source: &str,
+        types: &[&str],
+        lifetimes: &[&str],
+        consts: &[&str],
+    ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+        let types = types
+            .iter()
+            .map(|name| ParamName::new(*name).expect("type parameter"))
+            .collect::<Vec<_>>();
+        let lifetimes = lifetimes
+            .iter()
+            .map(|name| ParamName::new(*name).expect("lifetime parameter"))
+            .collect::<Vec<_>>();
+        let consts = consts
+            .iter()
+            .map(|name| ParamName::new(*name).expect("const parameter"))
+            .collect::<Vec<_>>();
+        SynTypeRefPathExtractorAdapter.extract(&type_ref(source), &types, &lifetimes, &consts)
+    }
 
     #[test]
     fn test_syn_type_ref_path_extractor_skips_reference_syntax_tokens() {
-        let adapter = SynTypeRefPathExtractorAdapter;
         for source in ["&mut OrderPlaced", "*const OrderPlaced", "&'static OrderPlaced"] {
-            let type_ref = TypeRef::new(source.to_owned()).expect("non-empty TypeRef");
-            let paths = adapter.extract(&type_ref).expect("syn extraction succeeds");
-            assert_eq!(
-                paths,
-                vec![ExtractedTypeRefPath::Reference(
-                    TypeRef::new("OrderPlaced".to_owned()).expect("path")
-                )]
-            );
+            let paths = extract(source, &[], &[], &[]).expect("syn extraction succeeds");
+            assert_eq!(paths, vec![ExtractedTypeRefPath::Path(type_ref("OrderPlaced"))]);
         }
     }
 
     #[test]
     fn test_syn_type_ref_path_extractor_classifies_external_constructor_and_inner_path() {
-        let adapter = SynTypeRefPathExtractorAdapter;
-        let type_ref = TypeRef::new("std::cell::Cell<OrderPlaced>".to_owned()).expect("type ref");
-
-        let paths = adapter.extract(&type_ref).expect("syn extraction succeeds");
+        let paths = extract("std::cell::Cell<OrderPlaced>", &[], &[], &[])
+            .expect("syn extraction succeeds");
 
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::GenericConstructor(
-                    TypeRef::new("std::cell::Cell".to_owned()).expect("constructor path")
-                ),
-                ExtractedTypeRefPath::Reference(
-                    TypeRef::new("OrderPlaced".to_owned()).expect("inner path")
-                )
+                ExtractedTypeRefPath::Path(type_ref("std::cell::Cell")),
+                ExtractedTypeRefPath::Path(type_ref("OrderPlaced")),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_preserves_same_named_qualified_paths() {
+        let paths = extract(
+            "std::result::Result<domain::alpha::Event, domain::beta::Event>",
+            &[],
+            &[],
+            &[],
+        )
+        .expect("syn extraction succeeds");
+
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("std::result::Result")),
+                ExtractedTypeRefPath::Path(type_ref("domain::alpha::Event")),
+                ExtractedTypeRefPath::Path(type_ref("domain::beta::Event")),
             ]
         );
     }
 
     #[test]
     fn test_syn_type_ref_path_extractor_collects_dyn_and_impl_trait_bounds() {
-        let adapter = SynTypeRefPathExtractorAdapter;
         for source in ["dyn domain::ports::Port", "impl domain::ports::Port"] {
-            let type_ref = TypeRef::new(source.to_owned()).expect("type ref");
-            let paths = adapter.extract(&type_ref).expect("syn extraction succeeds");
+            let paths = extract(source, &[], &[], &[]).expect("syn extraction succeeds");
 
             assert_eq!(
                 paths,
-                vec![ExtractedTypeRefPath::Reference(
-                    TypeRef::new("domain::ports::Port".to_owned()).expect("trait path")
-                )],
+                vec![ExtractedTypeRefPath::Path(type_ref("domain::ports::Port"))],
                 "trait-bound path was not extracted from `{source}`"
             );
         }
@@ -216,74 +469,73 @@ mod path_extractor_tests {
 
     #[test]
     fn test_syn_type_ref_path_extractor_splits_qself_into_self_and_trait_paths() {
-        let adapter = SynTypeRefPathExtractorAdapter;
-        let type_ref =
-            TypeRef::new("<domain::alpha::Wrapper as domain::ports::Port>::Output".to_owned())
-                .expect("qualified path is a valid TypeRef");
-
-        let paths = adapter.extract(&type_ref).expect("syn extraction succeeds");
+        let paths =
+            extract("<domain::alpha::Wrapper as domain::ports::Port>::Output", &[], &[], &[])
+                .expect("syn extraction succeeds");
 
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Reference(
-                    TypeRef::new("domain::alpha::Wrapper".to_owned()).expect("self path"),
-                ),
-                ExtractedTypeRefPath::Reference(
-                    TypeRef::new("domain::ports::Port".to_owned()).expect("trait path"),
-                ),
+                ExtractedTypeRefPath::Path(type_ref("domain::alpha::Wrapper")),
+                ExtractedTypeRefPath::Path(type_ref("domain::ports::Port")),
+                ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("Output").unwrap()),
             ]
         );
     }
 
     #[test]
-    fn test_syn_type_ref_path_extractor_resolves_inner_catalogue_identity_across_valid_wrappers() {
-        let adapter = SynTypeRefPathExtractorAdapter;
-        let catalogue_crate = CrateName::new("domain").expect("valid crate");
-        let expected = FullyQualifiedItemPath::new(
-            catalogue_crate.clone(),
-            ModulePath::from_segments(vec!["orders".to_owned()]).expect("valid module path"),
-            Identifier::new("OrderPlaced").expect("valid identifier"),
+    fn test_syn_type_ref_path_extractor_carries_parameter_context_exclusively() {
+        let paths = extract("std::vec::Vec<&'a T, [u8; N]>", &["T"], &["a"], &["N"])
+            .expect("parameterized type extracts");
+
+        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref("std::vec::Vec"))));
+        assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap())));
+        assert!(
+            paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap()))
         );
-        let universe = std::collections::BTreeSet::from([expected.clone()]);
+        assert!(
+            paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap()))
+        );
+        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref("u8"))));
+        assert!(!paths.iter().any(|path| {
+            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), "T" | "a" | "N"))
+        }));
+    }
 
-        for source in [
-            "&mut OrderPlaced",
-            "*const OrderPlaced",
-            "&'static OrderPlaced",
-            "std::cell::Cell<OrderPlaced>",
-        ] {
-            let type_ref = TypeRef::new(source.to_owned()).expect("non-empty TypeRef");
-            let extracted = adapter.extract(&type_ref).expect("valid Rust type extracts");
-            let inner = extracted
-                .iter()
-                .find_map(|path| match path {
-                    ExtractedTypeRefPath::Reference(path) => Some(path.clone()),
-                    ExtractedTypeRefPath::GenericConstructor(_) => None,
-                })
-                .expect("every wrapper contains the catalogue reference");
-            let resolved =
-                domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity(
-                    &inner,
-                    &catalogue_crate,
-                    &universe,
-                )
-                .expect("inner catalogue identity resolves");
+    #[test]
+    fn test_syn_type_ref_path_extractor_classifies_unbraced_const_generic_argument() {
+        let paths = extract("Buffer<N>", &[], &[], &["N"])
+            .expect("unbraced const generic argument extracts");
 
-            assert_eq!(resolved, expected, "source `{source}` resolved incorrectly");
-            assert!(extracted.iter().all(|path| match path {
-                ExtractedTypeRefPath::Reference(path) => path.as_str() == "OrderPlaced",
-                ExtractedTypeRefPath::GenericConstructor(path) => {
-                    path.as_str() == "std::cell::Cell"
-                }
-            }));
-        }
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("Buffer")),
+                ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths() {
+        let array_paths =
+            extract("[u8; CAPACITY]", &[], &[], &[]).expect("array const expression extracts");
+        assert_eq!(array_paths, vec![ExtractedTypeRefPath::Path(type_ref("u8"))]);
+
+        let call_paths = extract("Wrapper<{ size_of::<T>() }>", &["T"], &[], &[])
+            .expect("const block with nested type argument extracts");
+        assert_eq!(
+            call_paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("Wrapper")),
+                ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap()),
+            ]
+        );
     }
 
     #[test]
     fn test_catalogue_lint_accepts_syntactically_valid_unknown_external_wrapper() {
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
-        use domain::tddd::catalogue_v2::document::CatalogueSchemaVersion;
         use domain::tddd::catalogue_v2::entries::TypeEntry;
         use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
         use domain::tddd::layer_id::LayerId;
@@ -309,7 +561,7 @@ mod path_extractor_tests {
         let layer = LayerId::try_new("domain".to_owned()).expect("valid layer");
         let module = ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module");
         let mut catalogue = domain::tddd::catalogue_v2::CatalogueDocument::new(
-            CatalogueSchemaVersion::new(3),
+            3,
             CrateName::new("domain").expect("valid crate"),
             layer.clone(),
         );
@@ -379,13 +631,48 @@ mod path_extractor_tests {
 
     #[test]
     fn test_syn_type_ref_path_extractor_rejects_invalid_type_ref() {
-        let adapter = SynTypeRefPathExtractorAdapter;
-        let type_ref = TypeRef::new("(".to_owned()).expect("non-empty TypeRef");
-
         assert!(matches!(
-            adapter.extract(&type_ref),
-            Err(TypeRefPathExtractionError::InvalidTypeRef(invalid))
-                if invalid == type_ref
+            extract("(", &[], &[], &[]),
+            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })
+                if location == type_ref("(")
+        ));
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_rejects_unsupported_macro_syntax() {
+        assert!(matches!(
+            extract("foo!()", &[], &[], &[]),
+            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })
+                if location == type_ref("foo!()")
+        ));
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_rejects_partially_traversable_unsupported_syntax() {
+        let source = "std::option::Option<Good, bad!()>";
+        assert!(matches!(
+            extract(source, &[], &[], &[]),
+            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })
+                if location == type_ref(source)
+        ));
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_enforces_depth_and_resource_limits() {
+        let mut nested = "Leaf".to_owned();
+        for _ in 0..40 {
+            nested = format!("Option<{nested}>");
+        }
+        assert!(matches!(
+            extract(&nested, &[], &[], &[]),
+            Err(TypeRefPathExtractionError::DepthLimitExceeded { location }) if location.as_str() == nested
+        ));
+
+        let many = (0..600).map(|_| "Leaf").collect::<Vec<_>>().join(",");
+        let many = format!("({many})");
+        assert!(matches!(
+            extract(&many, &[], &[], &[]),
+            Err(TypeRefPathExtractionError::ResourceLimitExceeded { location }) if location.as_str() == many
         ));
     }
 }

@@ -442,4 +442,63 @@ mod tests {
                 if entry == "domain::alpha::Shared"
         ));
     }
+
+    #[test]
+    fn test_catalog_cli_keeps_duplicate_qualified_entry_keys_distinct() {
+        let alpha = TestCli::try_parse_from([
+            "catalog",
+            "add",
+            "--layer",
+            "domain",
+            "--kind",
+            "struct",
+            "--name",
+            "domain::alpha::Shared",
+            "--role",
+            "ValueObject",
+        ])
+        .unwrap()
+        .command;
+        let beta = TestCli::try_parse_from([
+            "catalog",
+            "add",
+            "--layer",
+            "domain",
+            "--kind",
+            "struct",
+            "--name",
+            "domain::beta::Shared",
+            "--role",
+            "ValueObject",
+        ])
+        .unwrap()
+        .command;
+        let cited = TestCli::try_parse_from([
+            "catalog",
+            "cite",
+            "--layer",
+            "domain",
+            "--entry",
+            "domain::beta::Shared",
+            "--anchor",
+            "AC-08",
+        ])
+        .unwrap()
+        .command;
+
+        let CatalogCommand::Add(CatalogAddArgs { name: alpha_name, .. }) = alpha else {
+            panic!("expected add command for alpha");
+        };
+        let CatalogCommand::Add(CatalogAddArgs { name: beta_name, .. }) = beta else {
+            panic!("expected add command for beta");
+        };
+        let CatalogCommand::Cite(CatalogCiteArgs { entry, .. }) = cited else {
+            panic!("expected cite command for beta");
+        };
+
+        assert_ne!(alpha_name, beta_name);
+        assert_eq!(alpha_name, "domain::alpha::Shared");
+        assert_eq!(beta_name, "domain::beta::Shared");
+        assert_eq!(entry, beta_name);
+    }
 }

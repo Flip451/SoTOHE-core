@@ -1910,11 +1910,7 @@ mod tests {
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
-        let mut doc = CatalogueDocument::new(
-            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
-            crate_name,
-            layer,
-        );
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
         doc.insert_type(
             CatalogueEntryKey::try_new("TrackId".to_owned()).unwrap(),
             TypeEntry::new(

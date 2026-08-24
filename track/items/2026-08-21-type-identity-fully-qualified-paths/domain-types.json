@@ -3,7 +3,7 @@
   "functions": {
     "domain::tddd::catalogue_linter::evaluate_catalogue_lint": {
       "action": "modify",
-      "docs": "Evaluates catalogue-lint rules with injected TypeRef scanning and path extraction.",
+      "docs": "Evaluates catalogue-lint rules by classifying syntactically extracted TypeRef occurrences against the supplied catalogue set.",
       "generics": [
         {
           "bounds": [
@@ -54,14 +54,22 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "OS-01",
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity": {
       "action": "add",
-      "docs": "Catalogue identity resolver.",
+      "docs": "Resolves catalogue entry references to fully qualified item paths.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -255,45 +263,6 @@
         }
       ],
       "type_name": "FullyQualifiedItemPath"
-    },
-    {
-      "methods": [
-        {
-          "action": "add",
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "u32"
-            }
-          ],
-          "returns": "Self",
-          "spec_refs": [
-            {
-              "anchor": "IN-05",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            }
-          ]
-        },
-        {
-          "action": "add",
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "value",
-          "params": [],
-          "receiver": "self",
-          "returns": "u32",
-          "spec_refs": [
-            {
-              "anchor": "IN-05",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            }
-          ]
-        }
-      ],
-      "type_name": "CatalogueSchemaVersion"
     }
   ],
   "layer": "domain",
@@ -330,38 +299,6 @@
     {
       "for_type": "FullyQualifiedItemPath",
       "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::cmp::PartialOrd"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::cmp::Ord"
-    },
-    {
-      "for_type": "CatalogueSchemaVersion",
-      "trait_ref": "core::hash::Hash"
     },
     {
       "action": "reference",
@@ -558,6 +495,26 @@
       "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>"
     },
     {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
       "trait_ref": "core::convert::From<TypeRefPathExtractionError>"
     },
@@ -641,7 +598,15 @@
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             },
             {
-              "anchor": "AC-05",
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "CO-03",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
@@ -661,7 +626,15 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "AC-05",
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-03",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -672,7 +645,7 @@
     },
     "domain::tddd::catalogue_linter::TypeRefPathExtractorPort": {
       "action": "add",
-      "docs": "Secondary port for parser-authoritative TypeRef path extraction.",
+      "docs": "Secondary port for complete syntactic TypeRef occurrence extraction.",
       "informal_grounds": [],
       "methods": [
         {
@@ -683,6 +656,18 @@
             {
               "name": "type_ref",
               "ty": "&TypeRef"
+            },
+            {
+              "name": "type_parameters",
+              "ty": "&[ParamName]"
+            },
+            {
+              "name": "lifetime_parameters",
+              "ty": "&[ParamName]"
+            },
+            {
+              "name": "const_parameters",
+              "ty": "&[ParamName]"
             }
           ],
           "receiver": "&self",
@@ -693,11 +678,7 @@
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             },
             {
-              "anchor": "AC-07",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            },
-            {
-              "anchor": "OS-01",
+              "anchor": "AC-05",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
@@ -717,7 +698,15 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "OS-01",
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -742,14 +731,14 @@
       },
       "methods": [
         {
-          "action": "modify",
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
           "params": [
             {
               "name": "schema_version",
-              "ty": "CatalogueSchemaVersion"
+              "ty": "u32"
             },
             {
               "name": "crate_name",
@@ -769,27 +758,17 @@
             {
               "anchor": "AC-01",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            },
-            {
-              "anchor": "IN-05",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
         },
         {
-          "action": "modify",
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "schema_version",
           "params": [],
           "receiver": "&self",
-          "returns": "CatalogueSchemaVersion",
-          "spec_refs": [
-            {
-              "anchor": "IN-05",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            }
-          ]
+          "returns": "u32"
         },
         {
           "action": "reference",
@@ -908,10 +887,6 @@
             {
               "anchor": "AC-01",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            },
-            {
-              "anchor": "AC-08",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
         },
@@ -939,10 +914,6 @@
             },
             {
               "anchor": "AC-01",
-              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-            },
-            {
-              "anchor": "AC-08",
               "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
             }
           ]
@@ -1047,7 +1018,7 @@
     },
     "CatalogueEntryKey": {
       "action": "modify",
-      "docs": "Catalogue entry-key value object; construction-boundary text representation.",
+      "docs": "Validated key for a catalogue entry reference.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1097,16 +1068,12 @@
         {
           "anchor": "AC-01",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-08",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "CatalogueIdentityResolutionError": {
       "action": "add",
-      "docs": "Identity-resolution error limited to ambiguity and unresolved-identity failures after TypeRef extraction.",
+      "docs": "Catalogue-reference classification and resolution error for an extracted TypeRef occurrence.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1128,6 +1095,18 @@
                 "TypeRef"
               ],
               "kind": "tuple"
+            }
+          },
+          {
+            "name": "ClassificationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
             }
           }
         ]
@@ -1159,38 +1138,22 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "CO-03",
+          "anchor": "AC-04",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        }
-      ]
-    },
-    "CatalogueSchemaVersion": {
-      "action": "add",
-      "docs": "Catalogue schema-version value object; construction-boundary scalar representation.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::catalogue_v2::document",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
+        },
         {
-          "anchor": "IN-05",
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "DeletionRecord": {
       "action": "modify",
-      "docs": "Catalogue deletion-record value object.",
+      "docs": "Record naming a deleted catalogue entry.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1285,16 +1248,12 @@
         {
           "anchor": "IN-01",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-08",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "FullyQualifiedItemPath": {
       "action": "add",
-      "docs": "Catalogue-domain fully qualified item-path value object.",
+      "docs": "Fully qualified catalogue item path comprising crate, module path, and item name.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1334,7 +1293,7 @@
     },
     "InherentImplDeclV2": {
       "action": "modify",
-      "docs": "Catalogue inherent-implementation declaration value object.",
+      "docs": "Catalogue inherent-implementation declaration.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1525,14 +1484,14 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "AC-04",
+          "anchor": "AC-06",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "TraitRefScope": {
       "action": "modify",
-      "docs": "Catalogue trait-reference scope value object.",
+      "docs": "Scope classification for a catalogue trait reference.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1576,16 +1535,12 @@
         {
           "anchor": "AC-05",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-08",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "domain::tddd::catalogue_linter::CatalogueLintViolation": {
       "action": "reference",
-      "docs": "Value-equatable catalogue-lint violation record; domain-owned as stable catalogue vocabulary shared across application operations.",
+      "docs": "Value-equatable catalogue-lint violation record carrying opaque diagnostic text.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1787,13 +1742,13 @@
     },
     "domain::tddd::catalogue_linter::ExtractedTypeRefPath": {
       "action": "add",
-      "docs": "Parser-produced classification of one path within a catalogue TypeRef.",
+      "docs": "One exclusively categorized occurrence from a complete TypeRef syntax inspection.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Reference",
+            "name": "Path",
             "payload": {
               "fields": [
                 "TypeRef"
@@ -1802,10 +1757,37 @@
             }
           },
           {
-            "name": "GenericConstructor",
+            "name": "TypeParameter",
             "payload": {
               "fields": [
-                "TypeRef"
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LifetimeParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ConstParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AssociatedItemLabel",
+            "payload": {
+              "fields": [
+                "ParamName"
               ],
               "kind": "tuple"
             }
@@ -1827,7 +1809,15 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "OS-01",
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
@@ -1840,12 +1830,39 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "InvalidTypeRef",
+            "name": "UnsupportedSyntax",
             "payload": {
               "fields": [
-                "TypeRef"
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DepthLimitExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ResourceLimitExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
             }
           }
         ]
@@ -1862,6 +1879,18 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]

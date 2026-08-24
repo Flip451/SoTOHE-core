@@ -26,7 +26,7 @@ use crate::tddd::type_ref_parser::{STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID, std_c
 
 fn make_doc(crate_name: &str) -> CatalogueDocument {
     CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(2),
+        2,
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new("domain").expect("static valid"),
     )
@@ -4988,4 +4988,207 @@ fn test_encode_struct_declared_generics_reach_rustdoc_generics() {
         !struct_inner.generics.where_predicates.is_empty(),
         "declared struct where-predicate / bound must be encoded, not dropped"
     );
+}
+
+#[test]
+fn test_encode_public_std_reexports_preserve_adapter_spelling_and_resolve_definition_paths() {
+    let mut doc = make_doc("domain");
+    insert_empty_enum_type(&mut doc, "Widget");
+    for trait_ref in ["std::iter::Iterator", "std::ops::Deref", "std::ops::FnOnce"] {
+        doc.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new(trait_ref.to_owned()).unwrap(),
+            TypeRef::new("Widget".to_owned()).unwrap(),
+        ));
+    }
+
+    // Model the rustdoc authority at the adapter boundary: the public std paths
+    // are absent, while rustdoc exposes the defining core paths. The codec keeps
+    // the adapter's source spelling, while the canonical identity assertion below
+    // verifies that the shared resolver supplies the re-export semantics.
+    let mut baseline = authoritative_crate_for_doc(&doc);
+    let public_paths = [
+        vec!["std".to_owned(), "iter".to_owned(), "Iterator".to_owned()],
+        vec!["std".to_owned(), "ops".to_owned(), "Deref".to_owned()],
+        vec!["std".to_owned(), "ops".to_owned(), "FnOnce".to_owned()],
+    ];
+    baseline.paths.retain(|_, summary| !public_paths.contains(&summary.path));
+    for (id, path) in [
+        (
+            Id(10_000),
+            vec![
+                "core".to_owned(),
+                "iter".to_owned(),
+                "traits".to_owned(),
+                "iterator".to_owned(),
+                "Iterator".to_owned(),
+            ],
+        ),
+        (
+            Id(10_001),
+            vec!["core".to_owned(), "ops".to_owned(), "deref".to_owned(), "Deref".to_owned()],
+        ),
+        (
+            Id(10_002),
+            vec!["core".to_owned(), "ops".to_owned(), "function".to_owned(), "FnOnce".to_owned()],
+        ),
+    ] {
+        baseline.paths.insert(id, ItemSummary { crate_id: 0, path, kind: ItemKind::Trait });
+    }
+    let current = baseline.clone();
+
+    let encoded = CatalogueToExtendedCrateCodec::new()
+        .encode(doc, &baseline, &current)
+        .expect("public std re-exports resolve through authoritative core paths");
+
+    for (source, expected_identity) in [
+        ("std::iter::Iterator", "core::iter::traits::iterator::Iterator"),
+        ("std::ops::Deref", "core::ops::deref::Deref"),
+        ("std::ops::FnOnce", "core::ops::function::FnOnce"),
+    ] {
+        let trait_path = encoded
+            .krate()
+            .index
+            .values()
+            .find_map(|item| match &item.inner {
+                ItemEnum::Impl(impl_item) => {
+                    impl_item.trait_.as_ref().filter(|path| path.path == source).cloned()
+                }
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("expected adapter-preserved trait path {source}"));
+        assert_eq!(
+            encoded.krate().paths[&trait_path.id].path.join("::"),
+            source,
+            "the adapter retains the source spelling on the emitted rustdoc path"
+        );
+
+        let source_ref = TypeRef::new(source.to_owned()).unwrap();
+        let identity = crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref(
+            &source_ref,
+            &CrateName::new("domain").unwrap(),
+            &baseline.paths,
+            &[],
+        )
+        .expect("the shared resolver normalizes the public re-export");
+        assert_eq!(identity.as_str(), expected_identity);
+    }
+}
+
+#[test]
+fn test_encode_short_declaration_keys_resolve_through_module_paths_for_impl_and_generics() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Node".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["beta".to_owned()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("Option<Node>").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Port".to_owned()).unwrap(),
+        TypeRef::new("Node".to_owned()).unwrap(),
+    ));
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Node".to_owned()).unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+        vec![],
+    ));
+
+    let encoded = encode_doc(doc).expect("short declaration notation remains resolvable");
+    let node_id = item_id_for_path(&encoded, &["domain", "alpha", "Node"]);
+    let port_id = item_id_for_path(&encoded, &["domain", "beta", "Port"]);
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected named Holder fields");
+    };
+    let ItemEnum::StructField(Type::ResolvedPath(option_path)) =
+        &encoded.krate().index[&fields[0]].inner
+    else {
+        panic!("expected Option<Node> to encode as a resolved generic path");
+    };
+    assert_eq!(option_path.path, "std::option::Option");
+    let Some(GenericArgs::AngleBracketed { args, .. }) = option_path.args.as_deref() else {
+        panic!("expected Option<Node> generic arguments");
+    };
+    assert!(matches!(
+        args.first(),
+        Some(GenericArg::Type(Type::ResolvedPath(path))) if path.id == node_id
+    ));
+
+    assert!(encoded.krate().index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(impl_item)
+                if impl_item
+                    .trait_
+                    .as_ref()
+                    .is_some_and(|path| path.id == port_id)
+                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == node_id)
+        )
+    }));
+    assert!(encoded.krate().index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(impl_item)
+                if impl_item.trait_.is_none()
+                    && impl_item.generics.params.iter().any(|param| param.name == "T")
+                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == node_id)
+        )
+    }));
 }

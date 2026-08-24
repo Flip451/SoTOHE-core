@@ -14,10 +14,10 @@ use crate::tddd::catalogue_v2::roles::NonEmptyVec;
 
 /// Failure while resolving an already extracted catalogue path.
 ///
-/// Syntax and `TypeRef` parsing failures belong to the adapter-owned codec
-/// error. This error contains only failures reachable after path extraction:
-/// an identity can be ambiguous or it can be absent from the supplied
-/// universe.
+/// Syntax and `TypeRef` parsing failures belong to the adapter-owned extractor
+/// error. This error contains failures reachable after path extraction: an
+/// identity can be ambiguous, absent from the supplied universe, or impossible
+/// to classify as either an in-catalogue path or an explicitly external path.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum CatalogueIdentityResolutionError {
     /// More than one fully qualified identity matches the reference.
@@ -31,6 +31,14 @@ pub enum CatalogueIdentityResolutionError {
     /// No identity in the supplied universe matches the reference.
     #[error("unresolved identifier `{identifier}`", identifier = .0.as_str())]
     UnresolvedIdentifier(TypeRef),
+
+    /// The extracted path does not carry enough crate/context information to
+    /// classify it as a catalogue reference or an explicitly external path.
+    #[error("could not classify TypeRef path at `{location}`")]
+    ClassificationFailed {
+        /// The extracted path whose ownership is unknown.
+        location: TypeRef,
+    },
 }
 
 /// Resolves one caller-extracted catalogue path against a supplied identity universe.
@@ -211,16 +219,63 @@ fn standard_reexport_suffix_matches(
     remaining: &[Identifier],
 ) -> bool {
     match (public_module, identity.name().as_str()) {
-        ("collections", "BTreeMap") => segments_match(remaining, &["btree", "map"]),
-        ("collections", "BTreeSet") => segments_match(remaining, &["btree", "set"]),
-        ("collections", "HashMap") => segments_match(remaining, &["hash", "map"]),
-        ("collections", "HashSet") => segments_match(remaining, &["hash", "set"]),
+        ("collections", "BTreeMap") => {
+            segments_match(remaining, &["btree", "map"])
+                || segments_match(remaining, &["btree_map"])
+        }
+        ("collections", "BTreeSet") => {
+            segments_match(remaining, &["btree", "set"])
+                || segments_match(remaining, &["btree_set"])
+        }
+        ("collections", "HashMap") => {
+            segments_match(remaining, &["hash", "map"]) || segments_match(remaining, &["hash_map"])
+        }
+        ("collections", "HashSet") => {
+            segments_match(remaining, &["hash", "set"]) || segments_match(remaining, &["hash_set"])
+        }
+        ("collections", "BinaryHeap") => segments_match(remaining, &["binary_heap"]),
+        ("collections", "LinkedList") => segments_match(remaining, &["linked_list"]),
+        ("collections", "VecDeque") => segments_match(remaining, &["vec_deque"]),
+        ("sync", "Mutex") => segments_match(remaining, &["poison", "mutex"]),
+        ("sync", "RwLock") => segments_match(remaining, &["poison", "rwlock"]),
         ("iter", "Iterator") => segments_match(remaining, &["traits", "iterator"]),
         ("iter", "IntoIterator") => segments_match(remaining, &["traits", "collect"]),
         ("iter", "DoubleEndedIterator") => segments_match(remaining, &["traits", "double_ended"]),
         ("iter", "ExactSizeIterator") => segments_match(remaining, &["traits", "exact_size"]),
-        ("ops", "Deref") => segments_match(remaining, &["deref"]),
-        ("ops", "FnOnce") => segments_match(remaining, &["function"]),
+        ("iter", "FromIterator" | "Extend") => segments_match(remaining, &["traits", "collect"]),
+        ("iter", "Sum" | "Product") => segments_match(remaining, &["traits", "accum"]),
+        ("ops", "Deref") | ("ops", "DerefMut") => segments_match(remaining, &["deref"]),
+        ("ops", "Fn") | ("ops", "FnMut") | ("ops", "FnOnce") => {
+            segments_match(remaining, &["function"])
+        }
+        ("ops", "Drop") => segments_match(remaining, &["drop"]),
+        (
+            "ops",
+            "Add" | "AddAssign" | "Div" | "DivAssign" | "Mul" | "MulAssign" | "Neg" | "Rem"
+            | "RemAssign" | "Sub" | "SubAssign",
+        ) => segments_match(remaining, &["arith"]),
+        (
+            "ops",
+            "BitAnd" | "BitAndAssign" | "BitOr" | "BitOrAssign" | "BitXor" | "BitXorAssign" | "Not"
+            | "Shl" | "ShlAssign" | "Shr" | "ShrAssign",
+        ) => segments_match(remaining, &["bit"]),
+        ("ops", "Index" | "IndexMut") => segments_match(remaining, &["index"]),
+        (
+            "ops",
+            "Bound" | "IntoBounds" | "OneSidedRange" | "OneSidedRangeBound" | "Range"
+            | "RangeBounds" | "RangeFrom" | "RangeFull" | "RangeInclusive" | "RangeTo"
+            | "RangeToInclusive",
+        ) => segments_match(remaining, &["range"]),
+        ("ops", "ControlFlow") => segments_match(remaining, &["control_flow"]),
+        ("ops", "Coroutine" | "CoroutineState") => segments_match(remaining, &["coroutine"]),
+        ("ops", "AsyncFn" | "AsyncFnMut" | "AsyncFnOnce") => {
+            segments_match(remaining, &["async_function"])
+        }
+        ("ops", "FromResidual" | "Residual" | "Try" | "Yeet") => {
+            segments_match(remaining, &["try_trait"])
+        }
+        ("ops", "CoerceShared" | "Reborrow") => segments_match(remaining, &["reborrow"]),
+        ("ops", "CoerceUnsized" | "DispatchFromDyn") => segments_match(remaining, &["unsize"]),
         ("str", "FromStr") => segments_match(remaining, &["traits"]),
         _ => false,
     }
@@ -462,17 +517,48 @@ mod tests {
 
     #[test]
     fn test_resolve_catalogue_identity_std_collection_alias_uses_definition_module() {
-        let expected = identity("alloc", &["collections", "btree", "map"], "BTreeMap");
-        let universe = BTreeSet::from([expected.clone()]);
+        let expected = [
+            ("BTreeMap", identity("alloc", &["collections", "btree", "map"], "BTreeMap")),
+            ("BTreeSet", identity("alloc", &["collections", "btree", "set"], "BTreeSet")),
+            ("HashMap", identity("std", &["collections", "hash", "map"], "HashMap")),
+            ("HashSet", identity("std", &["collections", "hash", "set"], "HashSet")),
+            ("LinkedList", identity("alloc", &["collections", "linked_list"], "LinkedList")),
+            ("VecDeque", identity("alloc", &["collections", "vec_deque"], "VecDeque")),
+        ];
+        let universe = expected.iter().map(|(_, path)| path.clone()).collect::<BTreeSet<_>>();
+        let catalogue_crate = CrateName::new("usecase").expect("valid crate");
 
-        let resolved = resolve_catalogue_identity(
-            &reference("std::collections::BTreeMap"),
-            &CrateName::new("usecase").expect("valid crate"),
+        for (name, expected_identity) in expected {
+            let resolved = resolve_catalogue_identity(
+                &reference(&format!("std::collections::{name}")),
+                &catalogue_crate,
+                &universe,
+            )
+            .expect("standard collection alias resolves to its definition");
+
+            assert_eq!(resolved, expected_identity);
+        }
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_std_sync_aliases_use_poison_definition_modules() {
+        let mutex = identity("std", &["sync", "poison", "mutex"], "Mutex");
+        let rw_lock = identity("std", &["sync", "poison", "rwlock"], "RwLock");
+        let universe = BTreeSet::from([mutex.clone(), rw_lock.clone()]);
+        let catalogue_crate = CrateName::new("usecase").expect("valid crate");
+
+        let resolved_mutex =
+            resolve_catalogue_identity(&reference("std::sync::Mutex"), &catalogue_crate, &universe)
+                .expect("Mutex re-export resolves to the poison definition");
+        let resolved_rw_lock = resolve_catalogue_identity(
+            &reference("std::sync::RwLock"),
+            &catalogue_crate,
             &universe,
         )
-        .expect("standard collection alias resolves to its definition");
+        .expect("RwLock re-export resolves to the poison definition");
 
-        assert_eq!(resolved, expected);
+        assert_eq!(resolved_mutex, mutex);
+        assert_eq!(resolved_rw_lock, rw_lock);
     }
 
     #[test]
@@ -494,8 +580,20 @@ mod tests {
     fn test_resolve_catalogue_identity_std_reexports_use_authoritative_definition_paths() {
         let iterator = identity("core", &["iter", "traits", "iterator"], "Iterator");
         let deref = identity("core", &["ops", "deref"], "Deref");
+        let deref_mut = identity("core", &["ops", "deref"], "DerefMut");
+        let fn_trait = identity("core", &["ops", "function"], "Fn");
+        let fn_mut = identity("core", &["ops", "function"], "FnMut");
         let fn_once = identity("core", &["ops", "function"], "FnOnce");
-        let universe = BTreeSet::from([iterator.clone(), deref.clone(), fn_once.clone()]);
+        let add = identity("core", &["ops", "arith"], "Add");
+        let universe = BTreeSet::from([
+            iterator.clone(),
+            deref.clone(),
+            deref_mut.clone(),
+            fn_trait.clone(),
+            fn_mut.clone(),
+            fn_once.clone(),
+            add.clone(),
+        ]);
 
         let resolved_iterator = resolve_catalogue_identity(
             &reference("std::iter::Iterator"),
@@ -509,16 +607,44 @@ mod tests {
             &universe,
         )
         .expect("Deref re-export resolves");
+        let resolved_deref_mut = resolve_catalogue_identity(
+            &reference("std::ops::DerefMut"),
+            &CrateName::new("usecase").expect("valid crate"),
+            &universe,
+        )
+        .expect("DerefMut re-export resolves");
+        let resolved_fn = resolve_catalogue_identity(
+            &reference("std::ops::Fn"),
+            &CrateName::new("usecase").expect("valid crate"),
+            &universe,
+        )
+        .expect("Fn re-export resolves");
+        let resolved_fn_mut = resolve_catalogue_identity(
+            &reference("std::ops::FnMut"),
+            &CrateName::new("usecase").expect("valid crate"),
+            &universe,
+        )
+        .expect("FnMut re-export resolves");
         let resolved_fn_once = resolve_catalogue_identity(
             &reference("std::ops::FnOnce"),
             &CrateName::new("usecase").expect("valid crate"),
             &universe,
         )
         .expect("FnOnce re-export resolves");
+        let resolved_add = resolve_catalogue_identity(
+            &reference("std::ops::Add"),
+            &CrateName::new("usecase").expect("valid crate"),
+            &universe,
+        )
+        .expect("Add re-export resolves");
 
         assert_eq!(resolved_iterator, iterator);
         assert_eq!(resolved_deref, deref);
+        assert_eq!(resolved_deref_mut, deref_mut);
+        assert_eq!(resolved_fn, fn_trait);
+        assert_eq!(resolved_fn_mut, fn_mut);
         assert_eq!(resolved_fn_once, fn_once);
+        assert_eq!(resolved_add, add);
     }
 
     #[test]

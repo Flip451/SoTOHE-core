@@ -188,6 +188,80 @@ fn test_fs_catalog_adapter_add_import_and_cite_write_track_catalogue() {
 }
 
 #[test]
+fn test_fs_catalog_adapter_keeps_duplicate_names_distinct_across_writes() {
+    let (_workspace, items_dir) = setup_items_dir();
+    let adapter = FsCatalogAdapter::new();
+    let track_id = track_id();
+    let expected_file = items_dir.join(TRACK_ID).join("domain-types.json");
+
+    CatalogPort::init(&adapter, &track_id, &items_dir).unwrap();
+    write_spec(&items_dir);
+
+    let first = CatalogPort::add(&adapter, &track_id, &items_dir, add_command()).unwrap();
+    let mut second_command = add_command();
+    second_command.name = "domain::beta::Shared".to_owned();
+    let second = CatalogPort::add(&adapter, &track_id, &items_dir, second_command).unwrap();
+    assert_eq!(first.entry_key, "domain::alpha::Shared");
+    assert_eq!(second.entry_key, "domain::beta::Shared");
+
+    let cite = CatalogPort::cite(
+        &adapter,
+        &track_id,
+        &items_dir,
+        CatalogCiteCommand {
+            layer: LayerId::try_new("domain").unwrap(),
+            entry: "domain::beta::Shared".to_owned(),
+            anchors: vec!["AC-01".to_owned()],
+        },
+    )
+    .unwrap();
+    assert_eq!(cite.entry_key, "domain::beta::Shared");
+
+    let import = CatalogPort::import(
+        &adapter,
+        &track_id,
+        &items_dir,
+        CatalogImportCommand {
+            layer: LayerId::try_new("domain").unwrap(),
+            type_path: "domain::gamma::Shared".to_owned(),
+            action: CatalogImportAction::Delete,
+            anchors: vec!["AC-02".to_owned()],
+        },
+    )
+    .unwrap();
+    assert_eq!(import.entry_key, "domain::gamma::Shared");
+
+    let catalogue: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&expected_file).unwrap()).unwrap();
+    let types = catalogue
+        .get("types")
+        .and_then(serde_json::Value::as_object)
+        .expect("catalogue must contain types");
+    assert_eq!(types.len(), 3);
+    for entry_key in ["domain::alpha::Shared", "domain::beta::Shared", "domain::gamma::Shared"] {
+        assert!(types.contains_key(entry_key), "missing qualified entry {entry_key}");
+    }
+
+    let anchors_for = |entry_key: &str| {
+        types
+            .get(entry_key)
+            .and_then(|entry| entry.get("spec_refs"))
+            .and_then(serde_json::Value::as_array)
+            .expect("entry must contain spec_refs")
+            .iter()
+            .filter_map(|reference| reference.get("anchor"))
+            .filter_map(serde_json::Value::as_str)
+            .collect::<Vec<_>>()
+    };
+    assert!(anchors_for("domain::alpha::Shared").contains(&"IN-01"));
+    assert!(!anchors_for("domain::alpha::Shared").contains(&"AC-01"));
+    assert!(anchors_for("domain::beta::Shared").contains(&"AC-01"));
+    assert!(!anchors_for("domain::beta::Shared").contains(&"AC-02"));
+    assert!(anchors_for("domain::gamma::Shared").contains(&"AC-02"));
+    assert!(!anchors_for("domain::gamma::Shared").contains(&"AC-01"));
+}
+
+#[test]
 fn test_fs_catalog_adapter_operations_preserve_invalid_layer_errors() {
     let (_workspace, items_dir) = setup_items_dir();
     let adapter = FsCatalogAdapter::new();

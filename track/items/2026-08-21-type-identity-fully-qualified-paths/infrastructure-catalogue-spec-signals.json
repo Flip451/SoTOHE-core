@@ -1,36 +1,31 @@
 {
-  "catalogue_declaration_hash": "18316abfe4fea52e155351c28f0803152dab44a3a29ced56d4c81c0b3b14f616",
+  "catalogue_declaration_hash": "e1e71bd558c2fdd8f15988dc3553f121ea01e186f8848744725a23f9c50b3a36",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "7c1d44b13f7c156b687ba62853822c6659abfe83d5770ac106005164237b632b",
+      "entry_hash": "8a10b9d510f2532719335fa16a1fc6c596cf5ce34681ba125efd48db5465701e",
       "signal": "blue",
       "type_name": "CanonicalTypeIdentity"
     },
     {
-      "entry_hash": "1bfa12426c1430bdd5b37b7ffcc8ad11646f20b48ddfe3e4d436660b177de9de",
+      "entry_hash": "ef43310942d26a8ee8efbf35c1441954ebc641efcd91c3fd1bdd6b77e30222d2",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
     },
     {
-      "entry_hash": "3b436fecc985310fd6319ae747f0963417e1efecf18f2d58bfc32e96310f495f",
+      "entry_hash": "e53f6e4703b5451b89b2c82fe4e97460fb8b7cb018bec42e63cf40b7ebdb0e19",
       "signal": "blue",
       "type_name": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter"
     },
     {
-      "entry_hash": "310c710691091a38577ca210b2c9df82c1023dd53fb185518f0fdcbd43db9105",
+      "entry_hash": "22ce9cf5ce2b7ad77e14d04629458aa897e3bab08c5f0cff18e152e1617a19ec",
       "signal": "blue",
       "type_name": "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter"
     },
     {
-      "entry_hash": "583161f93a609a96b948a1db21a48a2bfcaffeb301609282fcc6f9fbc69f796f",
+      "entry_hash": "3e15ccae0f7c7868adf475da49ec3c1f79faa595143b91a5ee9447cc7dcd1eb0",
       "signal": "blue",
       "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
-    },
-    {
-      "entry_hash": "e8eba8345cca5c47948f4186a7efe821f314ebd018588b63a24231e954e8e491",
-      "signal": "blue",
-      "type_name": "CatalogueToExtendedCrateCodecError"
     }
   ]
 }

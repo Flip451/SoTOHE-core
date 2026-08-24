@@ -216,12 +216,20 @@ mod tests {
             fn extract(
                 &self,
                 type_ref: &domain::tddd::catalogue_v2::identifiers::TypeRef,
+                type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
             ) -> Result<
                 Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
                 domain::tddd::catalogue_linter::TypeRefPathExtractionError,
             > {
                 self.calls.fetch_add(1, Ordering::SeqCst);
-                self.parser.extract(type_ref)
+                self.parser.extract(
+                    type_ref,
+                    type_parameters,
+                    lifetime_parameters,
+                    const_parameters,
+                )
             }
         }
 

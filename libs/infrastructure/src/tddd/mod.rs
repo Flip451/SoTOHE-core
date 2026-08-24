@@ -23,6 +23,7 @@ pub mod catalogue_document_codec;
 pub mod catalogue_spec_signals_codec;
 pub mod catalogue_spec_signals_refresher;
 pub mod catalogue_to_extended_crate_codec;
+pub mod catalogue_to_extended_crate_codec_error;
 pub mod contract_map_adapter;
 pub mod contract_map_renderer_adapter;
 pub mod feature_declaration_adapter;

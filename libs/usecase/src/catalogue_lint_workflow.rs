@@ -578,6 +578,9 @@ mod tests {
         fn extract(
             &self,
             _type_ref: &TypeRef,
+            _type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+            _lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+            _const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
         ) -> Result<
             Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
             domain::tddd::catalogue_linter::TypeRefPathExtractionError,
@@ -670,11 +673,7 @@ mod tests {
     }
 
     fn empty_doc(crate_name: &str) -> CatalogueDocument {
-        CatalogueDocument::new(
-            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(3),
-            CrateName::new(crate_name).unwrap(),
-            layer(crate_name),
-        )
+        CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
     }
 
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
@@ -863,6 +862,9 @@ mod tests {
             fn extract(
                 &self,
                 type_ref: &TypeRef,
+                _type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
             ) -> Result<
                 Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
                 domain::tddd::catalogue_linter::TypeRefPathExtractionError,
@@ -870,11 +872,11 @@ mod tests {
                 use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
 
                 let reference = |value: &str| {
-                    ExtractedTypeRefPath::Reference(TypeRef::new(value.to_owned()).unwrap())
+                    ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap())
                 };
                 let wrapped = |value: &str| {
                     vec![
-                        ExtractedTypeRefPath::GenericConstructor(
+                        ExtractedTypeRefPath::Path(
                             TypeRef::new("std::ghost::UnknownWrapper".to_owned()).unwrap(),
                         ),
                         reference(value),
@@ -895,9 +897,9 @@ mod tests {
                     "Event" => Ok(vec![reference("Event")]),
                     "domain::missing::Event" => Ok(vec![reference("domain::missing::Event")]),
                     _ => Err(
-                        domain::tddd::catalogue_linter::TypeRefPathExtractionError::InvalidTypeRef(
-                            type_ref.clone(),
-                        ),
+                        domain::tddd::catalogue_linter::TypeRefPathExtractionError::UnsupportedSyntax {
+                            location: type_ref.clone(),
+                        },
                     ),
                 }
             }
@@ -1010,6 +1012,14 @@ mod tests {
             ),
         );
         catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::UseCaseExtractionFailure".to_owned())
+                .unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("(".to_owned()).unwrap()] },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
             CatalogueEntryKey::try_new("domain::alpha::ExternalService".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1086,6 +1096,11 @@ mod tests {
         assert!(violations.iter().any(|violation| {
             violation.rule_kind() == "ReferencedRoleConstraint"
                 && violation.message().contains("domain::missing::Event")
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.entry_name() == "domain::alpha::UseCaseExtractionFailure"
+                && violation.message().contains("unsupported TypeRef syntax")
+                && violation.message().contains("(")
         }));
         assert!(violations.iter().any(|violation| {
             violation.rule_kind() == "FieldElementUniqueAcrossEntries"

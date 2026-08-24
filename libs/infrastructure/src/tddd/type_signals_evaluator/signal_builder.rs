@@ -471,7 +471,6 @@ mod tests {
         build_type_signal_identity_index, build_type_signals_from_report,
     };
     use domain::tddd::LayerId;
-    use domain::tddd::catalogue_v2::document::CatalogueSchemaVersion;
     use domain::tddd::catalogue_v2::roles::ItemAction;
     use domain::tddd::catalogue_v2::{
         CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath,
@@ -527,7 +526,6 @@ mod tests {
     fn test_build_identity_index_joins_generic_impl_owner_to_declaration_identity() {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
-        use domain::tddd::catalogue_v2::document::CatalogueSchemaVersion;
         use domain::tddd::catalogue_v2::entries::TypeEntry;
         use domain::tddd::catalogue_v2::methods::MethodGenericParam;
         use domain::tddd::catalogue_v2::roles::DataRole;
@@ -535,7 +533,7 @@ mod tests {
         use rustdoc_types::{Id, ItemKind, ItemSummary};
 
         let mut catalogue = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(5),
+            5,
             CrateName::new("domain").expect("valid crate name"),
             LayerId::try_new("domain").expect("valid layer"),
         );
@@ -589,6 +587,143 @@ mod tests {
             assert_eq!(built[0].type_name(), "domain::alpha::Wrapper");
             assert_eq!(built[0].kind_tag(), "struct");
             assert_eq!(built[0].found_items(), &["domain::ports::Port"]);
+        }
+    }
+
+    #[test]
+    fn test_build_type_signals_duplicate_module_impl_owners_join_independently() {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+        use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+        use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+        use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+        use rustdoc_types::{Id, ItemKind, ItemSummary};
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
+        );
+        for module in ["alpha", "beta"] {
+            let module_path =
+                ModulePath::from_segments(vec![module.to_owned()]).expect("valid module path");
+            catalogue.insert_type(
+                CatalogueEntryKey::try_new(format!("{module}::Input")).expect("valid type key"),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                    vec![],
+                    vec![],
+                    vec![],
+                    module_path.clone(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+            catalogue.insert_trait(
+                CatalogueEntryKey::try_new(format!("{module}::Port")).expect("valid trait key"),
+                TraitEntry::new(
+                    ItemAction::Add,
+                    ContractRole::SpecificationPort,
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    module_path,
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+            catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+                ItemAction::Add,
+                TypeRef::new(format!("domain::{module}::Port<domain::{module}::Input>"))
+                    .expect("valid qualified trait ref"),
+                TypeRef::new(format!("domain::{module}::Input<T>")).expect("valid generic owner"),
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").expect("valid generic name"),
+                    bounds: vec![],
+                }],
+                vec![],
+            ));
+        }
+
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "alpha".to_owned(), "Input".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "beta".to_owned(), "Input".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(3),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "alpha".to_owned(), "Port".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+            (
+                Id(4),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "beta".to_owned(), "Port".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let identity_index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("duplicate module identities must be indexable");
+        let signals = [
+            ThreeWaySignal::new(
+                "domain::alpha::Input: domain::alpha::Port<domain::alpha::Input>".to_owned(),
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::new(
+                "domain::beta::Input: domain::beta::Port<domain::beta::Input>".to_owned(),
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+        ];
+        let kinds = BTreeMap::from([
+            ("alpha::Input".to_owned(), vec!["struct"]),
+            ("beta::Input".to_owned(), vec!["struct"]),
+        ]);
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &identity_index);
+        assert_eq!(built.len(), 2, "each qualified owner must produce one signal");
+        for (module, other_module) in [("alpha", "beta"), ("beta", "alpha")] {
+            let signal = built
+                .iter()
+                .find(|signal| signal.type_name() == format!("{module}::Input"))
+                .expect("qualified owner must remain a separate entry");
+            assert_eq!(signal.signal(), domain::ConfidenceSignal::Blue);
+            assert_eq!(
+                signal.found_items(),
+                &[format!("domain::{module}::Port<domain::{module}::Input>")]
+            );
+            assert!(
+                signal
+                    .found_items()
+                    .iter()
+                    .all(|item| !item.contains(&format!("domain::{other_module}::"))),
+                "{module} owner must not receive {other_module} impl data: {:?}",
+                signal.found_items()
+            );
         }
     }
 
@@ -723,7 +858,7 @@ mod tests {
     #[test]
     fn test_build_identity_index_includes_type_and_trait_deletion_aliases() {
         let mut catalogue = CatalogueDocument::new(
-            CatalogueSchemaVersion::new(5),
+            5,
             CrateName::new("domain").expect("valid crate name"),
             LayerId::try_new("domain").expect("valid layer"),
         );

@@ -6,14 +6,13 @@
 |------|------|--------|---------|--------|----------|
 | DeletionRecord | enum | modify | Type, Trait, Function | 🔵 | 🔵 |
 | TraitRefScope | enum | modify | SelfCrate, Workspace, External | 🔵 | 🔵 |
-| domain::tddd::catalogue_linter::ExtractedTypeRefPath | enum | add | Reference, GenericConstructor | 🔵 | 🔵 |
+| domain::tddd::catalogue_linter::ExtractedTypeRefPath | enum | add | Path, TypeParameter, LifetimeParameter, ConstParameter, AssociatedItemLabel | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueEntryKey | value_object | modify | — | 🔵 | 🔵 |
-| CatalogueSchemaVersion | value_object | add | — | 🔵 | 🔵 |
 | FullyQualifiedItemPath | value_object | add | — | 🔵 | 🔵 |
 | InherentImplDeclV2 | value_object | modify | — | 🔵 | 🔵 |
 | domain::tddd::catalogue_linter::CatalogueLintViolation | value_object | reference | — | 🔵 | 🔵 |
@@ -22,17 +21,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueIdentityResolutionError | error_type | add | AmbiguousIdentifier, UnresolvedIdentifier | 🔵 | 🔵 |
+| CatalogueIdentityResolutionError | error_type | add | AmbiguousIdentifier, UnresolvedIdentifier, ClassificationFailed | 🔵 | 🔵 |
 | NewTypeGraphCodecError | error_type | modify | InvalidTypeRef, AmbiguousIdentifier, UnresolvedIdentifier | 🔵 | 🔵 |
 | domain::tddd::catalogue_linter::CatalogueLinterError | error_type | modify | DuplicateTypeAliasGenericParameter, InvalidTypeAliasGenericParameterName, ConflictingTypeAliasGenericParameters, InvalidRuleConfig, UnknownLayer, ScanFailed, PathExtractionFailed, IdentityResolutionFailed | 🔵 | 🔵 |
-| domain::tddd::catalogue_linter::TypeRefPathExtractionError | error_type | add | InvalidTypeRef | 🔵 | 🔵 |
+| domain::tddd::catalogue_linter::TypeRefPathExtractionError | error_type | add | UnsupportedSyntax, DepthLimitExceeded, ResourceLimitExceeded | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueToExtendedCratePort | secondary_port | modify | fn encode(&self, doc: CatalogueDocument, baseline: &rustdoc_types::Crate, current: &rustdoc_types::Crate) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
-| domain::tddd::catalogue_linter::TypeRefPathExtractorPort | secondary_port | add | fn extract(&self, type_ref: &TypeRef) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> | 🔵 | 🔵 |
+| domain::tddd::catalogue_linter::TypeRefPathExtractorPort | secondary_port | add | fn extract(&self, type_ref: &TypeRef, type_parameters: &[ParamName], lifetime_parameters: &[ParamName], const_parameters: &[ParamName]) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> | 🔵 | 🔵 |
 
 ## Free Functions
 

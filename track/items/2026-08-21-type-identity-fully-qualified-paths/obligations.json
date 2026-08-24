@@ -2,7 +2,7 @@
   "obligations": [
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-      "declaration_hash": "cb85694aa31b0c7bcca5747cdfe26b3659a467112422cd7adcb692f5fb1d27ec",
+      "declaration_hash": "86f37a15b943eb4c12f015c60914b329089d390ef43a0156cbb1db40d2acad13",
       "id": {
         "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
         "item_identifier": "entry",
@@ -18,7 +18,15 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "OS-01",
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-02",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -34,7 +42,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-      "declaration_hash": "40e3ff7b6e595929c800bae8b1879a18e0a33b5c6ff1382be63542e0fb38dab7",
+      "declaration_hash": "3fa69b69c5f92dbb1bb6109a4441b2b6f5978aa620059ddce8c0277ee3226607",
       "id": {
         "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
         "item_identifier": "entry",
@@ -86,7 +94,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:encode' of CatalogueToExtendedCratePort",
-      "declaration_hash": "72ede2a6af4f1c5534a94cfc454037fc06ab005eb9077dd4a0d89cbfb54c021b",
+      "declaration_hash": "647116311a78e3e8c3734662c80b4fabdf802ece5b213256337127de720efd84",
       "id": {
         "entry_key": "CatalogueToExtendedCratePort",
         "item_identifier": "trait_method:encode",
@@ -102,7 +110,15 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "AC-05",
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-03",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -118,7 +134,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:extract' of domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
-      "declaration_hash": "e7bd2e10ae41d21f8afe4053b481a4dfc0bd99020c445b8484c4a08fddda4d9f",
+      "declaration_hash": "1d9dadbc4f3aafa646dff16359aa55ed3755da8a8d1a40b975a25d2136b0eb2f",
       "id": {
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
         "item_identifier": "trait_method:extract",
@@ -130,11 +146,7 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "element_id": "OS-01",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -150,7 +162,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort' of std::sync::Arc<T>",
-      "declaration_hash": "f23c23f3978f874a73c14bc7ff77893b2a5dd6665f2804828212574982cb9bfd",
+      "declaration_hash": "6848efafab299cc3654060cc9fdccf71c2b79500c2a2b20069b4ce0306b5427f",
       "id": {
         "entry_key": "std::sync::Arc<T>",
         "item_identifier": "trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
@@ -166,7 +178,15 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "OS-01",
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-02",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -182,7 +202,7 @@
     },
     {
       "brief": "Author a result test covering 'entry' of usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
-      "declaration_hash": "861eda31a47e0b0deacbdc0e085063496655269c2882c04eb3d4632d5b5ca0c1",
+      "declaration_hash": "dc813645e18092c92865873cc2663957990ff5035f2c236d37b83499bc0b3698",
       "id": {
         "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
         "item_identifier": "entry",
@@ -195,6 +215,18 @@
         },
         {
           "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-02",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -210,7 +242,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
-      "declaration_hash": "acecebec9346dca2121cba0e8cea6b8da2635d51bc87193a1d40b3421ca76852",
+      "declaration_hash": "89dcae929ae161872fcba0b4510e6d8f7961d14295fd4ad1c80fc3a9d4ce1dc5",
       "id": {
         "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
         "item_identifier": "entry",
@@ -234,10 +266,6 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "CO-03",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
           "element_id": "AC-02",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
@@ -246,11 +274,7 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "element_id": "AC-05",
+          "element_id": "AC-06",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],
@@ -266,7 +290,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort' of infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
-      "declaration_hash": "c6c7a98cf77da866b5e430ce88507bbd7c5223e366a3e49e7959cb59534d6f81",
+      "declaration_hash": "f7a805a624f637a577bbb8c31316ec9a960d786f760674c05777255afef3f973",
       "id": {
         "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter",
         "item_identifier": "trait_impl:domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
@@ -282,7 +306,15 @@
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "element_id": "OS-01",
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "element_id": "CO-02",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ],

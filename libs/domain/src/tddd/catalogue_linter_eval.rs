@@ -39,6 +39,9 @@ use eval_helpers::sig_type_contains_entry;
 #[path = "catalogue_linter_eval_composition_root.rs"]
 mod eval_composition_root;
 
+#[path = "catalogue_linter_eval_external_refs.rs"]
+mod eval_external_refs;
+
 #[path = "catalogue_linter_identity.rs"]
 mod identity;
 
@@ -50,8 +53,9 @@ use eval_config::{
     ensure_target_can_produce_type_ref_checks,
 };
 use identity::{
-    build_declared_identities, declared_identity_universe, entry_identity, resolution_message,
-    resolve_reference_identities, role_constraint_failure, signature_contains_identity,
+    CatalogueIdentityContext, TypeRefInspectionContext, build_declared_identities,
+    declared_identity_universe, generic_parameter_names, resolution_message,
+    resolve_reference_identities, role_constraint_failure,
 };
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`
@@ -199,16 +203,26 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
+                let identity_context = CatalogueIdentityContext {
+                    catalogue_crate: catalogue.crate_name(),
+                    universe: &identity_universe,
+                    entries: &declared_identities,
+                };
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     for type_ref in field_type_refs(entry.role(), field) {
                         if let Some(message) = role_constraint_failure(
                             type_ref,
                             *expected_role,
-                            catalogue.crate_name(),
-                            &identity_universe,
-                            &declared_identities,
+                            identity_context,
                             field,
                             extractor,
+                            inspection,
                         ) {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
@@ -220,15 +234,20 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 }
 
                 for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     if let Some(type_ref) = contract_role_type_ref(entry.role(), field) {
                         if let Some(message) = role_constraint_failure(
                             type_ref,
                             *expected_role,
-                            catalogue.crate_name(),
-                            &identity_universe,
-                            &declared_identities,
+                            identity_context,
                             field,
                             extractor,
+                            inspection,
                         ) {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
@@ -455,14 +474,25 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
+                let identity_context = CatalogueIdentityContext {
+                    catalogue_crate: catalogue.crate_name(),
+                    universe: &identity_universe,
+                    entries: &declared_identities,
+                };
                 let mut seen: BTreeMap<FullyQualifiedItemPath, String> = BTreeMap::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     for type_ref in field_type_refs(entry.role(), *target_field) {
                         match resolve_reference_identities(
                             type_ref,
-                            catalogue.crate_name(),
-                            &identity_universe,
+                            identity_context,
                             extractor,
+                            inspection,
                         ) {
                             Ok(identities) => {
                                 for identity in identities {
@@ -493,142 +523,13 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
             }
 
             CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field } => {
-                // Per ADR D6/D11, this rule is defined only for `exclusive_members`.
-                // Other DataRole fields do not have external-reference-in-methods
-                // semantics in the minimum-core rule set (D19 fail-closed).
-                if *target_field != RolePayloadField::ExclusiveMembers {
-                    return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-                        "NoExternalReferenceInMethods: unsupported target_field '{}'; \
-                         only 'exclusive_members' is supported (ADR D6/D11)",
-                        target_field
-                    ))));
-                }
-                ensure_target_can_produce_type_ref_checks(
-                    rule.kind().discriminant_name(),
-                    rule.target().target_roles(),
+                violations.extend(eval_external_refs::evaluate_no_external_reference_in_methods(
+                    rule,
                     *target_field,
-                )?;
-                let declared_identities = build_declared_identities(all_catalogues)?;
-                let identity_universe = declared_identity_universe(&declared_identities);
-                for (agg_name, agg_entry) in type_entries_for_target(catalogue, rule.target()) {
-                    let exclusive_refs = field_type_refs(agg_entry.role(), *target_field);
-                    if exclusive_refs.is_empty() {
-                        continue;
-                    }
-                    let aggregate_identity =
-                        entry_identity(catalogue, agg_name, agg_entry.module_path())?;
-                    let mut inside_identities = vec![aggregate_identity];
-                    let mut exclusive_identities = Vec::new();
-                    for type_ref in exclusive_refs {
-                        match resolve_reference_identities(
-                            type_ref,
-                            catalogue.crate_name(),
-                            &identity_universe,
-                            extractor,
-                        ) {
-                            Ok(identities) => {
-                                for identity in identities {
-                                    if !exclusive_identities.contains(&identity) {
-                                        exclusive_identities.push(identity.clone());
-                                    }
-                                    if !inside_identities.contains(&identity) {
-                                        inside_identities.push(identity);
-                                    }
-                                }
-                            }
-                            Err(error) => violations.push(CatalogueLintViolation::new(
-                                rule.kind().discriminant_name(),
-                                agg_name.as_str(),
-                                resolution_message(type_ref, &error),
-                            )),
-                        }
-                    }
-                    for type_ref in
-                        field_type_refs(agg_entry.role(), RolePayloadField::SharedValueObjects)
-                    {
-                        match resolve_reference_identities(
-                            type_ref,
-                            catalogue.crate_name(),
-                            &identity_universe,
-                            extractor,
-                        ) {
-                            Ok(identities) => {
-                                for identity in identities {
-                                    if !inside_identities.contains(&identity) {
-                                        inside_identities.push(identity);
-                                    }
-                                }
-                            }
-                            Err(error) => violations.push(CatalogueLintViolation::new(
-                                rule.kind().discriminant_name(),
-                                agg_name.as_str(),
-                                resolution_message(type_ref, &error),
-                            )),
-                        }
-                    }
-                    for (other_name, other_entry) in
-                        catalogue.types().iter().filter(|(_, e)| e.action() != ItemAction::Delete)
-                    {
-                        let other_identity =
-                            entry_identity(catalogue, other_name, other_entry.module_path())?;
-                        if inside_identities.contains(&other_identity) {
-                            continue;
-                        }
-                        let all_methods =
-                            collect_methods_for_type(catalogue, other_entry, other_name.as_str())?;
-                        for exclusive_identity in &exclusive_identities {
-                            let mut comparison = None;
-                            'method_scan: for method in &all_methods {
-                                let signature_types = method
-                                    .params
-                                    .iter()
-                                    .map(|parameter| &parameter.ty)
-                                    .chain(std::iter::once(&method.returns));
-                                for signature_type in signature_types {
-                                    match signature_contains_identity(
-                                        signature_type,
-                                        exclusive_identity,
-                                        catalogue.crate_name(),
-                                        &identity_universe,
-                                        extractor,
-                                    ) {
-                                        Ok(true) => {
-                                            comparison = Some(Ok(true));
-                                            break 'method_scan;
-                                        }
-                                        Ok(false) => {}
-                                        Err(error) => {
-                                            comparison = Some(Err((error, signature_type.clone())));
-                                            break 'method_scan;
-                                        }
-                                    }
-                                }
-                            }
-                            match comparison {
-                                Some(Ok(true)) => violations.push(CatalogueLintViolation::new(
-                                    rule.kind().discriminant_name(),
-                                    agg_name.as_str(),
-                                    format!(
-                                        "exclusive member '{}' is referenced in methods of external entry '{}'",
-                                        exclusive_identity,
-                                        other_name.as_str()
-                                    ),
-                                )),
-                                Some(Err((error, signature_type))) => {
-                                    violations.push(CatalogueLintViolation::new(
-                                        rule.kind().discriminant_name(),
-                                        agg_name.as_str(),
-                                        format!(
-                                            "could not compare method signature type '{}' with exclusive member '{}': {error}",
-                                            signature_type, exclusive_identity
-                                        ),
-                                    ));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                }
+                    catalogue,
+                    all_catalogues,
+                    extractor,
+                )?);
             }
 
             CatalogueLinterRuleKind::NoPublicField => {

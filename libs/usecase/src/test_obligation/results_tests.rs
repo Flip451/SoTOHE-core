@@ -429,7 +429,7 @@ fn command() -> TestObligationResultsCommand {
 
 fn status_catalogue() -> CatalogueDocument {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1161,7 +1161,7 @@ fn test_results_new_keeps_unresolved_skipped_lane_informational() {
 fn test_results_does_not_report_unbound_anchorless_obligation_as_missing() {
     let obligation = obligation_with_spec_refs("Money", "status-lane", Vec::new());
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );

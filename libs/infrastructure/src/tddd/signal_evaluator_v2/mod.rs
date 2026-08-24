@@ -28,15 +28,15 @@
 //!
 //! ## Structural equality (ADR 3 D3)
 //!
-//! Types/traits/functions are compared by converting `rustdoc_types::Type` fields to
-//! short-name strings via an internal `format_type` helper (L1 resolution, module paths
-//! stripped). This matches the catalogue L1 representation so A-derived and rustdoc-derived
-//! items compare symmetrically.
+//! Types/traits/functions retain the established structural formatter for shape comparison,
+//! while every available `Crate::paths` identity is checked before that formatter runs. This
+//! keeps A-derived and rustdoc-derived items symmetric without allowing same-named declarations
+//! in different modules to collapse to one short-name identity.
 //!
 //! ## Module structure
 //!
 //! - `format`          — `format_type`, `format_generic_args`, `format_generic_bounds`, etc.
-//! - `structural_eq`   — `items_structurally_equal` (dispatch + struct/enum comparisons)
+//! - `structural_eq`   — `items_structurally_equal_with_paths` (dispatch + struct/enum comparisons)
 //! - `generics_eq`     — `generics_structurally_equal`, `build_trait_method_map`, `fn_sigs_*`
 //! - `phase2`          — `phase2_evaluate` and S/D/C region helpers
 //! - `resolve_type`    — `resolve_type` and friends (Phase 1.5 Id rewriting)
@@ -61,11 +61,13 @@ use crate::schema_export::{RustdocTargetResolution, resolve_rustdoc_root_name};
 // ---------------------------------------------------------------------------
 
 pub(super) mod alias_lexical;
+pub(super) mod alias_structural_eq;
 pub(super) mod collect_refs;
 pub(super) mod external_crates;
 pub(crate) mod format;
 pub(super) mod generics_eq;
 pub(super) mod impl_identity;
+pub(super) mod impl_identity_helpers;
 pub(super) mod phase1;
 pub(super) mod phase2;
 pub(super) mod resolution;
@@ -79,9 +81,19 @@ pub(super) mod tests;
 use phase1::phase1_build_s_and_d_with_rustdoc_root;
 use phase2::phase2_evaluate;
 
-pub(super) use impl_identity::build_impl_identity_map;
 #[cfg(test)]
-pub(crate) use impl_identity::{is_compiler_internal_trait, normalize_impl_trait_path};
+pub(super) fn build_impl_identity_map(
+    krate: &rustdoc_types::Crate,
+    crate_name: &str,
+) -> Result<std::collections::BTreeMap<String, rustdoc_types::Id>, domain::tddd::Phase1Error> {
+    let authority = crate::tddd::canonical_type_identity::DefinitionPathAuthority::from_path_maps(
+        &krate.paths,
+        &[],
+    );
+    impl_identity::build_impl_identity_map(krate, crate_name, &authority)
+}
+#[cfg(test)]
+pub(crate) use impl_identity::is_compiler_internal_trait;
 
 // ---------------------------------------------------------------------------
 // SignalEvaluatorV2 — secondary adapter

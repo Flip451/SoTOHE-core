@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_hash": "bf28da925f579527c51eb969deaf5b1ddcda450026e2637e8e753339048105d5",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueDocument",
@@ -10,22 +10,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_hash": "bf28da925f579527c51eb969deaf5b1ddcda450026e2637e8e753339048105d5",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueDocument",
@@ -34,22 +34,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_hash": "08ace95847a9c770367fce639984ecf2f90f7975941e2b01fbe53d4482c32294",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "4c19906faa673979ca12119b12f2d34b30dab31793cf36ee421d26a9e20b083c",
+      "claim_hash": "bf28da925f579527c51eb969deaf5b1ddcda450026e2637e8e753339048105d5",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueDocument",
@@ -58,22 +58,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "evidence_hash": "871698360f99fc546af3616e7bed138d927950b723ecc2b9538e9180eba78189",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+          "text_label": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
+        "citation": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_hash": "4a86e5fe1de568c4d0afa4521245ec20b5fb6fa34472e4b05bdccf93f896f680",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueEntryKey",
@@ -82,22 +82,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_hash": "4a86e5fe1de568c4d0afa4521245ec20b5fb6fa34472e4b05bdccf93f896f680",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueEntryKey",
@@ -106,22 +106,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。",
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
+      "claim_hash": "4a86e5fe1de568c4d0afa4521245ec20b5fb6fa34472e4b05bdccf93f896f680",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueEntryKey",
@@ -130,46 +130,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_hash": "08ace95847a9c770367fce639984ecf2f90f7975941e2b01fbe53d4482c32294",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "44be508f91c7b8cf3d1ae69e25bdc038212235f98e7a58e4d3f23aa5d48455e1",
-      "claim_origin": {
-        "data": {
-          "entry_key": "CatalogueEntryKey",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -178,22 +154,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -202,22 +178,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -226,22 +202,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "evidence_hash": "e25b2b44eeae94bdd44cb27270b3bdf5593c52c3f93a063c13959f6dba12894a",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -250,22 +226,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -274,22 +250,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_hash": "93056b6b862fb6d8f6a07db4c84bab387944bf5b1fd5c3ff1204f8502fe9703e",
       "evidence_origin": {
         "data": {
           "element_id": "CO-01",
           "section": "constraint",
-          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+          "text_label": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "citation": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5dc84cad475202640b6b493d39da7e7890984ba60649f03350ac485872c4d044",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueIdentityResolutionError",
@@ -298,46 +274,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b308aa0378ece54bda08e9d855aabb455c4f8caeb8c034386093357cfbc8870a",
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
       "evidence_origin": {
         "data": {
-          "element_id": "CO-03",
-          "section": "constraint",
-          "text_label": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。"
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。",
+        "citation": "未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "fcb845e94f97d6039a3bf70568b509148f3f6dc8db7d2bc5542058e24201319a",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
       "claim_origin": {
         "data": {
-          "entry_key": "CatalogueSchemaVersion",
+          "entry_key": "CatalogueIdentityResolutionError",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
           "section_key": "types"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d71d9ce04d8a4e9aea2aca92cd9616dce996733265c48b8fb6b085bcf244213c",
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
       "evidence_origin": {
         "data": {
-          "element_id": "IN-05",
-          "section": "in_scope",
-          "text_label": "catalogue 文書の schema_version を任意の数値一般と区別される schema version の値として扱い、既存の受理 version 意味論、数値としての読出し、および外部 JSON の数値表現を維持する。"
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue 文書の schema_version を任意の数値一般と区別される schema version の値として扱い、既存の受理 version 意味論、数値としての読出し、および外部 JSON の数値表現を維持する。",
+        "citation": "未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7bf1b5b45546398a11c86983797bb31975093533ccc09d8c82cccbed2ec14d62",
+      "claim_hash": "8430cb9806fe8088b1e336231532d42f32958b92a77916fc52bbed4e01a352dc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueIdentityResolutionError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dc868efb5f6d95e7e00e050f0255468b3f519c4b33fe26b4fde0906683fd752c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "df3805d24601489e6f9dc0c4b1aa3efc43dfc581c382cd253ea53c400ac1c854",
       "claim_origin": {
         "data": {
           "entry_key": "DeletionRecord",
@@ -346,46 +346,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7bf1b5b45546398a11c86983797bb31975093533ccc09d8c82cccbed2ec14d62",
-      "claim_origin": {
-        "data": {
-          "entry_key": "DeletionRecord",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_hash": "76bf670d0bc1f3211983739e250da9e008132af5ada27192872989cceb5ad7d9",
       "claim_origin": {
         "data": {
           "entry_key": "FullyQualifiedItemPath",
@@ -394,22 +370,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_hash": "76bf670d0bc1f3211983739e250da9e008132af5ada27192872989cceb5ad7d9",
       "claim_origin": {
         "data": {
           "entry_key": "FullyQualifiedItemPath",
@@ -418,22 +394,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_hash": "f55d60f1599de7fbb6b78072f47dc417e4fb2af4f76036b84f7c73bbc0366f11",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+          "text_label": "型・トレイト参照の解決、impl と generic 引数の比較、型シグナル出力の対応付け、contract-map の node / edge 解決、及び catalogue entry を扱う周辺評価を、同名併存と完全修飾パス識別に整合させること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "citation": "型・トレイト参照の解決、impl と generic 引数の比較、型シグナル出力の対応付け、contract-map の node / edge 解決、及び catalogue entry を扱う周辺評価を、同名併存と完全修飾パス識別に整合させること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_hash": "76bf670d0bc1f3211983739e250da9e008132af5ada27192872989cceb5ad7d9",
       "claim_origin": {
         "data": {
           "entry_key": "FullyQualifiedItemPath",
@@ -442,22 +418,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_hash": "93056b6b862fb6d8f6a07db4c84bab387944bf5b1fd5c3ff1204f8502fe9703e",
       "evidence_origin": {
         "data": {
           "element_id": "CO-01",
           "section": "constraint",
-          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+          "text_label": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "citation": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_hash": "76bf670d0bc1f3211983739e250da9e008132af5ada27192872989cceb5ad7d9",
       "claim_origin": {
         "data": {
           "entry_key": "FullyQualifiedItemPath",
@@ -466,22 +442,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "19bda19fd5426a6dce51e83bb82d42b12ff3552acf56df40dd77ddb903aaaa0f",
+      "evidence_hash": "08ace95847a9c770367fce639984ecf2f90f7975941e2b01fbe53d4482c32294",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。"
+          "text_label": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f7f1a09ba39b3d76f4bf1c23d34ffe0d1c9bcc7e4446aaba80a86b14cfb77fb4",
+      "claim_hash": "76bf670d0bc1f3211983739e250da9e008132af5ada27192872989cceb5ad7d9",
       "claim_origin": {
         "data": {
           "entry_key": "FullyQualifiedItemPath",
@@ -490,22 +466,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
+      "evidence_hash": "871698360f99fc546af3616e7bed138d927950b723ecc2b9538e9180eba78189",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
+          "text_label": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
+        "citation": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7b3971bb83fe227bf7ae34cbeff0d21662c2c6110f84a4c6182b08b98d198fbc",
+      "claim_hash": "db70c72bc35d99e3bea991c2c79eafc79c1a263eba489120a06084a2a14aa27c",
       "claim_origin": {
         "data": {
           "entry_key": "InherentImplDeclV2",
@@ -514,22 +490,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7b3971bb83fe227bf7ae34cbeff0d21662c2c6110f84a4c6182b08b98d198fbc",
+      "claim_hash": "db70c72bc35d99e3bea991c2c79eafc79c1a263eba489120a06084a2a14aa27c",
       "claim_origin": {
         "data": {
           "entry_key": "InherentImplDeclV2",
@@ -538,22 +514,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
       "evidence_origin": {
         "data": {
           "element_id": "AC-05",
           "section": "acceptance_criteria",
-          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
+        "citation": "generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_hash": "2431138de04c387463b985bbd61c1ed7560811b8015ba6e99d390c42df4b592a",
       "claim_origin": {
         "data": {
           "entry_key": "NewTypeGraphCodecError",
@@ -562,22 +538,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "be343b3030ffbcf9bca3545dce9ba9edcfa7ad3be1619232165e03f21b86fafa",
+      "evidence_hash": "69be3f63d2c19e3a9021fa1eb2a570b82de594d53f5ee42128cfc938dc00eff8",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "catalogue-lint では、短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。外部 wrapper の綴りを含む Rust 型式全体の妥当性と、その実装上の identity 解決は Chain ③ の実装突合で検証する。"
+          "text_label": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。",
+        "citation": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_hash": "2431138de04c387463b985bbd61c1ed7560811b8015ba6e99d390c42df4b592a",
       "claim_origin": {
         "data": {
           "entry_key": "NewTypeGraphCodecError",
@@ -586,22 +562,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
+      "evidence_hash": "e25b2b44eeae94bdd44cb27270b3bdf5593c52c3f93a063c13959f6dba12894a",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "0e2b793a4efe333a6ffba2a3bf0c9aef06cf5b7841547f04d0bac67400d9ba6a",
+      "claim_hash": "2431138de04c387463b985bbd61c1ed7560811b8015ba6e99d390c42df4b592a",
       "claim_origin": {
         "data": {
           "entry_key": "NewTypeGraphCodecError",
@@ -610,22 +586,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "44fdd756465c38ed4d0bc578cb9263911fa8d7b6a000cb7b7c52457a53ee218f",
+      "evidence_hash": "99739e70898e0d3c9d1437881276b0ff6a3bd437b6c72d2cc56c83793ac6ed5f",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-04",
+          "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "Chain ③ の実装突合は、外部 wrapper の綴りを含む Rust 型式全体を syn と rustdoc paths で妥当性検証し、完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ、暗黙の短名キーへ復帰させない。"
+          "text_label": "Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。catalogue-lint の成功は、外部 path、wrapper、型引数を含む TypeRef 全体の実装適合を検証済みとみなす根拠にならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ",
+        "citation": "Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "claim_hash": "88f7b1faa9f6ff8807d965c985abf33cdba1bacc29940c667ee14928d88630b7",
       "claim_origin": {
         "data": {
           "entry_key": "TraitRefScope",
@@ -634,22 +610,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
+      "claim_hash": "88f7b1faa9f6ff8807d965c985abf33cdba1bacc29940c667ee14928d88630b7",
       "claim_origin": {
         "data": {
           "entry_key": "TraitRefScope",
@@ -658,46 +634,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
       "evidence_origin": {
         "data": {
           "element_id": "AC-05",
           "section": "acceptance_criteria",
-          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
+        "citation": "カタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2fc0fdfeb42234bcc424e00c5a5ef3f2e6cec5796088f46d97e36f0923d67f93",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TraitRefScope",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "d43317f67795bf3a0a57fb023747484741ab508b8d5d51174c40396ae5710c08",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "同一 crate 内の同名 trait または型を含む fixture で、test-obligation derive の trait role index、task-contract と pre-review gate の CatalogueEntryKey、および catalog add / cite / import の書込み結果を検査すると、二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d9f66897560bbb3f7017b679b6f2ecaecdcd220e1dd09fb18d2f515a16c10dad",
+      "claim_hash": "f6704baf9d6c8043204f047881cb30b0c1fa3abe673802814592836bb0b35063",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::CatalogueLintViolation",
@@ -706,22 +658,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "d9f66897560bbb3f7017b679b6f2ecaecdcd220e1dd09fb18d2f515a16c10dad",
+      "claim_hash": "f6704baf9d6c8043204f047881cb30b0c1fa3abe673802814592836bb0b35063",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::CatalogueLintViolation",
@@ -730,17 +682,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
         "kind": "pass"
       }
     },
@@ -754,17 +706,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
         "kind": "pass"
       }
     },
@@ -778,17 +730,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "be343b3030ffbcf9bca3545dce9ba9edcfa7ad3be1619232165e03f21b86fafa",
+      "evidence_hash": "69be3f63d2c19e3a9021fa1eb2a570b82de594d53f5ee42128cfc938dc00eff8",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "catalogue-lint では、短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。外部 wrapper の綴りを含む Rust 型式全体の妥当性と、その実装上の identity 解決は Chain ③ の実装突合で検証する。"
+          "text_label": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "短名が一意に解決できない宣言または catalogue 宣言 entry universe 内で完全修飾パスを解決できない identity を fail-closed とし、前者では候補の完全修飾パス、後者では未解決対象を診断する。",
+        "citation": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。",
         "kind": "pass"
       }
     },
@@ -802,17 +754,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
         "kind": "pass"
       }
     },
@@ -826,22 +778,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b308aa0378ece54bda08e9d855aabb455c4f8caeb8c034386093357cfbc8870a",
+      "evidence_hash": "93b4b7b3dff8f1a1841a650687c91ca14058deea6c129ae8f08ed36eec8fd557",
       "evidence_origin": {
         "data": {
           "element_id": "CO-03",
           "section": "constraint",
-          "text_label": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。"
+          "text_label": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。",
+        "citation": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ddf92b5cac31caae51fc0dfad92b9f40bf72cb614d4a5953f365a0fdb2cc096",
+      "claim_hash": "156ca99ef4192b26bc98753cd2639cb63accb79e428d2ec9e567d213f8fa15ac",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
@@ -850,22 +802,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ddf92b5cac31caae51fc0dfad92b9f40bf72cb614d4a5953f365a0fdb2cc096",
+      "claim_hash": "156ca99ef4192b26bc98753cd2639cb63accb79e428d2ec9e567d213f8fa15ac",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
@@ -874,22 +826,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ddf92b5cac31caae51fc0dfad92b9f40bf72cb614d4a5953f365a0fdb2cc096",
+      "claim_hash": "156ca99ef4192b26bc98753cd2639cb63accb79e428d2ec9e567d213f8fa15ac",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
@@ -898,22 +850,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
       "evidence_origin": {
         "data": {
-          "element_id": "OS-01",
-          "section": "out_of_scope",
-          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。",
+        "citation": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "72a2313dea82f73c8493111f631b80223ab17f7c0d2161daa77f7ee100b1d565",
+      "claim_hash": "156ca99ef4192b26bc98753cd2639cb63accb79e428d2ec9e567d213f8fa15ac",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "156ca99ef4192b26bc98753cd2639cb63accb79e428d2ec9e567d213f8fa15ac",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dc868efb5f6d95e7e00e050f0255468b3f519c4b33fe26b4fde0906683fd752c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8368162de5e4f43ee7c3a4f8f345587d974780b8a296c0d55fe9718fddc8d071",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
@@ -922,22 +922,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "72a2313dea82f73c8493111f631b80223ab17f7c0d2161daa77f7ee100b1d565",
+      "claim_hash": "8368162de5e4f43ee7c3a4f8f345587d974780b8a296c0d55fe9718fddc8d071",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
@@ -946,22 +946,94 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_hash": "8368162de5e4f43ee7c3a4f8f345587d974780b8a296c0d55fe9718fddc8d071",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8368162de5e4f43ee7c3a4f8f345587d974780b8a296c0d55fe9718fddc8d071",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dc868efb5f6d95e7e00e050f0255468b3f519c4b33fe26b4fde0906683fd752c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8368162de5e4f43ee7c3a4f8f345587d974780b8a296c0d55fe9718fddc8d071",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea4b8d084c14383e044d8bfbbbbe92cd609c2663e1a5b64942928b86dd6bb2c4",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueToExtendedCratePort",
@@ -970,22 +1042,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
+      "evidence_hash": "93056b6b862fb6d8f6a07db4c84bab387944bf5b1fd5c3ff1204f8502fe9703e",
       "evidence_origin": {
         "data": {
           "element_id": "CO-01",
           "section": "constraint",
-          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
+          "text_label": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
+        "citation": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_hash": "ea4b8d084c14383e044d8bfbbbbe92cd609c2663e1a5b64942928b86dd6bb2c4",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueToExtendedCratePort",
@@ -994,22 +1066,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "55e688f1914b7f63cd7d6c1768bed63267869f05d5ae2840980d3926c10a9ffe",
+      "evidence_hash": "f55d60f1599de7fbb6b78072f47dc417e4fb2af4f76036b84f7c73bbc0366f11",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。"
+          "text_label": "型・トレイト参照の解決、impl と generic 引数の比較、型シグナル出力の対応付け、contract-map の node / edge 解決、及び catalogue entry を扱う周辺評価を、同名併存と完全修飾パス識別に整合させること。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "評価器の type / trait identity map、参照解決、impl・generic 引数比較、型シグナル出力の owner 結合、および contract-map の node / edge 解決を完全修飾パス識別へ追従させる。",
+        "citation": "型・トレイト参照の解決、impl と generic 引数の比較、型シグナル出力の対応付け、contract-map の node / edge 解決、及び catalogue entry を扱う周辺評価を、同名併存と完全修飾パス識別に整合させること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "275cc7c93dc1225a97e36a149f471a8be5a263baffda67b8e18cca0f336588a7",
+      "claim_hash": "ea4b8d084c14383e044d8bfbbbbe92cd609c2663e1a5b64942928b86dd6bb2c4",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueToExtendedCratePort",
@@ -1018,353 +1090,497 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ac856fc3e8f5b322db94906ccc339b5ad712f815f823ca74a856aa87be4c93a9",
+      "evidence_hash": "69be3f63d2c19e3a9021fa1eb2a570b82de594d53f5ee42128cfc938dc00eff8",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-05",
-          "section": "acceptance_criteria",
-          "text_label": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され、片方の型の impl または比較結果がもう片方の型に紐づかず、DanglingId も発生しない。"
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "同一 crate の異なる module に同名型を置く fixture で、trait_impls の trait_ref / for_type、inherent_impls の type_name、generic 引数、および in-crate TypeRef を検査すると、各参照が対応する rustdoc paths の完全修飾パスへ解決され",
+        "citation": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f523d116c82854dd51e542915e19a7b1e92da5d8f4f465584383971bf7bb5ba4",
+      "claim_hash": "ea4b8d084c14383e044d8bfbbbbe92cd609c2663e1a5b64942928b86dd6bb2c4",
       "claim_origin": {
         "data": {
-          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "entry_key": "CatalogueToExtendedCratePort",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
+      "evidence_hash": "99739e70898e0d3c9d1437881276b0ff6a3bd437b6c72d2cc56c83793ac6ed5f",
       "evidence_origin": {
         "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。catalogue-lint の成功は、外部 path、wrapper、型引数を含む TypeRef 全体の実装適合を検証済みとみなす根拠にならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
+        "citation": "Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f523d116c82854dd51e542915e19a7b1e92da5d8f4f465584383971bf7bb5ba4",
+      "claim_hash": "ea4b8d084c14383e044d8bfbbbbe92cd609c2663e1a5b64942928b86dd6bb2c4",
       "claim_origin": {
         "data": {
-          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "entry_key": "CatalogueToExtendedCratePort",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "f523d116c82854dd51e542915e19a7b1e92da5d8f4f465584383971bf7bb5ba4",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
-      "evidence_origin": {
-        "data": {
-          "element_id": "OS-01",
-          "section": "out_of_scope",
-          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "8f2f92388b5081c61776d9acc5df100da889ea8ced53ca17d9d059256ae8f0e9",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "8f2f92388b5081c61776d9acc5df100da889ea8ced53ca17d9d059256ae8f0e9",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "8f2f92388b5081c61776d9acc5df100da889ea8ced53ca17d9d059256ae8f0e9",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "e9b25e9c7199220e93229a35189f8502e4084dee30f814184946e52b0d908171",
-      "evidence_origin": {
-        "data": {
-          "element_id": "OS-01",
-          "section": "out_of_scope",
-          "text_label": "functions の key、cross-crate 参照の catalogue 表記、および catalog import --type の既存の完全一致照合は変更しない。catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず、その検証は syn と rustdoc paths を持つ Chain ③ の実装突合に属する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue-lint は外部 wrapper の綴りを含む Rust 型式全体の妥当性を検証対象にせず",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "4184080fc001f0f96f12befbd4f1d2d48d72f2aaa14dd2efca241b216c1bf121",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-01",
-          "section": "in_scope",
-          "text_label": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue の types / traits 宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に使用できるようにする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "5c173858c53dab8438a91337699b559952471c4035631163ecb7379084a8cfb1",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "catalogue-lint の指定三規則、test-obligation derive の trait role index、task-contract と pre-review gate、catalog add / cite / import の entry-key 書込みを、同名併存と完全修飾パス解決に整合させる。catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。有効な型式から内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe 内の catalogue identity だけを解決し、曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "271f95b200ab355f06c5ba6f7c51539a923d595b3a40a4553d5175c3fb1fc287",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "一意に解決できる短名の型・トレイト宣言と in-crate TypeRef は完全修飾パスへ解決され、型・トレイト識別に用いられる。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a81b790043b2a7b01111543c58900536961cfcb39f20dbbc422d2c65d7cb0703",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "複数候補に一致し、完全修飾パスの併記もなく、文脈から一意に決められない短名宣言は、評価が候補の完全修飾パスを列挙して失敗し、短名 identity へ fallback しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "44fdd756465c38ed4d0bc578cb9263911fa8d7b6a000cb7b7c52457a53ee218f",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "Chain ③ の実装突合は、外部 wrapper の綴りを含む Rust 型式全体を syn と rustdoc paths で妥当性検証し、完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ、暗黙の短名キーへ復帰させない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "外部 wrapper の綴りを含む Rust 型式全体を syn と rustdoc paths で妥当性検証し、完全修飾パスを解決できない対象では対象を示す診断とともに失敗させ、暗黙の短名キーへ復帰させない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "12dacac1a431df1897a647011af90c9a1f4ee4a37d0bb847a2f2080086c2f98c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "同名型または同名トレイトを含む fixture で、指定された catalogue-lint の ReferencedRoleConstraint、FieldElementUniqueAcrossEntries、NoExternalReferenceInMethods の各規則を実行すると、lint は catalogue 宣言 entry universe 内で各参照を対応する完全修飾パスの entry に個別に判定する。有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。外部 wrapper 自体の綴りを lint が検証対象にしない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "有効な型式からは内部の catalogue identity を正確に抽出し、構文マーカーや lifetime を path と誤認せず、外部 wrapper の内側の宣言型に到達する。曖昧な identity では候補の完全修飾パスを列挙し、未解決の identity では未解決対象を示して、それぞれ fail-closed とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "15f6a0f66ff7799b16e2a3cee258b54bd249bf2abf57702f5fb9972fe2a725e3",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-01",
-          "section": "constraint",
-          "text_label": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "識別の権威は rustdoc paths から得る完全修飾パスであり、短名へ暗黙に縮退してはならない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7315714f90c99da9dc26a2e21f9a8ddbc7a5bca4e8a3d4e8472f620c4cb09bad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "b308aa0378ece54bda08e9d855aabb455c4f8caeb8c034386093357cfbc8870a",
+      "evidence_hash": "93b4b7b3dff8f1a1841a650687c91ca14058deea6c129ae8f08ed36eec8fd557",
       "evidence_origin": {
         "data": {
           "element_id": "CO-03",
           "section": "constraint",
-          "text_label": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。外部 wrapper の綴りを含む Rust 型式全体の妥当性は、syn と rustdoc paths を持つ Chain ③ の実装突合が fail-closed で検証する。"
+          "text_label": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue-lint は catalogue 宣言 entry universe における曖昧または未解決の catalogue identity を成功や推測ではなく fail-closed とする。曖昧な identity の診断では候補の完全修飾パスを列挙し、未解決の identity の診断では未解決対象を示す。",
+        "citation": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d49c1b9afdae68d5511f5e45c46236a1008b23bc967298a739372210abc6120f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d49c1b9afdae68d5511f5e45c46236a1008b23bc967298a739372210abc6120f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d49c1b9afdae68d5511f5e45c46236a1008b23bc967298a739372210abc6120f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d49c1b9afdae68d5511f5e45c46236a1008b23bc967298a739372210abc6120f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d49c1b9afdae68d5511f5e45c46236a1008b23bc967298a739372210abc6120f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dc868efb5f6d95e7e00e050f0255468b3f519c4b33fe26b4fde0906683fd752c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0534fabba14038f680d46e27aa14a80233a16c0cf795bc02883384a7d61232f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0534fabba14038f680d46e27aa14a80233a16c0cf795bc02883384a7d61232f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0534fabba14038f680d46e27aa14a80233a16c0cf795bc02883384a7d61232f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0534fabba14038f680d46e27aa14a80233a16c0cf795bc02883384a7d61232f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bb202f1927a190cbc32f937339678d945dcd66f4f00ae6224f22389ac35d76b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0534fabba14038f680d46e27aa14a80233a16c0cf795bc02883384a7d61232f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dc868efb5f6d95e7e00e050f0255468b3f519c4b33fe26b4fde0906683fd752c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fc3e1b3e6992693227cfbacaa9824115366ac28ff7ac3fb2600639de4a14868c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "871698360f99fc546af3616e7bed138d927950b723ecc2b9538e9180eba78189",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一意に解決できる短名の型・トレイト宣言および in-crate TypeRef は完全修飾パスへ解決され、型・トレイトの識別に用いられる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e25b2b44eeae94bdd44cb27270b3bdf5593c52c3f93a063c13959f6dba12894a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "複数候補に一致し、完全修飾パスの併記もなく文脈から一意に決められない短名宣言は、候補の完全修飾パスを列挙する診断とともに失敗し、短名 identity へ fallback しない。完全修飾パスを解決できない対象も対象を示す診断とともに失敗する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e5375c90b0c11d749cef592f35638f1266577a6f97969e906db178a9848866d4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "93056b6b862fb6d8f6a07db4c84bab387944bf5b1fd5c3ff1204f8502fe9703e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型・トレイト識別は rustdoc の paths から得る完全修飾パスを基準とし、短名へ暗黙に縮退してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "36d7e90c8039f7546f8498a3db13bc196ce7f34448c7cb3041e15cef3dd0c2bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "93b4b7b3dff8f1a1841a650687c91ca14058deea6c129ae8f08ed36eec8fd557",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint と Chain ③ は異なる判定根拠に基づく独立した検査であり、一方の成功で他方の失敗または未検証を補ってはならない。",
         "kind": "pass"
       }
     }

@@ -328,11 +328,7 @@ mod tests {
     fn empty_catalogue(layer_id: &str) -> CatalogueDocument {
         let crate_name = CrateName::new(layer_id).unwrap();
         let layer = LayerId::try_new(layer_id).unwrap();
-        CatalogueDocument::new(
-            domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(4),
-            crate_name,
-            layer,
-        )
+        CatalogueDocument::new(4, crate_name, layer)
     }
 
     /// Add a `TypeEntry` with the given name and spec_refs to a `CatalogueDocument`.

@@ -41,6 +41,43 @@ impl std::fmt::Display for CanonicalTypeIdentity {
     }
 }
 
+/// Shared definition-path authority for one reconciliation pass.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct DefinitionPathAuthority {
+    primary: BTreeSet<FullyQualifiedItemPath>,
+    fallback: BTreeSet<FullyQualifiedItemPath>,
+}
+
+impl DefinitionPathAuthority {
+    pub(crate) fn from_path_maps(
+        primary: &HashMap<Id, ItemSummary>,
+        fallbacks: &[&HashMap<Id, ItemSummary>],
+    ) -> Self {
+        let primary = primary.values().filter_map(summary_identity).collect::<BTreeSet<_>>();
+        let fallback = fallbacks
+            .iter()
+            .flat_map(|paths| paths.values().filter_map(summary_identity))
+            .collect::<BTreeSet<_>>();
+        Self { primary, fallback }
+    }
+
+    fn resolve(
+        &self,
+        reference: &TypeRef,
+        catalogue_crate: &CrateName,
+    ) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
+        match resolve_catalogue_identity(reference, catalogue_crate, &self.primary) {
+            Ok(identity) => Ok(identity),
+            Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_))
+                if !self.fallback.is_empty() =>
+            {
+                resolve_catalogue_identity(reference, catalogue_crate, &self.fallback)
+            }
+            Err(error) => Err(error),
+        }
+    }
+}
+
 /// Resolves loose catalogue TypeRef notation into the infrastructure identity form.
 ///
 /// Parsing is delegated to the existing type_ref_parser authority. Generic
@@ -70,11 +107,62 @@ pub fn canonicalize_catalogue_type_ref(
         &generic_names,
     )
     .map_err(|reason| invalid_type_ref(type_ref, reason))?;
-    let canonical = canonicalize_type(parsed, type_ref, catalogue_crate, &universe)?;
+    let authority = DefinitionPathAuthority::from_path_maps(rustdoc_paths, &[]);
+    let canonical = canonicalize_type(parsed, type_ref, catalogue_crate, &authority, None)?;
     let rendered = render_identity_type(&canonical).ok_or_else(|| {
         invalid_type_ref(type_ref, "the parsed type has no canonical Rust rendering")
     })?;
     Ok(CanonicalTypeIdentity(rendered))
+}
+
+/// Resolves one rustdoc path through the same catalogue-identity boundary used by
+/// catalogue codecs and signal producers.
+pub(crate) fn canonicalize_rustdoc_path(
+    path: &Path,
+    catalogue_crate: &CrateName,
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    authority: &DefinitionPathAuthority,
+) -> Result<String, NewTypeGraphCodecError> {
+    let source = TypeRef::new(path.path.clone())
+        .map_err(|_| invalid_type_ref("rustdoc_path", "rustdoc path is not a valid TypeRef"))?;
+    canonicalize_path(
+        &path.path,
+        &source,
+        catalogue_crate,
+        authority,
+        Some(path.id),
+        Some(rustdoc_paths),
+    )
+}
+
+pub(crate) fn canonicalize_rustdoc_type_with_authority(
+    ty: &Type,
+    catalogue_crate: &CrateName,
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    authority: &DefinitionPathAuthority,
+) -> Result<Type, NewTypeGraphCodecError> {
+    let source = TypeRef::new("rustdoc_type".to_owned())
+        .map_err(|_| invalid_type_ref("rustdoc_type", "failed to construct an internal TypeRef"))?;
+    canonicalize_type(ty.clone(), &source, catalogue_crate, authority, Some(rustdoc_paths))
+}
+
+/// Canonicalizes generic arguments and all path-bearing constraint nodes through
+/// the shared definition-path resolver.
+pub(crate) fn canonicalize_rustdoc_generic_args_with_authority(
+    args: &GenericArgs,
+    catalogue_crate: &CrateName,
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    authority: &DefinitionPathAuthority,
+) -> Result<GenericArgs, NewTypeGraphCodecError> {
+    let source = TypeRef::new("rustdoc_type".to_owned())
+        .map_err(|_| invalid_type_ref("rustdoc_type", "failed to construct an internal TypeRef"))?;
+    canonicalize_generic_args(
+        args.clone(),
+        &source,
+        catalogue_crate,
+        authority,
+        Some(rustdoc_paths),
+    )
 }
 
 fn unique_resolved_id(
@@ -122,44 +210,85 @@ fn canonicalize_type(
     ty: Type,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<Type, NewTypeGraphCodecError> {
     match ty {
         Type::ResolvedPath(path) => {
-            let args = canonicalize_args(path.args, source, catalogue_crate, universe)?;
-            let path_name = canonicalize_path(&path.path, source, catalogue_crate, universe)?;
+            let args =
+                canonicalize_args(path.args, source, catalogue_crate, authority, rustdoc_paths)?;
+            let path_name = canonicalize_path(
+                &path.path,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths.map(|_| path.id),
+                rustdoc_paths,
+            )?;
             Ok(Type::ResolvedPath(Path { path: path_name, id: path.id, args }))
         }
         Type::Tuple(elements) => Ok(Type::Tuple(
             elements
                 .into_iter()
-                .map(|element| canonicalize_type(element, source, catalogue_crate, universe))
+                .map(|element| {
+                    canonicalize_type(element, source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .collect::<Result<Vec<_>, _>>()?,
         )),
-        Type::Slice(inner) => {
-            Ok(Type::Slice(Box::new(canonicalize_type(*inner, source, catalogue_crate, universe)?)))
-        }
+        Type::Slice(inner) => Ok(Type::Slice(Box::new(canonicalize_type(
+            *inner,
+            source,
+            catalogue_crate,
+            authority,
+            rustdoc_paths,
+        )?))),
         Type::Array { type_, len } => Ok(Type::Array {
-            type_: Box::new(canonicalize_type(*type_, source, catalogue_crate, universe)?),
+            type_: Box::new(canonicalize_type(
+                *type_,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths,
+            )?),
             len,
         }),
         Type::Pat { type_, __pat_unstable_do_not_use } => Ok(Type::Pat {
-            type_: Box::new(canonicalize_type(*type_, source, catalogue_crate, universe)?),
+            type_: Box::new(canonicalize_type(
+                *type_,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths,
+            )?),
             __pat_unstable_do_not_use,
         }),
         Type::BorrowedRef { lifetime, is_mutable, type_ } => Ok(Type::BorrowedRef {
             lifetime,
             is_mutable,
-            type_: Box::new(canonicalize_type(*type_, source, catalogue_crate, universe)?),
+            type_: Box::new(canonicalize_type(
+                *type_,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths,
+            )?),
         }),
         Type::RawPointer { is_mutable, type_ } => Ok(Type::RawPointer {
             is_mutable,
-            type_: Box::new(canonicalize_type(*type_, source, catalogue_crate, universe)?),
+            type_: Box::new(canonicalize_type(
+                *type_,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths,
+            )?),
         }),
         Type::ImplTrait(bounds) => Ok(Type::ImplTrait(
             bounds
                 .into_iter()
-                .map(|bound| canonicalize_bound(bound, source, catalogue_crate, universe))
+                .map(|bound| {
+                    canonicalize_bound(bound, source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .collect::<Result<Vec<_>, _>>()?,
         )),
         Type::DynTrait(dyn_trait) => Ok(Type::DynTrait(DynTrait {
@@ -167,10 +296,21 @@ fn canonicalize_type(
                 .traits
                 .into_iter()
                 .map(|poly| {
-                    let path =
-                        canonicalize_path(&poly.trait_.path, source, catalogue_crate, universe)?;
-                    let args =
-                        canonicalize_args(poly.trait_.args, source, catalogue_crate, universe)?;
+                    let path = canonicalize_path(
+                        &poly.trait_.path,
+                        source,
+                        catalogue_crate,
+                        authority,
+                        rustdoc_paths.map(|_| poly.trait_.id),
+                        rustdoc_paths,
+                    )?;
+                    let args = canonicalize_args(
+                        poly.trait_.args,
+                        source,
+                        catalogue_crate,
+                        authority,
+                        rustdoc_paths,
+                    )?;
                     Ok(rustdoc_types::PolyTrait {
                         trait_: Path { path, id: poly.trait_.id, args },
                         generic_params: poly.generic_params,
@@ -185,13 +325,24 @@ fn canonicalize_type(
                 .inputs
                 .into_iter()
                 .map(|(name, input)| {
-                    Ok((name, canonicalize_type(input, source, catalogue_crate, universe)?))
+                    Ok((
+                        name,
+                        canonicalize_type(
+                            input,
+                            source,
+                            catalogue_crate,
+                            authority,
+                            rustdoc_paths,
+                        )?,
+                    ))
                 })
                 .collect::<Result<Vec<_>, NewTypeGraphCodecError>>()?;
             let output = function_pointer
                 .sig
                 .output
-                .map(|output| canonicalize_type(output, source, catalogue_crate, universe))
+                .map(|output| {
+                    canonicalize_type(output, source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .transpose()?;
             Ok(Type::FunctionPointer(Box::new(rustdoc_types::FunctionPointer {
                 sig: rustdoc_types::FunctionSignature {
@@ -206,16 +357,37 @@ fn canonicalize_type(
         Type::QualifiedPath { name, args, self_type, trait_ } => Ok(Type::QualifiedPath {
             name,
             args: args
-                .map(|args| canonicalize_args(Some(args), source, catalogue_crate, universe))
+                .map(|args| {
+                    canonicalize_args(Some(args), source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .transpose()?
                 .flatten(),
-            self_type: Box::new(canonicalize_type(*self_type, source, catalogue_crate, universe)?),
+            self_type: Box::new(canonicalize_type(
+                *self_type,
+                source,
+                catalogue_crate,
+                authority,
+                rustdoc_paths,
+            )?),
             trait_: trait_
                 .map(|path| {
-                    Ok(Path {
-                        path: canonicalize_path(&path.path, source, catalogue_crate, universe)?,
+                    Ok::<Path, NewTypeGraphCodecError>(Path {
+                        path: canonicalize_path(
+                            &path.path,
+                            source,
+                            catalogue_crate,
+                            authority,
+                            rustdoc_paths.map(|_| path.id),
+                            rustdoc_paths,
+                        )?,
                         id: path.id,
-                        args: canonicalize_args(path.args, source, catalogue_crate, universe)?,
+                        args: canonicalize_args(
+                            path.args,
+                            source,
+                            catalogue_crate,
+                            authority,
+                            rustdoc_paths,
+                        )?,
                     })
                 })
                 .transpose()?,
@@ -228,10 +400,12 @@ fn canonicalize_args(
     args: Option<Box<GenericArgs>>,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<Option<Box<GenericArgs>>, NewTypeGraphCodecError> {
     args.map(|args| {
-        canonicalize_generic_args(*args, source, catalogue_crate, universe).map(Box::new)
+        canonicalize_generic_args(*args, source, catalogue_crate, authority, rustdoc_paths)
+            .map(Box::new)
     })
     .transpose()
 }
@@ -240,26 +414,33 @@ fn canonicalize_generic_args(
     args: GenericArgs,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<GenericArgs, NewTypeGraphCodecError> {
     match args {
         GenericArgs::AngleBracketed { args, constraints } => Ok(GenericArgs::AngleBracketed {
             args: args
                 .into_iter()
-                .map(|arg| canonicalize_arg(arg, source, catalogue_crate, universe))
+                .map(|arg| canonicalize_arg(arg, source, catalogue_crate, authority, rustdoc_paths))
                 .collect::<Result<Vec<_>, _>>()?,
             constraints: constraints
                 .into_iter()
                 .map(|constraint| {
-                    let args =
-                        canonicalize_args(constraint.args, source, catalogue_crate, universe)?;
+                    let args = canonicalize_args(
+                        constraint.args,
+                        source,
+                        catalogue_crate,
+                        authority,
+                        rustdoc_paths,
+                    )?;
                     let binding = match constraint.binding {
                         AssocItemConstraintKind::Equality(term) => {
                             AssocItemConstraintKind::Equality(canonicalize_term(
                                 term,
                                 source,
                                 catalogue_crate,
-                                universe,
+                                authority,
+                                rustdoc_paths,
                             )?)
                         }
                         AssocItemConstraintKind::Constraint(bounds) => {
@@ -267,7 +448,13 @@ fn canonicalize_generic_args(
                                 bounds
                                     .into_iter()
                                     .map(|bound| {
-                                        canonicalize_bound(bound, source, catalogue_crate, universe)
+                                        canonicalize_bound(
+                                            bound,
+                                            source,
+                                            catalogue_crate,
+                                            authority,
+                                            rustdoc_paths,
+                                        )
                                     })
                                     .collect::<Result<Vec<_>, _>>()?,
                             )
@@ -280,10 +467,14 @@ fn canonicalize_generic_args(
         GenericArgs::Parenthesized { inputs, output } => Ok(GenericArgs::Parenthesized {
             inputs: inputs
                 .into_iter()
-                .map(|input| canonicalize_type(input, source, catalogue_crate, universe))
+                .map(|input| {
+                    canonicalize_type(input, source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .collect::<Result<Vec<_>, _>>()?,
             output: output
-                .map(|output| canonicalize_type(output, source, catalogue_crate, universe))
+                .map(|output| {
+                    canonicalize_type(output, source, catalogue_crate, authority, rustdoc_paths)
+                })
                 .transpose()?,
         }),
         GenericArgs::ReturnTypeNotation => Ok(GenericArgs::ReturnTypeNotation),
@@ -294,12 +485,17 @@ fn canonicalize_arg(
     arg: GenericArg,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<GenericArg, NewTypeGraphCodecError> {
     match arg {
-        GenericArg::Type(ty) => {
-            Ok(GenericArg::Type(canonicalize_type(ty, source, catalogue_crate, universe)?))
-        }
+        GenericArg::Type(ty) => Ok(GenericArg::Type(canonicalize_type(
+            ty,
+            source,
+            catalogue_crate,
+            authority,
+            rustdoc_paths,
+        )?)),
         other => Ok(other),
     }
 }
@@ -308,15 +504,29 @@ fn canonicalize_bound(
     bound: GenericBound,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<GenericBound, NewTypeGraphCodecError> {
     match bound {
         GenericBound::TraitBound { trait_, generic_params, modifier } => {
             Ok(GenericBound::TraitBound {
                 trait_: Path {
-                    path: canonicalize_path(&trait_.path, source, catalogue_crate, universe)?,
+                    path: canonicalize_path(
+                        &trait_.path,
+                        source,
+                        catalogue_crate,
+                        authority,
+                        rustdoc_paths.map(|_| trait_.id),
+                        rustdoc_paths,
+                    )?,
                     id: trait_.id,
-                    args: canonicalize_args(trait_.args, source, catalogue_crate, universe)?,
+                    args: canonicalize_args(
+                        trait_.args,
+                        source,
+                        catalogue_crate,
+                        authority,
+                        rustdoc_paths,
+                    )?,
                 },
                 generic_params,
                 modifier,
@@ -330,10 +540,17 @@ fn canonicalize_term(
     term: Term,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<Term, NewTypeGraphCodecError> {
     match term {
-        Term::Type(ty) => Ok(Term::Type(canonicalize_type(ty, source, catalogue_crate, universe)?)),
+        Term::Type(ty) => Ok(Term::Type(canonicalize_type(
+            ty,
+            source,
+            catalogue_crate,
+            authority,
+            rustdoc_paths,
+        )?)),
         other => Ok(other),
     }
 }
@@ -342,17 +559,39 @@ fn canonicalize_path(
     raw_path: &str,
     source: &TypeRef,
     catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
+    authority: &DefinitionPathAuthority,
+    path_id: Option<Id>,
+    rustdoc_paths: Option<&HashMap<Id, ItemSummary>>,
 ) -> Result<String, NewTypeGraphCodecError> {
     if raw_path.strip_prefix("::").unwrap_or(raw_path) == "Self" {
         return Ok(raw_path.to_owned());
     }
     let path = TypeRef::new(raw_path.to_owned())
         .map_err(|_| invalid_type_ref(source, "path must not be empty"))?;
-    let identity = resolve_catalogue_identity(&path, catalogue_crate, universe)
-        .map_err(map_identity_resolution_error)?;
+    let identity = if let (Some(path_id), Some(rustdoc_paths)) = (path_id, rustdoc_paths) {
+        if path_id == Id(0) {
+            authority.resolve(&path, catalogue_crate).map_err(map_identity_resolution_error)?
+        } else {
+            let summary = rustdoc_paths.get(&path_id).ok_or_else(|| {
+                invalid_type_ref(source, "rustdoc path has no authoritative Crate::paths entry")
+            })?;
+            let summary_identity = summary_identity(summary).ok_or_else(|| {
+                invalid_type_ref(source, "rustdoc path has no authoritative type identity")
+            })?;
+            let summary_ref = TypeRef::new(summary_identity.to_string())
+                .map_err(|_| invalid_type_ref(source, "rustdoc path identity is invalid"))?;
+            match authority.resolve(&summary_ref, catalogue_crate) {
+                Ok(identity) => identity,
+                Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => summary_identity,
+                Err(error) => return Err(map_identity_resolution_error(error)),
+            }
+        }
+    } else {
+        authority.resolve(&path, catalogue_crate).map_err(map_identity_resolution_error)?
+    };
     let bare_name = raw_path.strip_prefix("::").unwrap_or(raw_path);
-    if !bare_name.contains("::")
+    if rustdoc_paths.is_none()
+        && !bare_name.contains("::")
         && identity.crate_name() != catalogue_crate
         && !STD_PRELUDE_TYPES.contains(&bare_name)
     {
@@ -370,6 +609,9 @@ fn map_identity_resolution_error(
         }
         CatalogueIdentityResolutionError::UnresolvedIdentifier(type_ref) => {
             NewTypeGraphCodecError::UnresolvedIdentifier(type_ref)
+        }
+        CatalogueIdentityResolutionError::ClassificationFailed { location } => {
+            NewTypeGraphCodecError::UnresolvedIdentifier(location)
         }
     }
 }
@@ -400,10 +642,20 @@ fn is_type_identity_kind(kind: ItemKind) -> bool {
     )
 }
 
-fn invalid_type_ref(type_ref: &TypeRef, reason: impl Into<String>) -> NewTypeGraphCodecError {
+fn invalid_type_ref(
+    type_ref: impl std::fmt::Display,
+    reason: impl Into<String>,
+) -> NewTypeGraphCodecError {
+    let mut raw_type_ref = type_ref.to_string();
+    let type_ref = loop {
+        match TypeRef::new(raw_type_ref.clone()) {
+            Ok(type_ref) => break type_ref,
+            Err(_) => raw_type_ref = "<invalid TypeRef>".to_owned(),
+        }
+    };
     let diagnostic = DiagnosticMessage::try_new(reason.into())
         .unwrap_or_else(|_| unavailable_diagnostic_message());
-    NewTypeGraphCodecError::InvalidTypeRef(type_ref.clone(), diagnostic)
+    NewTypeGraphCodecError::InvalidTypeRef(type_ref, diagnostic)
 }
 
 #[cfg(test)]
@@ -628,6 +880,44 @@ mod tests {
     }
 
     #[test]
+    fn test_canonicalize_rustdoc_path_uses_authoritative_path_id() {
+        let rustdoc_paths =
+            paths(&[(1, &["domain", "alpha", "Shared"]), (2, &["domain", "beta", "Shared"])]);
+        let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
+        let ty = Type::ResolvedPath(Path { path: "Shared".to_owned(), id: Id(1), args: None });
+
+        let canonical = canonicalize_rustdoc_type_with_authority(
+            &ty,
+            &CrateName::new("domain").expect("valid crate"),
+            &rustdoc_paths,
+            &authority,
+        )
+        .expect("the authoritative id selects alpha");
+
+        assert!(matches!(
+            canonical,
+            Type::ResolvedPath(Path { path, .. }) if path == "domain::alpha::Shared"
+        ));
+    }
+
+    #[test]
+    fn test_canonicalize_rustdoc_path_missing_authoritative_id_fails_closed() {
+        let rustdoc_paths = paths(&[(1, &["domain", "alpha", "Shared"])]);
+        let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
+        let ty = Type::ResolvedPath(Path { path: "Shared".to_owned(), id: Id(99), args: None });
+
+        let error = canonicalize_rustdoc_type_with_authority(
+            &ty,
+            &CrateName::new("domain").expect("valid crate"),
+            &rustdoc_paths,
+            &authority,
+        )
+        .expect_err("a missing path summary must not fall back to the short spelling");
+
+        assert!(matches!(error, NewTypeGraphCodecError::InvalidTypeRef(_, _)));
+    }
+
+    #[test]
     fn test_canonicalize_infer_type_fails_closed() {
         let error = canonical("_", &HashMap::new(), &[]).expect_err("infer is not an identity");
         assert!(matches!(error, NewTypeGraphCodecError::InvalidTypeRef(..)));
@@ -647,5 +937,41 @@ mod tests {
         let identity = canonical("Thing", &rustdoc_paths, &[])
             .expect("a function with the same short name is not a type candidate");
         assert_eq!(identity.as_str(), "domain::a::Thing");
+    }
+
+    #[test]
+    fn test_canonicalize_impl_generic_and_incrate_paths_share_authoritative_universe() {
+        let rustdoc_paths = paths(&[
+            (1, &["core", "iter", "traits", "iterator", "Iterator"]),
+            (2, &["domain", "alpha", "Shared"]),
+            (3, &["domain", "beta", "Shared"]),
+        ]);
+
+        let identity = canonical(
+            "impl std::iter::Iterator<Item = domain::alpha::Shared>",
+            &rustdoc_paths,
+            &[],
+        )
+        .expect("impl trait and its associated generic type resolve");
+
+        assert_eq!(
+            identity.as_str(),
+            "impl core::iter::traits::iterator::Iterator<Item = domain::alpha::Shared>"
+        );
+        assert!(!identity.as_str().contains("domain::beta::Shared"));
+    }
+
+    #[test]
+    fn test_canonicalize_loose_module_path_preserves_declaration_boundary() {
+        let rustdoc_paths =
+            paths(&[(1, &["domain", "alpha", "Shared"]), (2, &["domain", "beta", "Shared"])]);
+
+        for (source, expected) in
+            [("alpha::Shared", "domain::alpha::Shared"), ("beta::Shared", "domain::beta::Shared")]
+        {
+            let identity = canonical(source, &rustdoc_paths, &[])
+                .expect("module-qualified loose notation resolves");
+            assert_eq!(identity.as_str(), expected, "unexpected identity for {source}");
+        }
     }
 }

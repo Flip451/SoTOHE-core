@@ -1,8 +1,8 @@
 {
   "baseline_hash": "7fc8bc2545db16d70c3b8b4a79992bb3541f1859b9387e8364df357328075369",
-  "declaration_hash": "18316abfe4fea52e155351c28f0803152dab44a3a29ced56d4c81c0b3b14f616",
-  "generated_at": "2026-08-23T12:31:47Z",
-  "head_commit": "36243a3d690559c944bc77e651416f1f04e1399f",
+  "declaration_hash": "e1e71bd558c2fdd8f15988dc3553f121ea01e186f8848744725a23f9c50b3a36",
+  "generated_at": "2026-08-24T03:06:11Z",
+  "head_commit": "aac77f0159e3e1858bbc7e09362fdd0ea07bc6c8",
   "schema_version": 4,
   "signals": [
     {
@@ -45,18 +45,6 @@
       "kind_tag": "free_function",
       "signal": "blue",
       "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
-    },
-    {
-      "found_type": false,
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "type_name": "CatalogueToExtendedCrateCodecError"
-    },
-    {
-      "found_type": true,
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "type_name": "domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError"
     }
   ]
 }

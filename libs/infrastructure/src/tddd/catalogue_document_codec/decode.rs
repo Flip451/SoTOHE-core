@@ -3,7 +3,7 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{
     StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
 };
-use domain::tddd::catalogue_v2::document::{CatalogueDocument, CatalogueSchemaVersion};
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
@@ -45,8 +45,7 @@ pub(super) fn dto_to_domain(
         .map_err(|e| err(&dto.crate_name, format!("invalid crate_name: {e}")))?;
     let layer =
         LayerId::try_new(&dto.layer).map_err(|e| err(&dto.layer, format!("invalid layer: {e}")))?;
-    let schema_version = CatalogueSchemaVersion::new(dto.schema_version);
-    let mut doc = CatalogueDocument::new(schema_version, crate_name, layer);
+    let mut doc = CatalogueDocument::new(dto.schema_version, crate_name, layer);
     // Delete slots become deletion records rather than live entries.
     for (type_name_str, slot) in dto.types {
         let type_name = CatalogueEntryKey::try_new(type_name_str.clone())

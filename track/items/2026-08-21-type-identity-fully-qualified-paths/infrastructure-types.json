@@ -3,7 +3,7 @@
   "functions": {
     "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref": {
       "action": "add",
-      "docs": "Stable infrastructure adapter entry point for Rust type parsing, rustdoc-universe construction, and domain identity-resolution delegation.",
+      "docs": "Infrastructure entry point for canonicalizing catalogue TypeRef values against rustdoc paths.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -44,10 +44,6 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "CO-03",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
           "anchor": "AC-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
@@ -56,11 +52,7 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-05",
+          "anchor": "AC-06",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
@@ -95,26 +87,6 @@
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
-    {
-      "action": "delete",
-      "for_type": "CatalogueToExtendedCrateCodecError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "action": "delete",
-      "for_type": "CatalogueToExtendedCrateCodecError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "action": "delete",
-      "for_type": "CatalogueToExtendedCrateCodecError",
-      "trait_ref": "core::error::Error"
-    },
-    {
-      "action": "delete",
-      "for_type": "domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError",
-      "trait_ref": "core::convert::From<CatalogueToExtendedCrateCodecError>"
-    },
     {
       "for_type": "CanonicalTypeIdentity",
       "trait_ref": "core::fmt::Debug"
@@ -158,7 +130,7 @@
   "types": {
     "CanonicalTypeIdentity": {
       "action": "add",
-      "docs": "Infrastructure representation of a canonical Rust type expression after domain identity resolution.",
+      "docs": "Canonical representation of a parsed Rust type expression.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -188,28 +160,9 @@
         }
       ]
     },
-    "CatalogueToExtendedCrateCodecError": {
-      "action": "delete",
-      "informal_grounds": [],
-      "module_path": "tddd::catalogue_to_extended_crate_codec_error",
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        }
-      ]
-    },
     "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter": {
       "action": "add",
-      "docs": "Syn-backed adapter for TypeRefPathExtractorPort.",
+      "docs": "Syn-backed adapter for complete syntactic TypeRef occurrence extraction.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -232,14 +185,22 @@
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         {
-          "anchor": "OS-01",
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter": {
       "action": "modify",
-      "docs": "System secondary adapter for active-track catalogue linting with an injected parser-authoritative TypeRef path extractor.",
+      "docs": "System secondary adapter for active-track catalogue linting with an injected syntactic TypeRef occurrence extractor.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -286,16 +247,12 @@
         {
           "anchor": "AC-07",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "OS-01",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]
     },
     "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter": {
       "action": "modify",
-      "docs": "System secondary adapter for single-layer catalogue linting with an injected parser-authoritative TypeRef path extractor.",
+      "docs": "System secondary adapter for single-layer catalogue linting with an injected syntactic TypeRef occurrence extractor.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -341,10 +298,6 @@
         },
         {
           "anchor": "AC-07",
-          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        {
-          "anchor": "OS-01",
           "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         }
       ]

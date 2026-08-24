@@ -3,14 +3,38 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "04dd3a976ed0502cf0431a0922487a6733f4f5eaf6808ebbd951b2e866f320b0",
+        "declaration_hash": "042d162ffc2552ce373e8434a0ad06560e046013fabcb3c13726f0a5fc7b91b7",
+        "waived_reason_hash": "6930f8916bd903c831b2ac7f05ccfe0b19258de17a6f0b6fd01db8851cb23fc0"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "IN-01",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         "entry_key": "FullyQualifiedItemPath"
       },
       "key": {
-        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
-        "declaration_hash": "c2ca4b423a54496e77add9b8bfbea857155ca7184afd3e609fedb0f41da3e411",
+        "anchor_text_hash": "78834769f6b37f7c73567287393396ec5f9ffa782f6e678763d6283f8fa230d2",
+        "declaration_hash": "66f9da45faacc9964239c4f949a0eca65479a7640f8be659a309da6ec45010d3",
         "waived_reason_hash": "0351fa161c4953d341fb584d912a3605bcab42dfdad98808bbfd68f718f9df14"
       },
       "obligation_id": {
@@ -19,7 +43,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "catalogue の型・トレイト宣言、trait_impls、inherent_impls、および in-crate TypeRef を完全修飾パスへ解決して識別に用いること。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -33,9 +57,9 @@
         "entry_key": "FullyQualifiedItemPath"
       },
       "key": {
-        "anchor_text_hash": "31efb3c5d7646d506c1ebcf69bdb397956354b9e755351b9663d2666a0d581fa",
-        "declaration_hash": "983b375dc3c2bced8879c72eb143abf02002f53aaddb612bbb0a836b8a005472",
-        "waived_reason_hash": "da58f14536da1d56bf27ae60bbc071538bbd2f80800cb11b80d44eb0a640d6d2"
+        "anchor_text_hash": "f74e60b6b46088ca7aa1cadfbf123e9f6f11fd4397ae6ad7f6c5602b098f0a6c",
+        "declaration_hash": "8cec187155a439e30064ba891eb78236ecdf1ed378393eccf5919f6507cf42e5",
+        "waived_reason_hash": "54bae404ffaa8916472ed9d35a9ce04578b2870e29eac5ad6a35a80b58433c6c"
       },
       "obligation_id": {
         "entry_key": "FullyQualifiedItemPath",
@@ -43,7 +67,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -57,8 +81,8 @@
         "entry_key": "FullyQualifiedItemPath"
       },
       "key": {
-        "anchor_text_hash": "a3cde6357866fdfff10d8b4c1390c3bae314145cdec3919a68f8373180469126",
-        "declaration_hash": "984b91410244b59335c4bd5e277d9be50f7b4bfc469fc2ab49d8c9782a116ec4",
+        "anchor_text_hash": "6d7b940fe1dcd1cc7c4e1e9c445d2762294660d486f26326f03161e0071e4542",
+        "declaration_hash": "50614f1ee7b65238da1b7e669e4492e0889786be9c3d345a82ce6c00c9158fef",
         "waived_reason_hash": "a3f590b2e4ff23c2aa2958e0178c4d287b3e3f2c695702b1dd3dd9f68b7b2f86"
       },
       "obligation_id": {
@@ -67,7 +91,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"評価器はそれぞれを異なる完全修飾パスの対象として扱う\"",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -81,8 +105,8 @@
         "entry_key": "FullyQualifiedItemPath"
       },
       "key": {
-        "anchor_text_hash": "b40140082798a221b551613fab8c059c19f25c0afc425b5e45d9bd9157d82299",
-        "declaration_hash": "d4326d9366a5669cee351dc3547357fae91a6f9507af9a7a113650b9c4358ba2",
+        "anchor_text_hash": "6b6f0733cfa4ab0f3949aedebd939c9b2e26b0ed8edf7780db638d9d9665f877",
+        "declaration_hash": "5ecd9e0df77814cca693445dfcc2ecb97c9e0f904e45f06d32b2b83387afb18a",
         "waived_reason_hash": "b863ea8e1433723b7b8aa389ff7dc31dbd2353e4bba3fe65274c6ef825294db9"
       },
       "obligation_id": {
@@ -91,7 +115,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "\"methods: [],\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -105,8 +129,8 @@
         "entry_key": "CatalogueEntryKey"
       },
       "key": {
-        "anchor_text_hash": "14ece7db662433bc7e35d9153588647da33aa3967cfc1ac21ca281ad8ada2dcd",
-        "declaration_hash": "7bfc09f8f880568909d23863ec9eec8e3404f7bbec9fd556d260ab1f7a6d316a",
+        "anchor_text_hash": "78834769f6b37f7c73567287393396ec5f9ffa782f6e678763d6283f8fa230d2",
+        "declaration_hash": "f0ebbfb5e7d5b702a25a3df8e23bf4d57e5f2bee548c06b22c0504d48c28ad15",
         "waived_reason_hash": "586ebde94b8955ec7b741b46bca6d6f22fcd236989ec8bad4b40072a7d0f6131"
       },
       "obligation_id": {
@@ -115,7 +139,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Catalogue entry-key value object; construction-boundary text representation.",
+        "citation": "Validated key for a catalogue entry reference.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -129,8 +153,8 @@
         "entry_key": "CatalogueEntryKey"
       },
       "key": {
-        "anchor_text_hash": "fca57a33faf1121d5ed07aca79b144cd3fa7a1d360ef4b58723c207c10fbda63",
-        "declaration_hash": "ee158a2aa8cf3c8d0cfd9bdf177cde18050a38c6c697731d3f2ad9a6b3f3c2dc",
+        "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
+        "declaration_hash": "993341b3ff1e83b35b09f7d7e4a60bb975d3d7c1d41d2bf1b523b3d4163e6177",
         "waived_reason_hash": "0ddfc39ab051a3dca0ad1cb26ff2dbc359bf02baeb4587aca20cee140a1d541c"
       },
       "obligation_id": {
@@ -139,7 +163,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "DocString(\"Catalogue entry-key value object; construction-boundary text representation.\")",
+        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"try_new\")), receiver: None, params: [ParamDeclaration { name: ParamName(Identifier(\"raw\")), ty: TypeRef(\"String\") }], returns: TypeRef(\"Result<Self, ValidationError>\") }, MethodDeclaration { name: MethodName(Identifier(\"as_str\")), receiver: Some(SharedRef), params: [], returns: TypeRef(\"&str\") }]",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -153,8 +177,8 @@
         "entry_key": "CatalogueEntryKey"
       },
       "key": {
-        "anchor_text_hash": "a3cde6357866fdfff10d8b4c1390c3bae314145cdec3919a68f8373180469126",
-        "declaration_hash": "6215fc8fe2e8636f58cec6882d10774ed5056ce7c4e798b8005e8ae0157ca6d2",
+        "anchor_text_hash": "6d7b940fe1dcd1cc7c4e1e9c445d2762294660d486f26326f03161e0071e4542",
+        "declaration_hash": "3eaf769681bdc54d4f27e85f0b9aabe6b12d8d6b26f6a2b3cd36e6c44ccf5a83",
         "waived_reason_hash": "99f239bc021173dbe5c6634b4889c1b663eafe098de5d6aaed6c79f9fa55b837"
       },
       "obligation_id": {
@@ -163,7 +187,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価器はそれぞれを異なる完全修飾パスの対象として扱う。",
+        "citation": "同一 crate 内の同名型および同名トレイトを一つの catalogue に同時に宣言でき、評価はそれぞれを異なる完全修飾パスの対象として扱う。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -171,23 +195,287 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-08",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
-        "entry_key": "CatalogueEntryKey"
+        "entry_key": "InherentImplDeclV2"
       },
       "key": {
-        "anchor_text_hash": "8a0bd8c691f7683dec9480847b1b325f8adcbc5d709075150f0bb3ccdef462c5",
-        "declaration_hash": "5594139209ea36b76a30975d62ea439512acaf1596e925bfaf7eaa429440b72b",
-        "waived_reason_hash": "bd5ad617ffd69edd6374723778bd5c3a9faa8e624bb1e247e19ba72f92b6c1d8"
+        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "declaration_hash": "613444e374eede1f1988a592b42f6d67d044741598aca0605b6d1d963f5215bd",
+        "waived_reason_hash": "6d7b17b012548d696858ecf1d150fbb38d902d984c9752d94bade794430e10a5"
       },
       "obligation_id": {
-        "entry_key": "CatalogueEntryKey",
-        "item_identifier": "voluntary:AC-08",
+        "entry_key": "InherentImplDeclV2",
+        "item_identifier": "voluntary:AC-05",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "「二つの完全修飾パスが別々の entry として保持され、lookup または attribution が片方を他方に置き換えない」",
+        "citation": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "04dd3a976ed0502cf0431a0922487a6733f4f5eaf6808ebbd951b2e866f320b0",
+        "declaration_hash": "dba482eae512a1e9baaa35f8eb516fbac8dfdde9bdb9a53c2f1b3a8e06413674",
+        "waived_reason_hash": "8436dd55ac2f0546123c81639c3f934c372b1ceedc8c3a33a1834528fe051c78"
+      },
+      "obligation_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Chain ③ が実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証し、catalogue-lint の成功をその検証の代替にしないこと。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "TraitRefScope"
+      },
+      "key": {
+        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "declaration_hash": "7f480e1564b82d62f58a3a83ed1cee65ce160e85f3aae62d5cc19c5de94ee299",
+        "waived_reason_hash": "8999dbfc17c443275a3e3c5bac8a2cd7b943e7fd14ef4def613ffdfe772fdd98"
+      },
+      "obligation_id": {
+        "entry_key": "TraitRefScope",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "DocString(\"Scope classification for a catalogue trait reference.\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLinterError"
+      },
+      "key": {
+        "anchor_text_hash": "d11c683a75b5be4ce017055ca0eca7c6337d4a48d514cb14add745f7a20bb76c",
+        "declaration_hash": "1f6832d1f16191e104ca4c0e124210a48fc65eddca180c47e1db0f09a85332f3",
+        "waived_reason_hash": "ee529460a4ae4d49338bf8934d80be11f1013b52d9c58578cbb3a43d6e93167a"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLinterError",
+        "item_identifier": "voluntary:CO-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Catalogue-lint evaluation error.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLinterError"
+      },
+      "key": {
+        "anchor_text_hash": "04dd3a976ed0502cf0431a0922487a6733f4f5eaf6808ebbd951b2e866f320b0",
+        "declaration_hash": "b073daf1bc62985da4d842ffd591171623de92e29792f724e496963b03f9325b",
+        "waived_reason_hash": "d91c022a3c7e49bd36a383c145ec11e45fbafc4635137348500fa5f6233361c3"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLinterError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Catalogue-lint evaluation error.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+      },
+      "key": {
+        "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
+        "declaration_hash": "b9449ff152c7f146e8a33d5ab7a70a37f8bc303f5c51eb6df46e7890a92c7596",
+        "waived_reason_hash": "2d334ec242b9fa1f3340c863b9abe065a75f0ce5e132fe9310aa550c27e78328"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Failure to extract path references from a catalogue TypeRef.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+      },
+      "key": {
+        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "declaration_hash": "163d2117deeb6bece3543cc088d2c637456010d5cdab2eee34befa056c835035",
+        "waived_reason_hash": "c71667b097bd5562353edd311463f1bbb2425992b8e460e37aa4e09dfa4252e3"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"One exclusively categorized occurrence from a complete TypeRef syntax inspection.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+      },
+      "key": {
+        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
+        "declaration_hash": "de6df42a21f90646eeffce7d7e9c2b7e07225b31dfcbe3d2501e53b130ce66fc",
+        "waived_reason_hash": "a4abeb818a6dabcc89268115e64c505c565326f5dfaa3d121bfd187efa6efcd5"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+        "item_identifier": "voluntary:CO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "One exclusively categorized occurrence from a complete TypeRef syntax inspection.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+      },
+      "key": {
+        "anchor_text_hash": "d11c683a75b5be4ce017055ca0eca7c6337d4a48d514cb14add745f7a20bb76c",
+        "declaration_hash": "f1b332371a2b016cbf9c70515d89ca94af6fc772789e41d8cfc3c67f687402a6",
+        "waived_reason_hash": "54729f3aec5d9fef3e3310d90c139b3c6e8a7ce8bef145557f45a73620f1ab93"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Resolves catalogue entry references to fully qualified item paths.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "d11c683a75b5be4ce017055ca0eca7c6337d4a48d514cb14add745f7a20bb76c",
+        "declaration_hash": "042d162ffc2552ce373e8434a0ad06560e046013fabcb3c13726f0a5fc7b91b7",
+        "waived_reason_hash": "39013260d66c535b46aa73275c1402a103dc7524ef064aad467186c4ba5020fd"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "TraitEntry { action: Modify, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"encode\"))",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d",
+        "waived_reason_hash": "5083714fabfa62fa5dadcd05be3962ca00feded7db543bad8e5ec02dc3612496"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Catalogue-lint interactor with injected loader, config, primitive scanner, and syntactic TypeRef occurrence extractor dependencies.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+      },
+      "key": {
+        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "declaration_hash": "156160012267f32d3dbbdd888802e7930786acf369160e271627dfd8266f24f1",
+        "waived_reason_hash": "876e259bc9cfa3ef50ea8381156eeefaa2b9c148bb3112d2ae75517028ae03d7"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"methods: [],\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

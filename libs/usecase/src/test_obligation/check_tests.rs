@@ -855,7 +855,7 @@ fn voluntary_binding() -> TestBindingRecord {
 
 fn money_catalogue() -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -898,7 +898,7 @@ fn money_catalogue_in_layer(
     action: ItemAction,
 ) -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new(layer).unwrap(),
     );
@@ -925,7 +925,7 @@ fn money_catalogue_in_layer(
 
 fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
     let mut doc = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -984,7 +984,7 @@ fn method_without_spec_refs(name: &str) -> MethodDeclaration {
 
 fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1013,7 +1013,7 @@ fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
 
 fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1539,7 +1539,7 @@ fn test_check_catalogue_present_empty_artifacts_passes_verified_scope() {
     // AC-02 / CN-03: present artifacts with a zero derivation are distinct
     // from absent artifacts and therefore proceed through the check gate.
     let empty_catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1584,7 +1584,7 @@ fn test_materialized_scope_reports_uncited_findings() {
 #[test]
 fn test_cited_anchor_ids_includes_method_only_refs() {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1616,7 +1616,7 @@ fn test_cited_anchor_ids_includes_method_only_refs() {
 #[test]
 fn test_cited_anchor_ids_skips_reference_method_refs() {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1670,7 +1670,7 @@ fn test_cited_anchor_ids_skips_reference_entry_refs() {
 #[test]
 fn test_cited_anchor_ids_skips_delete_method_refs() {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1717,7 +1717,7 @@ fn test_cited_anchor_ids_skips_delete_method_refs() {
 #[test]
 fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
     let mut catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
@@ -1848,7 +1848,7 @@ fn test_obligation_declaration_text_with_workspace_qualified_trait_resolves_decl
     ));
 
     let mut trait_catalogue = CatalogueDocument::new(
-        domain::tddd::catalogue_v2::document::CatalogueSchemaVersion::new(5),
+        5,
         CrateName::new("infrastructure").unwrap(),
         LayerId::try_new("infrastructure").unwrap(),
     );
