@@ -93,22 +93,32 @@ pub(super) fn declared_identity_universe(
     entries.iter().map(|entry| entry.identity.clone()).collect()
 }
 
-/// Returns the live module paths that prove a crate-local root is in scope.
+/// Returns the supplied catalogue roots and live module paths that prove a
+/// crate-local root is in scope.
 ///
-/// Type and trait module paths come from their canonical declared identities;
-/// function paths are already fully qualified keys and contribute their own
-/// definition module paths. Deleted entries are excluded consistently with the
-/// identity universe, so tombstones cannot make an unresolved path look local.
+/// Every supplied catalogue contributes its crate name as a root, including an
+/// otherwise empty catalogue. Type and trait module paths come from their
+/// canonical declared identities; function paths are already fully qualified
+/// keys and contribute their own definition module paths. Deleted entries are
+/// excluded consistently with the identity universe, so tombstones cannot make
+/// an unresolved path look local.
 pub(super) fn declared_locality_modules(
     all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
     entries: &[DeclaredIdentity],
     catalogue_crate: &CrateName,
 ) -> BTreeSet<ModulePath> {
-    let mut modules = entries
-        .iter()
-        .filter(|entry| entry.identity.crate_name() == catalogue_crate)
-        .map(|entry| entry.identity.module_path().clone())
+    let mut modules = all_catalogues
+        .values()
+        .filter_map(|catalogue| {
+            ModulePath::from_segments(vec![catalogue.crate_name().as_str().to_owned()]).ok()
+        })
         .collect::<BTreeSet<_>>();
+    modules.extend(
+        entries
+            .iter()
+            .filter(|entry| entry.identity.crate_name() == catalogue_crate)
+            .map(|entry| entry.identity.module_path().clone()),
+    );
 
     for catalogue in
         all_catalogues.values().filter(|catalogue| catalogue.crate_name() == catalogue_crate)
@@ -316,7 +326,6 @@ fn is_explicit_external_qualified_path(
     root != catalogue_crate.as_str()
         && !matches!(root, "crate" | "self" | "super")
         && !universe.iter().any(|identity| identity.crate_name().as_str() == root)
-        && !is_known_catalogue_crate(root)
         && !locality_modules.iter().any(|module_path| {
             module_path.segments().first().is_some_and(|segment| segment.as_str() == root)
         })
@@ -437,13 +446,6 @@ fn is_known_external_bare_path(path: &str) -> bool {
             | "FromStr"
             | "Hasher"
             | "BuildHasher"
-    )
-}
-
-fn is_known_catalogue_crate(crate_name: &str) -> bool {
-    matches!(
-        crate_name,
-        "domain" | "usecase" | "infrastructure" | "cli" | "cli_driver" | "cli_composition"
     )
 }
 
@@ -649,6 +651,63 @@ mod tests {
                 CatalogueIdentityResolutionError::ClassificationFailed { location }
             ) if location == type_ref
         ));
+    }
+
+    #[test]
+    fn test_resolve_reference_identities_rejects_supplied_and_accepts_unprovided_crate_root() {
+        let catalogue_crate = CrateName::new("domain").expect("valid crate name");
+        let mut all_catalogues = BTreeMap::new();
+        all_catalogues.insert(
+            LayerId::try_new("domain").expect("valid layer id"),
+            CatalogueDocument::new(
+                2,
+                catalogue_crate.clone(),
+                LayerId::try_new("domain").expect("valid layer id"),
+            ),
+        );
+        all_catalogues.insert(
+            LayerId::try_new("payments").expect("valid layer id"),
+            CatalogueDocument::new(
+                2,
+                CrateName::new("payments").expect("valid crate name"),
+                LayerId::try_new("payments").expect("valid layer id"),
+            ),
+        );
+        let entries = Vec::new();
+        let universe = declared_identity_universe(&entries);
+        let locality_modules =
+            declared_locality_modules(&all_catalogues, &entries, &catalogue_crate);
+        let context = CatalogueIdentityContext {
+            catalogue_crate: &catalogue_crate,
+            universe: &universe,
+            locality_modules: &locality_modules,
+            entries: &entries,
+        };
+
+        let supplied_reference = TypeRef::new("payments::Missing").expect("valid TypeRef");
+        let error = resolve_reference_identities(
+            &supplied_reference,
+            context,
+            &ClassificationFailureExtractor,
+            empty_inspection(),
+        )
+        .expect_err("a supplied catalogue root must fail closed when unresolved");
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+            ) if unresolved == supplied_reference
+        ));
+
+        let external_reference = TypeRef::new("serde::Serialize").expect("valid TypeRef");
+        let resolved = resolve_reference_identities(
+            &external_reference,
+            context,
+            &ClassificationFailureExtractor,
+            empty_inspection(),
+        )
+        .expect("an unprovided crate root remains external");
+        assert!(resolved.is_empty());
     }
 
     #[test]
