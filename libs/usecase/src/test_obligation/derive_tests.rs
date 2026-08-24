@@ -1631,7 +1631,7 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
 }
 
 #[test]
-fn test_generic_local_trait_ref_is_external_under_closed_spelling_grammar() {
+fn test_generic_local_trait_ref_resolves_under_closed_spelling_grammar() {
     let path = PathBuf::from("domain-types.json");
     let mut doc = empty_catalogue("domain", "domain");
     doc.insert_trait(
@@ -1647,13 +1647,19 @@ fn test_generic_local_trait_ref_is_external_under_closed_spelling_grammar() {
     interactor.execute(&command(vec![path])).unwrap();
     let saved = sink.saved.lock().unwrap().clone().unwrap();
 
-    assert!(saved.obligations().iter().all(|obligation| {
-        *obligation.id().obligation_kind() != TestObligationKind::ContractConformance
-    }));
+    let conformance: Vec<_> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .collect();
+    assert_eq!(conformance.len(), 1);
+    assert_eq!(conformance[0].id().entry_key().as_str(), "Adapter");
 }
 
 #[test]
-fn test_generic_local_owner_retains_verbatim_external_key() {
+fn test_generic_local_owner_resolves_to_stored_key() {
     let path = PathBuf::from("domain-types.json");
     let mut doc = empty_catalogue("domain", "domain");
     doc.insert_type(
@@ -1680,7 +1686,7 @@ fn test_generic_local_owner_retains_verbatim_external_key() {
         })
         .unwrap();
 
-    assert_eq!(obligation.id().entry_key().as_str(), "domain::alpha::Adapter<T>");
+    assert_eq!(obligation.id().entry_key().as_str(), "domain::alpha::Adapter");
 }
 
 #[test]

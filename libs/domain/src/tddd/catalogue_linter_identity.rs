@@ -281,12 +281,7 @@ fn classify_catalogue_path(
         Ok(identity) => Ok(Some(identity)),
         Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location))
             if is_known_external_bare_path(location.as_str())
-                || is_explicit_external_qualified_path(
-                    normalized,
-                    catalogue_crate,
-                    universe,
-                    locality_modules,
-                ) =>
+                || is_explicit_external_qualified_path(normalized) =>
         {
             // Resolution has already had the first chance to find a declared
             // identity. Only an unresolved path can be classified as external;
@@ -294,7 +289,13 @@ fn classify_catalogue_path(
             Ok(None)
         }
         Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location))
-            if normalized.contains("::") =>
+            if normalized.contains("::")
+                && is_known_catalogue_qualified_path(
+                    normalized,
+                    catalogue_crate,
+                    universe,
+                    locality_modules,
+                ) =>
         {
             Err(CatalogueLinterError::IdentityResolutionFailed(
                 CatalogueIdentityResolutionError::UnresolvedIdentifier(location),
@@ -309,7 +310,20 @@ fn classify_catalogue_path(
     }
 }
 
-fn is_explicit_external_qualified_path(
+/// Returns whether the qualified root belongs to the closed standard-library
+/// namespace. A third-party root is external only when an authoritative input
+/// declares it; catalogue documents have no external-crate declaration field.
+fn is_explicit_external_qualified_path(normalized: &str) -> bool {
+    let Some((root, _)) = normalized.split_once("::") else {
+        return false;
+    };
+
+    matches!(root, "std" | "core" | "alloc")
+}
+
+/// Returns whether the qualified root is proven local by supplied catalogues or
+/// by a relative path marker. Unknown roots are intentionally not local.
+fn is_known_catalogue_qualified_path(
     normalized: &str,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
@@ -319,14 +333,10 @@ fn is_explicit_external_qualified_path(
         return false;
     };
 
-    if matches!(root, "std" | "core" | "alloc") {
-        return true;
-    }
-
-    root != catalogue_crate.as_str()
-        && !matches!(root, "crate" | "self" | "super")
-        && !universe.iter().any(|identity| identity.crate_name().as_str() == root)
-        && !locality_modules.iter().any(|module_path| {
+    root == catalogue_crate.as_str()
+        || matches!(root, "crate" | "self" | "super")
+        || universe.iter().any(|identity| identity.crate_name().as_str() == root)
+        || locality_modules.iter().any(|module_path| {
             module_path.segments().first().is_some_and(|segment| segment.as_str() == root)
         })
 }
@@ -654,7 +664,7 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_reference_identities_rejects_supplied_and_accepts_unprovided_crate_root() {
+    fn test_resolve_reference_identities_rejects_supplied_and_unknown_crate_roots() {
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
         let mut all_catalogues = BTreeMap::new();
         all_catalogues.insert(
@@ -699,15 +709,22 @@ mod tests {
             ) if unresolved == supplied_reference
         ));
 
-        let external_reference = TypeRef::new("serde::Serialize").expect("valid TypeRef");
-        let resolved = resolve_reference_identities(
-            &external_reference,
-            context,
-            &ClassificationFailureExtractor,
-            empty_inspection(),
-        )
-        .expect("an unprovided crate root remains external");
-        assert!(resolved.is_empty());
+        for unknown_reference in ["serde::Serialize", "heplers::Thing"] {
+            let unknown_reference = TypeRef::new(unknown_reference).expect("valid TypeRef");
+            let error = resolve_reference_identities(
+                &unknown_reference,
+                context,
+                &ClassificationFailureExtractor,
+                empty_inspection(),
+            )
+            .expect_err("an unknown crate root must fail closed");
+            assert!(matches!(
+                error,
+                CatalogueLinterError::IdentityResolutionFailed(
+                    CatalogueIdentityResolutionError::ClassificationFailed { location }
+                ) if location == unknown_reference
+            ));
+        }
     }
 
     #[test]

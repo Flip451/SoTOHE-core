@@ -4,7 +4,9 @@ use std::collections::BTreeSet;
 
 use domain::tddd::catalogue_v2::entries::TypeEntry;
 use domain::tddd::catalogue_v2::identifiers::{CrateName, FullyQualifiedItemPath, TypeRef};
-use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey, ModulePath, TraitEntry};
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, CatalogueEntryKey, ModulePath, TraitEntry, TraitImplDeclV2, TraitRefScope,
+};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 
 use super::{catalogue_key, diag};
@@ -12,8 +14,9 @@ use super::{catalogue_key, diag};
 /// The finite declaration-owned spelling set used by derive-time identity matching.
 ///
 /// `stored_key` is retained as the downstream catalogue identity. The other two
-/// spellings are constructed from the declaration's module and crate context; no
-/// spelling supplied by a reference is normalized into either form.
+/// spellings are constructed from the declaration's module and crate context.
+/// Raw references are checked first; a domain-owned generic-free outer path may
+/// be checked second without parsing or rewriting the reference here.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct CatalogueDeclarationIdentity {
     stored_key: CatalogueEntryKey,
@@ -34,8 +37,8 @@ impl CatalogueDeclarationIdentity {
         &self.fully_qualified_path
     }
 
-    fn accepts(&self, reference: &TypeRef) -> bool {
-        self.accepted_spellings.contains(reference.as_str())
+    fn accepts(&self, spelling: &str) -> bool {
+        self.accepted_spellings.contains(spelling)
     }
 }
 
@@ -69,9 +72,10 @@ pub(crate) fn declaration_identity(
 
 /// Resolves a reference against the caller-supplied declaration universe.
 ///
-/// Matching is exact against each declaration's finite spelling set. No match
-/// is external; multiple matches fail closed with every candidate's fully
-/// qualified path.
+/// Matching is exact against each declaration's finite spelling set. A raw
+/// spelling is checked first, then the domain-owned generic-free outer spelling
+/// when the domain can classify it. No match is external; multiple matches fail
+/// closed with every candidate's fully qualified path.
 pub(crate) fn resolve_catalogue_reference<'a, I>(
     reference: &TypeRef,
     declarations: I,
@@ -79,15 +83,17 @@ pub(crate) fn resolve_catalogue_reference<'a, I>(
 where
     I: IntoIterator<Item = &'a CatalogueDeclarationIdentity>,
 {
-    let matches = declarations
-        .into_iter()
-        .filter(|declaration| declaration.accepts(reference))
-        .collect::<Vec<_>>();
-    match matches.as_slice() {
-        [] => Ok(None),
-        [declaration] => Ok(Some(declaration)),
-        _ => Err(diag(&format_ambiguous_reference(reference, &matches))),
+    let declarations = declarations.into_iter().collect::<Vec<_>>();
+    if let Some(declaration) =
+        resolve_catalogue_spelling(reference.as_str(), declarations.iter().copied())?
+    {
+        return Ok(Some(declaration));
     }
+
+    let Some(generic_free_key) = generic_free_reference_key(reference) else {
+        return Ok(None);
+    };
+    resolve_catalogue_spelling(generic_free_key.as_str(), declarations.iter().copied())
 }
 
 /// Resolves an inherent-impl owner through the type declaration universe.
@@ -191,7 +197,7 @@ pub(crate) fn trait_declaration_text_for_reference(
 }
 
 fn format_ambiguous_reference(
-    reference: &TypeRef,
+    reference: &str,
     matches: &[&CatalogueDeclarationIdentity],
 ) -> String {
     let candidates = matches
@@ -200,9 +206,42 @@ fn format_ambiguous_reference(
         .collect::<Vec<_>>();
     format!(
         "catalogue reference '{}' is ambiguous; candidates: {}",
-        reference.as_str(),
+        reference,
         candidates.join(", ")
     )
+}
+
+fn resolve_catalogue_spelling<'a, I>(
+    spelling: &str,
+    declarations: I,
+) -> Result<Option<&'a CatalogueDeclarationIdentity>, DiagnosticMessage>
+where
+    I: IntoIterator<Item = &'a CatalogueDeclarationIdentity>,
+{
+    let matches = declarations
+        .into_iter()
+        .filter(|declaration| declaration.accepts(spelling))
+        .collect::<Vec<_>>();
+    match matches.as_slice() {
+        [] => Ok(None),
+        [declaration] => Ok(Some(declaration)),
+        _ => Err(diag(&format_ambiguous_reference(spelling, &matches))),
+    }
+}
+
+/// Returns the domain-owned generic-free outer path when the spelling is one
+/// of the supported self-crate or workspace forms.
+///
+/// `TraitImplDeclV2::trait_ref_scope` owns the generic boundary and path-shape
+/// validation. This adapter deliberately does not inspect or rewrite the
+/// `TypeRef` string itself; unsupported spellings remain external to the
+/// closed declaration grammar.
+fn generic_free_reference_key(reference: &TypeRef) -> Option<CatalogueEntryKey> {
+    let scope_probe = TraitImplDeclV2::new(reference.clone(), reference.clone());
+    match scope_probe.trait_ref_scope() {
+        TraitRefScope::SelfCrate(key) | TraitRefScope::Workspace(key) => Some(key),
+        TraitRefScope::External => None,
+    }
 }
 
 fn declaration_key_identity(

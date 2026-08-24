@@ -2571,7 +2571,8 @@ mod tests {
     }
 
     #[test]
-    fn test_referenced_role_constraint_treats_function_declared_module_as_local() {
+    fn test_referenced_role_constraint_treats_function_declared_module_as_local_and_unknown_root_as_failure()
+     {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
             CatalogueEntryKey::try_new("MissingReference".to_owned()).unwrap(),
@@ -2605,13 +2606,19 @@ mod tests {
             },
         );
 
-        assert_eq!(violations.len(), 1, "only the unresolved local path must fail closed");
-        assert_eq!(violations[0].entry_name(), "MissingReference");
-        assert!(violations[0].message().contains("helpers::Missing"));
-        assert!(
-            !violations.iter().any(|violation| violation.entry_name() == "ExternalReference"),
-            "explicit external roots such as serde must remain accepted"
+        assert_eq!(
+            violations.len(),
+            2,
+            "both the unresolved local and unknown qualified paths must fail closed"
         );
+        assert!(violations.iter().any(|violation| {
+            violation.entry_name() == "MissingReference"
+                && violation.message().contains("helpers::Missing")
+        }));
+        assert!(violations.iter().any(|violation| {
+            violation.entry_name() == "ExternalReference"
+                && violation.message().contains("serde::Missing")
+        }));
     }
 
     #[test]
