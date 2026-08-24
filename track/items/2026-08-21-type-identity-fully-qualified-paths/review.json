@@ -4870,6 +4870,188 @@
           "hash": "rvw1:sha256:9f7f5c0e5f4a5a9c558b4287275e799ce829b116230d2f550f5832f64c4c732a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T09:04:10Z",
+          "findings": [
+            {
+              "category": "logic error",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 337,
+              "message": "Trait-impl declaration lookup still compares `impl_decl.for_type()` verbatim with the obligation entry key. Derivation now canonicalizes a local short owner (e.g. `Adapter`) to the stored qualified key (`domain::alpha::Adapter`), so `trait_impl_declaration_text_in` cannot find the implementation during check/evaluate/cache declaration reconstruction and returns `None`. Resolve the owner through the shared identity helper before matching, and add a regression test covering a short `for_type` with a qualified catalogue key.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ea9e278877efee9475e9c086c1e3a19a4eac7ac22b8d323f2d5fc1652f1ffdcb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T09:12:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8f79d9f2019911409a6b181cb459b5fa41de4355e6e5c1fd18c04ac9857accda",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T09:21:20Z",
+          "findings": [
+            {
+              "category": "orchestration_correctness",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 109,
+              "message": "`UnresolvedIdentifier` is incorrectly treated as proof that a reference is external. Local/workspace typos such as `alpha::MissingPort` are therefore silently skipped; supported generic trait refs such as `MyPort<T>` also cannot match because the raw `TypeRef` is passed to the path resolver, so their implementations emit no contract-conformance obligation. Use the domain-owned path extraction/classification result and fail closed for unresolved local references.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:8f79d9f2019911409a6b181cb459b5fa41de4355e6e5c1fd18c04ac9857accda",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T09:39:54Z",
+          "findings": [
+            {
+              "category": "orchestration_correctness",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 68,
+              "message": "The raw generic spelling is classified as external before the generic-free `TraitRefScope` fallback runs. If the catalogue declares a local trait named `Read`, an impl of `Read<T>` misses raw identity lookup, hits the hardcoded external-name allowlist, returns `None` here, and emits no contract-conformance obligation. Resolve the canonical base trait path before external classification.",
+              "severity": "P0"
+            },
+            {
+              "category": "orchestration_correctness",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 99,
+              "message": "`resolve_named_type_key` still sends the complete self-type expression to the item-path resolver. A valid local generic impl such as `for_type: Adapter<T>` with stored key `domain::alpha::Adapter` cannot resolve and derivation aborts instead of using the stored catalogue key. The domain-owned path extraction must normalize the self type before lookup.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/usecase/src/test_obligation/derive/trait_roles.rs",
+              "line": 58,
+              "message": "The identity universe supplied to external classification contains traits only. Consequently `alpha::MissingPort` is silently considered external when `alpha` is a local module represented only by type entries; the added test passes only because it inserts another trait under `alpha`. Use complete catalogue module context and fail closed when locality cannot be disproved.",
+              "severity": "P0"
+            },
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 154,
+              "message": "The usecase layer now parses Rust paths and owns the external/prelude name allowlist plus workspace-crate classification. This duplicates domain catalogue-classification logic and violates the pure-orchestrator boundary; the decision belongs with the domain identity-resolution contract (`CatalogueIdentityResolutionError`/`resolve_catalogue_identity`) and should be exposed as a typed resolved/external/error result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:db93ee08af1a55a3133afe73d607c5438ddd4157851f8e17057c4797fc1b73b0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T10:13:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d8b7ead167ed22bc3142995a76247290ea3493528b7ee84e37bcf8649a116e0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T10:18:46Z",
+          "findings": [
+            {
+              "category": "orchestration_correctness",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 202,
+              "message": "Generic fallback is incomplete for crate-less module paths. `TraitRefScope` classifies `alpha::SharedPort<T>` as `External`, so the helper never retries `alpha::SharedPort`; a valid declared local trait therefore causes derivation to abort, while a similarly qualified generic `for_type` retains the raw key. The promised raw → generic-free resolution must also cover module-qualified local paths.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 217,
+              "message": "Local-prefix detection mishandles leading absolute paths because `split(\"::\").next()` returns an empty segment. After raw resolution fails for `::domain::MissingPort` or a valid generic `::domain::SharedPort<T>`, the reference is classified as external and its conformance obligation is silently skipped, despite the domain resolver supporting the leading `::` normalization.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/usecase/src/test_obligation/derive/trait_roles.rs",
+              "line": 66,
+              "message": "The resolver universe contains both type and trait identities, but a successfully resolved identity that belongs only to a `TypeEntry` makes this `find` return `None`; the caller then treats it like an external trait. A trait impl referencing a local type path as its trait consequently emits no conformance obligation instead of failing with a typed wrong-section error.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:1d8b7ead167ed22bc3142995a76247290ea3493528b7ee84e37bcf8649a116e0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T10:34:36Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 211,
+              "message": "The usecase layer is again interpreting and rewriting Rust path syntax: it strips leading `::`, recognizes `crate::`, and fabricates a crate-qualified `TypeRef` to obtain a generic-free key. This canonicalization belongs to the domain `TypeRef`/`TraitImplDeclV2` identity-resolution contract; keeping it here duplicates supported-path semantics and violates the pure-orchestrator boundary. Expose a domain operation that returns the generic-free canonical lookup path and have usecase only invoke it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:14e23dfbcd85752ead722279afe02568fcc19f5549280b9a71318fe64a3a5a04",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T11:23:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3948fa608b369df0bcc1859fb3327fc82a00975c4b7644a0c7e7780f16bdf348",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T11:29:54Z",
+          "findings": [
+            {
+              "category": "orchestration_correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 300,
+              "message": "The closed grammar now permits unmatched inherent owners as external, but declaration hashing still treats `Ok(None)` as fatal. If an external inherent impl and a valid local inherent impl contain the same method name and the external row appears first, this returns `None` before reaching the local owner; derive emitted the local obligation, yet fulfillment/waiver hashing cannot recover its declaration. Handle `Ok(None)` by continuing and reserve failure for resolver errors.",
+              "severity": "P0"
+            },
+            {
+              "category": "error_handling",
+              "file": "libs/usecase/src/test_obligation/derive/trait_roles.rs",
+              "line": 29,
+              "message": "Deduplication checks only `CatalogueDeclarationIdentity`, which excludes the trait role, anchors, and declaration body. Two supplied catalogues declaring the same crate/key/module with different contract metadata are therefore treated as an exact duplicate and the latter is silently discarded, making obligation attribution depend on input order. Deduplicate only identical complete entries and fail closed on conflicting snapshots.",
+              "severity": "P1"
+            },
+            {
+              "category": "fail_closed",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 218,
+              "message": "A stored type/trait key rejected by `FullyQualifiedItemPath` is currently recovered by stripping generic syntax. For example, an invalid declaration key `Widget<T>` becomes the declaration name `Widget`, adding module/crate spellings that were not among the three exact forms derived from a valid stored key. The closed grammar should propagate the original invalid-identity error rather than reinterpret malformed declaration keys.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3948fa608b369df0bcc1859fb3327fc82a00975c4b7644a0c7e7780f16bdf348",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T11:45:15Z",
+          "findings": [
+            {
+              "category": "error_handling",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 153,
+              "message": "Conflicting duplicate trait snapshots are still silently collapsed in the declaration-hash path. `catalogues_trait_identities` deduplicates solely by `CatalogueDeclarationIdentity`, so two catalogues with the same crate/key/module but different `TraitEntry` content become one identity and `trait_declaration_text_for_reference` returns the first declaration. Unlike derivation’s new conflict check, evaluate does not re-derive before freezing cache entries, so its result depends on catalogue order instead of failing closed. Apply the same complete-entry equality/conflict check in this shared lookup path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5350bd983d14cc0a037e260f79f898b61b1d5fc44f6178b6edb53a6346e3cd6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T11:53:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d321082ab6725d1705bed984598397c4f5720b98272dbf5ff6ed28d5c68c9d0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

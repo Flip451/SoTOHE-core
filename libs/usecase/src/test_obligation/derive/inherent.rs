@@ -38,7 +38,11 @@ pub(super) fn derive_inherent_impl_obligations(
     }
 
     for inherent in catalogue.inherent_impls() {
-        let (owner_key, type_entry) = resolve_named_type_entry(catalogue, inherent.type_name())?;
+        let Some((owner_key, type_entry)) =
+            resolve_named_type_entry(catalogue, inherent.type_name())?
+        else {
+            continue;
+        };
         let type_name = owner_key.as_str();
         let seen = seen_by_type.entry(type_name.to_owned()).or_default();
         let methods = unique_inherent_methods(type_name, inherent.methods(), seen)?;
@@ -282,7 +286,7 @@ mod tests {
     }
 
     #[test]
-    fn test_qualified_type_key_and_short_inherent_owner_emit_method_obligation() {
+    fn test_qualified_type_key_and_module_inherent_owner_emit_method_obligation() {
         let mut catalogue = CatalogueDocument::new(
             5,
             CrateName::new("domain").unwrap(),
@@ -304,7 +308,7 @@ mod tests {
             ),
         );
         catalogue.push_inherent_impl(InherentImplDeclV2::new(
-            CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("a::Compute".to_owned()).unwrap(),
             vec![],
             vec![],
             vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
@@ -337,7 +341,7 @@ mod tests {
     }
 
     #[test]
-    fn test_orphan_inherent_impl_fails_closed() {
+    fn test_orphan_inherent_impl_is_external_and_skipped() {
         let mut catalogue = CatalogueDocument::new(
             5,
             CrateName::new("domain").unwrap(),
@@ -349,6 +353,6 @@ mod tests {
             vec![],
             vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
         ));
-        assert!(derive(&catalogue).is_err());
+        assert!(derive(&catalogue).unwrap().is_empty());
     }
 }

@@ -5,7 +5,6 @@
 //! a catalogue `TraitEntry` role (external → zero). Identity is
 //! `(entry key, kind, item identifier)`.
 
-use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -13,9 +12,6 @@ use domain::SpecRef;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderPort, TrackStatusReaderPort,
 };
-use domain::tddd::catalogue_v2::entries::TypeEntry;
-use domain::tddd::catalogue_v2::identifiers::{FullyQualifiedItemPath, TypeRef};
-use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{CatalogueDocument, MethodDeclaration};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
@@ -47,9 +43,14 @@ use super::{
     sha256_content_hash,
 };
 
+mod identity;
 mod inherent;
 mod trait_roles;
 
+pub(super) use identity::{
+    declaration_identity, resolve_catalogue_reference, resolve_named_type_entry,
+    resolve_named_type_key, trait_declaration_text_for_reference,
+};
 use trait_roles::{TraitRoleEntry, index_trait_roles, resolve_trait_role};
 
 /// Command input for [`DeriveTestObligationsApplicationService`] (IN-07).
@@ -232,66 +233,12 @@ fn validate_named_catalogue_methods(
     }
     for inherent in catalogue.inherent_impls() {
         validate_add_modify_methods_have_spec_refs(inherent.methods())?;
-        let (_, owner) = resolve_named_type_entry(catalogue, inherent.type_name())?;
+        let Some((_, owner)) = resolve_named_type_entry(catalogue, inherent.type_name())? else {
+            continue;
+        };
         validate_parent_forbids_method_spec_refs(owner.action(), inherent.methods())?;
     }
     Ok(())
-}
-
-/// Resolves an inherent-impl owner through the catalogue's canonical identity
-/// universe rather than requiring the impl's spelling to equal the map key.
-pub(super) fn resolve_named_type_entry<'a>(
-    catalogue: &'a CatalogueDocument,
-    reference: &CatalogueEntryKey,
-) -> Result<(&'a CatalogueEntryKey, &'a TypeEntry), DiagnosticMessage> {
-    let identities = catalogue
-        .types()
-        .iter()
-        .map(|(key, entry)| {
-            FullyQualifiedItemPath::from_catalogue_entry_key(
-                catalogue.crate_name(),
-                key,
-                entry.module_path(),
-            )
-            .map_err(|error| {
-                diag(&format!("invalid catalogue type identity '{}': {error}", key.as_str()))
-            })
-        })
-        .collect::<Result<BTreeSet<_>, _>>()?;
-    let type_ref = TypeRef::new(reference.as_str().to_owned())
-        .map_err(|error| diag(&format!("invalid inherent_impl type_name: {error}")))?;
-    let resolved = resolve_catalogue_identity(&type_ref, catalogue.crate_name(), &identities)
-        .map_err(|error| {
-            diag(&format!(
-                "inherent_impl type_name '{}' could not resolve to a unique named catalogue type: {error}",
-                reference.as_str()
-            ))
-        })?;
-    let matches = catalogue
-        .types()
-        .iter()
-        .filter(|(key, entry)| {
-            FullyQualifiedItemPath::from_catalogue_entry_key(
-                catalogue.crate_name(),
-                key,
-                entry.module_path(),
-            )
-            .is_ok_and(|identity| identity == resolved)
-        })
-        .collect::<Vec<_>>();
-    match matches.as_slice() {
-        [(key, entry)] => Ok((key, entry)),
-        [] => Err(diag(&format!(
-            "inherent_impl type_name '{}' resolved to '{}' but no named catalogue entry retained that identity",
-            reference.as_str(),
-            resolved
-        ))),
-        _ => Err(diag(&format!(
-            "inherent_impl type_name '{}' resolved ambiguously across catalogue keys: {}",
-            reference.as_str(),
-            matches.iter().map(|(key, _)| key.as_str()).collect::<Vec<_>>().join(", ")
-        ))),
-    }
 }
 
 /// Derives obligations for every derivable `TypeEntry` (role + typestate).
@@ -443,17 +390,14 @@ fn derive_trait_impl_obligations(
         if !is_derivable(impl_decl.action()) {
             continue;
         }
-        let scope = impl_decl.trait_ref_scope();
-        let Some(trait_entry) =
-            resolve_trait_role(trait_roles, &scope, catalogue.crate_name().as_str())?
-        else {
+        let Some(trait_entry) = resolve_trait_role(trait_roles, impl_decl.trait_ref())? else {
             continue;
         };
         let role = trait_entry.role.clone();
         let Some(role_rules) = find_trait_impl_rules(rules, &role) else {
             continue;
         };
-        let entry_key = catalogue_key(impl_decl.for_type().as_str())?;
+        let entry_key = resolve_named_type_key(catalogue, impl_decl.for_type())?;
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Traits,
