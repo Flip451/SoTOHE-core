@@ -13,7 +13,9 @@ use super::{
 };
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
-use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use crate::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use crate::tddd::catalogue_v2::identifiers::{
     CrateName, FullyQualifiedItemPath, FunctionPath, ModulePath, ParamName, TypeRef,
 };
@@ -117,25 +119,12 @@ pub(super) fn collect_methods_for_type<'a>(
     entry: &'a TypeEntry,
     type_name: &str,
 ) -> Result<Vec<&'a MethodDeclaration>, CatalogueLinterError> {
-    let type_identity = canonical_catalogue_identity(catalogue, type_name, entry.module_path())?;
-    let type_identities = declared_type_identities(catalogue)?;
     let mut methods = Vec::new();
     let mut seen_names = std::collections::BTreeMap::new();
     let mut source_methods = entry.methods().iter().collect::<Vec<_>>();
 
-    for impl_decl in catalogue.inherent_impls() {
-        let Some(impl_identity) = resolve_catalogue_entry_reference(
-            catalogue,
-            impl_decl.type_name().as_str(),
-            &type_identities,
-            false,
-        )?
-        else {
-            continue;
-        };
-        if impl_identity == type_identity {
-            source_methods.extend(impl_decl.methods().iter());
-        }
+    for impl_decl in inherent_impls_for_type(catalogue, entry, type_name)? {
+        source_methods.extend(impl_decl.methods().iter());
     }
 
     for method in source_methods {
@@ -156,6 +145,39 @@ pub(super) fn collect_methods_for_type<'a>(
     }
 
     Ok(methods)
+}
+
+/// Returns the inherent implementation blocks whose owners resolve to the
+/// entry's canonical identity.
+///
+/// Both method aggregation and structural slot collection use this helper so
+/// a qualified catalogue key and a unique short inherent owner cannot diverge
+/// into different matching behavior.
+pub(super) fn inherent_impls_for_type<'a>(
+    catalogue: &'a CatalogueDocument,
+    entry: &TypeEntry,
+    type_name: &str,
+) -> Result<Vec<&'a InherentImplDeclV2>, CatalogueLinterError> {
+    let type_identity = canonical_catalogue_identity(catalogue, type_name, entry.module_path())?;
+    let type_identities = declared_type_identities(catalogue)?;
+    let mut matching = Vec::new();
+
+    for impl_decl in catalogue.inherent_impls() {
+        let Some(impl_identity) = resolve_catalogue_entry_reference(
+            catalogue,
+            impl_decl.type_name().as_str(),
+            &type_identities,
+            false,
+        )?
+        else {
+            continue;
+        };
+        if impl_identity == type_identity {
+            matching.push(impl_decl);
+        }
+    }
+
+    Ok(matching)
 }
 
 /// Converts a catalogue key and its declaration-module fallback into the shared

@@ -626,9 +626,162 @@ include_function_roles = []
         );
 
         let index = render::build_trait_index(&[doc_a, doc_b]);
-        assert!(index.resolve("TraitA", "crate_a").is_some());
-        assert!(index.resolve("TraitB", "crate_b").is_some());
-        assert!(index.resolve("TraitB", "crate_a").is_none());
+        assert!(index.resolve("TraitA", "crate_a").unwrap().is_some());
+        assert!(index.resolve("TraitB", "crate_b").unwrap().is_some());
+        assert!(index.resolve("TraitB", "crate_a").unwrap().is_none());
+    }
+
+    #[test]
+    fn test_relative_node_reference_fails_closed_with_spelling_and_accepted_forms() {
+        let index = render::NodeIndex::new();
+        let error = index.resolve("super::port::Port", "domain").unwrap_err();
+
+        let reason = match error {
+            ContractMapRendererError::RenderFailed { reason } => reason,
+            other => panic!("relative reference must return RenderFailed, got: {other:?}"),
+        };
+        assert!(
+            reason.contains("super::port::Port"),
+            "diagnostic must preserve spelling: {reason}"
+        );
+        assert!(reason.contains("crate 'domain'"), "diagnostic must identify location: {reason}");
+        assert!(
+            reason.contains("accepted forms"),
+            "diagnostic must state accepted forms: {reason}"
+        );
+        assert!(
+            reason.contains("module_path + name"),
+            "diagnostic must name module form: {reason}"
+        );
+    }
+
+    #[test]
+    fn test_render_nested_relative_reference_fails_closed_instead_of_emitting_wrong_edge() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let unit_entry = |module_path: ModulePath| {
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module_path,
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        doc.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::port::Port".to_owned()).unwrap(),
+            unit_entry(ModulePath::from_segments(vec!["alpha", "port"]).unwrap()),
+        );
+        // This root-level homonym demonstrates why stripping `super::` is unsafe:
+        // the old rewrite could select this node instead of alpha::port::Port.
+        doc.insert_type(
+            CatalogueEntryKey::try_new("domain::port::Port".to_owned()).unwrap(),
+            unit_entry(ModulePath::from_segments(vec!["port"]).unwrap()),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::detail::Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("port").unwrap(),
+                            TypeRef::new("super::port::Port").unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::from_segments(vec!["alpha", "detail"]).unwrap(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let error =
+            adapter.render(&[doc], &[layer], &ContractMapRenderOptions::default()).unwrap_err();
+        let ContractMapRendererError::RenderFailed { reason } = error else {
+            panic!("relative reference must produce RenderFailed: {error:?}");
+        };
+        assert!(
+            reason.contains("super::port::Port"),
+            "diagnostic must preserve spelling: {reason}"
+        );
+        assert!(reason.contains("crate 'domain'"), "diagnostic must identify location: {reason}");
+        assert!(
+            reason.contains("accepted forms"),
+            "diagnostic must state accepted forms: {reason}"
+        );
+    }
+
+    #[test]
+    fn test_render_nested_entry_resolves_module_and_fully_qualified_forms() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        doc.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::port::Port".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::from_segments(vec!["alpha", "port"]).unwrap(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::detail::Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![
+                            FieldDecl::new(
+                                FieldName::new("joined").unwrap(),
+                                TypeRef::new("alpha::port::Port").unwrap(),
+                            ),
+                            FieldDecl::new(
+                                FieldName::new("qualified").unwrap(),
+                                TypeRef::new("domain::alpha::port::Port").unwrap(),
+                            ),
+                        ],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::from_segments(vec!["alpha", "detail"]).unwrap(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "domain::alpha::detail::Owner");
+        let target = render::type_rep_node_id("domain", "domain", "domain::alpha::port::Port");
+        assert_edge_count(&rendered, &owner, "--o", Some("joined"), &target, 1);
+        assert_edge_count(&rendered, &owner, "--o", Some("qualified"), &target, 1);
     }
 
     // -----------------------------------------------------------------------
@@ -2881,7 +3034,7 @@ include_function_roles = []
     }
 
     #[test]
-    fn test_contract_map_dyn_self_crate_prefixes_resolve_to_trait() {
+    fn test_contract_map_dyn_accepted_qualified_forms_resolve_to_trait() {
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
         doc.insert_trait(
@@ -2897,12 +3050,12 @@ include_function_roles = []
                         TypeRef::new("Arc<dyn crate::port::DeclaredPort>").unwrap(),
                     ),
                     FieldDecl::new(
-                        FieldName::new("self_port").unwrap(),
-                        TypeRef::new("Arc<dyn self::port::DeclaredPort>").unwrap(),
+                        FieldName::new("module_port").unwrap(),
+                        TypeRef::new("Arc<dyn port::DeclaredPort>").unwrap(),
                     ),
                     FieldDecl::new(
-                        FieldName::new("super_port").unwrap(),
-                        TypeRef::new("Arc<dyn super::port::DeclaredPort>").unwrap(),
+                        FieldName::new("qualified_port").unwrap(),
+                        TypeRef::new("Arc<dyn domain::port::DeclaredPort>").unwrap(),
                     ),
                 ],
                 vec![],
@@ -2912,7 +3065,7 @@ include_function_roles = []
         let rendered = render_and_scan(&[doc], &[layer]);
         let owner = render::type_rep_node_id("domain", "domain", "Owner");
         let target = render::trait_rep_node_id("domain", "domain", "domain::port::DeclaredPort");
-        for field_name in ["crate_port", "self_port", "super_port"] {
+        for field_name in ["crate_port", "module_port", "qualified_port"] {
             assert_edge_count(&rendered, &owner, "--o", Some(field_name), &target, 1);
         }
     }
@@ -2927,7 +3080,7 @@ include_function_roles = []
             CatalogueEntryKey::try_new("domain::port::DeclaredPort".to_owned()).unwrap(),
             make_empty_trait_entry(),
         );
-        for type_name in ["CrateAdapter", "SelfAdapter", "SuperAdapter", "BareAdapter"] {
+        for type_name in ["CrateAdapter", "QualifiedAdapter", "BareAdapter"] {
             domain_doc.insert_type(
                 CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(),
                 make_plain_struct_entry(vec![], vec![]),
@@ -2935,8 +3088,7 @@ include_function_roles = []
         }
         for (trait_ref, for_type) in [
             ("crate::port::DeclaredPort", "CrateAdapter"),
-            ("self::port::DeclaredPort", "SelfAdapter"),
-            ("super::port::DeclaredPort", "SuperAdapter"),
+            ("domain::port::DeclaredPort", "QualifiedAdapter"),
             ("DeclaredPort", "BareAdapter"),
         ] {
             domain_doc.push_trait_impl(TraitImplDeclV2::new(
@@ -2968,8 +3120,7 @@ include_function_roles = []
         let target = render::trait_rep_node_id("domain", "domain", "domain::port::DeclaredPort");
         for source in [
             render::type_rep_node_id("domain", "domain", "CrateAdapter"),
-            render::type_rep_node_id("domain", "domain", "SelfAdapter"),
-            render::type_rep_node_id("domain", "domain", "SuperAdapter"),
+            render::type_rep_node_id("domain", "domain", "QualifiedAdapter"),
             render::type_rep_node_id("domain", "domain", "BareAdapter"),
             render::type_rep_node_id("infrastructure", "adapter", "CrossAdapter"),
         ] {

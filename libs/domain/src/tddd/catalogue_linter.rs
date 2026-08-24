@@ -8421,6 +8421,51 @@ mod tests {
     }
 
     #[test]
+    fn test_forbid_primitive_in_types_matches_short_owner_to_qualified_impl_bounds() {
+        let mut doc = make_doc("domain");
+        insert_duplicate_fixture_type(
+            &mut doc,
+            "domain::alpha::Thing",
+            DataRole::value_object(),
+            "alpha",
+            vec![],
+        );
+        doc.push_inherent_impl(InherentImplDeclV2 {
+            type_name: CatalogueEntryKey::try_new("Thing".to_owned()).unwrap(),
+            impl_generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+            }],
+            impl_where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            methods: vec![],
+        });
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::Bound, vec![]),
+            },
+        );
+
+        assert_eq!(
+            violations.len(),
+            2,
+            "qualified entry + short inherent owner must retain both impl-level bound slots: \
+             {violations:?}"
+        );
+        assert!(
+            violations.iter().all(|violation| violation.entry_name() == "domain::alpha::Thing")
+        );
+    }
+
+    #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_where_predicate() {
         let mut doc = make_doc("domain");
         doc.insert_type(

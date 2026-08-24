@@ -1280,6 +1280,20 @@
           "hash": "rvw1:sha256:883b4f1a4028b26c01f3c4ff8581e82090baa87a50b68bc68f221e16823d6231",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T12:31:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:68cd3231079f906c1def1b375a6c493193c3f97e54902bfbbd7d46daf0c02119",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T12:38:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:68cd3231079f906c1def1b375a6c493193c3f97e54902bfbbd7d46daf0c02119",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3280,6 +3294,50 @@
           "at": "2026-08-24T04:24:05Z",
           "findings": [],
           "hash": "rvw1:sha256:49dbb5bb1c56cd63aa9cdb8f7ee24126cb41cf6396e881376a5c76ddd3db0849",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T12:31:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40a47312137ddf159aa5f3d818b6acf769d43e9d21bbb580370a01d1620e0ef3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T12:45:12Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/node_index.rs",
+              "line": 111,
+              "message": "Unsupported-prefix validation only examines the outer path. For example, `NodeIndex::resolve(\"Port<super::Input>\", \"domain\")` reconstructs and resolves only `Port`, so trait-impl/inherent-owner paths containing nested `self::`, `super::`, or leading `::` references bypass the required fail-closed error. UFCS and `impl Trait` paths are similarly skipped by the type walker. Validate prohibited prefixes across the complete `syn::Type` AST before resolving or skipping candidates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40a47312137ddf159aa5f3d818b6acf769d43e9d21bbb580370a01d1620e0ef3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T13:01:20Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs",
+              "line": 53,
+              "message": "The new full-AST prefix visitor is bypassed by ordinary field/parameter/return/alias rendering. `resolve_type_ref_node_ids_with_generics` first reduces the parsed type to candidates, while this walker drops qualified projections, `impl Trait`, and bare function types without ever passing the original type to `NodeIndex::resolve`. Consequently valid inputs such as `<super::Input as Trait>::Assoc`, `impl super::Port`, or `fn(super::Input)` still return an empty target list and render successfully instead of failing closed. Validate the complete parsed TypeRef before candidate extraction and add a renderer-level regression test; the direct `NodeIndex` test does not cover this path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:85f7388ac6846afa024b7b43bb24a56bcb67ea85e3581b0eb6aee021e9e968cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T13:18:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c64d9faf3dcdb2934c71cc64b4f2db656975133b0f162db26654205f13b80e9",
           "type": "final",
           "verdict": "zero_findings"
         }

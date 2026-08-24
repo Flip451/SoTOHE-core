@@ -4,12 +4,14 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use domain::tddd::ContractMapRendererError;
 #[cfg(test)]
 use domain::tddd::catalogue_v2::Identifier;
 use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity;
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CatalogueEntryKey, CrateName, FullyQualifiedItemPath, ModulePath, TypeRef,
 };
+use syn::visit::Visit;
 
 use super::{trait_rep_node_id, type_rep_node_id};
 
@@ -86,37 +88,37 @@ impl NodeIndex {
     /// The input may be a complete type expression such as `Wrapper<T>`; the
     /// root path is extracted by `syn`, while identity selection itself remains
     /// owned by `resolve_catalogue_identity`. Ambiguous and unresolved paths
-    /// return `None`, so the renderer never guesses a node.
-    pub(crate) fn resolve(&self, type_ref_str: &str, current_crate: &str) -> Option<&str> {
-        let syn_type = syn::parse_str::<syn::Type>(type_ref_str).ok()?;
+    /// return `Ok(None)`, so the renderer never guesses a node.
+    ///
+    /// Relative prefixes and a leading absolute `::` cannot be interpreted
+    /// without the referring module context. They are rejected instead of
+    /// being rewritten into a potentially wrong catalogue identity.
+    pub(crate) fn resolve(
+        &self,
+        type_ref_str: &str,
+        current_crate: &str,
+    ) -> Result<Option<&str>, ContractMapRendererError> {
+        let syn_type = match syn::parse_str::<syn::Type>(type_ref_str) {
+            Ok(syn_type) => syn_type,
+            Err(_) => return Ok(None),
+        };
+        reject_unsupported_prefixes(&syn_type, current_crate)?;
         let syn::Type::Path(type_path) = syn_type else {
-            return None;
+            return Ok(None);
         };
         if type_path.qself.is_some() {
-            return None;
+            return Ok(None);
         }
 
-        let mut path = type_path
-            .path
-            .segments
-            .iter()
-            .map(|segment| segment.ident.to_string())
-            .collect::<Vec<_>>()
-            .join("::");
-        if type_path.path.leading_colon.is_some() {
-            path.insert_str(0, "::");
-        }
-        // `self` and `super` are syntax-relative prefixes, not catalogue
-        // identities. The resolver accepts the crate-relative spelling; the
-        // identity comparison itself remains delegated to the domain choke
-        // point below. Catalogue TypeRefs do not carry a module context, so
-        // both prefixes use the same crate-relative candidate here.
-        let path = path
-            .strip_prefix("self::")
-            .or_else(|| path.strip_prefix("super::"))
-            .map_or(path.clone(), |relative| format!("crate::{relative}"));
-        let reference = TypeRef::new(path).ok()?;
-        let catalogue_crate = CrateName::new(current_crate.to_owned()).ok()?;
+        let path = path_as_string(&type_path.path);
+        let reference = match TypeRef::new(path.clone()) {
+            Ok(reference) => reference,
+            Err(_) => return Ok(None),
+        };
+        let catalogue_crate = match CrateName::new(current_crate.to_owned()) {
+            Ok(catalogue_crate) => catalogue_crate,
+            Err(_) => return Ok(None),
+        };
         let absolute_crate =
             reference.as_str().strip_prefix("::").and_then(|path| path.split("::").next());
         let universe = self
@@ -131,8 +133,81 @@ impl NodeIndex {
             })
             .cloned()
             .collect::<BTreeSet<_>>();
-        let identity = resolve_catalogue_identity(&reference, &catalogue_crate, &universe).ok()?;
-        self.nodes.get(&identity).and_then(Option::as_deref)
+        let identity = match resolve_catalogue_identity(&reference, &catalogue_crate, &universe) {
+            Ok(identity) => identity,
+            Err(_) => return Ok(None),
+        };
+        Ok(self.nodes.get(&identity).and_then(Option::as_deref))
+    }
+}
+
+struct UnsupportedPrefixVisitor {
+    unsupported: Option<(String, &'static str)>,
+}
+
+impl UnsupportedPrefixVisitor {
+    fn new() -> Self {
+        Self { unsupported: None }
+    }
+}
+
+impl<'ast> Visit<'ast> for UnsupportedPrefixVisitor {
+    fn visit_path(&mut self, path: &'ast syn::Path) {
+        if self.unsupported.is_none() {
+            let spelling = path_as_string(path);
+            if let Some(prefix) = unsupported_prefix(&spelling) {
+                self.unsupported = Some((spelling, prefix));
+                return;
+            }
+        }
+        syn::visit::visit_path(self, path);
+    }
+}
+
+pub(super) fn reject_unsupported_prefixes(
+    syn_type: &syn::Type,
+    current_crate: &str,
+) -> Result<(), ContractMapRendererError> {
+    let mut visitor = UnsupportedPrefixVisitor::new();
+    visitor.visit_type(syn_type);
+    if let Some((spelling, prefix)) = visitor.unsupported {
+        Err(unsupported_prefix_error(&spelling, current_crate, prefix))
+    } else {
+        Ok(())
+    }
+}
+
+fn path_as_string(path: &syn::Path) -> String {
+    let segments = path
+        .segments
+        .iter()
+        .map(|segment| segment.ident.to_string())
+        .collect::<Vec<_>>()
+        .join("::");
+    if path.leading_colon.is_some() { format!("::{segments}") } else { segments }
+}
+
+fn unsupported_prefix(path: &str) -> Option<&'static str> {
+    if path.starts_with("self::") {
+        Some("self::")
+    } else if path.starts_with("super::") {
+        Some("super::")
+    } else if path.starts_with("::") {
+        Some("::")
+    } else {
+        None
+    }
+}
+
+fn unsupported_prefix_error(
+    spelling: &str,
+    current_crate: &str,
+    prefix: &str,
+) -> ContractMapRendererError {
+    ContractMapRendererError::RenderFailed {
+        reason: format!(
+            "unsupported contract-map TypeRef '{spelling}' in crate '{current_crate}': prefix '{prefix}' cannot be interpreted without the referring module context; accepted forms are the rustdoc fully-qualified path as supplied or the catalogue module_path + name"
+        ),
     }
 }
 
@@ -194,4 +269,31 @@ pub(crate) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
         }
     }
     index
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic)]
+mod tests {
+    use super::NodeIndex;
+    use domain::tddd::ContractMapRendererError;
+
+    #[test]
+    fn test_node_index_rejects_nested_unsupported_prefixes_with_location_aware_error() {
+        let index = NodeIndex::new();
+        for (type_ref, nested_spelling) in [
+            ("Port<super::Input>", "super::Input"),
+            ("Wrapper<self::Input>", "self::Input"),
+            ("Wrapper<::external::Input>", "::external::Input"),
+            ("<T as super::Trait>::Assoc", "super::Trait"),
+            ("impl Trait<super::Input>", "super::Input"),
+            ("fn(super::Input) -> Output", "super::Input"),
+        ] {
+            let error = index.resolve(type_ref, "domain").expect_err(type_ref);
+            let ContractMapRendererError::RenderFailed { reason } = error else {
+                panic!("unsupported prefix must return RenderFailed: {type_ref}");
+            };
+            assert!(reason.contains(nested_spelling), "diagnostic lost nested spelling: {reason}");
+            assert!(reason.contains("crate 'domain'"), "diagnostic lost location: {reason}");
+        }
+    }
 }

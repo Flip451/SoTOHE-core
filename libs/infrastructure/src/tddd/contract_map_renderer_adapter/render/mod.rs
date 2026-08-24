@@ -190,7 +190,7 @@ pub(super) fn render_mermaid(
             > = BTreeMap::new();
             for impl_decl in doc.inherent_impls() {
                 let Some(owner_node_id) =
-                    node_index.resolve(impl_decl.type_name().as_str(), crate_str)
+                    node_index.resolve(impl_decl.type_name().as_str(), crate_str)?
                 else {
                     continue;
                 };
@@ -332,17 +332,17 @@ pub(super) fn render_mermaid(
                 // Workspace-internal cross-crate for_type (e.g. "domain::MyType") is
                 // resolved through the index. Workspace-external types (std, external
                 // crates) are not in the index and are silently skipped (O-2 / ADR line 286).
-                let source_id = match node_index.resolve(for_type_str, crate_str) {
+                let source_id = match node_index.resolve(for_type_str, crate_str)? {
                     Some(id) => id.to_string(),
                     None => continue, // silent skip (workspace-external, OS-04)
                 };
 
                 // Resolve trait_ref to target subgraph_id (CN-10: silent skip if external).
-                let target_id = match resolve_trait_subgraph(trait_ref_str, crate_str, &trait_index)
-                {
-                    Some(id) => id.to_string(),
-                    None => continue, // silent skip (CN-10 / AC-06)
-                };
+                let target_id =
+                    match resolve_trait_subgraph(trait_ref_str, crate_str, &trait_index)? {
+                        Some(id) => id.to_string(),
+                        None => continue, // silent skip (CN-10 / AC-06)
+                    };
 
                 let (arrow, label) = edge_arrow_label(&style.edge, "trait_impl")?;
                 edge_lines.push(edge_line(&source_id, arrow, label, &target_id));
