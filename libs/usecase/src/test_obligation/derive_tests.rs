@@ -44,7 +44,7 @@ use domain::SpecDocumentLoaderPort;
 
 use super::{
     DeriveTestObligationsApplicationService, DeriveTestObligationsCommand,
-    DeriveTestObligationsInteractor,
+    DeriveTestObligationsInteractor, validate_named_catalogue_methods,
 };
 use crate::test_obligation::TestObligationCatalogueCommandInput;
 use crate::test_obligation::obligation_declaration_text;
@@ -1247,6 +1247,34 @@ fn test_inherent_impl_add_method_without_spec_refs_is_rejected() {
         result,
         Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
     ));
+}
+
+#[test]
+fn test_named_catalogue_validation_resolves_short_inherent_owner() {
+    let mut catalogue = empty_catalogue("domain", "domain");
+    catalogue.insert_type(
+        CatalogueEntryKey::try_new("a::Compute".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["a".to_owned()]).unwrap(),
+            None,
+            vec![spec_ref("IN-05")],
+            vec![],
+        ),
+    );
+    catalogue.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![method_with_spec_refs("compute", vec![spec_ref("IN-13")])],
+    ));
+
+    assert!(validate_named_catalogue_methods(&catalogue).is_ok());
 }
 
 #[test]

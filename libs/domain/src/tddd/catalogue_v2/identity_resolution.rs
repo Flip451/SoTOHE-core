@@ -12,6 +12,32 @@ use crate::tddd::catalogue_v2::identifiers::{
 };
 use crate::tddd::catalogue_v2::roles::NonEmptyVec;
 
+/// Canonical external trait identities used as the linter's standard-library
+/// seed universe. Keeping these paths beside the shared resolver ensures that
+/// aliases such as `std::cmp::PartialEq` are resolved against one canonical set.
+pub(crate) const STANDARD_EXTERNAL_TRAIT_PATHS: &str = concat!(
+    "core::convert::From core::convert::Into core::convert::TryFrom ",
+    "core::convert::TryInto core::convert::AsRef core::convert::AsMut ",
+    "core::clone::Clone core::marker::Copy core::marker::Send core::marker::Sync ",
+    "core::marker::Sized core::marker::Unpin core::fmt::Debug core::fmt::Display ",
+    "core::cmp::PartialEq core::cmp::Eq core::cmp::PartialOrd core::cmp::Ord ",
+    "core::hash::Hash core::hash::Hasher core::hash::BuildHasher ",
+    "core::default::Default core::iter::Iterator core::iter::IntoIterator ",
+    "core::iter::DoubleEndedIterator core::iter::ExactSizeIterator ",
+    "core::iter::FromIterator core::iter::Extend core::iter::Sum core::iter::Product ",
+    "core::ops::Drop core::ops::Deref core::ops::DerefMut core::ops::FnOnce ",
+    "core::ops::FnMut core::ops::Fn core::ops::Add core::ops::Sub core::ops::Mul ",
+    "core::ops::Div core::ops::Rem core::ops::Neg core::ops::Not core::ops::BitAnd ",
+    "core::ops::BitOr core::ops::BitXor core::ops::Shl core::ops::Shr ",
+    "core::ops::Index core::ops::IndexMut core::ops::RangeBounds ",
+    "core::ops::AddAssign core::ops::SubAssign ",
+    "core::ops::MulAssign core::ops::DivAssign core::ops::RemAssign ",
+    "core::ops::BitAndAssign core::ops::BitOrAssign core::ops::BitXorAssign ",
+    "core::ops::ShlAssign core::ops::ShrAssign core::str::traits::FromStr ",
+    "core::borrow::Borrow core::borrow::BorrowMut core::error::Error ",
+    "std::io::Read std::io::Write std::io::Seek std::io::BufRead",
+);
+
 /// Failure while resolving an already extracted catalogue path.
 ///
 /// Syntax and `TypeRef` parsing failures belong to the adapter-owned extractor
@@ -79,12 +105,49 @@ pub fn resolve_catalogue_identity(
     }
 }
 
-fn normalize_lookup(reference: &str, catalogue_crate: &CrateName) -> String {
+pub(crate) fn normalize_lookup(reference: &str, catalogue_crate: &CrateName) -> String {
     let lookup = reference.strip_prefix("::").unwrap_or(reference);
     lookup
         .strip_prefix("crate::")
         .map(|rest| format!("{}::{rest}", catalogue_crate.as_str()))
         .unwrap_or_else(|| lookup.to_owned())
+}
+
+/// Returns whether an unresolved qualified path is explicitly external to the
+/// catalogue crate represented by `universe`.
+///
+/// Resolution must happen before this classification. A path rooted in the
+/// catalogue crate, `crate`, `self`, `super`, or a declared local module is not
+/// external merely because its terminal item is missing; callers must report
+/// that unresolved identity instead of silently skipping it.
+pub(crate) fn is_explicit_external_path(
+    reference: &TypeRef,
+    catalogue_crate: &CrateName,
+    universe: &BTreeSet<FullyQualifiedItemPath>,
+) -> bool {
+    let normalized = normalize_lookup(reference.as_str(), catalogue_crate);
+    let Some((root, _)) = normalized.split_once("::") else {
+        return false;
+    };
+
+    if matches!(root, "std" | "core" | "alloc") {
+        return true;
+    }
+    if root == catalogue_crate.as_str() || matches!(root, "crate" | "self" | "super") {
+        return false;
+    }
+    if universe.iter().any(|identity| identity.crate_name().as_str() == root) {
+        return true;
+    }
+
+    !universe.iter().any(|identity| {
+        identity.crate_name() == catalogue_crate
+            && identity
+                .module_path()
+                .segments()
+                .first()
+                .is_some_and(|segment| segment.as_str() == root)
+    })
 }
 
 fn matching_candidates(

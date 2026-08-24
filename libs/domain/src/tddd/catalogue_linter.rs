@@ -661,6 +661,9 @@ impl CatalogueLinterRule {
 // Internal helper functions and evaluation logic (split into submodules)
 // ---------------------------------------------------------------------------
 
+#[path = "catalogue_linter_identity_helpers.rs"]
+mod identity_helpers;
+
 #[path = "catalogue_linter_helpers.rs"]
 mod helpers;
 

@@ -260,9 +260,15 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
             }
 
             CatalogueLinterRuleKind::TraitImplRequired { required_traits } => {
-                for (name, _entry) in type_entries_for_target(catalogue, rule.target()) {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
                     for trait_name in required_traits.as_slice() {
-                        if !has_trait_impl(catalogue, name.as_str(), trait_name.as_str()) {
+                        if !has_trait_impl(
+                            catalogue,
+                            name.as_str(),
+                            entry.module_path(),
+                            trait_name.as_str(),
+                            extractor,
+                        )? {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),

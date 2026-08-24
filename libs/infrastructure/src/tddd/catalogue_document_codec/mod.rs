@@ -755,13 +755,13 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_preserves_qualified_type_delete_key_and_ignores_codec_identity() {
+    fn test_decode_rejects_qualified_type_delete_key_and_module_path_mismatch() {
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
-    "domain::a::GoneType": {
+    "alpha::GoneType": {
       "action": "delete",
       "module_path": "b"
     }
@@ -770,22 +770,24 @@ mod tests {
   "functions": {}
 }"#;
 
-        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
-            panic!("expected type deletion");
-        };
-        assert_eq!(name.as_str(), "domain::a::GoneType");
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            err.to_string().contains("alpha::GoneType")
+                && err.to_string().contains("module_path 'alpha'")
+                && err.to_string().contains("module_path is 'b'"),
+            "qualified key/module mismatch must fail closed with both identities: {err}"
+        );
     }
 
     #[test]
-    fn test_decode_preserves_qualified_trait_delete_key_and_ignores_codec_identity() {
+    fn test_decode_rejects_qualified_trait_delete_key_and_module_path_mismatch() {
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
   "types": {},
   "traits": {
-    "domain::a::GonePort": {
+    "alpha::GonePort": {
       "action": "delete",
       "module_path": "b"
     }
@@ -793,11 +795,13 @@ mod tests {
   "functions": {}
 }"#;
 
-        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
-            panic!("expected trait deletion");
-        };
-        assert_eq!(name.as_str(), "domain::a::GonePort");
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            err.to_string().contains("alpha::GonePort")
+                && err.to_string().contains("module_path 'alpha'")
+                && err.to_string().contains("module_path is 'b'"),
+            "qualified key/module mismatch must fail closed with both identities: {err}"
+        );
     }
 
     #[test]
@@ -2047,13 +2051,32 @@ mod tests {
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
             DeletionRecord::Type { name, spec_refs, informal_grounds } => {
-                assert_eq!(name.as_str(), "OldType");
+                assert_eq!(name.as_str(), "tddd::foo::OldType");
                 assert_eq!(spec_refs.len(), 1);
                 assert_eq!(spec_refs[0].anchor.as_ref(), "IN-01");
                 assert!(informal_grounds.is_empty());
             }
             other => panic!("expected Type deletion, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_decode_type_delete_tombstone_canonicalizes_module_path_into_identity() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "tddd" }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Type deletion");
+        };
+        assert_eq!(name.as_str(), "tddd::GoneType");
     }
 
     #[test]
@@ -2077,6 +2100,25 @@ mod tests {
             }
             other => panic!("expected Trait deletion, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_decode_trait_delete_tombstone_canonicalizes_module_path_into_identity() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "GonePort": { "action": "delete", "module_path": "tddd" }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Trait deletion");
+        };
+        assert_eq!(name.as_str(), "tddd::GonePort");
     }
 
     #[test]
@@ -2210,8 +2252,8 @@ mod tests {
         assert_eq!(doc.deletions().len(), 1, "one deletion record");
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         assert!(
-            encoded.contains("\"GoneType\""),
-            "tombstone key remains loose notation: {encoded}"
+            encoded.contains("\"tddd::GoneType\""),
+            "tombstone key retains its canonical module-qualified identity: {encoded}"
         );
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2);

@@ -970,6 +970,316 @@
           "hash": "rvw1:sha256:dd331426dc428fef8a87cc61f1a763f4e94a1b454e1e3f036f174c2303859937",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T03:59:26Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 368,
+              "message": "`trait_ref_matches` は両方の解決が `None` の場合に raw spelling と suffix を比較しており、完全修飾 identity を経由せずに trait impl を認定します。例えば required trait `PartialEq` に対して `evil::PartialEq`（宣言 universe に存在しない外部 path）の impl が一致し、TraitImplRequired を不正に通過できます。unresolved path は fail-closed にし、外部 trait を許可する場合も canonical identity または明示的な許可集合で判定してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:15403d2fb872623bc66f2f71195976225df9fa8727ea304d953a6341f04f697c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T04:10:23Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 387,
+              "message": "`TraitImplRequired` は任意の `required_traits: NonEmptyVec<TypeRef>` を受け付ける公開ルールですが、外部 trait の identity universe が `core::cmp::PartialEq` と `core::cmp::Eq` に固定されています。そのため `Debug` など宣言 catalogue 外の正当な外部 trait impl（`core::fmt::Debug` や対応する bare `Debug`）は canonical identity として解決されず、実装が存在しても必ず missing violation になります。外部 identity は固定した equality 2 件ではなく、canonical な外部 universe/configuration を使って解決してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:87b7466c34413f0e507154dadcff1865dcaf9fe4e82427ce60180c57c4262708",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T04:20:48Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 386,
+              "message": "`TraitImplRequired` は任意の `TypeRef` を required trait として受け付けますが、外部 identity universe は手書きの標準 trait 一覧に限定されています。この一覧にない正当な外部 trait（例: `core::ops::RangeBounds` や任意の依存 crate の trait）の impl は canonical identity に解決されず、実装が存在しても missing violation になります。宣言側の universe だけでなく、adapter が提供する外部 identity universe をこの判定に渡して共有 resolver で解決してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ae2369259ba1c8f06060adb25b1c74c5198e23fdf9191abf0d79e9ac1208a9dc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T04:31:36Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 438,
+              "message": "`allowed_external_trait_identities` は trait implementation の raw path を `FullyQualifiedItemPath::from_fully_qualified_key` で直接構築しており、既存の `resolve_catalogue_identity` を経由していません。これにより resolver が扱う `::external_crate::Trait` の先頭 `::` や `crate::Trait` の crate alias を正規化できず、正当な trait impl を `InvalidRuleConfig`／未解決として扱います。外部 identity の収集・照合も shared resolver の path semantics に委譲してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eeacb1d3ea158fcbf3503417e1304995c57f059692a2e70c2ff69333c153971a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T04:52:51Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 441,
+              "message": "外部 trait universe の構築で、`trait_ref` を `normalize_lookup` した後も `FullyQualifiedItemPath::from_fully_qualified_key` に直接変換しており、shared resolver の標準ライブラリ re-export canonicalization を通していません。例えば `std::cmp::PartialEq` の impl では、canonical allowlist の `core::cmp::PartialEq` と `std::cmp::PartialEq` の両方が universe に入り、required の bare `PartialEq` が曖昧として失敗します。`std::cmp::PartialEq` と `core::cmp::PartialEq` を同一 canonical identity に解決してから universe に追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6e39c1d3f2502fc9ecc1165758af3ed8618dcc8b4fb3391cf0cc57295eb8a4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T05:00:24Z",
+          "findings": [
+            {
+              "category": "module-size",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 714,
+              "message": "`catalogue_linter_helpers.rs` の production 部分は `#[cfg(test)]` 開始位置の直前で 713 行あり、domain の 700 行上限を超えています。今回追加された external-trait identity 構築（特に標準 trait path の固定リストと fallback resolver）が超過を発生させているため、production helper を分割するか、既存の domain identity 経路へ集約してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b228eb2931df8044e51985261e0a200a4424be6b8a4eb06b7399498ede8d4be8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T05:09:17Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 15,
+              "message": "標準 external trait の seed universe に `core::ops::RangeBounds` などが含まれていないため、trait implementation と required trait の双方が bare `RangeBounds` で表現されると、両方とも unresolved のまま `TraitImplRequired` が missing violation を返します。完全修飾 path の impl だけでなく、短名 external reference も解決するという briefing の要件に反します。標準 trait universe を完全な canonical universe として供給するか、adapter の identity universe を利用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1b6d89837000af5fb83e9991523595592160ccb106fb07cd4df4513047228bfc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T05:15:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b6f58a13f50e0995c4b2f6034384738a3a0838238138982b2693026d5e8b9a8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T05:27:20Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 232,
+              "message": "`resolve_catalogue_entry_reference` がすべての `UnresolvedIdentifier` を `Ok(None)` に変換するため、`crate::missing::Thing` のような未解決の in-catalogue owner を持つ inherent impl が黙って除外されます。その impl の method は primitive／forbidden-role／receiver／external-reference 規則を回避でき、AC-03 の未解決診断も出ません。明示的な外部 self type のみを除外し、未解決の local/catalogue-qualified owner は fail-closed で伝播させる必要があります。",
+              "severity": "P0"
+            },
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 197,
+              "message": "`strip_type_arguments` は最初の `<` または空白で TypeRef を切る ad-hoc Rust 構文解析です。`PartialEq garbage` を `PartialEq` として受理して `TraitImplRequired` を不正に満たす一方、正当な `core :: cmp :: PartialEq` は `core` に切り詰めます。既存の parser-authoritative extractor を経由しないため、未対応／不正構文を fail-closed にする契約と domain で Rust 構文を再実装しない責務分割に違反しています。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:7b6f58a13f50e0995c4b2f6034384738a3a0838238138982b2693026d5e8b9a8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T05:47:40Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 130,
+              "message": "`resolve_catalogue_entry_reference` は明示的 external path を `None` にし、`collect_methods_for_type` はそのまま `continue` します。しかし inherent impl の owner は外部型になれません。`external_crate::Thing` のような owner を持つ impl が黙って除外され、その method が primitive／forbidden-role／receiver／external-reference 規則を回避できます。外部 self type のスキップは trait impl のみに限定し、inherent owner の未解決は常に fail-closed にしてください。",
+              "severity": "P0"
+            },
+            {
+              "category": "blocked_cross_scope",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 460,
+              "message": "`first_path_occurrence` は TypeRef 自体の形ではなく、内部で最初に見つかった path を identity として扱います。実 extractor は `&Required` から `Required`、`&Thing` や `(Thing,)` から `Thing` を返すため、非 path の `trait_ref` を正当な trait として受理したり、参照・tuple への impl を `Thing` 自身の impl として `TraitImplRequired` に数えたりできます。現在の occurrence 型には root shape が無く domain だけでは区別できないため、parser adapter／occurrence contract 側で root path を表現する cross-scope 修正が必要です。",
+              "severity": "P0"
+            },
+            {
+              "category": "type-invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 465,
+              "message": "`first_path_occurrence` は extractor に type/lifetime/const parameter context を常に空で渡しており、`TraitImplDeclV2::impl_generics()` を無視しています。そのため `impl<T> ... for T` の `T` が `TypeParameter` ではなく `Path(\"T\")` になり、同名 catalogue type があれば identity として解決されます。generic label を catalogue path にしない exclusive occurrence invariant を保つため、各 trait impl の generic context を抽出時に渡してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d4089981a54d173029d98a0487d2a2c55664cf1837e60ad534764edf65b7839c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T05:57:32Z",
+          "findings": [
+            {
+              "category": "blocked_cross_scope",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 468,
+              "message": "`first_path_occurrence` still treats the first nested path as the identity of the entire `TypeRef`. The real extractor returns `Required` for `&Required` and `Thing` for `&Thing` or `(Thing,)`, so `TraitImplRequired` can accept a non-path `trait_ref` or count an impl for a reference/tuple as an impl for `Thing` itself. The occurrence model does not expose root type shape, so the parser adapter/occurrence contract must be extended outside this scope to preserve or validate the root path and fail closed for non-path forms.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:4b95d9377fa94fe612091059a3c4e8dab5b8667415d46864496ec5cf1da0b79b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T06:29:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b84ef62275c4b1f9cb293389a78951b99377b3ac904125c4d4fa396143d7d044",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T06:39:03Z",
+          "findings": [
+            {
+              "category": "blocked_cross_scope",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 35,
+              "message": "`strip_type_arguments` reimplements Rust generic syntax in domain after the parser has already accepted the `TypeRef`, and its character-level delimiter tracking is not lexer-aware. For example, valid `Thing<{ b'{' as usize }>` leaves `brace_depth`/`angle_depth` nonzero because the `{` inside the byte literal is counted as syntax, so `TraitImplRequired` fails closed on a valid root path. Raw identifiers such as `r#Thing<T>` are also rejected because the adapter canonicalizes the first path to `Thing` while the manual comparison retains `r#`. Root-shape validation must consume parser-authoritative shape/canonical output instead of reparsing and rewriting the raw TypeRef in domain.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b84ef62275c4b1f9cb293389a78951b99377b3ac904125c4d4fa396143d7d044",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T07:02:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4adb2c2d02e5b72cb5e575486aba53af8faab724fe8021514a0143039738ce33",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T07:08:05Z",
+          "findings": [
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 81,
+              "message": "The anchor check accepts any suffix beginning with `<` without verifying that the complete TypeRef remains a path. A parseable bare trait-object form such as `Thing<T> + Send` yields first path `Thing`, passes line 81, and can be counted as an impl for nominal `Thing`; `Required<T> + Send` can likewise satisfy required `Required`. Root shape must remain parser-authoritative rather than treating the entire post-`<` suffix as opaque.",
+              "severity": "P0"
+            },
+            {
+              "category": "identity-resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 81,
+              "message": "Standalone paths with trailing whitespace are rejected: after consuming `Thing` from `\"Thing \"`, `raw.is_empty()` is false and the trimmed remainder does not start with `<`. The injected parser accepts this TypeRef, and the previous matching logic accepted the space form, so valid `for_type`/`trait_ref` values now fail with `ClassificationFailed`. Check emptiness after trimming the suffix.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4adb2c2d02e5b72cb5e575486aba53af8faab724fe8021514a0143039738ce33",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T07:17:31Z",
+          "findings": [
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 85,
+              "message": "The `rfind('>')` check still does not prove that the suffix is a single generic argument list. A parser-accepted non-path such as `Thing<T> + Other<U>` yields first path `Thing`; because the suffix starts with `<` and its last `>` is at the end, line 86 accepts it and `TraitImplRequired` can count the compound trait-object form as an impl for nominal `Thing`. Root shape must come from parser-authoritative structure rather than delimiter positions in the raw TypeRef.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:f6295703db6674423ce577dd927fa5014a5ad6b303520282a848163b8b3e6402",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T07:42:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4dbc52b4b0055b7b6aa4df66d6d1f19ad6cb5744d0ce423ec4629e34820f5293",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T07:47:05Z",
+          "findings": [
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 101,
+              "message": "The balanced suffix scan still rejects parser-valid generic paths because it treats lexical tokens as raw delimiters. `Thing<{ 1 < 2 }>` increments depth for the comparison operator and never closes; `Thing<'static, Other<'static>>` mistakes the first lifetime for a char literal and skips the nested `<`; and raw strings containing quotes/angles (for example `Thing<{ f(r#\"a\"<\"b\"#) }>`) are scanned as ordinary strings. Each reaches `ClassificationFailed` even though the injected parser accepted the TypeRef and identified root `Thing`. The suffix scanner must handle these parser-supported forms without interpreting their internal tokens as generic delimiters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4dbc52b4b0055b7b6aa4df66d6d1f19ad6cb5744d0ce423ec4629e34820f5293",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T08:00:20Z",
+          "findings": [
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 135,
+              "message": "Comments are not skipped by the balanced suffix scanner, so their `<`/`>` characters can manipulate depth and restore the compound-root bypass. For example, parser-valid `Thing<T /* < */> + Other<U /* > */>` keeps depth nonzero across the root-level `+` and returns to zero only at the final `>`, causing the non-path trait-object form to be accepted as nominal `Thing`. Comment contents must not affect delimiter depth.",
+              "severity": "P0"
+            },
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 241,
+              "message": "`char_literal_end` rejects valid hexadecimal character and byte escapes. For `Thing<{ b'\\x3c' as usize }>`, it treats only `x` as the escaped character, expects the closing quote immediately afterward, and returns `ClassificationFailed` at the first hex digit even though the injected parser accepted the TypeRef. Handle the complete `\\xNN` escape sequence when skipping literals.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4894156cbbfc7072035e04e9ad80e11eaa00faa0c55962ba17ab7e1df988c74b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T08:09:30Z",
+          "findings": [
+            {
+              "category": "fail-closed-syntax",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity_helpers.rs",
+              "line": 149,
+              "message": "`validate_generic_suffix` treats every `>` outside `{([` delimiters as a generic close, including the return arrow in a function-pointer type. For valid `Thing<fn() -> Other>`, the `)` removes the parenthesis delimiter, the arrow’s `>` drops generic depth to zero, and the following `Other` causes `ClassificationFailed`, even though the injected parser accepted the TypeRef and identified root `Thing`. The suffix scan must distinguish `->` from a generic closing token.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6794e72b775dbb20248632b4c906e57c8ccfc6e2dc8a184a513fffa8ea66a881",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T08:17:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:883b4f1a4028b26c01f3c4ff8581e82090baa87a50b68bc68f221e16823d6231",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2943,6 +3253,35 @@
           "hash": "rvw1:sha256:2049cdd911a5702e4ca838659e2eaab452a876b234c8e8a8ddc22833dcd11b14",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T03:58:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:430a48e2ef7dac74213414752ea63d4468024d18f9ba12b96aee0d179646570f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T04:07:49Z",
+          "findings": [
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 164,
+              "message": "`entry_name` に `::` があるだけで `module_path` を検証せず破棄しています。例えば key が `alpha::GoneType`、`module_path` が `beta` の tombstone は decode 後に `alpha::GoneType` として扱われますが、raw catalogue 側の正規化は `domain::beta::GoneType` と解釈するため、graph encoding と catalogue-spec signal が別の削除対象を指します。再 encode でも `module_path` が失われ、意味が黙って変わります。非空の `module_path` は常に検証し、明示 key の module と不一致なら typed error で fail-closed にしてください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:430a48e2ef7dac74213414752ea63d4468024d18f9ba12b96aee0d179646570f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T04:24:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:49dbb5bb1c56cd63aa9cdb8f7ee24126cb41cf6396e881376a5c76ddd3db0849",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4515,6 +4854,20 @@
           "at": "2026-08-24T00:46:08Z",
           "findings": [],
           "hash": "rvw1:sha256:1fadd9aeeb28093fa0b2539fa45b510cbb03574f77cc25726f0cac108fc371eb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T03:59:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7f5c0e5f4a5a9c558b4287275e799ce829b116230d2f550f5832f64c4c732a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T04:05:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f7f5c0e5f4a5a9c558b4287275e799ce829b116230d2f550f5832f64c4c732a",
           "type": "final",
           "verdict": "zero_findings"
         }
