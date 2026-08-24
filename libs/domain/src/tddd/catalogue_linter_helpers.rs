@@ -182,7 +182,7 @@ pub(super) fn inherent_impls_for_type<'a>(
 
 /// Converts a catalogue key and its declaration-module fallback into the shared
 /// fully qualified identity used by the linter.
-fn canonical_catalogue_identity(
+pub(super) fn canonical_catalogue_identity(
     catalogue: &CatalogueDocument,
     raw_key: &str,
     declared_module_path: &ModulePath,
@@ -204,7 +204,7 @@ fn canonical_catalogue_identity(
     })
 }
 
-fn declared_type_identities(
+pub(super) fn declared_type_identities(
     catalogue: &CatalogueDocument,
 ) -> Result<BTreeSet<FullyQualifiedItemPath>, CatalogueLinterError> {
     let mut identities = BTreeSet::new();
@@ -221,7 +221,7 @@ fn declared_type_identities(
     Ok(identities)
 }
 
-fn resolve_catalogue_entry_reference(
+pub(super) fn resolve_catalogue_entry_reference(
     catalogue: &CatalogueDocument,
     raw_key: &str,
     identities: &BTreeSet<FullyQualifiedItemPath>,
@@ -339,7 +339,7 @@ pub(super) fn has_trait_impl<E: TypeRefPathExtractorPort>(
     Ok(false)
 }
 
-fn declared_trait_identities(
+pub(super) fn declared_trait_identities(
     catalogue: &CatalogueDocument,
 ) -> Result<BTreeSet<FullyQualifiedItemPath>, CatalogueLinterError> {
     let mut identities = BTreeSet::new();
@@ -394,12 +394,10 @@ fn trait_ref_matches<E: TypeRefPathExtractorPort>(
     }
 }
 
-/// Builds the standard and explicitly declared external trait identity universe.
-fn allowed_external_trait_identities<E: TypeRefPathExtractorPort>(
-    catalogue: &CatalogueDocument,
-    extractor: &E,
-) -> Result<BTreeSet<FullyQualifiedItemPath>, CatalogueLinterError> {
-    let mut standard_identities = BTreeSet::new();
+/// Builds the standard-library seed for the external trait identity universe.
+pub(super) fn standard_external_trait_identities()
+-> Result<BTreeSet<FullyQualifiedItemPath>, CatalogueLinterError> {
+    let mut identities = BTreeSet::new();
     for path in STANDARD_EXTERNAL_TRAIT_PATHS.split_whitespace() {
         let key = CatalogueEntryKey::try_new(path.to_owned()).map_err(|error| {
             CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
@@ -411,8 +409,17 @@ fn allowed_external_trait_identities<E: TypeRefPathExtractorPort>(
                 "invalid allowed external trait path '{path}': {error}"
             )))
         })?;
-        standard_identities.insert(identity);
+        identities.insert(identity);
     }
+    Ok(identities)
+}
+
+/// Builds the standard and explicitly declared external trait identity universe.
+fn allowed_external_trait_identities<E: TypeRefPathExtractorPort>(
+    catalogue: &CatalogueDocument,
+    extractor: &E,
+) -> Result<BTreeSet<FullyQualifiedItemPath>, CatalogueLinterError> {
+    let standard_identities = standard_external_trait_identities()?;
 
     let mut identities = standard_identities.clone();
 
@@ -490,11 +497,6 @@ fn resolve_trait_identity(
 
 fn impl_type_parameters(impl_decl: &TraitImplDeclV2) -> Vec<ParamName> {
     impl_decl.impl_generics().iter().map(|generic| generic.name.clone()).collect()
-}
-
-/// Returns whether `bare_name` is a delimiter-bounded component of `sig_type`.
-pub(super) fn bare_name_in_type_ref(sig_type: &str, bare_name: &str) -> bool {
-    identifier_name_in_str(sig_type, bare_name, |_| true)
 }
 
 pub(super) fn identifier_name_in_str(

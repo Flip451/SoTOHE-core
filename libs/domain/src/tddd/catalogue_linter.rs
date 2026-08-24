@@ -759,6 +759,23 @@ mod tests {
                     location: type_ref.clone(),
                 });
             }
+            if let Some(root) = match type_ref.as_str() {
+                "core::convert::From<PathBuf>" => Some("core::convert::From"),
+                "core::convert::TryFrom<PathBuf>" => Some("core::convert::TryFrom"),
+                _ => None,
+            } {
+                return Ok(vec![ExtractedTypeRefPath::Path(
+                    TypeRef::new(root.to_owned()).unwrap(),
+                )]);
+            }
+            if matches!(
+                type_ref.as_str(),
+                "r#GreetingCompositionRoot<T>" | "GreetingCompositionRoot /* owner */ < T >"
+            ) {
+                return Ok(vec![ExtractedTypeRefPath::Path(
+                    TypeRef::new("GreetingCompositionRoot").unwrap(),
+                )]);
+            }
             if type_ref.as_str() == "same_named_paths" {
                 return Ok(vec![
                     ExtractedTypeRefPath::Path(
@@ -1326,7 +1343,11 @@ mod tests {
 
     #[test]
     fn test_composition_root_pure_di_detects_execution_methods_from_trait_impls() {
-        let mut composition_catalogue = make_doc("cli_composition");
+        let mut composition_catalogue = CatalogueDocument::new(
+            3,
+            CrateName::new("cli_composition").unwrap(),
+            layer("cli_composition"),
+        );
         composition_catalogue.insert_type(
             CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
@@ -1335,7 +1356,8 @@ mod tests {
             TypeRef::new("usecase::ApplicationService").unwrap(),
             TypeRef::new("GreetingCompositionRoot").unwrap(),
         ));
-        let mut usecase_catalogue = make_doc("usecase");
+        let mut usecase_catalogue =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), layer("usecase"));
         usecase_catalogue.insert_trait(
             CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             make_trait_entry_with_methods(
@@ -1364,6 +1386,150 @@ mod tests {
         assert!(
             violations.iter().any(|violation| violation.message().contains("execution method"))
         );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_matches_qualified_trait_identity_only() {
+        let mut composition_catalogue = CatalogueDocument::new(
+            3,
+            CrateName::new("cli_composition").unwrap(),
+            layer("cli_composition"),
+        );
+        composition_catalogue.insert_type(
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("a::Required").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+        ));
+
+        let mut a_catalogue = CatalogueDocument::new(3, CrateName::new("a").unwrap(), layer("a"));
+        a_catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Required".to_owned()).unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut b_catalogue = CatalogueDocument::new(3, CrateName::new("b").unwrap(), layer("b"));
+        b_catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Required".to_owned()).unwrap(),
+            make_trait_entry_with_methods(
+                ContractRole::ApplicationService,
+                vec![method_with_params(
+                    "execute",
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    "GreetingResponse",
+                )],
+            ),
+        );
+
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(a_catalogue.layer().clone(), a_catalogue);
+        all_catalogues.insert(b_catalogue.layer().clone(), b_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            !violations.iter().any(|violation| violation.message().contains("execution method")),
+            "a::Required must not import methods from b::Required"
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_rejects_unresolved_qualified_trait_even_with_matching_short_name()
+     {
+        let mut composition_catalogue = CatalogueDocument::new(
+            3,
+            CrateName::new("cli_composition").unwrap(),
+            layer("cli_composition"),
+        );
+        composition_catalogue.insert_type(
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("a::Missing").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+        ));
+
+        let mut b_catalogue = CatalogueDocument::new(3, CrateName::new("b").unwrap(), layer("b"));
+        b_catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Missing".to_owned()).unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(b_catalogue.layer().clone(), b_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("implements unresolved trait 'a::Missing'")
+        }));
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_rejects_ambiguous_short_trait_reference() {
+        let mut composition_catalogue = CatalogueDocument::new(
+            3,
+            CrateName::new("cli_composition").unwrap(),
+            layer("cli_composition"),
+        );
+        composition_catalogue.insert_type(
+            CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("Required").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+        ));
+
+        let mut a_catalogue = CatalogueDocument::new(3, CrateName::new("a").unwrap(), layer("a"));
+        a_catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Required".to_owned()).unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut b_catalogue = CatalogueDocument::new(3, CrateName::new("b").unwrap(), layer("b"));
+        b_catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Required".to_owned()).unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(a_catalogue.layer().clone(), a_catalogue);
+        all_catalogues.insert(b_catalogue.layer().clone(), b_catalogue);
+
+        let result = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        );
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::IdentityResolutionFailed(
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(_, _)
+            ))
+        ));
     }
 
     #[test]
@@ -1474,8 +1640,12 @@ mod tests {
         for trait_ref in [
             "core::default::Default",
             "core::fmt::Debug",
+            "core::hash::Hash",
+            "Debug",
             "core::convert::From<PathBuf>",
             "core::convert::TryFrom<PathBuf>",
+            "::core::fmt::Debug",
+            "::std::fmt::Debug",
         ] {
             composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
                 TypeRef::new(trait_ref).unwrap(),
@@ -1497,6 +1667,63 @@ mod tests {
             violations.is_empty(),
             "known non-execution traits do not expose execution methods"
         );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_uses_extractor_for_impl_owner_spellings() {
+        for owner in ["r#GreetingCompositionRoot<T>", "GreetingCompositionRoot /* owner */ < T >"] {
+            let mut composition_catalogue = make_doc("cli_composition");
+            composition_catalogue.insert_type(
+                CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
+                make_type_entry(DataRole::CompositionRoot),
+            );
+            composition_catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+                ItemAction::Add,
+                TypeRef::new("usecase::ApplicationService").unwrap(),
+                TypeRef::new(owner).unwrap(),
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+                }],
+                vec![],
+            ));
+
+            let mut usecase_catalogue = make_doc("usecase");
+            usecase_catalogue.insert_type(
+                CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
+                make_type_entry(DataRole::Interactor),
+            );
+            usecase_catalogue.insert_trait(
+                CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
+                make_trait_entry(ContractRole::ApplicationService),
+            );
+
+            let mut all_catalogues = BTreeMap::new();
+            let composition_layer = composition_catalogue.layer().clone();
+            all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+            all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+            let violations = evaluate_catalogue_lint(
+                &[composition_root_rule()],
+                &all_catalogues,
+                &composition_layer,
+                &StubPrimitiveScanner,
+            )
+            .unwrap();
+
+            assert!(
+                violations.iter().any(|violation| {
+                    violation.message().contains("public-surface role 'ApplicationService'")
+                }),
+                "extractor-resolved trait owner must expose the trait role for {owner}: {violations:?}"
+            );
+            assert!(
+                violations.iter().any(|violation| {
+                    violation.message().contains("public-surface role 'Interactor'")
+                }),
+                "extractor-resolved impl bounds must expose the bound role for {owner}: {violations:?}"
+            );
+        }
     }
 
     #[test]
@@ -1595,6 +1822,63 @@ mod tests {
             violations.iter().any(|violation| {
                 violation.message().contains("public-surface role 'Interactor'")
             })
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_resolves_qualified_entry_for_inherent_impl_bounds() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Root".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::CompositionRoot,
+                unit_struct_kind(),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        composition_catalogue.push_inherent_impl(InherentImplDeclV2 {
+            type_name: CatalogueEntryKey::try_new("Root".to_owned()).unwrap(),
+            impl_generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+            }],
+            impl_where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            methods: vec![],
+        });
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            CatalogueEntryKey::try_new("GreetUser".to_owned()).unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            violations.iter().any(|violation| {
+                violation.message().contains("public-surface role 'Interactor'")
+            }),
+            "qualified composition-root keys must include canonical inherent-impl bounds: {violations:?}"
         );
     }
 
@@ -2284,6 +2568,50 @@ mod tests {
             Err(CatalogueLinterError::InvalidRuleConfig(message))
                 if message.as_str().contains("invariants")
         ));
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_treats_function_declared_module_as_local() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("MissingReference".to_owned()).unwrap(),
+            make_type_entry_with_kind(
+                DataRole::UseCase { handles: vec![TypeRef::new("helpers::Missing").unwrap()] },
+                unit_struct_kind(),
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("ExternalReference".to_owned()).unwrap(),
+            make_type_entry_with_kind(
+                DataRole::UseCase { handles: vec![TypeRef::new("serde::Missing").unwrap()] },
+                unit_struct_kind(),
+            ),
+        );
+        catalogue.insert_function(
+            FunctionPath::new(
+                CrateName::new("domain").unwrap(),
+                ModulePath::from_segments(vec!["helpers"]).unwrap(),
+                FunctionName::new("make").unwrap(),
+            ),
+            make_function_entry(FunctionRole::FreeFunction),
+        );
+
+        let violations = run_rule(
+            &catalogue,
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        );
+
+        assert_eq!(violations.len(), 1, "only the unresolved local path must fail closed");
+        assert_eq!(violations[0].entry_name(), "MissingReference");
+        assert!(violations[0].message().contains("helpers::Missing"));
+        assert!(
+            !violations.iter().any(|violation| violation.entry_name() == "ExternalReference"),
+            "explicit external roots such as serde must remain accepted"
+        );
     }
 
     #[test]
@@ -3118,7 +3446,11 @@ mod tests {
 
     #[test]
     fn test_composition_root_pure_di_checks_reference_trait_impl_method_surface() {
-        let mut composition_catalogue = make_doc("cli_composition");
+        let mut composition_catalogue = CatalogueDocument::new(
+            3,
+            CrateName::new("cli_composition").unwrap(),
+            layer("cli_composition"),
+        );
         composition_catalogue.insert_type(
             CatalogueEntryKey::try_new("GreetingCompositionRoot".to_owned()).unwrap(),
             make_type_entry(DataRole::CompositionRoot),
@@ -3130,7 +3462,8 @@ mod tests {
             vec![],
             vec![],
         ));
-        let mut usecase_catalogue = make_doc("usecase");
+        let mut usecase_catalogue =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), layer("usecase"));
         usecase_catalogue.insert_trait(
             CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
             TraitEntry::new(

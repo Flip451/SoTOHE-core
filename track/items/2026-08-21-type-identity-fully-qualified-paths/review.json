@@ -1294,6 +1294,101 @@
           "hash": "rvw1:sha256:68cd3231079f906c1def1b375a6c493193c3f97e54902bfbbd7d46daf0c02119",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T13:55:30Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 95,
+              "message": "Composition-root trait handling still matches traits by bare-name substring (`bare_name_in_type_ref`) instead of resolved fully-qualified identity. With declared `a::Required` and `b::Required`, an impl of only `a::Required` imports methods from both traits; likewise `trait_impl_has_resolved_catalogue_entry` can treat unresolved `a::Missing` as resolved by `b::Missing`. This can produce false lint violations or let unresolved trait implementations bypass validation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:474772f2e1d80e7a2ff73b1910bb41b6097f3161d88b72ee442c2f0cab3e6b13",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T14:10:07Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 209,
+              "message": "`is_known_non_execution_trait` compares raw trait spelling and does not normalize through the shared identity semantics. A valid absolute standard-trait implementation such as `::core::fmt::Debug` or `::std::fmt::Debug` is therefore not recognized as a non-execution trait; declared-trait resolution also cannot resolve it, so `CompositionRootPureDi` reports it as an unresolved trait.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:197a4963cd969690fb118c4332c08141a146e09375efd1664d464fa6ddb80724",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T14:21:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f178cbbba74ea9afb94fca1c11a763d229e5fbc3baf5fbdcbed64d726f9c345e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T14:36:29Z",
+          "findings": [
+            {
+              "category": "identity_resolution",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 146,
+              "message": "`trait_impls_for_type` re-parses the impl owner by deleting whitespace and splitting at `<` instead of using the injected path extractor. Valid spellings such as `r#GreetingCompositionRoot<T>` or comment-separated generics remain unresolved and are silently skipped at lines 153–155, so their trait methods and bounds can evade `CompositionRootPureDi`. Resolve the owner through `root_path_occurrence` with the impl parameters.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 211,
+              "message": "The canonical non-execution list dropped `core::hash::Hash`, which the previous implementation explicitly accepted. A composition root implementing `core::hash::Hash` or its `std` spelling is now incorrectly reported as implementing an unresolved trait.",
+              "severity": "P1"
+            },
+            {
+              "category": "canonical_identity",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 250,
+              "message": "The helper inserts separate synthetic `std::*` identities alongside canonical `core::*` identities. Consequently a bare valid reference such as `Debug` resolves to two candidates and fails as ambiguous, even though the shared resolver already maps `std::fmt::Debug` to its canonical `core` identity. Keep only canonical identities and let `resolve_catalogue_identity` handle `std` aliases.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f178cbbba74ea9afb94fca1c11a763d229e5fbc3baf5fbdcbed64d726f9c345e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T14:51:23Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 1632,
+              "message": "The non-execution regression test still omits both `core::hash::Hash` and an unqualified standard trait such as `Debug`. Removing `Hash` from `NON_EXECUTION_TRAIT_PATHS` or reintroducing separate synthetic `std::*` identities therefore leaves the suite green, despite those being the two corrected failures. Add cases that exercise both behaviors through the public evaluator.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 3447,
+              "message": "No composition-root test exercises a trait-impl owner spelling that requires the new `root_path_occurrence` call, such as a raw identifier or comment-separated generic owner. Reverting this call to the previous whitespace/split implementation leaves all composition-root tests green; the helper-level raw-identifier test does not cover this call site. Add an evaluator regression whose prohibited bound or method is reached through such an owner.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4cf48930b9bff544d07a11832dd148bac27b19cb37185cc1af17313100eb0f6a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-24T14:58:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7876d7074ba35225e8d40081323d615f5171412e9411c84445d627ab0227c1af",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

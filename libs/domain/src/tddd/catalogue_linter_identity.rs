@@ -33,6 +33,7 @@ pub(super) struct TypeRefInspectionContext<'a> {
 pub(super) struct CatalogueIdentityContext<'a> {
     pub(super) catalogue_crate: &'a CrateName,
     pub(super) universe: &'a BTreeSet<FullyQualifiedItemPath>,
+    pub(super) locality_modules: &'a BTreeSet<ModulePath>,
     pub(super) entries: &'a [DeclaredIdentity],
 }
 
@@ -92,6 +93,36 @@ pub(super) fn declared_identity_universe(
     entries.iter().map(|entry| entry.identity.clone()).collect()
 }
 
+/// Returns the live module paths that prove a crate-local root is in scope.
+///
+/// Type and trait module paths come from their canonical declared identities;
+/// function paths are already fully qualified keys and contribute their own
+/// definition module paths. Deleted entries are excluded consistently with the
+/// identity universe, so tombstones cannot make an unresolved path look local.
+pub(super) fn declared_locality_modules(
+    all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    entries: &[DeclaredIdentity],
+    catalogue_crate: &CrateName,
+) -> BTreeSet<ModulePath> {
+    let mut modules = entries
+        .iter()
+        .filter(|entry| entry.identity.crate_name() == catalogue_crate)
+        .map(|entry| entry.identity.module_path().clone())
+        .collect::<BTreeSet<_>>();
+
+    for catalogue in
+        all_catalogues.values().filter(|catalogue| catalogue.crate_name() == catalogue_crate)
+    {
+        for (path, entry) in catalogue.functions() {
+            if entry.action() != ItemAction::Delete {
+                modules.insert(path.module_path.clone());
+            }
+        }
+    }
+
+    modules
+}
+
 fn role_for_identity(
     entries: &[DeclaredIdentity],
     identity: &FullyQualifiedItemPath,
@@ -137,9 +168,12 @@ pub(super) fn resolve_reference_identities<E: TypeRefPathExtractorPort>(
         let ExtractedTypeRefPath::Path(path) = extracted else {
             continue;
         };
-        if let Some(identity) =
-            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
-        {
+        if let Some(identity) = classify_catalogue_path(
+            &path,
+            context.catalogue_crate,
+            context.universe,
+            context.locality_modules,
+        )? {
             if !resolved.contains(&identity) {
                 resolved.push(identity);
             }
@@ -203,9 +237,12 @@ pub(super) fn signature_contains_identity<E: TypeRefPathExtractorPort>(
         let ExtractedTypeRefPath::Path(path) = extracted else {
             continue;
         };
-        if let Some(identity) =
-            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
-        {
+        if let Some(identity) = classify_catalogue_path(
+            &path,
+            context.catalogue_crate,
+            context.universe,
+            context.locality_modules,
+        )? {
             if identity == *target {
                 return Ok(true);
             }
@@ -223,6 +260,7 @@ fn classify_catalogue_path(
     path: &TypeRef,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
+    locality_modules: &BTreeSet<ModulePath>,
 ) -> Result<Option<FullyQualifiedItemPath>, CatalogueLinterError> {
     let normalized = path.as_str().strip_prefix("::").unwrap_or(path.as_str());
     if normalized == "Self" {
@@ -233,7 +271,12 @@ fn classify_catalogue_path(
         Ok(identity) => Ok(Some(identity)),
         Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location))
             if is_known_external_bare_path(location.as_str())
-                || is_explicit_external_qualified_path(normalized, catalogue_crate, universe) =>
+                || is_explicit_external_qualified_path(
+                    normalized,
+                    catalogue_crate,
+                    universe,
+                    locality_modules,
+                ) =>
         {
             // Resolution has already had the first chance to find a declared
             // identity. Only an unresolved path can be classified as external;
@@ -260,6 +303,7 @@ fn is_explicit_external_qualified_path(
     normalized: &str,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
+    locality_modules: &BTreeSet<ModulePath>,
 ) -> bool {
     let Some((root, _)) = normalized.split_once("::") else {
         return false;
@@ -273,13 +317,8 @@ fn is_explicit_external_qualified_path(
         && !matches!(root, "crate" | "self" | "super")
         && !universe.iter().any(|identity| identity.crate_name().as_str() == root)
         && !is_known_catalogue_crate(root)
-        && !universe.iter().any(|identity| {
-            identity.crate_name() == catalogue_crate
-                && identity
-                    .module_path()
-                    .segments()
-                    .first()
-                    .is_some_and(|segment| segment.as_str() == root)
+        && !locality_modules.iter().any(|module_path| {
+            module_path.segments().first().is_some_and(|segment| segment.as_str() == root)
         })
 }
 
@@ -483,7 +522,14 @@ mod tests {
         catalogue_crate: &'a CrateName,
         universe: &'a BTreeSet<FullyQualifiedItemPath>,
     ) -> CatalogueIdentityContext<'a> {
-        CatalogueIdentityContext { catalogue_crate, universe, entries: &[] }
+        static EMPTY_LOCALITY_MODULES: std::sync::OnceLock<BTreeSet<ModulePath>> =
+            std::sync::OnceLock::new();
+        CatalogueIdentityContext {
+            catalogue_crate,
+            universe,
+            locality_modules: EMPTY_LOCALITY_MODULES.get_or_init(BTreeSet::new),
+            entries: &[],
+        }
     }
 
     fn empty_inspection() -> TypeRefInspectionContext<'static> {

@@ -54,8 +54,8 @@ use eval_config::{
 };
 use identity::{
     CatalogueIdentityContext, TypeRefInspectionContext, build_declared_identities,
-    declared_identity_universe, generic_parameter_names, resolution_message,
-    resolve_reference_identities, role_constraint_failure,
+    declared_identity_universe, declared_locality_modules, generic_parameter_names,
+    resolution_message, resolve_reference_identities, role_constraint_failure,
 };
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`
@@ -203,9 +203,15 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
+                let locality_modules = declared_locality_modules(
+                    all_catalogues,
+                    &declared_identities,
+                    catalogue.crate_name(),
+                );
                 let identity_context = CatalogueIdentityContext {
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
+                    locality_modules: &locality_modules,
                     entries: &declared_identities,
                 };
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
@@ -480,9 +486,15 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
+                let locality_modules = declared_locality_modules(
+                    all_catalogues,
+                    &declared_identities,
+                    catalogue.crate_name(),
+                );
                 let identity_context = CatalogueIdentityContext {
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
+                    locality_modules: &locality_modules,
                     entries: &declared_identities,
                 };
                 let mut seen: BTreeMap<FullyQualifiedItemPath, String> = BTreeMap::new();
@@ -591,6 +603,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                     catalogue,
                     all_catalogues,
                     target_layer_id,
+                    extractor,
                 )?)
             }
         }

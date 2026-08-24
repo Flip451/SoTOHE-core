@@ -6,8 +6,8 @@ use super::super::helpers::{collect_methods_for_type, field_type_refs, type_entr
 use super::eval_config::ensure_target_can_produce_type_ref_checks;
 use super::identity::{
     CatalogueIdentityContext, TypeRefInspectionContext, build_declared_identities,
-    declared_identity_universe, entry_identity, generic_parameter_names, resolution_message,
-    resolve_reference_identities, signature_contains_identity,
+    declared_identity_universe, declared_locality_modules, entry_identity, generic_parameter_names,
+    resolution_message, resolve_reference_identities, signature_contains_identity,
 };
 use super::{CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, RolePayloadField};
 use crate::tddd::catalogue_linter::TypeRefPathExtractorPort;
@@ -40,9 +40,12 @@ pub(super) fn evaluate_no_external_reference_in_methods<E: TypeRefPathExtractorP
 
     let declared_identities = build_declared_identities(all_catalogues)?;
     let identity_universe = declared_identity_universe(&declared_identities);
+    let locality_modules =
+        declared_locality_modules(all_catalogues, &declared_identities, catalogue.crate_name());
     let identity_context = CatalogueIdentityContext {
         catalogue_crate: catalogue.crate_name(),
         universe: &identity_universe,
+        locality_modules: &locality_modules,
         entries: &declared_identities,
     };
     let mut violations = Vec::new();
