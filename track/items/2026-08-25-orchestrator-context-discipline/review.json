@@ -717,6 +717,35 @@
           "hash": "rvw1:sha256:43f3049e0acd2f2fd3c9e7bfc2d60e6c4dd9a6164b4d1fcdea0c0aeb26b7891f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:25:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7148117e52b7532231e139f9add7ad64ab1d5a2889becfb11da9f2d58e9d0cf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:29:35Z",
+          "findings": [
+            {
+              "category": "workflow-wiring",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 60,
+              "message": "The policy routes ADR findings to the `PR review workflow SSoT`'s `ADR-scope repair lane`, but `.harness/workflows/track/pr-review.md` has no such section; that workflow itself delegates to the lane in `.harness/workflows/track/review.md`. Point directly to the review workflow SSoT so executors can resolve the canonical guardian procedure.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:e7148117e52b7532231e139f9add7ad64ab1d5a2889becfb11da9f2d58e9d0cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:32:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64fd29d90aecc68c037276a2ac0d30e6ec3ac2d1a92b5cea48e2375d45c17998",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

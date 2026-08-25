@@ -57,7 +57,7 @@ review briefing には `## Architecture Verification Checklist` 節を含め、�
 
 PR review で actionable finding が source または review-scope の編集を要求する場合、委譲元は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。source 編集を許す briefing には、R1 が定める `## Architecture Constraints` 節も必ず含める。委譲元が親コンテキストで修正を inline edit することを通常経路にしてはならない。
 
-委譲先が修正を完了した後、委譲元は local review workflow を `zero_findings` まで収束させ、`commit` workflow を実行してから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行え、その場合も同じ local review の収束と `commit` workflow を経てから再レビューする。
+委譲先が修正を完了した後、委譲元は local review workflow を `zero_findings` まで収束させ、`commit` workflow を実行してから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
 ### R5. 長時間処理の待機
 

@@ -29,9 +29,11 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
   `review-fix-lead` provider; the wrapper resolves it.
 
 - **Convergence and commit**: after the delegated capability reports completion, run
-  `/track:review` to convergence and `/track:commit` before re-running this command. The
-  orchestrator edits directly only as recovery after a failed delegation, and still applies the
-  same local-convergence and commit sequence.
+  `/track:review` to convergence and `/track:commit` before re-running this command. The Claude
+  root may edit directly only as recovery after a failed delegation for non-ADR findings. A
+  finding requiring an edit to `knowledge/adr/*.md` must go through the review workflow SSoT's
+  `ADR-scope repair lane` and is never edited by the Claude root or `review-fix-lead`; apply the
+  same local-convergence and commit sequence afterward.
 
 - **PR command wrappers**: use these from the orchestrator host in sequence:
 
