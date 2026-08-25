@@ -31,10 +31,10 @@ AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 - [x] **T006**: `.harness/capabilities/*.md` の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。 (`1245c37740c6b54808e92e5ff2932184c5b5fab3`)
 - [x] **T019**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。 (`214f42cdd78a19bab51fd90f577ad03638ea7e73`)
 - [x] **T020**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。 (`4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18`)
-- [x] **T021**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+- [x] **T021**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。 (`ee34cea01db366387301dd2d4bc004f9789e039d`)
 - [x] **T022**: `.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。 (`214f42cdd78a19bab51fd90f577ad03638ea7e73`)
 - [x] **T023**: `.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。 (`4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18`)
-- [x] **T024**: `.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+- [x] **T024**: `.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。 (`ee34cea01db366387301dd2d4bc004f9789e039d`)
 
 ### S3 — Claude adapter units
 
@@ -76,4 +76,4 @@ AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
 > 全対象面の個別確認を実行する。AC-08。
 
-- [x] **T018**: Workflow SSoT、thin adapters、policy / capability、always-applied rules、consumer docs、agent profile の各対象面を個別確認する。AC-08。
+- [x] **T018**: Workflow SSoT、thin adapters、policy / capability、always-applied rules、consumer docs、agent profile の各対象面を個別確認する。AC-08。 (`ee34cea01db366387301dd2d4bc004f9789e039d`)

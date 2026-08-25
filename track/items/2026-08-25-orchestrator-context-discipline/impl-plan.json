@@ -172,6 +172,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
       "depends_on": [
         "T004"
       ],
@@ -198,6 +199,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
       "depends_on": [
         "T004"
       ],
@@ -299,6 +301,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
       "depends_on": [
         "T005",
         "T006",
