@@ -59,6 +59,10 @@ PR review で actionable finding が source または review-scope の編集を�
 
 委譲先が修正を完了した後、委譲元は local review workflow を `zero_findings` まで収束させ、`commit` workflow を実行してから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行え、その場合も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
+### R5. 長時間処理の待機
+
+委譲先 capability、workflow、または gate wrapper が長時間実行される場合、orchestrator は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合も、1 回の完了通知後に result を読むだけとし、ログの polling、status probe の再実行、fire-and-forget launch を行わない。内部の loop / poll は呼び出された capability または workflow の責務である。`bin/sotp test-obligation evaluate` は orchestrator host の repair round 内でだけ同期実行し、委譲元が commit prerequisite として launch してはならない。commit gate は `check` を使う。
+
 ## Enforcement
 
 | 検証手段 | タイミング | 自動化 |

@@ -132,13 +132,12 @@ cargo make track-local-review -- --round-type {round_type} --group {scope} --bri
 
 Do NOT pass `--track-id`; the wrapper auto-resolves the active track from the current git branch.
 
-The reviewer subprocess legitimately runs for many minutes (`bin/sotp review local` allows it
-3600 seconds by default). When your provider's shell tool enforces a per-call timeout, set that
-timeout parameter to at least 18,120,000 ms for this invocation: the configured
-implementation-scope gate sequence may consume four 3600-second command budgets before the
-3600-second reviewer budget, with a 120-second allowance for wrapper overhead. Do not conclude
-reviewer failure from a shell-tool timeout shorter than that; a timed-out invocation kills the
-in-flight round and records nothing.
+The reviewer subprocess may run for many minutes. Invoke `cargo make track-local-review` once as
+a single blocking call and read its terminal result once. If the host backgrounds the call, read
+the result once after the single completion notification. Do not poll its output, re-run status
+probes, or launch it fire-and-forget. The `bin/sotp review results` command below is a single
+post-completion confirmation read, not a polling loop. Re-review iterations occur only after the
+review result or a state-changing fix requires another round.
 
 ### Verdict parsing and confirmation
 
@@ -179,7 +178,9 @@ Priority handling:
 
 After applying fixes:
 
-1. Run `cargo make ci-rust` to verify fixes compile.
+1. Run `cargo make ci-rust` to verify fixes compile. Treat this long-running gate as one blocking
+   call and read its terminal result once; if the host backgrounds it, read the result once after
+   the single completion notification. Do not poll its logs or status.
 2. If any fix edited source, before re-invoking the reviewer repeat the pre-review verification
    required by `.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`.
    The review-fix lead owns this repeat because its source edits occur after the earlier
@@ -264,6 +265,8 @@ and invokes the commit workflow before re-running `pr-review`. Name the finding'
   recovery is to dispatch impl-planner and relaunch the scope review.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+- Do not run `bin/sotp test-obligation evaluate`; it is an orchestrator-host-owned synchronous
+  repair step, never a fire-and-forget launch or a commit prerequisite started by this capability.
 
 ## Session resume
 

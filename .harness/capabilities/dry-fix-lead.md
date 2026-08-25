@@ -15,6 +15,16 @@ cycle until the DRY gate passes (Approved), the loop is exhausted with violation
 `sotp dry write` is the **sole writer** of `dry-check.json`. This capability applies source-code
 fixes; it never edits `dry-check.json` directly.
 
+## Gate waiting and evaluate boundary
+
+Run each long-running `bin/sotp` gate or `cargo make` gate as one blocking call and read its
+terminal result once. If the host backgrounds a call, read the result once after the single
+completion notification. Do not poll output, re-run status probes, or launch a gate
+fire-and-forget. The Step 4 repetitions are repair iterations after an applied fix, not polling.
+This capability never runs `bin/sotp test-obligation evaluate`: that command is an
+orchestrator-host-owned synchronous repair step and is neither fire-and-forget nor a commit
+prerequisite; the commit gate runs `check`.
+
 ## Invocation contract
 
 The orchestrator invokes this capability with:

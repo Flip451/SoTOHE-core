@@ -58,8 +58,9 @@ Forbidden writes:
 
 - Direct edits to `review.json`, `dry-check.json`, ref-verify caches, or other verdict files.
 - Test-obligation verdict caches: they are written only by `bin/sotp test-obligation
-  evaluate`, which the orchestrator host runs (`obligation-fulfillment` workflow) — never
-  this capability.
+  evaluate`, which is an orchestrator-host-owned synchronous repair step in the
+  `obligation-fulfillment` workflow — never a fire-and-forget launch or a commit prerequisite
+  started by this capability.
 - Direct edits to `obligations.json`; it is generated only by `bin/sotp test-obligation derive`.
 - Direct commits, staging, pushes, PR edits, or git notes.
 - Track state transitions through `bin/sotp track transition`. Only the orchestrator may
@@ -102,7 +103,10 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a (re-)dispatch of this capab
 2. Add or update focused tests for the new public behavior and failure modes.
 3. Run focused tests while iterating.
 4. Run at least `cargo make ci-rust` before reporting implementation completion unless the
-   orchestrator requires full `cargo make ci`.
+   orchestrator requires full `cargo make ci`. Treat a long-running gate invocation as one
+   blocking call and read its terminal result once; if the host backgrounds it, read the result
+   once after the single completion notification. Do not poll logs or status, or launch it
+   fire-and-forget.
 
 ### Step 3 — Author Test-Obligation Bindings When Applicable
 
@@ -114,7 +118,10 @@ test-obligation gate itself, or when the orchestrator explicitly asks for obliga
 The surrounding orchestration loop (who runs `evaluate`, totality iteration, repair rounds,
 file-safety backups, cache semantics) is owned by the `obligation-fulfillment` workflow
 (`.harness/workflows/track/obligation-fulfillment.md`); this contract owns the per-record
-authoring discipline below.
+authoring discipline below. When the host runs `evaluate`, it does so synchronously as one
+blocking repair call and reads the terminal result once (or once after a single completion
+notification if the host backgrounds it). This capability never launches, polls, or repeats
+that evaluation as a commit prerequisite.
 
 1. Run:
    ```
@@ -165,11 +172,14 @@ authoring discipline below.
    ```
    bin/sotp test-obligation check
    ```
-   Do not run `bin/sotp test-obligation evaluate` — evaluation is host-owned
-   (`obligation-fulfillment` workflow); the orchestrator runs it between authoring rounds.
+   Do not run `bin/sotp test-obligation evaluate` — evaluation is the orchestrator host's
+   synchronous repair step in the `obligation-fulfillment` workflow. The host runs one blocking
+   call and reads its terminal result once (or once after a single completion notification); it
+   never launches evaluation fire-and-forget or as a commit prerequisite. The commit gate runs
+   `check`, not `evaluate`.
 8. Fix `missing`, `orphaned`, or unresolved findings by updating tests, bindings, or
    routing upstream SoT corrections to the owning capability. The missing/stale-VERDICT
-   class is resolved by the host's next `evaluate` round, not by this capability.
+   class is resolved by the host's next synchronous `evaluate` round, not by this capability.
 
 If neither `obligations.json` nor `test-bindings.json` exists, the gate has an empty
 existence-based scope and `check` reports zero pairs. If exactly one exists, the scope is

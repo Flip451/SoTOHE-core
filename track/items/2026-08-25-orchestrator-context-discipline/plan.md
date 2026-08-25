@@ -12,7 +12,7 @@ AC-03 → T003, T020, T023, T009, T013.
 AC-04 → T004, T021, T024, T010, T014.
 AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
-## Tasks (19/24 resolved)
+## Tasks (21/24 resolved)
 
 ### S1 — Canonical workflow units
 
@@ -29,11 +29,11 @@ AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
 - [x] **T005**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。 (`1245c37740c6b54808e92e5ff2932184c5b5fab3`)
 - [x] **T006**: `.harness/capabilities/*.md` の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。 (`1245c37740c6b54808e92e5ff2932184c5b5fab3`)
-- [x] **T019**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
-- [ ] **T020**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [x] **T019**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。 (`214f42cdd78a19bab51fd90f577ad03638ea7e73`)
+- [x] **T020**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
 - [ ] **T021**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
-- [x] **T022**: `.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
-- [ ] **T023**: `.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [x] **T022**: `.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。 (`214f42cdd78a19bab51fd90f577ad03638ea7e73`)
+- [x] **T023**: `.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
 - [ ] **T024**: `.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
 
 ### S3 — Claude adapter units

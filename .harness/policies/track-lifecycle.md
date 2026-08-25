@@ -31,6 +31,10 @@
 
 これらのコマンドは `bin/sotp` ネイティブサブコマンドとして直接呼び出す（`--items-dir` のデフォルトは `track/items`）。対応する `cargo make` ラッパータスクは廃止済み。
 
+### 状態照会と長時間ゲート
+
+`bin/sotp track` や各 gate の結果照会は、その時点の CLI summary を読むための単発の照会であり、長時間処理の polling ループではない。長時間の capability、workflow、または gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わない。`bin/sotp test-obligation evaluate` は obligation repair における orchestrator host の同期 step に限り、commit gate の前提にはしない。
+
 ### ADR baseline lifecycle
 
 - `/track:init` completes track initialization and then the orchestrator designates each primary

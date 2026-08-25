@@ -28,6 +28,10 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する (SoT Chain の layer skip 禁止と同型)。
 
+### 再収束ゲートの待機
+
+再収束に必要な capability、workflow、または gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わない。「列挙可能になり次第」は定期的な照会を意味せず、呼び出し側 workflow の terminal result を受けた後に次の許可された処理へ進むことを意味する。`bin/sotp test-obligation evaluate` が必要な場合も、obligation repair のための orchestrator host 上の同期 step に限り、commit prerequisite にはしない。
+
 ## 即時突き返し規則
 
 - 下流作業中に、収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る。回帰先が自明でなければ diagnose ルート (`/track:diagnose`) を経由する。

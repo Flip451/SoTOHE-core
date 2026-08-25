@@ -17,6 +17,10 @@ reviewer capability によるレビューサイクルの規律を定める。rev
 
 ## Rules
 
+### 長時間ゲートの待機
+
+reviewer dispatch と review workflow の長時間処理は 1 回の blocking call として待ち、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わず、内部の review loop は workflow が所有する。`bin/sotp test-obligation evaluate` は review や commit のゲートではなく、obligation repair における orchestrator host の同期 step に限る。
+
 ### レビューを経ずに merge させないこと
 
 守るべき不変条件は「変更が reviewer capability の判定を経ずに merge へ到達しない」ことである。「コミットの前に必ずローカルラウンドがある」はその既定形にすぎず、workflow はもう一つの経路を持つ。

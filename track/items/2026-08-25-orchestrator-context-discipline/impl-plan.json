@@ -154,6 +154,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "214f42cdd78a19bab51fd90f577ad03638ea7e73",
       "depends_on": [
         "T002"
       ],
@@ -167,7 +168,7 @@
       ],
       "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
       "id": "T020",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -178,6 +179,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "214f42cdd78a19bab51fd90f577ad03638ea7e73",
       "depends_on": [
         "T002"
       ],
@@ -191,7 +193,7 @@
       ],
       "description": "`.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
       "id": "T023",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

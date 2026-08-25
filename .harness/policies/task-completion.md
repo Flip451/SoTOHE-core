@@ -38,6 +38,10 @@ PR review の actionable finding が編集を要求する場合、orchestrator �
 
 ガードが見ているのは遷移だけである。commit_hash が埋め戻されていない done タスク（`DonePending`）もガードは解決済みとして通す — 埋め戻しを要求するのは merge ガードではなく full-cycle の lifecycle tail であり、その impl-plan review refresh である。この二つを同一視すると、埋め戻し漏れが merge で止まると誤って期待することになる。実際には止まらず、hash 未記録のまま merge が成立する。
 
+### 長時間 merge gate の待機
+
+`bin/sotp pr wait-and-merge` のような長時間 gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、PR status の定期的な再確認、fire-and-forget launch、timeout 後の自動再実行は行わない。`bin/sotp test-obligation evaluate` は merge / commit completion の前提ではなく、obligation repair における orchestrator host の同期 step に限る。
+
 ### commit_hash 埋め戻しの未強制 — エスカレーション済みの未解決事項
 
 これは「mechanism 整備の cost が benefit を上回るので規律で代替する」と整理できる状態ではない。drift が実測されているためである: merge 済み 102 トラックのうち **24 トラック** が、commit_hash を持たない done タスクを含んだまま merge されている（うち 7 トラックは全タスクが未記録、直近は 2026-07-19。2026-07-28 時点の計測）。規律だけでは保てていない、というのが観測結果であって、想定される穴ではない。

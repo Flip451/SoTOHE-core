@@ -114,7 +114,12 @@ The judgment may sometimes need to call true read-only `bin/sotp` inspection sub
 (`ref-verify results`, `task-contract coverage`, `task-contract check`, `review results`) to
 inspect the current gate state. It must not run mutating refresh commands such as `signal calc-*`;
 signal refresh is orchestrator-owned before invocation, and this capability reads the persisted
-signal JSON artifacts.
+signal JSON artifacts. Invoke each inspection command as one blocking call and read its terminal
+output once; if the host backgrounds it, read the result once after the single completion
+notification. Never poll for completion, run repeated status probes, or launch an inspection
+fire-and-forget. This capability never runs `bin/sotp test-obligation evaluate`; that command is
+an orchestrator-host-owned synchronous repair step, not a diagnosis operation or a commit
+prerequisite.
 
 ## Output contract
 
