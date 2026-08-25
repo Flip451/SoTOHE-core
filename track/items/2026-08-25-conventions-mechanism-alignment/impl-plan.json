@@ -110,6 +110,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "58041bbd83dbc447bdc9fa60d7c9cf5574af0cf6",
       "depends_on": [
         "T006"
       ],
@@ -123,7 +124,7 @@
       ],
       "description": "Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/tddd-product-correctness.md` for the layer-property matrix, and annotate the normative requirements in both files with T001's taxonomy. D5; IN-01; IN-08; OUT-01; AC-01; AC-08.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

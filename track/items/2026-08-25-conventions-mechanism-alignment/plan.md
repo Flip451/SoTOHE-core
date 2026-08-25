@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 
-## Tasks (7/8 resolved)
+## Tasks (8/8 resolved)
 
 ### S1 — Enforcement taxonomy and convention inventory
 
@@ -19,8 +19,8 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 
 - [x] **T002**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/prefer-type-safe-abstractions.md` for necessity-driven abstraction, and annotate the normative requirements in `prefer-type-safe-abstractions.md` with T001's taxonomy. D2; IN-01; IN-02; OUT-01; AC-01; AC-02. (`3dd6cbcef47f9df61863db4250faac19e09f66e0`)
 - [x] **T006**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/coding-principles.md` for port injection and facade policy, and annotate the normative requirements in `coding-principles.md` with T001's taxonomy. D3; IN-01; IN-06; OUT-01; AC-01; AC-06. (`57aa30a8511b552f2f5fc21bfd011907cdaf7181`)
-- [x] **T007**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/typed-deserialization.md` for the Command boundary, and annotate the normative requirements in `typed-deserialization.md` with T001's taxonomy. D4; IN-01; IN-07; OUT-01; AC-01; AC-07.
-- [ ] **T008**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/tddd-product-correctness.md` for the layer-property matrix, and annotate the normative requirements in both files with T001's taxonomy. D5; IN-01; IN-08; OUT-01; AC-01; AC-08.
+- [x] **T007**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/typed-deserialization.md` for the Command boundary, and annotate the normative requirements in `typed-deserialization.md` with T001's taxonomy. D4; IN-01; IN-07; OUT-01; AC-01; AC-07. (`58041bbd83dbc447bdc9fa60d7c9cf5574af0cf6`)
+- [x] **T008**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/tddd-product-correctness.md` for the layer-property matrix, and annotate the normative requirements in both files with T001's taxonomy. D5; IN-01; IN-08; OUT-01; AC-01; AC-08.
 
 ### S3 — Obligation-driven testing convention
 

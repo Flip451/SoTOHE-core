@@ -740,6 +740,50 @@
           "hash": "rvw1:sha256:23995af979717d83d6de4114c687c8ecc72f902a87b2f416343f8f99fbc92574",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:46:55Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 99,
+              "message": "R1 now claims that `KindLayerConstraint.permitted_layers` is resolved from each adopter's `architecture-rules.json` and therefore preserves the role × layer rules after layers are renamed or split, but the shipped lint configuration still hard-codes `domain`, `usecase`, `infrastructure`, `cli_driver`, and `cli_composition` (for example `.harness/catalogue-lint/config.json`). `architecture-rules.json` also has no layer-nature field or resolver mapping—only crate/path/dependency metadata—so the convention's advertised adopter-independent enforcement is not implemented and can silently enforce the wrong mapping in consumers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:98c7c0c195576a3f4423c247fb9eeb9b4f163fd4e3715658b2f52515aa57b933",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:50:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7fdf858641e5f9f7d0e201effd135e9c893be0f781b796ac13acbe876886be0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:59:59Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 95,
+              "message": "薄い process entrypoint を driving adapter または composition root のどちらか一つに分類する規則では、出荷済み `cli` layer を表現できません。現行 `KindLayerConstraint` は `cli` で `Dto`・`FreeFunction`・`ErrorType` を許可しますが、R1 の driving 列は `ErrorType` を禁止し、composition-root 列は `Dto` と `FreeFunction` を禁止します。さらに `architecture-rules.json` の `cli` には責務宣言がありません。このため line 99 が要求する表と literal lint config の突合が現行テンプレートですでに成立せず、adopter-independent な配置規則になっていません。entrypoint の性質を明示的に表現するか、表・architecture declaration・lint config を整合させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d7fdf858641e5f9f7d0e201effd135e9c893be0f781b796ac13acbe876886be0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0debfd2992dea031df41a9601e25ea523d1e425e7cc684f0f12e8bbcf2f8cfc6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -905,6 +949,20 @@
           "at": "2026-08-25T09:58:19Z",
           "findings": [],
           "hash": "rvw1:sha256:a009bbc2a67c8f60887dbbf2b6225aeeca40ae0a6f0ebbd5ae40a328eb0e1bd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:46:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd4dccfd46f04c01ff010b468d5044bd6493b0c1c32a85d98cf001035fb32e57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:49:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd4dccfd46f04c01ff010b468d5044bd6493b0c1c32a85d98cf001035fb32e57",
           "type": "final",
           "verdict": "zero_findings"
         }
