@@ -14,6 +14,10 @@ by the review workflow and are not standing orchestrator instructions.
 
 - Delegate implementation, planning, review-fix, and other specialist work through
   `bin/sotp capability exec` or the provider wrappers; keep workflow control in the root session.
+- Route all implementation work in this repository through a track workflow with Phase 0–3
+  planning complete before implementation: use `$track-plan` for standalone feature planning,
+  while end-to-end workflows such as `$track-adr2pr` own equivalent planning sequencing. Do not
+  implement directly from a free-form request.
 - Treat CLI summaries as the primary information for progress, review necessity, obligation
   state, and catalogue state: `bin/sotp track resolve`, `bin/sotp track task-counts`,
   `bin/sotp track next-task`, `bin/sotp review results`, `bin/sotp test-obligation results`, `bin/sotp catalog check`,
