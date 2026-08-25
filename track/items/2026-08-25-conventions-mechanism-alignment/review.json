@@ -1420,6 +1420,20 @@
           "hash": "rvw1:sha256:648261a21b343f87ebfbc766540c3b5279a04375a50529214fda37fddd38993f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:28:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:004102523a47ba9354517c2a3da14c19ab64cd14fb5f57cb8c4baff29cf075ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:32:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:004102523a47ba9354517c2a3da14c19ab64cd14fb5f57cb8c4baff29cf075ac",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1618,6 +1632,50 @@
           "at": "2026-08-25T20:08:29Z",
           "findings": [],
           "hash": "rvw1:sha256:42eebbd51bbdd9f0eb29fb640dff2d8f050b89045d9949e27fde31f37d542207",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:28:58Z",
+          "findings": [
+            {
+              "category": "missing enforcement coverage",
+              "file": "overlay/knowledge/conventions/testing.md",
+              "line": 188,
+              "message": "The checklist narrows enforcement for the property-based-testing requirement to `infrastructure / cli / cli_driver`, but the normative parser rule covers `usecase` and the evaluator rule covers `domain / usecase`. Changes in those layers can therefore escape the declared review enforcement scope. Keep this annotation aligned with the workspace counterpart and the preceding requirements.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35733ba263e3daa0cb5c9e3abd36e97705efd1901b96e632597ddb6cf8bcc1b0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:31:29Z",
+          "findings": [
+            {
+              "category": "enforcement annotation mismatch",
+              "file": "overlay/knowledge/conventions/testing.md",
+              "line": 189,
+              "message": "The checklist’s property-based-testing annotation includes `cli_composition`, while the workspace counterpart and the normative codec/parser/evaluator requirements scope this review to `domain / usecase / infrastructure / cli / cli_driver`. This altered enforcement annotation violates the required overlay/workspace alignment and assigns the obligation to an unrelated scope. Match the workspace annotation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9715fb7e9a652d9f840e90e53fb02fd56c5f803da277e995baabd7e48d303c5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:33:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c0bfab85626eaf74176230d3c3598801da435e5305e65ac518533272bf6a07a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:38:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c0bfab85626eaf74176230d3c3598801da435e5305e65ac518533272bf6a07a",
           "type": "final",
           "verdict": "zero_findings"
         }

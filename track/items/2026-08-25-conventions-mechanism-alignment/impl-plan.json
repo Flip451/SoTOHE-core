@@ -176,6 +176,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "a9af152ad6bf4c7960ce5c26b24d43343a7e57b2",
       "depends_on": [
         "T011"
       ],
@@ -189,7 +190,7 @@
       ],
       "description": "Synchronize the validated Command/Query boundary portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-12; AC-12.",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -200,6 +201,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "a9af152ad6bf4c7960ce5c26b24d43343a7e57b2",
       "depends_on": [
         "T006"
       ],
@@ -208,6 +210,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "a9af152ad6bf4c7960ce5c26b24d43343a7e57b2",
       "depends_on": [
         "T002"
       ],
@@ -221,7 +224,7 @@
       ],
       "description": "Synchronize `overlay/knowledge/conventions/testing.md`. IN-14; AC-14.",
       "id": "T017",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "02da090cd15be7f53966b1d44c00383082dc41aa",

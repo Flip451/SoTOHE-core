@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019.
 
-## Tasks (15/19 resolved)
+## Tasks (17/19 resolved)
 
 ### S1 — Enforcement taxonomy and convention inventory
 
@@ -47,11 +47,11 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012
 - [x] **T009**: Add or synchronize `overlay/knowledge/conventions/enforce-by-mechanism.md`. IN-09; AC-09. (`02da090cd15be7f53966b1d44c00383082dc41aa`)
 - [x] **T010**: Synchronize `overlay/knowledge/conventions/README.md` and `overlay/knowledge/conventions/security.md`. IN-16; AC-18. (`02da090cd15be7f53966b1d44c00383082dc41aa`)
 - [x] **T011**: Synchronize the necessity-driven abstraction portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-10; AC-10. (`02da090cd15be7f53966b1d44c00383082dc41aa`)
-- [x] **T012**: Synchronize the port-injection and facade-policy portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-11; AC-11.
-- [ ] **T013**: Synchronize the validated Command/Query boundary portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-12; AC-12.
+- [x] **T012**: Synchronize the port-injection and facade-policy portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-11; AC-11. (`a9af152ad6bf4c7960ce5c26b24d43343a7e57b2`)
+- [x] **T013**: Synchronize the validated Command/Query boundary portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-12; AC-12.
 - [ ] **T014**: Synchronize the role-by-layer portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-13; AC-13.
-- [x] **T015**: Synchronize `overlay/knowledge/conventions/coding-principles.md`. IN-16; IN-17; AC-18; AC-19.
-- [x] **T016**: Synchronize `overlay/knowledge/conventions/prefer-type-safe-abstractions.md`. IN-18; AC-20.
-- [ ] **T017**: Synchronize `overlay/knowledge/conventions/testing.md`. IN-14; AC-14.
+- [x] **T015**: Synchronize `overlay/knowledge/conventions/coding-principles.md`. IN-16; IN-17; AC-18; AC-19. (`a9af152ad6bf4c7960ce5c26b24d43343a7e57b2`)
+- [x] **T016**: Synchronize `overlay/knowledge/conventions/prefer-type-safe-abstractions.md`. IN-18; AC-20. (`a9af152ad6bf4c7960ce5c26b24d43343a7e57b2`)
+- [x] **T017**: Synchronize `overlay/knowledge/conventions/testing.md`. IN-14; AC-14.
 - [x] **T018**: Add `overlay/knowledge/conventions/environment-assumptions.md`. IN-15; AC-15. (`02da090cd15be7f53966b1d44c00383082dc41aa`)
 - [ ] **T019**: Create a fresh template export, run `bin/sotp template check-convention-shipping`, and compare its eight shipped convention files with the workspace contracts. AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20.
