@@ -32,7 +32,9 @@ or failure-recovery procedures here.
   `bin/sotp capability exec implementer --briefing-file <path>`; the dispatcher resolves the
   provider from `.harness/config/agent-profiles.json` and runs it as a separate process. The
   root session never implements a task inline and never loads the implementer skill itself;
-  direct editing by the root session is recovery after a failed delegation only.
+  direct editing by the root session is recovery after a failed delegation only, and only for
+  non-ADR files — a change to `knowledge/adr/*.md` always goes through the review workflow
+  SSoT's ADR-scope repair lane (adr-editor / adr-diagnoser), never the root session.
 - Task state transitions are the orchestrator's, never the `implementer` capability's. Their
   command, sequencing, and timing live in the workflow SSoT — do not restate them here.
 - CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 5).
