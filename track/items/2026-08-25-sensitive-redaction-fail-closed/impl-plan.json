@@ -1,0 +1,44 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Fail-closed static redaction patterns"
+      },
+      {
+        "description": [
+          "Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Security-boundary convention"
+      }
+    ],
+    "summary": [
+      "GO-01 is delivered by T001's fail-stop redaction construction and T002's security-boundary convention. The track intentionally introduces no public catalogue entries or startup execution surface."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": null,
+      "description": "Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04.",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "description": "Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03.",
+      "id": "T002",
+      "status": "todo"
+    }
+  ]
+}

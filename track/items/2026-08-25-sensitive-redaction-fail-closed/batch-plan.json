@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-sensitive-redaction-fail-closed",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 45,
+          "test_lines": 20
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 8,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001",
+        "T002"
+      ]
+    }
+  ]
+}
