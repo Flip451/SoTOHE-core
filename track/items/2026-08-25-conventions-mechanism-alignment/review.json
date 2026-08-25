@@ -1406,6 +1406,20 @@
           "hash": "rvw1:sha256:d40066ba4e66c9c0f2a0c061cbadb9367e62c27be1f6f2b3d73fa3313e2a732d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:59:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648261a21b343f87ebfbc766540c3b5279a04375a50529214fda37fddd38993f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:02:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648261a21b343f87ebfbc766540c3b5279a04375a50529214fda37fddd38993f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1568,6 +1582,42 @@
           "at": "2026-08-25T19:37:30Z",
           "findings": [],
           "hash": "rvw1:sha256:8b6ce3d886dafc911e0fc2df9aab635bf424009243333662a507b99a1212cf90",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48207a713d4d1f8422ba28fd4d6ca787b0f9c3e46c75f3446cfb0fe7779eef7f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:04:34Z",
+          "findings": [
+            {
+              "category": "spec_conformance",
+              "file": "overlay/knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 200,
+              "message": "The enum/typestate decision table is a normative pattern-selection rule, but its workspace counterpart's `types / domain / infrastructure` review annotation is missing. The annotation at line 215 applies to the separate escape-hatch rule and has a different scope, so restore the table's corresponding enforcement annotation as required by D1/AC-17.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_conformance",
+              "file": "overlay/knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 217,
+              "message": "The persistence-conversion requirement (domain typestate plus infrastructure DTO conversion) lost its `types / domain / infrastructure` review annotation. The annotation at line 224 has only `domain / infrastructure` scope and corresponds to the separate rule against compromising domain type safety, leaving type-catalogue review without this requirement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48207a713d4d1f8422ba28fd4d6ca787b0f9c3e46c75f3446cfb0fe7779eef7f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:08:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42eebbd51bbdd9f0eb29fb640dff2d8f050b89045d9949e27fde31f37d542207",
           "type": "final",
           "verdict": "zero_findings"
         }

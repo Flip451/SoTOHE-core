@@ -105,6 +105,16 @@ port が domain の不変条件または aggregate の語彙で説明できる�
 
 `Command` と `Query` を別の `Interactor` / `ApplicationService` に分離するのは、side effect、required collaborator、possible error、consistency boundary、read/write model のうち少なくとも一つに操作固有の実質的な非対称性がある場合だけである。分離する catalogue は、該当次元、具体的な操作差、分離根拠を `docs` または review 可能な track 記録に残す。read と write の両方があることや、role が利用可能なことだけでは分離理由にならない。
 
+#### Driver injection and facade prohibition
+
+入力 port は 1 ユースケースにつき 1 trait とし、実行メソッドを 1 つだけ持つ。driver の注入粒度はこの port 粒度に合わせ、driver は自分が消費する複数の単能 port をそれぞれ直接受け取ってよい。「driver は 1 つの interactor だけを注入する」という制約は置かない。
+
+> **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
+
+command と query を混載する `*Service` などの facade port を新設してはならない。この禁止は未移行の文脈にも適用する。既存の facade port や既存の単一 interactor 注入は、この規約だけを理由に遡及改修しない。
+
+> **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
+
 ### R2. Free Function Preference (stateless behavior は FreeFunction)
 
 以下の条件をすべて満たす型は `role: FreeFunction` (`functions` エントリ) で起草する。ゼロフィールド struct + 1 method を `role: ValueObject` / `role: UseCase` に matching するのは禁止する。
