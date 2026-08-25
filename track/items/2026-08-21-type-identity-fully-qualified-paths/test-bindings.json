@@ -118,6 +118,17 @@
       "reason": "CatalogueToExtendedCratePort only encodes a catalogue document against supplied rustdoc crates; it does not run Chain ③ or observe implementation-derived TypeRef conformance. Independent whole-TypeRef implementation reconciliation is enforced by the signal evaluator and its implementation-comparison tests, so IN-04 is nonlocal to this port contract."
     },
     {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "CatalogueToExtendedCratePort only encodes catalogue data from supplied rustdoc crates; it does not inspect implementation-derived TypeRef information or run Chain ③. AC-06's independent whole-TypeRef implementation conformance, including external paths, wrappers, and type arguments, is therefore not observable at this port boundary and belongs to the implementation-comparison evaluator."
+    },
+    {
       "kind": "fulfillment",
       "obligation_id": {
         "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
@@ -475,37 +486,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ]
     },
@@ -571,6 +582,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         }
       ]
     },
@@ -591,6 +607,16 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
           "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         }
       ]
     },
@@ -656,6 +682,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ]
     },
@@ -672,7 +708,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         }
       ]
     },
@@ -700,7 +736,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         }
       ]
     },
@@ -725,11 +761,6 @@
         }
       },
       "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
-          "test_name": "test_syn_type_ref_path_extractor_carries_parameter_context_exclusively"
-        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
@@ -836,6 +867,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
           "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_reports_incomplete_typeref_location"
         }
       ]
     },
@@ -852,7 +893,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "test_name": "test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_keeps_same_named_fully_qualified_results_separate"
         }
       ]
     },
@@ -868,8 +914,13 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_reports_incomplete_typeref_location"
         }
       ]
     },
@@ -885,8 +936,8 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_resolves_qualified_same_named_paths_and_external_references"
         }
       ]
     },
@@ -936,11 +987,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ]
     },
@@ -980,11 +1026,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ]
     },
@@ -1011,7 +1052,7 @@
       ]
     },
     {
-      "kind": "voluntary_binding",
+      "kind": "waiver",
       "edge_id": {
         "entry_key": "NewTypeGraphCodecError",
         "anchor_id": {
@@ -1019,48 +1060,7 @@
           "element_id": "AC-06"
         }
       },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_public_std_reexports_preserve_adapter_spelling_and_resolve_definition_paths"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_returns_invalid_type_ref_for_unparseable_field_type"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_field_with_generic_type_ref_creates_resolved_path_with_args"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_trait_impl_nested_generic_type_resolves_as_generic"
-        }
-      ]
+      "reason": "NewTypeGraphCodecError only represents errors returned by catalogue-to-type-graph encoding; it does not inspect implementation-derived TypeRef information or run Chain ③. AC-06's independent whole-TypeRef implementation conformance, including external paths, wrappers, and type arguments, is therefore not observable at this error declaration and belongs to the implementation-comparison evaluator."
     },
     {
       "kind": "waiver",
@@ -1163,7 +1163,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
-          "test_name": "test_syn_type_ref_path_extractor_carries_parameter_context_exclusively"
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_extractor_resolves_nested_paths_and_enumerates_ambiguous_candidates"
         }
       ]
     },
@@ -1186,6 +1191,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_preserves_same_named_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         }
       ]
     },
@@ -1236,11 +1246,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ]
     },
@@ -1256,8 +1261,8 @@
       "tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "module_path": "domain::tddd::catalogue_linter_helpers::tests",
+          "test_name": "test_has_trait_impl_rejects_reference_for_type_as_root_identity"
         }
       ]
     },
@@ -1273,8 +1278,8 @@
       "tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "module_path": "domain::tddd::catalogue_linter_helpers::tests",
+          "test_name": "test_has_trait_impl_rejects_reference_for_type_as_root_identity"
         }
       ]
     },
@@ -1287,7 +1292,7 @@
           "element_id": "AC-04"
         }
       },
-      "reason": "TypeRefPathExtractionError only represents extractor failures such as unsupported syntax and depth/resource limits; AC-04 requires resolving ambiguous or unresolved catalogue identities and failing closed with identity diagnostics. This error declaration does not perform catalogue identity resolution, and no plain test exercises both the declaration and AC-04 at the same boundary. The identity behavior belongs to CatalogueIdentityResolutionError and the evaluator, so binding their tests here would be nonlocal."
+      "reason": "TypeRefPathExtractionError represents extractor syntax, depth, and resource failures; it does not classify a catalogue reference as an accepted spelling, ambiguous match, or unmatched external path. Under AC-04, accepted spellings resolve uniquely, ambiguous catalogue matches fail closed with candidates, and unmatched references are delegated as external. No plain test exercises this error declaration together with that catalogue-identity boundary, so binding an extractor-error test here would be nonlocal."
     },
     {
       "kind": "voluntary_binding",
@@ -1303,6 +1308,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_preserves_same_named_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "domain",

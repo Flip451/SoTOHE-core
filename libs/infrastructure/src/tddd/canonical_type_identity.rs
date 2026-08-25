@@ -569,21 +569,29 @@ fn canonicalize_path(
     let path = TypeRef::new(raw_path.to_owned())
         .map_err(|_| invalid_type_ref(source, "path must not be empty"))?;
     let identity = if let (Some(path_id), Some(rustdoc_paths)) = (path_id, rustdoc_paths) {
-        if path_id == Id(0) {
-            authority.resolve(&path, catalogue_crate).map_err(map_identity_resolution_error)?
-        } else {
-            let summary = rustdoc_paths.get(&path_id).ok_or_else(|| {
-                invalid_type_ref(source, "rustdoc path has no authoritative Crate::paths entry")
-            })?;
-            let summary_identity = summary_identity(summary).ok_or_else(|| {
-                invalid_type_ref(source, "rustdoc path has no authoritative type identity")
-            })?;
-            let summary_ref = TypeRef::new(summary_identity.to_string())
-                .map_err(|_| invalid_type_ref(source, "rustdoc path identity is invalid"))?;
-            match authority.resolve(&summary_ref, catalogue_crate) {
-                Ok(identity) => identity,
-                Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => summary_identity,
-                Err(error) => return Err(map_identity_resolution_error(error)),
+        match rustdoc_paths.get(&path_id) {
+            Some(summary) if path_id != Id(0) => {
+                let summary_identity = summary_identity(summary).ok_or_else(|| {
+                    invalid_type_ref(
+                        source,
+                        format!(
+                            "rustdoc path `{raw_path}` (id {}) has no authoritative type identity",
+                            path_id.0
+                        ),
+                    )
+                })?;
+                let summary_ref = TypeRef::new(summary_identity.to_string())
+                    .map_err(|_| invalid_type_ref(source, "rustdoc path identity is invalid"))?;
+                match authority.resolve(&summary_ref, catalogue_crate) {
+                    Ok(identity) => identity,
+                    Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => {
+                        summary_identity
+                    }
+                    Err(error) => return Err(map_identity_resolution_error(error)),
+                }
+            }
+            Some(_) | None => {
+                authority.resolve(&path, catalogue_crate).map_err(map_identity_resolution_error)?
             }
         }
     } else {
@@ -692,6 +700,17 @@ mod tests {
             .map(|name| ParamName::new(*name).expect("test generic name must be valid"))
             .collect::<Vec<_>>();
         canonicalize_catalogue_type_ref(&type_ref, &crate_name, rustdoc_paths, &params)
+    }
+
+    fn generic_args_with_type_path(path_id: u32, path: &str) -> GenericArgs {
+        GenericArgs::AngleBracketed {
+            args: vec![GenericArg::Type(Type::ResolvedPath(Path {
+                path: path.to_owned(),
+                id: Id(path_id),
+                args: None,
+            }))],
+            constraints: vec![],
+        }
     }
 
     #[test]
@@ -901,20 +920,93 @@ mod tests {
     }
 
     #[test]
-    fn test_canonicalize_rustdoc_path_missing_authoritative_id_fails_closed() {
+    fn test_canonicalize_rustdoc_path_missing_authoritative_id_falls_back_to_spelling() {
         let rustdoc_paths = paths(&[(1, &["domain", "alpha", "Shared"])]);
         let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
         let ty = Type::ResolvedPath(Path { path: "Shared".to_owned(), id: Id(99), args: None });
 
-        let error = canonicalize_rustdoc_type_with_authority(
+        let canonical = canonicalize_rustdoc_type_with_authority(
             &ty,
             &CrateName::new("domain").expect("valid crate"),
             &rustdoc_paths,
             &authority,
         )
-        .expect_err("a missing path summary must not fall back to the short spelling");
+        .expect("a missing path summary falls back to spelling resolution");
 
-        assert!(matches!(error, NewTypeGraphCodecError::InvalidTypeRef(_, _)));
+        assert!(matches!(
+            canonical,
+            Type::ResolvedPath(Path { path, .. }) if path == "domain::alpha::Shared"
+        ));
+    }
+
+    #[test]
+    fn test_canonicalize_trait_impl_generic_args_synthetic_id_falls_back_to_spelling() {
+        let rustdoc_paths = paths(&[(1, &["domain", "errors", "PrimitiveOccurrenceScanError"])]);
+        let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
+        let crate_name = CrateName::new("domain").expect("valid crate");
+
+        for synthetic_id in [u32::MAX, u32::MAX - 1] {
+            let canonical = canonicalize_rustdoc_generic_args_with_authority(
+                &generic_args_with_type_path(synthetic_id, "PrimitiveOccurrenceScanError"),
+                &crate_name,
+                &rustdoc_paths,
+                &authority,
+            )
+            .expect("a synthetic path id must use spelling-based authority resolution");
+
+            assert!(matches!(
+                canonical,
+                GenericArgs::AngleBracketed { args, .. }
+                    if matches!(
+                        args.as_slice(),
+                        [GenericArg::Type(Type::ResolvedPath(Path { path, .. }))]
+                            if path == "domain::errors::PrimitiveOccurrenceScanError"
+                    )
+            ));
+        }
+    }
+
+    #[test]
+    fn test_canonicalize_trait_impl_generic_args_unresolved_synthetic_id_fails_closed() {
+        let rustdoc_paths = paths(&[(1, &["domain", "errors", "KnownError"])]);
+        let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
+        let error = canonicalize_rustdoc_generic_args_with_authority(
+            &generic_args_with_type_path(u32::MAX, "MissingError"),
+            &CrateName::new("domain").expect("valid crate"),
+            &rustdoc_paths,
+            &authority,
+        )
+        .expect_err("an unresolved spelling must remain fail-closed");
+
+        assert!(matches!(
+            error,
+            NewTypeGraphCodecError::UnresolvedIdentifier(identifier)
+                if identifier.as_str() == "MissingError"
+        ));
+    }
+
+    #[test]
+    fn test_canonicalize_trait_impl_generic_args_existing_id_uses_authoritative_summary() {
+        let rustdoc_paths =
+            paths(&[(1, &["domain", "alpha", "Shared"]), (2, &["domain", "beta", "Shared"])]);
+        let authority = DefinitionPathAuthority::from_path_maps(&rustdoc_paths, &[]);
+        let canonical = canonicalize_rustdoc_generic_args_with_authority(
+            &generic_args_with_type_path(1, "Shared"),
+            &CrateName::new("domain").expect("valid crate"),
+            &rustdoc_paths,
+            &authority,
+        )
+        .expect("an existing path id must use its authoritative summary");
+
+        assert!(matches!(
+            canonical,
+            GenericArgs::AngleBracketed { args, .. }
+                if matches!(
+                    args.as_slice(),
+                    [GenericArg::Type(Type::ResolvedPath(Path { path, .. }))]
+                        if path == "domain::alpha::Shared"
+                )
+        ));
     }
 
     #[test]

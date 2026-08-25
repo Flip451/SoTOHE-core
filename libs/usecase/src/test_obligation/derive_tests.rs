@@ -1853,6 +1853,50 @@ fn test_trait_impl_declaration_resolves_self_crate_trait_from_other_catalogue() 
 }
 
 #[test]
+fn test_trait_impl_bare_ref_resolves_only_against_implementing_catalogue_crate() {
+    let domain_path = PathBuf::from("domain-traits.json");
+    let infrastructure_path = PathBuf::from("infrastructure-impls.json");
+
+    let mut domain_catalogue = empty_catalogue("domain", "domain");
+    domain_catalogue.insert_trait(
+        CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-99"),
+    );
+
+    let mut infrastructure_catalogue = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure_catalogue.insert_trait(
+        CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    infrastructure_catalogue.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Port").unwrap(),
+        TypeRef::new("MyAdapter").unwrap(),
+    ));
+
+    let (interactor, sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (domain_path.clone(), domain_catalogue),
+            (infrastructure_path.clone(), infrastructure_catalogue),
+        ],
+    );
+
+    interactor.execute(&command(vec![domain_path, infrastructure_path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let conformance: Vec<_> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .collect();
+
+    assert_eq!(conformance.len(), 1);
+    assert_eq!(conformance[0].id().entry_key().as_str(), "MyAdapter");
+    assert_eq!(conformance[0].spec_refs()[0].element_id(), "IN-06");
+}
+
+#[test]
 fn test_fs_spec_document_loader_trait_impl_derives_its_secondary_port_obligation() {
     // IN-07 / IN-08: the real filesystem loader declaration resolves the
     // domain port's SecondaryPort role across the catalogue boundary.

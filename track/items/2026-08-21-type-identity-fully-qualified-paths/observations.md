@@ -102,3 +102,20 @@ identity 解決の中核 (参照の宣言表記 + 既知 identity の宇宙 → 
 - catalogue-lint: その catalogue が宣言している entry の集合を宇宙として供給
 
 これで通過点は 1 つのまま、lint も codec も同じ解決を通る。曖昧時の候補列挙 (ADR D1 / spec AC-03) もその 1 箇所に実装される。
+
+## 2026-08-25: 受理文法の閉鎖に伴う spec 改訂 (user 裁定)
+
+艦隊処方箋 2 (tmp/handoff/2026-08-24-closed-spelling-grammar-prescription.md) の採用により、
+参照 spelling の受理を宣言ごとの有限集合 (stored key / module_path::name / crate 修飾形) の
+完全一致に閉じ、一致しない参照は解釈せず Chain ③ (実装突合) に委譲する意味論へ移行した。
+
+この移行後、test-obligation evaluate が spec anchor AC-04 / AC-05 / CO-02 の現行文言
+(「未解決参照は一律 fail-closed」) とテスト (unmatched 参照の受理を assert) の Contradiction
+6 件を正しく検出した。採用済み ADR (2026-08-23-0000) の「カタログ内参照」定義 (有効な宣言を
+指す参照) は skip 意味論と両立するため ADR は変更せず、spec の 3 anchor の fail-closed 範囲を
+「カタログ内参照の一意性 (曖昧時は候補列挙) + 検査完了性 (構文・深さ・資源・分類不能)」に
+限定する改訂を user が裁定した (2026-08-25)。宣言に一致しない参照の存在検証は Chain ③ の
+責務であり、typo は実装との突合で検出される。
+
+処方箋の逸脱条項 (「spec / ADR の Decision 変更が要ると判断した場合は observations に記録
+して User へ」) に基づく記録である。有限追加した受理 spelling はゼロ。

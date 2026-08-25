@@ -76,6 +76,21 @@ impl TypeSignalIdentityIndex {
         }
         (!candidates.is_empty()).then_some(candidates)
     }
+
+    fn aliases_for_entry_key<'a>(&'a self, key: &str) -> Vec<&'a str> {
+        let mut aliases = Vec::new();
+        for (alias, keys) in
+            self.canonical_to_keys.iter().chain(self.declaration_aliases_to_keys.iter())
+        {
+            if keys.len() == 1
+                && keys.first().is_some_and(|candidate| candidate.as_str() == key)
+                && !aliases.contains(&alias.as_str())
+            {
+                aliases.push(alias.as_str());
+            }
+        }
+        aliases
+    }
 }
 
 /// Builds the identity join used by the type-signal producer.
@@ -377,8 +392,10 @@ pub(super) fn build_type_signals_from_report<'a>(
     }
 
     for name in kind_tag_map.keys() {
-        acc.entry(name.clone()).or_insert_with(|| {
-            order.push(name.clone());
+        let entry_name =
+            stored_entry_key_for_kind_name(name, identity_index).unwrap_or_else(|| name.clone());
+        acc.entry(entry_name.clone()).or_insert_with(|| {
+            order.push(entry_name);
             (ConfidenceSignal::Blue, true, Vec::new(), Vec::new(), Vec::new())
         });
     }
@@ -391,7 +408,7 @@ pub(super) fn build_type_signals_from_report<'a>(
             else {
                 return Vec::new();
             };
-            let kind_tags = kind_tag_map.get(name.as_str()).map(Vec::as_slice).unwrap_or(&[]);
+            let kind_tags = kind_tags_for_entry(name.as_str(), kind_tag_map, identity_index);
             if kind_tags.is_empty() {
                 return vec![TypeSignal::new(
                     name,
@@ -442,6 +459,38 @@ fn record_plain_signal(
     });
     entry.0 = worse_signal(entry.0, confidence);
     entry.1 = entry.1 || found_in_c;
+}
+
+fn kind_tags_for_entry(
+    entry_key: &str,
+    kind_tag_map: &BTreeMap<String, Vec<&'static str>>,
+    identity_index: &TypeSignalIdentityIndex,
+) -> Vec<&'static str> {
+    if let Some(kind_tags) = kind_tag_map.get(entry_key) {
+        return kind_tags.clone();
+    }
+
+    let mut kind_tags = Vec::new();
+    for alias in identity_index.aliases_for_entry_key(entry_key) {
+        if let Some(tags) = kind_tag_map.get(alias) {
+            for &tag in tags {
+                if !kind_tags.contains(&tag) {
+                    kind_tags.push(tag);
+                }
+            }
+        }
+    }
+    kind_tags
+}
+
+fn stored_entry_key_for_kind_name(
+    kind_name: &str,
+    identity_index: &TypeSignalIdentityIndex,
+) -> Option<String> {
+    match identity_index.declaration_candidates(kind_name)?.as_slice() {
+        [entry_key] => Some(entry_key.clone()),
+        _ => None,
+    }
 }
 
 fn signal_kind_to_confidence(kind: ThreeWaySignalKind) -> ConfidenceSignal {
@@ -828,6 +877,28 @@ mod tests {
                 })
                 .all(|signal| signal.found_items().is_empty())
         );
+    }
+
+    #[test]
+    fn test_build_type_signals_nested_supertrait_joins_qualified_kind_alias_to_stored_entry() {
+        let mut index = TypeSignalIdentityIndex::default();
+        index.add_alias("usecase::chain::traits::SoTChain", "SoTChain");
+        let kinds = BTreeMap::from([(
+            "usecase::chain::traits::SoTChain".to_owned(),
+            vec!["secondary_port"],
+        )]);
+        let signals = vec![ThreeWaySignal::new(
+            "usecase::chain::traits::SoTChain: ChainIdentity".to_owned(),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), "SoTChain");
+        assert_eq!(built[0].kind_tag(), "secondary_port");
+        assert_eq!(built[0].signal(), domain::ConfidenceSignal::Blue);
+        assert_eq!(built[0].found_items(), &["ChainIdentity"]);
     }
 
     #[test]

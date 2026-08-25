@@ -1,18 +1,18 @@
 {
   "baseline_hash": "7fc8bc2545db16d70c3b8b4a79992bb3541f1859b9387e8364df357328075369",
   "declaration_hash": "e1e71bd558c2fdd8f15988dc3553f121ea01e186f8848744725a23f9c50b3a36",
-  "generated_at": "2026-08-24T16:27:43Z",
-  "head_commit": "8e20214cbf5eba8027e5fca42473e827adce1159",
+  "generated_at": "2026-08-25T02:55:21Z",
+  "head_commit": "45af327661cc67f3533c5afa09860b45b43be3de",
   "schema_version": 4,
   "signals": [
     {
       "found_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Hash",
-        "PartialEq"
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash"
       ],
       "found_type": true,
       "kind_tag": "value_object",

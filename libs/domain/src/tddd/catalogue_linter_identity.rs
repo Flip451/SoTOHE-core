@@ -33,7 +33,6 @@ pub(super) struct TypeRefInspectionContext<'a> {
 pub(super) struct CatalogueIdentityContext<'a> {
     pub(super) catalogue_crate: &'a CrateName,
     pub(super) universe: &'a BTreeSet<FullyQualifiedItemPath>,
-    pub(super) locality_modules: &'a BTreeSet<ModulePath>,
     pub(super) entries: &'a [DeclaredIdentity],
 }
 
@@ -93,46 +92,6 @@ pub(super) fn declared_identity_universe(
     entries.iter().map(|entry| entry.identity.clone()).collect()
 }
 
-/// Returns the supplied catalogue roots and live module paths that prove a
-/// crate-local root is in scope.
-///
-/// Every supplied catalogue contributes its crate name as a root, including an
-/// otherwise empty catalogue. Type and trait module paths come from their
-/// canonical declared identities; function paths are already fully qualified
-/// keys and contribute their own definition module paths. Deleted entries are
-/// excluded consistently with the identity universe, so tombstones cannot make
-/// an unresolved path look local.
-pub(super) fn declared_locality_modules(
-    all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
-    entries: &[DeclaredIdentity],
-    catalogue_crate: &CrateName,
-) -> BTreeSet<ModulePath> {
-    let mut modules = all_catalogues
-        .values()
-        .filter_map(|catalogue| {
-            ModulePath::from_segments(vec![catalogue.crate_name().as_str().to_owned()]).ok()
-        })
-        .collect::<BTreeSet<_>>();
-    modules.extend(
-        entries
-            .iter()
-            .filter(|entry| entry.identity.crate_name() == catalogue_crate)
-            .map(|entry| entry.identity.module_path().clone()),
-    );
-
-    for catalogue in
-        all_catalogues.values().filter(|catalogue| catalogue.crate_name() == catalogue_crate)
-    {
-        for (path, entry) in catalogue.functions() {
-            if entry.action() != ItemAction::Delete {
-                modules.insert(path.module_path.clone());
-            }
-        }
-    }
-
-    modules
-}
-
 fn role_for_identity(
     entries: &[DeclaredIdentity],
     identity: &FullyQualifiedItemPath,
@@ -178,12 +137,9 @@ pub(super) fn resolve_reference_identities<E: TypeRefPathExtractorPort>(
         let ExtractedTypeRefPath::Path(path) = extracted else {
             continue;
         };
-        if let Some(identity) = classify_catalogue_path(
-            &path,
-            context.catalogue_crate,
-            context.universe,
-            context.locality_modules,
-        )? {
+        if let Some(identity) =
+            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
+        {
             if !resolved.contains(&identity) {
                 resolved.push(identity);
             }
@@ -247,12 +203,9 @@ pub(super) fn signature_contains_identity<E: TypeRefPathExtractorPort>(
         let ExtractedTypeRefPath::Path(path) = extracted else {
             continue;
         };
-        if let Some(identity) = classify_catalogue_path(
-            &path,
-            context.catalogue_crate,
-            context.universe,
-            context.locality_modules,
-        )? {
+        if let Some(identity) =
+            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
+        {
             if identity == *target {
                 return Ok(true);
             }
@@ -261,16 +214,15 @@ pub(super) fn signature_contains_identity<E: TypeRefPathExtractorPort>(
     Ok(false)
 }
 
-/// Classifies a syntactic path using only catalogue declarations and crate
-/// context. `None` means an explicitly external Rust path; `Some` is a
-/// resolved catalogue identity. Unknown bare names fail closed because the
-/// linter cannot prove whether they are an external import or a missing
-/// catalogue declaration.
+/// Classifies a syntactic path against the finite set of declared catalogue
+/// identities. `None` means that the path did not match a catalogue identity;
+/// Chain 3 owns validating whether such a path exists in the implementation.
+/// Ambiguous catalogue matches remain an error because catalogue-local
+/// identity must be unique.
 fn classify_catalogue_path(
     path: &TypeRef,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
-    locality_modules: &BTreeSet<ModulePath>,
 ) -> Result<Option<FullyQualifiedItemPath>, CatalogueLinterError> {
     let normalized = path.as_str().strip_prefix("::").unwrap_or(path.as_str());
     if normalized == "Self" {
@@ -279,184 +231,9 @@ fn classify_catalogue_path(
 
     match resolve_catalogue_identity(path, catalogue_crate, universe) {
         Ok(identity) => Ok(Some(identity)),
-        Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location))
-            if is_known_external_bare_path(location.as_str())
-                || is_explicit_external_qualified_path(normalized) =>
-        {
-            // Resolution has already had the first chance to find a declared
-            // identity. Only an unresolved path can be classified as external;
-            // this preserves declarations such as `domain::std::Entity`.
-            Ok(None)
-        }
-        Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location))
-            if normalized.contains("::")
-                && is_known_catalogue_qualified_path(
-                    normalized,
-                    catalogue_crate,
-                    universe,
-                    locality_modules,
-                ) =>
-        {
-            Err(CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::UnresolvedIdentifier(location),
-            ))
-        }
-        Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(location)) => {
-            Err(CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::ClassificationFailed { location },
-            ))
-        }
+        Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => Ok(None),
         Err(error) => Err(CatalogueLinterError::IdentityResolutionFailed(error)),
     }
-}
-
-/// Returns whether the qualified root belongs to the closed standard-library
-/// namespace. A third-party root is external only when an authoritative input
-/// declares it; catalogue documents have no external-crate declaration field.
-fn is_explicit_external_qualified_path(normalized: &str) -> bool {
-    let Some((root, _)) = normalized.split_once("::") else {
-        return false;
-    };
-
-    matches!(root, "std" | "core" | "alloc")
-}
-
-/// Returns whether the qualified root is proven local by supplied catalogues or
-/// by a relative path marker. Unknown roots are intentionally not local.
-fn is_known_catalogue_qualified_path(
-    normalized: &str,
-    catalogue_crate: &CrateName,
-    universe: &BTreeSet<FullyQualifiedItemPath>,
-    locality_modules: &BTreeSet<ModulePath>,
-) -> bool {
-    let Some((root, _)) = normalized.split_once("::") else {
-        return false;
-    };
-
-    root == catalogue_crate.as_str()
-        || matches!(root, "crate" | "self" | "super")
-        || universe.iter().any(|identity| identity.crate_name().as_str() == root)
-        || locality_modules.iter().any(|module_path| {
-            module_path.segments().first().is_some_and(|segment| segment.as_str() == root)
-        })
-}
-
-fn is_known_external_bare_path(path: &str) -> bool {
-    matches!(
-        path,
-        "bool"
-            | "char"
-            | "str"
-            | "f32"
-            | "f64"
-            | "i8"
-            | "i16"
-            | "i32"
-            | "i64"
-            | "i128"
-            | "isize"
-            | "u8"
-            | "u16"
-            | "u32"
-            | "u64"
-            | "u128"
-            | "usize"
-            | "never"
-            | "Option"
-            | "Result"
-            | "Vec"
-            | "String"
-            | "Box"
-            | "Rc"
-            | "Arc"
-            | "Cell"
-            | "RefCell"
-            | "Pin"
-            | "PhantomData"
-            | "PhantomPinned"
-            | "Path"
-            | "PathBuf"
-            | "Cow"
-            | "HashMap"
-            | "HashSet"
-            | "BTreeMap"
-            | "BTreeSet"
-            | "VecDeque"
-            | "LinkedList"
-            | "Iterator"
-            | "IntoIterator"
-            | "DoubleEndedIterator"
-            | "ExactSizeIterator"
-            | "FromIterator"
-            | "Extend"
-            | "Sum"
-            | "Product"
-            | "Send"
-            | "Sync"
-            | "Sized"
-            | "Unpin"
-            | "Clone"
-            | "Copy"
-            | "Debug"
-            | "Display"
-            | "Default"
-            | "Eq"
-            | "Ord"
-            | "Hash"
-            | "PartialEq"
-            | "PartialOrd"
-            | "From"
-            | "Into"
-            | "TryFrom"
-            | "TryInto"
-            | "AsRef"
-            | "AsMut"
-            | "Deref"
-            | "DerefMut"
-            | "Drop"
-            | "Fn"
-            | "FnMut"
-            | "FnOnce"
-            | "ToString"
-            | "ToOwned"
-            | "Borrow"
-            | "BorrowMut"
-            | "Mutex"
-            | "RwLock"
-            | "Error"
-            | "Read"
-            | "Write"
-            | "Seek"
-            | "BufRead"
-            | "Formatter"
-            | "Add"
-            | "Sub"
-            | "Mul"
-            | "Div"
-            | "Rem"
-            | "Neg"
-            | "Not"
-            | "BitAnd"
-            | "BitOr"
-            | "BitXor"
-            | "Shl"
-            | "Shr"
-            | "Index"
-            | "IndexMut"
-            | "AddAssign"
-            | "SubAssign"
-            | "MulAssign"
-            | "DivAssign"
-            | "RemAssign"
-            | "BitAndAssign"
-            | "BitOrAssign"
-            | "BitXorAssign"
-            | "ShlAssign"
-            | "ShrAssign"
-            | "FromStr"
-            | "Hasher"
-            | "BuildHasher"
-    )
 }
 
 #[cfg(test)]
@@ -534,14 +311,7 @@ mod tests {
         catalogue_crate: &'a CrateName,
         universe: &'a BTreeSet<FullyQualifiedItemPath>,
     ) -> CatalogueIdentityContext<'a> {
-        static EMPTY_LOCALITY_MODULES: std::sync::OnceLock<BTreeSet<ModulePath>> =
-            std::sync::OnceLock::new();
-        CatalogueIdentityContext {
-            catalogue_crate,
-            universe,
-            locality_modules: EMPTY_LOCALITY_MODULES.get_or_init(BTreeSet::new),
-            entries: &[],
-        }
+        CatalogueIdentityContext { catalogue_crate, universe, entries: &[] }
     }
 
     fn empty_inspection() -> TypeRefInspectionContext<'static> {
@@ -579,57 +349,47 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_reference_identities_rejects_leading_colon_known_crate_constructor() {
+    fn test_resolve_reference_identities_skips_unmatched_path_and_keeps_catalogue_match() {
         let event = identity("alpha", "Event");
-        let universe = BTreeSet::from([event]);
+        let universe = BTreeSet::from([event.clone()]);
         let type_ref =
             TypeRef::new("missing-catalogue-wrapper").expect("valid extractor fixture reference");
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
 
-        let error = resolve_reference_identities(
+        let resolved = resolve_reference_identities(
             &type_ref,
             identity_context(&catalogue_crate, &universe),
             &IdentityReferenceExtractor,
             empty_inspection(),
         )
-        .expect_err("unresolved known-crate constructor must fail closed");
+        .expect("unmatched paths are delegated to Chain 3");
 
-        assert!(matches!(
-            error,
-            CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
-            ) if unresolved.as_str() == "::domain::missing::Wrapper"
-        ));
+        assert_eq!(resolved, vec![event]);
     }
 
     #[test]
-    fn test_signature_contains_identity_rejects_unresolved_known_crate_reference() {
+    fn test_signature_contains_identity_skips_unmatched_known_crate_reference() {
         let target = identity("orders", "OrderLine");
         let universe = BTreeSet::from([target.clone()]);
         let type_ref =
             TypeRef::new("missing-catalogue-identity").expect("valid extractor fixture reference");
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
 
-        let error = signature_contains_identity(
+        let contains = signature_contains_identity(
             &type_ref,
             &target,
             identity_context(&catalogue_crate, &universe),
             &IdentityReferenceExtractor,
             empty_inspection(),
         )
-        .expect_err("unresolved known-crate reference must fail closed");
+        .expect("unmatched paths are delegated to Chain 3");
 
-        assert!(matches!(
-            error,
-            CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
-            ) if unresolved.as_str() == "domain::missing::Customer"
-        ));
+        assert!(!contains);
     }
 
-    struct ClassificationFailureExtractor;
+    struct EchoPathExtractor;
 
-    impl TypeRefPathExtractorPort for ClassificationFailureExtractor {
+    impl TypeRefPathExtractorPort for EchoPathExtractor {
         fn extract(
             &self,
             type_ref: &TypeRef,
@@ -642,88 +402,37 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_reference_identities_reports_classification_failure_for_unknown_bare_path() {
+    fn test_resolve_reference_identities_skips_unknown_bare_path() {
         let type_ref = TypeRef::new("ImportedButUnclassified").expect("valid TypeRef");
         let universe = BTreeSet::new();
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
 
-        let error = resolve_reference_identities(
+        let resolved = resolve_reference_identities(
             &type_ref,
             identity_context(&catalogue_crate, &universe),
-            &ClassificationFailureExtractor,
+            &EchoPathExtractor,
             empty_inspection(),
         )
-        .expect_err("unknown bare paths must not be guessed as external");
+        .expect("unmatched bare paths are delegated to Chain 3");
 
-        assert!(matches!(
-            error,
-            CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::ClassificationFailed { location }
-            ) if location == type_ref
-        ));
+        assert!(resolved.is_empty());
     }
 
     #[test]
-    fn test_resolve_reference_identities_rejects_supplied_and_unknown_crate_roots() {
+    fn test_resolve_reference_identities_skips_unmatched_paths_regardless_of_root() {
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
-        let mut all_catalogues = BTreeMap::new();
-        all_catalogues.insert(
-            LayerId::try_new("domain").expect("valid layer id"),
-            CatalogueDocument::new(
-                2,
-                catalogue_crate.clone(),
-                LayerId::try_new("domain").expect("valid layer id"),
-            ),
-        );
-        all_catalogues.insert(
-            LayerId::try_new("payments").expect("valid layer id"),
-            CatalogueDocument::new(
-                2,
-                CrateName::new("payments").expect("valid crate name"),
-                LayerId::try_new("payments").expect("valid layer id"),
-            ),
-        );
-        let entries = Vec::new();
-        let universe = declared_identity_universe(&entries);
-        let locality_modules =
-            declared_locality_modules(&all_catalogues, &entries, &catalogue_crate);
-        let context = CatalogueIdentityContext {
-            catalogue_crate: &catalogue_crate,
-            universe: &universe,
-            locality_modules: &locality_modules,
-            entries: &entries,
-        };
+        let universe = BTreeSet::new();
 
-        let supplied_reference = TypeRef::new("payments::Missing").expect("valid TypeRef");
-        let error = resolve_reference_identities(
-            &supplied_reference,
-            context,
-            &ClassificationFailureExtractor,
-            empty_inspection(),
-        )
-        .expect_err("a supplied catalogue root must fail closed when unresolved");
-        assert!(matches!(
-            error,
-            CatalogueLinterError::IdentityResolutionFailed(
-                CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
-            ) if unresolved == supplied_reference
-        ));
-
-        for unknown_reference in ["serde::Serialize", "heplers::Thing"] {
-            let unknown_reference = TypeRef::new(unknown_reference).expect("valid TypeRef");
-            let error = resolve_reference_identities(
-                &unknown_reference,
-                context,
-                &ClassificationFailureExtractor,
+        for reference in ["payments::Missing", "serde::Serialize", "heplers::Thing"] {
+            let reference = TypeRef::new(reference).expect("valid TypeRef");
+            let resolved = resolve_reference_identities(
+                &reference,
+                identity_context(&catalogue_crate, &universe),
+                &EchoPathExtractor,
                 empty_inspection(),
             )
-            .expect_err("an unknown crate root must fail closed");
-            assert!(matches!(
-                error,
-                CatalogueLinterError::IdentityResolutionFailed(
-                    CatalogueIdentityResolutionError::ClassificationFailed { location }
-                ) if location == unknown_reference
-            ));
+            .expect("unmatched qualified paths are delegated to Chain 3");
+            assert!(resolved.is_empty(), "unexpected catalogue identity for {reference}");
         }
     }
 
@@ -740,17 +449,17 @@ mod tests {
             let resolved = resolve_reference_identities(
                 &type_ref,
                 identity_context(&catalogue_crate, &universe),
-                &ClassificationFailureExtractor,
+                &EchoPathExtractor,
                 empty_inspection(),
             )
-            .expect("catalogue identity must win over external-root classification");
+            .expect("declared catalogue identities resolve before unmatched paths are skipped");
 
             assert_eq!(resolved, vec![expected]);
         }
     }
 
     #[test]
-    fn test_resolve_reference_identities_classifies_unresolved_std_path_as_external() {
+    fn test_resolve_reference_identities_skips_unmatched_std_path() {
         let universe = BTreeSet::new();
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
         let type_ref = TypeRef::new("std::vec::Vec").expect("valid external path");
@@ -758,16 +467,16 @@ mod tests {
         let resolved = resolve_reference_identities(
             &type_ref,
             identity_context(&catalogue_crate, &universe),
-            &ClassificationFailureExtractor,
+            &EchoPathExtractor,
             empty_inspection(),
         )
-        .expect("unresolved standard-library path is external");
+        .expect("unmatched standard-library paths are delegated to Chain 3");
 
         assert!(resolved.is_empty());
     }
 
     #[test]
-    fn test_resolve_reference_identities_classifies_supported_bare_external_paths() {
+    fn test_resolve_reference_identities_skips_unmatched_bare_paths() {
         let universe = BTreeSet::new();
         let catalogue_crate = CrateName::new("domain").expect("valid crate name");
 
@@ -786,10 +495,10 @@ mod tests {
             let resolved = resolve_reference_identities(
                 &type_ref,
                 identity_context(&catalogue_crate, &universe),
-                &ClassificationFailureExtractor,
+                &EchoPathExtractor,
                 empty_inspection(),
             )
-            .expect("supported bare standard path is external");
+            .expect("unmatched bare paths are delegated to Chain 3");
 
             assert!(resolved.is_empty(), "unexpected catalogue identity for {path}");
         }

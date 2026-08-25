@@ -265,7 +265,7 @@
         "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
         "bound_tests_set_hash": "cea7e280eed97027e7d4c8aab84286856daa1f28d96e2013870ae45b97eece4f",
         "declaration_hash": "f1b332371a2b016cbf9c70515d89ca94af6fc772789e41d8cfc3c67f687402a6"
       },
@@ -275,7 +275,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let ambiguous_universe =\n            BTreeSet::from([expected.clone(), identity(\"domain\", &[\"beta\"], \"Entity\")]);\n        let ambiguous = resolve_catalogue_identity(\n            &reference(\"Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &ambiguous_universe,\n        )\n        .expect_err(\"ambiguous short name must not fall back to a short identity\");\n        assert!(matches!(ambiguous, CatalogueIdentityResolutionError::AmbiguousIdentifier(_, _)));\n\n        let unresolved = resolve_catalogue_identity(\n            &reference(\"domain::missing::Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect_err(\"unresolved qualified path must not fall back to a short identity\");\n        assert!(matches!(unresolved, CatalogueIdentityResolutionError::UnresolvedIdentifier(_)));",
+        "citation": "let resolved = resolve_catalogue_identity(\n            &reference(\"Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect(\"unique short name resolves\");\n\n        assert_eq!(resolved, expected);\n        assert_eq!(resolved.to_string(), \"domain::alpha::Entity\");\n        assert_ne!(resolved.to_string(), \"Entity\");\n\nlet resolved = resolve_catalogue_identity(\n            &reference(\"domain::beta::Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect(\"crate-prefixed path resolves\");\n\n        assert_eq!(resolved, expected);\n        assert_ne!(resolved, other);\n\nlet resolved = resolve_catalogue_identity(\n            &reference(\"crate::alpha::Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect(\"crate keyword path resolves\");\n\n        assert_eq!(resolved, expected);\n\nassert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::AmbiguousIdentifier(identifier, candidates)\n                if identifier.as_str() == \"Entity\"\n                    && candidates.as_slice() == [first, second]\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -550,87 +550,6 @@
       },
       "verdict": {
         "citation": "assert_ne!(alpha_id, beta_id);\n    assert_ne!(alpha_port_id, beta_port_id);\n    assert_eq!(encoded.krate().paths[&alpha_id].path, [\"domain\", \"alpha\", \"Input\"]);\n    assert_eq!(encoded.krate().paths[&beta_id].path, [\"domain\", \"beta\", \"Input\"]);\n    assert_eq!(encoded.krate().paths[&alpha_port_id].path, [\"domain\", \"alpha\", \"Port\"]);\n    assert_eq!(encoded.krate().paths[&beta_port_id].path, [\"domain\", \"beta\", \"Port\"]);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_same_short_name_in_different_modules_resolves_qualified_paths"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_unique_short_names_resolve_incrate_type_and_trait_refs_to_qualified_paths"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_returns_invalid_type_ref_for_unparseable_field_type"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_field_with_generic_type_ref_creates_resolved_path_with_args"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_trait_impl_nested_generic_type_resolves_as_generic"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        "entry_key": "CatalogueToExtendedCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "373293ed59b7853007797f752df2c07f9c898f61aa4e4802a7b6f081dfeb15ca",
-        "bound_tests_set_hash": "2b1d98367adc4df5903bf798d7b76a6029e23f69a5da8f5996aa0a7539ead2c6",
-        "declaration_hash": "042d162ffc2552ce373e8434a0ad06560e046013fabcb3c13726f0a5fc7b91b7"
-      },
-      "obligation_id": {
-        "entry_key": "CatalogueToExtendedCratePort",
-        "item_identifier": "trait_method:encode",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "let field_with_args = ec.krate().index.values().find(|item| {\n        matches!(&item.inner, ItemEnum::StructField(Type::ResolvedPath(p)) if p.path.contains(\"Vec\") && p.args.is_some())\n    });\n    assert!(field_with_args.is_some(), \"expected Vec<String> field with generic args\");\n\n    let error = encode_doc(doc).unwrap_err();\n    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {\n        panic!(\"expected AmbiguousIdentifier, got {error:?}\");\n    };",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1323,37 +1242,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ],
       "edge_id": {
@@ -1365,7 +1284,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "ac099f0e125391b1ae0acaabc7f1ae4e22de66230eaf94c79ebc88f8a7d12794",
+        "bound_tests_set_hash": "2f76011faa43636d3ab25eacdb306634edbf16c6acae1351611632f5a5b11a33",
         "declaration_hash": "e080a0ab00a5c3a3f2b8e21bb59fd47477ef8ea9eb3fe7b0fd8d458f964ddd91"
       },
       "obligation_id": {
@@ -1374,7 +1293,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(violations.iter().any(|violation| { violation.entry_name() == \"domain::alpha::UseCaseExtractionFailure\" && violation.message().contains(\"unsupported TypeRef syntax\") && violation.message().contains(\"(\") })); ... assert!(ambiguous.message().contains(\"ambiguous identifier `Event`\")); ... assert!(unresolved.message().contains(\"domain::missing::Event\"));",
+        "citation": "assert_eq!(violations.len(), 1);\n        let Some(violation) = violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1384,37 +1303,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ],
       "edge_id": {
@@ -1426,7 +1345,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "ac099f0e125391b1ae0acaabc7f1ae4e22de66230eaf94c79ebc88f8a7d12794",
+        "bound_tests_set_hash": "2f76011faa43636d3ab25eacdb306634edbf16c6acae1351611632f5a5b11a33",
         "declaration_hash": "e080a0ab00a5c3a3f2b8e21bb59fd47477ef8ea9eb3fe7b0fd8d458f964ddd91"
       },
       "obligation_id": {
@@ -1435,7 +1354,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            !violations\n                .iter()\n                .any(|violation| { violation.entry_name() == \"domain::alpha::HandlesAlphaEvent\" })\n        );\n        assert!(violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::alpha::HandlesBetaEvent\"\n                && violation.message().contains(\"ValueObject\")\n                && violation.message().contains(\"DomainEvent\")\n        }));\n\n        assert!(\n            !violations\n                .iter()\n                .any(|violation| { violation.entry_name() == \"domain::alpha::Caller\" })\n        );\n        assert!(violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::beta::Caller\"\n                && violation.rule_kind() == \"NoRoleInMethodSignature\"\n        }));",
+        "citation": "assert_eq!(violations.len(), 1);\n        let Some(violation) = violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violation.message().contains(\"ValueObject\"));\n        assert!(violation.message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1445,37 +1364,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ],
       "edge_id": {
@@ -1486,8 +1405,8 @@
         "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
-        "bound_tests_set_hash": "ac099f0e125391b1ae0acaabc7f1ae4e22de66230eaf94c79ebc88f8a7d12794",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
+        "bound_tests_set_hash": "2f76011faa43636d3ab25eacdb306634edbf16c6acae1351611632f5a5b11a33",
         "declaration_hash": "e080a0ab00a5c3a3f2b8e21bb59fd47477ef8ea9eb3fe7b0fd8d458f964ddd91"
       },
       "obligation_id": {
@@ -1496,7 +1415,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(role_violations.iter().any(|violation| {\n    violation.message().contains(\"FullyQualifiedItemPath\")\n        && violation.message().contains(\"alpha\")\n        && violation.message().contains(\"beta\")\n}), \"ambiguous identity diagnostic: {role_violations:?}\");\nassert!(role_violations.iter().any(|violation| {\n    violation.message().contains(\"domain::missing::Event\")\n}));",
+        "citation": "assert_eq!(identifier.as_str(), \"Event\");\nassert_eq!(candidates.as_slice().len(), 2);\nassert_complete_duplicate_candidates(&format!(\"{candidates:?}\"), \"Event\");\n\nassert!(\n    violations.is_empty(),\n    \"catalogue-lint must not reject an external reference: {violations:?}\"\n);\n\nassert_eq!(violations.len(), 1);\nlet Some(violation) = violations.first() else {\n    panic!(\"the beta reference must produce one role violation\");\n};\nassert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\nassert!(violation.message().contains(\"ValueObject\"));\nassert!(violation.message().contains(\"DomainEvent\"));\nassert!(!violations.iter().any(|violation| {\n    matches!(\n        violation.entry_name(),\n        \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n    )\n}));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1506,37 +1425,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ],
       "edge_id": {
@@ -1547,8 +1466,8 @@
         "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
-        "bound_tests_set_hash": "ac099f0e125391b1ae0acaabc7f1ae4e22de66230eaf94c79ebc88f8a7d12794",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
+        "bound_tests_set_hash": "2f76011faa43636d3ab25eacdb306634edbf16c6acae1351611632f5a5b11a33",
         "declaration_hash": "e080a0ab00a5c3a3f2b8e21bb59fd47477ef8ea9eb3fe7b0fd8d458f964ddd91"
       },
       "obligation_id": {
@@ -1557,7 +1476,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!violations.iter().any(|violation| { violation.entry_name() == \"domain::alpha::Parameterized\" })); ... assert!(violation.message().contains(location));",
+        "citation": "expect_err(\"incomplete TypeRef inspection must fail closed\")",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1567,37 +1486,37 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "test_name": "test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
-          "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_referenced_role_constraint_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_field_element_unique_across_entries_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_no_external_reference_in_methods_duplicate_names_resolve_wrappers_and_diagnose_failures"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_resolves_duplicate_names_in_trait_method_references"
+          "test_name": "test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits"
         }
       ],
       "edge_id": {
@@ -1608,8 +1527,8 @@
         "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
-        "bound_tests_set_hash": "ac099f0e125391b1ae0acaabc7f1ae4e22de66230eaf94c79ebc88f8a7d12794",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
+        "bound_tests_set_hash": "2f76011faa43636d3ab25eacdb306634edbf16c6acae1351611632f5a5b11a33",
         "declaration_hash": "e080a0ab00a5c3a3f2b8e21bb59fd47477ef8ea9eb3fe7b0fd8d458f964ddd91"
       },
       "obligation_id": {
@@ -1618,7 +1537,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "for (entry_name, location) in [\n            (\"domain::alpha::DepthLimited\", \"depth_limited\"),\n            (\"domain::alpha::PartialInspection\", \"partially_inspected\"),\n            (\"domain::alpha::Unclassifiable\", \"UnknownBarePath\"),\n        ] {\n            let violation =\n                violations.iter().find(|violation| violation.entry_name() == entry_name).unwrap();\n            assert!(violation.message().contains(location));\n        }",
+        "citation": "expect(\"all qualified and external references are completely inspectable\");\n\n        assert_eq!(violations.len(), 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1679,6 +1598,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         }
       ],
       "edge_id": {
@@ -1690,7 +1614,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "bound_tests_set_hash": "f03e2fdbbb6abfceeb72fd865fa55cc7253ea9f996f34f2a7a63e24a8b963227",
         "declaration_hash": "b4de0f753df78a91c44f13a78b51c90dc8becc172291d7fec098cffdcc2c7ebe"
       },
       "obligation_id": {
@@ -1699,7 +1623,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"std::vec::Vec\"))));\n        assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new(\"T\").unwrap())));\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new(\"a\").unwrap()))\n        );\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new(\"N\").unwrap()))\n        );\n        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"u8\"))));\n        assert!(!paths.iter().any(|path| {\n            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n        }));",
+        "citation": "assert_eq!(violations.len(), 1);\n        let Some(violation) = violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violation.message().contains(\"ValueObject\"));\n        assert!(violation.message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1760,6 +1684,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         }
       ],
       "edge_id": {
@@ -1770,8 +1699,8 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
+        "bound_tests_set_hash": "f03e2fdbbb6abfceeb72fd865fa55cc7253ea9f996f34f2a7a63e24a8b963227",
         "declaration_hash": "b4de0f753df78a91c44f13a78b51c90dc8becc172291d7fec098cffdcc2c7ebe"
       },
       "obligation_id": {
@@ -1780,7 +1709,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new(\"T\").unwrap()))); ... assert!(paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new(\"a\").unwrap()))); ... assert!(paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new(\"N\").unwrap()))); ... assert!(!paths.iter().any(|path| {\n            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n        })); ... Err(TypeRefPathExtractionError::UnsupportedSyntax { location }) ... Err(TypeRefPathExtractionError::DepthLimitExceeded { location }) ... Err(TypeRefPathExtractionError::ResourceLimitExceeded { location }) ... ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new(\"Output\").unwrap()),",
+        "citation": "assert!(matches!(\n    extract(source, &[], &[], &[]),\n    Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n        if location == type_ref(source)\n));\n\nassert!(matches!(\n    extract(&nested, &[], &[], &[]),\n    Err(TypeRefPathExtractionError::DepthLimitExceeded { location }) if location.as_str() == nested\n));\n\nassert!(matches!(\n    extract(&many, &[], &[], &[]),\n    Err(TypeRefPathExtractionError::ResourceLimitExceeded { location }) if location.as_str() == many\n));\n\nassert!(!paths.iter().any(|path| {\n    matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n}));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1796,6 +1725,16 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
           "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -1807,7 +1746,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "c01128a13349873650159fc9e5f1634b1d436b8fc75d672174007df5591fc4b2",
+        "bound_tests_set_hash": "7dbe8b0511aeefc2a47592935d653055bb09acdcb3a5410d452ede8130b313e2",
         "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d"
       },
       "obligation_id": {
@@ -1816,7 +1755,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"ReferencedRoleConstraint\"\n                && violation.message().contains(\"domain::missing::Event\")\n        }));\n        assert!(violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::alpha::UseCaseExtractionFailure\"\n                && violation.message().contains(\"unsupported TypeRef syntax\")\n                && violation.message().contains(\"(\")\n        }));\n        assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"FieldElementUniqueAcrossEntries\"\n                && violation.message().contains(\"FullyQualifiedItemPath\")\n                && violation.message().contains(\"alpha\")\n                && violation.message().contains(\"beta\")\n        }));",
+        "citation": "`.expect_err(\"unresolved TypeRef inspection must fail closed before rule evaluation\")` ... `assert!(diagnostic.contains(\"AmbiguousIdentifier\"));` ... `.expect_err(\"incomplete TypeRef inspection must fail closed\")` ... `assert!(diagnostic.contains(\"PathExtractionFailed\"));` ... `assert!(diagnostic.contains(\"UnsupportedSyntax\"));` ... `assert!(diagnostic.contains(\"(\") || diagnostic.contains(\"location\"));`",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1832,6 +1771,16 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
           "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -1843,7 +1792,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "c01128a13349873650159fc9e5f1634b1d436b8fc75d672174007df5591fc4b2",
+        "bound_tests_set_hash": "7dbe8b0511aeefc2a47592935d653055bb09acdcb3a5410d452ede8130b313e2",
         "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d"
       },
       "obligation_id": {
@@ -1852,7 +1801,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            violations\n                .iter()\n                .filter(|violation| violation.rule_kind() == \"NoExternalReferenceInMethods\")\n                .count(),\n            2\n        );\n        assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"NoExternalReferenceInMethods\"\n                && violation.message().contains(\"domain::alpha::Entity\")\n                && violation.message().contains(\"domain::alpha::ExternalService\")\n        }));\n        assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"NoExternalReferenceInMethods\"\n                && violation.message().contains(\"FullyQualifiedItemPath\")\n                && violation.message().contains(\"alpha\")\n                && violation.message().contains(\"beta\")\n        }));",
+        "citation": "let violations = interactor\n            .execute(RunCatalogueLintCommand {\n                track_id: \"my-track\".to_owned(),\n                layer_id: \"domain\".to_owned(),\n                rules: vec![LintRuleSpec {\n                    target_roles: vec![\"UseCase\".to_owned()],\n                    kind: LintRuleKind::ReferencedRoleConstraint {\n                        target_field: RolePayloadField::Handles,\n                        expected_role: RoleKind::DomainEvent,\n                    },\n                }],\n            })\n            .expect(\"all unique catalogue references and external references are accepted\");\n\n        assert_eq!(violations.len(), 1);\n        assert_eq!(violations[0].entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violations[0].message().contains(\"ValueObject\"));\n        assert!(violations[0].message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1868,6 +1817,16 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
           "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -1878,8 +1837,8 @@
         "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
-        "bound_tests_set_hash": "c01128a13349873650159fc9e5f1634b1d436b8fc75d672174007df5591fc4b2",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
+        "bound_tests_set_hash": "7dbe8b0511aeefc2a47592935d653055bb09acdcb3a5410d452ede8130b313e2",
         "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d"
       },
       "obligation_id": {
@@ -1888,7 +1847,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"ReferencedRoleConstraint\"\n                && violation.message().contains(\"domain::missing::Event\")\n        }));\n        assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"ReferencedRoleConstraint\"\n                && violation.message().contains(\"FullyQualifiedItemPath\")\n                && violation.message().contains(\"alpha\")\n                && violation.message().contains(\"beta\")\n        }));",
+        "citation": "let error = interactor\n            .execute(RunCatalogueLintCommand {\n                track_id: \"my-track\".to_owned(),\n                layer_id: \"domain\".to_owned(),\n                rules,\n            })\n            .expect_err(\"unresolved TypeRef inspection must fail closed before rule evaluation\");\n        let diagnostic = format!(\"{error:?}\");\n        assert!(diagnostic.contains(\"AmbiguousIdentifier\"));\n        assert!(diagnostic.contains(\"alpha\"));\n        assert!(diagnostic.contains(\"beta\"));\n\n        let violations = interactor\n            .execute(RunCatalogueLintCommand {\n                track_id: \"my-track\".to_owned(),\n                layer_id: \"domain\".to_owned(),\n                rules: vec![LintRuleSpec {\n                    target_roles: vec![\"UseCase\".to_owned()],\n                    kind: LintRuleKind::ReferencedRoleConstraint {\n                        target_field: RolePayloadField::Handles,\n                        expected_role: RoleKind::DomainEvent,\n                    },\n                }],\n            })\n            .expect(\"all unique catalogue references and external references are accepted\");\n\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1904,6 +1863,16 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_lint_workflow::tests",
           "test_name": "test_execute_identity_rules_resolve_wrappers_and_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_fails_closed_with_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -1914,8 +1883,8 @@
         "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
-        "bound_tests_set_hash": "c01128a13349873650159fc9e5f1634b1d436b8fc75d672174007df5591fc4b2",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
+        "bound_tests_set_hash": "7dbe8b0511aeefc2a47592935d653055bb09acdcb3a5410d452ede8130b313e2",
         "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d"
       },
       "obligation_id": {
@@ -1924,7 +1893,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::alpha::UseCaseExtractionFailure\"\n                && violation.message().contains(\"unsupported TypeRef syntax\")\n                && violation.message().contains(\"(\")\n        }));\n        assert_eq!(\n            violations\n                .iter()\n                .filter(|violation| violation.rule_kind() == \"NoExternalReferenceInMethods\")\n                .count(),\n            2\n        );\n        assert!(violations.iter().any(|violation| {\n            violation.rule_kind() == \"NoExternalReferenceInMethods\"\n                && violation.message().contains(\"FullyQualifiedItemPath\")\n                && violation.message().contains(\"alpha\")\n                && violation.message().contains(\"beta\")\n        }));",
+        "citation": ".expect(\"all unique catalogue references and external references are accepted\");\n\n        assert_eq!(violations.len(), 1);\n        assert_eq!(violations[0].entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violations[0].message().contains(\"ValueObject\"));\n        assert!(violations[0].message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));\n\n        let error = interactor\n            .execute(RunCatalogueLintCommand {\n                track_id: \"my-track\".to_owned(),\n                layer_id: \"domain\".to_owned(),\n                rules: vec![LintRuleSpec {\n                    target_roles: vec![\"UseCase\".to_owned()],\n                    kind: LintRuleKind::ReferencedRoleConstraint {\n                        target_field: RolePayloadField::Handles,\n                        expected_role: RoleKind::DomainEvent,\n                    },\n                }],\n            })\n            .expect_err(\"incomplete TypeRef inspection must fail closed\");\n        let diagnostic = format!(\"{error:?}\");\n        assert!(diagnostic.contains(\"PathExtractionFailed\"));\n        assert!(diagnostic.contains(\"UnsupportedSyntax\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1985,6 +1954,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ],
       "edge_id": {
@@ -1996,7 +1975,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "bound_tests_set_hash": "12b71d908a4d2dbf9654adfde8f45d72f7486c9603fc087917f84dbf82ccf990",
         "declaration_hash": "28c98bcf8e729a09026fa48f5d4fa74ff9f3c1d552f0727f36e92ed788ad337d"
       },
       "obligation_id": {
@@ -2005,7 +1984,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(paths, vec![ ExtractedTypeRefPath::Path(type_ref(\"std::result::Result\")), ExtractedTypeRefPath::Path(type_ref(\"domain::alpha::Event\")), ExtractedTypeRefPath::Path(type_ref(\"domain::beta::Event\")), ]);",
+        "citation": "assert_eq!(violations.len(), 1); ... assert!(!violations.iter().any(|violation| { matches!( violation.entry_name(), \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\" ) })); ... .expect_err(\"an ambiguous short-name reference must fail closed\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2066,6 +2045,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ],
       "edge_id": {
@@ -2077,7 +2066,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "bound_tests_set_hash": "12b71d908a4d2dbf9654adfde8f45d72f7486c9603fc087917f84dbf82ccf990",
         "declaration_hash": "28c98bcf8e729a09026fa48f5d4fa74ff9f3c1d552f0727f36e92ed788ad337d"
       },
       "obligation_id": {
@@ -2086,7 +2075,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            paths,\n            vec![\n                ExtractedTypeRefPath::Path(type_ref(\"std::result::Result\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::alpha::Event\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::beta::Event\")),\n            ]\n        );",
+        "citation": "\"std::result::Result<domain::alpha::Event, domain::beta::Event>\" ... \"ExtractedTypeRefPath::Path(type_ref(\\\"domain::alpha::Event\\\")),\" ... \"ExtractedTypeRefPath::Path(type_ref(\\\"domain::beta::Event\\\")),\"; and `assert!(!violations.iter().any(|violation| { matches!( violation.entry_name(), \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\" ) }))`",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2147,6 +2136,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ],
       "edge_id": {
@@ -2157,8 +2156,8 @@
         "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
+        "bound_tests_set_hash": "12b71d908a4d2dbf9654adfde8f45d72f7486c9603fc087917f84dbf82ccf990",
         "declaration_hash": "28c98bcf8e729a09026fa48f5d4fa74ff9f3c1d552f0727f36e92ed788ad337d"
       },
       "obligation_id": {
@@ -2167,7 +2166,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let paths = extract(\n            \"std::result::Result<domain::alpha::Event, domain::beta::Event>\",\n            &[],\n            &[],\n            &[],\n        )\n        .expect(\"syn extraction succeeds\");\n\n        assert_eq!(\n            paths,\n            vec![\n                ExtractedTypeRefPath::Path(type_ref(\"std::result::Result\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::alpha::Event\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::beta::Event\")),\n            ]\n        );",
+        "citation": "let violations = evaluate_catalogue_lint(\n            &[rule],\n            &all_catalogues,\n            &layer,\n            &NoopScanner,\n            &SynTypeRefPathExtractorAdapter,\n        )\n        .expect(\"all qualified and external references are completely inspectable\");\n\n        assert_eq!(violations.len(), 1);\n        let Some(violation) = violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violation.message().contains(\"ValueObject\"));\n        assert!(violation.message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));\n\n        let error = evaluate_catalogue_lint(\n            &[rule],\n            &all_catalogues,\n            &layer,\n            &NoopScanner,\n            &SynTypeRefPathExtractorAdapter,\n        )\n        .expect_err(\"an ambiguous short-name reference must fail closed\");\n        let domain::tddd::catalogue_linter::CatalogueLinterError::IdentityResolutionFailed(\n            domain::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(\n                identifier,\n                candidates,\n            ),\n        ) = error\n        else {\n            panic!(\"ambiguous catalogue identity must be reported as a fail-closed error\");\n        };\n        assert_eq!(identifier.as_str(), \"Event\");\n        let candidate_paths =\n            candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();\n        assert_eq!(\n            candidate_paths,\n            vec![\"domain::alpha::Event\".to_owned(), \"domain::beta::Event\".to_owned(),]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2228,6 +2227,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ],
       "edge_id": {
@@ -2238,8 +2247,8 @@
         "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
+        "bound_tests_set_hash": "12b71d908a4d2dbf9654adfde8f45d72f7486c9603fc087917f84dbf82ccf990",
         "declaration_hash": "28c98bcf8e729a09026fa48f5d4fa74ff9f3c1d552f0727f36e92ed788ad337d"
       },
       "obligation_id": {
@@ -2309,6 +2318,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name"
         }
       ],
       "edge_id": {
@@ -2319,8 +2338,8 @@
         "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
-        "bound_tests_set_hash": "1f1705ae066336ef264140e9e3940f4c46c56a2a5f5e46bdfdc7530595509a46",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
+        "bound_tests_set_hash": "12b71d908a4d2dbf9654adfde8f45d72f7486c9603fc087917f84dbf82ccf990",
         "declaration_hash": "28c98bcf8e729a09026fa48f5d4fa74ff9f3c1d552f0727f36e92ed788ad337d"
       },
       "obligation_id": {
@@ -2329,7 +2348,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let source = \"std::option::Option<Good, bad!()>\";\n        assert!(matches!(\n            extract(source, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n                if location == type_ref(source)\n        ));",
+        "citation": "assert_eq!(violations.len(), 1);\n        let Some(violation) = violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violation.message().contains(\"ValueObject\"));\n        assert!(violation.message().contains(\"DomainEvent\"));\n        assert!(!violations.iter().any(|violation| {\n            matches!(\n                violation.entry_name(),\n                \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\"\n            )\n        }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2339,7 +2358,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         }
       ],
       "edge_id": {
@@ -2351,7 +2370,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "23e214bfe05de7ae011fec252e0b27b0f22f3f725383aafe7bf0e46512b7e1a8",
+        "bound_tests_set_hash": "d6be3f7656c54cee13cd019022df6e0aa6d506f019e9149304b1f5aaa7944513",
         "declaration_hash": "f1ff3515fb769b04fc5b90af1c4284d2eb53251f359049beaf98814523375af3"
       },
       "obligation_id": {
@@ -2360,7 +2379,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            !role_violations\n                .iter()\n                .any(|violation| { violation.entry_name() == \"domain::alpha::UseCaseValid\" })\n        );\n        assert!(role_violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::alpha::UseCaseWrongRole\"\n                && violation.message().contains(\"DomainEvent\")\n        }));",
+        "citation": "CatalogueLinterError::IdentityResolutionFailed(\n                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(\n                    identifier,\n                    candidates,\n                ),\n            ) => {\n                assert_eq!(identifier.as_str(), \"Event\");\n                assert_eq!(candidates.as_slice().len(), 2);\n                assert_complete_duplicate_candidates(&format!(\"{candidates:?}\"), \"Event\");\n            }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2370,7 +2389,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_identity_rules_resolve_wrappers_and_fail_closed"
+          "test_name": "test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference"
         }
       ],
       "edge_id": {
@@ -2382,7 +2401,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "23e214bfe05de7ae011fec252e0b27b0f22f3f725383aafe7bf0e46512b7e1a8",
+        "bound_tests_set_hash": "d6be3f7656c54cee13cd019022df6e0aa6d506f019e9149304b1f5aaa7944513",
         "declaration_hash": "7eab06a38a2e2b4804ebe151d07306ecaba89acc6c73eba42e29ebcf6f6e0060"
       },
       "obligation_id": {
@@ -2391,18 +2410,13 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(role_violations.iter().any(|violation| {\n            violation.message().contains(\"FullyQualifiedItemPath\")\n                && violation.message().contains(\"alpha\")\n                && violation.message().contains(\"beta\")\n        }),\n        \"ambiguous identity diagnostic: {role_violations:?}\"\n        );\n        assert!(role_violations.iter().any(|violation| {\n            violation.entry_name() == \"domain::alpha::UseCaseExtractionFailure\"\n                && violation.message().contains(\"unsupported TypeRef syntax\")\n                && violation.message().contains(\"(\")\n        }));\n        assert!(role_violations.iter().any(|violation| {\n            violation.message().contains(\"domain::missing::Event\")\n        }));",
+        "citation": "let error = match evaluate_catalogue_lint_with_preflight(\n            &[rule],\n            &all_catalogues,\n            catalogue.layer(),\n            &StubPrimitiveScanner,\n            &DuplicateNameFixtureExtractor,\n        ) {\n            Ok(_) => panic!(\"ambiguous catalogue identities must fail before rule evaluation\"),\n            Err(error) => error,\n        };\n\n        match error {\n            CatalogueLinterError::IdentityResolutionFailed(\n                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(\n                    identifier,\n                    candidates,\n                ),\n            ) => {\n                assert_eq!(identifier.as_str(), \"Event\");\n                assert_eq!(candidates.as_slice().len(), 2);\n                assert_complete_duplicate_candidates(&format!(\"{candidates:?}\"), \"Event\");\n            }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
-          "test_name": "test_syn_type_ref_path_extractor_carries_parameter_context_exclusively"
-        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
@@ -2433,7 +2447,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "437561c2a9e9b90696ecf2bd03bf832f7d6dfba32acc80094e43a5eb5f9b8fe9",
+        "bound_tests_set_hash": "42f58ab4338f69ab121fc70da50d24efa7e97511dc5474b48ae3c1a17016246e",
         "declaration_hash": "2ce5438b2e0cf3e2bb73ca682558ecfcd1c4b00d13fd32cb265baff176041ca4"
       },
       "obligation_id": {
@@ -2474,7 +2488,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "3d19bb355d83715ea1ccd2b4219d005231f5566e1e128dc1f0fc07c13dd4321b",
+        "bound_tests_set_hash": "7b4642eecdb839460a9f0e03d28b02318adad09315dfece26b08f60521472c6c",
         "declaration_hash": "ed4e4f69ed199e14f7ab4ce7e4edd544ebcce7d8cf11de0e2b9239d9bd36ce95"
       },
       "obligation_id": {
@@ -2483,7 +2497,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(role_violations.iter().any(|violation| {\n    violation.entry_name() == \"domain::alpha::UseCaseWrongRole\"\n        && violation.message().contains(\"DomainEvent\")\n}));\nassert!(role_violations.iter().any(|violation| {\n    violation.message().contains(\"domain::missing::Event\")\n}));\nassert!(role_violations.iter().any(|violation| {\n    violation.entry_name() == \"domain::alpha::UseCaseExtractionFailure\"\n        && violation.message().contains(\"unsupported TypeRef syntax\")\n        && violation.message().contains(\"(\")\n}));",
+        "citation": "let paths = extract(\"std::vec::Vec<&'a T, [u8; N]>\", &[\"T\"], &[\"a\"], &[\"N\"])\n            .expect(\"parameterized type extracts\");\n\n        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"std::vec::Vec\"))));\n        assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new(\"T\").unwrap())));\n        assert!(paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new(\"a\").unwrap())));\n        assert!(paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new(\"N\").unwrap())));\n        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"u8\"))));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2597,7 +2611,7 @@
         "entry_key": "std::sync::Arc<T>"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
         "bound_tests_set_hash": "be62c8bf19d2a5584817aea45ae0ebf0b4a9d5035c8095b2ca27c27411a2c7a8",
         "declaration_hash": "1bde6de50b37b3b258577c49b571ea03dcd93b39929459f646b185bf95d7beea"
       },
@@ -2607,7 +2621,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(wrapped_paths, direct_paths);\nassert_eq!(wrapped_error, direct_error);\nassert_eq!(qualified_wrapped, qualified_direct);",
+        "citation": "assert_eq!(wrapped_paths, direct_paths);\n        assert_eq!(wrapped_paths, vec![ExtractedTypeRefPath::Path(type_ref)]);\n\n        assert_eq!(wrapped_error, direct_error);\n        assert_eq!(\n            wrapped_error,\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location: invalid_type_ref })\n        );\n\n        assert_eq!(qualified_wrapped, qualified_direct);\n        assert_eq!(\n            qualified_wrapped,\n            vec![\n                ExtractedTypeRefPath::Path(\n                    TypeRef::new(\"domain::alpha::Event\".to_owned()).unwrap(),\n                ),\n                ExtractedTypeRefPath::Path(TypeRef::new(\"domain::beta::Event\".to_owned()).unwrap(),)\n            ]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2628,7 +2642,7 @@
         "entry_key": "std::sync::Arc<T>"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "bound_tests_set_hash": "be62c8bf19d2a5584817aea45ae0ebf0b4a9d5035c8095b2ca27c27411a2c7a8",
         "declaration_hash": "1bde6de50b37b3b258577c49b571ea03dcd93b39929459f646b185bf95d7beea"
       },
@@ -2638,7 +2652,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(wrapped_error, direct_error);\n        assert_eq!(\n            wrapped_error,\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location: invalid_type_ref })\n        );",
+        "citation": "assert_eq!(wrapped_paths, direct_paths);\n        assert_eq!(wrapped_paths, vec![ExtractedTypeRefPath::Path(type_ref)]);\n\n        assert_eq!(wrapped_error, direct_error);\n        assert_eq!(\n            wrapped_error,\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location: invalid_type_ref })\n        );\n\n        assert_eq!(qualified_wrapped, qualified_direct);\n        assert_eq!(\n            qualified_wrapped,\n            vec![\n                ExtractedTypeRefPath::Path(\n                    TypeRef::new(\"domain::alpha::Event\".to_owned()).unwrap(),\n                ),\n                ExtractedTypeRefPath::Path(TypeRef::new(\"domain::beta::Event\".to_owned()).unwrap(),\n            ]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2659,7 +2673,7 @@
         "entry_key": "std::sync::Arc<T>"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
         "bound_tests_set_hash": "be62c8bf19d2a5584817aea45ae0ebf0b4a9d5035c8095b2ca27c27411a2c7a8",
         "declaration_hash": "1bde6de50b37b3b258577c49b571ea03dcd93b39929459f646b185bf95d7beea"
       },
@@ -2669,7 +2683,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let direct_error = direct.extract(&invalid_type_ref, &[], &[], &[]);\n        let wrapped_error = wrapped.extract(&invalid_type_ref, &[], &[], &[]);\n\n        assert_eq!(wrapped_error, direct_error);\n        assert_eq!(\n            wrapped_error,\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location: invalid_type_ref })\n        );",
+        "citation": "let qualified_direct = direct.extract(&qualified_type_ref, &[], &[], &[]).unwrap();\n        let qualified_wrapped = wrapped.extract(&qualified_type_ref, &[], &[], &[]).unwrap();\n        assert_eq!(qualified_wrapped, qualified_direct);\n        assert_eq!(\n            qualified_wrapped,\n            vec![\n                ExtractedTypeRefPath::Path(\n                    TypeRef::new(\"domain::alpha::Event\".to_owned()).unwrap(),\n                ),\n                ExtractedTypeRefPath::Path(TypeRef::new(\"domain::beta::Event\".to_owned()).unwrap(),),\n            ]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2680,6 +2694,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
           "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_reports_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -2691,7 +2715,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "729fdc0ddc0e80a6502304bde10f6eac7ae1e6be5d3a58c2726b285dc95b942b",
+        "bound_tests_set_hash": "461207176fd72a252b85b11373c4f85feadbbe91dab056201194cdfee555188e",
         "declaration_hash": "01ae27667589257d2b5f71621b0940ab61fbe7961553901ff04a081f8df3b6c7"
       },
       "obligation_id": {
@@ -2700,7 +2724,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(active_violations.iter().any(|violation| {\n            violation.message().contains(\"ambiguous identifier\")\n                && violation.message().contains(\"Event\")\n        }));\n        assert!(active_violations.iter().any(|violation| {\n            violation.message().contains(\"unresolved identifier\")\n                && violation.message().contains(\"domain::missing::Event\")\n        }));\n        assert!(\n            !active_violations\n                .iter()\n                .any(|violation| violation.entry_name() == \"domain::alpha::UseCaseValid\")\n        );",
+        "citation": "\"assert!(calls.load(Ordering::SeqCst) > 0,\\n            \\\"the active adapter must forward the injected extractor before reporting the identity error\\\"\\n        );\"; \"panic!(\\\"ambiguous catalogue identities must fail closed before rule evaluation\\\")\"; \"assert!(diagnostic.contains(\\\"ambiguous identifier\\\"));\"; \"panic!(\\\"incomplete TypeRef inspection must fail closed\\\")\"; \"assert!(diagnostic.contains(\\\"unsupported TypeRef syntax\\\"));\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2710,7 +2734,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "test_name": "test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
+          "test_name": "test_system_catalogue_lint_active_adapter_keeps_same_named_fully_qualified_results_separate"
         }
       ],
       "edge_id": {
@@ -2722,7 +2751,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "729fdc0ddc0e80a6502304bde10f6eac7ae1e6be5d3a58c2726b285dc95b942b",
+        "bound_tests_set_hash": "d922626e501d1de776033df0023ee986934cb7a98f7e35b2fc741944ee691bcf",
         "declaration_hash": "92053d3b42614b48bf08066a97f3c6d80ea00f561edc249465ab5ce78e1b814f"
       },
       "obligation_id": {
@@ -2731,7 +2760,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(ambiguous_message.contains(\"FullyQualifiedItemPath\"));\n        assert!(ambiguous_message.contains(\"Identifier(\\\"alpha\\\")\"));\n        assert!(ambiguous_message.contains(\"Identifier(\\\"beta\\\")\"));\n        assert!(\n            !active_violations\n                .iter()\n                .any(|violation| violation.entry_name() == \"domain::alpha::UseCaseValid\")\n        );",
+        "citation": "\"the adapter fixture contains same-named declarations on two distinct\\n        // fully qualified paths, and both qualified references must stay separate.\" ... \"the beta result must not be joined with the alpha result\" ... \"!layer.violations.iter().any(|violation| violation.message().contains(\\\"DanglingId\\\"))\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2740,8 +2769,13 @@
       "bound_tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_resolves_qualified_same_named_paths_and_external_references"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_reports_incomplete_typeref_location"
         }
       ],
       "edge_id": {
@@ -2753,7 +2787,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "729fdc0ddc0e80a6502304bde10f6eac7ae1e6be5d3a58c2726b285dc95b942b",
+        "bound_tests_set_hash": "10d15cbb3cbc2dceb134023587bde54a1e5acc3cd551b7da9d9b366ce883e7f6",
         "declaration_hash": "919ad75677810ff4cc0e417c6df4747f1e2ab4d520e836e3e437c28ab1665665"
       },
       "obligation_id": {
@@ -2762,7 +2796,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(active_violations.iter().any(|violation| {\n            violation.message().contains(\"unresolved identifier\")\n                && violation.message().contains(\"domain::missing::Event\")\n        })); ... assert!(active_violations.iter().any(|violation| {\n            violation.message().contains(\"ambiguous identifier\")\n                && violation.message().contains(\"Event\")\n        }));",
+        "citation": "\"qualified and external references are accepted by the single-layer adapter\"; \"incomplete TypeRef inspection must fail closed\"; \"assert!(diagnostic.contains(\\\"unsupported TypeRef syntax\\\"));\"; \"assert!(diagnostic.contains(\\\"(\\\"));\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2771,8 +2805,8 @@
       "bound_tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::tests",
-          "test_name": "test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules"
+          "module_path": "infrastructure::track_lifecycle::tddd::lint::tests",
+          "test_name": "test_system_track_lint_adapter_resolves_qualified_same_named_paths_and_external_references"
         }
       ],
       "edge_id": {
@@ -2784,7 +2818,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "729fdc0ddc0e80a6502304bde10f6eac7ae1e6be5d3a58c2726b285dc95b942b",
+        "bound_tests_set_hash": "4bebef99e76769283e5ae85c4d90263a8fa8469775cc9f791a766a31287347e0",
         "declaration_hash": "4accb126ccd3ad58e3521f3403d55831f2fc5e6016127af088609b8e870e6c4a"
       },
       "obligation_id": {
@@ -2793,7 +2827,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let single_adapter =\n            crate::track_lifecycle::tddd::lint::SystemTrackLintAdapter::new(extractor);\n        let single_command = usecase::track_lifecycle::tddd::lint::TrackLintCommand {\n            track: usecase::track_lifecycle::TrackSelection::Explicit(\n                TrackId::try_new(\"lint-track\").expect(\"track id is valid\"),\n            ),\n            workspace_root: usecase::track_lifecycle::TrackWorkspaceRoot::try_new(\n                root.to_path_buf(),\n            )\n            .expect(\"workspace root is valid\"),\n            layer: domain::tddd::LayerId::try_new(\"domain\".to_owned()).expect(\"layer is valid\"),\n            rules_file: None,\n        };\n        let single_result = single_adapter\n            .execute(TrackId::try_new(\"lint-track\").expect(\"track id is valid\"), single_command)\n            .expect(\"single-layer lint execution succeeds\");\n        assert_eq!(single_result.violations.len(), 5);\n        assert_eq!(\n            single_result\n                .violations\n                .iter()\n                .filter(|violation| violation.rule_kind() == \"FieldElementUniqueAcrossEntries\")\n                .count(),\n            1\n        );\n        assert_eq!(\n            single_result\n                .violations\n                .iter()\n                .filter(|violation| violation.rule_kind() == \"NoExternalReferenceInMethods\")\n                .count(),\n            2\n        );\n        assert!(\n            single_result\n                .violations\n                .iter()\n                .any(|violation| { violation.message().contains(\"ambiguous identifier\") })\n        );\n        assert!(\n            single_result\n                .violations\n                .iter()\n                .any(|violation| { violation.message().contains(\"unresolved identifier\") })\n        );\n        let single_ambiguous_message = single_result\n            .violations\n            .iter()\n            .find(|violation| violation.message().contains(\"ambiguous identifier\"))\n            .unwrap()\n            .message();\n        assert!(single_ambiguous_message.contains(\"FullyQualifiedItemPath\"));\n        assert!(single_ambiguous_message.contains(\"Identifier(\\\"alpha\\\")\"));\n        assert!(single_ambiguous_message.contains(\"Identifier(\\\"beta\\\")\"));\n        assert!(calls.load(Ordering::SeqCst) >= 6);",
+        "citation": "assert_eq!(result.violations.len(), 1);\n        let Some(violation) = result.violations.first() else {\n            panic!(\"the beta reference must produce one role violation\");\n        };\n        assert_eq!(violation.entry_name(), \"domain::alpha::HandlesBetaEvent\");\n        assert!(violation.message().contains(\"ValueObject\"));\n        assert!(violation.message().contains(\"DomainEvent\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2850,11 +2884,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ],
       "edge_id": {
@@ -2866,7 +2895,7 @@
       },
       "key": {
         "anchor_text_hash": "25c6b4325f60623139b9ff62ffe05fd58cf737748171b1c8b1cc0c550e09eddd",
-        "bound_tests_set_hash": "07a34863cf2e9280659cd12afe6eaccbf1beab1f02d66cff4af61716fc33100b",
+        "bound_tests_set_hash": "301243e4e69b3166e8f7b1579f0a7c2929ba9b26cf4c76ff39e81c42a4bfcc7e",
         "declaration_hash": "9134ca78243973baa433cbc69ca8931825e0ec36ed691a04c36401a10525230f"
       },
       "obligation_id": {
@@ -2875,7 +2904,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": ".expect_err(\"ambiguous short name must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::AmbiguousIdentifier(identifier, candidates)\n                if identifier.as_str() == \"Entity\"\n                    && candidates.as_slice() == [first, second]\n        ));\n\n        let error = resolve_catalogue_identity(\n            &reference(\"domain::beta::Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect_err(\"unresolved path must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)\n                if unresolved.as_str() == \"domain::beta::Entity\"\n        ));",
+        "citation": ".expect_err(\"ambiguous short name must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::AmbiguousIdentifier(identifier, candidates)\n                if identifier.as_str() == \"Entity\"\n                    && candidates.as_slice() == [first, second]\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2922,11 +2951,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ],
       "edge_id": {
@@ -2938,7 +2962,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "07a34863cf2e9280659cd12afe6eaccbf1beab1f02d66cff4af61716fc33100b",
+        "bound_tests_set_hash": "301243e4e69b3166e8f7b1579f0a7c2929ba9b26cf4c76ff39e81c42a4bfcc7e",
         "declaration_hash": "d4dec31a4939947c4a134f0612987570723439fff869ee3f2007842bea3f080b"
       },
       "obligation_id": {
@@ -2992,72 +3016,6 @@
       "bound_tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_undeclared_type_ref_field_returns_unresolved_identifier"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_public_std_reexports_preserve_adapter_spelling_and_resolve_definition_paths"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_returns_invalid_type_ref_for_unparseable_field_type"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_field_with_generic_type_ref_creates_resolved_path_with_args"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_trait_impl_nested_generic_type_resolves_as_generic"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
-        },
-        "entry_key": "NewTypeGraphCodecError"
-      },
-      "key": {
-        "anchor_text_hash": "373293ed59b7853007797f752df2c07f9c898f61aa4e4802a7b6f081dfeb15ca",
-        "bound_tests_set_hash": "9971a8d84528fdc840dd954456310264471acedad4a84fc65fc92f68c64ed0cf",
-        "declaration_hash": "e351fb258736c7363e584d517d817ebbca54881fbfa3ea1e6f45ac7f0867ca28"
-      },
-      "obligation_id": {
-        "entry_key": "NewTypeGraphCodecError",
-        "item_identifier": "voluntary:AC-06",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "let error = encode_doc(doc).unwrap_err();\n    assert!(matches!(\n        error,\n        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)\n            if type_ref.as_str() == \"ghost::Missing\"\n    ));\n\n    let field_with_args = ec.krate().index.values().find(|item| {\n        matches!(&item.inner, ItemEnum::StructField(Type::ResolvedPath(p)) if p.path.contains(\"Vec\") && p.args.is_some())\n    });\n    assert!(field_with_args.is_some(), \"expected Vec<String> field with generic args\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_carries_parameter_context_exclusively"
         },
@@ -3075,7 +3033,7 @@
         "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "bound_tests_set_hash": "f369450550c8377a49cb00b17aee43ff796cc7ecb1e692f5de3dc9111542a892",
         "declaration_hash": "ee6957dda375f1801a5d8f790fe01ed1a31931332876e883af33ef9fe6038823"
       },
@@ -3085,7 +3043,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!paths.iter().any(|path| {\n            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n        }));\n\nassert_eq!(\n            paths,\n            vec![\n                ExtractedTypeRefPath::Path(type_ref(\"domain::alpha::Wrapper\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::ports::Port\")),\n                ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new(\"Output\").unwrap()),\n            ]\n        );",
+        "citation": "assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new(\"T\").unwrap())));\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new(\"a\").unwrap()))\n        );\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new(\"N\").unwrap()))\n        );\n        assert!(!paths.iter().any(|path| {\n            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n        }));\n\nassert_eq!(\n            paths,\n            vec![\n                ExtractedTypeRefPath::Path(type_ref(\"domain::alpha::Wrapper\")),\n                ExtractedTypeRefPath::Path(type_ref(\"domain::ports::Port\")),\n                ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new(\"Output\").unwrap()),\n            ]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3116,7 +3074,7 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "bound_tests_set_hash": "00c49fb116fc18f4f854552a574a59c61009b02b04af8293f53a238dd3cac12c",
         "declaration_hash": "16650762c646aeb1c45c2f6f8b86efbddbe407d6749e7b5b097b025c481c7ea4"
       },
@@ -3126,7 +3084,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            extract(\"(\", &[], &[], &[]),\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n                if location == type_ref(\"(\")\n        ));\n\nassert!(matches!(\n            extract(source, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n                if location == type_ref(source)\n        ));\n\nassert!(matches!(\n            extract(&nested, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::DepthLimitExceeded { location }) if location.as_str() == nested\n        ));\n\nassert!(matches!(\n            extract(&many, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::ResourceLimitExceeded { location }) if location.as_str() == many\n        ));",
+        "citation": "assert!(matches!(\n            extract(source, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n                if location == type_ref(source)\n        ));\n    }\n{\n        let mut nested = \"Leaf\".to_owned();\n        for _ in 0..40 {\n            nested = format!(\"Option<{nested}>\");\n        }\n        assert!(matches!(\n            extract(&nested, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::DepthLimitExceeded { location }) if location.as_str() == nested\n        ));\n\n        let many = (0..600).map(|_| \"Leaf\").collect::<Vec<_>>().join(\",\");\n        let many = format!(\"({many})\");\n        assert!(matches!(\n            extract(&many, &[], &[], &[]),\n            Err(TypeRefPathExtractionError::ResourceLimitExceeded { location }) if location.as_str() == many\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3147,7 +3105,7 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
         "bound_tests_set_hash": "f2c0e9e86905c15764bbbe387672d033d60a778c90f36e7950d089cb5e315fd3",
         "declaration_hash": "c2f23c7a468dba83dc551d313d12db231bb4e9670ebeba3058d32d2e3880f5ec"
       },
@@ -3167,7 +3125,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
-          "test_name": "test_syn_type_ref_path_extractor_carries_parameter_context_exclusively"
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_via_extractor_resolves_nested_paths_and_enumerates_ambiguous_candidates"
         }
       ],
       "edge_id": {
@@ -3178,8 +3141,8 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
-        "bound_tests_set_hash": "2ca8803d020c2b2b8303b908ae36d4aef2097a04adaacc55432f0e81cb1bf83a",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
+        "bound_tests_set_hash": "e93c7ed47b6f082c433a64fea8947c332186b089ff0520ed41e46a2aa6e1b4e3",
         "declaration_hash": "487440649137b5c785619bd93d55c3d7e124d28649b8b8265dec69d5b2b6b5f9"
       },
       "obligation_id": {
@@ -3188,7 +3151,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let paths = extract(\"std::vec::Vec<&'a T, [u8; N]>\", &[\"T\"], &[\"a\"], &[\"N\"])\n            .expect(\"parameterized type extracts\");\n\n        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"std::vec::Vec\"))));\n        assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new(\"T\").unwrap())));\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new(\"a\").unwrap()))\n        );\n        assert!(\n            paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new(\"N\").unwrap()))\n        );\n        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref(\"u8\"))));\n        assert!(!paths.iter().any(|path| {\n            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), \"T\" | \"a\" | \"N\"))\n        }));",
+        "citation": "assert_eq!(nested_violations.len(), 1); ... expect_err(\"an accepted unqualified spelling must fail closed when ambiguous\"); ... assert_eq!(candidate_paths, vec![\"domain::alpha::Event\".to_owned(), \"domain::beta::Event\".to_owned(),]); ... assert!(!violations.iter().any(|violation| { matches!(violation.entry_name(), \"domain::alpha::HandlesAlphaEvent\" | \"domain::alpha::HandlesExternalEvent\") }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3204,6 +3167,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_preserves_same_named_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         }
       ],
       "edge_id": {
@@ -3214,8 +3182,8 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
-        "bound_tests_set_hash": "9bc8393ab7eea7f51a03bc8e0dbb5ad0e21ee5159f2b0ef0f11df9100381f0f7",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
+        "bound_tests_set_hash": "6215dc1e07f1a5e9452edec11ba6b8e55acb47d7b41cc09e1950b7b837372d50",
         "declaration_hash": "41779005c87d3f5d2994314d96cef69bbcb08f068baa47eee6d4eff46c12fbff"
       },
       "obligation_id": {
@@ -3224,7 +3192,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            extract(\"(\", &[], &[], &[]),\n            Err(TypeRefPathExtractionError::UnsupportedSyntax { location })\n                if location == type_ref(\"(\")\n        ));",
+        "citation": "expect(\"all qualified and external references are completely inspectable\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3235,11 +3203,6 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
           "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
-          "test_name": "test_resolve_catalogue_identity_unresolved_path_fails_closed"
         }
       ],
       "edge_id": {
@@ -3250,8 +3213,8 @@
         "entry_key": "CatalogueIdentityResolutionError"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
-        "bound_tests_set_hash": "07a34863cf2e9280659cd12afe6eaccbf1beab1f02d66cff4af61716fc33100b",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
+        "bound_tests_set_hash": "301243e4e69b3166e8f7b1579f0a7c2929ba9b26cf4c76ff39e81c42a4bfcc7e",
         "declaration_hash": "a1c6cd5005aea7d0ad5a7ac1532bdf0f6a4739a168eee8a6cd752815ec6e0c29"
       },
       "obligation_id": {
@@ -3260,7 +3223,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": ".expect_err(\"ambiguous short name must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::AmbiguousIdentifier(identifier, candidates)\n                if identifier.as_str() == \"Entity\"\n                    && candidates.as_slice() == [first, second]\n        ));\n\n        .expect_err(\"unresolved path must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)\n                if unresolved.as_str() == \"domain::beta::Entity\"\n        ));",
+        "citation": "        let error = resolve_catalogue_identity(\n            &reference(\"Entity\"),\n            &CrateName::new(\"domain\").expect(\"valid crate\"),\n            &universe,\n        )\n        .expect_err(\"ambiguous short name must fail\");\n\n        assert!(matches!(\n            error,\n            CatalogueIdentityResolutionError::AmbiguousIdentifier(identifier, candidates)\n                if identifier.as_str() == \"Entity\"\n                    && candidates.as_slice() == [first, second]\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3269,8 +3232,8 @@
       "bound_tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "module_path": "domain::tddd::catalogue_linter_helpers::tests",
+          "test_name": "test_has_trait_impl_rejects_reference_for_type_as_root_identity"
         }
       ],
       "edge_id": {
@@ -3281,8 +3244,8 @@
         "entry_key": "CatalogueIdentityResolutionError"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
-        "bound_tests_set_hash": "878fd94dcf56fc705fc7e5c1222458a6a360a0e56387e8bd7b5f81b85c26b6fd",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
+        "bound_tests_set_hash": "d04a2232e9d0be0bed0b82a23e6f7c10a2454cc09a7a2c9d57c93f21c8caca02",
         "declaration_hash": "0e158ef147b1859e1aea38bc5b2643a51d3dac89233d8b37a6d6e28c8aed0a6c"
       },
       "obligation_id": {
@@ -3291,7 +3254,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            !violations\n                .iter()\n                .any(|violation| { violation.entry_name() == \"domain::alpha::Parameterized\" })\n        );\n        for (entry_name, location) in [\n            (\"domain::alpha::DepthLimited\", \"depth_limited\"),\n            (\"domain::alpha::PartialInspection\", \"partially_inspected\"),\n            (\"domain::alpha::Unclassifiable\", \"UnknownBarePath\"),\n        ] {\n            let violation =\n                violations.iter().find(|violation| violation.entry_name() == entry_name).unwrap();\n            assert!(violation.message().contains(location));\n        }",
+        "citation": "assert!(matches!(\n            result,\n            Err(CatalogueLinterError::IdentityResolutionFailed(\n                CatalogueIdentityResolutionError::ClassificationFailed { location }\n            )) if location.as_str() == \"&Thing\"\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3300,8 +3263,8 @@
       "bound_tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits"
+          "module_path": "domain::tddd::catalogue_linter_helpers::tests",
+          "test_name": "test_has_trait_impl_rejects_reference_for_type_as_root_identity"
         }
       ],
       "edge_id": {
@@ -3312,8 +3275,8 @@
         "entry_key": "CatalogueIdentityResolutionError"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
-        "bound_tests_set_hash": "878fd94dcf56fc705fc7e5c1222458a6a360a0e56387e8bd7b5f81b85c26b6fd",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
+        "bound_tests_set_hash": "d04a2232e9d0be0bed0b82a23e6f7c10a2454cc09a7a2c9d57c93f21c8caca02",
         "declaration_hash": "09f8c7841ec42816c2d59f6874b58cac49d6cc60562f640984a1337899f8d96c"
       },
       "obligation_id": {
@@ -3322,7 +3285,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            !violations\n                .iter()\n                .any(|violation| { violation.entry_name() == \"domain::alpha::Parameterized\" })\n        );\n        for (entry_name, location) in [\n            (\"domain::alpha::DepthLimited\", \"depth_limited\"),\n            (\"domain::alpha::PartialInspection\", \"partially_inspected\"),\n            (\"domain::alpha::Unclassifiable\", \"UnknownBarePath\"),\n        ] {\n            let violation =\n                violations.iter().find(|violation| violation.entry_name() == entry_name).unwrap();\n            assert!(violation.message().contains(location));\n        }",
+        "citation": "assert!(matches!(\n            result,\n            Err(CatalogueLinterError::IdentityResolutionFailed(\n                CatalogueIdentityResolutionError::ClassificationFailed { location }\n            )) if location.as_str() == \"&Thing\"\n        ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3333,6 +3296,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
           "test_name": "test_syn_type_ref_path_extractor_preserves_same_named_qualified_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests",
+          "test_name": "test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths"
         },
         {
           "layer": "domain",
@@ -3349,7 +3317,7 @@
       },
       "key": {
         "anchor_text_hash": "9f998fb9f21666ad0484f816fb5bed1b91cf5c81db339de6a03e7f88d77668d7",
-        "bound_tests_set_hash": "0d32bbdb7fc5ceb10f7e10183b8c7101de4ca97f0f4c7bfb578e6954be83e20b",
+        "bound_tests_set_hash": "c9a025b7af06259361df78367ccf16aefc87eebcee318ee50f1358ae0d166dda",
         "declaration_hash": "0f241cca9f62f43e142a5a1cf11621589de68aa18a529a15392cc8e697c2231b"
       },
       "obligation_id": {

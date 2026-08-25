@@ -3,7 +3,9 @@
 use std::path::PathBuf;
 
 use domain::tddd::catalogue_v2::roles::ContractRole;
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitEntry, TypeRef};
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, CrateName, TraitEntry, TraitImplDeclV2, TraitRefScope, TypeRef,
+};
 use domain::tddd::test_obligation::ids::{DiagnosticMessage, TestObligationAnchorId};
 
 use super::identity::CatalogueDeclarationIdentity;
@@ -55,14 +57,25 @@ pub(super) fn index_trait_roles(
 /// Resolves a trait impl's `trait_ref` to the matching catalogue trait.
 ///
 /// The trait universe is intentionally separate from type declarations. A
-/// unique exact spelling is local, no match is external, and an ambiguous
-/// spelling is reported with all fully qualified candidates.
+/// bare `trait_ref` is self-crate scoped by [`TraitImplDeclV2`]; module- and
+/// crate-qualified spellings retain the global closed-grammar lookup. A unique
+/// exact spelling is local, no match is external, and an ambiguous spelling is
+/// reported with all fully qualified candidates.
 pub(super) fn resolve_trait_role<'a>(
     trait_roles: &'a [TraitRoleEntry],
+    implementing_crate: &CrateName,
     trait_ref: &TypeRef,
 ) -> Result<Option<&'a TraitRoleEntry>, DiagnosticMessage> {
+    let is_bare_self_crate = matches!(
+        TraitImplDeclV2::new(trait_ref.clone(), trait_ref.clone()).trait_ref_scope(),
+        TraitRefScope::SelfCrate(_)
+    );
+    let declarations = trait_roles.iter().filter(|entry| {
+        !is_bare_self_crate
+            || entry.identity.fully_qualified_path().crate_name() == implementing_crate
+    });
     let Some(identity) =
-        resolve_catalogue_reference(trait_ref, trait_roles.iter().map(|entry| &entry.identity))?
+        resolve_catalogue_reference(trait_ref, declarations.map(|entry| &entry.identity))?
     else {
         return Ok(None);
     };

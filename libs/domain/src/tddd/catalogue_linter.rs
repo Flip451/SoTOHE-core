@@ -883,13 +883,26 @@ mod tests {
         target_layer_id: &LayerId,
         scanner: &S,
     ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
-        super::evaluate_catalogue_lint(
+        super::entrypoint::evaluate_catalogue_lint_rules_only(
             rules,
             all_catalogues,
             target_layer_id,
             scanner,
             &StubTypeRefPathExtractor,
         )
+    }
+
+    fn evaluate_catalogue_lint_with_preflight<
+        S: PrimitiveOccurrenceScanner,
+        E: TypeRefPathExtractorPort,
+    >(
+        rules: &[CatalogueLinterRule],
+        all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>,
+        target_layer_id: &LayerId,
+        scanner: &S,
+        extractor: &E,
+    ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
+        super::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner, extractor)
     }
 
     /// Test double for [`PrimitiveOccurrenceScanner`]: always fails with
@@ -2252,7 +2265,7 @@ mod tests {
         let all_catalogues = all_catalogues_single(&catalogue);
         let target_layer = layer("domain");
 
-        let result = super::evaluate_catalogue_lint(
+        let result = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[],
             &all_catalogues,
             &target_layer,
@@ -2474,7 +2487,7 @@ mod tests {
         ];
         let all_catalogues = all_catalogues_single(&catalogue);
         let target_layer = catalogue.layer().clone();
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &rules,
             &all_catalogues,
             &target_layer,
@@ -2503,11 +2516,6 @@ mod tests {
                     && violation.message().contains("beta")
             }),
             "ambiguous identity diagnostic: {role_violations:?}"
-        );
-        assert!(
-            role_violations
-                .iter()
-                .any(|violation| violation.message().contains("domain::missing::Event"))
         );
         assert!(role_violations.iter().any(|violation| {
             violation.entry_name() == "domain::alpha::UseCaseExtractionFailure"
@@ -2556,7 +2564,7 @@ mod tests {
             },
         )
         .unwrap();
-        let invalid_result = super::evaluate_catalogue_lint(
+        let invalid_result = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[invalid_rule],
             &all_catalogues,
             &target_layer,
@@ -2571,8 +2579,111 @@ mod tests {
     }
 
     #[test]
-    fn test_referenced_role_constraint_treats_function_declared_module_as_local_and_unknown_root_as_failure()
-     {
+    fn test_evaluate_catalogue_lint_returns_identity_resolution_error_for_ambiguous_reference() {
+        let mut catalogue = make_doc("domain");
+        insert_duplicate_fixture_type(
+            &mut catalogue,
+            "domain::alpha::Event",
+            DataRole::DomainEvent,
+            "alpha",
+            vec![],
+        );
+        insert_duplicate_fixture_type(
+            &mut catalogue,
+            "domain::beta::Event",
+            DataRole::value_object(),
+            "beta",
+            vec![],
+        );
+        insert_duplicate_fixture_type(
+            &mut catalogue,
+            "domain::alpha::HandlesEvent",
+            DataRole::UseCase { handles: vec![TypeRef::new("Event").unwrap()] },
+            "alpha",
+            vec![],
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let error = match evaluate_catalogue_lint_with_preflight(
+            &[rule],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &DuplicateNameFixtureExtractor,
+        ) {
+            Ok(_) => panic!("ambiguous catalogue identities must fail before rule evaluation"),
+            Err(error) => error,
+        };
+
+        match error {
+            CatalogueLinterError::IdentityResolutionFailed(
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                    identifier,
+                    candidates,
+                ),
+            ) => {
+                assert_eq!(identifier.as_str(), "Event");
+                assert_eq!(candidates.as_slice().len(), 2);
+                assert_complete_duplicate_candidates(&format!("{candidates:?}"), "Event");
+            }
+            other => panic!("expected an identity-resolution error, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three() {
+        let mut catalogue = make_doc("domain");
+        insert_duplicate_fixture_type(
+            &mut catalogue,
+            "domain::alpha::Event",
+            DataRole::DomainEvent,
+            "alpha",
+            vec![],
+        );
+        insert_duplicate_fixture_type(
+            &mut catalogue,
+            "domain::alpha::HandlesExternalEvent",
+            DataRole::UseCase { handles: vec![TypeRef::new("external_crate::Event").unwrap()] },
+            "alpha",
+            vec![],
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let violations = match evaluate_catalogue_lint_with_preflight(
+            &[rule],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        ) {
+            Ok(violations) => violations,
+            Err(error) => panic!("an unmatched path must be external to catalogue-lint: {error:?}"),
+        };
+
+        assert!(
+            violations.is_empty(),
+            "catalogue-lint must not reject an external reference: {violations:?}"
+        );
+    }
+
+    #[test]
+    fn test_referenced_role_constraint_skips_unmatched_paths_without_root_inference() {
         let mut catalogue = make_doc("domain");
         catalogue.insert_type(
             CatalogueEntryKey::try_new("MissingReference".to_owned()).unwrap(),
@@ -2606,19 +2717,10 @@ mod tests {
             },
         );
 
-        assert_eq!(
-            violations.len(),
-            2,
-            "both the unresolved local and unknown qualified paths must fail closed"
+        assert!(
+            violations.is_empty(),
+            "unmatched paths must be delegated to Chain 3: {violations:?}"
         );
-        assert!(violations.iter().any(|violation| {
-            violation.entry_name() == "MissingReference"
-                && violation.message().contains("helpers::Missing")
-        }));
-        assert!(violations.iter().any(|violation| {
-            violation.entry_name() == "ExternalReference"
-                && violation.message().contains("serde::Missing")
-        }));
     }
 
     #[test]
@@ -2687,7 +2789,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -2696,7 +2798,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(violations.len(), 3);
+        assert_eq!(violations.len(), 2);
         assert!(
             !violations
                 .iter()
@@ -2717,13 +2819,11 @@ mod tests {
         assert!(ambiguous.message().contains("ambiguous identifier `Event`"));
         assert_complete_duplicate_candidates(ambiguous.message(), "Event");
 
-        let Some(unresolved) = violations
-            .iter()
-            .find(|violation| violation.entry_name() == "domain::alpha::HandlesMissingEvent")
-        else {
-            panic!("unresolved qualified reference must be diagnosed");
-        };
-        assert!(unresolved.message().contains("domain::missing::Event"));
+        assert!(
+            !violations
+                .iter()
+                .any(|violation| violation.entry_name() == "domain::alpha::HandlesMissingEvent")
+        );
     }
 
     #[test]
@@ -2793,7 +2893,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -2810,11 +2910,216 @@ mod tests {
         for (entry_name, location) in [
             ("domain::alpha::DepthLimited", "depth_limited"),
             ("domain::alpha::PartialInspection", "partially_inspected"),
-            ("domain::alpha::Unclassifiable", "UnknownBarePath"),
         ] {
             let violation =
                 violations.iter().find(|violation| violation.entry_name() == entry_name).unwrap();
             assert!(violation.message().contains(location));
+        }
+        assert!(
+            !violations
+                .iter()
+                .any(|violation| violation.entry_name() == "domain::alpha::Unclassifiable")
+        );
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_ignores_parameter_labels_and_fails_closed_for_limits() {
+        use std::sync::{Arc, Mutex};
+
+        type ExtractionObservation = (String, Vec<ExtractedTypeRefPath>);
+
+        struct ParameterAndLimitFixtureExtractor {
+            observations: Arc<Mutex<Vec<ExtractionObservation>>>,
+        }
+
+        impl ParameterAndLimitFixtureExtractor {
+            fn new() -> Self {
+                Self { observations: Arc::new(Mutex::new(Vec::new())) }
+            }
+        }
+
+        impl TypeRefPathExtractorPort for ParameterAndLimitFixtureExtractor {
+            fn extract(
+                &self,
+                type_ref: &TypeRef,
+                type_parameters: &[ParamName],
+                _lifetime_parameters: &[ParamName],
+                _const_parameters: &[ParamName],
+            ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+                let extracted = match type_ref.as_str() {
+                    "T" => {
+                        assert!(
+                            type_parameters.iter().any(|parameter| parameter.as_str() == "T"),
+                            "the evaluator must carry the active generic parameter context"
+                        );
+                        vec![ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap())]
+                    }
+                    "'a" => {
+                        vec![ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap())]
+                    }
+                    "N" => {
+                        vec![ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap())]
+                    }
+                    "<domain::alpha::AssociatedCarrier as domain::alpha::Port>::Output" => vec![
+                        ExtractedTypeRefPath::Path(
+                            TypeRef::new("domain::alpha::AssociatedCarrier").unwrap(),
+                        ),
+                        ExtractedTypeRefPath::AssociatedItemLabel(
+                            ParamName::new("Output").unwrap(),
+                        ),
+                    ],
+                    "depth_limited_ref" => {
+                        return Err(TypeRefPathExtractionError::DepthLimitExceeded {
+                            location: type_ref.clone(),
+                        });
+                    }
+                    "resource_limited_ref" => {
+                        return Err(TypeRefPathExtractionError::ResourceLimitExceeded {
+                            location: type_ref.clone(),
+                        });
+                    }
+                    _ => vec![ExtractedTypeRefPath::Path(type_ref.clone())],
+                };
+
+                self.observations
+                    .lock()
+                    .unwrap()
+                    .push((type_ref.as_str().to_owned(), extracted.clone()));
+                Ok(extracted)
+            }
+        }
+
+        let associated_output = "<domain::alpha::AssociatedCarrier as domain::alpha::Port>::Output";
+        let mut catalogue = make_doc("domain");
+        for (entry_name, role) in [
+            ("domain::alpha::T", DataRole::value_object()),
+            ("domain::alpha::a", DataRole::value_object()),
+            ("domain::alpha::N", DataRole::value_object()),
+            ("domain::alpha::Output", DataRole::value_object()),
+            ("domain::alpha::AssociatedCarrier", DataRole::DomainEvent),
+        ] {
+            insert_duplicate_fixture_type(&mut catalogue, entry_name, role, "alpha", vec![]);
+        }
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::ParameterCarrier".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new("T").unwrap(),
+                        TypeRef::new("'a").unwrap(),
+                        TypeRef::new("N").unwrap(),
+                        TypeRef::new(associated_output).unwrap(),
+                    ],
+                },
+                unit_struct_kind(),
+                vec![],
+                vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+                vec![],
+                duplicate_fixture_module("alpha"),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let extractor = ParameterAndLimitFixtureExtractor::new();
+        let violations = super::evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &extractor,
+        )
+        .unwrap();
+
+        assert!(
+            violations.is_empty(),
+            "generic, lifetime, const, and associated labels must not resolve as catalogue paths: {violations:?}"
+        );
+        let observations = extractor.observations.lock().unwrap();
+        assert!(observations.iter().any(|(source, paths)| {
+            source == "T"
+                && paths == &vec![ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap())]
+        }));
+        assert!(observations.iter().any(|(source, paths)| {
+            source == "'a"
+                && paths
+                    == &vec![ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap())]
+        }));
+        assert!(observations.iter().any(|(source, paths)| {
+            source == "N"
+                && paths
+                    == &vec![ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap())]
+        }));
+        assert!(observations.iter().any(|(source, paths)| {
+            source == associated_output
+                && paths.iter().any(|path| {
+                    matches!(
+                        path,
+                        ExtractedTypeRefPath::Path(path)
+                            if path.as_str() == "domain::alpha::AssociatedCarrier"
+                    )
+                })
+                && paths.iter().any(|path| {
+                    matches!(
+                        path,
+                        ExtractedTypeRefPath::AssociatedItemLabel(label)
+                            if label.as_str() == "Output"
+                    )
+                })
+        }));
+
+        for (reference, expected_error) in
+            [("depth_limited_ref", "depth limit"), ("resource_limited_ref", "resource limit")]
+        {
+            let mut incomplete_catalogue = make_doc("domain");
+            insert_duplicate_fixture_type(
+                &mut incomplete_catalogue,
+                "domain::alpha::IncompleteInspection",
+                DataRole::UseCase { handles: vec![TypeRef::new(reference).unwrap()] },
+                "alpha",
+                vec![],
+            );
+            let all_catalogues = all_catalogues_single(&incomplete_catalogue);
+            let error = match super::evaluate_catalogue_lint(
+                &[],
+                &all_catalogues,
+                incomplete_catalogue.layer(),
+                &StubPrimitiveScanner,
+                &ParameterAndLimitFixtureExtractor::new(),
+            ) {
+                Ok(_) => panic!("incomplete TypeRef inspection must fail closed"),
+                Err(error) => error,
+            };
+            assert!(error.to_string().contains(reference));
+            assert!(error.to_string().contains(expected_error));
+            match (reference, error) {
+                (
+                    "depth_limited_ref",
+                    CatalogueLinterError::PathExtractionFailed(
+                        TypeRefPathExtractionError::DepthLimitExceeded { location },
+                    ),
+                )
+                | (
+                    "resource_limited_ref",
+                    CatalogueLinterError::PathExtractionFailed(
+                        TypeRefPathExtractionError::ResourceLimitExceeded { location },
+                    ),
+                ) => assert_eq!(location.as_str(), reference),
+                (reference, other) => {
+                    panic!("unexpected fail-closed error for {reference}: {other:?}")
+                }
+            }
         }
     }
 
@@ -2871,7 +3176,7 @@ mod tests {
             },
         )
         .unwrap();
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues_single(&catalogue),
             catalogue.layer(),
@@ -2990,7 +3295,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -2999,7 +3304,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(violations.len(), 3);
+        assert_eq!(violations.len(), 2);
         assert!(violations.iter().any(|violation| {
             violation.entry_name() == "domain::alpha::AggregateWrapped"
                 && violation.message().contains("domain::alpha::Entity")
@@ -3020,13 +3325,11 @@ mod tests {
         assert!(ambiguous.message().contains("ambiguous identifier `Entity`"));
         assert_complete_duplicate_candidates(ambiguous.message(), "Entity");
 
-        let Some(unresolved) = violations
-            .iter()
-            .find(|violation| violation.entry_name() == "domain::alpha::AggregateMissing")
-        else {
-            panic!("unresolved member must be diagnosed");
-        };
-        assert!(unresolved.message().contains("domain::missing::Entity"));
+        assert!(
+            !violations
+                .iter()
+                .any(|violation| violation.entry_name() == "domain::alpha::AggregateMissing")
+        );
     }
 
     #[test]
@@ -3105,7 +3408,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -3114,7 +3417,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(violations.len(), 3);
+        assert_eq!(violations.len(), 2);
         assert!(violations.iter().any(|violation| {
             violation.message().contains("domain::alpha::Entity")
                 && violation.message().contains("domain::alpha::WrappedExternal")
@@ -3134,13 +3437,11 @@ mod tests {
         assert!(ambiguous.message().contains("ambiguous identifier `Entity`"));
         assert_complete_duplicate_candidates(ambiguous.message(), "Entity");
 
-        let Some(unresolved) = violations
-            .iter()
-            .find(|violation| violation.message().contains("domain::missing::Entity"))
-        else {
-            panic!("unresolved method reference must be diagnosed");
-        };
-        assert!(unresolved.message().contains("domain::missing::Entity"));
+        assert!(
+            !violations
+                .iter()
+                .any(|violation| violation.message().contains("domain::missing::Entity"))
+        );
     }
 
     #[test]
@@ -3170,7 +3471,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -3230,7 +3531,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -3284,7 +3585,7 @@ mod tests {
         )
         .unwrap();
         let all_catalogues = all_catalogues_single(&catalogue);
-        let violations = super::evaluate_catalogue_lint(
+        let violations = super::entrypoint::evaluate_catalogue_lint_rules_only(
             &[rule],
             &all_catalogues,
             catalogue.layer(),
@@ -3334,6 +3635,55 @@ mod tests {
             Err(CatalogueLinterError::ConflictingTypeAliasGenericParameters { alias_name })
                 if alias_name.as_str() == "ConflictingAlias"
         ));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_preflight_skips_unmatched_struct_field_without_rules() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("BrokenField".to_owned()).unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                plain_struct_kind(vec![field_decl("value", "helpers::Thing")]),
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+
+        let result = evaluate_catalogue_lint_with_preflight(
+            &[],
+            &all_catalogues,
+            &catalogue.layer().clone(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        );
+
+        assert!(result.is_ok_and(|violations| violations.is_empty()));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_preflight_skips_unmatched_alias_target_without_rules() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("BrokenAlias".to_owned()).unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("helpers::Thing").unwrap(),
+                    generics: vec![],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+
+        let result = evaluate_catalogue_lint_with_preflight(
+            &[],
+            &all_catalogues,
+            &catalogue.layer().clone(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        );
+
+        assert!(result.is_ok_and(|violations| violations.is_empty()));
     }
 
     #[test]
@@ -4007,8 +4357,6 @@ mod tests {
     // T016: Test fixture helpers
     // ===========================================================================
 
-    use std::collections::BTreeMap;
-
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use crate::tddd::catalogue_v2::document::CatalogueDocument;
     use crate::tddd::catalogue_v2::entries::{
@@ -4028,6 +4376,7 @@ mod tests {
     use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use crate::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
     use crate::tddd::semantic_verify::CatalogueEntryKey;
+    use std::collections::BTreeMap;
 
     fn make_doc(layer_name: &str) -> CatalogueDocument {
         CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer(layer_name))
@@ -7016,8 +7365,8 @@ mod tests {
     fn test_resolve_type_role_skips_delete_action_type_entry() {
         // A TypeEntry with action: Delete in the domain layer must not be found by
         // find_in_catalogue, so resolve_type_role returns None for it.
-        // As a result, ReferencedRoleConstraint treats the reference as unresolvable
-        // and emits a violation (fail-closed semantics).
+        // An unmatched TypeRef is delegated to Chain 3 rather than diagnosed by
+        // catalogue-lint.
         let domain_layer = layer("domain");
         let usecase_layer = layer("usecase");
 
@@ -7064,15 +7413,10 @@ mod tests {
         .unwrap();
         let violations =
             evaluate_catalogue_lint(&[rule], &all, &usecase_layer, &StubPrimitiveScanner).unwrap();
-        assert_eq!(
-            violations.len(),
-            1,
-            "expected 1 violation: Delete-marked TypeEntry must not satisfy role lookup, \
-             got: {violations:?}"
+        assert!(
+            violations.is_empty(),
+            "deleted declarations are unmatched and delegated to Chain 3: {violations:?}"
         );
-        assert_eq!(violations[0].rule_kind(), "ReferencedRoleConstraint");
-        assert_eq!(violations[0].entry_name(), "PlaceOrder");
-        assert!(violations[0].message().contains("OrderPlaced"));
     }
 
     #[test]

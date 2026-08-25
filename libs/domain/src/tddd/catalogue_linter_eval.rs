@@ -7,7 +7,7 @@
 //! Cross-layer type-role resolution helpers live in the sibling submodule
 //! `eval_helpers` (file `catalogue_linter_eval_helpers.rs`).
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use super::eval_layer_signature;
 use super::eval_primitives;
@@ -23,7 +23,9 @@ use super::{
 };
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath;
+use crate::tddd::catalogue_v2::identifiers::{
+    CrateName, FullyQualifiedItemPath, ParamName, TypeRef,
+};
 use crate::tddd::catalogue_v2::roles::{InvariantPredicate, ItemAction, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner;
@@ -54,9 +56,47 @@ use eval_config::{
 };
 use identity::{
     CatalogueIdentityContext, TypeRefInspectionContext, build_declared_identities,
-    declared_identity_universe, declared_locality_modules, generic_parameter_names,
-    resolution_message, resolve_reference_identities, role_constraint_failure,
+    declared_identity_universe, generic_parameter_names, resolution_message,
+    resolve_reference_identities, role_constraint_failure,
 };
+
+/// Owned identity context reused while the entrypoint inspects every TypeRef
+/// in one catalogue. The resolution itself remains delegated to the existing
+/// T013 identity adapter below; this wrapper only keeps its derived declaration
+/// universe alive across the preflight traversal.
+pub(super) struct CatalogueTypeRefIdentityContext {
+    catalogue_crate: CrateName,
+    universe: BTreeSet<FullyQualifiedItemPath>,
+}
+
+pub(super) fn build_type_ref_identity_context(
+    all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    catalogue_crate: &CrateName,
+) -> Result<CatalogueTypeRefIdentityContext, CatalogueLinterError> {
+    let entries = build_declared_identities(all_catalogues)?;
+    Ok(CatalogueTypeRefIdentityContext {
+        catalogue_crate: catalogue_crate.clone(),
+        universe: declared_identity_universe(&entries),
+    })
+}
+
+pub(super) fn inspect_type_ref<E: TypeRefPathExtractorPort>(
+    context: &CatalogueTypeRefIdentityContext,
+    type_ref: &TypeRef,
+    type_parameters: &[ParamName],
+    lifetime_parameters: &[ParamName],
+    const_parameters: &[ParamName],
+    extractor: &E,
+) -> Result<(), CatalogueLinterError> {
+    let identity_context = CatalogueIdentityContext {
+        catalogue_crate: &context.catalogue_crate,
+        universe: &context.universe,
+        entries: &[],
+    };
+    let inspection =
+        TypeRefInspectionContext { type_parameters, lifetime_parameters, const_parameters };
+    resolve_reference_identities(type_ref, identity_context, extractor, inspection).map(|_| ())
+}
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`
 /// within `all_catalogues`.
@@ -203,15 +243,9 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
-                let locality_modules = declared_locality_modules(
-                    all_catalogues,
-                    &declared_identities,
-                    catalogue.crate_name(),
-                );
                 let identity_context = CatalogueIdentityContext {
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
-                    locality_modules: &locality_modules,
                     entries: &declared_identities,
                 };
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
@@ -486,15 +520,9 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                 )?;
                 let declared_identities = build_declared_identities(all_catalogues)?;
                 let identity_universe = declared_identity_universe(&declared_identities);
-                let locality_modules = declared_locality_modules(
-                    all_catalogues,
-                    &declared_identities,
-                    catalogue.crate_name(),
-                );
                 let identity_context = CatalogueIdentityContext {
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
-                    locality_modules: &locality_modules,
                     entries: &declared_identities,
                 };
                 let mut seen: BTreeMap<FullyQualifiedItemPath, String> = BTreeMap::new();

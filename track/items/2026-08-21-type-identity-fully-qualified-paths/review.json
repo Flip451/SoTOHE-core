@@ -217,6 +217,20 @@
           "hash": "rvw1:sha256:145c606af09791257eb3a4445523583f79720fac830b4dcd0bb0c0fdda0b8ea6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:50:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6db304462e7bff2bc1f4bf8e962d1187a15f9f59313b44181fe5c5c01bfc293f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:53:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6db304462e7bff2bc1f4bf8e962d1187a15f9f59313b44181fe5c5c01bfc293f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1417,6 +1431,49 @@
           "hash": "rvw1:sha256:ebc247711b898457bfde8a09d8d7de8d6f20a527166fcfb74a67e1bf9fe0f57a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:12:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4fbe6d8fb38d24395c17af326afef5a00f14c3f336add152579279c8af4b22f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:28:39Z",
+          "findings": [
+            {
+              "category": "fail_closed",
+              "file": "libs/domain/src/tddd/catalogue_linter_preflight.rs",
+              "line": 45,
+              "message": "`inspect_catalogue` excludes every `ItemAction::Reference` from the rule-independent preflight. Reference records are not tombstones: the linter consumes Reference trait implementations and referenced trait method surfaces, and the identity universe excludes only `Delete`. Consequently, an ambiguous, unsupported, or limit-exceeding TypeRef in a Reference trait/impl can bypass extraction entirely and let `evaluate_catalogue_lint` succeed when no rule happens to inspect that slot, violating the complete-inspection fail-closed contract. Scan the authoritative TypeRef fields of Reference records and add a Reference-action regression test.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:d4fbe6d8fb38d24395c17af326afef5a00f14c3f336add152579279c8af4b22f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T00:40:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f2266762760be6d127c17871f19773b48e8ce0b76fc324eb773fe0c33a586bcd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:27:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d588ce196a8f0f53430f5ecc66479cbe10a868c74aca0ee6e53abbec522294c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:35:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d588ce196a8f0f53430f5ecc66479cbe10a868c74aca0ee6e53abbec522294c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2259,6 +2316,20 @@
           "at": "2026-08-24T03:14:46Z",
           "findings": [],
           "hash": "rvw1:sha256:43b164e0af4a6be28c860f8a884017cf36fc8671481b709a27c2527ae6476a57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:10:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97fe256864bd40785be7ffe58abf50abae21f1b5414b870077b770c405dd2172",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:19:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97fe256864bd40785be7ffe58abf50abae21f1b5414b870077b770c405dd2172",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3463,6 +3534,129 @@
           "hash": "rvw1:sha256:5c64d9faf3dcdb2934c71cc64b4f2db656975133b0f162db26654205f13b80e9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:11:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81aa1afa69c374f8cb5bdac16adde4d95d9c90b40b2f053d26e030724f6f979d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:32:22Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/template_export/convention_reference_parser.rs",
+              "line": 15,
+              "message": "This dead-reference scanner is not declared by `template_export/mod.rs`, and its entry point has no call site. Consequently `FsTemplateExportAdapter` never runs the new gate and can still report success when exported operational content references a missing convention. Wire the private module into the export completion path.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 307,
+              "message": "Qualified paths in value expressions are not completely traversed. For `[u8; <domain::Ty as external::Trait>::N]`, the default `ExprPath` visitor visits the qself type and generic arguments but never records the `external::Trait` prefix, so external-reference or ambiguity checks can be bypassed. Handle qself expression paths analogously to `visit_type_path`, excluding only the final value label.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/conventions/resolver.rs",
+              "line": 18,
+              "message": "The new resolver file is orphaned: `conventions.rs` does not declare its `resolver` submodule, and the imported `usecase::conventions` port/types do not exist in the current source tree. Rust therefore compiles neither this adapter nor its tests, leaving the declared convention-resolution adapter unavailable. Add the companion port definitions and integrate/re-export the adapter through the canonical `infrastructure::conventions` path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:81aa1afa69c374f8cb5bdac16adde4d95d9c90b40b2f053d26e030724f6f979d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T00:44:02Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/template_export/convention_reference_parser.rs",
+              "line": 15,
+              "message": "This dead-reference scanner remains undeclared by `template_export/mod.rs`, and its entry point has no call site. `FsTemplateExportAdapter` therefore never executes the gate and can still report success when exported operational content references a missing convention. Wire this private module into the export completion path.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/conventions/resolver.rs",
+              "line": 18,
+              "message": "The resolver file remains orphaned: `conventions.rs` does not declare or re-export its `resolver` submodule, and the imported `usecase::conventions` port/types are absent from the current source tree. Rust compiles neither this adapter nor its tests, so the declared convention-resolution adapter is unavailable.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 311,
+              "message": "Qualified expression paths are still passed through bare-const classification. With an active const parameter `N`, `[u8; <domain::Ty>::N]` has a one-segment `node.path` and is incorrectly emitted as `ConstParameter(N)` even though `N` is an associated-constant label; post-qself segments are never emitted as `AssociatedItemLabel`. Skip bare-const handling when `qself` exists and classify the segments after `qself.position` as associated labels.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:acc8fff56be1549b3c26b534ebb49e486a186c077a78b8452546bd2f81159b3e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T00:53:47Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 89,
+              "message": "Precise-capture bounds are silently accepted without complete inspection. For `impl Trait + use<T>` or standalone `use<T>`, syn visits `CapturedParam::Ident` only through `visit_ident`, which this adapter does not classify; extraction therefore returns success while omitting the active type/const parameter (and `use<'a, T>` returns partial results). Handle `CapturedParam` using the supplied parameter contexts, or reject `PreciseCapture`/`Verbatim` bounds as unsupported.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fe1f44c101ab93b989cd5bb0b5442f3cf25c4fc7698450f8ffa1220a70254670",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T01:04:53Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 89,
+              "message": "`TypeParamBound::Verbatim` is still delegated to syn's default token-stream visitor instead of being rejected. Syn represents bounds such as `[const] external::Trait` or `const external::Trait` as `Verbatim` after consuming the trait path, so extraction returns `Ok([])` and the external reference bypasses the complete-inspection gate. Override `visit_type_param_bound` to fail closed for `Verbatim` or explicitly inspect it.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 300,
+              "message": "Precise-capture validation rejects valid built-in captures that are absent from the supplied parameter arrays. `use<Self>` is valid—and required in applicable trait definitions—and `use<'_>` is also permitted, but both reach the unsupported branches because callers supply only declared catalogue generics. Special-case `Self` and the elided lifetime consistently with the other visitor paths. See the [Rust Reference](https://doc.rust-lang.org/reference/types/impl-trait.html#precise-capturing).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:719c2ffae0afd88042032632875f8ff03a729b013e1f9de86e0acea03e783556",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T01:13:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:155ec3f546888deee5aa649ec402d3434fb9188b4db568af732c343a50fc36e0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:25:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00204fbc225c57a781ce8b09427e88c4bb56f19de1741878d57d5254c3c8f2d0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:32:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00204fbc225c57a781ce8b09427e88c4bb56f19de1741878d57d5254c3c8f2d0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3844,6 +4038,135 @@
           "hash": "rvw1:sha256:92400b4dcda234cf6657c7564c6be713f38196244caf347071d3c9424087c37f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:11:20Z",
+          "findings": [
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 1308,
+              "message": "This record binds `test_evaluate_catalogue_lint_passes_unmatched_reference_to_chain_three` to `CatalogueIdentityResolutionError × AC-04`, but the test deliberately passes an external reference and never constructs or returns that error. It is unrelated evidence for this declaration; retain the unresolved/error-producing test here and bind the external-reference test to the evaluator/port edge instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cf9d0a9c6b723958b4b3e7c6f33aac974f3be7cf7cf6e119bfabe895de98f187",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T00:14:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97621cc0da45887f249866509044ac9fcad3b56dcfe9571ab3905f02f68bd5f8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T01:17:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97621cc0da45887f249866509044ac9fcad3b56dcfe9571ab3905f02f68bd5f8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T01:33:04Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 478,
+              "message": "Six domain tests in this fulfillment now call `evaluate_catalogue_lint_rules_only`, bypassing the target function's new rule-independent preflight. Meanwhile the new direct regressions for ambiguous references, unmatched-reference delegation, and rule-free field/alias inspection are absent. The obligation can therefore remain fulfilled while `evaluate_catalogue_lint` preflight behavior regresses; replace the rules-only evidence with relevant public-entry tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 47,
+              "message": "The global `CatalogueToExtendedCratePort` fulfillment still applies to AC-06 because only IN-04 and CO-03 have waivers. These codec tests encode catalogue data but never run Chain ③ implementation-derived whole-TypeRef reconciliation, which AC-06 requires. Add an AC-06 waiver analogous to the existing IN-04 waiver.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 1071,
+              "message": "`NewTypeGraphCodecError × AC-06` is bound to catalogue-encoding tests that never exercise independent Chain ③ implementation comparison. This contradicts the same entry's IN-04 waiver and cannot establish AC-06; replace this binding with a precise nonlocal waiver.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 895,
+              "message": "Both adapter-specific AC-07 records include a `reports_incomplete_typeref_location` test (here and under `SystemTrackLintAdapter`). Those tests cover incomplete-syntax fail-closed behavior, not AC-07's separation of same-named fully-qualified identities or DanglingId prevention. Remove them from the AC-07 records.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 756,
+              "message": "`test_syn_type_ref_path_extractor_carries_parameter_context_exclusively` is unrelated evidence in both this `ExtractedTypeRefPath × AC-07` record and the later `TypeRefPathExtractorPort × AC-04` record. It contains no same-named identities or accepted-spelling/external-delegation scenario; it belongs to parameter-classification anchors such as AC-05, not these edges.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 1325,
+              "message": "The `CatalogueIdentityResolutionError × AC-05` and `× CO-02` records bind `test_evaluate_catalogue_lint_excludes_parameters_and_propagates_inspection_limits`, but that test produces linter violations from extraction limits and never constructs or matches `CatalogueIdentityResolutionError`. Bind direct `ClassificationFailed` evidence or use precise waivers.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 998,
+              "message": "`test_resolve_catalogue_identity_unresolved_path_fails_closed` remains in the `CatalogueIdentityResolutionError` bindings for IN-03, AC-04, and AC-07. It asserts that a low-level resolver rejects a nonmatching path, whereas the revised catalogue-lint boundary delegates unmatched references to Chain ③, and AC-07 concerns same-name separation. Retain this test only on anchors that actually require unresolved-path failure.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 1355,
+              "message": "This waiver says AC-04 requires unresolved catalogue references to fail closed, but current AC-04 explicitly passes references matching no catalogue declaration to Chain ③. The reason therefore misstates the anchor and is not an accurate self-contained waiver; rewrite it around the actual accepted-spelling/ambiguity boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97621cc0da45887f249866509044ac9fcad3b56dcfe9571ab3905f02f68bd5f8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T01:46:31Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/test-bindings.json",
+              "line": 485,
+              "message": "The replacement fulfillment set was trimmed too far: it covers ambiguous references and unmatched-reference delegation, but no bound test proves successful resolution/separation of same-named fully-qualified references or fail-closed incomplete TypeRef inspection. `test_execute_identity_rules_resolve_wrappers_and_fail_closed` terminates on `AmbiguousIdentifier`, so its unsupported-syntax fixture cannot detect an AC-05 regression. Bind the existing qualified-path success test and incomplete-location failure test (or direct equivalents) so IN-03/AC-04/AC-05/AC-07/CO-02 remain covered.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c56184f5434d751de25f3e99521041b554b537c59182cdf4c6c37470ff5fa595",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T01:50:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bad590f2c060031e0d85db276fa1e8cfd2b78c728fd8e5d2710af50cf254004b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:25:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53b4207549031c9a729737fd2c6e76e77d3ccb8192267c474799e4cd1dff2c29",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T02:33:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53b4207549031c9a729737fd2c6e76e77d3ccb8192267c474799e4cd1dff2c29",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3983,6 +4306,20 @@
           "at": "2026-08-23T18:18:44Z",
           "findings": [],
           "hash": "rvw1:sha256:e674990d0be08c4b020a7074d43239ac002fe984deabc285353202c2c6169e58",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T23:03:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eaa0afbe57fb12e586c7c233b1cde41da4cc56f848ca319ee839016eab0c1c42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-24T23:07:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eaa0afbe57fb12e586c7c233b1cde41da4cc56f848ca319ee839016eab0c1c42",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -5245,6 +5582,20 @@
           "at": "2026-08-24T16:26:53Z",
           "findings": [],
           "hash": "rvw1:sha256:ce8daa431e71bab3b956d4f2e454205e47ddc47e4ad1c09ec1db678a2a9b7d48",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:11:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45f9f603225c5192389b3991ecb60e15aa7edfc56663bca284b144ac2cd86f52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T00:27:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45f9f603225c5192389b3991ecb60e15aa7edfc56663bca284b144ac2cd86f52",
           "type": "final",
           "verdict": "zero_findings"
         }

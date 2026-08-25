@@ -27,6 +27,30 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "373293ed59b7853007797f752df2c07f9c898f61aa4e4802a7b6f081dfeb15ca",
+        "declaration_hash": "042d162ffc2552ce373e8434a0ad06560e046013fabcb3c13726f0a5fc7b91b7",
+        "waived_reason_hash": "2e0b4934a1a0c89460cf3fea1b380cb6fce3a3c04c4a8df8995d68a310ede6fb"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "IN-01",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
@@ -201,7 +225,7 @@
         "entry_key": "InherentImplDeclV2"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "declaration_hash": "613444e374eede1f1988a592b42f6d67d044741598aca0605b6d1d963f5215bd",
         "waived_reason_hash": "6d7b17b012548d696858ecf1d150fbb38d902d984c9752d94bade794430e10a5"
       },
@@ -211,7 +235,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。",
+        "citation": "catalogue-lint は、未対応構文、解析不能、深さ又は資源上限によって TypeRef 全体の検査を完了できない場合、位置を示して fail-closed とし、部分的な解決成功を成功扱いしない。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -249,7 +273,7 @@
         "entry_key": "TraitRefScope"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "declaration_hash": "7f480e1564b82d62f58a3a83ed1cee65ce160e85f3aae62d5cc19c5de94ee299",
         "waived_reason_hash": "8999dbfc17c443275a3e3c5bac8a2cd7b943e7fd14ef4def613ffdfe772fdd98"
       },
@@ -259,7 +283,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "DocString(\"Scope classification for a catalogue trait reference.\")",
+        "citation": "Scope classification for a catalogue trait reference.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -339,13 +363,37 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "373293ed59b7853007797f752df2c07f9c898f61aa4e4802a7b6f081dfeb15ca",
+        "declaration_hash": "e351fb258736c7363e584d517d817ebbca54881fbfa3ea1e6f45ac7f0867ca28",
+        "waived_reason_hash": "4fbed4a0d00099269151cdf7486e3d53f6e1431f1b65487820ef38c18d5f06c3"
+      },
+      "obligation_id": {
+        "entry_key": "NewTypeGraphCodecError",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Chain ③ の実装突合は実装から得た型情報に対して TypeRef 全体の適合を独立に fail-closed で検証する。\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "AC-04",
           "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
         },
         "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
         "declaration_hash": "163d2117deeb6bece3543cc088d2c637456010d5cdab2eee34befa056c835035",
         "waived_reason_hash": "c71667b097bd5562353edd311463f1bbb2425992b8e460e37aa4e09dfa4252e3"
       },
@@ -369,7 +417,7 @@
         "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
       },
       "key": {
-        "anchor_text_hash": "6e53a8bb4d6261a50c6fedb1f3b8d433a6776a2d480b2393079c56e614e78158",
+        "anchor_text_hash": "915f113fd52ae773cd43a13734da82c76b14ae8444528968463fe7ea1ab984ed",
         "declaration_hash": "de6df42a21f90646eeffce7d7e9c2b7e07225b31dfcbe3d2501e53b130ce66fc",
         "waived_reason_hash": "a4abeb818a6dabcc89268115e64c505c565326f5dfaa3d121bfd187efa6efcd5"
       },
@@ -441,7 +489,7 @@
         "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
       },
       "key": {
-        "anchor_text_hash": "0b61c3a87d0637a8c46db1e10d06d1bc54a40b2adb8a08599805af88ba62dafc",
+        "anchor_text_hash": "0cfbfcca4ca46871df87cbe32556870751da85117aaff80e587ee99cfce2f27c",
         "declaration_hash": "0c8d76c5fc5ae5d134d2c11b3cf2d0038c8b485a42949a4ca4cc0ef833b9253d",
         "waived_reason_hash": "5083714fabfa62fa5dadcd05be3962ca00feded7db543bad8e5ec02dc3612496"
       },
@@ -465,9 +513,9 @@
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
       },
       "key": {
-        "anchor_text_hash": "a2d7e31da3c7cd76a83f7c891ff6d85c9814537277580e2f91e7e3c2a10cf6b4",
+        "anchor_text_hash": "18b5154fdbb5562f74048b9856c9deef3e6fcc21c24a3e111687e0903a4670b1",
         "declaration_hash": "156160012267f32d3dbbdd888802e7930786acf369160e271627dfd8266f24f1",
-        "waived_reason_hash": "876e259bc9cfa3ef50ea8381156eeefaa2b9c148bb3112d2ae75517028ae03d7"
+        "waived_reason_hash": "e6975659b410746b028a67a32602dcf85c778cc589393eb82082b937d8946ab2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
@@ -475,7 +523,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"methods: [],\"",
+        "citation": "Failure to extract path references from a catalogue TypeRef.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

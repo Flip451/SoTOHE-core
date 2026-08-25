@@ -1075,57 +1075,212 @@ mod tests {
             StubScanner,
             IdentityAwareExtractor,
         );
-        let violations = interactor
+        let error = interactor
             .execute(RunCatalogueLintCommand {
                 track_id: "my-track".to_owned(),
                 layer_id: "domain".to_owned(),
                 rules,
             })
-            .expect("identity-sensitive lint execution succeeds");
+            .expect_err("unresolved TypeRef inspection must fail closed before rule evaluation");
+        let diagnostic = format!("{error:?}");
+        assert!(diagnostic.contains("AmbiguousIdentifier"));
+        assert!(diagnostic.contains("alpha"));
+        assert!(diagnostic.contains("beta"));
+    }
 
-        assert!(!violations.iter().any(|violation| {
-            violation.rule_kind() == "ReferencedRoleConstraint"
-                && violation.entry_name() == "domain::alpha::UseCaseValid"
-        }));
-        assert!(violations.iter().any(|violation| {
-            violation.rule_kind() == "ReferencedRoleConstraint"
-                && violation.message().contains("FullyQualifiedItemPath")
-                && violation.message().contains("alpha")
-                && violation.message().contains("beta")
-        }));
-        assert!(violations.iter().any(|violation| {
-            violation.rule_kind() == "ReferencedRoleConstraint"
-                && violation.message().contains("domain::missing::Event")
-        }));
-        assert!(violations.iter().any(|violation| {
-            violation.entry_name() == "domain::alpha::UseCaseExtractionFailure"
-                && violation.message().contains("unsupported TypeRef syntax")
-                && violation.message().contains("(")
-        }));
-        assert!(violations.iter().any(|violation| {
-            violation.rule_kind() == "FieldElementUniqueAcrossEntries"
-                && violation.message().contains("FullyQualifiedItemPath")
-                && violation.message().contains("alpha")
-                && violation.message().contains("beta")
-        }));
-        assert_eq!(
-            violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "NoExternalReferenceInMethods")
-                .count(),
-            2
+    #[test]
+    fn test_execute_identity_rules_resolve_qualified_same_named_paths_and_external_references() {
+        struct CompleteIdentityExtractor;
+
+        impl TypeRefPathExtractorPort for CompleteIdentityExtractor {
+            fn extract(
+                &self,
+                type_ref: &TypeRef,
+                _type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+            ) -> Result<
+                Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
+                domain::tddd::catalogue_linter::TypeRefPathExtractionError,
+            > {
+                use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
+
+                let reference = |value: &str| {
+                    ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap())
+                };
+                match type_ref.as_str() {
+                    "std::ghost::UnknownWrapper<&'static domain::alpha::Event>" => Ok(vec![
+                        reference("std::ghost::UnknownWrapper"),
+                        reference("domain::alpha::Event"),
+                    ]),
+                    "domain::beta::Event" | "external_crate::Event" => {
+                        Ok(vec![reference(type_ref.as_str())])
+                    }
+                    _ => Err(
+                        domain::tddd::catalogue_linter::TypeRefPathExtractionError::UnsupportedSyntax {
+                            location: type_ref.clone(),
+                        },
+                    ),
+                }
+            }
+        }
+
+        let (order, mut catalogues) = three_layer_result("domain");
+        let domain_layer = layer("domain");
+        let catalogue = catalogues.get_mut(&domain_layer).expect("domain catalogue exists");
+        let module = |name: &str| ModulePath::from_segments(vec![name.to_owned()]).unwrap();
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
         );
-        assert!(violations.iter().any(|violation| {
-            violation.rule_kind() == "NoExternalReferenceInMethods"
-                && violation.message().contains("domain::alpha::Entity")
-                && violation.message().contains("domain::alpha::ExternalService")
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesAlphaEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new(
+                            "std::ghost::UnknownWrapper<&'static domain::alpha::Event>".to_owned(),
+                        )
+                        .unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesBetaEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::beta::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesExternalEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("external_crate::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .with(mockall::predicate::function(|t: &TrackId| t.as_ref() == "my-track"))
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            CompleteIdentityExtractor,
+        );
+        let violations = interactor
+            .execute(RunCatalogueLintCommand {
+                track_id: "my-track".to_owned(),
+                layer_id: "domain".to_owned(),
+                rules: vec![LintRuleSpec {
+                    target_roles: vec!["UseCase".to_owned()],
+                    kind: LintRuleKind::ReferencedRoleConstraint {
+                        target_field: RolePayloadField::Handles,
+                        expected_role: RoleKind::DomainEvent,
+                    },
+                }],
+            })
+            .expect("all unique catalogue references and external references are accepted");
+
+        assert_eq!(violations.len(), 1);
+        assert_eq!(violations[0].entry_name(), "domain::alpha::HandlesBetaEvent");
+        assert!(violations[0].message().contains("ValueObject"));
+        assert!(violations[0].message().contains("DomainEvent"));
+        assert!(!violations.iter().any(|violation| {
+            matches!(
+                violation.entry_name(),
+                "domain::alpha::HandlesAlphaEvent" | "domain::alpha::HandlesExternalEvent"
+            )
         }));
-        assert!(violations.iter().any(|violation| {
-            violation.rule_kind() == "NoExternalReferenceInMethods"
-                && violation.message().contains("FullyQualifiedItemPath")
-                && violation.message().contains("alpha")
-                && violation.message().contains("beta")
-        }));
+    }
+
+    #[test]
+    fn test_execute_fails_closed_with_incomplete_typeref_location() {
+        struct IncompleteExtractor;
+
+        impl TypeRefPathExtractorPort for IncompleteExtractor {
+            fn extract(
+                &self,
+                type_ref: &TypeRef,
+                _type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                _const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+            ) -> Result<
+                Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
+                domain::tddd::catalogue_linter::TypeRefPathExtractionError,
+            > {
+                Err(domain::tddd::catalogue_linter::TypeRefPathExtractionError::UnsupportedSyntax {
+                    location: type_ref.clone(),
+                })
+            }
+        }
+
+        let (order, mut catalogues) = three_layer_result("domain");
+        let catalogue = catalogues.get_mut(&layer("domain")).expect("domain catalogue exists");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::IncompleteTypeRef".to_owned()).unwrap(),
+            type_entry_with_methods(
+                DataRole::UseCase { handles: vec![TypeRef::new("(").unwrap()] },
+                vec![],
+            ),
+        );
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            StubMissingConfigLoader,
+            StubScanner,
+            IncompleteExtractor,
+        );
+
+        let error = interactor
+            .execute(RunCatalogueLintCommand {
+                track_id: "my-track".to_owned(),
+                layer_id: "domain".to_owned(),
+                rules: vec![LintRuleSpec {
+                    target_roles: vec!["UseCase".to_owned()],
+                    kind: LintRuleKind::ReferencedRoleConstraint {
+                        target_field: RolePayloadField::Handles,
+                        expected_role: RoleKind::DomainEvent,
+                    },
+                }],
+            })
+            .expect_err("incomplete TypeRef inspection must fail closed");
+        let diagnostic = format!("{error:?}");
+        assert!(diagnostic.contains("PathExtractionFailed"));
+        assert!(diagnostic.contains("UnsupportedSyntax"));
+        assert!(diagnostic.contains("(") || diagnostic.contains("location"));
     }
 
     // ------------------------------------------------------------------

@@ -160,6 +160,162 @@ mod tests {
         }
     }
 
+    fn write_identity_fixture(root: &std::path::Path) {
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{
+              "version": 2,
+              "layers": [{
+                "crate": "domain",
+                "tddd": {"enabled": true, "catalogue_file": "domain-types.json"}
+              }]
+            }"#,
+        )
+        .expect("architecture rules are written");
+        std::fs::create_dir_all(root.join(".harness/catalogue-lint"))
+            .expect("lint config directory exists");
+        std::fs::write(
+            root.join(".harness/catalogue-lint/config.json"),
+            r#"{
+              "schema_version": 1,
+              "rules": [{
+                "target_roles": ["UseCase"],
+                "kind": {"ReferencedRoleConstraint": {
+                  "target_field": "handles",
+                  "expected_role": "DomainEvent"
+                }}
+              }]
+            }"#,
+        )
+        .expect("lint config is written");
+        std::fs::create_dir_all(root.join("track/items/lint-track"))
+            .expect("track directory exists");
+        std::fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::Event": {
+                  "action": "add",
+                  "role": {"DomainEvent": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::Event": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesAlphaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::alpha::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesBetaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::beta::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesExternalEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["external_crate::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("catalogue fixture is written");
+    }
+
+    fn write_incomplete_identity_fixture(root: &std::path::Path) {
+        write_identity_fixture(root);
+        std::fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::IncompleteTypeRef": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["("]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("incomplete catalogue fixture is written");
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_resolves_qualified_same_named_paths_and_external_references()
+    {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_identity_fixture(workspace.path());
+
+        let result = SystemTrackLintAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+            .execute(
+                TrackId::try_new("lint-track").expect("track id is valid"),
+                command(workspace.path()),
+            )
+            .expect("qualified and external references are accepted by the single-layer adapter");
+
+        assert_eq!(result.violations.len(), 1);
+        let Some(violation) = result.violations.first() else {
+            panic!("the beta reference must produce one role violation");
+        };
+        assert_eq!(violation.entry_name(), "domain::alpha::HandlesBetaEvent");
+        assert!(violation.message().contains("ValueObject"));
+        assert!(violation.message().contains("DomainEvent"));
+    }
+
+    #[test]
+    fn test_system_track_lint_adapter_reports_incomplete_typeref_location() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_incomplete_identity_fixture(workspace.path());
+
+        let error = match SystemTrackLintAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+            .execute(
+                TrackId::try_new("lint-track").expect("track id is valid"),
+                command(workspace.path()),
+            ) {
+            Ok(_) => panic!("incomplete TypeRef inspection must fail closed"),
+            Err(error) => error,
+        };
+        let diagnostic = error.to_string();
+        assert!(diagnostic.contains("unsupported TypeRef syntax"));
+        assert!(diagnostic.contains("("));
+    }
+
     #[test]
     fn test_system_track_lint_adapter_missing_config_returns_execution_error() {
         let workspace = tempfile::tempdir().expect("temporary workspace exists");

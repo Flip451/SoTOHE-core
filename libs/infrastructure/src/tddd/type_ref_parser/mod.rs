@@ -5,7 +5,8 @@
 //!
 //! ## Responsibilities
 //!
-//! * Parse the string via `syn::parse_str::<syn::Type>()`.
+//! * Parse the string via `syn::Type`, falling back to `syn::TypeParamBound`
+//!   for standalone bound spellings such as `?Sized`.
 //! * Walk the `syn::Type` AST recursively and produce complete syntactic
 //!   occurrences for the domain linter.
 //! * Keep catalogue-vs-external membership classification in the domain layer.
@@ -62,9 +63,17 @@ impl TypeRefPathExtractorPort for SynTypeRefPathExtractorAdapter {
         lifetime_parameters: &[ParamName],
         const_parameters: &[ParamName],
     ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
-        let syntax = parse_syn_type(type_ref.as_str()).map_err(|_| {
-            TypeRefPathExtractionError::UnsupportedSyntax { location: type_ref.clone() }
-        })?;
+        enum ParsedTypeRef {
+            Type(syn::Type),
+            Bound(syn::TypeParamBound),
+        }
+
+        let syntax = parse_syn_type(type_ref.as_str())
+            .map(ParsedTypeRef::Type)
+            .or_else(|_| parse_syn_type_param_bound(type_ref.as_str()).map(ParsedTypeRef::Bound))
+            .map_err(|_| TypeRefPathExtractionError::UnsupportedSyntax {
+                location: type_ref.clone(),
+            })?;
         let mut visitor = TypeRefPathVisitor {
             paths: Vec::new(),
             type_parameters,
@@ -75,7 +84,10 @@ impl TypeRefPathExtractorPort for SynTypeRefPathExtractorAdapter {
             resources: 0,
             error: None,
         };
-        visitor.visit_type(&syntax);
+        match &syntax {
+            ParsedTypeRef::Type(syntax) => visitor.visit_type(syntax),
+            ParsedTypeRef::Bound(bound) => visitor.visit_type_param_bound(bound),
+        }
         visitor.error.map_or(Ok(visitor.paths), Err)
     }
 }
@@ -253,6 +265,17 @@ impl<'ast, 'ctx> Visit<'ast> for TypeRefPathVisitor<'ctx> {
         self.leave_node();
     }
 
+    fn visit_type_param_bound(&mut self, node: &'ast syn::TypeParamBound) {
+        if !self.enter_node() {
+            return;
+        }
+        match node {
+            syn::TypeParamBound::Verbatim(_) => self.unsupported(),
+            _ => visit::visit_type_param_bound(self, node),
+        }
+        self.leave_node();
+    }
+
     fn visit_type_path(&mut self, node: &'ast syn::TypePath) {
         if self.error.is_some() {
             return;
@@ -277,6 +300,68 @@ impl<'ast, 'ctx> Visit<'ast> for TypeRefPathVisitor<'ctx> {
         visit::visit_trait_bound(self, node);
     }
 
+    fn visit_precise_capture(&mut self, node: &'ast syn::PreciseCapture) {
+        if !self.enter_node() {
+            return;
+        }
+        for parameter in &node.params {
+            match parameter {
+                syn::CapturedParam::Lifetime(lifetime) => {
+                    let name = ident_text(&lifetime.ident);
+                    if name == "_" || name == "static" {
+                        continue;
+                    }
+                    if self.lifetime_parameters.iter().any(|parameter| parameter.as_str() == name) {
+                        match ParamName::new(name) {
+                            Ok(name) => {
+                                self.push_param(ExtractedTypeRefPath::LifetimeParameter(name));
+                            }
+                            Err(_) => self.unsupported(),
+                        }
+                    } else {
+                        self.unsupported();
+                    }
+                }
+                syn::CapturedParam::Ident(ident) => {
+                    let name = ident_text(ident);
+                    if name == "Self" {
+                        match ParamName::new(name) {
+                            Ok(name) => {
+                                self.push_param(ExtractedTypeRefPath::TypeParameter(name));
+                            }
+                            Err(_) => self.unsupported(),
+                        }
+                        continue;
+                    }
+                    let is_type_parameter =
+                        self.type_parameters.iter().any(|parameter| parameter.as_str() == name);
+                    let is_const_parameter =
+                        self.const_parameters.iter().any(|parameter| parameter.as_str() == name);
+                    match (is_type_parameter, is_const_parameter) {
+                        (true, false) => match ParamName::new(name) {
+                            Ok(name) => {
+                                self.push_param(ExtractedTypeRefPath::TypeParameter(name));
+                            }
+                            Err(_) => self.unsupported(),
+                        },
+                        (false, true) => match ParamName::new(name) {
+                            Ok(name) => {
+                                self.push_param(ExtractedTypeRefPath::ConstParameter(name));
+                            }
+                            Err(_) => self.unsupported(),
+                        },
+                        (false, false) | (true, true) => self.unsupported(),
+                    }
+                }
+                _ => self.unsupported(),
+            }
+            if self.error.is_some() {
+                break;
+            }
+        }
+        self.leave_node();
+    }
+
     fn visit_lifetime(&mut self, node: &'ast syn::Lifetime) {
         let name = ident_text(&node.ident);
         let declared = self.lifetime_parameters.iter().any(|param| param.as_str() == name);
@@ -293,8 +378,24 @@ impl<'ast, 'ctx> Visit<'ast> for TypeRefPathVisitor<'ctx> {
     }
 
     fn visit_expr_path(&mut self, node: &'ast syn::ExprPath) {
-        self.record_expr_path(&node.path);
+        if self.error.is_some() {
+            return;
+        }
+        if node.qself.is_none() {
+            self.record_expr_path(&node.path);
+        }
         visit::visit_expr_path(self, node);
+        if self.error.is_some() {
+            return;
+        }
+        if let Some(qself) = node.qself.as_ref() {
+            if qself.position > 0 {
+                self.record_path_prefix(&node.path, qself.position);
+            }
+            for segment in node.path.segments.iter().skip(qself.position) {
+                self.record_associated_label(&segment.ident);
+            }
+        }
     }
 
     fn visit_generic_argument(&mut self, node: &'ast syn::GenericArgument) {
@@ -421,6 +522,13 @@ mod path_extractor_tests {
     }
 
     #[test]
+    fn test_syn_type_ref_path_extractor_accepts_standalone_maybe_sized_bound() {
+        let paths = extract("?Sized", &[], &[], &[]).expect("bound extraction succeeds");
+
+        assert_eq!(paths, vec![ExtractedTypeRefPath::Path(type_ref("Sized"))]);
+    }
+
+    #[test]
     fn test_syn_type_ref_path_extractor_classifies_external_constructor_and_inner_path() {
         let paths = extract("std::cell::Cell<OrderPlaced>", &[], &[], &[])
             .expect("syn extraction succeeds");
@@ -534,6 +642,74 @@ mod path_extractor_tests {
     }
 
     #[test]
+    fn test_syn_type_ref_path_extractor_collects_qself_trait_in_const_expression() {
+        let paths = extract("[u8; <domain::Ty as external::Trait>::N]", &[], &[], &["N"])
+            .expect("qualified const expression extracts");
+
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("u8")),
+                ExtractedTypeRefPath::Path(type_ref("domain::Ty")),
+                ExtractedTypeRefPath::Path(type_ref("external::Trait")),
+                ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("N").unwrap()),
+            ]
+        );
+
+        let paths = extract("[u8; <domain::Ty>::N]", &[], &[], &["N"])
+            .expect("qself-associated const expression extracts");
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("u8")),
+                ExtractedTypeRefPath::Path(type_ref("domain::Ty")),
+                ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("N").unwrap()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_classifies_precise_capture_parameters() {
+        let paths = extract("impl Trait + use<'a, T, K>", &["T"], &["a"], &["K"])
+            .expect("precise-capture parameters extract");
+
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::Path(type_ref("Trait")),
+                ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap()),
+                ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap()),
+                ExtractedTypeRefPath::ConstParameter(ParamName::new("K").unwrap()),
+            ]
+        );
+
+        assert!(matches!(
+            extract("impl Trait + use<'a, Unknown>", &["T"], &["a"], &["K"]),
+            Err(TypeRefPathExtractionError::UnsupportedSyntax { .. })
+        ));
+
+        let paths = extract("use<'_, Self, T>", &["T"], &[], &[])
+            .expect("built-in precise-capture parameters extract");
+        assert_eq!(
+            paths,
+            vec![
+                ExtractedTypeRefPath::TypeParameter(ParamName::new("Self").unwrap()),
+                ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_syn_type_ref_path_extractor_rejects_verbatim_bounds() {
+        for source in ["const external::Trait", "[const] external::Trait"] {
+            assert!(matches!(
+                extract(source, &[], &[], &[]),
+                Err(TypeRefPathExtractionError::UnsupportedSyntax { .. })
+            ));
+        }
+    }
+
+    #[test]
     fn test_catalogue_lint_accepts_syntactically_valid_unknown_external_wrapper() {
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
@@ -626,6 +802,392 @@ mod path_extractor_tests {
         assert!(
             violations.is_empty(),
             "the inner domain event should resolve despite the unknown wrapper: {violations:?}"
+        );
+    }
+
+    #[test]
+    fn test_catalogue_lint_resolves_qualified_same_named_paths_and_passes_external_paths() {
+        use domain::tddd::catalogue_linter::evaluate_catalogue_lint;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
+        use domain::tddd::layer_id::LayerId;
+        use domain::tddd::primitive_occurrence_scanner::{
+            PrimitiveName, PrimitiveOccurrencePosition, PrimitiveOccurrenceReport,
+            PrimitiveOccurrenceScanError, PrimitiveOccurrenceScanner,
+        };
+        use domain::tddd::semantic_verify::CatalogueEntryKey;
+
+        struct NoopScanner;
+
+        impl PrimitiveOccurrenceScanner for NoopScanner {
+            fn scan(
+                &self,
+                _type_ref: TypeRef,
+                _primitives: NonEmptyVec<PrimitiveName>,
+                _position: PrimitiveOccurrencePosition,
+            ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+                Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
+            }
+        }
+
+        let layer = LayerId::try_new("domain".to_owned()).expect("valid layer");
+        let module = |name: &str| {
+            ModulePath::from_segments(vec![name.to_owned()]).expect("valid module path")
+        };
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        let mut catalogue = domain::tddd::catalogue_v2::CatalogueDocument::new(
+            3,
+            CrateName::new("domain").expect("valid crate"),
+            layer.clone(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesAlphaEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new(
+                            "std::not_a_real_wrapper<&'static domain::alpha::Event>".to_owned(),
+                        )
+                        .unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesBetaEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("domain::beta::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesExternalEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![TypeRef::new("external_crate::Event".to_owned()).unwrap()],
+                },
+                "alpha",
+            ),
+        );
+
+        let mut all_catalogues = std::collections::BTreeMap::new();
+        all_catalogues.insert(layer.clone(), catalogue);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .expect("valid identity rule");
+        let violations = evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            &layer,
+            &NoopScanner,
+            &SynTypeRefPathExtractorAdapter,
+        )
+        .expect("all qualified and external references are completely inspectable");
+
+        assert_eq!(violations.len(), 1);
+        let Some(violation) = violations.first() else {
+            panic!("the beta reference must produce one role violation");
+        };
+        assert_eq!(violation.entry_name(), "domain::alpha::HandlesBetaEvent");
+        assert!(violation.message().contains("ValueObject"));
+        assert!(violation.message().contains("DomainEvent"));
+        assert!(!violations.iter().any(|violation| {
+            matches!(
+                violation.entry_name(),
+                "domain::alpha::HandlesAlphaEvent" | "domain::alpha::HandlesExternalEvent"
+            )
+        }));
+    }
+
+    #[test]
+    fn test_catalogue_lint_via_syn_adapter_fails_closed_for_ambiguous_short_name() {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
+        use domain::tddd::layer_id::LayerId;
+        use domain::tddd::primitive_occurrence_scanner::{
+            PrimitiveName, PrimitiveOccurrencePosition, PrimitiveOccurrenceReport,
+            PrimitiveOccurrenceScanError, PrimitiveOccurrenceScanner,
+        };
+        use domain::tddd::semantic_verify::CatalogueEntryKey;
+
+        struct NoopScanner;
+
+        impl PrimitiveOccurrenceScanner for NoopScanner {
+            fn scan(
+                &self,
+                _type_ref: TypeRef,
+                _primitives: NonEmptyVec<PrimitiveName>,
+                _position: PrimitiveOccurrencePosition,
+            ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+                Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
+            }
+        }
+
+        // The catalogue deliberately declares the same short name on two distinct
+        // fully qualified paths; the unqualified `Event` reference must not fall back
+        // to either declaration.
+        let layer = LayerId::try_new("domain".to_owned()).expect("valid layer");
+        let module = |name: &str| {
+            ModulePath::from_segments(vec![name.to_owned()]).expect("valid module path")
+        };
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        let mut catalogue = domain::tddd::catalogue_v2::CatalogueDocument::new(
+            3,
+            CrateName::new("domain").expect("valid crate"),
+            layer.clone(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesAmbiguousEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("Event".to_owned()).unwrap()] },
+                "alpha",
+            ),
+        );
+
+        let mut all_catalogues = std::collections::BTreeMap::new();
+        all_catalogues.insert(layer.clone(), catalogue);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .expect("valid identity rule");
+        let error = evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            &layer,
+            &NoopScanner,
+            &SynTypeRefPathExtractorAdapter,
+        )
+        .expect_err("an ambiguous short-name reference must fail closed");
+        let domain::tddd::catalogue_linter::CatalogueLinterError::IdentityResolutionFailed(
+            domain::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                identifier,
+                candidates,
+            ),
+        ) = error
+        else {
+            panic!("ambiguous catalogue identity must be reported as a fail-closed error");
+        };
+        assert_eq!(identifier.as_str(), "Event");
+        let candidate_paths =
+            candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+        assert_eq!(
+            candidate_paths,
+            vec!["domain::alpha::Event".to_owned(), "domain::beta::Event".to_owned(),]
+        );
+    }
+
+    #[test]
+    fn test_catalogue_lint_via_extractor_resolves_nested_paths_and_enumerates_ambiguous_candidates()
+    {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
+        use domain::tddd::layer_id::LayerId;
+        use domain::tddd::primitive_occurrence_scanner::{
+            PrimitiveName, PrimitiveOccurrencePosition, PrimitiveOccurrenceReport,
+            PrimitiveOccurrenceScanError, PrimitiveOccurrenceScanner,
+        };
+        use domain::tddd::semantic_verify::CatalogueEntryKey;
+
+        struct NoopScanner;
+
+        impl PrimitiveOccurrenceScanner for NoopScanner {
+            fn scan(
+                &self,
+                _type_ref: TypeRef,
+                _primitives: NonEmptyVec<PrimitiveName>,
+                _position: PrimitiveOccurrencePosition,
+            ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+                Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
+            }
+        }
+
+        let layer = LayerId::try_new("domain".to_owned()).expect("valid layer");
+        let module = |name: &str| {
+            ModulePath::from_segments(vec![name.to_owned()]).expect("valid module path")
+        };
+        let unit_entry = |role: DataRole, module_path: &str| {
+            TypeEntry::new(
+                ItemAction::Add,
+                role,
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module(module_path),
+                None,
+                vec![],
+                vec![],
+            )
+        };
+        let mut nested_catalogue = domain::tddd::catalogue_v2::CatalogueDocument::new(
+            3,
+            CrateName::new("domain").expect("valid crate"),
+            layer.clone(),
+        );
+        nested_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::DomainEvent, "alpha"),
+        );
+        nested_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::beta::Event".to_owned()).unwrap(),
+            unit_entry(DataRole::value_object(), "beta"),
+        );
+        nested_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesNestedCorrectEvent".to_owned())
+                .unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new("std::not_a_real_wrapper<domain::alpha::Event>").unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+        nested_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesNestedWrongEvent".to_owned())
+                .unwrap(),
+            unit_entry(
+                DataRole::UseCase {
+                    handles: vec![
+                        TypeRef::new("std::not_a_real_wrapper<domain::beta::Event>").unwrap(),
+                    ],
+                },
+                "alpha",
+            ),
+        );
+
+        let mut nested_catalogues = std::collections::BTreeMap::new();
+        nested_catalogues.insert(layer.clone(), nested_catalogue.clone());
+        let nested_rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .expect("valid identity rule");
+        let nested_violations = evaluate_catalogue_lint(
+            &[nested_rule],
+            &nested_catalogues,
+            &layer,
+            &NoopScanner,
+            &SynTypeRefPathExtractorAdapter,
+        )
+        .expect("nested TypeRef paths are completely inspectable");
+
+        assert_eq!(nested_violations.len(), 1);
+        let Some(nested_violation) = nested_violations.first() else {
+            panic!("the nested wrong-role reference must produce a violation");
+        };
+        assert_eq!(nested_violation.entry_name(), "domain::alpha::HandlesNestedWrongEvent");
+        assert!(nested_violation.message().contains("ValueObject"));
+        assert!(nested_violation.message().contains("DomainEvent"));
+        assert!(
+            !nested_violations
+                .iter()
+                .any(|violation| violation.entry_name()
+                    == "domain::alpha::HandlesNestedCorrectEvent")
+        );
+
+        let mut ambiguous_catalogue = nested_catalogue;
+        ambiguous_catalogue.insert_type(
+            CatalogueEntryKey::try_new("domain::alpha::HandlesAmbiguousEvent".to_owned()).unwrap(),
+            unit_entry(
+                DataRole::UseCase { handles: vec![TypeRef::new("Event").unwrap()] },
+                "alpha",
+            ),
+        );
+        let mut ambiguous_catalogues = std::collections::BTreeMap::new();
+        ambiguous_catalogues.insert(layer.clone(), ambiguous_catalogue);
+        let ambiguous_rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .expect("valid identity rule");
+        let error = evaluate_catalogue_lint(
+            &[ambiguous_rule],
+            &ambiguous_catalogues,
+            &layer,
+            &NoopScanner,
+            &SynTypeRefPathExtractorAdapter,
+        )
+        .expect_err("an accepted unqualified spelling must fail closed when ambiguous");
+        let domain::tddd::catalogue_linter::CatalogueLinterError::IdentityResolutionFailed(
+            domain::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                identifier,
+                candidates,
+            ),
+        ) = error
+        else {
+            panic!("ambiguous catalogue identity must be reported as a fail-closed error");
+        };
+        assert_eq!(identifier.as_str(), "Event");
+        let candidate_paths =
+            candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+        assert_eq!(
+            candidate_paths,
+            vec!["domain::alpha::Event".to_owned(), "domain::beta::Event".to_owned(),]
         );
     }
 

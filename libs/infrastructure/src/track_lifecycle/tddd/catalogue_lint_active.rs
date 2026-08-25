@@ -167,7 +167,6 @@ mod tests {
 
     use super::*;
     use crate::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter;
-    use usecase::track_lifecycle::tddd::lint::TrackLintPort;
     use usecase::track_lifecycle::{TrackSelection, TrackWorkspaceRoot};
 
     fn command(root: &std::path::Path) -> TrackCatalogueLintActiveCommand {
@@ -203,6 +202,111 @@ mod tests {
         fs::create_dir_all(&config).expect("lint config directory exists");
         fs::write(config.join("config.json"), r#"{"schema_version":1,"rules":[]}"#)
             .expect("lint config is written");
+    }
+
+    fn write_identity_fixture(root: &std::path::Path) {
+        write_rules(root);
+        fs::create_dir_all(root.join("track/items/lint-track")).expect("track directory exists");
+        fs::create_dir_all(root.join(".harness/catalogue-lint"))
+            .expect("lint config directory exists");
+        fs::write(
+            root.join(".harness/catalogue-lint/config.json"),
+            r#"{
+              "schema_version": 1,
+              "rules": [{
+                "target_roles": ["UseCase"],
+                "kind": {"ReferencedRoleConstraint": {
+                  "target_field": "handles",
+                  "expected_role": "DomainEvent"
+                }}
+              }]
+            }"#,
+        )
+        .expect("lint config is written");
+        fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::Event": {
+                  "action": "add",
+                  "role": {"DomainEvent": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::Event": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesAlphaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::alpha::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesBetaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::beta::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesExternalEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["external_crate::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("catalogue fixture is written");
+    }
+
+    fn write_incomplete_identity_fixture(root: &std::path::Path) {
+        write_identity_fixture(root);
+        fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::IncompleteTypeRef": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["("]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("incomplete catalogue fixture is written");
     }
 
     #[test]
@@ -429,119 +533,116 @@ mod tests {
                 parser: SynTypeRefPathExtractorAdapter,
             });
         let active_adapter = SystemTrackCatalogueLintActiveAdapter::new(extractor.clone());
-        let active_result = active_adapter
+        let error = match active_adapter
             .execute(TrackId::try_new("lint-track").expect("track id is valid"), command(root))
-            .expect("active-track lint execution succeeds");
-        let active_layers = match active_result {
-            TrackCatalogueLintActiveResult::Checked { layers } => layers,
-            _ => panic!("expected checked active-track result"),
+        {
+            Ok(_) => {
+                panic!("ambiguous catalogue identities must fail closed before rule evaluation")
+            }
+            Err(error) => error,
         };
-        assert_eq!(active_layers.len(), 1);
-        let active_violations = &active_layers.first().unwrap().violations;
-        assert_eq!(active_violations.len(), 5);
-        assert_eq!(
-            active_violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "ReferencedRoleConstraint")
-                .count(),
-            2
-        );
-        assert_eq!(
-            active_violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "FieldElementUniqueAcrossEntries")
-                .count(),
-            1
-        );
-        assert_eq!(
-            active_violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "NoExternalReferenceInMethods")
-                .count(),
-            2
-        );
-        assert!(active_violations.iter().any(|violation| {
-            violation.message().contains("ambiguous identifier")
-                && violation.message().contains("Event")
-        }));
-        let ambiguous_message = active_violations
-            .iter()
-            .find(|violation| violation.message().contains("ambiguous identifier"))
-            .unwrap()
-            .message();
-        assert!(ambiguous_message.contains("FullyQualifiedItemPath"));
-        assert!(ambiguous_message.contains("Identifier(\"alpha\")"));
-        assert!(ambiguous_message.contains("Identifier(\"beta\")"));
-        assert!(active_violations.iter().any(|violation| {
-            violation.message().contains("unresolved identifier")
-                && violation.message().contains("domain::missing::Event")
-        }));
-        assert!(active_violations.iter().any(|violation| {
-            violation.rule_kind() == "NoExternalReferenceInMethods"
-                && violation.message().contains("domain::alpha::Entity")
-                && violation.message().contains("domain::alpha::ExternalService")
-        }));
+        let diagnostic = error.to_string();
+        assert!(diagnostic.contains("ambiguous identifier"));
+        assert!(diagnostic.contains("Identifier(\"alpha\")"));
+        assert!(diagnostic.contains("Identifier(\"beta\")"));
         assert!(
-            !active_violations
-                .iter()
-                .any(|violation| violation.entry_name() == "domain::alpha::UseCaseValid")
+            calls.load(Ordering::SeqCst) > 0,
+            "the active adapter must forward the injected extractor before reporting the identity error"
         );
+    }
 
-        let single_adapter =
-            crate::track_lifecycle::tddd::lint::SystemTrackLintAdapter::new(extractor);
-        let single_command = usecase::track_lifecycle::tddd::lint::TrackLintCommand {
-            track: usecase::track_lifecycle::TrackSelection::Explicit(
-                TrackId::try_new("lint-track").expect("track id is valid"),
-            ),
-            workspace_root: usecase::track_lifecycle::TrackWorkspaceRoot::try_new(
-                root.to_path_buf(),
-            )
-            .expect("workspace root is valid"),
-            layer: domain::tddd::LayerId::try_new("domain".to_owned()).expect("layer is valid"),
-            rules_file: None,
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references()
+     {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_identity_fixture(workspace.path());
+
+        let result =
+            SystemTrackCatalogueLintActiveAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+                .execute(
+                    TrackId::try_new("lint-track").expect("track id is valid"),
+                    command(workspace.path()),
+                )
+                .expect("qualified and external references are accepted by the active adapter");
+        let TrackCatalogueLintActiveResult::Checked { layers } = result else {
+            panic!("materialized catalogue must be checked");
         };
-        let single_result = single_adapter
-            .execute(TrackId::try_new("lint-track").expect("track id is valid"), single_command)
-            .expect("single-layer lint execution succeeds");
-        assert_eq!(single_result.violations.len(), 5);
+
+        assert_eq!(layers.len(), 1);
+        let Some(layer) = layers.first() else {
+            panic!("one checked layer is expected");
+        };
+        assert_eq!(layer.layer.as_ref(), "domain");
+        assert_eq!(layer.violations.len(), 1);
+        let Some(violation) = layer.violations.first() else {
+            panic!("the beta reference must produce one role violation");
+        };
+        assert_eq!(violation.entry_name(), "domain::alpha::HandlesBetaEvent");
+        assert!(violation.message().contains("ValueObject"));
+        assert!(violation.message().contains("DomainEvent"));
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_keeps_same_named_fully_qualified_results_separate()
+    {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_identity_fixture(workspace.path());
+
+        let fixture =
+            fs::read_to_string(workspace.path().join("track/items/lint-track/domain-types.json"))
+                .expect("identity fixture is readable");
+        // The adapter fixture contains same-named declarations on two distinct
+        // fully qualified paths, and both qualified references must stay separate.
+        assert!(fixture.contains("\"domain::alpha::Event\""));
+        assert!(fixture.contains("\"domain::beta::Event\""));
+        assert!(fixture.contains("\"handles\": [\"domain::alpha::Event\"]"));
+        assert!(fixture.contains("\"handles\": [\"domain::beta::Event\"]"));
+
+        let result =
+            SystemTrackCatalogueLintActiveAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+                .execute(
+                    TrackId::try_new("lint-track").expect("track id is valid"),
+                    command(workspace.path()),
+                )
+                .expect("same-named fully qualified identities must not produce DanglingId");
+        let TrackCatalogueLintActiveResult::Checked { layers } = result else {
+            panic!("materialized catalogue must be checked");
+        };
+
+        assert_eq!(layers.len(), 1);
+        let Some(layer) = layers.first() else {
+            panic!("one checked layer is expected");
+        };
+        let violation_names =
+            layer.violations.iter().map(|violation| violation.entry_name()).collect::<Vec<_>>();
         assert_eq!(
-            single_result
-                .violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "FieldElementUniqueAcrossEntries")
-                .count(),
-            1
-        );
-        assert_eq!(
-            single_result
-                .violations
-                .iter()
-                .filter(|violation| violation.rule_kind() == "NoExternalReferenceInMethods")
-                .count(),
-            2
+            violation_names,
+            vec!["domain::alpha::HandlesBetaEvent"],
+            "the beta result must not be joined with the alpha result"
         );
         assert!(
-            single_result
-                .violations
-                .iter()
-                .any(|violation| { violation.message().contains("ambiguous identifier") })
+            !layer.violations.iter().any(|violation| violation.message().contains("DanglingId"))
         );
-        assert!(
-            single_result
-                .violations
-                .iter()
-                .any(|violation| { violation.message().contains("unresolved identifier") })
-        );
-        let single_ambiguous_message = single_result
-            .violations
-            .iter()
-            .find(|violation| violation.message().contains("ambiguous identifier"))
-            .unwrap()
-            .message();
-        assert!(single_ambiguous_message.contains("FullyQualifiedItemPath"));
-        assert!(single_ambiguous_message.contains("Identifier(\"alpha\")"));
-        assert!(single_ambiguous_message.contains("Identifier(\"beta\")"));
-        assert!(calls.load(Ordering::SeqCst) >= 6);
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_reports_incomplete_typeref_location() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_incomplete_identity_fixture(workspace.path());
+
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
+            TrackId::try_new("lint-track").expect("track id is valid"),
+            command(workspace.path()),
+        ) {
+            Ok(_) => panic!("incomplete TypeRef inspection must fail closed"),
+            Err(error) => error,
+        };
+        let diagnostic = error.to_string();
+        assert!(diagnostic.contains("unsupported TypeRef syntax"));
+        assert!(diagnostic.contains("("));
     }
 
     #[test]

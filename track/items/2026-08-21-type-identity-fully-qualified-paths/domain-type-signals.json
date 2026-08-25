@@ -1,14 +1,14 @@
 {
   "baseline_hash": "3a7b153f588d16bfc4e188a5e27516a106ae356d574bc834f4c72d395d66ccf3",
   "declaration_hash": "5043c291c99b0bd4a6acc995243953b4d58e6b31031dd6909c1593c6fff3f827",
-  "generated_at": "2026-08-24T16:27:35Z",
-  "head_commit": "8e20214cbf5eba8027e5fca42473e827adce1159",
+  "generated_at": "2026-08-25T02:54:40Z",
+  "head_commit": "45af327661cc67f3533c5afa09860b45b43be3de",
   "schema_version": 4,
   "signals": [
     {
       "found_items": [
-        "From<CatalogueIdentityResolutionError>",
-        "From<TypeRefPathExtractionError>"
+        "core::convert::From<domain::tddd::catalogue_linter::TypeRefPathExtractionError>",
+        "core::convert::From<domain::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError>"
       ],
       "found_type": true,
       "kind_tag": "error_type",
@@ -17,10 +17,10 @@
     },
     {
       "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ],
       "found_type": true,
       "kind_tag": "enum",
@@ -29,11 +29,11 @@
     },
     {
       "found_items": [
-        "Debug",
-        "Display",
-        "Eq",
-        "Error",
-        "PartialEq"
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ],
       "found_type": true,
       "kind_tag": "error_type",
@@ -72,14 +72,14 @@
     },
     {
       "found_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Hash",
-        "Ord",
-        "PartialEq",
-        "PartialOrd"
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash"
       ],
       "found_type": true,
       "kind_tag": "value_object",
@@ -88,12 +88,12 @@
     },
     {
       "found_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Error",
-        "PartialEq"
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ],
       "found_type": true,
       "kind_tag": "error_type",
@@ -114,8 +114,8 @@
     },
     {
       "found_items": [
-        "Ord",
-        "PartialOrd"
+        "core::cmp::Ord",
+        "core::cmp::PartialOrd"
       ],
       "found_type": true,
       "kind_tag": "value_object",

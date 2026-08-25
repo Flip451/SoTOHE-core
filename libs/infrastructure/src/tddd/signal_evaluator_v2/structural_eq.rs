@@ -350,7 +350,19 @@ fn item_context(item: &Item) -> String {
         ItemEnum::Impl(_) => "trait_impl",
         _ => "item",
     };
-    format!("{kind}:{}", item.name.as_deref().unwrap_or("<anonymous>"))
+    let name = match (&item.inner, item.name.as_deref()) {
+        // The catalogue codec has no tuple-field names, while rustdoc names
+        // those same fields "0", "1", ... . Keep the structural context
+        // representation independent of that graph-local naming detail.
+        (ItemEnum::StructField(_), Some(name))
+            if !name.is_empty() && name.bytes().all(|byte| byte.is_ascii_digit()) =>
+        {
+            "<anonymous>"
+        }
+        (_, Some(name)) => name,
+        (_, None) => "<anonymous>",
+    };
+    format!("{kind}:{name}")
 }
 
 fn child_context(parent: &str, parent_item: &Item, child: &Item, child_index: usize) -> String {
@@ -662,7 +674,7 @@ mod tests {
         FunctionPointer, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
         GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Path,
         PolyTrait, PreciseCapturingArg, Struct, StructKind, Term, TraitBoundModifier, Type,
-        TypeAlias, Visibility,
+        TypeAlias, Variant, VariantKind, Visibility,
     };
 
     use super::structs_structurally_equal;
@@ -942,6 +954,177 @@ mod tests {
     }
 
     #[test]
+    fn test_structural_equality_normalizes_codec_and_rustdoc_tuple_field_names() {
+        let a_field_id = Id(3);
+        let a_variant_id = Id(2);
+        let a_root_id = Id(1);
+        let b_field_id = Id(13);
+        let b_variant_id = Id(12);
+        let b_root_id = Id(11);
+
+        let field = |id: Id, name: Option<&str>, path_id: Id| {
+            let mut item = make_struct_field_resolved_path(id, "Thing", path_id);
+            item.name = name.map(str::to_owned);
+            item
+        };
+        let variant = |id: Id, field_id: Id| {
+            let mut item = make_item(
+                id,
+                ItemEnum::Variant(Variant {
+                    kind: VariantKind::Tuple(vec![Some(field_id)]),
+                    discriminant: None,
+                }),
+            );
+            item.name = Some("Value".to_owned());
+            item
+        };
+
+        let a = make_item(
+            a_root_id,
+            ItemEnum::Enum(rustdoc_types::Enum {
+                generics: empty_generics(),
+                variants: vec![a_variant_id],
+                impls: vec![],
+                has_stripped_variants: false,
+            }),
+        );
+        let b = make_item(
+            b_root_id,
+            ItemEnum::Enum(rustdoc_types::Enum {
+                generics: empty_generics(),
+                variants: vec![b_variant_id],
+                impls: vec![],
+                has_stripped_variants: false,
+            }),
+        );
+        let a_index = HashMap::from([
+            (a_root_id, a.clone()),
+            (a_variant_id, variant(a_variant_id, a_field_id)),
+            (a_field_id, field(a_field_id, None, Id(101))),
+        ]);
+        let b_index = HashMap::from([
+            (b_root_id, b.clone()),
+            (b_variant_id, variant(b_variant_id, b_field_id)),
+            (b_field_id, field(b_field_id, Some("0"), Id(201))),
+        ]);
+        let a_paths = HashMap::from([(
+            Id(101),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Thing".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(201),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Thing".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
+    #[test]
+    fn test_structural_equality_ignores_codec_self_path_receiver_marker() {
+        let method = |id: Id, input: Type| {
+            make_item(
+                id,
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("self".to_owned(), input)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            )
+        };
+        let inherent_impl = |id: Id, method_id: Id| {
+            make_item(
+                id,
+                ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: empty_generics(),
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: Type::ResolvedPath(Path {
+                        path: "Widget".to_owned(),
+                        id: Id(0),
+                        args: None,
+                    }),
+                    items: vec![method_id],
+                    is_synthetic: false,
+                    is_negative: false,
+                    blanket_impl: None,
+                }),
+            )
+        };
+        let a = make_item(
+            Id(1),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(2)],
+            }),
+        );
+        let b = make_item(
+            Id(11),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(12)],
+            }),
+        );
+        let a_method = method(
+            Id(3),
+            Type::ResolvedPath(Path { path: "Self".to_owned(), id: Id(0), args: None }),
+        );
+        let b_method = method(Id(13), Type::Generic("Self".to_owned()));
+        let a_index = HashMap::from([
+            (Id(1), a.clone()),
+            (Id(2), inherent_impl(Id(2), Id(3))),
+            (Id(3), a_method),
+        ]);
+        let b_index = HashMap::from([
+            (Id(11), b.clone()),
+            (Id(12), inherent_impl(Id(12), Id(13))),
+            (Id(13), b_method),
+        ]);
+        let a_paths = HashMap::from([(
+            Id(101),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(201),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
+    #[test]
     fn test_structural_equality_ignores_inherent_impl_block_grouping() {
         let inherent_impl = |id: Id, owner_id: Id| {
             make_item(
@@ -1024,6 +1207,99 @@ mod tests {
             deprecation: None,
             inner,
         }
+    }
+
+    #[test]
+    fn test_nested_supertrait_self_projection_path_marker_compares_equal() {
+        fn self_projection(trait_id: Id) -> Type {
+            Type::BorrowedRef {
+                lifetime: None,
+                is_mutable: false,
+                type_: Box::new(Type::QualifiedPath {
+                    name: "Input".to_owned(),
+                    args: Some(Box::new(GenericArgs::AngleBracketed {
+                        args: vec![GenericArg::Lifetime("'_".to_owned())],
+                        constraints: vec![],
+                    })),
+                    self_type: Box::new(Type::Generic("Self".to_owned())),
+                    trait_: Some(Path { path: String::new(), id: trait_id, args: None }),
+                }),
+            }
+        }
+
+        fn method(id: Id, trait_id: Id) -> Item {
+            make_item(
+                id,
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("input".to_owned(), self_projection(trait_id))],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            )
+        }
+
+        let a_method_id = Id(11);
+        let b_method_id = Id(21);
+        let a_trait = make_item(
+            Id(10),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: false,
+                items: vec![a_method_id],
+                generics: empty_generics(),
+                bounds: vec![make_trait_bound("ChainIdentity")],
+                implementations: vec![],
+            }),
+        );
+        let b_trait = make_item(
+            Id(20),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: false,
+                items: vec![b_method_id],
+                generics: empty_generics(),
+                bounds: vec![make_trait_bound("ChainIdentity")],
+                implementations: vec![],
+            }),
+        );
+        let a_index = HashMap::from([(a_method_id, method(a_method_id, Id(31)))]);
+        let b_index = HashMap::from([(b_method_id, method(b_method_id, Id(41)))]);
+        let a_paths = HashMap::from([(
+            Id(30),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "ChainIdentity".to_owned()],
+                kind: ItemKind::Trait,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(40),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "ChainIdentity".to_owned()],
+                kind: ItemKind::Trait,
+            },
+        )]);
+
+        assert!(
+            super::items_structurally_equal_with_paths(
+                &a_trait, &b_trait, &a_index, &b_index, &a_paths, &b_paths, "fixture",
+            ),
+            "nested supertrait method projections with unnamed rustdoc trait markers must compare \
+             equal and allow the surrounding signal to remain Blue"
+        );
     }
 
     fn default_fn_item(id: Id) -> Item {

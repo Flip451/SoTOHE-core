@@ -38,7 +38,7 @@
         }
       ],
       "id": "AC-04",
-      "text": "catalogue-lint は TypeRef 全体で発見したすべてのカタログ内参照を、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。未解決または曖昧な参照は、該当箇所または候補の完全修飾パスを示して fail-closed とする。"
+      "text": "catalogue-lint は、TypeRef の参照が各宣言の受理 spelling（stored key、module_path と名前の結合形、又は crate 修飾の完全修飾形）のいずれかに一致するカタログ内参照である場合、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。複数宣言に一致する曖昧な参照は、候補の完全修飾パスを列挙して fail-closed とする。どの宣言にも一致しない参照は外部参照としてこの検査では検証せずに通す。"
     },
     {
       "adr_refs": [
@@ -48,7 +48,7 @@
         }
       ],
       "id": "AC-05",
-      "text": "catalogue-lint は未対応または検査不能な構文、資源または深さの上限、及びカタログ内参照か外部参照かを分類できない箇所を位置とともに fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+      "text": "catalogue-lint は、未対応構文、解析不能、深さ又は資源上限によって TypeRef 全体の検査を完了できない場合、位置を示して fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
     },
     {
       "adr_refs": [
@@ -90,7 +90,7 @@
         }
       ],
       "id": "CO-02",
-      "text": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならず、カタログ内参照か外部参照かを分類できない参照を外部参照と推測してはならない。"
+      "text": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならない。各宣言の受理 spelling のいずれにも一致しない参照は外部参照としてこの検査で検証せずに通し、その存在と正しさは Chain ③ のコンパイラに検証された実装との突合で検証する。書き誤りはこの突合の不一致として検出する。"
     },
     {
       "adr_refs": [

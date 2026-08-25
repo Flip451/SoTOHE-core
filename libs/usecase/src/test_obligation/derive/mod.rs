@@ -390,7 +390,9 @@ fn derive_trait_impl_obligations(
         if !is_derivable(impl_decl.action()) {
             continue;
         }
-        let Some(trait_entry) = resolve_trait_role(trait_roles, impl_decl.trait_ref())? else {
+        let Some(trait_entry) =
+            resolve_trait_role(trait_roles, catalogue.crate_name(), impl_decl.trait_ref())?
+        else {
             continue;
         };
         let role = trait_entry.role.clone();

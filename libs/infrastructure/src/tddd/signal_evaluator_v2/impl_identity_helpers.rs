@@ -565,19 +565,30 @@ fn collect_path_identities_with_context(
                 let Some(serde_json::Value::String(raw_path)) = values.get("path") else {
                     return false;
                 };
-                let Some(id) = values
-                    .get("id")
-                    .and_then(serde_json::Value::as_u64)
-                    .and_then(|id| u32::try_from(id).ok())
-                else {
-                    return false;
-                };
-                let path = Path { path: raw_path.clone(), id: Id(id), args: None };
-                let Ok(identity) = canonicalize_rustdoc_path(&path, crate_name, paths, authority)
-                else {
-                    return false;
-                };
-                identities.entry(context.to_owned()).or_default().push(identity);
+                // Rustdoc uses an empty path for the unnamed trait in a
+                // QualifiedPath self projection such as <Self>::Input. It is
+                // a projection marker, not a named definition to resolve
+                // through the catalogue identity universe.
+                // `Self` is a local type marker, not a definition identity. The
+                // catalogue codec represents a self receiver as a resolved path
+                // while rustdoc represents it as `Type::Generic("Self")`; recording
+                // only the former would make equivalent signatures look different.
+                if !raw_path.is_empty() && raw_path != "Self" && raw_path != "::Self" {
+                    let Some(id) = values
+                        .get("id")
+                        .and_then(serde_json::Value::as_u64)
+                        .and_then(|id| u32::try_from(id).ok())
+                    else {
+                        return false;
+                    };
+                    let path = Path { path: raw_path.clone(), id: Id(id), args: None };
+                    let Ok(identity) =
+                        canonicalize_rustdoc_path(&path, crate_name, paths, authority)
+                    else {
+                        return false;
+                    };
+                    identities.entry(context.to_owned()).or_default().push(identity);
+                }
             }
             for (key, value) in values {
                 if !collect_path_identities_with_context(
