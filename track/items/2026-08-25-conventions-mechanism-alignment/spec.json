@@ -13,12 +13,12 @@
     {
       "adr_refs": [
         {
-          "anchor": "D2",
-          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
         }
       ],
       "id": "AC-02",
-      "text": "type-designer-kind-selection.md と関連規約は、複数実装が現存するかテスト境界として差し替えが必要な場合だけ trait を導入し、共有所有だけを理由に trait を導入しないことを明確にする。"
+      "text": "type-designer-kind-selection.md と関連規約は、層内で任意に追加する trait と実装の組を、複数実装が現存するかテスト境界として差し替えが必要な場合だけ導入し、共有所有だけを理由に導入しないことを明確にする。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。"
     },
     {
       "adr_refs": [
@@ -179,12 +179,12 @@
       {
         "adr_refs": [
           {
-            "anchor": "D2",
-            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
           }
         ],
         "id": "IN-02",
-        "text": "type-designer-kind-selection.md と関連規約を改訂し、抽象は複数実装またはテスト差し替えが必要な場合だけ導入する。"
+        "text": "type-designer-kind-selection.md と関連規約を改訂し、層内で任意に追加する trait と実装の組は複数実装またはテスト差し替えが必要な場合だけ導入する。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。"
       },
       {
         "adr_refs": [

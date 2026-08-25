@@ -14,7 +14,7 @@ signals: { blue: 23, yellow: 0, red: 0 }
 
 ### In Scope
 - [IN-01] knowledge/conventions/ の現存する規範的要求それぞれに、機械 lint、宣言突合、review 観点、または強制なしのいずれかの強制先を注記するメタ規則を追加し、有限な対象集合の完全性は harness-policy review で判断する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D1] [tasks: T001, T002, T003, T004, T006, T007, T008]
-- [IN-02] type-designer-kind-selection.md と関連規約を改訂し、抽象は複数実装またはテスト差し替えが必要な場合だけ導入する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D2] [tasks: T002]
+- [IN-02] type-designer-kind-selection.md と関連規約を改訂し、層内で任意に追加する trait と実装の組は複数実装またはテスト差し替えが必要な場合だけ導入する。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1] [tasks: T002]
 - [IN-06] type-designer-kind-selection.md と関連規約を改訂し、driver は消費する単能 port を直接受け取り、command と query を混載する facade port を新設しない。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3] [tasks: T006]
 - [IN-07] type-designer-kind-selection.md と関連規約を改訂し、command usecase の入力境界は検証済み Command を 1 個、query usecase の入力境界は検証済み Query を 1 個だけ受け取り、cli は一度だけ対応する型へパースして入力境界を呼び出す。 [adr: knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md#D1] [tasks: T007]
 - [IN-08] type-designer-kind-selection.md と関連規約を改訂し、role × layer 規則は固有 crate 名ではなく層の性質で表す。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D5] [tasks: T008]
@@ -34,7 +34,7 @@ signals: { blue: 23, yellow: 0, red: 0 }
 
 ## Acceptance Criteria
 - [ ] [AC-01] enforce-by-mechanism.md に D1 のメタ規則があり、knowledge/conventions/ の現存する規範的要求は機械 lint、宣言突合、review 観点、または強制なしとして注記され、harness-policy review でその完全性を評価できる。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D1] [tasks: T001, T002, T003, T004, T006, T007, T008]
-- [ ] [AC-02] type-designer-kind-selection.md と関連規約は、複数実装が現存するかテスト境界として差し替えが必要な場合だけ trait を導入し、共有所有だけを理由に trait を導入しないことを明確にする。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D2] [tasks: T002]
+- [ ] [AC-02] type-designer-kind-selection.md と関連規約は、層内で任意に追加する trait と実装の組を、複数実装が現存するかテスト境界として差し替えが必要な場合だけ導入し、共有所有だけを理由に導入しないことを明確にする。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1] [tasks: T002]
 - [ ] [AC-06] type-designer-kind-selection.md と関連規約は、driver が消費する複数の単能 port を直接受け取り、command と query を混載する facade port を新設しないことを明確にする。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3] [tasks: T006]
 - [ ] [AC-07] type-designer-kind-selection.md と関連規約は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が一度だけ対応する型へパースして入力境界を呼び出すことを明確にする。 [adr: knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md#D1] [tasks: T007]
 - [ ] [AC-08] type-designer-kind-selection.md と関連規約は、R1 の層規則を層の性質で解決することを明確にする。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D5] [tasks: T008]

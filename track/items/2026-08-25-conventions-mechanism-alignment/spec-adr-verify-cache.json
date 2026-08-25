@@ -208,25 +208,25 @@
       }
     },
     {
-      "claim_hash": "dd22f94ea6471d1a4050dfd3a874dc74ec631ce79022edd96fbba817e4a855b0",
+      "claim_hash": "8b73f2d649e577ef00747f42ca72e38518fc99ccb3a05a9831cf672a6f8e04dd",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、抽象は複数実装またはテスト差し替えが必要な場合だけ導入する。"
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、層内で任意に追加する trait と実装の組は複数実装またはテスト差し替えが必要な場合だけ導入する。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
       "evidence_origin": {
         "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "抽象（port trait + 実装）は (a) 複数実装が現存する、(b) テスト境界として差し替えが必要、のいずれか成立時のみ導入する。",
+        "citation": "対象は、構造規則が要求する port とは別に、層の内部で任意に追加する trait と実装の組である。",
         "kind": "pass"
       }
     },
@@ -553,25 +553,25 @@
       }
     },
     {
-      "claim_hash": "d8aad5bce676bb17df75e7cc7e6280afaeb70e5ef129140194de4b0686e523b0",
+      "claim_hash": "a60503e1e26afbcccbbb104f695f336dff08cdb69da1f111a45b310c12dc09dd",
       "claim_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "type-designer-kind-selection.md と関連規約は、複数実装が現存するかテスト境界として差し替えが必要な場合だけ trait を導入し、共有所有だけを理由に trait を導入しないことを明確にする。"
+          "text_label": "type-designer-kind-selection.md と関連規約は、層内で任意に追加する trait と実装の組を、複数実装が現存するかテスト境界として差し替えが必要な場合だけ導入し、共有所有だけを理由に導入しないことを明確にする。inbound port trait と secondary port は構造規則が要求する port としてこの必要性テストの対象外とし、支配するアーキテクチャ規則に従う。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
       "evidence_origin": {
         "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "抽象（port trait + 実装）は (a) 複数実装が現存する、(b) テスト境界として差し替えが必要、のいずれか成立時のみ導入する。共有所有だけが目的なら `Arc<具象型>` を既定とする。",
+        "citation": "対象は、構造規則が要求する port とは別に、層の内部で任意に追加する trait と実装の組である。既存の具体 service の上に、`Arc<dyn>` で共有するためだけにこの組を重ねる場合、および複数実装もテスト境界での差し替えもないまま同様の抽象を追加する場合は、必要性テストの対象とする。",
         "kind": "pass"
       }
     },

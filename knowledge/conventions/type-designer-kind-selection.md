@@ -160,7 +160,7 @@ command と query を混載する `*Service` などの facade port を新設し�
 - top-level の pub fn (struct や trait の method ではない)
 - またはゼロフィールド struct で、その「struct」が表す唯一の責務が 1 つの pub fn 呼び出しに帰着する
 - 内部 state を持たない (struct field なし、または `()` のみ)
-- 依存注入を必要としない (依存ありなら、application は `role: UseCase` の具体型を既定とし、D2 の条件が成立する場合だけ `role: Interactor` + `role: ApplicationService`、driven adapter は `role: SecondaryAdapter`)
+- 依存注入を必要としない (依存ありなら、まず structure-required port か任意の service-level 抽象かを分類する。structure-required port は D2 の必要性テストではなく支配するアーキテクチャ規則に従い、任意の service-level 抽象は D2 の条件に従う。application の任意の service-level 抽象は、条件成立時だけ `role: Interactor` + `role: ApplicationService` とし、その他は `role: UseCase` の具体型を既定とする。driven adapter は `role: SecondaryAdapter`)
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
@@ -172,7 +172,11 @@ command と query を混載する `*Service` などの facade port を新設し�
 
 #### 必要駆動の抽象
 
-port trait とその実装は、(a) 複数の実装が現存する、または (b) テスト境界で差し替えが必要な場合に限って導入する。共有所有だけを理由に `Arc<dyn Service>` や `role: Interactor` + `role: ApplicationService` ペアを導入してはならない。共有所有だけなら `Arc<具象型>` を既定とし、条件が後から成立した時点で trait を切り出す。既存の抽象ペアは改訂後の規約に合わせて遡及解体しない。
+候補はまず、(1) アーキテクチャが要求する structure-required port とその実装の組か、(2) その組の上に層の内部で任意に重ねる service-level 抽象かを分類する。ユースケース自身の入力ポートは、1 ユースケース 1 trait・実行メソッド 1 つの `ApplicationService` inbound port と、その `Interactor` 実装からなる structure-required な組であり、複数実装や service 自体のテスト差し替えがなくても D2 の必要性テストを適用せず、R1 / D3 の配置・粒度規則に従って導入する。層を越える依存を表す `SecondaryPort` と aggregate の永続化を表す `Repository` も structure-required ports であり、必要性テストではなく支配するアーキテクチャ規則に従って導入する。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
+
+一方、structure-required な入力ポートの組の上に同じ service を共有するためだけに第二の trait と実装を重ねる場合、またはその他の層内 service-level 抽象を追加する場合は、D2 の必要性テストの対象である。(a) 複数の実装が現存する、または (b) service 自体をテスト境界で差し替える必要がある場合だけ導入し、共有所有だけなら `Arc<具象型>` を既定とする。条件が後から成立した時点で trait を切り出す。既存の抽象ペアは改訂後の規約に合わせて遡及解体しない。structure-required な `ApplicationService`、`SecondaryPort`、`Repository` の port 自体やその必要な実装を、単一実装だからという理由で省略してはならない。
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
@@ -196,7 +200,7 @@ port trait とその実装は、(a) 複数の実装が現存する、または (
 behavior を持つ struct は以下のいずれかに振り分ける:
 
 - 依存なし stateless → `role: FreeFunction` (R2)
-- 依存あり (port を呼び出す) → application では、共有所有だけなら `role: UseCase` の具体型を `Arc<具象型>` で扱う。複数実装またはテスト境界の差し替えが必要な場合だけ `role: ApplicationService` + `role: Interactor` の組を導入する。driven adapter では `role: SecondaryAdapter` (port 実装)
+- 依存あり (port を呼び出す) → application では、ユースケース自身の structure-required な inbound port の実装は `role: Interactor` とし、`role: ApplicationService` trait と組にする。structure-required な `SecondaryPort` / `Repository` も支配するアーキテクチャ規則に従う。structure-required な port とは別に任意の service-level 抽象を追加する場合は、共有所有だけなら `role: UseCase` の具体型を `Arc<具象型>` で扱い、複数実装または service 自体のテスト境界での差し替えが必要な場合だけ `role: ApplicationService` + `role: Interactor` の組を導入する。driven adapter では `role: SecondaryAdapter` (port 実装)
 - 集約構築 → `role: Factory`
 - 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 値の同一性ではなく domain behavior を中心にする struct → `role: DomainService` (R6)
@@ -236,13 +240,13 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 > **強制先**: review 観点 — types / harness-policy scope
 
-`role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは、依存を持つ application の具体型としての `role: UseCase`、D2 の複数実装またはテスト差し替え条件が成立した場合の `role: Interactor`、`role: SecondaryAdapter` (port 実装)、または `role: DomainService` (R6: field を持つ domain behavior) である。`role: ValueObject` を選ぶ前に、これらの候補を必ず検討する。
+`role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは、依存を持つ application の任意 service の具体型としての `role: UseCase`、structure-required な inbound port の実装としての `role: Interactor` + `role: ApplicationService`、D2 の複数実装または service 自体のテスト差し替え条件が成立した任意 abstraction としての `role: Interactor` + `role: ApplicationService`、`role: SecondaryAdapter` (port 実装)、または `role: DomainService` (R6: field を持つ domain behavior) である。`role: ValueObject` を選ぶ前に、候補が structure-required な組か任意 abstraction かを分類する。
 
 > **強制先**: review 観点 — types scope
 
 ### R6. DomainService Selection Criteria (domain behavior の住所)
 
-値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、`role: Interactor` (D2 の条件を満たす ApplicationService trait 実装である application の型) との混同を防ぐため、以下の全条件を満たす場合に採用する。
+値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、structure-required な `ApplicationService` inbound port の実装、または D2 の条件を満たす任意 service-level abstraction の `role: Interactor` と混同しないため、以下の全条件を満たす場合に採用する。
 
 採用条件 (AND):
 
@@ -250,7 +254,7 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - `kind.shape.fields` >= 1 field (state を保持する; ゼロフィールドは R2 の `FreeFunction` 候補)
 - `methods` >= 1 entry (domain behavior を持つ; 導出 method だけなら R3 の `ValueObject` 候補)
 - 状態遷移なし (ある場合は typestate pattern — R3 の振り分け)
-- `ApplicationService` / `SecondaryPort` の実装ではない (D2 の条件を満たして ApplicationService を実装する場合は `role: Interactor`、port 実装なら `role: SecondaryAdapter`)
+- `ApplicationService` / `SecondaryPort` の実装ではない (structure-required な inbound port の実装は `role: Interactor`、任意 service-level abstraction が D2 の条件を満たして `ApplicationService` を実装する場合も `role: Interactor`、secondary port の実装は `role: SecondaryAdapter`)
 - 配置層は innermost (default) / application (要根拠 — trans-domain な application logic で domain knowledge を集約する場合のみ、`docs` フィールドに根拠を記録) / driven adapter (forbidden)
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure scope
@@ -260,8 +264,9 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - `PolicyEvaluator { rules: Vec<Rule> }` + `evaluate(&self, ctx: &Context) -> Decision` → `role: DomainService` (state あり、behavior あり、依存なし)
 - `Email(String)` + `new()` / `normalized()` → `role: ValueObject` (R3: 値からの side-effect-free な導出)
 - `parse_yaml(input: &str) -> Result<...>` → `role: FreeFunction` (R2: state なし、依存なし)
-- `RegisterUserUseCase { repo: Arc<dyn UserRepository> }` を `Arc<RegisterUserUseCase>` で共有し、`execute(&self, cmd) -> ...` を持たせる → `role: UseCase` (D2: repository port 自体の複数実装 / test seam は保ちつつ、service は具体型を既定)
-- `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: Interactor` (R1: ApplicationService 自体に複数実装がある、または service 自体をテスト境界で差し替える必要がある場合だけ。repository port の seam だけでは不十分)
+- `RegisterUserApplicationService` + `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: ApplicationService` + `role: Interactor` (R1 / D3: ユースケース自身の structure-required な inbound port の組。repository port の複数実装や test seam の有無で省略しない)
+- `RegisterUserUseCase { repo: Arc<dyn UserRepository> }` を `Arc<RegisterUserUseCase>` として共有し、`execute(&self, cmd) -> ...` を持たせる → `role: UseCase` (任意の service-level behavior で、共有所有だけなら service 自体は具体型を既定。`UserRepository` は required port のまま維持する)
+- 任意の `RegisterUserService` trait + 実装を追加する → `role: ApplicationService` + `role: Interactor` (D2: service 自体に複数実装がある、または service 自体をテスト境界で差し替える必要がある場合だけ。required inbound port / `SecondaryPort` / `Repository` の組やその seam だけでは不十分)
 
 ### R7. Cross-Track Port Reference (SecondaryAdapter が参照する port は当該 track catalogue に declare する)
 
@@ -421,7 +426,7 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 - `AdrFrontMatterCodec` (parse method を持つ struct) を `role: ValueObject` で起草 (R3 違反: behavior を持つ)
   - 正しい修正: `parse_adr_frontmatter` を `role: FreeFunction` に分解 (R2)
 - `AdrSignalsVerifyAdapter` を `role: UseCase` で driven adapter に起草 (R1 違反: `UseCase` は application ONLY)
-  - 正しい修正: R1 の層配置違反を直し、複数実装またはテスト境界での差し替えが必要かを確認する。必要な場合だけ application に `role: Interactor` + `role: ApplicationService` ペアを置き、driven adapter には `role: SecondaryAdapter` を置く。共有所有だけなら `Arc<具象型>` を既定とし、不要な抽象は追加しない
+  - 正しい修正: R1 の層配置違反を直し、driven adapter の port 実装なら `role: SecondaryAdapter` を置く。application のユースケース自身の inbound port なら `role: ApplicationService` + `role: Interactor` の structure-required な組を複数実装や service 自体のテスト差し替えなしでも置く。structure-required な組とは別の任意 service-level 抽象なら、D2 の必要性テストを適用し、共有所有だけなら `Arc<具象型>` を既定として不要な抽象を追加しない
 - 状態遷移を持つ ADR decision を `role: ValueObject` + `kind: { "kind": "enum" }` (`DecisionStatus { Proposed, Accepted, ... }`) で起草し、別 entry に `role: ValueObject` + `kind: { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false } }` (`status: DecisionStatus`, `implemented_in: Option<String>`) を置く (R3 違反 + 決定木違反)
   - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 「他の role が fit しないので」という理由で `role: ValueObject` を選ぶ (R5 違反)

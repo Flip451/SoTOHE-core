@@ -131,6 +131,42 @@
           "hash": "rvw1:sha256:3ecbd75e8ec2cb81d7898223739b0213c0649426bc90205a46f85bccf5fbf998",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:46:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7320f2275dffad09be75549825e6b14ee6c6d802245a35ce4f878afe876fa8f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:51:04Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md",
+              "line": 20,
+              "message": "D1 は `ApplicationService` + `Interactor` の組を必要性テストの対象とする一方、直後ですべての inbound port trait を対象外としており、分類が重複している。R1 では `ApplicationService` は application interface、その実装は `Interactor` と定義され、port-granularity D1 の「1 usecase = 1 input trait」もこの application-side interface に該当するため、必須の per-usecase `ApplicationService` port がテスト対象か免除対象か決定できない。必要性テスト対象と structure-required inbound port を重ならない分類で記録しない限り、refine 対象 D2 と D3 の矛盾が残る。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e7320f2275dffad09be75549825e6b14ee6c6d802245a35ce4f878afe876fa8f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:57:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6892d5f3c53e5281623b87da882054023281a88605d265629c275f76703e470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:00:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6892d5f3c53e5281623b87da882054023281a88605d265629c275f76703e470",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -908,6 +944,64 @@
           "hash": "rvw1:sha256:34f69e8f950fe873c52cd0dc533cacf3909a447a8e68b20322c7086de723d7e4",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:20:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:22:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:31:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 175,
+              "message": "この段落はユースケース自身の `ApplicationService` inbound port を必要性テストの対象外とする一方、同じ文書の R2/R3/R5/R6（163、199、239、245、253、264 行目）は `Interactor` + `ApplicationService` を複数実装または service 自体の test seam がある場合だけ許可している。R1 では `Interactor` を `ApplicationService` の実装と定義しているため、必須 inbound port が同時に「無条件で対象外」と「D2 条件付き」になり、type-designer が構造必須 port を省略し得る。structure-required な組と任意に重ねる第二の抽象を、判断木と例を含め一貫して区別する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:40:43Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 175,
+              "message": "structure-required exemption is limited to the literal `SecondaryPort` role here and in `prefer-type-safe-abstractions.md:19`, but R1 models aggregate persistence ports separately as `Repository`. The governing required-port decision exempts all output-side/layer-crossing ports and explicitly rejects replacing them with concrete infrastructure adapters. As written, a single-implementation `Repository` can still be subjected to D2 and omitted. Explicitly include `Repository` in both exemption rules.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 268,
+              "message": "This example injects `Arc<具象Repository>` into an application `UseCase`, contradicting the same file’s R1 port placement, `coding-principles.md` usecase-purity rule, and `architecture-rules.json` (infrastructure implements domain/usecase ports; usecase cannot depend on infrastructure). Keep the service concrete for shared ownership, but retain the repository dependency behind `UserRepository`—for example `RegisterUserUseCase { repo: Arc<dyn UserRepository> }` shared as `Arc<RegisterUserUseCase>`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f8d41000c1300ee7d0c13628d721b5bb9d34c4aea2ad3edc4368931edfc17e5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:45:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccaa452356a8c6e53ee62bd8a258fbde86bdfd376fcb73820503cdfbd86c2b51",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1209,6 +1303,20 @@
           "at": "2026-08-25T10:53:06Z",
           "findings": [],
           "hash": "rvw1:sha256:84444ff7b6679915018598a32e65594cb179c2dc488352c26dc36f5215971276",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:04:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45fc4c63ffa7258e4118d3d6d694cc49f69324f150fa1c388c1bfe360c5679da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:09:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45fc4c63ffa7258e4118d3d6d694cc49f69324f150fa1c388c1bfe360c5679da",
           "type": "final",
           "verdict": "zero_findings"
         }

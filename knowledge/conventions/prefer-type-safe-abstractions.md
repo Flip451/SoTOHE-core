@@ -16,11 +16,11 @@ required_for:
 
 ## 必要駆動の抽象
 
-抽象（port trait と実装）は、複数の実装が現存するか、テスト境界で差し替えが必要な場合にだけ導入する。
+候補はまず、アーキテクチャが要求する structure-required port とその実装の組か、層の内部で任意に追加する service-level 抽象かを分類する。ユースケース自身の入力ポートは、1 ユースケース 1 trait・実行メソッド 1 つの `ApplicationService` inbound port と、その `Interactor` 実装からなる structure-required な組であり、複数の実装や service 自体のテスト境界での差し替えがなくても、必要性テストではなくアーキテクチャ規則に従って導入する。層を越える依存を表す `SecondaryPort` と aggregate の永続化を表す `Repository` も同じく structure-required ports として扱う。
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
-共有所有だけを理由に `Arc<dyn Service>` や `Interactor` + `ApplicationService` のペアを導入してはならない。共有所有だけなら `Arc<具象型>` を既定とし、条件が後から成立したときに trait を切り出す。
+structure-required な入力ポートの組の上に同じ service を共有するためだけに第二の trait と実装を重ねたり、その他の任意の service-level 抽象を追加したりしてはならない。これらの任意 abstraction は、複数の実装が現存するか、service 自体をテスト境界で差し替える必要がある場合だけ導入する。共有所有だけなら `Arc<具象型>` を既定とし、条件が後から成立したときに trait を切り出す。structure-required な `ApplicationService` + `Interactor` の組、`SecondaryPort`、`Repository` は、この禁止の対象ではなく、単一実装でも支配するアーキテクチャ規則に従う。
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
