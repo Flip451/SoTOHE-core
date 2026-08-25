@@ -54,6 +54,128 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:33:37Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates the upstream behavior contract in prose (for example, “retain full output under `tmp/gate/`” and “emit only PASS/FAIL plus the log path”). Keep only the target, operation, and anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream contract and exclusions in prose, including “without changing task membership, exit-code judgment, or check commands.” Replace the behavioral restatement with target + operation + anchor citations.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 21,
+              "message": "T003 restates upstream behavior in prose, including nested-log retention and aggregate exit/check semantics. Replace the restatement with target + operation + anchor citations.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 40,
+              "message": "Section S1 restates the upstream behavior contract in “reusable output behavior ... without introducing stdout parsing as a machine-judgment path.” Keep the section description limited to target, operation, and anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 50,
+              "message": "Section S2 restates upstream scope and output behavior in “Apply the contract ... and revise output-sensitive coverage.” Replace this prose with target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 60,
+              "message": "Section S3 restates upstream behavior in “retaining full nested logs and unchanged machine judgment.” Replace the behavioral restatement with target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9944d3059b97e240c2eb1e4ab1be7d6e1d96fe1c68845a11ffce5e944876ddc4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:37:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b8b529efa5d7bea492ff0805d42f1a06fbc275cfa58887e6f340d140a9c7f2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:43:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b8b529efa5d7bea492ff0805d42f1a06fbc275cfa58887e6f340d140a9c7f2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:32:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93cffdd48a118ead30a129e53adc9540894de4ac81bd4f05a781bc53f1a51d12",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:35:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93cffdd48a118ead30a129e53adc9540894de4ac81bd4f05a781bc53f1a51d12",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:01:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92e23e02004f491f8d14789ee4bef3d1ffd267fc3c1239972e5066e7c7e23d20",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:05:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92e23e02004f491f8d14789ee4bef3d1ffd267fc3c1239972e5066e7c7e23d20",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:19:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0092874ad59c9c60f49c3e5148a15eee057fe9cc73011a4b55891f64f92d3abc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:24:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0092874ad59c9c60f49c3e5148a15eee057fe9cc73011a4b55891f64f92d3abc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,172 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "対象タスクの成功時には、個別 PASS 行および内部レコードの Debug 表現を stdout に出力してはならない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "機械による合否は既存の exit code で、状態照会は既存の check 系コマンドで引き続き判定しなければならない。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "対象となるゲート・検証タスクの標準出力を、判定・フルログの保存先・失敗時だけの診断抜粋からなる簡潔なサマリ契約に統一する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+        }
+      ],
+      "id": "GO-02",
+      "text": "出力表示を簡潔化しても、既存の exit code と状態検査コマンドによる機械判定を維持する。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "Makefile.toml と bin/sotp の既存定義でテスト実行・義務評価・コミット前の集約ゲートとして扱われるタスクに、共通の stdout サマリ契約を適用する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+          }
+        ],
+        "id": "OUT-01",
+        "text": "対象タスクの所属を新たに定義または変更することは対象外とし、その所属は既存の Makefile.toml と bin/sotp の定義に委ねる。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md"
+          }
+        ],
+        "id": "OUT-02",
+        "text": "stdout の文面をパースして合否または状態を判定する新しい機械可読経路を導入することは対象外とする。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 14,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "ゲートの標準出力をサマリ契約にする",
+  "version": "1.0"
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-gate-output-summary-contract",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 160,
+          "test_lines": 110
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 180,
+          "test_lines": 160
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 130,
+          "test_lines": 150
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001"
+      ]
+    },
+    {
+      "id": "B2",
+      "task_ids": [
+        "T002"
+      ]
+    },
+    {
+      "id": "B3",
+      "task_ids": [
+        "T003"
+      ]
+    }
+  ]
+}
