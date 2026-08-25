@@ -162,6 +162,15 @@ commit on the track branch.
   remaining full-cycle batches or the lifecycle tail.
 - At the start of the PR lane in Step 10, before invoking `pr-review`.
 
+Each boundary is a one-way handoff. The invocation that reaches a boundary must honor it and
+stop before the next operation. An invocation that resumes directly at the step after a boundary
+is, by definition, already post-refresh and must start that step without stopping at the same
+boundary again. The resume derivation from persisted git and track state is the evidence that the
+refresh occurred; no additional durable refresh state is introduced. Thus a resume that lands at
+Step 9 after the plan-artifacts commit starts Step 9, a resume that lands at Step 9 after the
+first implementation batch invokes the normal continuation, and a resume that lands at Step 10
+after all batches and the lifecycle tail are complete invokes `pr-review`.
+
 Step 9 uses the caller-requested `--single-batch` mode for the first unfinished declared batch
 after Step 8. That mode drains the declared batch, including any runtime admission-split
 execution units, and returns before the lifecycle tail. After that invocation returns, refresh
