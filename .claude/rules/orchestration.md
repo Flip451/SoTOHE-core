@@ -1,5 +1,9 @@
 # Orchestration
 
+This is the detailed Claude-side orchestration reference. The concise always-applied root rule
+surface is `.claude/rules/orchestrator.md`; this file is read when workflow control or capability
+routing is in scope, and is not a PR-review briefing.
+
 The root orchestrator is selected by `.harness/config/agent-profiles.json` at
 `capabilities.orchestrator.provider`. Claude Code and Codex CLI are both permanent template
 choices. This file describes the Claude-side operating rules while preserving the same `/track:*`
@@ -23,25 +27,32 @@ Terms:
 
 - `track`: `metadata.json` (identity SSoT) / `spec.json` (Phase 1 behavioral contract SSoT) / `<layer>-types.json` (Phase 2 type-contract SSoT) / `impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` (Phase 3 implementation plan SSoT) / `spec.md` / `plan.md` (read-only rendered views) / `observations.md` (optional manual observation log) / progress management layer
 
-## Source Of Truth
+## Summary-first context intake
 
-Read these first before planning or implementation:
+Before planning or implementation, collect the summaries needed for the current workflow:
 
-- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
-- `.harness/policies/branch-strategy.md`
-- `.harness/policies/track-lifecycle.md`
-- `.harness/policies/git-notes.md`
-- `track/registry.md`
-- `knowledge/conventions/README.md`
-- `track/items/<id>/metadata.json`
-- `track/items/<id>/spec.json` (Phase 1 SSoT, if exists)
-- `track/items/<id>/<layer>-types.json` (Phase 2 SSoT, if exists)
-- `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` (Phase 3 SSoT, if exists)
-- `track/items/<id>/spec.md`
-- `track/items/<id>/plan.md`
-- `track/items/<id>/observations.md` (optional — manual observation log)
-- `.claude/rules/`
-- `architecture-rules.json`
+- `bin/sotp track resolve`, `bin/sotp track task-counts`, and `bin/sotp track next-task` for phase
+  and progress;
+- `bin/sotp review results` for scopes that need review;
+- `bin/sotp test-obligation results` for enrollment and fulfillment state when the track is enrolled;
+  and
+- `bin/sotp catalog check` plus `bin/sotp ref-verify results --chain 2 --filter all` for catalogue
+  completion and catalogue-to-specification state.
+
+Treat CLI output and the delegated task briefing as primary. Do not bulk-read track artifacts,
+review or binding JSON, full workflow texts, or convention lists during intake. Open an artifact
+body only for a targeted diff or a blocker investigation. The dispatcher supplies resolved
+convention paths in each capability briefing; the delegated capability reads those paths, while
+the orchestrator does not enumerate or read conventions itself.
+
+The `adr2pr` workflow's mandatory Step 0 is a bounded exception: before executing that workflow,
+read each sub-workflow definition it enumerates to build the required execution plan. This is
+required workflow planning, not general bulk intake.
+
+The track artifacts, ADR index, policies, architecture rules, and provider-specific rules remain
+the applicable sources of truth. Read only the specific path required by the current workflow
+step or blocker, after the summary intake, and keep the provider-neutral workflow SSoT under
+`.harness/workflows/track/` authoritative for shared behavior.
 
 Operational split:
 

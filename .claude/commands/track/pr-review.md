@@ -10,7 +10,13 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
 
 ## Claude Code invocation constraints
 
-This command runs directly — no subagents. Key commands used in sequence:
+The push / PR / review-cycle commands below run from the orchestrator host. Actionable
+findings are not fixed inline: per the workflow SSoT's Step 3, each one is delegated through a
+briefing (`bin/sotp capability exec implementer --host claude --briefing-file <path>` or
+`cargo make track-local-review-fix -- --scope <scope> ...`), converged locally with
+`/track:review`, and committed with `/track:commit` before re-running this command; the
+orchestrator edits directly only as recovery after a failed delegation. Key commands used in
+sequence:
 
 - `bin/sotp pr push` — push the track branch
 - `bin/sotp pr ensure-pr` — create or reuse a PR

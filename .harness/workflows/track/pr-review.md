@@ -84,10 +84,20 @@ After `bin/sotp pr review-cycle` completes, apply the following loop:
 - Otherwise, surface the latest review round's comments verbatim (review body + inline
   comments with `path:line`). For each round:
   1. Read each comment and assess actionability.
-  2. Fix every actionable finding locally (apply code changes, run local reviews to zero_findings,
-     commit via the `commit` workflow).
-  3. Re-run `pr-review` to push the fix, trigger a new review round, and verify the response.
-  4. Repeat until the reviewer signals explicit zero findings.
+  2. For each actionable finding, prepare a focused briefing that includes the comment, affected
+     path and line, relevant track context, and the requested correction. Delegate the fix to
+     the capability that owns the change: `implementer` for implementation changes or
+     `review-fix-lead` for review-scope fixes.
+  3. After the delegated capability reports completion, run the local review workflow to
+     convergence at `zero_findings`, then invoke the `commit` workflow for the fix.
+  4. Re-run `pr-review` to push the fix, trigger a new review round, and verify the response.
+  5. Repeat until the reviewer signals explicit zero findings.
+
+The implementation-delegation principle used by the `implement` workflow applies to the PR
+lane as well: the parent orchestrator delegates the edit through a briefing, and the delegated
+capability owns the scoped change. If delegation fails, the parent may directly edit only as
+recovery; it must then run local review convergence and the `commit` workflow before re-running
+`pr-review`.
 
 **Do NOT stop the loop on intermediate states**, including:
 
@@ -155,8 +165,11 @@ polling cannot replicate.
 - **Poll timeout (reviewer active but no review)**: try the workflow again later.
 - **Stale review (same review ID)**: re-trigger the workflow. After 2 retries, push a trivial
   commit to force a new HEAD.
-- **Actionable findings remain**: fix locally, commit, re-run the workflow. Repeat until
-  explicit zero findings. Deviations require user approval before the loop may terminate.
+- **Actionable findings remain**: prepare a briefing and delegate each fix to `implementer` or
+  `review-fix-lead`, converge local review to `zero_findings`, invoke the `commit` workflow, and
+  re-run `pr-review`. Repeat until explicit zero findings. If delegation fails, parent editing is
+  recovery only; still converge local review and use the `commit` workflow before re-running.
+  Deviations require user approval before the loop may terminate.
 
 ## Outputs
 

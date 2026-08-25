@@ -1,5 +1,8 @@
 # Development Environment (Rust)
 
+Reference this rule when running repository tooling; the concise root orchestrator rules are in
+`.claude/rules/orchestrator.md`.
+
 ## Toolchain
 
 An exported scaffold is host-first. `rust-toolchain.toml` selects the required Rust toolchain

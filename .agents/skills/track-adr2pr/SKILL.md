@@ -57,7 +57,18 @@ or failure-recovery procedures here.
   step pauses for user confirmation; the invocation-time input acquisition (skill note 1)
   happens before Step 1 begins and is outside this pause accounting.
 
-### (5) Reporting format
+### (5) Parent-session refresh points
+
+- The workflow SSoT fixes the parent-session refresh boundaries (after the plan-artifacts
+  commit, after the first implementation batch, at PR-lane start) and what may be discarded
+  there; this skill adds no boundary of its own.
+- Codex has no automatic session refresh. At each boundary, ask the user in plain prose to
+  start a fresh Codex session that re-invokes `$track-adr2pr` on the same `track/<id>` branch.
+  The re-invoked run resumes at the step the workflow SSoT derives from the persisted state
+  (commits, plan artifacts, task states) rather than replaying earlier steps. Do not add
+  host-specific backgrounding, notification-format, or compaction handling here.
+
+### (6) Reporting format
 
 - On successful completion (only when the final `$track-pr-review` step reaches a terminal
   state per `.harness/workflows/track/adr2pr.md` — machine PASS, or Accepted Deviations

@@ -1,5 +1,8 @@
 # Maintainer Checklist
 
+Maintainer reference only; this checklist is not an always-applied orchestrator or PR-review
+briefing.
+
 When changing workflow or architecture, update all affected layers together.
 
 Always consider:

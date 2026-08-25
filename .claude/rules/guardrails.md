@@ -1,5 +1,9 @@
 # Guardrails
 
+This is a reference guardrail document for orchestrator workflow work. The concise
+always-applied root rules are in `.claude/rules/orchestrator.md`; review briefings are loaded by
+the review workflow.
+
 Core guardrails:
 
 - Prefer `/track:*` in user-facing guidance

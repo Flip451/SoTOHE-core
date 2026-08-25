@@ -7,29 +7,38 @@ The active root provider is selected by `.harness/config/agent-profiles.json` at
 When that provider is `codex`, act as the SoTOHE root orchestrator. When a specialist capability is
 assigned to Codex, act only within that specialist boundary.
 
+## Root Orchestrator Rules (always applied)
+
+This file is the Codex root orchestrator's concise rule surface. PR-review briefings are loaded
+by the review workflow and are not standing orchestrator instructions.
+
+- Delegate implementation, planning, review-fix, and other specialist work through
+  `bin/sotp capability exec` or the provider wrappers; keep workflow control in the root session.
+- Treat CLI summaries as the primary information for progress, review necessity, obligation
+  state, and catalogue state: `bin/sotp track resolve`, `bin/sotp track task-counts`,
+  `bin/sotp track next-task`, `bin/sotp review results`, `bin/sotp test-obligation results`, `bin/sotp catalog check`,
+  `bin/sotp ref-verify results`. Open an artifact body (`spec.json`, `*-types.json`,
+  `impl-plan.json`, `review.json`, bindings JSON, full workflow texts, convention lists) only to
+  inspect a diff or investigate a blocker; the delegated capability reads the paths its briefing
+  lists. The `adr2pr` workflow's mandatory Step 0 is a bounded exception: read each
+  sub-workflow definition it enumerates to build the execution plan before execution — required
+  workflow planning, not general bulk intake.
+- Do not run direct Git mutations. Use the guarded workflow commands in the Command Policy
+  below; read-only Git inspection is permitted.
+
 ## Operating Context
 
-Read these first:
+Start from `AGENTS.md` and the CLI summaries above. Read `.codex/rules/default.rules` (the
+Codex-specific command-policy surface) when running as the Codex root host, and open
+`.harness/policies/branch-strategy.md`, `.harness/policies/track-lifecycle.md`,
+`.harness/policies/git-notes.md`, `knowledge/adr/README.md`, `knowledge/conventions/README.md`,
+or `architecture-rules.json` only when the current step needs that rule. Detailed Claude-side
+references under `.claude/rules/` are not loaded by default.
 
-- `AGENTS.md`
-- `.harness/policies/branch-strategy.md`
-- `.harness/policies/track-lifecycle.md`
-- `.harness/policies/git-notes.md`
-- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
-- `track/registry.md`
-- `knowledge/conventions/README.md`
-- current `track/items/<id>/metadata.json`
-- current `track/items/<id>/spec.json`, if present
-- current `track/items/<id>/<layer>-types.json`, if present
-- current `track/items/<id>/impl-plan.json`, `track/items/<id>/task-coverage.json`, and `track/items/<id>/task-contract.json`, if present
-- current `track/items/<id>/spec.md` and `track/items/<id>/plan.md`, if present
-- `.claude/rules/`
-- `.codex/rules/default.rules` (the Codex-specific command-policy surface — read it when running as the Codex root host)
-- `architecture-rules.json`
+If `knowledge/conventions/` contains a domain-specific convention for the work, treat it as binding
+for the delegated capability that the dispatcher lists it for.
 
-If `knowledge/conventions/` contains a domain-specific convention for the work, treat it as binding.
-
-## Root Orchestrator Rules
+## Workflow Rules
 
 - Keep the public `/track:*` workflow stable regardless of whether Claude Code or Codex is the root host.
 - Use the existing SoTOHE phase commands and `cargo make` wrappers.
@@ -48,7 +57,7 @@ are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 - `orchestrator`: overall workflow coordination.
 - `spec-designer`: writes `spec.json`; use the `spec-designer` skill.
 - `type-designer`: writes per-layer type catalogues; use the `type-designer` skill.
-- `impl-planner`: writes `impl-plan.json`, `task-coverage.json`, and `task-contract.json`; use the `impl-planner` skill.
+- `impl-planner`: sole writer of `impl-plan.json`, `task-coverage.json`, `task-contract.json`, and `batch-plan.json`; use the `impl-planner` skill.
 - `adr-editor`: edits target ADRs during back-and-forth planning; use the `adr-editor` skill.
 - `implementer`: edits source code within the current task.
 - `reviewer`: reviews correctness and safety only.

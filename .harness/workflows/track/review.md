@@ -23,11 +23,11 @@ briefing preparation, and capability dispatching.
 
 - **Current branch** — must match `track/<id>`. The track id is resolved from this branch. If
   the branch does not match this pattern, stop and instruct the caller to switch first.
-- **Track context** — `spec.md`, `plan.md`, `metadata.json`, and all conventions listed in the
-  `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy
-  tracks). Use the corresponding `<layer>-types.json` catalogue entries for exact type
-  signatures and module trees, and `impl-plan.json` for task execution detail. Rendered views
-  provide context but do not replace those machine-readable sources.
+- **Track context** — CLI summaries for the active track, the current diff, and the exact paths
+  needed by the delegated reviewer or fixer. The delegated capability reads the relevant spec,
+  plan, task, catalogue, and convention paths from its briefing; the orchestrator does not
+  bulk-read those artifacts. Rendered views provide context but do not replace the capability's
+  machine-readable inputs.
 - **Primary ADR sources** — Phase-0 init-kind ledger records are the orchestrator's primary-ADR
   designation records; no separate primary identity exists. The review prelude requires a
   nonempty init-record designation set and verifies every recorded ledger copy. It does not
@@ -36,13 +36,27 @@ briefing preparation, and capability dispatching.
   check-review` invocation. Byte matching and coverage for ADRs cited by `spec.json` remain
   enforced at the commit gate and track-aware CI.
 
+## Summary-first context intake
+
+Before opening any artifact, use `bin/sotp track resolve` and `bin/sotp track task-counts` for
+progress, `bin/sotp review results` for review necessity, `bin/sotp test-obligation results` for
+obligation state when enrolled, and `bin/sotp catalog check` plus
+`bin/sotp ref-verify results --chain 2 --filter all` for catalogue state. The CLI summaries,
+current diff, and scope file list are primary. Do not open `review.json`, bindings JSON,
+`*-types.json`, a full sub-workflow, or a `Related Conventions` list during intake. Open an
+artifact body only for a targeted diff or blocker investigation. Resolved convention paths are
+listed in each delegated briefing (possibly as an empty set) and are read by the capability.
+
 ## Sequence
 
 **Step 0: Gather context**
 
-Extract the track id from the current git branch (`track/<id>`). Read the current track's
-`spec.md`, `plan.md`, `metadata.json`, and every convention listed under
-`## Related Conventions (Required Reading)`.
+Extract the track id from the current git branch (`track/<id>`). Run the summary commands above
+and use `bin/sotp review results` to determine the required scopes. Use the current diff and
+scope file list to prepare the review briefing. Open only the relevant sections of `spec.md`,
+`plan.md`, or `metadata.json` needed for a design-intent or blocker investigation; do not begin
+with a bulk artifact read or open the review, binding, catalogue, sub-workflow, or convention
+documents just to discover state.
 
 **Step 1: Verify the primary ADR baseline and resolve dispatch capabilities**
 
@@ -95,7 +109,12 @@ For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope
 # Review Briefing: {track-id} — {scope} layer
 
 ## Design Intent
-{3-5 bullets from spec.md / plan.md describing what changed and why}
+{3-5 bullets from the current diff and CLI summaries; open a targeted spec.md / plan.md section
+only when the diff or a blocker requires an anchor explaining what changed and why}
+
+## Context Paths
+{exact spec / plan / task paths and the resolved convention paths supplied by the dispatcher;
+the delegated reviewer or fixer reads these paths}
 
 ## Review Checklist
 {scope-specific checklist items — keep this list short and observable}
@@ -296,9 +315,10 @@ Back-and-forth loops (the `plan` workflow's Phase 1/Phase 2 loops and the `diagn
    is not complete (stale hash, auto-record failure, etc.); diagnose and resolve before
    declaring readiness.
 
-**NotStarted bypass**: when `review.json` does not exist and every required scope is `NotStarted`,
-`bin/sotp review check-approved` returns exit 0 to allow PR-based reviews without a local round.
-Once any local round is recorded, the bypass is no longer available.
+**NotStarted bypass**: when `bin/sotp review results` reports that no local round exists and every
+required scope is `NotStarted`, `bin/sotp review check-approved` returns exit 0 to allow PR-based
+reviews without a local round. Once any local round is recorded, the bypass is no longer
+available. Do not inspect `review.json` directly to determine this state.
 
 ## Gates
 
@@ -327,8 +347,9 @@ All five gates must pass before the workflow reports readiness.
 - **`cargo make ci` failure**: fix the CI failure (format, clippy, test), re-run, and continue
   the workflow. CI failure does not reset the review loop.
 - **`bin/sotp review check-approved` non-zero**: diagnose — stale hash (re-stage and re-run
-  the final review), auto-record failure (check `review.json` state), or scope not complete
-  (relaunch the incomplete scope).
+  the final review), auto-record failure (inspect the relevant `bin/sotp review results` output),
+  or scope not complete (relaunch the incomplete scope). Do not open `review.json` unless a
+  targeted diff or blocker investigation requires it.
 
 ## Outputs
 

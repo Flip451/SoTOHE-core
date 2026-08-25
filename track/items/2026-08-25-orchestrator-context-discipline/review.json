@@ -33,6 +33,198 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-25T07:09:26Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 23,
+              "message": "The implement workflow contradicts itself: Inputs require stopping when the branch is not `track/<id>` (lines 23–24), while Step 1 explicitly falls back to the latest materialized active track (lines 61–65). This makes track selection and safety behavior ambiguous; define one authoritative rule.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestration.md",
+              "line": 32,
+              "message": "The revised orchestration reference still mandates reading all track artifacts, conventions, and rule files before planning or implementation (lines 32–48), contradicting the new summary-first policy in the root rules and workflows, which forbids bulk reads and delegates convention reading. This can reintroduce the context-loading behavior the change is intended to remove.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce73395265a708794cb06f6c87f4a77e8d6194b0761dcdb309c6757380418751",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:13:27Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".codex/instructions.md",
+              "line": 21,
+              "message": "The Codex root rule forbids opening full workflow texts except for diff or blocker investigation, but `adr2pr` Step 0 requires reading every referenced sub-workflow before execution. A Codex orchestrator therefore cannot satisfy both instructions; add an explicit mandatory-workflow-planning exception or revise one side.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 9,
+              "message": "The Claude orchestration rule says full workflow texts must not be bulk-read during intake, while `adr2pr` Step 0 requires reading every referenced sub-workflow definition before execution. Clarify that the mandatory SSoT execution-plan read is an exception, otherwise Claude orchestration has conflicting context rules.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc20b1c5ee115cf31d9c9291d727e33da5185b21cbf2c4cae2eedc0eb9692c93",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:21:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35fa9446405e813761359edf2a321355d60c57f13f53bae6a78e67fabb418aa9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:35:37Z",
+          "findings": [
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 65,
+              "message": "Codex adapter が `ADR2PR_SESSION_REFRESH: <boundary>` というホスト固有の通知形式を追加しているが、workflow SSoT は notification format の追加を明示的に禁止しており、OS-03 にも反する。固定マーカーは削除し、必要なら通常のユーザー更新要求だけにする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow_state",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 67,
+              "message": "更新後に `$track-adr2pr` 全体を再実行しても、その位置から再開できない。既存 track に対する SSoT Step 1 は明示的に Step 2 へ戻すため、Step 8 後の更新でも ADR baseline review・planning・commit を再実行してしまう。境界を永続状態から判定して正しい次 step へ進む再開契約が必要。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 30,
+              "message": "summary-first 化後も ADR pre-check が orchestrator に `spec.md`／`plan.md` と ADR 本文を通常時に読ませ、矛盾時には identity-only の `metadata.json` を修正するよう指示している。同文書の「本文は diff/blocker 調査時のみ」「本文は implementer が読む」という境界と矛盾し、task contract の不整合も解消できない。検証を委譲先へ渡し、不整合は owning spec/plan phase へ戻すべき。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "新しい SSoT は actionable finding の修正を `implementer`／`review-fix-lead` に委譲すると定めた一方、現在出荷される Claude adapter は依然として `This command runs directly — no subagents` と指示している。これは briefing が例外扱いしない明示的な adapter–SSoT 矛盾であり、Claude 経路では新しい委譲境界が実行されない。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 261,
+              "message": "`adr2pr` の failure/recovery は依然として親に `fix locally, commit, re-run` と指示しており、改訂後の `pr-review` が定める briefing → capability 委譲 → local convergence → commit の経路を迂回する。ここは `pr-review` の委譲・回復契約へ委ねる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring",
+              "file": ".codex/rules/default.rules",
+              "line": 30,
+              "message": "`plan` と `implement` workflow が一次情報として要求する `bin/sotp track next-task` が、Codex の summary 一覧にも `default.rules` の新しい allow 群にも存在しない。このため Codex root だけ canonical intake を追加承認または別手段なしに実行できない。summary 一覧と allow rule の両方へ追加する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "writer_ownership",
+              "file": ".codex/instructions.md",
+              "line": 60,
+              "message": "Codex の writer mapping は `impl-planner` の所有物から `batch-plan.json` を落としているが、impl-plan workflow は同 capability を四成果物すべての sole writer と定めている。同じ欠落が `.codex/agents/orchestrator.toml` にもあり、root による直接編集を許す責任境界のずれになる。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35fa9446405e813761359edf2a321355d60c57f13f53bae6a78e67fabb418aa9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:47:02Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 86,
+              "message": "Step 1 still says that any initialized track skips only init and always starts at Step 2, contradicting the new resume contract immediately below, which requires deriving the first incomplete lifecycle boundary and may resume at Steps 5–11. Update Step 1 to delegate existing-track invocations to that persisted-state resume logic.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:af2406766ef16c193543b145e9c19780872a687c76c354becab306b7b8df75d5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:49:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:227ba2e91d78733a9592a5eaa3312ec34e5544ea732100c90cf81dc6f8119fdb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:59:32Z",
+          "findings": [
+            {
+              "category": "workflow_state",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 65,
+              "message": "Inputs still says every initialized track skips `init` and starts at Step 2, directly contradicting the new Step 1/resume contract that derives the first incomplete boundary from persisted state. A refreshed run can therefore still follow the old replay path depending on which section the orchestrator applies; update this input contract to reference persisted-state resumption.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 10,
+              "message": "The mission still instructs the orchestrator to read the approved implementation plan, while the revised inputs and intake contract assign artifact-body reading to the implementer and restrict the orchestrator to CLI summaries except for diff/blocker investigation. Remove or reword this operational instruction so it unambiguously consumes the plan summary/briefing rather than `impl-plan.json`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "The revised SSoT requires actionable fixes to be delegated to `implementer` or `review-fix-lead`, but the currently shipped Claude adapter still says `This command runs directly — no subagents`. This is the explicit adapter–SSoT contradiction identified by the briefing’s exception rule; the adapter must defer its finding-fix lane to this delegated route.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:227ba2e91d78733a9592a5eaa3312ec34e5544ea732100c90cf81dc6f8119fdb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:03:28Z",
+          "findings": [
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "改訂後の SSoT は actionable finding の修正を `implementer` または `review-fix-lead` へ委譲すると定めているが、現在出荷される Claude adapter は依然として `This command runs directly — no subagents` と指示している。briefing が例外扱いしない明示的な adapter–SSoT 矛盾であり、adapter をこの委譲経路へ合わせる必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:385656a76ab68bd4f325925af82a37ea51bd3c89a6887237594e1939e9a04fb6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:07:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e6e66650eef3932a5b7b3cadffb6679534d2e8efbafcd8ded35e2b564be91e6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:11:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e6e66650eef3932a5b7b3cadffb6679534d2e8efbafcd8ded35e2b564be91e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -275,6 +467,20 @@
           "at": "2026-08-25T06:35:57Z",
           "findings": [],
           "hash": "rvw1:sha256:092b3c2f082d37f6fe71f0372a84ea07f48efdb4d101e56b6bf02e61a531a470",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e797b7e43f05642253349e5c23d7452a1e7eaf1df624d54309c7ec2c1ad14d93",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:11:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e797b7e43f05642253349e5c23d7452a1e7eaf1df624d54309c7ec2c1ad14d93",
           "type": "final",
           "verdict": "zero_findings"
         }
