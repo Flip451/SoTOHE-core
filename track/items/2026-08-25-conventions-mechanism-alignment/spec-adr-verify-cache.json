@@ -1,0 +1,718 @@
+{
+  "entries": [
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`knowledge/conventions/` の各規則は、その強制先 — 機械 lint / 宣言突合（catalogue + verify）/ review 観点 / **強制なし（明記）** — を注記しなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "抽象（port trait + 実装）は (a) 複数実装が現存する、(b) テスト境界として差し替えが必要、のいずれか成立時のみ導入する。共有所有だけが目的なら `Arc<具象型>` を既定とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver の注入粒度は port 粒度 ADR の D1（1 ユースケース 1 trait・実行メソッド 1 つ）に従い、driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "usecase の入力境界は検証済み Command 型のみを受け取る。string から Command へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから入力境界を呼び出す",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "consumer が層構成を変更しても表が壊れない形にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "品質保証の正は test-obligation 機構（約束への結び付け検証）とし、カバレッジ目標 80% は廃止する。改稿後の構成: 層ごとのテスト責務（ピラミッド）/ fake 優先・mock は相互作用が仕様である場合に限定 / codec・parser・evaluator への property-based testing / 自ソースの部分文字列 assert の禁止（依存制約は architecture-rules へ、振る舞いは記録ダブルへ）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad15ad8ab8fd5d0cf783230090c927ce44c4c3dda692ad7b171c249f5fe56471",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "テンプレートが出荷する規約とレビュー指示を、各規範の強制機構、必要駆動の抽象、型安全な境界、および宣言済み環境前提に整合させ、consumer 側で同じ設計逸脱を再生産しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "コード全 scope のレビュープロンプトに、ドメイン非依存のメタ問いを 1 つ追加する: 「diff が接する外部境界(OS・プロセス・エンコーディング・並行・資源上限・時刻・別バージョンの自成果物)を列挙し、依存する前提が仕様または環境前提宣言に無ければ『未宣言の前提への依存』として指摘せよ」。spec レビューには「環境前提の宣言が必要な変更か」を問う対応形を置く。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2cf5e06286ba7bcaf2ad0aebefe4953b96fef1eaf75f3f9725e9d5f462ace26a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "knowledge/conventions/ の現存する規範的要求それぞれに、機械 lint、宣言突合、review 観点、または強制なしのいずれかの強制先を注記するメタ規則を追加し、有限な対象集合の完全性は harness-policy review で判断する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`knowledge/conventions/` の各規則は、その強制先 — 機械 lint / 宣言突合（catalogue + verify）/ review 観点 / **強制なし（明記）** — を注記しなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dd22f94ea6471d1a4050dfd3a874dc74ec631ce79022edd96fbba817e4a855b0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、抽象は複数実装またはテスト差し替えが必要な場合だけ導入する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "抽象（port trait + 実装）は (a) 複数実装が現存する、(b) テスト境界として差し替えが必要、のいずれか成立時のみ導入する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "80c68b59e4a13575cd5885127eac0a9ba4bc068de230a1c83d39da615c0cd771",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、driver は消費する単能 port を直接受け取り、command と query を混載する facade port を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d37bd68d9d18bb8b5ad08607d80d0ee24e1f84e8df91afa2d4546fb820be9e0c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、usecase 境界は検証済み Command 型へ一本化し、cli は一度だけ Command へパースして入力境界を呼び出す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "usecase の入力境界は検証済み Command 型のみを受け取る。string から Command へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから入力境界を呼び出す",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6741209930ae70f4ae7b57a384de5a2553dbfa2a88819c0d88ff111026b95e82",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、role × layer 規則は固有 crate 名ではなく層の性質で表す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`type-designer-kind-selection.md` R1 の表を、固有 crate 名から層の性質（innermost / application / driven adapter / driving adapter / composition root）に対する制約へ書き換え",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a271987e47088e0801ede6cb79c73a83a0571dff5101c15c78a4f5151f33d86",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "testing.md を、test-obligation を品質保証の正とし、層ごとのテスト責務、fake 優先、codec・parser・evaluator の property-based testing、および自ソース部分文字列 assert 禁止を定める構成へ全面改稿する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "改稿後の構成: 層ごとのテスト責務（ピラミッド）/ fake 優先・mock は相互作用が仕様である場合に限定 / codec・parser・evaluator への property-based testing / 自ソースの部分文字列 assert の禁止",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3baaa460cd4916d8380efde589df8557175bc9cdd7ecff07805409e56e5cde7a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "対応プラットフォーム、入力エンコーディング方針、資源上限、並行モデルを consumer が宣言できる環境前提の置き場を、枠と記入指針だけを含む形で knowledge/conventions/ に新設する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`knowledge/conventions/` に環境前提宣言(対応プラットフォーム・入力エンコーディング方針・資源上限・並行モデル)の置き場を新設する。宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "301e26d35cd8064698371f4b7c5d061c3ff876ad0fcc280522e9760f8173f83b",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": ".harness/custom/review-prompts/ の review-scope.json が宣言する全 code scope に、diff が接する外部境界と未宣言の前提への依存を確認するドメイン非依存のメタ問いを追加し、spec review prompt には環境前提宣言の必要性を問う対応形を追加する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "コード全 scope のレビュープロンプトに、ドメイン非依存のメタ問いを 1 つ追加する: 「diff が接する外部境界(OS・プロセス・エンコーディング・並行・資源上限・時刻・別バージョンの自成果物)を列挙し、依存する前提が仕様または環境前提宣言に無ければ『未宣言の前提への依存』として指摘せよ」。spec レビューには「環境前提の宣言が必要な変更か」を問う対応形を置く。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "db81b0e6782d1d0d5f8bd6a311933cd821e68c3e007ecf3b1ed1117efef42b73",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "既存コード、既存の抽象ペア、または既存の境界実装を、改訂後の規約に合わせて遡及修正することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既存ペアの遡及解体は本 track の範囲外",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "166808159fe31b2ed3e8e15110f152397182733a797700fe493a4f6fe0016b48",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "新しい lint、catalogue preset、または規約注記を機械抽出する実装を導入することは対象外とし、必要なら後続 ADR で扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "したがって、機械的な全規則抽出や将来追加される規則までの証明は要求せず、各時点の有限な文書集合を review で再評価する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1895a6a15663286a8e95a293588f1100fa74b91cee04003f666c4d889f00b2f",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "特定 OS、特定プロトコル、その他のドメイン固有の境界チェック項目をテンプレートの review prompt や環境前提宣言の既定値として追加することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1895a6a15663286a8e95a293588f1100fa74b91cee04003f666c4d889f00b2f",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "特定 OS、特定プロトコル、その他のドメイン固有の境界チェック項目をテンプレートの review prompt や環境前提宣言の既定値として追加することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "特定ドメインの検査項目(特定 OS・特定プロトコル等)はプロンプトに置かず、D7 の宣言側が供給する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "da943e68cadd40c7e62730edaaa75b36df6a1364d46059bc39864eb4fbde2b52",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "D1 の注記対象は現時点の knowledge/conventions/ にある有限な規範的要求であり、注記漏れの判定を機械的な全規則抽出の完了条件に置き換えてはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "注記対象の母集団は `knowledge/conventions/` 配下の現存文書にある規範的な要求とし、義務・禁止・許容条件・確認項目を保守的に含める。母集団の完全性と注記漏れの判断は、同ディレクトリを対象とする harness-policy review が担う。したがって、機械的な全規則抽出や将来追加される規則までの証明は要求せず、各時点の有限な文書集合を review で再評価する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "19050754471c30060caa9e67d2514de8f9be2b168335d677883e6d6e7a77a495",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "環境前提宣言は consumer 所有とし、テンプレートは宣言枠と記入指針だけを提供して、プロジェクト固有の前提を既定として決めてはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18513e489d5d0145c3af701ae09dfb0bef78703a99bfd7f3982f912ee910e78b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "レビュー問いの注入先は review-scope.json が宣言する code scope とその briefing_file、および spec review prompt に限り、doc scope を含めず、外部境界の列挙で到達性を確定できない間接境界も未宣言の前提への依存として扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "注入先の完全性は `.harness/config/review-scope.json` のコード scope とその briefing_file 宣言を正本とする。境界の列挙は、diff で変わる振る舞いから直接到達する外部操作と、列挙済みの分類を保守的に対象とする。到達性を確定できない間接境界は除外せず、「未宣言の前提への依存」として指摘するため、無限の依存探索を完了条件にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "96f45a3005491ba7421753a4d0b23c91550afabb59af606d70bbf4e950ac90a8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "enforce-by-mechanism.md に D1 のメタ規則があり、knowledge/conventions/ の現存する規範的要求は機械 lint、宣言突合、review 観点、または強制なしとして注記され、harness-policy review でその完全性を評価できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`enforce-by-mechanism.md` にこのメタ規則を追加する。`knowledge/conventions/` の各規則は、その強制先 — 機械 lint / 宣言突合（catalogue + verify）/ review 観点 / **強制なし（明記）** — を注記しなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8aad5bce676bb17df75e7cc7e6280afaeb70e5ef129140194de4b0686e523b0",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "type-designer-kind-selection.md と関連規約は、複数実装が現存するかテスト境界として差し替えが必要な場合だけ trait を導入し、共有所有だけを理由に trait を導入しないことを明確にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "抽象（port trait + 実装）は (a) 複数実装が現存する、(b) テスト境界として差し替えが必要、のいずれか成立時のみ導入する。共有所有だけが目的なら `Arc<具象型>` を既定とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0416f78f5b7fc3f3716e78062d1a0bbb9a78e1ff85655473279af36eb621a7cc",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "type-designer-kind-selection.md と関連規約は、driver が消費する複数の単能 port を直接受け取り、command と query を混載する facade port を新設しないことを明確にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b70c0c7f9fa1ae965bb540324b2bf14b11c3cab86c09ac4b2f3f28cc556ad175",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "type-designer-kind-selection.md と関連規約は、cli が一度だけ Command へパースして usecase 入力境界を呼び出すことを明確にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "cli はそのパースを一度だけ呼び出してから入力境界を呼び出す",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4cc8690b71d67279767df52813b7361dd930e341c2f0a6df7b7b12d1c71240e8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "type-designer-kind-selection.md と関連規約は、R1 の層規則を層の性質で解決することを明確にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`type-designer-kind-selection.md` R1 の表を、固有 crate 名から層の性質（innermost / application / driven adapter / driving adapter / composition root）に対する制約へ書き換え",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "063877d81debba0afbb25bf3b31d5a786dacf1f61d5a82400157319d9c431d04",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "testing.md は新規コードの line coverage 80% 目標を保持せず、test-obligation 機構を品質保証の正として、テストピラミッド、fake 優先、限定的な mock、property-based testing、および自ソース部分文字列 assert の禁止を明示する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "品質保証の正は test-obligation 機構（約束への結び付け検証）とし、カバレッジ目標 80% は廃止する。改稿後の構成: 層ごとのテスト責務（ピラミッド）/ fake 優先・mock は相互作用が仕様である場合に限定 / codec・parser・evaluator への property-based testing / 自ソースの部分文字列 assert の禁止",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5947c74c527fbd2d934ab8d3dec0c1ecbb5e96adaf44c379a910a358c8b1b19a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "新しい環境前提宣言の置き場は、対応プラットフォーム、入力エンコーディング方針、資源上限、並行モデルを consumer が記入できる枠と指針を含み、特定ドメインの前提を既定値として含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`knowledge/conventions/` に環境前提宣言(対応プラットフォーム・入力エンコーディング方針・資源上限・並行モデル)の置き場を新設する。宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "14af6e40fac9290446fe8269aa0859a004060810bc03cfef14ff724ad99a2368",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "review-scope.json が宣言する全 code scope の review prompt と spec review prompt は、D8 の対応する境界メタ問いを含む。問いは OS、プロセス、エンコーディング、並行、資源上限、時刻、別バージョンの自成果物を分類として扱い、未宣言の前提への依存を報告させる一方、doc scope とドメイン固有チェックリストには注入しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "コード全 scope のレビュープロンプトに、ドメイン非依存のメタ問いを 1 つ追加する: 「diff が接する外部境界(OS・プロセス・エンコーディング・並行・資源上限・時刻・別バージョンの自成果物)を列挙し、依存する前提が仕様または環境前提宣言に無ければ『未宣言の前提への依存』として指摘せよ」。spec レビューには「環境前提の宣言が必要な変更か」を問う対応形を置く。doc scope には注入しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

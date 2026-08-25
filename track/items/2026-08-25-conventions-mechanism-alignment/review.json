@@ -105,6 +105,236 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:19:57Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 16,
+              "message": "Section S2 restates upstream behavior contracts (necessity-driven abstractions, single-purpose ports, validated Command boundary, and layer-property rules) instead of limiting the section description to target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 26,
+              "message": "Section S3 restates the testing behavior contract (replacing line coverage with obligation-driven guidance) rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 36,
+              "message": "Section S4 restates the consumer-owned environment-assumption contract and prohibition on project-specific defaults rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 46,
+              "message": "Section S5 restates D8's boundary-question behavior and target semantics rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 72,
+              "message": "Task T002 restates the D2–D5 behavior contracts (necessity-driven traits, direct single-purpose ports, one-time Command parsing, and layer-property placement) in prose. Keep only the file targets, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 81,
+              "message": "Task T003 restates the D6 testing contract by enumerating testing-pyramid, fake/mock, property-based testing, substring-assertion, and line-coverage behavior. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 90,
+              "message": "Task T004 restates the D7 environment-assumption contract by specifying declaration slots, authoring guidance, and the default prohibition. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 96,
+              "message": "Task T005 restates D8's required question categories and exclusions in prose. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 96,
+              "message": "Task T005's target `spec.md` is ambiguous: the repository contains both `.harness/custom/review-prompts/spec.md` and track-rendered `track/items/<track-id>/spec.md`. The executor would have to invent which file to update; use the full `.harness/custom/review-prompts/spec.md` path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce4c8c0cf8b02cf9d311f5effe3d3be2843e39112f398a62d47590eedd85bc2c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:23:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d2eb33219bedc8e05ea7104cce44be63aa7cf67579ae35d35580347615d9378b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:31:46Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/task-coverage.json",
+              "line": 4,
+              "message": "IN-01/AC-01 coverage is incomplete: T001's explicit convention inventory omits `knowledge/conventions/README.md`, while T004's generic README update is anchored only to IN-04/CN-02/OUT-03/AC-04. The README contains existing normative Maintenance Rules covered by IN-01. Add an explicit README annotation operation anchored to IN-01/AC-01.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 63,
+              "message": "T001 restates upstream constraints in “rely on harness-policy review for finite-set completeness and do not add rule-extraction or lint implementation.” Retain only the target, validation operation, and CN-01/OUT-02 anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 72,
+              "message": "T002 is still `todo` but bundles four independently verifiable behavior units. Split it into ordered tasks for necessity-driven abstraction (IN-02/AC-02), port injection/facade policy (IN-06/AC-06), the Command boundary (IN-07/AC-07), and the layer-property matrix (IN-08/AC-08); explicitly allocate its IN-01/AC-01 annotation work among those tasks or a separate annotation pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d2eb33219bedc8e05ea7104cce44be63aa7cf67579ae35d35580347615d9378b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:48:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e5a946c6b556ba6209fcb80e4f3ee42acf6563a4e7d6de6f76a573610bb71f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:53:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e5a946c6b556ba6209fcb80e4f3ee42acf6563a4e7d6de6f76a573610bb71f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:18:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:298827db5fc1f5dd6b46c312baf4b27dbbbd5a59e04864a03c6dccb2ded38c66",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:21:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:298827db5fc1f5dd6b46c312baf4b27dbbbd5a59e04864a03c6dccb2ded38c66",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:34:43Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 129,
+              "message": "GO-01 cites only D1 and D8, but its intent also claims alignment with necessity-driven abstraction, typed boundaries, and declared environment assumptions—decisions D2–D7. Those expansions are not anchored by the goal's ADR references, so the goal is not a faithful decision-grounded contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55f2b4f2c598faf2f7d6febb110167af435deb47e42183f8299a3dfebd2a8911",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:37:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f42a8443316cf57b3005721d2b5c9ebb43beacc66bdfc82b01ce98147cf19c4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:45:04Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 21,
+              "message": "AC-02 only prohibits introducing a trait solely for shared ownership. GO-01 and IN-02 require the stronger necessity-driven rule that abstractions are introduced only for multiple implementations or a required test seam. Documentation could permit speculative or symmetry-driven traits and still pass AC-02, so completion would not prove the stated goal.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 31,
+              "message": "AC-06 checks only that a facade does not mix commands and queries, while IN-06 requires drivers to receive the consumed single-purpose ports directly. A query-only multi-usecase facade would satisfy AC-06 while recreating the facade aggregation that GO-01 is intended to prevent.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 113,
+              "message": "CN-03 limits review-question injection to code scopes and their briefing files, but IN-05 and AC-05 also require the corresponding question in the spec review prompt. Because `spec` is not a code scope, downstream work cannot satisfy both the constraint and the declared scope/acceptance criterion.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6f42a8443316cf57b3005721d2b5c9ebb43beacc66bdfc82b01ce98147cf19c4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:49:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a162b1f50c0f8b105145239d2c39758bfd540ef989a434517c2113bd8bedb1a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:03:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:05:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:08:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
