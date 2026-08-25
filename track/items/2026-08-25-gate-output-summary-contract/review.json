@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:06:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55fad34796fab44049a9fd2256d2afd3fff719f3def63df8b1ce62c4427a83ce",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:10:02Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0425-gate-output-summary-contract.md",
+              "line": 21,
+              "message": "D1 applies the contract to the open-ended set “ゲート・検証系タスク（…等）” without recording how that universally quantified scope is resolved. This leaves the migration boundary unbounded as commands evolve. Record one permitted resolution: delegate membership to an existing authority, choose a conservative over-approximation, or acknowledge strict implementation with a depth estimate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55fad34796fab44049a9fd2256d2afd3fff719f3def63df8b1ce62c4427a83ce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:15:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d68849d83c73474a8ee8d367678a91121a5535c75e67ff80f6aa26ee7986d28",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:18:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d68849d83c73474a8ee8d367678a91121a5535c75e67ff80f6aa26ee7986d28",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:29:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b801015504e06caaa9f270b4811360f74ff0bf784ec2376ce6e9d795d690df45",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:33:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b801015504e06caaa9f270b4811360f74ff0bf784ec2376ce6e9d795d690df45",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
