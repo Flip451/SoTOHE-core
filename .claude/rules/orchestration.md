@@ -74,7 +74,7 @@ Operational split:
 
 ## Planning Gate (Mandatory)
 
-Always invoke `/track:plan` before implementation, regardless of task difficulty. `/track:plan` orchestrates Phase 0-3 (init → spec → design → impl-plan) and back-and-forth escalation when downstream signals fail. Skipping design entirely causes expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
+Complete Phase 0–3 planning before implementation, regardless of task difficulty: `/track:plan` orchestrates init → spec → design → impl-plan and back-and-forth escalation when downstream signals fail, and end-to-end workflows such as `/track:adr2pr` own the equivalent sequencing on an initialized track (do not invoke `/track:plan` on a `track/<id>` branch it already initialized). Skipping design entirely causes expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
 
 ## Delegation Rules
 

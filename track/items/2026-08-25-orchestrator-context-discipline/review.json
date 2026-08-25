@@ -875,6 +875,57 @@
           "hash": "rvw1:sha256:b44a61171ab4e043d56bc51753f5b5f698d44a38bfa74c45b66a335c2c97cb87",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:04:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40d07bab63f463719738a07976ef02ef66c62efb63786fb89e4d30eae9551f03",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:08:38Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 10,
+              "message": "The new unconditional rule requires `/track:plan` before every implementation path, but the canonical `/track:adr2pr` workflow explicitly says “Do NOT invoke the `plan` workflow” and instead runs `spec-design`, `type-design`, and `impl-plan` directly after initialization. Because this rule is always loaded, invoking the documented end-to-end `/track:adr2pr` flow now presents the orchestrator with contradictory mandatory instructions and can trigger a redundant or invalid Phase 0 planning run. State the semantic requirement—Phase 0–3 planning must complete before implementation—while exempting workflows such as `/track:adr2pr` that own equivalent planning sequencing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40d07bab63f463719738a07976ef02ef66c62efb63786fb89e4d30eae9551f03",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:11:29Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 12,
+              "message": "The new `/track:adr2pr` exception was not propagated to the detailed Claude rule surface. `.claude/rules/orchestration.md:77` still says to always invoke `/track:plan` before implementation, while the new always-applied rule says end-to-end workflows own equivalent sequencing and the canonical adr2pr SSoT explicitly forbids invoking `plan` after initialization. When the conditional orchestration rule is loaded for `.claude/commands/**`, the orchestrator receives contradictory mandatory instructions and may invoke a workflow that fails on the active track branch. Align the detailed Planning Gate with this exception.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:33f90d77e55feef068a2b5a19d0c1ab3d428c898f19ced3f6aa54c5f4662437f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:14:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca30ab1307b59a4399f4c5b09aa45435ce6e36f8478ccd0dd9c9164411ca214e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:16:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca30ab1307b59a4399f4c5b09aa45435ce6e36f8478ccd0dd9c9164411ca214e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
