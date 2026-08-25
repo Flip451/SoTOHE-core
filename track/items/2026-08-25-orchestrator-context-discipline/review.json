@@ -810,6 +810,71 @@
           "hash": "rvw1:sha256:1e5d064e37d0b502a8866f3a61775cdd92e86daee7dbda8147deb083529d2f72",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:01:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e368a082e242195f86a6c1ab774877e679a67a7a9b5b792a65cb6cdde11a5782",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:08:28Z",
+          "findings": [
+            {
+              "category": "command-contract-drift",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 50,
+              "message": "The new impl-plan existence guard is based on a false runtime premise. `next-task` deliberately returns no open task and `task-counts` returns zero counts when `impl-plan.json` is absent; CLI tests explicitly cover successful Phase 0–2 use. The analogous guards in the three workflow SSoTs and the “fails closed” claims in five skills therefore contradict the shipped command contract and omit supported summary-first intake. Restore the unconditional summaries and remove the false claims.",
+              "severity": "P2"
+            },
+            {
+              "category": "adapter-SSoT-sync",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 48,
+              "message": "This adapter names bare `bin/sotp ref-verify results`, but its workflow SSoT requires `bin/sotp ref-verify results --chain 2 --filter all`. The bare command defaults to both chains and fail/pending filtering, so Chain 1 results can be included in the overall summary being consumed as catalogue state. Mirror the exact SSoT invocation.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:e368a082e242195f86a6c1ab774877e679a67a7a9b5b792a65cb6cdde11a5782",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:21:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:986271a21e539218c6cefddd1afa6aa66835f5beb7b84bb0080b7f37cec149f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:26:11Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT-sync",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 50,
+              "message": "The plan adapter still narrows its SSoT by running `catalog check` and Chain 2 `ref-verify results` only after catalogues exist. The plan SSoT requires these summaries once a track is active, and both commands intentionally represent absent catalogues (`catalog check` returns `Skipped`; Chain 2 reports zero pairs). This condition suppresses the primary catalogue-state intake during earlier phases and leaves adapter/SSoT timing inconsistent; remove it.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:986271a21e539218c6cefddd1afa6aa66835f5beb7b84bb0080b7f37cec149f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:31:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b44a61171ab4e043d56bc51753f5b5f698d44a38bfa74c45b66a335c2c97cb87",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:34:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b44a61171ab4e043d56bc51753f5b5f698d44a38bfa74c45b66a335c2c97cb87",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

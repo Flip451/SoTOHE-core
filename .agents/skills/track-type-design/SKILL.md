@@ -33,10 +33,10 @@ or failure-recovery procedures here.
 
 ### (4) Context intake
 
-- Follow the workflow SSoT's summary-first context intake: take progress, review necessity,
-  obligation state, and catalogue state from the CLI summaries it names (`bin/sotp track resolve`,
-  `bin/sotp track task-counts`, `bin/sotp track next-task`, `bin/sotp review results`,
-  `bin/sotp test-obligation results`, `bin/sotp catalog check`, `bin/sotp ref-verify results`).
+- Follow the workflow SSoT's summary-first context intake with the Phase 2 summaries it names:
+  `bin/sotp track resolve`, `bin/sotp catalog check`,
+  `bin/sotp ref-verify results --chain 2 --filter all`, `bin/sotp review results`, and
+  `bin/sotp test-obligation results` when enrollment state is relevant.
 - Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
   `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
   blocker it names. Convention paths are listed in each delegated briefing and read by the
