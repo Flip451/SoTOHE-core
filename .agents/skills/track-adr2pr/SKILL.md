@@ -15,11 +15,16 @@ or failure-recovery procedures here.
 
 - Triggered via `$track-adr2pr` in a Codex skill mention surface.
 - Can also be force-loaded with `codex exec` by referencing this skill file.
-- Feature name and primary ADR filename are optional at invocation: an explicitly supplied
-  value always takes precedence, and any missing value is resolved and user-confirmed per the
-  workflow SSoT's input-acquisition contract (conversation context resolution, one
-  confirmation of the completed pair, candidate selection when resolution is not unique)
-  before `$track-init` receives both values explicitly.
+- Before any input acquisition, check whether the current branch is an initialized
+  `track/<id>` with `metadata.json`. On that re-invocation path (including every resumed run
+  after a refresh handoff, skill note 5) skip feature / ADR resolution, user confirmation, and
+  `$track-init` forwarding entirely; the workflow SSoT's Step 1 derives the first incomplete
+  lifecycle boundary from persisted state and resumes there.
+- Only when the track needs initialization are the feature name and primary ADR filename
+  acquired: an explicitly supplied value always takes precedence, and any missing value is
+  resolved and user-confirmed per the workflow SSoT's input-acquisition contract (conversation
+  context resolution, one confirmation of the completed pair, candidate selection when
+  resolution is not unique) before `$track-init` receives both values explicitly.
 
 ### (2) Sandbox constraint
 
