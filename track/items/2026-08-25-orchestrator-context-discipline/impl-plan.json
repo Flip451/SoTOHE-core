@@ -124,6 +124,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "description": "`.harness/workflows/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の長時間 gate / evaluate 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
       "id": "T003",
       "status": "done"
@@ -135,6 +136,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T001"
       ],
@@ -143,6 +145,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T001"
       ],
@@ -156,7 +159,7 @@
       ],
       "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
       "id": "T019",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -180,7 +183,7 @@
       ],
       "description": "`.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
       "id": "T022",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -217,6 +220,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T003"
       ],
@@ -234,6 +238,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T001"
       ],
@@ -251,6 +256,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T003"
       ],
@@ -274,6 +280,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
       "depends_on": [
         "T015"
       ],

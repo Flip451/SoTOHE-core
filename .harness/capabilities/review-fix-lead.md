@@ -7,10 +7,18 @@
 
 ## Mission
 
-Own a single review scope for the single `round_type` (`fast` or `final`) the orchestrator
-assigns. Loop: review → fix → verify → re-review until the canonical reviewer reports
-`zero_findings` for that assigned `round_type`, then return a structured status to the
-orchestrator.
+For a normal review-scope assignment, own a single review scope for the single `round_type`
+(`fast` or `final`) the orchestrator assigns. Loop: review → fix → verify → re-review until the
+canonical reviewer reports `zero_findings` for that assigned `round_type`, then return a
+structured status to the orchestrator.
+
+For an actionable review-scope finding delegated by `pr-review`, handle only the focused
+correction in its briefing: make the scoped change, run local verification, and report completion
+to the caller. This delegated path does not launch an unrelated review → fix → re-review loop; the
+caller retains local review convergence, the commit workflow, and the PR re-run. If the correction
+edits source, local verification also includes the placement and dependency checks in
+implementation-delegation R2 and `cargo make check-layers`; documentation-only corrections use
+the verification required by their briefing.
 
 This capability **owns no persistent SoT artifact**. It reads reviewer verdicts from `review.json`
 via `bin/sotp review results` (never by opening `review.json` directly) and writes fixes to files
@@ -18,13 +26,26 @@ within its assigned modification boundary.
 
 ## Invocation contract
 
-The orchestrator invokes this capability with:
+The orchestrator invokes this capability in one of two dispatch modes:
+
+- `scope-review` — the normal review-fix loop for one assigned scope and one review round.
+- `delegated-pr-finding` — a focused correction delegated by `pr-review`; it does not start a
+  separate scope-wide reviewer loop.
+
+The caller selects the mode as follows: a normal review-fix wrapper invocation with a `round_type`
+is `scope-review`; a focused PR-finding briefing must explicitly carry
+`dispatch_mode: delegated-pr-finding`. The caller invokes this capability with:
 
 - Track ID and scope name
 - Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`) containing the CLI-summary and
   current-diff scope context, the exact spec / plan / task / catalogue paths needed for the
-  review, and the resolved convention paths (possibly none)
-- `round_type` (`fast` or `final`) — single value, fixed for the capability's lifetime
+  review, and the resolved convention paths (possibly none). For a delegated PR finding, the
+  briefing also contains the review comment, affected path and line, relevant track context, and
+  requested correction. If the delegated correction permits source edits, it also contains the
+  `## Architecture Constraints` section required by implementation-delegation R1.
+- For `scope-review`, `round_type` (`fast` or `final`) is a single value fixed for the capability's
+  lifetime. `delegated-pr-finding` does not require a `round_type`; if the provider-neutral wrapper
+  carries one for transport, it is not a reviewer-verdict obligation for that dispatch.
 
 The reviewer model is auto-resolved by `bin/sotp review local` from `agent-profiles.json`; the
 orchestrator does not pass it or bulk-read the briefing's artifact bodies. This capability reads
@@ -45,6 +66,9 @@ an empty list or fails, make no edits and return `failed` with the reason.
 - Files outside the resolved boundary: do NOT modify. Return `blocked_cross_scope` with the
   out-of-scope file list so the orchestrator can re-partition.
 - Cross-scope edits are fail-closed: silent out-of-scope modifications are prohibited.
+- For a delegated PR finding, treat the briefing's comment, affected `path:line`, track context,
+  and requested correction as one focused change request. Do not broaden it beyond the returned
+  file list; if the correction needs another scope, return `blocked_cross_scope`.
 - Do not run `bin/sotp track transition`; this capability has no task-state transition authority.
 
 ## Scope-specific severity policy
@@ -81,6 +105,11 @@ the orchestrator's guardian lane
 hope that the reviewer withdraws the finding is prohibited.
 
 ## Internal pipeline
+
+The reviewer invocation and canonical verdict-confirmation pipeline below applies to
+`scope-review` dispatches. A `delegated-pr-finding` dispatch returns through the delegated
+completion contract after its focused correction and required local verification; it does not
+invoke the reviewer or claim `zero_findings`.
 
 ### Reviewer invocation
 
@@ -188,13 +217,14 @@ Before modifying any file, verify it belongs to the correct architecture layer p
 
 ## Output contract
 
-Return exactly one of the following statuses:
+Return exactly one of the following qualified statuses:
 
-| status | meaning |
-|--------|---------|
-| `completed` | The assigned `round_type` returned `zero_findings`, confirmed via the canonical API (`bin/sotp review results --limit 1` shows `findings: zero_findings`). |
-| `blocked_cross_scope` | A fix requires modifying files outside this capability's scope. Include the list of out-of-scope files needed. |
-| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR finding requiring an ADR edit remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
+| status | dispatch mode | meaning |
+|--------|---------------|---------|
+| `completed` | `scope-review` | The assigned `round_type` returned `zero_findings`, confirmed via the canonical API (`bin/sotp review results --limit 1` shows `findings: zero_findings`). |
+| `completed` | `delegated-pr-finding` | The focused correction and required local verification passed. The completion report must include `dispatch_mode: delegated-pr-finding`, the affected `path:line`, requested correction, changed files, and verification result; this status does not assert `zero_findings`. |
+| `blocked_cross_scope` | either | A fix requires modifying files outside this capability's scope. Include the list of out-of-scope files needed. |
+| `failed` | either | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR finding requiring an ADR edit remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
 
 ## Boundary with other capabilities
 
@@ -202,7 +232,7 @@ Return exactly one of the following statuses:
 |---|---|---|---|
 | output | fixes within one review scope + status report | source-code DRY refactors + status report | structured routing decision |
 | scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (some DRY violations span layers) | read-only |
-| trigger | orchestrator assigns scope + `round_type` | orchestrator assigns track-id for DFP | orchestrator passes diagnostic text |
+| trigger | orchestrator assigns scope + `round_type`, or delegates a focused PR finding | orchestrator assigns track-id for DFP | orchestrator passes diagnostic text |
 | artifact written | source files within scope boundary | source files across workspace | none |
 | verdict source | `bin/sotp review results` (reads `review.json`) | `bin/sotp dry check-approved` (reads `dry-check.json`) | none |
 
@@ -211,6 +241,11 @@ If the briefing asks for:
 - DRY violation fixes → forward to the `dry-fix-lead` capability.
 - Routing a finding to the correct rollback phase → forward to `rollback-diagnoser`.
 - Source fixes requiring files outside the resolved boundary → return `blocked_cross_scope`.
+
+For a delegated PR finding, return the scoped change and verification result to the caller; do not
+commit, push, or re-run the PR from this capability. The caller performs local review convergence
+and invokes the commit workflow before re-running `pr-review`. Name the finding's affected
+`path:line`, requested correction, changed files, and verification result in that report.
 
 ## Rules
 

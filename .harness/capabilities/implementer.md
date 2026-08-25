@@ -7,36 +7,49 @@
 
 ## Mission
 
-Implement one or more assigned plan tasks on a `track/<id>` branch. The implementer owns source
-edits, production/test code, implementation-local track artifacts that prove the work, and local
-verification. It does **not** own commits, pushes, PR creation, review verdict files, or task
-commit-hash recording, or task-state transitions.
+Implement one or more assigned plan tasks or a focused delegated PR-finding correction on a
+`track/<id>` branch. The implementer owns source edits, production/test code,
+implementation-local track artifacts that prove the work, and local verification. It does **not**
+own commits, pushes, PR creation, review verdict files, or task commit-hash recording, or
+task-state transitions.
 
 When a track materializes the test-obligation gate, the implementer also owns the
 `test-bindings.json` authoring step that binds derived obligation ids / edge ids to tests or
 waivers. The gate keeps source tests marker-free; bindings live in the track artifact.
+
+When `pr-review` delegates an actionable implementation finding, the briefing is the correction
+boundary: the implementer owns the scoped source/test change and its local verification, then
+reports completion to the caller. The caller retains local review convergence, the commit
+workflow, and the PR re-run.
 
 ## Invocation Contract
 
 The orchestrator invokes this capability with:
 
 - Track id and current branch context.
-- One or more task ids from `impl-plan.json`.
+- One or more task ids from `impl-plan.json` for plan-task work. A PR-finding dispatch may omit
+  task ids when the briefing supplies a focused correction without reopening a plan task.
 - A briefing file containing the selected task descriptions, spec anchors, and exact paths to the
-  relevant spec, plan, metadata, task-contract, and catalogue artifacts.
+  relevant spec, plan, metadata, task-contract, and catalogue artifacts. For a delegated PR
+  finding, it also contains the review comment, affected path and line, relevant track context,
+  and requested correction. A source-editing PR-finding dispatch must also contain the
+  `## Architecture Constraints` section required by implementation-delegation R1.
 - The resolved convention paths delivered alongside the briefing (possibly none).
 - Optional briefing notes that narrow target files or constraints.
 
 The implementer reads the exact artifact and convention paths named in the briefing before
 changing code. It does not derive the convention set from a rendered track document or require
-the orchestrator to pre-read those bodies. Prefer canonical blocks and catalogue JSON for exact
-contracts.
+the orchestrator to pre-read those bodies. For a source-editing PR-finding dispatch, it also reads
+and applies the `## Architecture Constraints` section as a required input. It treats the comment,
+affected path and line, track context, and requested correction as the focused change request.
+Prefer canonical blocks and catalogue JSON for exact contracts.
 
 ## Scope Ownership
 
 Allowed writes:
 
-- Source and tests under the repository workspace required by the assigned tasks.
+- Source and tests under the repository workspace required by the assigned tasks or delegated
+  PR-finding correction.
 - Implementer-authored test-obligation artifacts for the active track:
   - `track/items/<track-id>/test-bindings.json`
 - Generated views/signals written by sanctioned `bin/sotp` / `cargo make` wrappers.
@@ -69,19 +82,23 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a (re-)dispatch of this capab
 ### Step 1 — Ground The Task
 
 1. Confirm the current branch is `track/<id>`.
-2. **Pre-work precondition (task state)**: confirm every assigned task is `in_progress` in
-   `track/items/<id>/impl-plan.json` — the SSoT, **not** the rendered `plan.md` view. If any
-   assigned task is not `in_progress`, do not implement anything: return to the orchestrator
-   naming the task and asking it to perform the transition (`bin/sotp track transition` is the
-   orchestrator's lane). This precondition closes the bypass where an implementation dispatch
+2. **Pre-work precondition (task state)**: for plan-task dispatches, confirm every assigned task
+   is `in_progress` in `track/items/<id>/impl-plan.json` — the SSoT, **not** the rendered `plan.md`
+   view. If any assigned task is not `in_progress`, do not implement anything: return to the
+   orchestrator naming the task and asking it to perform the transition (`bin/sotp track transition`
+   is the orchestrator's lane). A PR-finding dispatch without assigned task ids instead requires
+   the briefing to identify one focused requested correction; do not synthesize a task or change
+   task state for that dispatch. This precondition closes the bypass where a plan implementation
    reaches source code without passing the transition path's admission judgment.
-3. Read the assigned task descriptions and the cited spec anchors.
-4. Read the relevant catalogue entries (`<layer>-types.json`) and existing implementation.
+3. Read the assigned task descriptions and the cited spec anchors, or the PR finding's cited
+   paths and relevant contract anchors.
+4. Read the relevant catalogue entries (`<layer>-types.json`) and existing implementation, as
+   applicable to the requested change.
 5. Check architecture boundaries before introducing or moving types.
 
 ### Step 2 — Implement And Test
 
-1. Apply source edits matching the assigned task only.
+1. Apply source edits matching the assigned task or requested PR correction only.
 2. Add or update focused tests for the new public behavior and failure modes.
 3. Run focused tests while iterating.
 4. Run at least `cargo make ci-rust` before reporting implementation completion unless the
@@ -89,9 +106,10 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a (re-)dispatch of this capab
 
 ### Step 3 — Author Test-Obligation Bindings When Applicable
 
-Run this step when the track already has `obligations.json` / `test-bindings.json`, when the
-assigned task creates or changes the test-obligation gate itself, or when the orchestrator
-explicitly asks for obligation coverage.
+For a delegated PR-finding dispatch, skip this step unless the briefing explicitly requests
+obligation repair. For plan-task dispatches, run this step when the track already has
+`obligations.json` / `test-bindings.json`, when the assigned task creates or changes the
+test-obligation gate itself, or when the orchestrator explicitly asks for obligation coverage.
 
 The surrounding orchestration loop (who runs `evaluate`, totality iteration, repair rounds,
 file-safety backups, cache semantics) is owned by the `obligation-fulfillment` workflow
@@ -159,9 +177,10 @@ half-materialized and must fail closed.
 
 ### Step 4 — Report Completion
 
-Report the implemented task ids, changed areas, tests/gates run, and any remaining blockers to
-the orchestrator. The orchestrator decides and performs any task-state transition; do not stage,
-commit, or transition tasks.
+Report the implemented task ids or delegated PR finding, changed areas, tests/gates run, and any
+remaining blockers to the orchestrator. For a PR finding, include its affected `path:line` and
+requested correction in the completion report. The orchestrator decides and performs any
+task-state transition; do not stage, commit, or transition tasks.
 
 ## Architecture Guard
 
@@ -179,7 +198,7 @@ Return one of:
 
 | status | meaning |
 |---|---|
-| `completed` | Assigned tasks implemented and required tests/gates passed. |
+| `completed` | Assigned tasks or a delegated PR finding implemented and required tests/gates passed. |
 | `blocked` | Implementation cannot proceed without upstream SoT changes, user input, or external state. |
 | `failed` | Tooling or verification failed in a way that prevents a reliable implementation handoff. |
 

@@ -404,6 +404,138 @@
           "hash": "rvw1:sha256:f4c079d718bfe9241c03ad2d29c920cdc7c7d1afc4751d1302a0a7e3c284e54f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:17:56Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 10,
+              "message": "Delegated PR findings are defined as focused corrections that return after local verification, but the capability mission still requires the full review → fix → re-review loop to zero_findings. This can broaden a PR-finding dispatch into an unrelated scope review and conflicts with the delegated route described later in the file.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "R4 adds source PR-finding delegation but does not require the mandatory `## Architecture Constraints` section from R1 in the focused briefing. The implementer invocation contract likewise lists PR-finding fields without that constraint section, allowing delegated source fixes to bypass the architecture-placement and dependency constraints required for every source-capability request.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c737570a3ea64fc995e7b9beddb4d328ab2b30a03702445f9773316271fb3b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:21:41Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 15,
+              "message": "The delegated `review-fix-lead` path now bypasses the normal review loop and only requires “local verification,” but it can modify source files within its resolved review scope. That path does not explicitly require the R2 post-edit architecture placement/dependency checks and `cargo make check-layers`, so source fixes can reach local review without the mandatory implementation-delegation verification.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5614f403f43b085365ae79c61f61cf91c2d382568db56ff256e91ad4e5ae7f2b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:23:44Z",
+          "findings": [
+            {
+              "category": "command-wiring",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 209,
+              "message": "The delegated PR-finding path still cannot satisfy this capability's output contract: it intentionally performs only the focused correction and local verification, while `completed` still requires an assigned `round_type` to produce `zero_findings` via the canonical review API. The invocation contract also still requires `round_type`, and the normal reviewer pipeline remains the only defined completion path. Add a distinct delegated-path completion/status contract and dispatch mode.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0bf6afae833e8f051aa33dba81294679f63a78dc7b6adf0fd9c44144d5c82ed0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:27:22Z",
+          "findings": [
+            {
+              "category": "command-wiring",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "The capability now requires the caller to declare `scope-review` versus `delegated-pr-finding` in the briefing because that mode determines whether the reviewer pipeline runs, but the canonical PR-finding delegation policy does not require the focused briefing to carry this dispatch-mode field. A compliant caller can therefore produce a briefing that the capability cannot safely classify, causing the delegated path to be treated as the normal review loop or vice versa.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b7892751c6787648857c49b5bc7f5c73e2b713c04cfce8e89b964826c147c254",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:29:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b46942ee8756bedcb4e49b97a283a8d5c05694a715db43de01f87e194ef3e0f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:39:59Z",
+          "findings": [
+            {
+              "category": "wiring-consistency",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "The new delegated mode is not wired into its actual callers. This policy requires `dispatch_mode: delegated-pr-finding` and, for source edits, `## Architecture Constraints`; `review-fix-lead` depends on that marker to avoid entering its scope-wide review loop. However, the operational `pr-review` SSoT and both thin adapters still define briefings with only comment, path/line, track context, and requested correction. Consequently, a normal review-fix dispatch is classified as `scope-review`, while an implementer dispatch lacks a required input. Add these fields to the caller contract or make the delegated mode inferable from the existing briefing shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 20,
+              "message": "The focused PR-finding entry point still falls through the plan-task test-obligation pipeline. Step 3 runs whenever `obligations.json` or `test-bindings.json` exists—which is normally true by PR review—and regenerates the skeleton and rewrites the track-wide bindings even for an unrelated one-finding source correction. This contradicts the newly declared correction boundary and can introduce unrelated artifact changes. Skip Step 3 for delegated PR findings unless their briefing explicitly requests obligation repair.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b46942ee8756bedcb4e49b97a283a8d5c05694a715db43de01f87e194ef3e0f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:46:13Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 36,
+              "message": "The Codex adapter's finding-fix section duplicates workflow logic owned by the PR-review SSoT: briefing preparation, capability routing, local convergence, commit/re-run sequencing, and parent-edit recovery. The adapter-SSoT policy requires adapters to retain only provider-specific invocation/tool constraints and reporting details, so this duplication can drift from `.harness/workflows/track/pr-review.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 14,
+              "message": "The Claude adapter similarly duplicates the PR-review workflow's finding-fix sequence and recovery policy, including briefing contents, delegation routing, local review/commit sequencing, and direct-edit recovery. This violates the thin-adapter contract and creates a second source of truth for workflow behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:366227a123aff4f92f3ce64fac2601567989d9ea80ab77ee61fb4250897c21ab",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:53:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1933b719e6ef391068541fc692db8745a14db7bf5782cab97fd2c71a5ce8ef65",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:57:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1933b719e6ef391068541fc692db8745a14db7bf5782cab97fd2c71a5ce8ef65",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -691,6 +823,20 @@
           "at": "2026-08-25T09:31:43Z",
           "findings": [],
           "hash": "rvw1:sha256:79d21369965b7ec8734abcd671122bf08353060a6c6d7ae0e36d4d69a6e353a7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:16:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56d45a922986d6a175b0cdae51fb7e7933f1c1332388d60e27c20a087b8a4190",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:19:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56d45a922986d6a175b0cdae51fb7e7933f1c1332388d60e27c20a087b8a4190",
           "type": "final",
           "verdict": "zero_findings"
         }

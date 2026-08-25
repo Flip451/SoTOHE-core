@@ -34,13 +34,14 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - 「後でまとめて直す」「変更の有無を判定して続行する」は禁止する — 収束の有効性判定という裁量を挟まない。
 - 上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させる。再収束 (上記 3 要素) まで、その下流のフェーズは再開禁止。意味論検証要素の判定は item 2 のとおり当該 chain の指摘に限る — 列挙 abort 中に fresh 検証を生成できないことは再開を妨げず、列挙可能になり次第の検証で当該 chain の指摘が出れば即時に上流へ戻る。
 - **artifact 編集に対する例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容される。この例外は本規律 (順次処理) 上のものに限る — 遷移は上流 rollback も下流停止も要求しない。ただし hash ベースの commit gate が要求する impl-plan final `zero_findings` review refresh (`.harness/workflows/track/full-cycle.md` の lifecycle tail) は引き続き必須であり、本例外はそれを免除しない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。
-- **guarded base-merge conflict source-repair exception**: guarded merge conflict 中に限り、orchestrator は既存 hunk の選択・編集を pre-gate 実行可能化のためだけに行える。placeholder・意味追加は禁止し、対象 path を記録する。既存 hunk の選択だけで pre-gate を通せない場合は、designated writer を `conflict-preparation` mode で起動し、既存 hunk の解消と derived artifact の再生成だけを許す。base-induced drift が conflict hunk を持たない場合は、影響 chain の順序に従う normal writer/implementer reconciliation と chain-limited review を先に実行し、global pre-gate はその chain 再収束後に要求する。上流再収束後には designated writer を通常 mode で必ず再実行する。ADR に触れた場合は直ちに `adr-diagnoser` の verdict を取得する。この境界を通常の Phase 再入へ一般化しない。
+- **guarded base-merge conflict source-repair exception**: guarded merge conflict 中に限り、orchestrator は既存 hunk の選択・編集を pre-gate 実行可能化のためだけに行える。placeholder・意味追加は禁止し、対象 path を記録する。既存 hunk の選択だけで pre-gate を通せない場合は、designated writer を `conflict-preparation` mode で起動し、既存 hunk の解消と derived artifact の再生成だけを許す。base-induced drift が conflict hunk を持たない場合は、影響 chain の順序に従う normal writer/implementer reconciliation と chain-limited review を先に実行し、global pre-gate はその chain 再収束後に要求する。上流再収束後には designated writer を通常 mode で必ず再実行する。ADR に触れた場合は直ちに `adr-diagnoser` の verdict を取得する。この境界を通常の Phase 再入へ一般化せず、review / PR finding の通常修正経路にも流用しない。
 
 ## 役割分担
 
 - **回帰先の判定**: `rollback-diagnoser`。出力は勧告であり、orchestrator が `reason` を不十分と判断すれば override し得る (既存どおり)。
 - **Prerequisite の充足確認と降下順序の遵守**: dispatch する orchestrator。
 - **各 writer capability**: 自分の再開 Prerequisite が briefing 上満たされていない場合、通常 mode では作業せず orchestrator へ差し戻す。`conflict-preparation` mode のみ、guarded merge conflict の既存 hunk 解消と derived artifact 再生成に限り起動できる。
+- **PR finding の修正**: actionable finding ごとに orchestrator が focused briefing を作り、実装変更は `implementer`、review-scope の修正は `review-fix-lead` へ委譲する。委譲先の完了後は local review を `zero_findings` まで収束させ、`commit` workflow を経てから PR review を再実行する。親コンテキストの直接編集は委譲失敗時の recovery に限る。
 
 ## Examples
 

@@ -67,6 +67,12 @@ bypass が動かすのは判定の**時期**だけで、判定の要否ではな
 
   baseline の測定は、現在の作業ツリーに触れない base branch の独立した clean checkout（測定対象の base commit に固定）で行う。in-place の guarded stash push / pop は baseline の往復手段に使わない。この wrapper は push が作成した stash の commit OID を記録し、pop はその記録された OID だけを適用して無関係な stash entry には触れないが、`--index` 相当の staged 状態の復元は行わないため、staged 状態の損失は防げない。直接の `git stash` / `git switch` は guard の対象で代替にならない。独立した clean checkout を用意できないなら、「既存の問題」と断定せず未分類のまま報告する
 
+### PR finding の修正経路
+
+PR review で actionable finding が返った場合、orchestrator は finding ごとに comment、対象 path / line、track context、requested correction を含む focused briefing を作り、実装変更は `implementer`、review-scope の修正は `review-fix-lead` へ委譲する。親コンテキストでの inline edit は通常経路にしてはならず、委譲先が scoped change を適用して completion を返すまで修正済みと扱わない。
+
+委譲先の completion 後、orchestrator は local review workflow を `zero_findings` まで収束させ、`commit` workflow で修正をコミットしてから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として許し、その場合も local review の収束と `commit` workflow を完了してから PR review を再実行する。
+
 ### レビュー対象サイズ
 
 1 ラウンドの diff は、reviewer が finding をどの変更に帰属させられる範囲に収める。上限値そのものは `.harness/config/review-scope.json` の scope ごとの diff ceiling が所有し、コミット単位（バッチ）の切り方は full-cycle workflow がその値から決める。本書はどちらも再記述しない。

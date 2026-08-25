@@ -53,6 +53,12 @@ review briefing には `## Architecture Verification Checklist` 節を含め、�
 - 依存先 layer の logic が呼び出し側 layer へ漏れていないか
 - port 実装を bypass する no-op 代替が入っていないか (設計が明示的に許可した no-op 実装を除く)
 
+### R4. review / PR finding の修正を委譲する
+
+PR review で actionable finding が source または review-scope の編集を要求する場合、委譲元は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。source 編集を許す briefing には、R1 が定める `## Architecture Constraints` 節も必ず含める。委譲元が親コンテキストで修正を inline edit することを通常経路にしてはならない。
+
+委譲先が修正を完了した後、委譲元は local review workflow を `zero_findings` まで収束させ、`commit` workflow を実行してから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行え、その場合も同じ local review の収束と `commit` workflow を経てから再レビューする。
+
 ## Enforcement
 
 | 検証手段 | タイミング | 自動化 |

@@ -11,9 +11,8 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
 ## Claude Code invocation constraints
 
 - **Finding-fix dispatch**: the push / PR / review-cycle commands run from the orchestrator
-  host, but actionable findings are not fixed inline. Prepare a focused briefing for each
-  finding with the review comment, affected path and line, relevant track context, and requested
-  correction. For implementation changes, dispatch `implementer` with:
+  host. Follow Step 3 of the workflow SSoT for the finding-fix procedure. For implementation
+  corrections, dispatch `implementer` with:
   ```
   bin/sotp capability exec implementer --host claude --briefing-file <path>
   ```

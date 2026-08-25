@@ -22,6 +22,12 @@
 
 遷移は `bin/sotp track transition` に限る。`impl-plan.json` を直接編集して状態を書き換えてはならない。
 
+### PR finding の修正主体
+
+PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとの focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。親コンテキストの直接編集は委譲失敗時の recovery に限り、通常の修正経路にしてはならない。
+
+委譲先の完了報告後、orchestrator は local review を `zero_findings` まで収束させ、`commit` workflow を完了してから PR review を再実行する。タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
+
 ### アーキテクチャ変更を含むタスク
 
 ワークスペースのレイヤ構成に触れるタスクは、完了を報告する前に `.claude/skills/architecture-customizer/SKILL.md` の Documentation 更新対象を同期する。同期対象の列挙は skill 側が所有する。

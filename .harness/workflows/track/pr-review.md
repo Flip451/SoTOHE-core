@@ -90,10 +90,14 @@ After `bin/sotp pr review-cycle` completes, apply the following loop:
 - Otherwise, surface the latest review round's comments verbatim (review body + inline
   comments with `path:line`). For each round:
   1. Read each comment and assess actionability.
-  2. For each actionable finding, prepare a focused briefing that includes the comment, affected
-     path and line, relevant track context, and the requested correction. Delegate the fix to
-     the capability that owns the change: `implementer` for implementation changes or
-     `review-fix-lead` for review-scope fixes.
+  2. For each actionable finding, prepare a focused briefing that opens with
+     `dispatch_mode: delegated-pr-finding` and includes the comment, affected path and line,
+     relevant track context, and the requested correction; a briefing that permits source
+     edits also carries the `## Architecture Constraints` section required by
+     `.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`.
+     Delegate the fix to the capability that owns the change: `implementer` for implementation
+     changes or `review-fix-lead` for review-scope fixes (the marker tells `review-fix-lead` to
+     fix that finding only, not to enter its scope-wide review loop).
   3. After the delegated capability reports completion, run the local review workflow to
      convergence at `zero_findings`, then invoke the `commit` workflow for the fix.
   4. Re-run `pr-review` to push the fix, trigger a new review round, and verify the response.
