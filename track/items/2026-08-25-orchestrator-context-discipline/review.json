@@ -32,6 +32,351 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:35:40Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 6,
+              "message": "T001 bundles independently verifiable workflow-context, PR-fix delegation, long-running gate, and adr2pr session-update units; split them into separate tasks before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles independently verifiable policy and capability updates; split the units by document surface or acceptance criterion before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 21,
+              "message": "T003 bundles independently verifiable Claude adapter and Codex skill-adapter updates, including separate delegation, polling, evaluate, and catalogue-boundary checks; split the units before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/task-coverage.json",
+              "line": 29,
+              "message": "AC-08 is mapped to every task, but none of T001–T006 describes the required per-surface validation/confirmation step. The mapping therefore does not identify a task that executes AC-08's fixed individual confirmation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior contracts in prose (CLI-summary precedence, full-read prohibition, delegation, single wait, evaluate boundary, and session-update points) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts in prose (CLI precedence, delegation, waiting, evaluate, ADR self-containment, and prompt-level enforcement) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 21,
+              "message": "T003 restates upstream adapter behavior contracts in prose (forbidden reads, direct edits, polling, evaluate handling, and catalogue behavior) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 30,
+              "message": "T004 restates upstream always-applied-rule behavior and boundaries in prose (delegation, CLI precedence, git prohibition, reviewer-detail removal, and ADR-reference prohibition) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 40,
+              "message": "T005 restates the upstream consumer-ownership and non-hard-fail behavior contract in prose after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 49,
+              "message": "T006 restates the upstream required reasoning-effort value and preservation of other settings after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 67,
+              "message": "Section S1 restates the upstream workflow behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 77,
+              "message": "Section S2 restates the upstream policy/capability alignment contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 87,
+              "message": "Section S3 restates the upstream thin-adapter behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 97,
+              "message": "Section S4 restates the upstream always-applied-rule separation contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 107,
+              "message": "Section S5 restates the upstream consumer-ownership and non-hard-fail contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 117,
+              "message": "Section S6 restates the upstream orchestrator-profile behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:905bac878492960edd33897fd97a11c656afc2e59e25459424e0f4e7c35f7b52",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:52:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fb3e6630c7276bdbda7b3f7f874ae476b140c3cada802ae06380da12d7bec519",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:02:19Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 168,
+              "message": "`plan.summary` contains only acceptance-criterion mappings such as `AC-01 → T001, T005, T006, T007, T011, T015.` and omits every goal. Because goals cannot appear in `task-coverage.json`, add explicit traceability for GL-01→T001/T005/T006/T007/T011/T015, GL-02→T002/T005/T006/T008/T012, and GL-03→T003/T005/T006/T009/T013.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/task-coverage.json",
+              "line": 80,
+              "message": "`OS-03` omits T005 and T006 even though both tasks claim IN-04 and AC-03/AC-04 and revise policy/capability waiting and session-update boundaries. Add both tasks to this mapping and cite OS-03 in their descriptions so they cannot introduce the excluded host-specific backgrounding threshold, notification format, or compaction behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 132,
+              "message": "T016 edits the operational policy `.harness/policies/consumer-ownership.md`, but neither its description nor the CN-01 coverage mapping requires that document to remain self-contained and avoid a dated ADR reference. Add CN-01 attribution for T016 and its anchor to the task/section description.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 30,
+              "message": "T005 bundles four independently verifiable policy behavior units while still `todo`: CLI/context intake (AC-01), PR-fix delegation (AC-02), long-gate/evaluate handling (AC-03), and session-update handling (AC-04). Split these by behavior/document group before implementation, carrying their applicable OS/CN anchors, then re-estimate and recompose the batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 42,
+              "message": "T006 likewise bundles four independently verifiable capability-document units while still `todo`: CLI/context intake (AC-01), PR-fix delegation (AC-02), long-gate/evaluate handling (AC-03), and session-update handling (AC-04). Split these units before implementation and update coverage, estimates, dependencies, and batches accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fb3e6630c7276bdbda7b3f7f874ae476b140c3cada802ae06380da12d7bec519",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:12:19Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 180,
+              "message": "T016 is mapped to CN-01 and CN-02, but its description only updates provider-compatibility ownership wording. It does not assign the required self-contained/no-ADR-reference operation (CN-01) or the non-hard-fail configuration/documentation boundary (CN-02), so these mappings are not load-bearing executable coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a07eca73dc538bb028a3d35c54f996eaf947c710e0f815b08b6ddf69e79ddd42",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:15:32Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 180,
+              "message": "T016 restates the upstream CN-01/CN-02 behavior contract in prose (self-contained documents, no ADR date/path references, consumer-owned compatibility rules, and non-hard-fail boundaries). Per `.harness/policies/no-upstream-restatement.md`, retain the target, operation, and anchor cites without re-explaining the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:43ddad9f3e0205df828fc3a0c541f47a9ca2dd6d50ce5bca411069fb7aa6fcd2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:17:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e97b838b55bd8fd5848005d7bc36b7c9ec4d0571e8d6ca1f056043f3feb0047",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:22:55Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/batch-plan.json",
+              "line": 290,
+              "message": "B2 groups T005, T019, T020, and T021 even though every task declares the same write target, `.harness/policies/*.md` excluding `consumer-ownership.md`. T005/T019/T021 are already ready at the B2 frontier and T020 becomes ready after T003, so their shared batch creates overlapping write ownership. Refine them to concrete non-overlapping policy files or place overlapping tasks in separate batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/batch-plan.json",
+              "line": 291,
+              "message": "B2 also groups T006, T022, T023, and T024 while all four declare `.harness/capabilities/*.md` as their write target. T006/T022/T024 are ready at the B2 frontier and T023 becomes ready after T003, leaving concurrent tasks with the same capability-file ownership. Refine their targets to disjoint files or serialize the overlapping tasks across batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e97b838b55bd8fd5848005d7bc36b7c9ec4d0571e8d6ca1f056043f3feb0047",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:31:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:092b3c2f082d37f6fe71f0372a84ea07f48efdb4d101e56b6bf02e61a531a470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:35:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:092b3c2f082d37f6fe71f0372a84ea07f48efdb4d101e56b6bf02e61a531a470",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:35:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1fe3ccf92ae1c681f5c8057287def5a81498fc2d45ef83c33b1479f62bbda975",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:38:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1fe3ccf92ae1c681f5c8057287def5a81498fc2d45ef83c33b1479f62bbda975",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:55:39Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 101,
+              "message": "AC-08 bundles six ADR anchors into one broad consistency assertion, but does not define a deterministic per-surface check for what each document must contain or how each boundary is proven consistent. Its “同じ…と矛盾しない” wording requires downstream reviewers to invent the comparison procedure, so the acceptance criterion is not sufficiently observable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c0ff98f9da6bc457527f0b0252e90856fb729dc5da3a1e08802d793b51c76cf0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:59:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:696d455656a9fd72245a27b657276a7b751aa8ef7a82c90e6e4607b42a9a9d7c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:04:18Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 51,
+              "message": "AC-05 の「短い rules 文書」には長さや構成の判定基準がなく、同じ成果物を合格・不合格のどちらにも解釈できるため決定的に観測可能な acceptance criterion ではありません。Phase 3 が「短い」の意味を発明せずに済む観測可能な条件へ置き換えるか、この主観条件を AC から外す必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 171,
+              "message": "`coding-principles.md#Purpose` は `libs/`・`apps/` の Rust 実装規約であり、Rust 変更を明示的に除外する OS-01 の文書・設定限定トラックには適用されません。実装時の必読規約になる `related_conventions` としては narrative-level で明白に off-topic です。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 175,
+              "message": "`prefer-type-safe-abstractions.md#Rule` はバグクラスを Rust の型システムや標準ライブラリで排除する設計規約ですが、このトラックは手順文書と設定だけを変更し、型設計も Rust 実装も行いません。この参照も契約全体に適用されず、下流の必読規約を誤誘導します。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:696d455656a9fd72245a27b657276a7b751aa8ef7a82c90e6e4607b42a9a9d7c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:08:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58bf7346adacee682918fc8dd744209a774222aa9fd18b5ca16218334f919aae",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:22:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3175eb779c7d9974e0a8d9cb73ccecf4af0982d3169f6585029092f30dd78633",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:26:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3175eb779c7d9974e0a8d9cb73ccecf4af0982d3169f6585029092f30dd78633",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

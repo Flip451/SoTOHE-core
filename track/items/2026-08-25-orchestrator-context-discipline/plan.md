@@ -1,4 +1,79 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # オーケストレーターの文脈摂取を規律化する
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+GL-01 → T001, T005, T006, T007, T011, T015.
+GL-02 → T002, T019, T022, T008, T012.
+GL-03 → T003, T020, T023, T009, T013.
+AC-01 → T001, T005, T006, T007, T011, T015.
+AC-02 → T002, T019, T022, T008, T012.
+AC-03 → T003, T020, T023, T009, T013.
+AC-04 → T004, T021, T024, T010, T014.
+AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
+
+## Tasks (0/24 resolved)
+
+### S1 — Canonical workflow units
+
+> `.harness/workflows/track/*.md` の対象操作を改訂する。IN-01〜IN-04、AC-01〜AC-04。
+
+- [ ] **T001**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue intake 操作を改訂する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
+- [ ] **T002**: `.harness/workflows/track/pr-review.md` の review-fix 操作を改訂する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [ ] **T003**: `.harness/workflows/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の長時間 gate / evaluate 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [ ] **T004**: `.harness/workflows/track/adr2pr.md` の session-update 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+
+### S2 — Policy and capability units
+
+> `.harness/policies/*.md` と `.harness/capabilities/*.md` の対象操作を個別に整合させる。IN-01〜IN-04、OS-01、OS-03、CN-01、CN-03、AC-01〜AC-04。
+
+- [ ] **T005**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
+- [ ] **T006**: `.harness/capabilities/*.md` の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
+- [ ] **T019**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [ ] **T020**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [ ] **T021**: `.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+- [ ] **T022**: `.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [ ] **T023**: `.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [ ] **T024**: `.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+
+### S3 — Claude adapter units
+
+> `.claude/commands/track/*.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。
+
+- [ ] **T007**: `.claude/commands/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
+- [ ] **T008**: `.claude/commands/track/pr-review.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [ ] **T009**: `.claude/commands/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
+- [ ] **T010**: `.claude/commands/track/adr2pr.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+
+### S4 — Codex adapter units
+
+> `.agents/skills/track-*/SKILL.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。
+
+- [ ] **T011**: `.agents/skills/track-{plan,spec-design,type-design,impl-plan,implement,review}/SKILL.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、OS-02、CN-01、CN-03、AC-01。
+- [ ] **T012**: `.agents/skills/track-pr-review/SKILL.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、OS-02、CN-01、CN-03、AC-02。
+- [ ] **T013**: `.agents/skills/track-{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}/SKILL.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-03。
+- [ ] **T014**: `.agents/skills/track-adr2pr/SKILL.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-04。
+
+### S5 — Always-applied rules
+
+> Root / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、AC-01、AC-05。
+
+- [ ] **T015**: `CLAUDE.md`、`AGENTS.md`、`.claude/rules/`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/orchestrator.toml` の always-applied / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、OS-01、CN-01、CN-02、AC-01、AC-05。
+
+### S6 — Consumer documentation
+
+> `README.md` と `.harness/policies/consumer-ownership.md` の所有説明を更新する。IN-05、CN-01、CN-02、AC-06。
+
+- [ ] **T016**: `README.md` と `.harness/policies/consumer-ownership.md` の provider compatibility ownership、runtime 文書の self-contained 表現、enforcement boundary の記述を更新する。IN-05、OS-01、CN-01、CN-02、AC-06。
+
+### S7 — Orchestrator profile
+
+> `.harness/config/agent-profiles.json` の対象 profile default を更新する。IN-06、AC-07。
+
+- [ ] **T017**: `.harness/config/agent-profiles.json` の orchestrator profile default を更新する。IN-06、OS-01、AC-07。
+
+### S8 — Per-surface confirmation
+
+> 全対象面の個別確認を実行する。AC-08。
+
+- [ ] **T018**: Workflow SSoT、thin adapters、policy / capability、always-applied rules、consumer docs、agent profile の各対象面を個別確認する。AC-08。
