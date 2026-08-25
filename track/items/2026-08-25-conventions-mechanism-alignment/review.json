@@ -117,6 +117,20 @@
           "hash": "rvw1:sha256:6d206ee154dbe6cc0319c6af157b7bb83054500122fda33e1b1b541f5a55931a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:53:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ecbd75e8ec2cb81d7898223739b0213c0649426bc90205a46f85bccf5fbf998",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:55:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ecbd75e8ec2cb81d7898223739b0213c0649426bc90205a46f85bccf5fbf998",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -784,6 +798,116 @@
           "hash": "rvw1:sha256:0debfd2992dea031df41a9601e25ea523d1e425e7cc684f0f12e8bbcf2f8cfc6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:53:23Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 91,
+              "message": "The new normative “Security Boundary Failure Handling” requirements are unannotated; add a taxonomy annotation naming the responsible mechanism/review scope (or explicit 強制なし) so this convention is routed and enforced consistently.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 202,
+              "message": "The new security-boundary checklist requirement lacks the required taxonomy annotation, unlike the surrounding checklist items. Add the appropriate mechanism/review-scope annotation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39358b0b6e4a059b8118c1d2c690620a3e1af89ee95439ad1ed77eada36e7356",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:57:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:01:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 93,
+              "message": "`fail-stop` を入力検証・権限判定を含む全レイヤーで一般に許容しており、`coding-principles.md` の「本番ライブラリコードは panic/expect 禁止、失敗は Result で返す」という規約と矛盾します。静的な秘匿パターンに例外が必要ならそのケースへ明確に限定し、それ以外のライブラリ層では Result 伝播を要求するよう規約間を整合させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:05:00Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 98,
+              "message": "静的な秘匿パターンにもライブラリ層で `Result` 伝播を必須化していますが、同時に取り込まれている sensitive-redaction ADR の D1 と実装は、静的リテラルを `LazyLock<Regex>` と限定的な `expect` で fail-stop させることを明示的に要求しています。この文面では規約が正規実装を禁止するため、ADR の限定例外を反映して no-panic 規約側にも整合的に伝播するか、ADR 変更を orchestrator にルーティングしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d5d3d0de22395ae2fd4e2e0d2e9a6b2c2f31d062502d1d643d7e56d75f5ddce0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:09:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:12:40Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 93,
+              "message": "復元された規約は静的秘匿パターンの限定的な library-level fail-stop を許容しますが、`coding-principles.md` と `AGENTS.md` は本番ライブラリの `expect` を例外なく禁止したままです。この文面は develop 側の確定内容なので変更せず、ADR が認めた「静的リテラル・行単位 allow・事前構築テスト」という限定例外を no-panic 規約と reviewer policy に伝播させてください。現状では同じ実装が security 規約では必須、review policy では P0 になります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:16:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c519e1fe66969b168b8b322ed0300db9d0b9ae86d39272524471c024149719",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:19:11Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 203,
+              "message": "Review Checklist は依然として本番コードの `expect` を無条件に禁止しており、直前に追加された静的秘匿 regex の限定例外および更新済み `AGENTS.md` と矛盾します。許可された実装もこのチェックでは違反になるため、限定例外を明記し、その例外条件の確認を review 観点へ対応付けてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a2c519e1fe66969b168b8b322ed0300db9d0b9ae86d39272524471c024149719",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:21:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34f69e8f950fe873c52cd0dc533cacf3909a447a8e68b20322c7086de723d7e4",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1110,6 +1234,24 @@
           "at": "2026-08-25T06:08:47Z",
           "findings": [],
           "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-25T12:58:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:13:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -18,7 +18,7 @@ When reviewing pull requests, focus on the following areas:
 
 ### Coding Principles
 
-- **No panics in library code**: `unwrap()`, `expect()`, `panic!()`, `todo!()`, `unreachable!()` are forbidden outside `#[cfg(test)]`. Use `?` operator and `Result` types.
+- **No panics in library code**: `unwrap()`, `expect()`, `panic!()`, `todo!()`, `unreachable!()` are forbidden outside `#[cfg(test)]`. Use `?` operator and `Result` types. Single bounded exception, granted by the merged sensitive-redaction ADR (see the index in `knowledge/adr/README.md`): a static secret-pattern regex literal built as `LazyLock<Regex>` with a line-scoped, allow-annotated `expect`, paired with a construction test — an invalid static pattern is a programming error and must fail-stop rather than silently disable redaction.
 - **Make illegal states unrepresentable**: Use validated domain types (e.g., `Email(String)`) instead of raw primitives.
 - **Error handling**: Errors should propagate via `Result<T, E>` with the `?` operator. An explicit exhaustive `match` is also permitted for typed conversion or error-context attachment when every branch returns a `Result` and no error is discarded. No silent error swallowing.
 - **Trait-based abstraction**: Infrastructure dependencies must be behind trait boundaries (hexagonal architecture).

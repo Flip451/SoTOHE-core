@@ -86,6 +86,19 @@ Infrastructure 層のファイル I/O アダプターは、対象ファイルと
 
 > **強制先**: review 観点 — infrastructure scope
 
+## Security Boundary Failure Handling
+
+秘匿・入力検証・権限判定のセキュリティ境界では、エラー時の無音の機能縮退を許さない。
+構築または初期化に失敗した場合は、警告のみの通知、無効値への縮退、保護なしでの処理継続ではなく、
+処理を停止してエラーを返すか fail-stop とする。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
+
+静的な秘匿パターンなど、構築がプログラミングエラーを示す場合も、同じ構築保証を適用する。
+外部入力を使う動的な値は、検証に失敗した時点でエラーとして伝播させる。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
+
 ## Enforcement
 
 When adding a new sensitive directory to this project:
@@ -190,6 +203,8 @@ cargo make deny      # 脆弱性・ライセンス・禁止クレートチェッ
   > **強制先**: review 観点 — infrastructure scope
 - [ ] ログに機密情報が含まれていない
   > **強制先**: review 観点 — infrastructure scope
+- [ ] セキュリティ境界（秘匿・検証・権限判定）で無音の機能縮退がなく、構築・初期化の失敗が停止として扱われている
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] `unsafe` コードは最小限かつコメント付き
   > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] `cargo make deny` が通っている

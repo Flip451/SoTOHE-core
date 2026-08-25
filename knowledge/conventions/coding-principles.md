@@ -75,6 +75,10 @@ Rust コードベース全体に適用する実装規約。エラーハンドリ
 
 > **強制先**: 機械 lint — cargo make clippy
 
+唯一の限定例外は、秘匿境界の静的リテラル正規表現である。`LazyLock<Regex>` として構築し、当該行に限定した allow 注釈つきの `expect` を使い、構築検証のテストを併設する。不正な静的パターンはプログラミングエラーであり、秘匿の無音停止より fail-stop が正しいという判断は ADR（`knowledge/adr/README.md` の索引から辿る sensitive-redaction の決定）に記録されている。この例外を他の `expect` / `unwrap` に広げてはならない。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
+
 `assert!()` / `assert_eq!()` を本番コードのエラー処理に使わず、失敗を `Result` で返す。
 
 > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
@@ -196,8 +200,8 @@ println!("loaded");
 
 ## Review Checklist
 
-- [ ] 本番コードに `unwrap()` / `expect()` / `panic!()` / `todo!()` / `unreachable!()` がないか
-  > **強制先**: 機械 lint — cargo make clippy
+- [ ] 本番コードに `unwrap()` / `panic!()` / `todo!()` / `unreachable!()` がなく、`expect()` は秘匿境界の静的リテラル正規表現を `LazyLock<Regex>` として構築し、当該行に限定した allow 注釈と構築検証テストを併設する場合に限って使われているか
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
 - [ ] インデックスアクセス `slice[i]` / `str[range]` が `.get()` に置き換えられているか
   > **強制先**: 機械 lint — cargo make clippy
 - [ ] 公開 API に `///` コメントと `# Errors` セクションがあるか
