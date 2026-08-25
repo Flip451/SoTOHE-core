@@ -185,3 +185,21 @@ writer subagent — it is diagnose-only and has no task-state transition authori
 
 The structured object described under **Output contract**. The orchestrator reads this output
 verbatim and dispatches the corresponding writer (or applies a source edit for `impl`).
+
+## Session continuity and resume
+
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted routing judgment. This diagnose-only capability
+writes no durable verdict state. The hand-off is the current briefing, diagnostic input, exact
+context-file paths, and read-only gate summaries named by the dispatch.
+
+After a parent refresh, the dispatcher must issue a fresh briefing carrying the current
+diagnostic verbatim, the relevant spec / catalogue / plan / ADR paths, current CLI summaries,
+and any routing framing needed by this contract. A fresh dispatch, or a dispatch that changes
+concern, starts from that briefing. Only an explicit `sotp capability exec --resume` for the same
+track and capability continues a capability session. Fresh and resumed dispatches re-specify
+every execution flag (model, sandbox, and effort); a failed or expired resume, or a
+provider/model mismatch, falls back to a fresh session. On resume, first check whether the
+briefing, diagnostic, context files, or gate summaries changed since the prior capability
+session, and re-read every changed input before returning a routing decision.

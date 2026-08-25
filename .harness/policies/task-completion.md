@@ -22,6 +22,14 @@
 
 遷移は `bin/sotp track transition` に限る。`impl-plan.json` を直接編集して状態を書き換えてはならない。
 
+### 親セッション更新後のタスク状態
+
+`adr2pr` の親セッションは、計画成果物コミットが成功した後（Step 9 の開始前）、Step 9 の最初の実装バッチが完了した後（残りのバッチを続ける前）、および Step 10 の PR レーン開始時（`pr-review` の呼出し前）に更新する。host が親セッションを自動更新できない場合は、同じ `track/<id>` ブランチで新しいセッションを再入させるよう user に要求してよい。
+
+これらの境界では親コンテキストをタスク状態として扱わず、`bin/sotp track resolve`、`bin/sotp track task-counts`、`bin/sotp track next-task`、review summary、宣言済みの batch / task state、および read-only git state を根拠に最初の未完了 lifecycle boundary を再構成する。`impl-plan.json` が task-state の SSoT であり、生成された `plan.md` は独立した状態根拠ではない。CLI summary に差分または blocker が現れた場合だけ、該当する永続 artifact body を開いて確認する。部分完了した step は最初の未完了 sub-step から再開し、曖昧または相反する証拠がある場合は task を `done` / `skipped` と推定せず、再実行や skip をせず停止して報告する。セッションの再入は状態遷移の権限を変更せず、`done` / `skipped` の遷移は引き続き orchestrator が `bin/sotp track transition` で行う。
+
+これは orchestrator の session boundary だけを定める規律であり、host 固有の backgrounding threshold、通知形式、または compaction timing は定めない。
+
 ### PR finding の修正主体
 
 PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとの focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。親コンテキストの直接編集は委譲失敗時の recovery に限り、通常の修正経路にしてはならない。
@@ -71,6 +79,7 @@ PR review の actionable finding が編集を要求する場合、orchestrator �
 - [ ] merge 前に全タスクが done/skipped になっているか
 - [ ] その遷移が push 済みか（worktree だけの遷移は ref に反映されない）
 - [ ] commit_hash 埋め戻しの diff が lifecycle tail としてコミット済みか。ガードは通ってしまうので、ここは機械に頼らず自分で確認する
+- [ ] 親セッション更新後のタスク状態を、親コンテキストではなく永続した track / git state から再構成しているか
 - [ ] merge target 上での直接 `impl-plan.json` 編集が含まれていないか
 
 ## Decision Reference

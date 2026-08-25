@@ -13,8 +13,8 @@ workflow for either root host.
 - Context management: `track/`
 - Capability routing: `.harness/config/agent-profiles.json`
 - Provider authority: each capability resolves through `capabilities.<name>.provider`; the
-  committed default profile preserves the existing Claude-first workflow, but the config file is
-  the source of truth for every capability.
+  config file is the source of truth for every capability, and no provider is assumed from the
+  host session — dispatch through `bin/sotp capability exec` and let it resolve.
 - Parallel execution: Agent Teams
 
 Host orchestration may run in Claude Code or Codex depending on `capabilities.orchestrator.provider`.

@@ -28,6 +28,14 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する (SoT Chain の layer skip 禁止と同型)。
 
+## 親セッション更新後の再入
+
+`adr2pr` の親セッション更新点は、計画成果物コミット成功後で Step 9 開始前、Step 9 の最初の実装バッチ完了後で残りのバッチ継続前、および Step 10 の PR レーン開始時で `pr-review` 呼出し前である。これらの境界では親コンテキストを破棄してよく、再入する orchestrator は git、track artifacts、track / review summary、宣言済みの batch / task state、および read-only git state から最初の未完了 lifecycle boundary を再構成する。
+
+セッション更新は再開 Prerequisite を満たしたことを意味しない。再入時にも直上流 1 層の収束要件を確認し、過去の親コンテキストや in-memory state を根拠に下流フェーズを再開してはならない。部分完了した step は最初の未完了 sub-step から続け、永続状態の証拠が曖昧または相反する場合は再実行や skip をせず停止して報告する。
+
+これは orchestrator の session boundary だけを定める規律であり、host 固有の backgrounding threshold、通知形式、または compaction timing は定めない。host が自動更新できない場合の再入は user に要求してよい。
+
 ### 再収束ゲートの待機
 
 再収束に必要な capability、workflow、または gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わない。「列挙可能になり次第」は定期的な照会を意味せず、呼び出し側 workflow の terminal result を受けた後に次の許可された処理へ進むことを意味する。`bin/sotp test-obligation evaluate` が必要な場合も、obligation repair のための orchestrator host 上の同期 step に限り、commit prerequisite にはしない。
@@ -64,6 +72,7 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 - [ ] 上流 SoT の編集後、その下流フェーズを再開する前に、当該 chain に適用される再収束要素を確認したか
 - [ ] 再開 Prerequisite の検査を直上流 1 層に限定しているか (上位層の再検査を重複させない)
+- [ ] 親セッション更新後の再入で、最初の未完了 boundary と直上流の収束を永続状態から確認したか
 - [ ] 上流編集の必要性の発見時に下流作業を即時中断したか
 - [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移または D2 conflict-recovery source-repair 以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
 - [ ] 信号の許容値や ref-verify の対応表を本書や下流文書に複製していないか

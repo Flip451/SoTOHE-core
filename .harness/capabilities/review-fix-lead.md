@@ -268,11 +268,19 @@ and invokes the commit workflow before re-running `pr-review`. Name the finding'
 - Do not run `bin/sotp test-obligation evaluate`; it is an orchestrator-host-owned synchronous
   repair step, never a fire-and-forget launch or a commit prerequisite started by this capability.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (ADR, `spec.json`, type catalogues, `impl-plan.json`, the
-review briefing — as applicable) changed since that session, and re-read any that did before
-continuing. All execution flags are explicitly re-specified by the dispatcher on resume; a
-failed or expired resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted review-loop reasoning. Applied in-scope fixes, CLI-owned
+review results, and read-only git state are the durable hand-off; capability memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current scope and
+round, carrying the dispatch mode, current findings / diff, exact spec / plan / catalogue paths,
+the severity policy when applicable, and the requested correction when in delegated mode. A
+fresh dispatch, or a dispatch that changes concern, starts from that briefing. This
+typed-pipeline capability has no generic `bin/sotp capability exec --resume` route; resume it
+by re-running the canonical `track-local-review-fix` wrapper from the fresh briefing and
+persisted review state. On that re-entry, do not trust carried-over context: first check whether
+the upstream artifacts, review briefing, current diff, or persisted review result changed, and
+re-read every changed input before continuing.

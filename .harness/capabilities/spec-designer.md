@@ -150,11 +150,22 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a normal re-entry dispatch re
 - Required reading before writing: every convention the dispatcher resolved for this capability, `.harness/policies/pre-track-adr-authoring.md`, `.harness/policies/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. Do not browse the project's convention directory for further documents to read — the resolution is the whole required set, and a resolution of zero documents leaves this reading step with no convention target rather than in error.
 - Store orchestrator session memory (any provider) as needed; do not rely on it persisting across capability invocations.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (the target ADRs under `knowledge/adr/` and
-`metadata.json`) changed since that session, and re-read any that did before continuing. All
-execution flags are explicitly re-specified by the dispatcher on resume; a failed or expired
-resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted spec draft or signal reasoning. `spec.json`, its
+CLI-written signals, generated views, and the read-only track state are the durable hand-off;
+capability memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current spec revision,
+carrying the track id, exact ADR / metadata paths, prior spec context when applicable, resolved
+conventions, current signal summaries, and any open question. A fresh dispatch, or a dispatch
+that changes concern, starts from that briefing. Only an explicit `sotp capability exec
+--resume` for the same track and capability continues a capability session. Fresh and resumed
+dispatches re-specify every execution flag (model, sandbox, and effort); a failed or expired
+resume, or a provider/model mismatch, falls back to a fresh session. On resume, do not trust
+carried-over context: first check whether the upstream artifacts of this assignment (the target
+ADRs, `metadata.json`, `spec.json`, or the briefing) changed, and re-read every changed input
+before
+continuing.

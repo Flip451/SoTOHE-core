@@ -199,3 +199,20 @@ If the briefing asks for:
   paths.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+
+## Session continuity and resume
+
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted DRY-loop reasoning. The durable hand-off is the current
+source diff, track state, and any `dry-check.json` result already written by the sanctioned CLI;
+in-memory violation triage is not durable.
+
+After a parent refresh, the dispatcher must issue a fresh briefing carrying the current track
+id, DRY findings / CLI summaries, current diff, architecture constraints, and exact artifact
+paths needed by this contract. A fresh dispatch, or a dispatch that changes concern, starts
+from that briefing. This typed-pipeline capability has no generic
+`bin/sotp capability exec --resume` route; resume it by re-running the canonical
+`track-local-dry-fix` wrapper from the fresh briefing and persisted state. On that re-entry,
+first check whether the briefing, source diff, and persisted DRY state changed since the prior
+capability session, and re-read every changed input before continuing.

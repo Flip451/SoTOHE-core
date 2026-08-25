@@ -550,6 +550,42 @@
           "hash": "rvw1:sha256:eb262ff250423191e635829690ff5b87a5ceb2d5be3bfd6fd8151038e2755af6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:57:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6793520609f27b34c07472cc93853dd2e256376bdd1071457a032b106811fe6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:07:45Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/capabilities/dry-fix-lead.md",
+              "line": 214,
+              "message": "The new resume contract routes `dry-fix-lead` through generic `sotp capability exec --resume`; the same instruction appears in `review-fix-lead`. Both profiles use `execution_mode: typed-pipeline`, while generic capability dispatch rejects every mode except `orchestrator-output`. Their canonical routes are `track-local-dry-fix` and `track-local-review-fix`, neither of which exposes this resume flag. Following this instruction therefore fails before the fixer starts. Keep typed-pipeline session handling with the canonical wrappers and limit `capability exec --resume` guidance to eligible capabilities.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/policies/task-completion.md",
+              "line": 29,
+              "message": "The resume rule makes generated `plan.md` an input for reconstructing task state. This conflicts with `impl-plan.json` being the task-state SSoT and with the summary-first contract: a stale rendered view can now create “conflicting evidence” and unnecessarily block resume. Reconstruct progress from `bin/sotp track resolve`, `task-counts`, `next-task`, review summaries, and read-only git state; open artifacts only for a resulting discrepancy or blocker.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6793520609f27b34c07472cc93853dd2e256376bdd1071457a032b106811fe6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:15:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40bb9416645c1faf604d791844381c443d8011179b4cd9914227785d5401df8f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -865,6 +901,20 @@
           "at": "2026-08-25T11:16:16Z",
           "findings": [],
           "hash": "rvw1:sha256:126ee96840026532eace87126167caac4fe98b94eb74e35c109b22171d61d07c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:56:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7aace36d0ac178b3fc7603de6c7ce810d66388bf98d9c1a1cc0ce4d448bd81f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:58:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7aace36d0ac178b3fc7603de6c7ce810d66388bf98d9c1a1cc0ce4d448bd81f",
           "type": "final",
           "verdict": "zero_findings"
         }

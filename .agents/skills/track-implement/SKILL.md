@@ -28,9 +28,11 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- Implementation work is delegated to the `implementer` capability per the routing in
-  `.harness/config/agent-profiles.json` (default: Claude main-session / ad-hoc delegation
-  per `.claude/agents/README.md`).
+- Implementation work is always delegated to the `implementer` capability through
+  `bin/sotp capability exec implementer --briefing-file <path>`; the dispatcher resolves the
+  provider from `.harness/config/agent-profiles.json` and runs it as a separate process. The
+  root session never implements a task inline and never loads the implementer skill itself;
+  direct editing by the root session is recovery after a failed delegation only.
 - Task state transitions are the orchestrator's, never the `implementer` capability's. Their
   command, sequencing, and timing live in the workflow SSoT — do not restate them here.
 - CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 5).

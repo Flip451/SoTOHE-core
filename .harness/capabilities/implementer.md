@@ -225,11 +225,21 @@ writer capability, or stop.
 - Keep edits within the assigned task scope. If a required fix crosses ownership boundaries,
   report it rather than silently expanding scope.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (`spec.json`, the type catalogues, `impl-plan.json`, and
-the task briefing) changed since that session, and re-read any that did before continuing. All
-execution flags are explicitly re-specified by the dispatcher on resume; a failed or expired
-resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted implementation reasoning. Source / test edits, test
+bindings when written, task state, and read-only git state are the durable hand-off; capability
+memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current task or PR
+finding, carrying the task ids or focused correction, current diff, exact upstream artifact
+paths, architecture constraints, and verification requirements. A fresh dispatch, or a dispatch
+that changes concern, starts from that briefing. Only an explicit `sotp capability exec
+--resume` for the same track and capability continues a capability session. Fresh and resumed
+dispatches re-specify every execution flag (model, sandbox, and effort); a failed or expired
+resume, or a provider/model mismatch, falls back to a fresh session. On resume, do not trust
+carried-over context: first check whether the upstream artifacts of this assignment (`spec.json`,
+the type catalogues, `impl-plan.json`, the task briefing, or the current diff) changed, and re-read
+every changed input before continuing.

@@ -163,6 +163,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18",
       "depends_on": [
         "T003"
       ],
@@ -176,7 +177,7 @@
       ],
       "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
       "id": "T021",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "214f42cdd78a19bab51fd90f577ad03638ea7e73",
@@ -188,6 +189,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18",
       "depends_on": [
         "T003"
       ],
@@ -201,7 +203,7 @@
       ],
       "description": "`.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
       "id": "T024",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
@@ -319,7 +321,7 @@
       ],
       "description": "Workflow SSoT、thin adapters、policy / capability、always-applied rules、consumer docs、agent profile の各対象面を個別確認する。AC-08。",
       "id": "T018",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

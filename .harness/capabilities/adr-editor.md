@@ -203,9 +203,21 @@ deleting a draft). Do NOT spawn further agents.
   task-contract.json, batch-plan.json, or any catalogue file.
 - Store reasoning in session memory, not on disk.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session, do not trust carried-over context: first check whether
-the target ADR, the baseline records, or the briefing changed since the prior session, and
-re-read any that did. All execution flags are re-specified by the dispatcher on resume; a
-failed or expired resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted draft or edit rationale. Already-applied working-tree
+ADR / index bytes and orchestrator-owned baseline records are the durable hand-off; capability
+memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current ADR edit,
+carrying the target path, current text / diff, originating input, guardian verdict or user
+adjudication, lifecycle context, and exact verification paths required by this contract. A
+fresh dispatch, or a dispatch that changes concern, starts from that briefing. Only an explicit
+`sotp capability exec --resume` for the same track and capability continues a capability
+session. Fresh and resumed dispatches re-specify every execution flag (model, sandbox, and
+effort); a failed or expired resume, or a provider/model mismatch, falls back to a fresh session.
+On resume, do not trust carried-over context. First check whether the target ADR, baseline records,
+or briefing changed since the prior capability session, and re-read every changed input before
+editing.
