@@ -97,17 +97,23 @@ After `bin/sotp pr review-cycle` completes, apply the following loop:
      `.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`.
      Delegate the fix to the capability that owns the change: `implementer` for implementation
      changes or `review-fix-lead` for review-scope fixes (the marker tells `review-fix-lead` to
-     fix that finding only, not to enter its scope-wide review loop).
-  3. After the delegated capability reports completion, run the local review workflow to
-     convergence at `zero_findings`, then invoke the `commit` workflow for the fix.
+     fix that finding only, not to enter its scope-wide review loop). A finding requiring an
+     edit to `knowledge/adr/*.md` is not delegated here; route it to the guardian lane in the
+     review workflow SSoT's `ADR-scope repair lane` section.
+  3. After the delegated capability or guardian lane reports completion, run the local review
+     workflow to convergence at `zero_findings`, then invoke the `commit` workflow for the fix.
   4. Re-run `pr-review` to push the fix, trigger a new review round, and verify the response.
   5. Repeat until the reviewer signals explicit zero findings.
 
 The implementation-delegation principle used by the `implement` workflow applies to the PR
 lane as well: the parent orchestrator delegates the edit through a briefing, and the delegated
-capability owns the scoped change. If delegation fails, the parent may directly edit only as
-recovery; it must then run local review convergence and the `commit` workflow before re-running
-`pr-review`.
+capability owns the scoped change. A finding whose fix requires editing
+`knowledge/adr/*.md` is exempt from this generic path: neither the parent orchestrator nor
+`review-fix-lead` may apply the fix. Route it through the guardian lane in the review workflow
+SSoT's `ADR-scope repair lane` section. After that lane completes, continue with local review
+convergence, the `commit` workflow, and a `pr-review` re-run. For non-ADR files, if delegation
+fails, the parent may directly edit only as recovery; it must then run local review convergence
+and the `commit` workflow before re-running `pr-review`.
 
 **Do NOT stop the loop on intermediate states**, including:
 
@@ -177,8 +183,10 @@ polling cannot replicate.
   commit to force a new HEAD.
 - **Actionable findings remain**: prepare a briefing and delegate each fix to `implementer` or
   `review-fix-lead`, converge local review to `zero_findings`, invoke the `commit` workflow, and
-  re-run `pr-review`. Repeat until explicit zero findings. If delegation fails, parent editing is
-  recovery only; still converge local review and use the `commit` workflow before re-running.
+  re-run `pr-review`. Repeat until explicit zero findings. If delegation fails for a non-ADR
+  finding, parent editing is recovery only; still converge local review and use the `commit`
+  workflow before re-running. ADR findings follow the review workflow SSoT's `ADR-scope repair
+  lane`.
   Deviations require user approval before the loop may terminate.
 
 ## Outputs

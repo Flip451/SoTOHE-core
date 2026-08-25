@@ -586,6 +586,28 @@
           "hash": "rvw1:sha256:40bb9416645c1faf604d791844381c443d8011179b4cd9914227785d5401df8f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:56:36Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 177,
+              "message": "The Failure / recovery bullet still says that if delegation fails, “parent editing is recovery only” without excluding ADR findings. This leaves a second route that conflicts with the new explicit prohibition on parent/review-fix-lead editing `knowledge/adr/*.md`; the ADR guardian lane must be the sole route everywhere in this workflow.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ee52cc93d0a34b897dcb62ecba6ede51d9b3370eb1abd2d1a6a863adda040db4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:06:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7937182496b0be288f6f0ed8c0c6d89302a72007b6ad1e2ff637ccdcf255a8c3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
