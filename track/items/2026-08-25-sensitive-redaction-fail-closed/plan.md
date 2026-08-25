@@ -11,10 +11,10 @@ GO-01 is delivered by T001's fail-stop redaction construction and T002's securit
 
 > Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04.
 
-- [x] **T001**: Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04.
+- [x] **T001**: Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04. (`7391bc4ffa9e5da2b951f7c8a40a3c6c5bfd2e32`)
 
 ### S2 — Security-boundary convention
 
 > Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03.
 
-- [x] **T002**: Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03.
+- [x] **T002**: Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03. (`7391bc4ffa9e5da2b951f7c8a40a3c6c5bfd2e32`)

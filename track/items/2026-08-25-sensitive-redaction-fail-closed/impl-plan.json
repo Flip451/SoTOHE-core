@@ -29,11 +29,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "7391bc4ffa9e5da2b951f7c8a40a3c6c5bfd2e32",
       "description": "Convert the four static redaction-boundary regexes and update their sanitization call sites in libs/usecase/src/pr_review.rs; add construction verification. IN-01; IN-02; OS-01; OS-02; CN-01; CN-02; AC-01; AC-02; AC-04.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "7391bc4ffa9e5da2b951f7c8a40a3c6c5bfd2e32",
       "description": "Add redaction, validation, and authorization boundary guidance to knowledge/conventions/security.md. IN-03; AC-03.",
       "id": "T002",
       "status": "done"
