@@ -103,6 +103,20 @@
           "hash": "rvw1:sha256:d714f8aca3bee8dd474143492d6f7fa8d99cc1cf1f2b84687bc3a7462d18c511",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:29:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d206ee154dbe6cc0319c6af157b7bb83054500122fda33e1b1b541f5a55931a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:35:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d206ee154dbe6cc0319c6af157b7bb83054500122fda33e1b1b541f5a55931a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -574,6 +588,158 @@
           "hash": "rvw1:sha256:36d54cb135dcdc6498585d686c2df26bd97217306eb796a1c4a0ddfbe27c4bdd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:54:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:931a7301281fa7cb893bfe21d2d2140846d407f5f7b0d118d5937f151c10ac11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:02:38Z",
+          "findings": [
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "The new “Command only” rule contradicts this file’s R1 `Query` role and CQRS guidance: a validated `Query` would now be forbidden at a read-usecase input port. Scope this rule to command use cases or explicitly permit the corresponding validated `Query` type.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 124,
+              "message": "`cli` is the thin-bin crate and may not depend on `usecase`; it therefore cannot call a usecase-owned parser or pass `Command` directly. The one-time Input/String→Command conversion and port invocation belong to the primary adapter (`cli_driver`). The current wording conflicts with `architecture-rules.json` and the CLI responsibility boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "requirement-coverage",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 5,
+              "message": "T007 assigns `typed-deserialization.md` a Command-boundary revision, but this file received only enforcement annotations and still contains no CLI/usecase/Command conversion rule. Consequently the related convention does not require the one-time conversion into a validated usecase-owned Command. Add the D4 boundary rule and its actual review scopes.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-correctness",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 5,
+              "message": "The rule covers JSON, YAML, and TOML but mandates `serde_json::from_str::<T>()` for all three. That decoder rejects valid YAML/TOML. Require the format-appropriate typed decoder (`serde_json`, `serde_yaml`, or `toml`) instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 46,
+              "message": "Assigning production `libs/domain/src/guard/` to this rule requires `#[derive(Deserialize)]` in the domain layer, contradicting the repository’s serde-free domain boundary and the DTO placement rules in `type-designer-kind-selection.md`. The domain crate has no production serde dependency. External config parsing/DTO ownership must remain in infrastructure, with validated types passed inward.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:931a7301281fa7cb893bfe21d2d2140846d407f5f7b0d118d5937f151c10ac11",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:11:16Z",
+          "findings": [
+            {
+              "category": "adr-conformance",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Both touched conventions broaden D4 from validated `Command` to `Command` / `Query` (also `typed-deserialization.md` lines 11–13), but the frozen ADR and spec IN-07/AC-07 explicitly require `Command` only. This is a semantic expansion, not a convention clarification; remove the Query extension or route the decision back through ADR adjudication.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 7,
+              "message": "The typed-decoder rule is still assigned to `domain scope`, and the `Value` exception likewise names domain, while line 54 declares the domain serde-free. Applying the rule in domain would require `Deserialize`/serde or `serde_json::Value`, directly contradicting that boundary. Restrict external-format decoding and its exceptions to infrastructure; keep only the serde-free prohibition under domain review.",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 50,
+              "message": "After adding `Usecase Boundary Handoff`, the document-level Scope, “new code only” condition, and test exception remain wired only to domain/infrastructure. They neither list nor assign the types/usecase/cli/cli_driver surfaces governed by the new section, so the scope and enforcement annotations disagree. Split these into section-specific scopes/exceptions or include the actual D4 review scopes.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-correctness",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 23,
+              "message": "Serde does not detect misspelled incoming field names or input type mismatches at compile time; those failures occur while decoding at runtime. This false guarantee can cause callers to omit required parse-error handling and tests. State the runtime failure boundary accurately.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:64273866ec7f4c46f0edcd728b7b540b8f6674e522609c6b9c2bc6866f054a0a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:17:15Z",
+          "findings": [
+            {
+              "category": "adr-conformance",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Both touched conventions now narrow D4 to “command usecases” and explicitly exempt query usecases (mirrored in `typed-deserialization.md` line 11). The frozen D4 and spec IN-07/AC-07 apply the validated-`Command` boundary to the cli→usecase input boundary, and the promoted predecessor rule includes read-only usecases. This carve-out is therefore an unadjudicated semantic narrowing introduced to reconcile R1’s `Query` role. Route that conflict through ADR adjudication rather than resolving it inside the convention text.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c9a44e710a2325fab1fe63d748a549ca70028a437a763dc10ee78b4059727e44",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:20:25Z",
+          "findings": [
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "The exact D4 transcription now makes every new usecase input boundary `Command`-only, while R1 line 66 defines `Query` as a usecase input and the CQRS section supports query usecases; `typed-deserialization.md` line 11 duplicates the same conflict. A new query usecase therefore must both accept `Query` and accept only `Command`. Because this contradiction originates in the frozen ADR/predecessor decision, route it through ADR adjudication rather than adding another convention-level exception.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf54a36aad04fc11f34fe9eef0cf3d35945c6dbb2d9bfbe823543e186b9c216",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:02:46Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Phase 1+ delta の admitted D1 は command usecase には Command、query usecase には Query を要求していますが、この規約は全 usecase input boundary を Command のみに限定しており、Query usecase を誤って拒否します。Command / Query を usecase role に応じて明記してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 11,
+              "message": "Usecase Boundary Handoff も外部入力を全て検証済み Command に限定しており、admitted D1 の query usecase → validated Query という契約と不整合です。handoff、parse、domain-agnostic CLI の規則を Command / Query 両対応に修正してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf54a36aad04fc11f34fe9eef0cf3d35945c6dbb2d9bfbe823543e186b9c216",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:05:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23995af979717d83d6de4114c687c8ecc72f902a87b2f416343f8f99fbc92574",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23995af979717d83d6de4114c687c8ecc72f902a87b2f416343f8f99fbc92574",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -727,6 +893,20 @@
           "hash": "rvw1:sha256:511e671e6dd91605bc0b91354a55bc9b67ce2b4c80979c22da9dc97a4ee833a1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:54:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a009bbc2a67c8f60887dbbf2b6225aeeca40ae0a6f0ebbd5ae40a328eb0e1bd9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:58:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a009bbc2a67c8f60887dbbf2b6225aeeca40ae0a6f0ebbd5ae40a328eb0e1bd9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -805,6 +985,34 @@
           "at": "2026-08-25T05:49:30Z",
           "findings": [],
           "hash": "rvw1:sha256:a162b1f50c0f8b105145239d2c39758bfd540ef989a434517c2113bd8bedb1a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:41:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe0aa57de1bc184f81debb0a7d3f1548506677d7ff3b0fd5a4f32227a63b3959",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:45:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe0aa57de1bc184f81debb0a7d3f1548506677d7ff3b0fd5a4f32227a63b3959",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:50:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84444ff7b6679915018598a32e65594cb179c2dc488352c26dc36f5215971276",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:53:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84444ff7b6679915018598a32e65594cb179c2dc488352c26dc36f5215971276",
           "type": "final",
           "verdict": "zero_findings"
         }

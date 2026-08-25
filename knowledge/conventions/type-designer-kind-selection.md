@@ -116,6 +116,21 @@ command と query を混載する `*Service` などの facade port を新設し�
 
 > **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
 
+#### Validated Command / Query boundary
+
+- 新規コードの usecase 入力 boundary は、command usecase では検証済みの usecase 所有 `Command` 型を 1 個だけ、query usecase では検証済みの usecase 所有 `Query` 型を 1 個だけ受け取る。未検証の `String` などを入力 boundary の公開シグネチャに置いてはならない。
+
+  > **強制先**: review 観点 — types / usecase / cli_driver scope
+- `String` から対応する `Command` または `Query` へのパースと検証は usecase 所有の boundary 型が担う。CLI の driving path（規約上の `cli`）はそのパースを一度だけ呼び出してから対応する入力 boundary を呼び出し、得られた検証済み `Command` または `Query` を渡す。現行の層構成ではこの責務を `cli_driver` が担い、薄い `cli` bin は `cli_driver` を呼び出すだけで usecase crate に直接依存しない。
+
+  > **強制先**: review 観点 — types / usecase / cli / cli_driver scope
+- domain enum の鏡像を cli 側に定義してはならない。boundary の語彙は usecase 所有の boundary 型に統一し、`cli` と `cli_driver` は domain 型を知らないという原則を維持する。
+
+  > **強制先**: review 観点 — types / usecase / cli / cli_driver scope
+- 既存の境界実装は、この規約だけを理由に遡及改修しない。
+
+  > **強制先**: review 観点 — types / usecase / cli / cli_driver scope
+
 ### R2. Free Function Preference (stateless behavior は FreeFunction)
 
 以下の条件をすべて満たす型は `role: FreeFunction` (`functions` エントリ) で起草する。zero-field struct + 1 method を `role: ValueObject` / `role: UseCase` に matching するのは禁止する。

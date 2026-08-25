@@ -254,25 +254,25 @@
       }
     },
     {
-      "claim_hash": "d37bd68d9d18bb8b5ad08607d80d0ee24e1f84e8df91afa2d4546fb820be9e0c",
+      "claim_hash": "e15ea11f5ec2922bc810ad7d6a9d89b6adfb14ba0ffc9656b285a24e5608f936",
       "claim_origin": {
         "data": {
           "element_id": "IN-07",
           "section": "in_scope",
-          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、usecase 境界は検証済み Command 型へ一本化し、cli は一度だけ Command へパースして入力境界を呼び出す。"
+          "text_label": "type-designer-kind-selection.md と関連規約を改訂し、command usecase の入力境界は検証済み Command を 1 個、query usecase の入力境界は検証済み Query を 1 個だけ受け取り、cli は一度だけ対応する型へパースして入力境界を呼び出す。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
       "evidence_origin": {
         "data": {
-          "decision_id": "D4",
-          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "usecase の入力境界は検証済み Command 型のみを受け取る。string から Command へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから入力境界を呼び出す",
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
         "kind": "pass"
       }
     },
@@ -599,25 +599,25 @@
       }
     },
     {
-      "claim_hash": "b70c0c7f9fa1ae965bb540324b2bf14b11c3cab86c09ac4b2f3f28cc556ad175",
+      "claim_hash": "722ed5e61e8a6b7e779be88d95620b895b7f0f7474d34b6924ce77f8d4ea55d0",
       "claim_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "type-designer-kind-selection.md と関連規約は、cli が一度だけ Command へパースして usecase 入力境界を呼び出すことを明確にする。"
+          "text_label": "type-designer-kind-selection.md と関連規約は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が一度だけ対応する型へパースして入力境界を呼び出すことを明確にする。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
       "evidence_origin": {
         "data": {
-          "decision_id": "D4",
-          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "cli はそのパースを一度だけ呼び出してから入力境界を呼び出す",
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
         "kind": "pass"
       }
     },

@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 
-## Tasks (6/8 resolved)
+## Tasks (7/8 resolved)
 
 ### S1 — Enforcement taxonomy and convention inventory
 
@@ -18,15 +18,15 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 > Revise the type and boundary convention set through four ordered operations, with file-level annotation ownership allocated across them. IN-01; IN-02; IN-06; IN-07; IN-08; OUT-01; AC-01; AC-02; AC-06; AC-07; AC-08.
 
 - [x] **T002**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/prefer-type-safe-abstractions.md` for necessity-driven abstraction, and annotate the normative requirements in `prefer-type-safe-abstractions.md` with T001's taxonomy. D2; IN-01; IN-02; OUT-01; AC-01; AC-02. (`3dd6cbcef47f9df61863db4250faac19e09f66e0`)
-- [x] **T006**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/coding-principles.md` for port injection and facade policy, and annotate the normative requirements in `coding-principles.md` with T001's taxonomy. D3; IN-01; IN-06; OUT-01; AC-01; AC-06.
-- [ ] **T007**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/typed-deserialization.md` for the Command boundary, and annotate the normative requirements in `typed-deserialization.md` with T001's taxonomy. D4; IN-01; IN-07; OUT-01; AC-01; AC-07.
+- [x] **T006**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/coding-principles.md` for port injection and facade policy, and annotate the normative requirements in `coding-principles.md` with T001's taxonomy. D3; IN-01; IN-06; OUT-01; AC-01; AC-06. (`57aa30a8511b552f2f5fc21bfd011907cdaf7181`)
+- [x] **T007**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/typed-deserialization.md` for the Command boundary, and annotate the normative requirements in `typed-deserialization.md` with T001's taxonomy. D4; IN-01; IN-07; OUT-01; AC-01; AC-07.
 - [ ] **T008**: Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/tddd-product-correctness.md` for the layer-property matrix, and annotate the normative requirements in both files with T001's taxonomy. D5; IN-01; IN-08; OUT-01; AC-01; AC-08.
 
 ### S3 — Obligation-driven testing convention
 
 > Rewrite `knowledge/conventions/testing.md` and annotate normative requirements with T001's taxonomy. IN-03; AC-03.
 
-- [x] **T003**: Rewrite `knowledge/conventions/testing.md` and annotate normative requirements with T001's taxonomy. IN-01; IN-03; AC-01; AC-03.
+- [x] **T003**: Rewrite `knowledge/conventions/testing.md` and annotate normative requirements with T001's taxonomy. IN-01; IN-03; AC-01; AC-03. (`57aa30a8511b552f2f5fc21bfd011907cdaf7181`)
 
 ### S4 — Environment-assumption declaration
 
@@ -38,4 +38,4 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 
 > Update the configured code-scope prompt files under `.harness/custom/review-prompts/` and `.harness/custom/review-prompts/spec.md` with the required review questions. IN-05; CN-03; OUT-03; AC-05.
 
-- [x] **T005**: Update `.harness/custom/review-prompts/domain.md`, `.harness/custom/review-prompts/usecase.md`, `.harness/custom/review-prompts/infrastructure.md`, `.harness/custom/review-prompts/cli.md`, `.harness/custom/review-prompts/cli_composition.md`, `.harness/custom/review-prompts/cli_driver.md`, and `.harness/custom/review-prompts/spec.md`; add the required review questions. IN-05; CN-03; OUT-03; AC-05.
+- [x] **T005**: Update `.harness/custom/review-prompts/domain.md`, `.harness/custom/review-prompts/usecase.md`, `.harness/custom/review-prompts/infrastructure.md`, `.harness/custom/review-prompts/cli.md`, `.harness/custom/review-prompts/cli_composition.md`, `.harness/custom/review-prompts/cli_driver.md`, and `.harness/custom/review-prompts/spec.md`; add the required review questions. IN-05; CN-03; OUT-03; AC-05. (`57aa30a8511b552f2f5fc21bfd011907cdaf7181`)

@@ -33,12 +33,12 @@
     {
       "adr_refs": [
         {
-          "anchor": "D4",
-          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
         }
       ],
       "id": "AC-07",
-      "text": "type-designer-kind-selection.md と関連規約は、cli が一度だけ Command へパースして usecase 入力境界を呼び出すことを明確にする。"
+      "text": "type-designer-kind-selection.md と関連規約は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が一度だけ対応する型へパースして入力境界を呼び出すことを明確にする。"
     },
     {
       "adr_refs": [
@@ -199,12 +199,12 @@
       {
         "adr_refs": [
           {
-            "anchor": "D4",
-            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
           }
         ],
         "id": "IN-07",
-        "text": "type-designer-kind-selection.md と関連規約を改訂し、usecase 境界は検証済み Command 型へ一本化し、cli は一度だけ Command へパースして入力境界を呼び出す。"
+        "text": "type-designer-kind-selection.md と関連規約を改訂し、command usecase の入力境界は検証済み Command を 1 個、query usecase の入力境界は検証済み Query を 1 個だけ受け取り、cli は一度だけ対応する型へパースして入力境界を呼び出す。"
       },
       {
         "adr_refs": [

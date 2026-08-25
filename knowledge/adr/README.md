@@ -215,6 +215,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
 | [consumer 規約の所有権分離と harness 固定依存の撤去](2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md) | Proposed | 2026-07-24 |
 | [規約を機構と突き合わせて改訂する](2026-08-20-1043-conventions-mechanism-alignment.md) | Proposed | 2026-08-20 |
+| [usecase 入力境界を Command と Query の検証済み型に統一する](2026-08-25-1021-validated-usecase-input-boundaries.md) | Proposed | 2026-08-25 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
