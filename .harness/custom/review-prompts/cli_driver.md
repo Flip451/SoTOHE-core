@@ -3,7 +3,7 @@
 The reviewer's role is **primary-adapter correctness review** of `apps/cli-driver/`.
 `cli_driver` is the primary (driving) adapter layer: it holds injected use-case
 ports, with one trait and one execute method per use case; it translates typed `Input`
-enums into use-case commands, invokes exactly one single-purpose port per request,
+enums into validated use-case `Command` / `Query` values (one parse, usecase-owned boundary types), invokes exactly one single-purpose port per request,
 and renders the result into a `CommandOutcome`. A Driver may hold several
 single-purpose ports for different requests; multi-step behavior belongs behind one
 use-case/application-service port. DI belongs in `cli_composition`, not here. Both

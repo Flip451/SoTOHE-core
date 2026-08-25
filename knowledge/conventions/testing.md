@@ -65,7 +65,7 @@ codec、parser、evaluator、永続化 adapter など、外部表現との変換
 
 ### `cli-driver` と `cli`
 
-入力の変換、Command の dispatch、結果の表示、および exit code の境界をテストする。usecase や
+入力の変換、Command と Query それぞれの dispatch（happy path と、不正入力を error として返す経路の両方）、結果の表示、および exit code の境界をテストする。usecase や
 infrastructure の内部規則を再テストするのではなく、adapter 間のデータとエラーの受け渡しを確認する。
 
 > **強制先**: review 観点 — cli / cli_driver scope
@@ -108,7 +108,7 @@ property-based test を置く。境界値や不正な表現が仕様どおりに
 parser には、生成した入力について、受理された結果が typed な境界へ対応し、受理できない入力が仕様
 どおりに失敗することを確かめる property-based test を置く。
 
-> **強制先**: review 観点 — infrastructure / cli / cli_driver scope
+> **強制先**: review 観点 — usecase / infrastructure / cli / cli_driver scope
 
 evaluator には、生成した入力と状態について、仕様の不変条件を保った判定、結果の一貫性、および失敗時
 の結果を確かめる property-based test を置く。

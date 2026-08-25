@@ -1002,6 +1002,35 @@
           "hash": "rvw1:sha256:ccaa452356a8c6e53ee62bd8a258fbde86bdfd376fcb73820503cdfbd86c2b51",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:09:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f00060964b6c46e16c69bfb09baada6f88c1ac2fdc04fad81ca0da759df90c9d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:15:35Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 111,
+              "message": "`parser` の property-based test の強制先が `infrastructure / cli / cli_driver` に限定されていますが、`type-designer-kind-selection.md` §Validated Command / Query boundary は String→Command/Query のパースと検証を usecase 所有型の責務としています。さらに本ファイルの Review Checklist は同じ検査に `usecase` scope を含めており、規約内でも不一致です。このままでは usecase 内の新規 boundary parser がレビュー対象から漏れるため、強制先に `usecase` を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f00060964b6c46e16c69bfb09baada6f88c1ac2fdc04fad81ca0da759df90c9d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:19:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b195b4d61a0417b0a411e1bd1f2b9b0a7b5d7da2f1c7131c23c78f178ad64fed",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
