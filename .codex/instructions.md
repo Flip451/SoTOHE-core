@@ -86,6 +86,10 @@ Use the gate aggregates via `cargo make` and single workflow operations via guar
 - `bin/sotp track transition <task-id> <state> [--commit-hash <hash>]` (task-state transitions
   are performed only by the root orchestrator session, at the points the full-cycle workflow
   SSoT fixes)
+- read-only summary intake (the primary information named in the Root Orchestrator Rules):
+  `bin/sotp track resolve`, `bin/sotp track task-counts`, `bin/sotp track next-task`,
+  `bin/sotp review results`, `bin/sotp test-obligation results`, `bin/sotp catalog check`,
+  `bin/sotp ref-verify results`
 
 Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,
 `git show`, `git rev-parse`, `git ls-files`, and `git notes show/list`.

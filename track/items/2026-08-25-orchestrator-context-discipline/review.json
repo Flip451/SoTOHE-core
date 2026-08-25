@@ -760,6 +760,42 @@
           "hash": "rvw1:sha256:c13aa4b889eacfa63dde5d757ae25550f25a04872c5f8fdeaa9ac21de26f1355",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:10:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fee00f759c69e8c25afc861bd237de4b1b31114f6dbe216e49ed0e2663a8b2aa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:17:19Z",
+          "findings": [
+            {
+              "category": "workflow-contract",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 199,
+              "message": "The one-batch path explicitly continues without the fixed post-first-batch refresh. This contradicts lines 158–163 and AC-04/D4, which require a parent-session refresh after the first implementation batch even when it is the only declared batch. The lifecycle tail therefore runs with the implementation-heavy parent context. Return and refresh after that batch, then let the resumed invocation complete the tail before the separate PR-lane refresh.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow-contract",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 195,
+              "message": "`--single-batch` returns after the first Step 3 whenever any work remains, but a runtime admission split makes Step 3 commit only the admitted execution-unit prefix while the selected declared batch remains unfinished. Adr2pr will consequently refresh mid-batch and then process the rest without refreshing when that first declared batch actually completes. Either continue split execution units until the selected declared batch is complete or define and consistently consume a single-execution-unit mode.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:fee00f759c69e8c25afc861bd237de4b1b31114f6dbe216e49ed0e2663a8b2aa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:23:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b83fed1864ad7effcf2d7aa7317baf43cbc5bf1b91656b1d923930c3b351dbd7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

@@ -6,7 +6,8 @@ description: Run the declared-batch implement → DRY check → review → commi
 
 ## Invocation
 
-User invokes this command as `/track:full-cycle`. No arguments.
+User invokes this command as `/track:full-cycle`. No arguments are required; a workflow caller
+may pass the SSoT's `--single-batch` option when it needs a one-batch return.
 
 ## Claude Code invocation constraints
 

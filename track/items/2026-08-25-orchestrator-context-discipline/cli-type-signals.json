@@ -1,8 +1,8 @@
 {
   "baseline_hash": "d95b06e751a4f541f1e06275c653a199552e757f6497fb73d622497d3f448bed",
   "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "generated_at": "2026-08-25T14:51:47Z",
-  "head_commit": "f95be94e9af5d00e98ef32babc26907224f27766",
+  "generated_at": "2026-08-25T15:25:56Z",
+  "head_commit": "30be92dbf6c4fd88a518dfa58f948ab189c12f45",
   "schema_version": 4,
   "signals": []
 }

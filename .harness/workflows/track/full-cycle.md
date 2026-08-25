@@ -8,12 +8,17 @@
 ## Mission
 
 Run the autonomous feature-batch implement → DRY check → task completion → review → commit loop for the current
-track. The consumption unit is the **declared batch**: the batches declared in
+track. The default invocation mode (`normal`) consumes all remaining declared batches. The
+consumption unit is the **declared batch**: the batches declared in
 `track/items/<id>/batch-plan.json` `batches[]` are consumed in declaration order — each
 batch's member tasks are implemented in dependency order into the same working tree without
-intermediate commits, then a single DFP + review pass + commit close the batch. This workflow
-performs no batch composition of its own: sizing, ceilings, and admission are planning- and
-admission-domain concerns, not execution concerns. Requires being on a `track/<id>` branch.
+intermediate commits, then a single DFP + review pass + commit close the batch. A caller may
+request `--single-batch`; that invocation drains the first unfinished declared batch, including
+any runtime admission-split execution units, then returns after Step 3 so its caller can refresh
+and resume from durable state. It does not run the lifecycle tail, even when that was the last
+batch. This workflow performs no batch composition of its own:
+sizing, ceilings, and admission are planning- and admission-domain concerns, not execution
+concerns. Requires being on a `track/<id>` branch.
 
 Sub-workflows used:
 
@@ -33,14 +38,19 @@ Sub-workflows used:
   unsettled-task declaration domain): the impl-planner issues a batch-plan covering the open
   tasks, and settled history stays undeclared per the non-retroactivity constraint.
 - **`spec.md`, `plan.md`, `metadata.json`** — task context for the implement sub-workflow.
+- **Invocation mode** — `normal` is the default when `--single-batch` is absent. A caller may
+  pass `--single-batch` to drain the first unfinished batch selected by Step 0a, including any
+  execution units created by runtime admission splits, and return after that declared batch's
+  Step 3. The option does not change the declared batch plan or run the lifecycle tail.
 
 ## Sequence
 
 ### Step 0: Build an execution plan (required before any execution)
 
-Use the track CLI summaries, declared batch state, and selected task briefing as the primary
-intake. Do not bulk-read every referenced sub-workflow definition before execution. Treat each
-referenced workflow as its own SSoT and open its body only for the active handoff or a targeted
+Resolve the invocation mode, using `normal` when `--single-batch` is absent. Use the track CLI
+summaries, declared batch state, and selected task briefing as the primary intake. Do not bulk-read
+every referenced sub-workflow definition before execution. Treat each referenced workflow as its
+own SSoT and open its body only for the active handoff or a targeted
 diff/blocker investigation. Follow the referenced workflow's own contract; where it delegates
 work, its delegated capability owns that detailed procedure.
 
@@ -180,7 +190,22 @@ bin/sotp track transition <task_id> done --commit-hash <hash>
 `TaskStatus::Done` has no `commit_hash` uniqueness constraint; the same hash on multiple
 tasks is the canonical representation of a batch commit.
 
+**Step 3a: Continue or return**
+
+After Step 3, re-evaluate the declared batch state using Step 0a. Without `--single-batch`, if
+an unfinished batch remains, repeat Steps 0a–3 so the next execution starts at the first
+unfinished batch. With `--single-batch`, if the selected declared batch remains unfinished
+because a runtime admission split left a rejected member in `todo`, repeat Steps 0a–3 in this
+same invocation to consume its next admitted execution unit; do not return between execution
+units. Once the selected declared batch is complete, return to the caller before Step 4 or
+Post-loop, even when no later declared batch remains. The caller refreshes and a subsequent
+normal invocation runs Step 4 when no unfinished declared batch remains.
+
 ### Step 4: Lifecycle tail commit (after all batches)
+
+Run this section only after Step 3a finds no unfinished declared batch. A `--single-batch`
+invocation always returns before this section after its selected declared batch completes; a
+subsequent normal invocation runs it for the last batch.
 
 Post-commit task hash recording (Step 3) writes the commit hash to `impl-plan.json` *after*
 the batch commit — the hash cannot exist before the commit. For the last batch, no successor
@@ -220,8 +245,8 @@ The workflow completes only when `git status --short` is empty after this step.
 
 ### Post-loop
 
-After all batches are committed and the optional lifecycle tail commit is recorded, create or
-append to `track/items/<id>/observations.md` only when:
+After all batches are committed and the optional lifecycle tail commit is recorded, the terminal
+invocation creates or appends to `track/items/<id>/observations.md` only when:
 
 - (a) Any task produced machine-non-verifiable observations worth recording, or
 - (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
@@ -239,6 +264,7 @@ Otherwise, skip (file absence = no observations).
 | 2 | Review `zero_findings` all required scopes | completed / blocked / failed |
 | 2 | R2 placement verification repeated on each back-edge pass | pass / fail |
 | 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
+| 3a | Default mode continues; `--single-batch` drains one declared batch and returns before Step 4 | OK / stop |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
 
 ## Failure / recovery

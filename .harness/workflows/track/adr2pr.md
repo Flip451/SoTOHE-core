@@ -159,8 +159,14 @@ commit on the track branch.
 
 - After the plan-artifacts commit in Step 8 succeeds, before starting Step 9.
 - After the first implementation batch in Step 9 completes, before continuing with any
-  remaining full-cycle batches.
+  remaining full-cycle batches or the lifecycle tail.
 - At the start of the PR lane in Step 10, before invoking `pr-review`.
+
+Step 9 uses the caller-requested `--single-batch` mode for the first unfinished declared batch
+after Step 8. That mode drains the declared batch, including any runtime admission-split
+execution units, and returns before the lifecycle tail. After that invocation returns, refresh
+the parent session before continuing; the resumed invocation reconstructs the first unfinished
+lifecycle boundary from durable state.
 
 At each boundary, git and the track artifacts are the machine state, so the parent context may
 be discarded and reconstructed from them. On every invocation for an existing track, reconstruct
@@ -185,9 +191,14 @@ backgrounding thresholds, notification formats, or compaction timing.
 
 **Step 9: full-cycle workflow**
 
-Invoke the `full-cycle` workflow (`.harness/workflows/track/full-cycle.md`) for
-feature-batch implement → DRY check → review → commit. See that workflow's SSoT for the
-full internal state machine.
+For the first unfinished declared batch after Step 8, invoke the `full-cycle` workflow
+(`.harness/workflows/track/full-cycle.md`) once with `--single-batch`. It drains that declared
+batch, including any runtime admission-split execution units, and returns before the lifecycle
+tail. After it returns successfully, apply the parent-session refresh point above. On the
+resumed Step 9, and on any later Step 9 entry after that first batch commit, invoke `full-cycle`
+without the option (the default `normal` mode); it resumes at the first unfinished lifecycle
+boundary and consumes the remaining batches or runs the lifecycle tail. See that workflow's
+SSoT for the full internal state machine.
 
 **Step 10: pr-review workflow**
 
@@ -262,7 +273,7 @@ or retry by using the review-request path.
 | 5 | Phase 1-3 gates (per `plan` SSoT loop rules) | proceed / escalate / stop |
 | 6 | `review` check-approved exit 0 (plan artifacts) | proceed / blocked |
 | 8 | `commit` CI + git commit OK | proceed / ERROR |
-| 9 | `full-cycle` completes (all batches committed) | proceed / stop |
+| 9 | `full-cycle` reaches the requested return and, after refresh when needed, all batches are committed | proceed / stop |
 | 10 | `pr-review` reaches a terminal state: machine PASS (explicit zero findings) or user-approved Accepted Deviations | terminal / loop |
 | 11 | One independently posted all-protected-source terminal-audit comment, or a reported non-fatal posting/preparation failure | complete / reported |
 
