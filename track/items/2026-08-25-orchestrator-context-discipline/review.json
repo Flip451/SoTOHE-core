@@ -931,6 +931,50 @@
           "hash": "rvw1:sha256:7fda8038040d86f39e4c598d28087c8f0662d1fe99130bfcd546b06ee237ed18",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:32:22Z",
+          "findings": [
+            {
+              "category": "observations.md factual inconsistency",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/observations.md",
+              "line": 5,
+              "message": "Line 5 incorrectly attributes T011–T014 to the `.codex/` surface. Track history identifies T011–T013 as `.agents/` tasks and T014 as a workflow task; only T015 is a `.codex/` task. Correct the task/surface attribution.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:43177fff8f5aca4b6cc0d88b6eda1f655cf678eb7407af8089602c9ab21e1c40",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:34:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:04176f9a26e02b04c7979174d6897020a9471edb3dffacfcfc3e9cdfb1018ba7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:41:38Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/observations.md",
+              "line": 15,
+              "message": "「ADR が効果測定に用いる指標（呼び出し数・非キャッシュ入力・全文 read 回数・委譲回数）」は ADR の測定方針をそのまま再記述しており、観測値ではありません。今回の briefing が求める observation-only の内容と `.harness/policies/no-upstream-restatement.md` の重複防止方針に反するため、この上流説明を削除し、後続の実観測だけを残してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:04176f9a26e02b04c7979174d6897020a9471edb3dffacfcfc3e9cdfb1018ba7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:43:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:470d8685d2228c98cbb999612b81a6f21c175d3e49d9ed2d7a8f42542b005835",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
