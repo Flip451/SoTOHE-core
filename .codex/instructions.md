@@ -87,6 +87,9 @@ Use the gate aggregates via `cargo make` and single workflow operations via guar
 - `bin/sotp pr push`
 - `bin/sotp pr ensure-pr`
 - `bin/sotp pr review-cycle`
+- `bin/sotp capability exec <capability> --briefing-file <path>` (the primary delegation route;
+  omit `--host` from a Codex root so the dispatcher runs the provider subprocess itself)
+- `bin/sotp phase enter spec-design|type-design|impl-plan` (phase-writer entry)
 - `bin/sotp track transition <task-id> <state> [--commit-hash <hash>]` (task-state transitions
   are performed only by the root orchestrator session, at the points the full-cycle workflow
   SSoT fixes)
