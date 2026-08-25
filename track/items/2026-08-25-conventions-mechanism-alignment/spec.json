@@ -190,7 +190,7 @@
         }
       ],
       "id": "AC-16",
-      "text": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+      "text": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、exported tree に overlay が供給しない convention が含まれないことを検証できる。改訂または追加した consumer 所有の convention 初期値が export に存在することは、AC-17 の export 比較で別途確認できる。"
     },
     {
       "adr_refs": [

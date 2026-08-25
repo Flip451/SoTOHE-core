@@ -1074,6 +1074,42 @@
           "hash": "rvw1:sha256:2f73bb60db1198350f467caba74e7b367e7380e6e0bda490bfffeba218b28bf5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:07:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:697c7986e623f6ca475bfa9361dc0de3f4b2e3d10f6f56059ecd394e5b6c5c2b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:11:36Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 10,
+              "message": "この規約と `.harness/custom/review-prompts/*.md` はどちらも consumer 所有であり、既存 ADR D9 は review prompt から consumer 所有規約への固定 path 参照を残すことを明示的に禁じています。この一文は prompt を harness 所有と再分類し、固定参照による結合を「唯一の改名不可例外」として規約側だけで正当化しているため、所有境界と ADR に矛盾します。固定参照を解消するか、この例外を ADR レベルで裁定する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:697c7986e623f6ca475bfa9361dc0de3f4b2e3d10f6f56059ecd394e5b6c5c2b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:15:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f96bb809aae17cd06cb7ac0e3e9a7512a1fc632b2c5ad535d1b710f4194760",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:21:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f96bb809aae17cd06cb7ac0e3e9a7512a1fc632b2c5ad535d1b710f4194760",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1757,6 +1793,63 @@
           "hash": "rvw1:sha256:9a0fb161b328e37537bf8ef97a1c5a2e41e8ac17f879710e527a6a8ef3d5a5ce",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:07:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dabec28144f3c0d6903524851aad5dc461f443b0979ecf4ec39e3158898caf38",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:10:44Z",
+          "findings": [
+            {
+              "category": "convention-annotation-completeness",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 9,
+              "message": "The new fixed-filename exception is a normative requirement, but it has no immediate `強制先` annotation. Once exported under `knowledge/conventions/`, this violates the D1 annotation-completeness rule; add the corresponding `review 観点 — harness-policy scope` annotation.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "overlay/knowledge/conventions/environment-assumptions.md",
+              "line": 5,
+              "message": "The fixed-path and deletion conditions mirror a workspace requirement that is followed by `review 観点 — harness-policy scope`, but the overlay omits that enforcement annotation. This breaks the required workspace/overlay annotation parity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dabec28144f3c0d6903524851aad5dc461f443b0979ecf4ec39e3158898caf38",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:13:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:456395bd70ea101e9ee622809280807641a0cd672e053b9deb898e5de12ee578",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:16:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:18:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2027,6 +2120,20 @@
           "at": "2026-08-25T17:29:57Z",
           "findings": [],
           "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:10:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aecfacef5c3705bc01031f8ab2d885c29457f95672fbe5ead4c68bed01b3c13a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:14:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aecfacef5c3705bc01031f8ab2d885c29457f95672fbe5ead4c68bed01b3c13a",
           "type": "final",
           "verdict": "zero_findings"
         }

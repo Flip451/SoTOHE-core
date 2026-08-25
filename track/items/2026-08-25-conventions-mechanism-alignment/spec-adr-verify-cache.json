@@ -1496,12 +1496,12 @@
       }
     },
     {
-      "claim_hash": "93bdc9a44f277178a0971459ad53f01087410de7f259cff3a67f69847980625b",
+      "claim_hash": "975cdb3a2c656e37d27b435b376e2de2212b2f8a3299f657b813d68be976fd53",
       "claim_origin": {
         "data": {
           "element_id": "AC-16",
           "section": "acceptance_criteria",
-          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、exported tree に overlay が供給しない convention が含まれないことを検証できる。改訂または追加した consumer 所有の convention 初期値が export に存在することは、AC-17 の export 比較で別途確認できる。"
         },
         "kind": "spec_element"
       },
@@ -1514,17 +1514,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "citation": "テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "93bdc9a44f277178a0971459ad53f01087410de7f259cff3a67f69847980625b",
+      "claim_hash": "975cdb3a2c656e37d27b435b376e2de2212b2f8a3299f657b813d68be976fd53",
       "claim_origin": {
         "data": {
           "element_id": "AC-16",
           "section": "acceptance_criteria",
-          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、exported tree に overlay が供給しない convention が含まれないことを検証できる。改訂または追加した consumer 所有の convention 初期値が export に存在することは、AC-17 の export 比較で別途確認できる。"
         },
         "kind": "spec_element"
       },
