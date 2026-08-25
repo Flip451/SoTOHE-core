@@ -32,7 +32,7 @@
 
 ### PR finding の修正主体
 
-PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとの focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。親コンテキストの直接編集は委譲失敗時の recovery に限り、通常の修正経路にしてはならない。
+PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとの focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
 委譲先の完了報告後、orchestrator は local review を `zero_findings` まで収束させ、`commit` workflow を完了してから PR review を再実行する。タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
 

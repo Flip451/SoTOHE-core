@@ -53,7 +53,7 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - **回帰先の判定**: `rollback-diagnoser`。出力は勧告であり、orchestrator が `reason` を不十分と判断すれば override し得る (既存どおり)。
 - **Prerequisite の充足確認と降下順序の遵守**: dispatch する orchestrator。
 - **各 writer capability**: 自分の再開 Prerequisite が briefing 上満たされていない場合、通常 mode では作業せず orchestrator へ差し戻す。`conflict-preparation` mode のみ、guarded merge conflict の既存 hunk 解消と derived artifact 再生成に限り起動できる。
-- **PR finding の修正**: actionable finding ごとに orchestrator が focused briefing を作り、実装変更は `implementer`、review-scope の修正は `review-fix-lead` へ委譲する。委譲先の完了後は local review を `zero_findings` まで収束させ、`commit` workflow を経てから PR review を再実行する。親コンテキストの直接編集は委譲失敗時の recovery に限る。
+- **PR finding の修正**: actionable finding ごとに orchestrator が focused briefing を作り、実装変更は `implementer`、review-scope の修正は `review-fix-lead` へ委譲する。委譲先の完了後は local review を `zero_findings` まで収束させ、`commit` workflow を経てから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
 ## Examples
 
