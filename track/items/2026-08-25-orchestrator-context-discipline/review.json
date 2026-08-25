@@ -608,6 +608,79 @@
           "hash": "rvw1:sha256:7937182496b0be288f6f0ed8c0c6d89302a72007b6ad1e2ff637ccdcf255a8c3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:24:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f13746a3f572c8dd44667a895bd63edb68850fff6a7794ecbbae220cb2406e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:31:41Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/guardrails.md",
+              "line": 2,
+              "message": "条件付き読み込みの対象に `.claude/settings.json` と `.claude/permission-extensions.json` が含まれていません。この文書の Permission Guardrails は、CI で強制されない危険な allow 追加に警告する運用面なので、permission ファイルだけを扱うセッションでは肝心の警告経路がロードされません。両パスを `paths` に追加してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/maintainer-checklist.md",
+              "line": 2,
+              "message": "このチェックリストが同期対象として明記する `architecture-rules.json`、`knowledge/conventions/**`、`.gemini/**` などが `paths` から漏れています。これらだけを変更する保守作業ではチェックリストがロードされず、「影響する全レイヤーを同時更新する」という契約を適用できません。列挙済みのアーキテクチャ面を条件に追加してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/dev-environment.md",
+              "line": 2,
+              "message": "このルールが直接説明する Docker／Compose／監査・toolchain 面 (`Dockerfile`, `compose*.yml`, `deny.toml`, `overlay/**` など) が `paths` に含まれていません。これらの tooling 設定だけを変更する場合、環境差や canonical wrapper の指示が条件付きロードされません。本文が管理する tooling surface を glob に追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4f13746a3f572c8dd44667a895bd63edb68850fff6a7794ecbbae220cb2406e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:38:03Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/orchestration.md",
+              "line": 2,
+              "message": "条件付き orchestration の `paths` は Codex skill の `.agents/**` を含む一方、同じ provider-routing surface の `.claude/agents/**` と `.codex/**` を含みません。本文は `.codex` の config/rules/hooks/agents の trust と capability routing を直接規定しているため、それらだけを扱う Claude セッションでは profile authority や dispatcher discipline がロードされません。両パターンを追加し、subagent/hook 制約を持つ `guardrails.md` の対象面も同様に揃えてください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:bf1354a3bcd4381986574da89d93509c1b08e8efe47857bb5724c0cbeb866a46",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:41:05Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/maintainer-checklist.md",
+              "line": 2,
+              "message": "条件付き maintainer checklist は `.claude/**` を対象にする一方、Codex 側の `.agents/**` と `.codex/**` を対象にしていません。本文は workflow SSoT と thin command adapters の同期を要求しているため、Claude adapter の変更時にはチェックリストがロードされますが、対応する Codex skill/provider surface だけを変更した場合にはロードされず、クロスプロバイダー同期が片側だけになります。両パターンを `paths` に追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:21453a9090ddca36cbc4ff66c393fef6587a4512e40ffb0b4bb6e27d9718a5b0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:43:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89d99f4b420039166eb27b31967aa0f4d4d39e1752fa5062c76a7603f00fcee9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

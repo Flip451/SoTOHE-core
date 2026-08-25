@@ -278,10 +278,12 @@ All gates are binary; no step begins until the previous step's gate passes.
 - **DFP `blocked`** (in `full-cycle`): surface violation pairs and halt. Do not proceed to
   review or commit.
 - **PR review loop actionable findings**: use the `pr-review` workflow's briefing → owning
-  capability → local review convergence → `commit` route. If delegation fails, parent editing is
-  recovery only; the parent must still converge local review and use the `commit` workflow before
-  re-running `pr-review`. Repeat until machine PASS (explicit zero findings) or user-approved
-  Accepted Deviations. The loop MUST continue until the terminal condition is met.
+  capability → local review convergence → `commit` route. A finding requiring an edit to
+  `knowledge/adr/*.md` follows the review workflow SSoT's `ADR-scope repair lane` and is never
+  fixed by the parent or `review-fix-lead`. If delegation fails for a non-ADR finding, parent
+  editing is recovery only; the parent must still converge local review and use the `commit`
+  workflow before re-running `pr-review`. Repeat until machine PASS (explicit zero findings) or
+  user-approved Accepted Deviations. The loop MUST continue until the terminal condition is met.
 - **Terminal diff-comment preparation or posting failure**: report the failure, including any
   available diff/provenance fallback, but do not invalidate Step 10, request user confirmation,
   or route through `pr review-cycle`.

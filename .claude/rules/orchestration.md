@@ -1,8 +1,18 @@
+---
+paths:
+  - ".harness/**"
+  - "track/**"
+  - ".claude/commands/**"
+  - ".claude/agents/**"
+  - ".codex/**"
+  - ".agents/**"
+---
+
 # Orchestration
 
-This is the detailed Claude-side orchestration reference. The concise always-applied root rule
-surface is `.claude/rules/orchestrator.md`; this file is read when workflow control or capability
-routing is in scope, and is not a PR-review briefing.
+This conditionally loaded document is the detailed Claude-side orchestration reference. The
+concise always-applied root rule surface is `.claude/rules/orchestrator.md`; this file is read
+when workflow control or capability routing is in scope, and is not a PR-review briefing.
 
 The root orchestrator is selected by `.harness/config/agent-profiles.json` at
 `capabilities.orchestrator.provider`. Claude Code and Codex CLI are both permanent template

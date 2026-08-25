@@ -1,7 +1,9 @@
 # Orchestrator Rules
 
-This is the concise, always-applied Claude Code rule surface for the root orchestrator. Review
-briefings are loaded by the review workflow and are not standing orchestrator instructions.
+This is the concise, always-applied Claude Code rule surface for the root orchestrator. It and
+`.claude/rules/language.md` are the only unconditionally loaded rules; the other rule documents
+are conditionally loaded by their `paths:` frontmatter. Review briefings are loaded by the review
+workflow and are not standing orchestrator instructions.
 
 - Delegate implementation, planning, review-fix, and other specialist work through the capability
   CLI or provider wrapper; keep workflow control in the root session.
