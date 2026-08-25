@@ -15,6 +15,7 @@ Refinement is not a defect.
 
 Report findings ONLY for the following categories:
 
+- **environment-assumption declaration**: Does this change require an environment-assumption declaration? If a changed contract depends on an external-boundary assumption not recorded in the spec or `knowledge/conventions/environment-assumptions.md`, report it as `未宣言の前提への依存`.
 - **acceptance criterion non-observable**: an `AC-NN` element whose text
   describes a state that cannot be checked by a deterministic procedure
   (CI command, grep, file-existence query, manual machine read). Example:

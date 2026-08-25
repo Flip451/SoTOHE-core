@@ -65,7 +65,7 @@ Tags appear inline at the end of the requirement statement:
 ## Constraints
 
 - New logic must be implemented in Rust, not Python [source: feedback — Rust-first policy]
-- TDD workflow is mandatory [source: convention — knowledge/conventions/testing.md]
+- Fake-first test doubles; mock only when the interaction is the specification [source: convention — knowledge/conventions/testing.md]
 - Input validation uses domain types [source: knowledge/conventions/prefer-type-safe-abstractions.md]
 ```
 

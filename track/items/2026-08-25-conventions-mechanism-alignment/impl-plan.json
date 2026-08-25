@@ -62,11 +62,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "3dd6cbcef47f9df61863db4250faac19e09f66e0",
       "description": "Update `knowledge/conventions/enforce-by-mechanism.md` with D1's required enforcement-destination annotation rule, then inventory and annotate normative requirements in `dry-check-workflow.md`, `filesystem-persistence-guard.md`, `language-policy.md`, `nightly-dev-tool.md`, `no-backward-compat.md`, `security.md`, `shell-parsing.md`, `source-attribution.md`, and `workflow-ceremony-minimization.md`; validate the finite convention set in harness-policy review. D1; IN-01; CN-01; OUT-02; AC-01.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "3dd6cbcef47f9df61863db4250faac19e09f66e0",
       "depends_on": [
         "T001"
       ],
@@ -80,9 +82,10 @@
       ],
       "description": "Rewrite `knowledge/conventions/testing.md` and annotate normative requirements with T001's taxonomy. IN-01; IN-03; AC-01; AC-03.",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "3dd6cbcef47f9df61863db4250faac19e09f66e0",
       "depends_on": [
         "T001"
       ],
@@ -93,7 +96,7 @@
     {
       "description": "Update `.harness/custom/review-prompts/domain.md`, `.harness/custom/review-prompts/usecase.md`, `.harness/custom/review-prompts/infrastructure.md`, `.harness/custom/review-prompts/cli.md`, `.harness/custom/review-prompts/cli_composition.md`, `.harness/custom/review-prompts/cli_driver.md`, and `.harness/custom/review-prompts/spec.md`; add the required review questions. IN-05; CN-03; OUT-03; AC-05.",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -101,7 +104,7 @@
       ],
       "description": "Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/coding-principles.md` for port injection and facade policy, and annotate the normative requirements in `coding-principles.md` with T001's taxonomy. D3; IN-01; IN-06; OUT-01; AC-01; AC-06.",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

@@ -10,6 +10,7 @@ cleanly but break trust boundaries at runtime.
 
 Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
+- **external-boundary assumptions**: What external boundaries does the diff touch (OS, process, encoding, concurrency, resource limits, time, and other versions of its own artifacts)? Enumerate operations directly reached from the changed behavior. If a depended-on assumption is in neither the spec nor `knowledge/conventions/environment-assumptions.md`, report it as `未宣言の前提への依存`; treat unresolvable indirect boundaries the same way rather than searching exhaustively.
 - **trusted-root violation**: a path-handling code path that resolves user
   / config input via `Path::join` / canonicalize WITHOUT verifying the
   resolved path stays under a `trusted_root: &Path` (path traversal).

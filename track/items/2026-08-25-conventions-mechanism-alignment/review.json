@@ -422,6 +422,158 @@
           "hash": "rvw1:sha256:9e8e3a0e150c94360390aeb3d6061b93d49c1af9e836bde6af901f48bb968480",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:58:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb85302c7f8ff0df11d2b98a7c36e2cf0628fd084239699272eef5f0242e296",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:10:26Z",
+          "findings": [
+            {
+              "category": "enforcement annotation",
+              "file": "knowledge/conventions/testing.md",
+              "line": 10,
+              "message": "Scope の適用・除外条件は D1 が注記対象とする規範的な許容条件だが、強制先注記がない。区切り線の前に実在する review scope または強制なしを明記する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "mechanism mismatch",
+              "file": "knowledge/conventions/testing.md",
+              "line": 26,
+              "message": "`test-obligation check/evaluate` は binding と verdict を検証するだけで、数値 coverage 目標の追加や coverage 値だけによる判定を検出しない。この禁止規則を completion-gate 規則から分離し、review 観点または強制なしへ割り当てる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "review wiring inconsistency",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 59,
+              "message": "公開 API documentation を domain review に割り当てているが、domain review policy は doc string presence を機械検査として reviewer 対象外にしている。しかも現在の clippy 設定には missing-docs / missing-errors-doc lint がなく、検出責任が空白になる。機械 gate を実装するか review policy と割り当てを一致させる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 30,
+              "message": "すべてのエラー伝搬に `?` を要求する規則は、cli policy が context 付与のための明示的 `match` を報告対象外としていることと矛盾する。`?` を原則としつつ、型付き変換や context 付与を行う明示的処理を許容する形に揃える必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "incorrect convention example",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 162,
+              "message": "panic-free の Good 例は `b == 0` しか検査せず、`i32::MIN / -1` で除算オーバーフローにより panic する。`checked_div` と overflow 用の型付きエラーを使う例にする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 22,
+              "message": "複数 usecase の orchestration を composition の責務にも分類しているが、cli_composition policy は composition root による usecase invocation を明示的に禁止しており、同じファイルの後続規則も usecase application service を所有者としている。`composition/` を削除して責任境界を一意にする必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb85302c7f8ff0df11d2b98a7c36e2cf0628fd084239699272eef5f0242e296",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:17:42Z",
+          "findings": [
+            {
+              "category": "review wiring inconsistency",
+              "file": ".harness/custom/review-prompts/domain.md",
+              "line": 7,
+              "message": "同じ段落で doc string presence を機械検査の責務とした直後に reviewer の責務としており、所有者が二重化している。実際の workspace lint に missing-docs 系設定もないため、`doc string presence` を機械検査一覧から外し、新設した review category を唯一の強制先にする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement annotation mismatch",
+              "file": "knowledge/conventions/testing.md",
+              "line": 13,
+              "message": "Scope の `Applies to` と `Does not apply` をまとめて「強制なし」としているが、理由は非 Rust 文書の除外しか説明せず、`libs/`・`apps/` に規約を適用する条件を誤って未強制扱いにしている。coding-principles の Scope と同様に code review scopes を割り当てるか、適用条件と除外条件を分けて注記する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a792e1b2246df32b87a974b5062d05483fcb77b347e06dc1a962164e574f151d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:22:18Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 5,
+              "message": "TDD 規則を削除したため、`knowledge/conventions/source-attribution.md` の出荷例が引き続き「TDD workflow is mandatory」を本ファイル由来としているのは虚偽の source attribution になっている。例を現存する testing 規則へ更新するか、TDD の根拠を別の有効な SSoT に向ける必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-policy contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 84,
+              "message": "fake-first・interaction-only mock という厳密な区別は、現在の `AGENTS.md` review contract にある「External dependencies (DB, API) must be mocked」と矛盾する。このままでは同じテストを convention reviewer は fake 必須、PR reviewer は mock 必須と判定できるため、AGENTS.md 側も同じ test-double policy に同期する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a93aba76ab616532699f916c6fa7200a9ae80ceca3262a99806173a9e7fe6ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:25:53Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 7,
+              "message": "The D3 update allows a driver to receive multiple single-purpose ports and explicitly removes the one-interactor injection constraint, but this prompt still states “one interactor per request” and requires multi-interactor calls to be extracted. That makes compliant multi-port drivers reportable as violations; update the role statement and the affected categories together.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c270558bfe39092cede69857698bfda29b00d82d4f15f8083904e8e3a6184da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:29:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc432d31d791bcf9f434ba9691b1f6d3450c1a85c0ee792153e1591ae002088a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:35:19Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 23,
+              "message": "D3 removes the single-interactor injection constraint, but it does not remove the one-subcommand/one-use-case execution boundary. Allowing one request to invoke multiple use-case ports moves multi-use-case orchestration back into the primary adapter. A Driver may hold several single-purpose ports for different requests, but each request should invoke one use-case port; multi-step behavior must be represented behind one application-service port.",
+              "severity": "P1"
+            },
+            {
+              "category": "review-policy contradiction",
+              "file": "AGENTS.md",
+              "line": 23,
+              "message": "This absolute `?` requirement still contradicts `coding-principles.md`, which now permits an explicit exhaustive `match` for typed conversion or context attachment, and `cli.md`, which explicitly excludes such matches from findings. Align the PR-review rule with those permitted error-propagation forms so reviewers do not reject valid boundary handling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc432d31d791bcf9f434ba9691b1f6d3450c1a85c0ee792153e1591ae002088a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:40:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:36d54cb135dcdc6498585d686c2df26bd97217306eb796a1c4a0ddfbe27c4bdd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -559,6 +711,20 @@
           "at": "2026-08-25T07:39:05Z",
           "findings": [],
           "hash": "rvw1:sha256:a312e4fd9dcb79c0117f7d92c9f2546b6e792e9c6ce7b01fb56787fc7e873982",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:57:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:511e671e6dd91605bc0b91354a55bc9b67ce2b4c80979c22da9dc97a4ee833a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:00:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:511e671e6dd91605bc0b91354a55bc9b67ce2b4c80979c22da9dc97a4ee833a1",
           "type": "final",
           "verdict": "zero_findings"
         }
