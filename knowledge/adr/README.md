@@ -214,6 +214,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
 | [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
 | [consumer 規約の所有権分離と harness 固定依存の撤去](2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md) | Proposed | 2026-07-24 |
+| [規約を機構と突き合わせて改訂する](2026-08-20-1043-conventions-mechanism-alignment.md) | Proposed | 2026-08-20 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 

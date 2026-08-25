@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T03:54:08Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 46,
+              "message": "D1 は「全規約規則」「各規則」を例外なく注記するという完全追跡の義務を決定しているが、既存 authority への委譲、保守的 over-approximation、または実装深度見積りのいずれで解決するかを Decision/Consequences に記録していない。対象集合の増加に対して非収束な実装・レビュー範囲を残している。",
+              "severity": "P1"
+            },
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 74,
+              "message": "D8 はコード scope ごとに diff が接する外部境界を「列挙」することを要求しているが、列挙の完全性を既存 authority に委譲するのか、保守的 over-approximation とするのか、厳密実装の深度をどう見積もるのかを Decision/Consequences に記録していない。外部境界の open set に対する未解決の完全追跡義務になっている。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:316b32d46bc11d5dfc000953d9fdb2d26ae6a8222155b1ded1fadfed139bb3a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:01:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0aac233b4a2bfb0f260152b097d315f6a07b1438735476484f678bf6a143a7c3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:07:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0aac233b4a2bfb0f260152b097d315f6a07b1438735476484f678bf6a143a7c3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ecc0a0d601087dd693376fbd89d2be286f1d7af766ba3b041f9e8c4f55691893",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:24:49Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 68,
+              "message": "D6 は「カバレッジ目標 80% は廃止する」と決定していますが、既存の accepted decision `2026-07-08-1405-grandfathered-tech-and-product-baseline.md` D16 は新規コードの line coverage 80% 目標を維持しています。本 ADR はその supersede/refine 関係を記録していないため、両方が有効な相反する決定として残ります。D6 が D16 のカバレッジ行を置き換えることと、D16 の残余を維持することを Existing decision relationship に明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ecc0a0d601087dd693376fbd89d2be286f1d7af766ba3b041f9e8c4f55691893",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:31:01Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 61,
+              "message": "D4 internally conflicts on the boundary contract: it says the boundary receives an already validated Command, but also requires parsing strings at that same usecase boundary. Clarify whether raw strings or validated Command values cross the boundary; otherwise implementations can satisfy one clause only by violating the other.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e79118086600cb88d727e5601c95c10b12d831e0c1fba2e70e047b81468ebc29",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:37:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:167f7168f3edaba15041e1328e94c0600a5f3e1157bdd98cf0b3fd85c562d045",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:41:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:167f7168f3edaba15041e1328e94c0600a5f3e1157bdd98cf0b3fd85c562d045",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:10:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d714f8aca3bee8dd474143492d6f7fa8d99cc1cf1f2b84687bc3a7462d18c511",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:14:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d714f8aca3bee8dd474143492d6f7fa8d99cc1cf1f2b84687bc3a7462d18c511",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
