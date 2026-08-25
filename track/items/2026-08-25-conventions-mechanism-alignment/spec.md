@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 23, yellow: 0, red: 0 }
+signals: { blue: 45, yellow: 0, red: 0 }
 ---
 
 # 規約を機構と突き合わせて改訂する
@@ -21,6 +21,16 @@ signals: { blue: 23, yellow: 0, red: 0 }
 - [IN-03] testing.md を、test-obligation を品質保証の正とし、層ごとのテスト責務、fake 優先、codec・parser・evaluator の property-based testing、および自ソース部分文字列 assert 禁止を定める構成へ全面改稿する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D6] [tasks: T003]
 - [IN-04] 対応プラットフォーム、入力エンコーディング方針、資源上限、並行モデルを consumer が宣言できる環境前提の置き場を、枠と記入指針だけを含む形で knowledge/conventions/ に新設する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D7] [tasks: T004]
 - [IN-05] .harness/custom/review-prompts/ の review-scope.json が宣言する全 code scope に、diff が接する外部境界と未宣言の前提への依存を確認するドメイン非依存のメタ問いを追加し、spec review prompt には環境前提宣言の必要性を問う対応形を追加する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D8] [tasks: T005]
+- [IN-09] D1 のメタ規則を実装する consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T009]
+- [IN-10] D2 の必要駆動の抽象規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T011]
+- [IN-11] D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T012]
+- [IN-12] command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T013]
+- [IN-13] D5 の層の性質で表す role × layer 規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D5, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T014]
+- [IN-14] D6 の testing.md 全面改稿を実装する consumer 所有の overlay/knowledge/conventions/testing.md 初期値を、改訂した convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D6, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T017]
+- [IN-15] D7 の環境前提宣言の置き場として、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を追加する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D7, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T018]
+- [IN-16] D1 の強制機構注記を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md、overlay/knowledge/conventions/security.md および overlay/knowledge/conventions/README.md 初期値を、各 workspace 側 convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T010, T015]
+- [IN-17] D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md 初期値を、workspace 側 convention 文書と同期する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T015]
+- [IN-18] 必要性テストから structure-required port を除外する D1 の refine を反映する consumer 所有の overlay/knowledge/conventions/prefer-type-safe-abstractions.md 初期値を、workspace 側 convention 文書と同期する。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T016]
 
 ### Out of Scope
 - [OUT-01] 既存コード、既存の抽象ペア、または既存の境界実装を、改訂後の規約に合わせて遡及修正することは対象外とする。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D2] [tasks: T002, T006, T007, T008]
@@ -41,6 +51,18 @@ signals: { blue: 23, yellow: 0, red: 0 }
 - [ ] [AC-03] testing.md は新規コードの line coverage 80% 目標を保持せず、test-obligation 機構を品質保証の正として、テストピラミッド、fake 優先、限定的な mock、property-based testing、および自ソース部分文字列 assert の禁止を明示する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D6] [tasks: T003]
 - [ ] [AC-04] 新しい環境前提宣言の置き場は、対応プラットフォーム、入力エンコーディング方針、資源上限、並行モデルを consumer が記入できる枠と指針を含み、特定ドメインの前提を既定値として含まない。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D7] [tasks: T004]
 - [ ] [AC-05] review-scope.json が宣言する全 code scope の review prompt と spec review prompt は、D8 の対応する境界メタ問いを含む。問いは OS、プロセス、エンコーディング、並行、資源上限、時刻、別バージョンの自成果物を分類として扱い、未宣言の前提への依存を報告させる一方、doc scope とドメイン固有チェックリストには注入しない。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D8] [tasks: T005]
+- [ ] [AC-09] fresh template export は、D1 のメタ規則を反映した consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T009, T019]
+- [ ] [AC-10] fresh template export は、D2 の必要駆動の抽象規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T011, T019]
+- [ ] [AC-11] fresh template export は、D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T012, T019]
+- [ ] [AC-12] fresh template export は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T013, T019]
+- [ ] [AC-13] fresh template export は、D5 の層の性質で表す role × layer 規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D5, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T014, T019]
+- [ ] [AC-14] fresh template export は、D6 の test-obligation を品質保証の正とする改訂を反映した consumer 所有の overlay/knowledge/conventions/testing.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D6, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T017, T019]
+- [ ] [AC-15] fresh template export は、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を出荷する。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D7, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T018, T019]
+- [ ] [AC-16] fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D7, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T019]
+- [ ] [AC-17] fresh template export の consumer 所有 overlay/knowledge/conventions/ 初期値は、track が改訂または追加した README.md、coding-principles.md、prefer-type-safe-abstractions.md、security.md、enforce-by-mechanism.md、type-designer-kind-selection.md、testing.md、environment-assumptions.md の workspace 側の内容と同期していることを内容比較で確認できる。environment-assumptions.md は CN-02 / OUT-03 に従い、宣言枠と記入指針だけを含む。 [adr: knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T019]
+- [ ] [AC-18] fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md、security.md および README.md は、各 workspace 側文書と同じ規範的要求および強制機構注記を持ち、consumer 向けの framing だけが異なることを内容比較で確認できる。 [adr: knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T010, T015, T019]
+- [ ] [AC-19] fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md は、workspace 側文書と同じ port 注入粒度および command と query を混載する facade port を新設しない規則を持つことを内容比較で確認できる。 [adr: knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md#D3, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T015, T019]
+- [ ] [AC-20] fresh template export の consumer 所有 overlay/knowledge/conventions/prefer-type-safe-abstractions.md は、workspace 側文書と同じ structure-required port を必要性テストの対象外とする規則および強制機構注記を持つことを内容比較で確認できる。 [adr: knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md#D1, knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md#D1] [tasks: T016, T019]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -49,5 +71,5 @@ signals: { blue: 23, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 23  🟡 0  🔴 0
+🔵 45  🟡 0  🔴 0
 

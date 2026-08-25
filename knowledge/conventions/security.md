@@ -56,14 +56,14 @@ passwords, and other credential files).
 
 ## Symlink Rejection in Infrastructure Adapters
 
-Infrastructure 層のファイル I/O アダプターは、対象ファイルとその親ディレクトリの symlink を事前に拒絶する。
+Infrastructure 層のファイル I/O アダプターは、対象ファイルと、信頼された root より下にあるすべてのディレクトリ component（中間ディレクトリを含む）の symlink を事前に拒絶する。leaf と直上の親だけを検査する実装は不十分である。
 
 ### ルール
 
 | 対象 | チェック |
 |---|---|
 | 読み書き対象ファイル（leaf） | `symlink_metadata()` で symlink なら fail-closed エラー |
-| 親ディレクトリ（track dir 等） | `symlink_metadata()` で symlink なら fail-closed エラー |
+| root より下の全ディレクトリ component（中間ディレクトリを含む） | root 側から leaf に向かって順に `symlink_metadata()` で検査し、symlink なら fail-closed エラー（leaf が存在しなくても親は検査する） |
 | root ディレクトリ | CLI composition root から渡されるため信頼する |
 
 > **強制先**: review 観点 — infrastructure / cli_composition scope

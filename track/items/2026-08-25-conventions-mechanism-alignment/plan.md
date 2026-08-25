@@ -3,9 +3,9 @@
 
 ## Summary
 
-GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
+GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019.
 
-## Tasks (8/8 resolved)
+## Tasks (12/19 resolved)
 
 ### S1 — Enforcement taxonomy and convention inventory
 
@@ -39,3 +39,19 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008.
 > Update the configured code-scope prompt files under `.harness/custom/review-prompts/` and `.harness/custom/review-prompts/spec.md` with the required review questions. IN-05; CN-03; OUT-03; AC-05.
 
 - [x] **T005**: Update `.harness/custom/review-prompts/domain.md`, `.harness/custom/review-prompts/usecase.md`, `.harness/custom/review-prompts/infrastructure.md`, `.harness/custom/review-prompts/cli.md`, `.harness/custom/review-prompts/cli_composition.md`, `.harness/custom/review-prompts/cli_driver.md`, and `.harness/custom/review-prompts/spec.md`; add the required review questions. IN-05; CN-03; OUT-03; AC-05. (`57aa30a8511b552f2f5fc21bfd011907cdaf7181`)
+
+### S6 — Consumer convention initial-value shipping
+
+> Synchronize the eight convention initial values under `overlay/knowledge/conventions/`, then create and validate a fresh template export. IN-09; IN-10; IN-11; IN-12; IN-13; IN-14; IN-15; IN-16; IN-17; IN-18; AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20.
+
+- [x] **T009**: Add or synchronize `overlay/knowledge/conventions/enforce-by-mechanism.md`. IN-09; AC-09.
+- [x] **T010**: Synchronize `overlay/knowledge/conventions/README.md` and `overlay/knowledge/conventions/security.md`. IN-16; AC-18.
+- [x] **T011**: Synchronize the necessity-driven abstraction portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-10; AC-10.
+- [ ] **T012**: Synchronize the port-injection and facade-policy portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-11; AC-11.
+- [ ] **T013**: Synchronize the validated Command/Query boundary portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-12; AC-12.
+- [ ] **T014**: Synchronize the role-by-layer portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-13; AC-13.
+- [ ] **T015**: Synchronize `overlay/knowledge/conventions/coding-principles.md`. IN-16; IN-17; AC-18; AC-19.
+- [ ] **T016**: Synchronize `overlay/knowledge/conventions/prefer-type-safe-abstractions.md`. IN-18; AC-20.
+- [ ] **T017**: Synchronize `overlay/knowledge/conventions/testing.md`. IN-14; AC-14.
+- [x] **T018**: Add `overlay/knowledge/conventions/environment-assumptions.md`. IN-15; AC-15.
+- [ ] **T019**: Create a fresh template export, run `bin/sotp template check-convention-shipping`, and compare its eight shipped convention files with the workspace contracts. AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20.

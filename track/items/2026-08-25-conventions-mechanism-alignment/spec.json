@@ -79,6 +79,166 @@
       ],
       "id": "AC-05",
       "text": "review-scope.json が宣言する全 code scope の review prompt と spec review prompt は、D8 の対応する境界メタ問いを含む。問いは OS、プロセス、エンコーディング、並行、資源上限、時刻、別バージョンの自成果物を分類として扱い、未宣言の前提への依存を報告させる一方、doc scope とドメイン固有チェックリストには注入しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-09",
+      "text": "fresh template export は、D1 のメタ規則を反映した consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-10",
+      "text": "fresh template export は、D2 の必要駆動の抽象規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-11",
+      "text": "fresh template export は、D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-12",
+      "text": "fresh template export は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-13",
+      "text": "fresh template export は、D5 の層の性質で表す role × layer 規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D6",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-14",
+      "text": "fresh template export は、D6 の test-obligation を品質保証の正とする改訂を反映した consumer 所有の overlay/knowledge/conventions/testing.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D7",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-15",
+      "text": "fresh template export は、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を出荷する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D7",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-16",
+      "text": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-17",
+      "text": "fresh template export の consumer 所有 overlay/knowledge/conventions/ 初期値は、track が改訂または追加した README.md、coding-principles.md、prefer-type-safe-abstractions.md、security.md、enforce-by-mechanism.md、type-designer-kind-selection.md、testing.md、environment-assumptions.md の workspace 側の内容と同期していることを内容比較で確認できる。environment-assumptions.md は CN-02 / OUT-03 に従い、宣言枠と記入指針だけを含む。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-18",
+      "text": "fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md、security.md および README.md は、各 workspace 側文書と同じ規範的要求および強制機構注記を持ち、consumer 向けの framing だけが異なることを内容比較で確認できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-19",
+      "text": "fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md は、workspace 側文書と同じ port 注入粒度および command と query を混載する facade port を新設しない規則を持つことを内容比較で確認できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        }
+      ],
+      "id": "AC-20",
+      "text": "fresh template export の consumer 所有 overlay/knowledge/conventions/prefer-type-safe-abstractions.md は、workspace 側文書と同じ structure-required port を必要性テストの対象外とする規則および強制機構注記を持つことを内容比較で確認できる。"
     }
   ],
   "constraints": [
@@ -245,6 +405,146 @@
         ],
         "id": "IN-05",
         "text": ".harness/custom/review-prompts/ の review-scope.json が宣言する全 code scope に、diff が接する外部境界と未宣言の前提への依存を確認するドメイン非依存のメタ問いを追加し、spec review prompt には環境前提宣言の必要性を問う対応形を追加する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-09",
+        "text": "D1 のメタ規則を実装する consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-10",
+        "text": "D2 の必要駆動の抽象規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-11",
+        "text": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-12",
+        "text": "command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-13",
+        "text": "D5 の層の性質で表す role × layer 規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D6",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-14",
+        "text": "D6 の testing.md 全面改稿を実装する consumer 所有の overlay/knowledge/conventions/testing.md 初期値を、改訂した convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D7",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-15",
+        "text": "D7 の環境前提宣言の置き場として、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を追加する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-16",
+        "text": "D1 の強制機構注記を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md、overlay/knowledge/conventions/security.md および overlay/knowledge/conventions/README.md 初期値を、各 workspace 側 convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-17",
+        "text": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md 初期値を、workspace 側 convention 文書と同期する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+          }
+        ],
+        "id": "IN-18",
+        "text": "必要性テストから structure-required port を除外する D1 の refine を反映する consumer 所有の overlay/knowledge/conventions/prefer-type-safe-abstractions.md 初期値を、workspace 側 convention 文書と同期する。"
       }
     ],
     "out_of_scope": [
@@ -285,7 +585,7 @@
     ]
   },
   "signals": {
-    "blue": 23,
+    "blue": 45,
     "red": 0,
     "yellow": 0
   },

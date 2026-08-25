@@ -218,6 +218,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [規約を機構と突き合わせて改訂する](2026-08-20-1043-conventions-mechanism-alignment.md) | Proposed | 2026-08-20 |
 | [usecase 入力境界を Command と Query の検証済み型に統一する](2026-08-25-1021-validated-usecase-input-boundaries.md) | Proposed | 2026-08-25 |
 | [必須ポートを必要性テストの対象外にする](2026-08-25-2239-required-ports-exempt-from-necessity-test.md) | Proposed | 2026-08-25 |
+| [consumer 所有の初期規約にも改訂済みの規範を出荷する](2026-08-26-0000-consumer-shipped-convention-initial-values.md) | Proposed | 2026-08-26 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 

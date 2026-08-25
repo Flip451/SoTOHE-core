@@ -53,10 +53,30 @@
           "T005"
         ],
         "title": "Review boundary meta-questions"
+      },
+      {
+        "description": [
+          "Synchronize the eight convention initial values under `overlay/knowledge/conventions/`, then create and validate a fresh template export. IN-09; IN-10; IN-11; IN-12; IN-13; IN-14; IN-15; IN-16; IN-17; IN-18; AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20."
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011",
+          "T012",
+          "T013",
+          "T014",
+          "T015",
+          "T016",
+          "T017",
+          "T018",
+          "T019"
+        ],
+        "title": "Consumer convention initial-value shipping"
       }
     ],
     "summary": [
-      "GO-01 → T001, T002, T003, T004, T005, T006, T007, T008."
+      "GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019."
     ]
   },
   "schema_version": 2,
@@ -126,6 +146,104 @@
       "description": "Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/tddd-product-correctness.md` for the layer-property matrix, and annotate the normative requirements in both files with T001's taxonomy. D5; IN-01; IN-08; OUT-01; AC-01; AC-08.",
       "id": "T008",
       "status": "done"
+    },
+    {
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Add or synchronize `overlay/knowledge/conventions/enforce-by-mechanism.md`. IN-09; AC-09.",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T001",
+        "T004"
+      ],
+      "description": "Synchronize `overlay/knowledge/conventions/README.md` and `overlay/knowledge/conventions/security.md`. IN-16; AC-18.",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T008"
+      ],
+      "description": "Synchronize the necessity-driven abstraction portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-10; AC-10.",
+      "id": "T011",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T011"
+      ],
+      "description": "Synchronize the port-injection and facade-policy portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-11; AC-11.",
+      "id": "T012",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T012"
+      ],
+      "description": "Synchronize the validated Command/Query boundary portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-12; AC-12.",
+      "id": "T013",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T013"
+      ],
+      "description": "Synchronize the role-by-layer portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-13; AC-13.",
+      "id": "T014",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T006"
+      ],
+      "description": "Synchronize `overlay/knowledge/conventions/coding-principles.md`. IN-16; IN-17; AC-18; AC-19.",
+      "id": "T015",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T002"
+      ],
+      "description": "Synchronize `overlay/knowledge/conventions/prefer-type-safe-abstractions.md`. IN-18; AC-20.",
+      "id": "T016",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Synchronize `overlay/knowledge/conventions/testing.md`. IN-14; AC-14.",
+      "id": "T017",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T004"
+      ],
+      "description": "Add `overlay/knowledge/conventions/environment-assumptions.md`. IN-15; AC-15.",
+      "id": "T018",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T009",
+        "T010",
+        "T011",
+        "T012",
+        "T013",
+        "T014",
+        "T015",
+        "T016",
+        "T017",
+        "T018"
+      ],
+      "description": "Create a fresh template export, run `bin/sotp template check-convention-shipping`, and compare its eight shipped convention files with the workspace contracts. AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20.",
+      "id": "T019",
+      "status": "todo"
     }
   ]
 }

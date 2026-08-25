@@ -369,6 +369,466 @@
       }
     },
     {
+      "claim_hash": "4a706ae31794f107dce147eea096084614fae7c959882c89c50c300a56012b80",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "D1 のメタ規則を実装する consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`enforce-by-mechanism.md` にこのメタ規則を追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4a706ae31794f107dce147eea096084614fae7c959882c89c50c300a56012b80",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "D1 のメタ規則を実装する consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75a4a9ca04e144765b694e4e3d9a75f3c8c2255087ada206541e2be7153973f9",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "D2 の必要駆動の抽象規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`2026-08-20-1043-conventions-mechanism-alignment.md` D2 の必要性テストは、役割名ではなく導入理由で適用範囲を決める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75a4a9ca04e144765b694e4e3d9a75f3c8c2255087ada206541e2be7153973f9",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "D2 の必要駆動の抽象規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8987a6fa6d398939c26067d123c94a2ee0300308679115031eb4e728708b5702",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8987a6fa6d398939c26067d123c94a2ee0300308679115031eb4e728708b5702",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ffd761df0b4b57fec78a1b7c2f7ff26205d3655900e98a0c2bd9086407e1962f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-12",
+          "section": "in_scope",
+          "text_label": "command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。」「string から Command または Query へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから対応する入力境界を呼び出す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ffd761df0b4b57fec78a1b7c2f7ff26205d3655900e98a0c2bd9086407e1962f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-12",
+          "section": "in_scope",
+          "text_label": "command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3c740b98cf8512fd449e4ae1408f334c5e631f5ff1c27e080a8797f5170f781b",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "D5 の層の性質で表す role × layer 規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`type-designer-kind-selection.md` R1 の表を、固有 crate 名から層の性質（innermost / application / driven adapter / driving adapter / composition root）に対する制約へ書き換え、crate 名との対応は `architecture-rules.json` の宣言から解決する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3c740b98cf8512fd449e4ae1408f334c5e631f5ff1c27e080a8797f5170f781b",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "D5 の層の性質で表す role × layer 規則を実装する consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "96cded1dc5e328c08586d81bf09ee2ae2bbc6855df805f69a47c6d36689aa333",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "D6 の testing.md 全面改稿を実装する consumer 所有の overlay/knowledge/conventions/testing.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "### D6: testing.md を全面改稿する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "96cded1dc5e328c08586d81bf09ee2ae2bbc6855df805f69a47c6d36689aa333",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "D6 の testing.md 全面改稿を実装する consumer 所有の overlay/knowledge/conventions/testing.md 初期値を、改訂した convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e7eaf2b70a18825ec9b3e40a447cbd8f736551a08bab5ea78bacdd1fcbe7ee5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "D7 の環境前提宣言の置き場として、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を追加する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e7eaf2b70a18825ec9b3e40a447cbd8f736551a08bab5ea78bacdd1fcbe7ee5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "D7 の環境前提宣言の置き場として、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を追加する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "環境前提の初期値は、宣言の枠と記入指針だけを含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ccb19f74731ce5136ab4cc78fd37129e283aaafcb7041d0cdb7e791aca309e29",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "D1 の強制機構注記を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md、overlay/knowledge/conventions/security.md および overlay/knowledge/conventions/README.md 初期値を、各 workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`knowledge/conventions/` の各規則は、その強制先 — 機械 lint / 宣言突合（catalogue + verify）/ review 観点 / **強制なし（明記）** — を注記しなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ccb19f74731ce5136ab4cc78fd37129e283aaafcb7041d0cdb7e791aca309e29",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "D1 の強制機構注記を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md、overlay/knowledge/conventions/security.md および overlay/knowledge/conventions/README.md 初期値を、各 workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "68ae602b1722a94e81faecbdbbaf360c1b45bf53dfcda565cb50e8a3b40e55fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-17",
+          "section": "in_scope",
+          "text_label": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md 初期値を、workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver の注入粒度は port 粒度 ADR の D1（1 ユースケース 1 trait・実行メソッド 1 つ）に従い、driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "68ae602b1722a94e81faecbdbbaf360c1b45bf53dfcda565cb50e8a3b40e55fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-17",
+          "section": "in_scope",
+          "text_label": "D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映する consumer 所有の overlay/knowledge/conventions/coding-principles.md 初期値を、workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0cecaced633aafcfe85f3edb175ec9a14a329c13d4c2f96cff9e2ef488848615",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-18",
+          "section": "in_scope",
+          "text_label": "必要性テストから structure-required port を除外する D1 の refine を反映する consumer 所有の overlay/knowledge/conventions/prefer-type-safe-abstractions.md 初期値を、workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "次の port trait は必要性テストの対象外とし、複数実装またはテスト差し替えの有無で導入可否を判断しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0cecaced633aafcfe85f3edb175ec9a14a329c13d4c2f96cff9e2ef488848615",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-18",
+          "section": "in_scope",
+          "text_label": "必要性テストから structure-required port を除外する D1 の refine を反映する consumer 所有の overlay/knowledge/conventions/prefer-type-safe-abstractions.md 初期値を、workspace 側 convention 文書と同期する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "db81b0e6782d1d0d5f8bd6a311933cd821e68c3e007ecf3b1ed1117efef42b73",
       "claim_origin": {
         "data": {
@@ -710,6 +1170,512 @@
       },
       "verdict": {
         "citation": "コード全 scope のレビュープロンプトに、ドメイン非依存のメタ問いを 1 つ追加する: 「diff が接する外部境界(OS・プロセス・エンコーディング・並行・資源上限・時刻・別バージョンの自成果物)を列挙し、依存する前提が仕様または環境前提宣言に無ければ『未宣言の前提への依存』として指摘せよ」。spec レビューには「環境前提の宣言が必要な変更か」を問う対応形を置く。doc scope には注入しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76425e9d488a21871aaf2e6c66923c5b23f670132c291e7bb43c049d5c4e25de",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D1 のメタ規則を反映した consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「`enforce-by-mechanism.md` にこのメタ規則を追加する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76425e9d488a21871aaf2e6c66923c5b23f670132c291e7bb43c049d5c4e25de",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D1 のメタ規則を反映した consumer 所有の overlay/knowledge/conventions/enforce-by-mechanism.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "05fb64ff00f54058336a76ba9a4f1369f4957b3674a9865804aa505fde6181ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D2 の必要駆動の抽象規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`2026-08-20-1043-conventions-mechanism-alignment.md` D2 の必要性テストは、役割名ではなく導入理由で適用範囲を決める。対象は、構造規則が要求する port とは別に、層の内部で任意に追加する trait と実装の組である。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "05fb64ff00f54058336a76ba9a4f1369f4957b3674a9865804aa505fde6181ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D2 の必要駆動の抽象規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e3e5adaffa9c188c62bd67c2acd959d4a12402c7accaff8944d98a8dfce98fe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e3e5adaffa9c188c62bd67c2acd959d4a12402c7accaff8944d98a8dfce98fe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D3 の port 注入粒度および command と query を混載する facade port を新設しない規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d6479b950573e38848e8ba32101dbb9484d6229f2f9f33551c954a30e2a63f27",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-1021-validated-usecase-input-boundaries.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d6479b950573e38848e8ba32101dbb9484d6229f2f9f33551c954a30e2a63f27",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、command usecase が検証済み Command を 1 個、query usecase が検証済み Query を 1 個だけ受け取り、cli が usecase 所有の boundary 型へ一度だけパースして対応する入力境界を呼び出す規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21a8c992236a0398d524c3842088968b000148d1471f2c4e2d89676b2592f8a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D5 の層の性質で表す role × layer 規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`type-designer-kind-selection.md` R1 の表を、固有 crate 名から層の性質（innermost / application / driven adapter / driving adapter / composition root）に対する制約へ書き換え、crate 名との対応は `architecture-rules.json` の宣言から解決する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21a8c992236a0398d524c3842088968b000148d1471f2c4e2d89676b2592f8a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D5 の層の性質で表す role × layer 規則を反映した consumer 所有の overlay/knowledge/conventions/type-designer-kind-selection.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3323d61c3f7d3bf38e8ed9219fa7ba83eb58338d35b493d5ad783f253aac608b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D6 の test-obligation を品質保証の正とする改訂を反映した consumer 所有の overlay/knowledge/conventions/testing.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "品質保証の正は test-obligation 機構（約束への結び付け検証）とし、カバレッジ目標 80% は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3323d61c3f7d3bf38e8ed9219fa7ba83eb58338d35b493d5ad783f253aac608b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、D6 の test-obligation を品質保証の正とする改訂を反映した consumer 所有の overlay/knowledge/conventions/testing.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0798ca303c6926130efa430ad7fef5d00fd837d083f17538e0a9f8040dd840d6",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0798ca303c6926130efa430ad7fef5d00fd837d083f17538e0a9f8040dd840d6",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export は、consumer が記入する枠と指針だけを含む consumer 所有の overlay/knowledge/conventions/environment-assumptions.md 初期値を出荷する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "環境前提の初期値は、宣言の枠と記入指針だけを含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "93bdc9a44f277178a0971459ad53f01087410de7f259cff3a67f69847980625b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "宣言の内容はプロジェクト固有であり consumer が所有する — テンプレートは枠と記入指針だけを出荷し、特定ドメインの前提を既定値として書かない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "93bdc9a44f277178a0971459ad53f01087410de7f259cff3a67f69847980625b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の出力に対して bin/sotp template check-convention-shipping が成功し、改訂または追加した consumer 所有の convention 初期値の出荷を検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "完全性はこの有限の文書対のレビューで判断し、出荷するファイルの被覆は `bin/sotp template check-convention-shipping` で確認する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7e3e9ba2f98ae901ba3367db445172084449996fdb49dbe374e809419eb31c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-17",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/ 初期値は、track が改訂または追加した README.md、coding-principles.md、prefer-type-safe-abstractions.md、security.md、enforce-by-mechanism.md、type-designer-kind-selection.md、testing.md、environment-assumptions.md の workspace 側の内容と同期していることを内容比較で確認できる。environment-assumptions.md は CN-02 / OUT-03 に従い、宣言枠と記入指針だけを含む。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。\n\n環境前提の初期値は、宣言の枠と記入指針だけを含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eeb1fa8ce8e9d987e82ebfb668acd044bb47231ea61b8214ea133f4ab5095e21",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md、security.md および README.md は、各 workspace 側文書と同じ規範的要求および強制機構注記を持ち、consumer 向けの framing だけが異なることを内容比較で確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f6e5e2093c662bbef84186e9d2c2f937035d21451fee7fe0b221abee6270c253",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md は、workspace 側文書と同じ port 注入粒度および command と query を混載する facade port を新設しない規則を持つことを内容比較で確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "49f0df6e19f4856d23160bfc31e004f1ac3ab11139a1b5a1722edc180ab45544",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "driver は消費する複数の単能ポートをそのまま注入してよい。未移行文脈でも、command と query を混載する facade ポートの新設を禁止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f6e5e2093c662bbef84186e9d2c2f937035d21451fee7fe0b221abee6270c253",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/coding-principles.md は、workspace 側文書と同じ port 注入粒度および command と query を混載する facade port を新設しない規則を持つことを内容比較で確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "62c3d30f95effee45b0312080015234e9fa1acec70507b9b8f7c9d955640df01",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-20",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/prefer-type-safe-abstractions.md は、workspace 側文書と同じ structure-required port を必要性テストの対象外とする規則および強制機構注記を持つことを内容比較で確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「次の port trait は必要性テストの対象外とし、複数実装またはテスト差し替えの有無で導入可否を判断しない。」また、「この二つは、必要性テストではなく支配するアーキテクチャ規則に従って導入する structure-required ports である。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "62c3d30f95effee45b0312080015234e9fa1acec70507b9b8f7c9d955640df01",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-20",
+          "section": "acceptance_criteria",
+          "text_label": "fresh template export の consumer 所有 overlay/knowledge/conventions/prefer-type-safe-abstractions.md は、workspace 側文書と同じ structure-required port を必要性テストの対象外とする規則および強制機構注記を持つことを内容比較で確認できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
         "kind": "pass"
       }
     }

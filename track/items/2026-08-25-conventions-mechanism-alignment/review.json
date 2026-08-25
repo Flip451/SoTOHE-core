@@ -167,6 +167,35 @@
           "hash": "rvw1:sha256:d6892d5f3c53e5281623b87da882054023281a88605d265629c275f76703e470",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:18:45Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md",
+              "line": 25,
+              "message": "D1 commits to preserving every normative requirement and enforcement correspondence across the workspace and overlay conventions, but neither the decision nor Consequences delegates completeness to an existing authority, chooses conservative over-approximation, or acknowledges an implementation depth estimate. This is an unresolved open-set commitment under the ADR review policy.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8f95f98e7d233b4a189aaf164179939980f8b78f12b67ebec8587c09a98878da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:25:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42ee3120fedc9cc941cab5ac0a95c46e6d1b1c7a28ae5fbdc2ac440119f33c39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:29:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42ee3120fedc9cc941cab5ac0a95c46e6d1b1c7a28ae5fbdc2ac440119f33c39",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1031,6 +1060,20 @@
           "hash": "rvw1:sha256:b195b4d61a0417b0a411e1bd1f2b9b0a7b5d7da2f1c7131c23c78f178ad64fed",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:27:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f73bb60db1198350f467caba74e7b367e7380e6e0bda490bfffeba218b28bf5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:32:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f73bb60db1198350f467caba74e7b367e7380e6e0bda490bfffeba218b28bf5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1226,6 +1269,143 @@
           "hash": "rvw1:sha256:af60ba45dfc4f563fb81bc5eb1a19bf70d47d9a9b95c3f24544f3a00c3eb24ae",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:48:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b01e041dcb96a9816e0b5796ba1824a86c80ef8df6bf4074ab66f53d3d6c0429",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:55:15Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/task-coverage.json",
+              "line": 42,
+              "message": "AC-09–AC-13 and AC-18–AC-20 require behavior in a fresh template export, but they are mapped only to source-sync tasks T009–T011. T012 is the sole task that creates and validates that export and compares all eight shipped files, yet it is absent from these mappings. Add T012 to those criteria (and cite them in T012), or add equivalent fresh-export validation to the currently mapped tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 149,
+              "message": "T009 is still todo but bundles two independently verifiable units: enforce-by-mechanism shipping (IN-09/AC-09) and README/security synchronization (IN-16/AC-18). Split these units before implementation and assign the holistic AC-17 export comparison to the dependent validation task.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 158,
+              "message": "T010 is still todo but bundles four independently verifiable updates in one file: necessity-driven abstraction (IN-10/AC-10), port/facade policy (IN-11/AC-11), the validated Command/Query boundary (IN-12/AC-12), and the role × layer rule (IN-13/AC-13). Split them into ordered tasks and assign AC-17 comparison ownership explicitly.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 167,
+              "message": "T011 is still todo but combines two independently verifiable document units: coding-principles synchronization (IN-16/IN-17, AC-18/AC-19) and prefer-type-safe-abstractions synchronization (IN-18/AC-20). Split them before implementation; AC-17 can converge in the later export-validation task.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 180,
+              "message": "T012 is still todo but bundles three independently verifiable units: testing.md synchronization (IN-14/AC-14), environment-assumptions.md creation (IN-15/AC-15), and fresh-export plus shipping/content validation (AC-16/AC-17). Split the two source-document units from a dependent export-validation task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b01e041dcb96a9816e0b5796ba1824a86c80ef8df6bf4074ab66f53d3d6c0429",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:07:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b3453bbfa584f4dc8487e2c3194ab112d4c6cb2770b7c352024054c2906940",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:12:59Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 145,
+              "message": "Batch B6 groups T011, T012, T013, and T014 even though all four write `overlay/knowledge/conventions/type-designer-kind-selection.md`. Their dependency chain orders the edits but does not provide isolated write ownership within the implementation batch, so separate task owners cannot work safely without overlapping changes. Have the impl-planner place these same-file tasks in separate ordered batches and repack non-overlapping tasks as ceilings permit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9b3453bbfa584f4dc8487e2c3194ab112d4c6cb2770b7c352024054c2906940",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:19:57Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 146,
+              "message": "B8 unnecessarily serializes T014 and T019 after B7. T014 depends only on T013, and T019 becomes ready after T014 plus the other B7 predecessors; placing T014 and then T019 in B7 is dependency-respecting, has no conflicting write ownership beyond that declared sequence, and totals 210 + 90 + 80 = 380 `other` lines, below the 500-line ceiling. The B8 boundary is therefore removable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53678bb189860dc11187c5050837f94dff9973cc480e51f5637002e805cd13c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:28:27Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 146,
+              "message": "B7 still groups T013 and T014, which both write `overlay/knowledge/conventions/type-designer-kind-selection.md`. Their dependency orders the edits but does not provide isolated write ownership within one implementation batch. Place T014 in a later batch; T019 can follow it there after all source tasks complete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53678bb189860dc11187c5050837f94dff9973cc480e51f5637002e805cd13c6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:33:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:36:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:56:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d40066ba4e66c9c0f2a0c061cbadb9367e62c27be1f6f2b3d73fa3313e2a732d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:58:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d40066ba4e66c9c0f2a0c061cbadb9367e62c27be1f6f2b3d73fa3313e2a732d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1242,6 +1422,152 @@
           "at": "2026-08-25T06:21:36Z",
           "findings": [],
           "hash": "rvw1:sha256:298827db5fc1f5dd6b46c312baf4b27dbbbd5a59e04864a03c6dccb2ded38c66",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:56:55Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/enforce-by-mechanism.md",
+              "line": 143,
+              "message": "The exported `enforce-by-mechanism.md` references `no-backward-compat.md` (lines 84 and 145) and `workflow-ceremony-minimization.md` (line 143), but neither file exists under `overlay/knowledge/conventions/`. A fresh template export therefore contains dangling convention references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6551b203bf5ef55d96f4c9b20558737b75850ff80a6e59cb9a6bf51808e0ab9b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:00:28Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/enforce-by-mechanism.md",
+              "line": 143,
+              "message": "The exported `enforce-by-mechanism.md` references `no-backward-compat.md` (lines 84 and 145) and `workflow-ceremony-minimization.md` (line 143), but neither file exists under `overlay/knowledge/conventions/`. A fresh template export therefore contains dangling convention references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:04:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:12:08Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 50,
+              "message": "AC-18 requires the overlay README to differ from its workspace counterpart only in consumer framing, but this Maintenance Rules block adds a new `required_for` obligation and replaces the workspace sensitive-directory procedure with a different `.gitignore`/`security.md` contract. These are normative changes, so fresh exports receive different maintenance requirements. Keep the operational rules aligned and isolate ownership framing separately.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The overlay symlink policy requires checking every existing path component and adds a nested-symlink review requirement, while the workspace counterpart requires only leaf and parent checks. This is a materially different security contract rather than consumer framing, violating AC-18's normative parity requirement.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 187,
+              "message": "The required-port exemption is not faithfully synchronized: this decision guidance drops the workspace qualifier that `UseCase` is for an optional service, and the bad-example correction at line 335 applies the multiple-implementation/test-seam necessity test to a repository adapter. Repository and SecondaryPort boundaries are structure-required regardless of that test, so this wording can cause mandatory inbound or secondary ports to be omitted.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope-leak",
+              "file": "overlay/track/items/2026-08-25-conventions-mechanism-alignment/logs/telemetry.jsonl",
+              "line": 1,
+              "message": "This runtime telemetry record embeds the active maintainer track ID and timestamp under the export overlay. It violates the briefing's no-track-specific-content constraint and, unlike root `track/items/**/logs/`, this nested path is not ignored, so it can be committed as an overlay artifact. Remove it and emit verification telemetry to the workspace's ignored track log location.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:19:58Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The revised policy checks only the leaf and its immediate parent. An intermediate symlink is followed while resolving both paths, allowing I/O to escape the trusted root even though both checks pass. This also contradicts `reject_symlinks_below`, which checks every ancestor. Require inspection of every component below the trusted root, including nested-symlink tests.",
+              "severity": "P0"
+            },
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 73,
+              "message": "This consumer overlay references maintainer-only `FsReviewStore`, `review_v2`, and `WriteGuard`; none exist in the exported overlay source. Fresh templates therefore receive a dead project-specific example, violating the no-distribution-leak requirement. Replace it with a generic consumer-facing example or remove it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:58e4b36e748ae84c742abe275e6fd2cdf2f94228b7701a2d4b81c74a55aa762e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:27:04Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The overlay security convention still permits checking only the leaf and immediate parent. It omits the workspace requirement to inspect every directory component below the trusted root, root-to-leaf, including intermediate symlinks and parents when the leaf is absent; this allows path escape through a nested symlink.",
+              "severity": "P0"
+            },
+            {
+              "category": "conformance",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 48,
+              "message": "The overlay README omits the workspace maintenance rule requiring `required_for` frontmatter and capability IDs for conventions intended to be automatically delivered to capabilities. This changes the normative convention behavior rather than merely changing consumer framing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9c6fa77d3c6fc519d266f96808ad35564c9e09fecdb881e6a68ef69c19cd97d5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:31:15Z",
+          "findings": [
+            {
+              "category": "conformance",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 50,
+              "message": "The overlay README adds a normative `required_for` frontmatter maintenance rule at line 50, but the current workspace counterpart does not contain this rule. This is an overlay-only behavioral requirement, not merely consumer ownership framing, so the overlay no longer matches the workspace convention.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:521095490e3bc4f808f1b33339a826f50f183fe52127241c8146e76fec5ffc8a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:34:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b6ce3d886dafc911e0fc2df9aab635bf424009243333662a507b99a1212cf90",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:37:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b6ce3d886dafc911e0fc2df9aab635bf424009243333662a507b99a1212cf90",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1346,6 +1672,174 @@
           "at": "2026-08-25T14:09:11Z",
           "findings": [],
           "hash": "rvw1:sha256:45fc4c63ffa7258e4118d3d6d694cc49f69324f150fa1c388c1bfe360c5679da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:41:04Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 362,
+              "message": "Round 3 requires every Command-boundary element to cite the admitted validated-usecase-input-boundaries ADR (#D1). IN-12 and AC-12 remain anchored only to the primary ADR’s D4, so the overlay contract can be derived from the superseded Command-only wording and omit the required Command/Query distinction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:96a2dfd30281c7b4c1baf28259326c0f317f4c6135b64e514b7977d17e42738f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:45:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1dcd12af2c4ba616464c31c429129ba73471c70c1e2160bf3c5086adfa43065a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:53:16Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 91,
+              "message": "GO-01 の consumer 出荷側の規約整合を証明する AC が不足しています。AC-09〜AC-15 は `enforce-by-mechanism.md`、`type-designer-kind-selection.md`、`testing.md`、`environment-assumptions.md` に限定されていますが、IN-01/AC-01 は全規範要求を、IN-02/AC-02 と IN-06/AC-06 は関連規約も改訂対象にしています。そのため consumer 所有の `coding-principles.md`、`prefer-type-safe-abstractions.md`、`security.md` が旧内容のままでも全 AC を満たせます。AC-16 の既存コマンドも一方向の文書一覧比較であり内容同期を検証しないため、この欠落を補えません。結果として fresh export が通っても、GO-01 の「consumer 側で同じ逸脱を再生産しない」は証明されません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1dcd12af2c4ba616464c31c429129ba73471c70c1e2160bf3c5086adfa43065a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:05:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7f94fafe6cc23f1357fd5ad84e38f63d019ee08864ed422accfb065fb0d68eaa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:34:13Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 84,
+              "message": "Round 8 requires every overlay element IN-09..IN-18 and AC-09..AC-20 to cite the admitted consumer-shipping ADR D1 alongside its content anchor. The current elements cite only the new ADR, so D2/D3/D5/D6/D7-specific overlay claims are no longer formally grounded in their corresponding workspace decisions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1df41e6ed3714006755de21d2ca1f9162323d8bfa6ea3a3a1e5e7bc757072892",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:42:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f829af243654736ff7cc90672da9a79a60031649f659427c6894ed881869f4a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:48:05Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 231,
+              "message": "GO-01 の consumer 出荷側の強制機構整合について、`README.md` の AC coverage が残っています。AC-17 は同期対象を7文書に限定していますが、この track は workspace の `knowledge/conventions/README.md` にある規範的な Maintenance Rules にも強制機構注記を追加しており、consumer 所有の overlay 側にも対応する `README.md` が出荷されます。AC-16 は文書一覧の被覆しか検査せず、AC-18〜20 も別文書だけを対象とするため、overlay の `README.md` が注記のない旧内容でも全 AC を満たせます。これは GO-01 の consumer 側における強制機構整合を決定的に証明できない coverage gap です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f829af243654736ff7cc90672da9a79a60031649f659427c6894ed881869f4a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:58:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8b76a85df3a5d8a6ca16e0135b4adb28e93561e2e9ef4d5e6c1c7f15d6c93f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:01:52Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 198,
+              "message": "Round 8 requires every overlay element AC-09..AC-20 to cite the admitted consumer-shipping ADR D1 alongside its content anchors. AC-17 now cites only the shipping ADR, despite asserting synchronization of D1/D2/D3/D5/D6/D7-derived workspace documents and the environment-assumption contract; its corresponding content anchors were removed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:07:07Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 232,
+              "message": "Round 8 requires each overlay acceptance element to cite the admitted consumer-shipping D1 alongside its content anchor. AC-18 cites only the shipping ADR, although it asserts preservation of the D1-derived normative requirements and enforcement annotations in coding-principles.md, security.md, and README.md; the primary ADR D1 anchor is missing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:341f8d92b3a3c60f3f066f902c33cfb4f5545c838aeabb5b112f3b442cbbd484",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:09:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491bbaaf46cfe6de557f7f8ce084eedfe74b54857302f9b9361802a3ee3c40",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:12:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491bbaaf46cfe6de557f7f8ce084eedfe74b54857302f9b9361802a3ee3c40",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:19:08Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 198,
+              "message": "AC-17 is the composite export-shipping claim. The Round 8 pairing rule explicitly says it must cite only the consumer-shipping ADR D1; its added primary D1, D2-refinement D1, D3, D5, D6, and D7 anchors create failing per-anchor semantic pairs. Per-document traceability belongs in AC-09..15 and AC-18..20.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 232,
+              "message": "AC-18 is a per-document overlay claim and must cite its content anchor alongside the consumer-shipping ADR D1. It currently cites only the shipping draft, leaving its coding-principles/security/README normative-content claim without the required content anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:27:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:29:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
           "type": "final",
           "verdict": "zero_findings"
         }
