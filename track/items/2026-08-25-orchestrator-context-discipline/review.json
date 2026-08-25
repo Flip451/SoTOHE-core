@@ -222,6 +222,108 @@
           "hash": "rvw1:sha256:9e6e66650eef3932a5b7b3cadffb6679534d2e8efbafcd8ded35e2b564be91e6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:29:17Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 15,
+              "message": "On re-invocation for an already initialized track, the unconditional instruction to pass inputs to `/track:init` conflicts with the refresh/resume contract and can restart or fail the existing track instead of deriving the first incomplete boundary from persisted state. Make `/track:init` forwarding conditional on first initialization and explicitly preserve the SSoT resume behavior.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:e128b196d5adc2c269b5f30de7a9160ba6d13a91db8df069888d503b0f4816ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:31:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea4f473c9e5aae61c7293f6260f6eff17bdddfffb94f941596288cfb752e2f5b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:41:09Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 37,
+              "message": "`implementer` is currently routed to Codex, so this command returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host` without executing the fix. The skill never handles that outcome and proceeds toward local review/commit, leaving implementation PR findings unfixed. On the sentinel, invoke the matching in-host Codex capability and wait for its result.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 14,
+              "message": "Input acquisition remains unconditional before Step 1: after the mandated `/clear` refresh, a re-invocation without arguments still tries to resolve and confirm the feature/ADR—potentially prompting because conversation context was cleared—even though the SSoT limits acquisition to tracks needing initialization. Detect the existing initialized track first and skip acquisition entirely when resuming from persisted state.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:ea4f473c9e5aae61c7293f6260f6eff17bdddfffb94f941596288cfb752e2f5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:48:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:086f9a81beda010aff7b69ce84fb8bf4456ff27f67a45021ff6cd11a30083931",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:53:06Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 41,
+              "message": "The `delegate-in-host` payload names only the capability, briefing, and discipline; it never names a custom-agent-versus-skill route, and this repository has no `.codex/agents/implementer.toml`. Therefore “whichever the dispatcher names” is not executable guidance, while loading `$implementer` in the root session would violate the no-inline-fix boundary. Specify a concrete separate in-host Codex agent dispatch using the implementer skill, then wait for that agent’s completion.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:086f9a81beda010aff7b69ce84fb8bf4456ff27f67a45021ff6cd11a30083931",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:58:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d013b5e1ed7df40a24f33608efcd18d8aace34f5a7e2a589f5ef279a3cd821ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:01:20Z",
+          "findings": [
+            {
+              "category": "hook coverage gap",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 42,
+              "message": "This hand-assembled `codex exec --sandbox workspace-write` subprocess violates `.claude/rules/guardrails.md` §Sandbox and Hook Coverage Warning: Claude hooks do not intercept its writes or direct Git operations, and Rule 2 explicitly requires workspace-writing orchestrator-output capabilities to run through the dispatcher rather than a manually assembled provider command. It also omits the dispatcher-owned model/effort flags. Use a genuine in-host Codex subagent route or a guarded dispatcher-owned execution path instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d013b5e1ed7df40a24f33608efcd18d8aace34f5a7e2a589f5ef279a3cd821ad",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:06:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f49d2c6ec5d504f50b66770e2dd26937a11e2fd8db70e59795a601aeba5694c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:09:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f49d2c6ec5d504f50b66770e2dd26937a11e2fd8db70e59795a601aeba5694c9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -481,6 +583,20 @@
           "at": "2026-08-25T07:11:47Z",
           "findings": [],
           "hash": "rvw1:sha256:e797b7e43f05642253349e5c23d7452a1e7eaf1df624d54309c7ec2c1ad14d93",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:28:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53577b73026cfe166760741680ed81a670765510709f12d20a923702528cfad6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:31:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53577b73026cfe166760741680ed81a670765510709f12d20a923702528cfad6",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -30,7 +30,25 @@ or failure-recovery procedures here.
 - Codex-specific prerequisite: the **Codex Cloud GitHub App** must be installed on the
   repository so `@codex review` is acted upon.
 
-### (4) Reporting format
+### (4) Finding fixes are delegated
+
+- Actionable PR findings are not fixed inline in the root Codex session. Per the workflow SSoT's
+  Step 3, prepare a focused briefing per finding and dispatch
+  `bin/sotp capability exec implementer --briefing-file <path>` (implementation changes) or
+  `cargo make track-local-review-fix -- --scope <scope> --briefing-file <path>
+  --round-type fast|final` (review-scope fixes). Omit `--host` on the implementer dispatch from
+  a Codex root: the dispatcher then runs the provider subprocess itself with its own sandbox,
+  model, and effort flags and the shared no-direct-git discipline, so the outcome is
+  `CAPABILITY_EXEC_OUTCOME: executed` and the implementer skill is never loaded into the root
+  session. Do not pass `--host codex` here (it would return `delegate-in-host`, for which no
+  separate in-host implementer agent exists) and never hand-assemble a `codex exec` command.
+  Only an `executed` outcome with the subprocess's completion report counts as the fix being
+  applied. Then converge locally
+  with `$track-review`, commit with `$track-commit`, and re-run this skill. The root session edits files directly only as
+  recovery after a failed delegation, and still runs the local convergence and commit before
+  re-running.
+
+### (5) Reporting format
 
 - On successful completion (only when the PR review reaches explicit zero findings or the user
   approves an Accepted Deviations exception per `.harness/workflows/track/pr-review.md`),

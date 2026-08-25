@@ -10,6 +10,12 @@ User invokes this command as `/track:spec-design`. No arguments.
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the spec-design workflow SSoT's `Summary-first context intake`.
+  Use CLI summaries as the primary context; do not bulk-read `spec.json`, review or binding
+  JSON, catalogues, full sub-workflow texts, or a `Related Conventions` list. Open only a
+  targeted diff or the artifact body named by a blocker; the dispatcher supplies exact
+  convention paths to the delegated capability.
+
 Write a briefing to `tmp/spec-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/metadata.json` path

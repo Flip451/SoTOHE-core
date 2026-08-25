@@ -10,17 +10,35 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
 
 ## Claude Code invocation constraints
 
-The push / PR / review-cycle commands below run from the orchestrator host. Actionable
-findings are not fixed inline: per the workflow SSoT's Step 3, each one is delegated through a
-briefing (`bin/sotp capability exec implementer --host claude --briefing-file <path>` or
-`cargo make track-local-review-fix -- --scope <scope> ...`), converged locally with
-`/track:review`, and committed with `/track:commit` before re-running this command; the
-orchestrator edits directly only as recovery after a failed delegation. Key commands used in
-sequence:
+- **Finding-fix dispatch**: the push / PR / review-cycle commands run from the orchestrator
+  host, but actionable findings are not fixed inline. Prepare a focused briefing for each
+  finding with the review comment, affected path and line, relevant track context, and requested
+  correction. For implementation changes, dispatch `implementer` with:
+  ```
+  bin/sotp capability exec implementer --host claude --briefing-file <path>
+  ```
+  If the dispatcher returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the matching
+  Claude Agent tool with the returned briefing path and discipline body. For review-scope fixes,
+  dispatch the `review-fix-lead` lane through the provider-neutral wrapper:
+  ```
+  cargo make track-local-review-fix -- --scope <scope> \
+    --briefing-file <path> \
+    --round-type fast|final
+  ```
+  If the wrapper exits `64` with `SUBAGENT_DISPATCH_REQUIRED`, parse its payload and spawn the
+  `review-fix-lead` Claude subagent as instructed. Do not branch on the configured
+  `review-fix-lead` provider; the wrapper resolves it.
 
-- `bin/sotp pr push` — push the track branch
-- `bin/sotp pr ensure-pr` — create or reuse a PR
-- `bin/sotp pr review-cycle` — trigger + poll + parse the Codex Cloud review cycle
+- **Convergence and commit**: after the delegated capability reports completion, run
+  `/track:review` to convergence and `/track:commit` before re-running this command. The
+  orchestrator edits directly only as recovery after a failed delegation, and still applies the
+  same local-convergence and commit sequence.
+
+- **PR command wrappers**: use these from the orchestrator host in sequence:
+
+  - `bin/sotp pr push` — push the track branch
+  - `bin/sotp pr ensure-pr` — create or reuse a PR
+  - `bin/sotp pr review-cycle` — trigger + poll + parse the Codex Cloud review cycle
 
 Prerequisites: Codex Cloud GitHub App must be installed; `gh` CLI must be authenticated.
 `sotp pr review-cycle` resolves `capabilities.pr-reviewer` internally from

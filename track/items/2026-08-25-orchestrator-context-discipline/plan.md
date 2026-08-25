@@ -12,16 +12,16 @@ AC-03 → T003, T020, T023, T009, T013.
 AC-04 → T004, T021, T024, T010, T014.
 AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
-## Tasks (6/24 resolved)
+## Tasks (10/24 resolved)
 
 ### S1 — Canonical workflow units
 
 > `.harness/workflows/track/*.md` の対象操作を改訂する。IN-01〜IN-04、AC-01〜AC-04。
 
-- [x] **T001**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue intake 操作を改訂する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
-- [x] **T002**: `.harness/workflows/track/pr-review.md` の review-fix 操作を改訂する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [x] **T001**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue intake 操作を改訂する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
+- [x] **T002**: `.harness/workflows/track/pr-review.md` の review-fix 操作を改訂する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
 - [ ] **T003**: `.harness/workflows/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の長時間 gate / evaluate 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
-- [x] **T004**: `.harness/workflows/track/adr2pr.md` の session-update 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+- [x] **T004**: `.harness/workflows/track/adr2pr.md` の session-update 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
 
 ### S2 — Policy and capability units
 
@@ -40,25 +40,25 @@ AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
 > `.claude/commands/track/*.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。
 
-- [ ] **T007**: `.claude/commands/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
-- [ ] **T008**: `.claude/commands/track/pr-review.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
+- [x] **T007**: `.claude/commands/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。
+- [x] **T008**: `.claude/commands/track/pr-review.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。
 - [ ] **T009**: `.claude/commands/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。
-- [ ] **T010**: `.claude/commands/track/adr2pr.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
+- [x] **T010**: `.claude/commands/track/adr2pr.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。
 
 ### S4 — Codex adapter units
 
 > `.agents/skills/track-*/SKILL.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。
 
 - [ ] **T011**: `.agents/skills/track-{plan,spec-design,type-design,impl-plan,implement,review}/SKILL.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、OS-02、CN-01、CN-03、AC-01。
-- [ ] **T012**: `.agents/skills/track-pr-review/SKILL.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、OS-02、CN-01、CN-03、AC-02。
+- [x] **T012**: `.agents/skills/track-pr-review/SKILL.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、OS-02、CN-01、CN-03、AC-02。
 - [ ] **T013**: `.agents/skills/track-{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}/SKILL.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-03。
-- [x] **T014**: `.agents/skills/track-adr2pr/SKILL.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-04。
+- [x] **T014**: `.agents/skills/track-adr2pr/SKILL.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-04。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
 
 ### S5 — Always-applied rules
 
 > Root / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、AC-01、AC-05。
 
-- [x] **T015**: `CLAUDE.md`、`AGENTS.md`、`.claude/rules/`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/orchestrator.toml` の always-applied / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、OS-01、CN-01、CN-02、AC-01、AC-05。
+- [x] **T015**: `CLAUDE.md`、`AGENTS.md`、`.claude/rules/`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/orchestrator.toml` の always-applied / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、OS-01、CN-01、CN-02、AC-01、AC-05。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
 
 ### S6 — Consumer documentation
 
@@ -70,7 +70,7 @@ AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018.
 
 > `.harness/config/agent-profiles.json` の対象 profile default を更新する。IN-06、AC-07。
 
-- [x] **T017**: `.harness/config/agent-profiles.json` の orchestrator profile default を更新する。IN-06、OS-01、AC-07。
+- [x] **T017**: `.harness/config/agent-profiles.json` の orchestrator profile default を更新する。IN-06、OS-01、AC-07。 (`6ab732ece974e0cd9a244935ba998b6b18c3efdb`)
 
 ### S8 — Per-surface confirmation
 
