@@ -1,0 +1,257 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T09:58:58Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 35,
+              "message": "D2 commits to applying the alias through “all resolution routes” without defining an existing authority, conservative over-approximation, or acknowledged implementation-depth bound for that open set. Record which permitted resolution is chosen so the obligation is bounded.",
+              "severity": "P1"
+            },
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 23,
+              "message": "The permanent ADR cites the track-local `observations` artifact as evidence in Context. This reverse reference makes the ADR depend on a track-internal document; retain the historical fact without citing the downstream artifact.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c02f622bd8b4c38fd54065f64014a348c2187812775a7ceb7a7550daf7728015",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:05:53Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 35,
+              "message": "D2 は「その他の解決経路」「すべての解決経路」が単一通過点を経由するという未限定の普遍的義務を決定しているが、対象経路の完全な範囲、既存権威への委譲、保守的過近似、または実装深度見積りのいずれも記録していない。将来経路まで含む実装範囲が収束しないため、採用する解決方針を Decision または Consequences に明記すべき。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6134cd62ee8831d0acda210c7d168ca3602fafa86c76b44cd33935792982a37e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:12:26Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 35,
+              "message": "D2 commits that every identity-universe consumer must pass through the same canonicalization stage, but it does not record a permitted resolution for this open-ended universal obligation (delegation, conservative over-approximation, or strict implementation with an acknowledged depth estimate). This leaves future consumers unbounded and the decision non-convergent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e0784bf050fdce48be1df8e8e29225800ae87b3dc0f9835be71f010df1ee778",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:17:56Z",
+          "findings": [
+            {
+              "category": "decision obscured by excess detail",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 35,
+              "message": "D2 embeds implementation and test-structure prescriptions (the exact canonicalization placement, domain API visibility constraints, bypass-route handling, and verifying alias knowledge exists in exactly one code location). Removing these operational details would leave the architectural decision unchanged; they should be omitted or delegated to downstream specification/convention artifacts.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eb0f6a7a19f6cc503c7c0bd82da5d9d292235896e1d2eb1ce54d5c64023fffa5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:23:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:96d68ef38c24f2434476515d1a82a8436e98573150028f550488ee6dcd33e8f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:25:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:96d68ef38c24f2434476515d1a82a8436e98573150028f550488ee6dcd33e8f1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:00:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:146e91033784a5f9b94f8ca551b1791b71fe5ba1773facf9c1601c1071db5f6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:04:34Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 46,
+              "message": "D1 と D3 で、未実装かつ `module_path` 省略の add 型を表す決定が両立していません。D1 は catalogue 宣言から具体的な rustdoc summary を合成して解決集合へ入れる一方、D3 はこの場合の module を未確定のままにします。rustdoc summary の `[crate, name]` は crate root を表すため、D1 に従うと D3 が否定した root 扱いへ戻り、D3 に従うと D1 の summary を構成できません。未確定 module の identity を解決集合でどう保持するか、両決定を一つの方針に揃える必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:146e91033784a5f9b94f8ca551b1791b71fe5ba1773facf9c1601c1071db5f6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:10:27Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 42,
+              "message": "D2 commits to an open-ended universal obligation by covering unenumerated resolution routes, but its parenthetical merely names both existing-authority delegation and conservative over-approximation without selecting which resolution governs. Record one explicit resolution (or a strict implementation with a depth estimate) in the decision or Consequences.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ffef437f31cbbb49a2a6695be19642952a30162f5c37ac10e211c74bbfdf9643",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:14:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ffef437f31cbbb49a2a6695be19642952a30162f5c37ac10e211c74bbfdf9643",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:33:23Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 42,
+              "message": "D2 は「全経路」「対象経路は列挙せず」という開集合の普遍的コミットメントを置いていますが、「既存権威への委譲と保守的過近似」と選択肢を並べるだけで、どの権威へ委譲するのか、どの過近似を採用するのかを確定していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 67,
+              "message": "Related の D7 引用は、参照先ADRの D7 が TypeKindV2 の entry struct 定義を扱っており、module_path 省略を crate root とする決定ではないため、本文の根拠関係と一致しません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4000bfd866ee25517d700826d9dfa3b7a108c67f129657c38d046b8015370c8c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:37:57Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 42,
+              "message": "D1/D2 は対象経路を列挙せず、すべての参照解決経路を単一の取得口へ通すという開集合の義務を置いています。しかし括弧内は「既存権威への委譲」と「保守的過近似」を併記するだけで、委譲先の権威も過近似する集合も確定していません。許可された解決方法のいずれか一つを具体的に記録してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4000bfd866ee25517d700826d9dfa3b7a108c67f129657c38d046b8015370c8c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:43:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f68ed225b6966136bcc42f3d270141cab2b521b8dd43aecae5361094eed0ebad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:47:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f68ed225b6966136bcc42f3d270141cab2b521b8dd43aecae5361094eed0ebad",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:04:20Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 42,
+              "message": "D2 は未列挙の将来の解決経路まで単一通過点へ通す開集合の義務を定めていますが、「既存権威への委譲」の委譲先として示す D1 の解決集合構築は ADR 内で新たに定める仕組みであり、許可された既存権威ではありません。実装範囲を収束させる許可済みの解決を明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6801e851405b08fa3e79d98cdcd90b02c7aa4acf7447dcd9813303f4fdc5de80",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:07:28Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md",
+              "line": 42,
+              "message": "D1 の「全経路」と D2 の列挙しない対象経路は普遍量化された義務だが、D2 が委譲先とする D1 の解決集合構築は経路集合を独立に確定する既存権威ではなく、同じ全経路通過義務を言い換えた循環的な委譲になっている。このままでは将来追加される解決経路までどう収束して捕捉するかが未解決である。既存の独立した権威・保守的過近似・深さ見積りを伴う厳密実装のいずれかを決定として記録する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6801e851405b08fa3e79d98cdcd90b02c7aa4acf7447dcd9813303f4fdc5de80",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:18:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ff630618d450a9191dcb76df38fa3484d8faac4909711c28cf1489b1495c1ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:24:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ff630618d450a9191dcb76df38fa3484d8faac4909711c28cf1489b1495c1ba",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:38:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9986d7cb31f01ab728057f9efb5f7423f7a89a81eaa8eff78f48537dae759fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:41:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9986d7cb31f01ab728057f9efb5f7423f7a89a81eaa8eff78f48537dae759fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:48:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1aba4598b156326cd314517f77ce29dd102843b74dde414d516e17511a5da42e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:51:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1aba4598b156326cd314517f77ce29dd102843b74dde414d516e17511a5da42e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
