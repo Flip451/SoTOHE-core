@@ -228,6 +228,15 @@ pub(super) fn insert_a_item_tree_into_s(
     stored_root.id = new_s_id;
     state.s_index.entry(new_s_id).or_insert(stored_root);
     if let Some(p) = path {
+        if matches!(
+            kind,
+            rustdoc_types::ItemKind::Struct
+                | rustdoc_types::ItemKind::Enum
+                | rustdoc_types::ItemKind::TypeAlias
+                | rustdoc_types::ItemKind::Trait
+        ) {
+            state.s_type_identity_to_id.insert(p.join("::"), new_s_id);
+        }
         state.s_paths.insert(new_s_id, ItemSummary { crate_id: 0, path: p, kind });
     }
     state.s_actions.insert(new_s_id, action);
@@ -333,6 +342,15 @@ pub(super) fn insert_b_item_tree_into_s(
     stored_root.id = new_s_id;
     state.s_index.entry(new_s_id).or_insert(stored_root);
     if let Some(p) = path {
+        if matches!(
+            kind,
+            rustdoc_types::ItemKind::Struct
+                | rustdoc_types::ItemKind::Enum
+                | rustdoc_types::ItemKind::TypeAlias
+                | rustdoc_types::ItemKind::Trait
+        ) {
+            state.s_type_identity_to_id.insert(p.join("::"), new_s_id);
+        }
         state.s_paths.insert(new_s_id, ItemSummary { crate_id: 0, path: p, kind });
     }
     state.s_actions.insert(new_s_id, action);

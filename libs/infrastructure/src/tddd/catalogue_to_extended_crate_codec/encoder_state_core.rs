@@ -5,23 +5,86 @@
 //! `encoder_state_type_ref_parsing` to keep each file within the 700-line limit.
 
 use domain::tddd::catalogue_v2::{
-    BoundOp, CrateName, MethodGenericParam, ModulePath, WherePredicateDecl,
+    BoundOp, CatalogueEntryKey, CrateName, MethodGenericParam, ModulePath, TypeRef,
+    WherePredicateDecl,
 };
 use rustdoc_types::{
     ExternalCrate, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id, ItemKind,
     ItemSummary, Term, Type, WherePredicate,
 };
 
-use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
+use domain::tddd::NewTypeGraphCodecError;
 
 use super::encoder::EncoderState;
-use super::helpers::{is_bare_generic_name, rewrite_generic_types, try_build_generic_projection};
+use super::invalid_type_ref;
+use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
 
 impl EncoderState {
     pub(super) fn alloc_id(&mut self) -> Id {
         let id = Id(self.next_id);
         self.next_id += 1;
         id
+    }
+
+    pub(super) fn local_id_for_catalogue_entry(
+        &self,
+        module_path: &ModulePath,
+        item_name: &str,
+    ) -> Result<Id, NewTypeGraphCodecError> {
+        let mut path = self.crate_name.as_str().to_owned();
+        for segment in module_path.segments() {
+            path.push_str("::");
+            path.push_str(segment.as_str());
+        }
+        path.push_str("::");
+        path.push_str(item_name);
+        let type_ref = TypeRef::new(path.clone())
+            .map_err(|_| invalid_type_ref(&path, "catalogue entry path is empty"))?;
+        let identity = canonicalize_catalogue_type_ref(
+            &type_ref,
+            &self.crate_name,
+            &self.resolution_paths,
+            &[],
+        )?;
+        self.local_id_for_identity(&identity)?
+            .ok_or_else(|| invalid_type_ref(&path, "catalogue entry identity is not registered"))
+    }
+
+    pub(super) fn resolved_catalogue_key_path(
+        &self,
+        key: &CatalogueEntryKey,
+    ) -> Result<(CatalogueEntryKey, String, ModulePath), NewTypeGraphCodecError> {
+        let type_ref = TypeRef::new(key.as_str().to_owned())
+            .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key is empty"))?;
+        let effective_key = match canonicalize_catalogue_type_ref(
+            &type_ref,
+            &self.crate_name,
+            &self.resolution_paths,
+            &[],
+        ) {
+            Ok(identity) => CatalogueEntryKey::try_new(identity.as_str().to_owned())
+                .map_err(|_| invalid_type_ref(key.as_str(), "canonical identity is empty"))?,
+            Err(error) => return Err(error),
+        };
+        let segments = effective_key.as_str().split("::").collect::<Vec<_>>();
+        let Some(item_name) = segments.last().copied().filter(|name| !name.is_empty()) else {
+            return Err(invalid_type_ref(key.as_str(), "catalogue key has no item name"));
+        };
+        let item_name = item_name.to_owned();
+        let path_segments =
+            segments.iter().take(segments.len().saturating_sub(1)).copied().collect::<Vec<_>>();
+        let skip_crate_name =
+            usize::from(path_segments.first().copied() == Some(self.crate_name.as_str()));
+        let module_segments = path_segments
+            .iter()
+            .copied()
+            .skip(skip_crate_name)
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        let module_path = ModulePath::from_segments(module_segments).map_err(|_| {
+            invalid_type_ref(key.as_str(), "catalogue key has an invalid module path")
+        })?;
+        Ok((effective_key, item_name, module_path))
     }
 
     /// Ensures an external crate is registered and returns its `crate_id`.
@@ -63,10 +126,8 @@ impl EncoderState {
 
         let crate_id = self.ensure_external_crate(crate_name.to_string());
         let path_segs: Vec<String> = canonical_path.split("::").map(str::to_string).collect();
-        self.paths.insert(
-            synthetic_id,
-            ItemSummary { crate_id, path: path_segs, kind: ItemKind::Struct },
-        );
+        let summary = ItemSummary { crate_id, path: path_segs, kind: ItemKind::Struct };
+        self.paths.insert(synthetic_id, summary.clone());
         synthetic_id
     }
 
@@ -86,7 +147,7 @@ impl EncoderState {
         generics_decl: &[MethodGenericParam],
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, false)
     }
 
@@ -98,7 +159,7 @@ impl EncoderState {
         generics_decl: &[MethodGenericParam],
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, true)
     }
 
@@ -108,7 +169,7 @@ impl EncoderState {
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
         preserve_bound_spelling: bool,
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         let mut params: Vec<GenericParamDef> = Vec::with_capacity(generics_decl.len());
         let mut where_predicates: Vec<WherePredicate> = Vec::new();
         let preserve_lexical_types = preserve_bound_spelling && !generic_names.is_empty();
@@ -152,12 +213,11 @@ impl EncoderState {
             // syntactically invalid in Rust (`where T:` without any bound).
             // This mirrors the symmetrical check in `where_predicates_from_dtos`.
             if w.rhs.is_empty() {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: lhs_str.to_owned(),
-                    reason: "where predicate has no rhs (`where T:` is not valid Rust); \
-                             at least one rhs entry is required"
-                        .to_owned(),
-                });
+                return Err(invalid_type_ref(
+                    lhs_str,
+                    "where predicate has no rhs (`where T:` is not valid Rust); \
+                     at least one rhs entry is required",
+                ));
             }
             // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable LHS,
             // including qualified-path forms such as `<T as Trait>::Assoc`.  The type-ref
@@ -169,23 +229,8 @@ impl EncoderState {
             // preserve round-trip symmetry.
             let lhs_type = if preserve_lexical_types {
                 self.parse_type_ref_str_with_generics_preserving_spelling(lhs_str, generic_names)?
-            } else if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
-                // Simple bare generic: `T` → `Type::Generic("T")`
-                Type::Generic(lhs_str.trim().to_string())
             } else if !generic_names.is_empty() {
-                if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
-                    // Single-level associated-type projection: `T::Item` →
-                    // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
-                    //  trait_: None, args: None }`.
-                    //
-                    // This matches the shape that rustdoc emits for `where T::Item: …`
-                    // predicates so that A-catalogue and C-rustdoc representations
-                    // compare equal in `build_where_form_view`.
-                    proj
-                } else {
-                    let raw = self.parse_type_ref_str_with_generics(lhs_str, generic_names)?;
-                    rewrite_generic_types(raw, generic_names)
-                }
+                self.parse_type_ref_str_with_generics(lhs_str, generic_names)?
             } else {
                 self.parse_type_ref_str(lhs_str)?
             };
@@ -214,27 +259,26 @@ impl EncoderState {
                     // Enforce rhs.len() == 1 defensively: decode validates this, but
                     // in-memory domain values constructed outside the codec must also pass.
                     if w.rhs.len() != 1 {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: lhs_str.to_owned(),
-                            reason: format!(
+                        return Err(invalid_type_ref(
+                            lhs_str,
+                            format!(
                                 "Equal predicate must have exactly one rhs entry (got {}); \
                                  `where T::Assoc = U` accepts a single RHS only",
                                 w.rhs.len()
                             ),
-                        });
+                        ));
                     }
                     // Permissive principle (ADR `2026-05-18-1223` / `2026-05-20-0048`):
                     // accept any syn-parseable LHS for Equal predicates, including bare
                     // type parameters (`T = U`).  The `lhs_type` has already been computed
-                    // via `parse_type_ref_str` / `is_bare_generic_name` above; no additional
-                    // shape validation is applied here.
+                    // via the shared syn-backed parser above; no additional shape validation
+                    // is applied here.
                     // Safe: len == 1 asserted above.
                     let rhs_entry = w.rhs.first().ok_or_else(|| {
-                        CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: lhs_str.to_owned(),
-                            reason: "Equal predicate has no rhs (codec invariant violated)"
-                                .to_owned(),
-                        }
+                        invalid_type_ref(
+                            lhs_str,
+                            "Equal predicate has no rhs (codec invariant violated)",
+                        )
                     })?;
                     let rhs_str = rhs_entry.as_str();
                     // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable
@@ -246,18 +290,8 @@ impl EncoderState {
                             rhs_str,
                             generic_names,
                         )?
-                    } else if !generic_names.is_empty()
-                        && is_bare_generic_name(rhs_str, generic_names)
-                    {
-                        Type::Generic(rhs_str.trim().to_string())
                     } else if !generic_names.is_empty() {
-                        if let Some(proj) = try_build_generic_projection(rhs_str, generic_names) {
-                            proj
-                        } else {
-                            let raw =
-                                self.parse_type_ref_str_with_generics(rhs_str, generic_names)?;
-                            rewrite_generic_types(raw, generic_names)
-                        }
+                        self.parse_type_ref_str_with_generics(rhs_str, generic_names)?
                     } else {
                         self.parse_type_ref_str(rhs_str)?
                     };
@@ -298,7 +332,8 @@ impl EncoderState {
         module_path: &ModulePath,
     ) {
         let path = Self::build_path_segments(&self.crate_name.clone(), module_path, item_name);
-        self.paths.insert(id, ItemSummary { crate_id: 0, path, kind });
+        let summary = ItemSummary { crate_id: 0, path, kind };
+        self.paths.insert(id, summary);
     }
 
     /// Registers an `ItemSummary` in `Crate::paths` using an explicit crate name.
@@ -322,6 +357,7 @@ impl EncoderState {
             (fn_crate_name.clone(), ext_id)
         };
         let path = Self::build_path_segments(&effective_crate_name, module_path, item_name);
-        self.paths.insert(id, ItemSummary { crate_id, path, kind });
+        let summary = ItemSummary { crate_id, path, kind };
+        self.paths.insert(id, summary);
     }
 }

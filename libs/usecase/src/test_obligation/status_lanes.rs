@@ -338,7 +338,6 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::tddd::catalogue_v2::{
         CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TypeEntry, TypeKindV2,
-        TypeName,
     };
     use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationEdgeId};
@@ -355,7 +354,7 @@ mod tests {
             LayerId::try_new(layer).unwrap(),
         );
         document.insert_type(
-            TypeName::new("SharedEntry").unwrap(),
+            CatalogueEntryKey::try_new("SharedEntry".to_owned()).unwrap(),
             TypeEntry::new(
                 action,
                 DataRole::value_object(),

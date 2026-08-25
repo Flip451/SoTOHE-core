@@ -36,19 +36,34 @@ pub(super) fn sanitize(s: &str) -> String {
     s.chars().map(|c| if c.is_ascii_alphanumeric() || c == '_' { c } else { '_' }).collect()
 }
 
+/// Encode an identity component without collapsing separators and underscores.
+///
+/// The byte length and hexadecimal payload keep the result Mermaid-safe while
+/// making the encoding injective for arbitrary catalogue keys.
+fn encode_identity_component(value: &str) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut encoded = value.len().to_string();
+    encoded.push('_');
+    for byte in value.bytes() {
+        encoded.push(HEX.get((byte >> 4) as usize).copied().map_or('0', char::from));
+        encoded.push(HEX.get((byte & 0x0f) as usize).copied().map_or('0', char::from));
+    }
+    encoded
+}
+
 /// Generate a subgraph id for a Type entry (Decision D-2).
 ///
-/// Format: `T<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
-/// where `<len>` is the length of `<sanitized_layer>_<sanitized_crate>_<sanitized_name>`.
+/// Format: `T<len>_<encoded_layer>_<encoded_crate>_<encoded_name>`
+/// where `<len>` is the length of the encoded body.
 ///
 /// This id is the **container** subgraph id only.  Edge endpoints must use
 /// [`type_rep_node_id`] (the representative node inside the subgraph) so that
 /// no edge points at a subgraph id, which breaks Dagre/ELK cluster-boundary
 /// layout.
 pub(super) fn type_node_id(layer: &str, crate_name: &str, type_name: &str) -> String {
-    let sl = sanitize(layer);
-    let sc = sanitize(crate_name);
-    let sn = sanitize(type_name);
+    let sl = encode_identity_component(layer);
+    let sc = encode_identity_component(crate_name);
+    let sn = encode_identity_component(type_name);
     let body = format!("{sl}_{sc}_{sn}");
     format!("T{}_{}", body.len(), body)
 }
@@ -65,14 +80,14 @@ pub(super) fn type_rep_node_id(layer: &str, crate_name: &str, type_name: &str) -
 
 /// Generate a subgraph id for a Trait entry (Decision D-2).
 ///
-/// Format: `R<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
+/// Format: `R<len>_<encoded_layer>_<encoded_crate>_<encoded_name>`
 ///
 /// This id is the **container** subgraph id only.  Edge endpoints must use
 /// [`trait_rep_node_id`] (the representative node inside the subgraph).
 pub(super) fn trait_node_id(layer: &str, crate_name: &str, trait_name: &str) -> String {
-    let sl = sanitize(layer);
-    let sc = sanitize(crate_name);
-    let sn = sanitize(trait_name);
+    let sl = encode_identity_component(layer);
+    let sc = encode_identity_component(crate_name);
+    let sn = encode_identity_component(trait_name);
     let body = format!("{sl}_{sc}_{sn}");
     format!("R{}_{}", body.len(), body)
 }
@@ -86,26 +101,28 @@ pub(super) fn trait_rep_node_id(layer: &str, crate_name: &str, trait_name: &str)
 
 /// Generate a node_id for a Function entry (Decision D-2).
 ///
-/// Format: `F<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_full_path>`
+/// Format: `F<len>_<encoded_layer>_<encoded_crate>_<encoded_full_path>`
 pub(super) fn function_node_id(layer: &str, crate_name: &str, full_path: &str) -> String {
-    let sl = sanitize(layer);
-    let sc = sanitize(crate_name);
-    let sp = sanitize(full_path);
+    let sl = encode_identity_component(layer);
+    let sc = encode_identity_component(crate_name);
+    let sp = encode_identity_component(full_path);
     let body = format!("{sl}_{sc}_{sp}");
     format!("F{}_{}", body.len(), body)
 }
 
 /// Generate a subgraph id for a module (top-level module aggregation, U-6d-iii).
 fn module_subgraph_id(layer: &str, crate_name: &str, module_first_segment: &str) -> String {
-    let sl = sanitize(layer);
-    let sc = sanitize(crate_name);
-    let sm = sanitize(module_first_segment);
-    format!("{sl}_{sc}_module_{sm}")
+    let sl = encode_identity_component(layer);
+    let sc = encode_identity_component(crate_name);
+    let sm = encode_identity_component(module_first_segment);
+    let body = format!("{sl}_{sc}_{sm}");
+    format!("M{}_{}", body.len(), body)
 }
 
 /// Generate a subgraph id for a layer.
 fn layer_subgraph_id(layer: &str) -> String {
-    sanitize(layer)
+    let encoded = encode_identity_component(layer);
+    format!("L{}_{}", encoded.len(), encoded)
 }
 
 // ---------------------------------------------------------------------------
@@ -163,15 +180,22 @@ pub(super) fn render_mermaid(
             let crate_str = doc.crate_name().as_str();
             let layer_str_doc = doc.layer().as_ref();
 
-            // Build inherent_impls index for this doc: type_name -> Vec<methods>
+            // Build inherent_impls index by the canonical rendered owner node.
+            // A declaration may use a short owner key while the type catalogue
+            // uses a fully-qualified key; resolving both through the same index
+            // keeps the method aggregation attached to the correct type.
             let mut inherent_methods: BTreeMap<
                 String,
                 Vec<&domain::tddd::catalogue_v2::methods::MethodDeclaration>,
             > = BTreeMap::new();
             for impl_decl in doc.inherent_impls() {
-                let tn = impl_decl.type_name.as_str().to_string();
-                for m in &impl_decl.methods {
-                    inherent_methods.entry(tn.clone()).or_default().push(m);
+                let Some(owner_node_id) =
+                    node_index.resolve(impl_decl.type_name().as_str(), crate_str)?
+                else {
+                    continue;
+                };
+                for method in impl_decl.methods() {
+                    inherent_methods.entry(owner_node_id.to_owned()).or_default().push(method);
                 }
             }
 
@@ -308,17 +332,17 @@ pub(super) fn render_mermaid(
                 // Workspace-internal cross-crate for_type (e.g. "domain::MyType") is
                 // resolved through the index. Workspace-external types (std, external
                 // crates) are not in the index and are silently skipped (O-2 / ADR line 286).
-                let source_id = match node_index.resolve(for_type_str, crate_str) {
+                let source_id = match node_index.resolve(for_type_str, crate_str)? {
                     Some(id) => id.to_string(),
                     None => continue, // silent skip (workspace-external, OS-04)
                 };
 
                 // Resolve trait_ref to target subgraph_id (CN-10: silent skip if external).
-                let target_id = match resolve_trait_subgraph(trait_ref_str, crate_str, &trait_index)
-                {
-                    Some(id) => id.to_string(),
-                    None => continue, // silent skip (CN-10 / AC-06)
-                };
+                let target_id =
+                    match resolve_trait_subgraph(trait_ref_str, crate_str, &trait_index)? {
+                        Some(id) => id.to_string(),
+                        None => continue, // silent skip (CN-10 / AC-06)
+                    };
 
                 let (arrow, label) = edge_arrow_label(&style.edge, "trait_impl")?;
                 edge_lines.push(edge_line(&source_id, arrow, label, &target_id));
@@ -366,4 +390,26 @@ pub(super) fn render_mermaid(
     out.push_str("```\n");
 
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{layer_subgraph_id, module_subgraph_id, type_node_id};
+
+    #[test]
+    fn test_container_ids_distinguish_separator_from_underscore() {
+        assert_ne!(layer_subgraph_id("my-gateway"), layer_subgraph_id("my_gateway"));
+        assert_ne!(
+            module_subgraph_id("domain", "domain", "my-gateway"),
+            module_subgraph_id("domain", "domain", "my_gateway")
+        );
+    }
+
+    #[test]
+    fn test_type_node_id_distinguishes_separator_from_underscore() {
+        let qualified = type_node_id("domain", "domain", "alpha::Shared");
+        let underscored = type_node_id("domain", "domain", "alpha__Shared");
+
+        assert_ne!(qualified, underscored);
+    }
 }

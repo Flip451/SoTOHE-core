@@ -5,6 +5,7 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 
 use super::*;
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 // ---------------------------------------------------------------------------
 // Identifier
@@ -323,8 +324,141 @@ fn test_type_ref_display_fromstr_roundtrip() {
 }
 
 // ---------------------------------------------------------------------------
+// FullyQualifiedItemPath
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_fully_qualified_item_path_new_stores_components() {
+    let crate_name = CrateName::new("domain_core").unwrap();
+    let module_path: ModulePath = "user::input".parse().unwrap();
+    let name = Identifier::new("Input").unwrap();
+
+    let path = FullyQualifiedItemPath::new(crate_name.clone(), module_path.clone(), name.clone());
+
+    assert_eq!(path.crate_name(), &crate_name);
+    assert_eq!(path.module_path(), &module_path);
+    assert_eq!(path.name(), &name);
+}
+
+#[test]
+fn test_fully_qualified_item_path_orders_by_full_path() {
+    let crate_name = CrateName::new("domain_core").unwrap();
+    let first = FullyQualifiedItemPath::new(
+        crate_name.clone(),
+        "a".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+    let second = FullyQualifiedItemPath::new(
+        crate_name,
+        "b".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+
+    assert!(first < second);
+}
+
+#[test]
+fn test_fully_qualified_item_path_display_includes_crate_module_and_name() {
+    let path = FullyQualifiedItemPath::new(
+        CrateName::new("domain_core").unwrap(),
+        "user::input".parse().unwrap(),
+        Identifier::new("Input").unwrap(),
+    );
+
+    assert_eq!(path.to_string(), "domain_core::user::input::Input");
+}
+
+// ---------------------------------------------------------------------------
 // FunctionPath
 // ---------------------------------------------------------------------------
+
+#[test]
+fn test_catalogue_entry_key_resolve_catalogue_identity_uses_declared_module_for_bare_key() {
+    let key = CatalogueEntryKey::try_new("SharedPort".to_owned()).unwrap();
+    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+        &CrateName::new("infrastructure").unwrap(),
+        &key,
+        &"adapters".parse().unwrap(),
+    )
+    .unwrap();
+    assert_eq!(identity.to_string(), "infrastructure::adapters::SharedPort");
+}
+
+#[test]
+fn test_catalogue_entry_key_resolve_catalogue_identity_uses_qualified_module() {
+    let key = CatalogueEntryKey::try_new("infrastructure::alpha::SharedPort".to_owned()).unwrap();
+    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+        &CrateName::new("infrastructure").unwrap(),
+        &key,
+        &"beta".parse().unwrap(),
+    )
+    .unwrap();
+    assert_eq!(identity.to_string(), "infrastructure::alpha::SharedPort");
+}
+
+#[test]
+fn test_catalogue_entry_key_resolve_catalogue_identity_rejects_invalid_item_segment() {
+    let key = CatalogueEntryKey::try_new("domain::bad-name".to_owned()).unwrap();
+    let result = FullyQualifiedItemPath::from_catalogue_entry_key(
+        &CrateName::new("domain").unwrap(),
+        &key,
+        &ModulePath::root(),
+    );
+    assert!(matches!(
+        result,
+        Err(IdentifierError::InvalidCharacters(value)) if value == "bad-name"
+    ));
+}
+
+#[test]
+fn test_catalogue_entry_key_resolve_catalogue_identity_rejects_empty_module_segment() {
+    let key = CatalogueEntryKey::try_new("domain::::Port".to_owned()).unwrap();
+    let result = FullyQualifiedItemPath::from_catalogue_entry_key(
+        &CrateName::new("domain").unwrap(),
+        &key,
+        &ModulePath::root(),
+    );
+    assert!(matches!(
+        result,
+        Err(IdentifierError::InvalidSegment(value)) if value.is_empty()
+    ));
+}
+
+#[test]
+fn test_catalogue_entry_key_parse_fully_qualified_identity_preserves_module_path() {
+    let key = CatalogueEntryKey::try_new("usecase::ports::SharedPort".to_owned()).unwrap();
+    let identity = FullyQualifiedItemPath::from_fully_qualified_key(&key).unwrap();
+    assert_eq!(identity.to_string(), "usecase::ports::SharedPort");
+}
+
+#[test]
+fn test_catalogue_entry_key_parse_fully_qualified_identity_rejects_bare_key() {
+    let key = CatalogueEntryKey::try_new("SharedPort".to_owned()).unwrap();
+    assert!(matches!(
+        FullyQualifiedItemPath::from_fully_qualified_key(&key),
+        Err(IdentifierError::InvalidFunctionPath(_))
+    ));
+}
+
+#[test]
+fn test_catalogue_entry_key_parse_fully_qualified_identity_rejects_invalid_item_segment() {
+    let key = CatalogueEntryKey::try_new("domain::bad-name".to_owned()).unwrap();
+    let result = FullyQualifiedItemPath::from_fully_qualified_key(&key);
+    assert!(matches!(
+        result,
+        Err(IdentifierError::InvalidCharacters(value)) if value == "bad-name"
+    ));
+}
+
+#[test]
+fn test_catalogue_entry_key_parse_fully_qualified_identity_rejects_empty_module_segment() {
+    let key = CatalogueEntryKey::try_new("domain::::Port".to_owned()).unwrap();
+    let result = FullyQualifiedItemPath::from_fully_qualified_key(&key);
+    assert!(matches!(
+        result,
+        Err(IdentifierError::InvalidSegment(value)) if value.is_empty()
+    ));
+}
 
 #[test]
 fn test_function_path_at_crate_root_display_and_parse() {

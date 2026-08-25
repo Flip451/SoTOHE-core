@@ -17,6 +17,13 @@
 use std::fmt;
 use std::str::FromStr;
 
+use crate::tddd::semantic_verify::CatalogueEntryKey;
+
+#[path = "identifiers_helpers.rs"]
+mod helpers;
+
+use helpers::{is_valid_rust_identifier, split_catalogue_key};
+
 // ---------------------------------------------------------------------------
 // IdentifierError — shared error type for all identifier newtypes
 // ---------------------------------------------------------------------------
@@ -45,25 +52,6 @@ pub enum IdentifierError {
         "function path '{0}' could not be parsed; expected form '<crate_name>[::<module_segment>...].<function_name>'"
     )]
     InvalidFunctionPath(String),
-}
-
-// ---------------------------------------------------------------------------
-// Internal helper
-// ---------------------------------------------------------------------------
-
-/// Returns `true` if `s` is a syntactically valid Rust identifier fragment:
-/// - Non-empty
-/// - First character: ASCII alphabetic or underscore
-/// - Remaining characters: ASCII alphanumeric or underscore
-fn is_valid_rust_identifier(s: &str) -> bool {
-    let mut chars = s.chars();
-    match chars.next() {
-        None => false,
-        Some(first) => {
-            (first.is_ascii_alphabetic() || first == '_')
-                && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -496,6 +484,103 @@ impl FromStr for TypeRef {
 impl AsRef<str> for TypeRef {
     fn as_ref(&self) -> &str {
         self.as_str()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// FullyQualifiedItemPath — full-path identity for catalogue type and trait entries
+// ---------------------------------------------------------------------------
+
+/// Fully qualified identity for a catalogue type or trait entry.
+///
+/// The identity is composed of the crate name, module path, and declared item
+/// name.  Keeping the components typed prevents a short name from being used
+/// as the identity when two items share that name in different modules.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct FullyQualifiedItemPath {
+    crate_name: CrateName,
+    module_path: ModulePath,
+    name: Identifier,
+}
+
+impl FullyQualifiedItemPath {
+    /// Creates a fully qualified item path from validated path components.
+    #[must_use]
+    pub fn new(crate_name: CrateName, module_path: ModulePath, name: Identifier) -> Self {
+        Self { crate_name, module_path, name }
+    }
+
+    /// Returns the crate name component.
+    #[must_use]
+    pub fn crate_name(&self) -> &CrateName {
+        &self.crate_name
+    }
+
+    /// Returns the module path component.
+    #[must_use]
+    pub fn module_path(&self) -> &ModulePath {
+        &self.module_path
+    }
+
+    /// Returns the declared item name component.
+    #[must_use]
+    pub fn name(&self) -> &Identifier {
+        &self.name
+    }
+
+    /// Resolves a catalogue entry key using the declaration module as the
+    /// fallback for a bare key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an identifier error when a key segment is malformed.
+    pub fn from_catalogue_entry_key(
+        crate_name: &CrateName,
+        key: &CatalogueEntryKey,
+        declared_module_path: &ModulePath,
+    ) -> Result<Self, IdentifierError> {
+        let (item_name, path_segments) = split_catalogue_key(key)?;
+        let name = Identifier::new(item_name.to_owned())?;
+        let module_segments = match path_segments.split_first() {
+            Some((first, rest)) if *first == crate_name.as_str() => rest,
+            Some(_) => path_segments.as_slice(),
+            None => {
+                return Ok(Self::new(crate_name.clone(), declared_module_path.clone(), name));
+            }
+        };
+        let module_path = ModulePath::from_segments(
+            module_segments.iter().map(|segment| (*segment).to_owned()).collect(),
+        )?;
+        Ok(Self::new(crate_name.clone(), module_path, name))
+    }
+
+    /// Parses a key that already contains an explicit crate-qualified path.
+    ///
+    /// # Errors
+    ///
+    /// Returns an identifier error when the key is bare or contains a malformed
+    /// path segment.
+    pub fn from_fully_qualified_key(key: &CatalogueEntryKey) -> Result<Self, IdentifierError> {
+        let (item_name, path_segments) = split_catalogue_key(key)?;
+        let (crate_segment, module_segments) = path_segments
+            .split_first()
+            .ok_or_else(|| IdentifierError::InvalidFunctionPath(key.as_str().to_owned()))?;
+        let crate_name = CrateName::new((*crate_segment).to_owned())?;
+        let name = Identifier::new(item_name.to_owned())?;
+        let module_path = ModulePath::from_segments(
+            module_segments.iter().map(|segment| (*segment).to_owned()).collect(),
+        )?;
+        Ok(Self::new(crate_name, module_path, name))
+    }
+}
+
+impl fmt::Display for FullyQualifiedItemPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.crate_name, f)?;
+        if !self.module_path.is_root() {
+            write!(f, "::{}", self.module_path)?;
+        }
+        write!(f, "::{}", self.name)
     }
 }
 

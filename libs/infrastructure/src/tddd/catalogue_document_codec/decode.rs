@@ -3,12 +3,13 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{
     StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
 };
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ItemAction, MethodGenericParam,
-    MethodName, ModulePath, TraitImplDeclV2, TraitName, TypeName, TypeRef,
+    CatalogueEntryKey, CrateName, DeletionRecord, FullyQualifiedItemPath, FunctionPath, ItemAction,
+    MethodGenericParam, MethodName, ModulePath, TraitImplDeclV2, TypeName, TypeRef,
 };
 use std::str::FromStr;
 
@@ -44,22 +45,17 @@ pub(super) fn dto_to_domain(
         .map_err(|e| err(&dto.crate_name, format!("invalid crate_name: {e}")))?;
     let layer =
         LayerId::try_new(&dto.layer).map_err(|e| err(&dto.layer, format!("invalid layer: {e}")))?;
-    let mut doc = CatalogueDocument::new(dto.schema_version, crate_name, layer);
+    let mut doc = CatalogueDocument::new(dto.schema_version, crate_name.clone(), layer);
     // Delete slots become deletion records rather than live entries.
     for (type_name_str, slot) in dto.types {
-        let type_name = TypeName::new(&type_name_str)
-            .map_err(|e| err(&type_name_str, format!("invalid type name: {e}")))?;
+        let type_name = CatalogueEntryKey::try_new(type_name_str.clone())
+            .map_err(|e| err(&type_name_str, format!("invalid catalogue entry key: {e}")))?;
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
-                let module_path = tombstone_module_path(&type_name_str, &tombstone)?;
                 let (spec_refs, informal_grounds) =
                     tombstone_grounding(&type_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Type {
-                    name: type_name,
-                    module_path,
-                    spec_refs,
-                    informal_grounds,
-                });
+                let name = tombstone_entry_key(&crate_name, &type_name, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Type { name, spec_refs, informal_grounds });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = type_entry_from_dto(&type_name_str, entry_dto)?;
@@ -69,19 +65,14 @@ pub(super) fn dto_to_domain(
     }
     // Traits
     for (trait_name_str, slot) in dto.traits {
-        let trait_name = TraitName::new(&trait_name_str)
-            .map_err(|e| err(&trait_name_str, format!("invalid trait name: {e}")))?;
+        let trait_name = CatalogueEntryKey::try_new(trait_name_str.clone())
+            .map_err(|e| err(&trait_name_str, format!("invalid catalogue entry key: {e}")))?;
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
-                let module_path = tombstone_module_path(&trait_name_str, &tombstone)?;
                 let (spec_refs, informal_grounds) =
                     tombstone_grounding(&trait_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Trait {
-                    name: trait_name,
-                    module_path,
-                    spec_refs,
-                    informal_grounds,
-                });
+                let name = tombstone_entry_key(&crate_name, &trait_name, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Trait { name, spec_refs, informal_grounds });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = trait_entry_from_dto(&trait_name_str, entry_dto)?;
@@ -140,22 +131,6 @@ pub(super) fn dto_to_domain(
     Ok(doc)
 }
 
-fn tombstone_module_path(
-    entry_name: &str,
-    tombstone: &TombstoneDto,
-) -> Result<ModulePath, CatalogueDocumentCodecError> {
-    if tombstone.module_path.is_empty() {
-        Ok(ModulePath::root())
-    } else {
-        ModulePath::from_str(&tombstone.module_path).map_err(|e| {
-            CatalogueDocumentCodecError::InvalidEntry {
-                entry_name: entry_name.to_owned(),
-                reason: format!("invalid delete module_path '{}': {e}", tombstone.module_path),
-            }
-        })
-    }
-}
-
 fn tombstone_grounding(
     entry_name: &str,
     tombstone: &TombstoneDto,
@@ -176,6 +151,54 @@ fn tombstone_grounding(
     Ok((spec_refs, informal_grounds))
 }
 
+/// Keeps the module context of a type/trait tombstone in its identity-only
+/// domain record. Type and trait deletion records have no separate
+/// `module_path` field, so a bare legacy key must be promoted to the local
+/// module-qualified notation before the DTO context is discarded. A key that
+/// already contains a path is retained as written, matching live-entry key
+/// handling and preserving explicitly qualified spellings.
+fn tombstone_entry_key(
+    crate_name: &CrateName,
+    entry_key: &CatalogueEntryKey,
+    tombstone: &TombstoneDto,
+) -> Result<CatalogueEntryKey, CatalogueDocumentCodecError> {
+    let entry_name = entry_key.as_str();
+    let module_path = ModulePath::from_str(&tombstone.module_path).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid module_path '{}': {error}", tombstone.module_path),
+        }
+    })?;
+    let identity =
+        FullyQualifiedItemPath::from_catalogue_entry_key(crate_name, entry_key, &module_path)
+            .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!("invalid catalogue entry identity: {error}"),
+            })?;
+    if !tombstone.module_path.is_empty() && identity.module_path() != &module_path {
+        return Err(CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!(
+                "tombstone key '{entry_name}' identifies module_path '{}', but tombstone \
+                 module_path is '{}'",
+                identity.module_path(),
+                tombstone.module_path
+            ),
+        });
+    }
+    let effective_name = if module_path.is_root() || entry_name.contains("::") {
+        entry_name.to_owned()
+    } else {
+        format!("{module_path}::{entry_name}")
+    };
+    CatalogueEntryKey::try_new(effective_name.clone()).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid catalogue entry key: {error}"),
+        }
+    })
+}
+
 pub(super) fn type_entry_from_dto(
     name: &str,
     dto: TypeEntryDto,
@@ -184,7 +207,6 @@ pub(super) fn type_entry_from_dto(
         entry_name: name.to_owned(),
         reason,
     };
-
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
@@ -235,7 +257,6 @@ pub(super) fn type_entry_from_dto(
         ModulePath::from_str(&dto.module_path)
             .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
     };
-
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -453,7 +474,6 @@ pub(super) fn trait_entry_from_dto(
         entry_name: name.to_owned(),
         reason,
     };
-
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
@@ -465,7 +485,6 @@ pub(super) fn trait_entry_from_dto(
         ModulePath::from_str(&dto.module_path)
             .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
     };
-
     let generics = method_generics_from_dtos(name, dto.generics)?;
     let generic_names = generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
     let methods = dto

@@ -4,9 +4,9 @@
 //! for `CatalogueToExtendedCrateCodec` (implemented in T005).
 //!
 //! The codec converts a domain `CatalogueDocument` to an `ExtendedCrate` via
-//! the `CatalogueToExtendedCratePort` trait.  This module provides the
-//! infrastructure-specific error wrapper that may carry additional context (e.g.
-//! the offending `TypeRef` string, the conflicting name).
+//! the `CatalogueToExtendedCratePort` trait. This module provides the
+//! infrastructure-specific error wrapper that may carry additional context
+//! (e.g. the offending `TypeRef` string or the conflicting name).
 //!
 //! ## Variants
 //!
@@ -17,12 +17,17 @@
 //!
 //! Note: crate-prefixed `TypeRef` values (e.g. `"domain_core::UserId"`) are
 //! **never** rejected; they are auto-collected into `external_crates`
-//! (ADR 2 D5 / D11 open-world semantics).  `ExternalCrateUnresolvable` is not
+//! (ADR 2 D5 / D11 open-world semantics). `ExternalCrateUnresolvable` is not
 //! a variant of this error type.
 //!
 //! (infrastructure-types.json entry: `CatalogueToExtendedCrateCodecError`)
 
 use domain::tddd::NewTypeGraphCodecError;
+use domain::tddd::catalogue_v2::identifiers::{
+    CrateName, FullyQualifiedItemPath, Identifier, ModulePath, TypeRef,
+};
+use domain::tddd::catalogue_v2::roles::NonEmptyVec;
+use domain::tddd::test_obligation::ids::{DiagnosticMessage, unavailable_diagnostic_message};
 use thiserror::Error;
 
 /// Infrastructure-level error for `CatalogueToExtendedCrateCodec`.
@@ -58,11 +63,57 @@ impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError {
     fn from(err: CatalogueToExtendedCrateCodecError) -> Self {
         match err {
             CatalogueToExtendedCrateCodecError::InvalidTypeRef { type_ref, reason } => {
-                NewTypeGraphCodecError::InvalidTypeRef(format!("{type_ref}: {reason}"))
+                NewTypeGraphCodecError::InvalidTypeRef(
+                    legacy_type_ref(type_ref),
+                    legacy_diagnostic(reason),
+                )
             }
             CatalogueToExtendedCrateCodecError::AmbiguousIdentifier { name } => {
-                NewTypeGraphCodecError::AmbiguousTypeName(name)
+                let identifier = legacy_identifier(name);
+                let candidate = FullyQualifiedItemPath::new(
+                    legacy_crate_name(),
+                    ModulePath::root(),
+                    identifier.clone(),
+                );
+                NewTypeGraphCodecError::AmbiguousIdentifier(
+                    identifier,
+                    NonEmptyVec::new(candidate, Vec::new()),
+                )
             }
+        }
+    }
+}
+
+fn legacy_type_ref(value: String) -> TypeRef {
+    let mut value = if value.is_empty() { "<empty TypeRef>".to_owned() } else { value };
+    loop {
+        match TypeRef::new(value.clone()) {
+            Ok(type_ref) => return type_ref,
+            Err(_) => value = "<invalid TypeRef>".to_owned(),
+        }
+    }
+}
+
+fn legacy_diagnostic(value: String) -> DiagnosticMessage {
+    DiagnosticMessage::try_new(value).unwrap_or_else(|_| unavailable_diagnostic_message())
+}
+
+fn legacy_identifier(value: String) -> Identifier {
+    let mut value = if value.is_empty() { "<empty identifier>".to_owned() } else { value };
+    loop {
+        match Identifier::new(value.clone()) {
+            Ok(identifier) => return identifier,
+            Err(_) => value = "_invalid_identifier".to_owned(),
+        }
+    }
+}
+
+fn legacy_crate_name() -> CrateName {
+    let mut value = "unknown".to_owned();
+    loop {
+        match CrateName::new(value.clone()) {
+            Ok(crate_name) => return crate_name,
+            Err(_) => value = "fallback".to_owned(),
         }
     }
 }
@@ -72,9 +123,17 @@ impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+    use std::fmt::{Debug, Display};
+
+    fn assert_error_surface<T: Debug + Display + std::error::Error>() {}
+
+    #[test]
+    fn test_catalogue_to_extended_crate_codec_error_has_error_surface() {
+        assert_error_surface::<CatalogueToExtendedCrateCodecError>();
+    }
 
     #[test]
     fn test_invalid_type_ref_display() {
@@ -104,7 +163,7 @@ mod tests {
         };
         let domain_err: NewTypeGraphCodecError = codec_err.into();
         assert!(
-            matches!(domain_err, NewTypeGraphCodecError::InvalidTypeRef(_)),
+            matches!(domain_err, NewTypeGraphCodecError::InvalidTypeRef(_, _)),
             "expected InvalidTypeRef, got: {domain_err:?}"
         );
     }
@@ -115,8 +174,8 @@ mod tests {
             CatalogueToExtendedCrateCodecError::AmbiguousIdentifier { name: "Draft".to_string() };
         let domain_err: NewTypeGraphCodecError = codec_err.into();
         assert!(
-            matches!(domain_err, NewTypeGraphCodecError::AmbiguousTypeName(_)),
-            "expected AmbiguousTypeName, got: {domain_err:?}"
+            matches!(domain_err, NewTypeGraphCodecError::AmbiguousIdentifier(_, _)),
+            "expected AmbiguousIdentifier, got: {domain_err:?}"
         );
     }
 }

@@ -3,9 +3,12 @@
 
 use std::collections::BTreeSet;
 use std::path::Path;
+use std::str::FromStr;
 
 use domain::plan_ref::SpecElementId;
 use domain::tddd::catalog_gen::{CatalogEntryName, CatalogImportAction};
+use domain::tddd::catalogue_v2::{CrateName, FullyQualifiedItemPath, Identifier, ModulePath};
+use domain::tddd::semantic_verify::CatalogueEntryKey;
 use usecase::catalog_gen::{CatalogError, CatalogImportCommand, CatalogWriteReport};
 
 use super::fs_access::{
@@ -57,22 +60,25 @@ fn import_entry_to_file(
     resolve: impl FnOnce() -> Result<ImportedShape, CatalogError>,
 ) -> Result<CatalogWriteReport, CatalogError> {
     let mut document = read_catalogue(path, trusted_root)?;
-    validate_type_path_crate_matches_catalogue(&document, &command.type_path)?;
-    let (entry_name, entry) = match command.action {
+    let entry_key = fully_qualified_entry_key(&document, &command.type_path)?;
+    let name = CatalogEntryName::try_new(entry_key.as_str().to_owned()).map_err(|err| {
+        schema_error(format!("invalid entry name `{}`: {err}", entry_key.as_str()))
+    })?;
+    reject_duplicate_identity(&document, "types", &entry_key, &name)?;
+    let entry = match command.action {
         // A delete import records the removed type's identity plus grounding
         // without resolving the (expensive, nightly) rustdoc shape or emitting
         // role/docs `$todo` holes.
         CatalogImportAction::Delete => {
-            build_delete_entry(&command.type_path, &command.anchors, spec_file, spec_anchors)?
+            build_delete_entry(&command.type_path, &command.anchors, spec_file, spec_anchors)
+                .map(|(_, entry)| entry)?
         }
         CatalogImportAction::Reference | CatalogImportAction::Modify => {
             let shape = resolve()?;
-            let entry = build_import_entry(command, &shape, spec_file, spec_anchors)?;
-            (shape.name.clone(), entry)
+            validate_resolved_shape_path(&command.type_path, &shape)?;
+            build_import_entry(command, &shape, spec_file, spec_anchors)?
         }
     };
-    let name = CatalogEntryName::try_new(entry_name.clone())
-        .map_err(|err| schema_error(format!("invalid entry name `{entry_name}`: {err}")))?;
     insert_entry(&mut document, "types", &name, entry)?;
     write_catalogue(path, trusted_root, &document)?;
     let holes = scan_entry_holes(&document, "types", name.as_str());
@@ -83,21 +89,136 @@ fn import_entry_to_file(
     })
 }
 
-fn validate_type_path_crate_matches_catalogue(
+fn reject_duplicate_identity(
+    document: &serde_json::Value,
+    section: &str,
+    new_key: &CatalogueEntryKey,
+    new_name: &CatalogEntryName,
+) -> Result<(), CatalogError> {
+    let crate_name_text = document
+        .get("crate_name")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| schema_error("catalogue is missing a string `crate_name`"))?;
+    let crate_name = CrateName::new(crate_name_text.to_owned())
+        .map_err(|error| schema_error(format!("invalid catalogue crate_name: {error}")))?;
+    let new_identity =
+        FullyQualifiedItemPath::from_catalogue_entry_key(&crate_name, new_key, &ModulePath::root())
+            .map_err(|error| {
+                schema_error(format!("invalid import identity `{}`: {error}", new_key.as_str()))
+            })?;
+    let requested_name = terminal_entry_name(new_key.as_str());
+    let Some(section_value) = document.get(section) else {
+        return Ok(());
+    };
+    let entries = section_value.as_object().ok_or_else(|| {
+        schema_error(format!("catalogue section `{section}` is not a JSON object"))
+    })?;
+
+    for (raw_key, entry) in entries {
+        if raw_key == "$todo" {
+            continue;
+        }
+        if terminal_entry_name(raw_key) != requested_name {
+            continue;
+        }
+        let existing_key = CatalogueEntryKey::try_new(raw_key.to_owned()).map_err(|error| {
+            schema_error(format!("invalid existing catalogue entry key `{raw_key}`: {error}"))
+        })?;
+        let module_path = if raw_key.contains("::") {
+            ModulePath::root()
+        } else {
+            existing_module_path(raw_key, entry)?
+        };
+        let existing_identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+            &crate_name,
+            &existing_key,
+            &module_path,
+        )
+        .map_err(|error| {
+            schema_error(format!("invalid existing entry identity `{raw_key}`: {error}"))
+        })?;
+        if existing_identity == new_identity {
+            return Err(CatalogError::DuplicateEntry { entry_key: new_name.clone() });
+        }
+    }
+    Ok(())
+}
+
+fn terminal_entry_name(key: &str) -> &str {
+    key.rsplit("::").next().unwrap_or(key)
+}
+
+fn existing_module_path(
+    raw_key: &str,
+    entry: &serde_json::Value,
+) -> Result<ModulePath, CatalogError> {
+    let Some(module_value) = entry.get("module_path") else {
+        return Ok(ModulePath::root());
+    };
+    let module = module_value.as_str().ok_or_else(|| {
+        schema_error(format!("existing entry `{raw_key}` has an invalid `module_path`"))
+    })?;
+    if module.is_empty() {
+        return Ok(ModulePath::root());
+    }
+    ModulePath::from_str(module).map_err(|error| {
+        schema_error(format!("existing entry `{raw_key}` has invalid module_path: {error}"))
+    })
+}
+
+/// Build the catalogue key from the exact crate/module/type path supplied to
+/// `catalog import --type`.  The catalogue entry keeps its module path in the
+/// entry body, while the map key retains the complete identity so two
+/// same-named types can be written side by side.
+fn fully_qualified_entry_key(
     document: &serde_json::Value,
     type_path: &str,
-) -> Result<(), CatalogError> {
-    let (crate_name, _, _) = parse_type_path(type_path)?;
+) -> Result<CatalogueEntryKey, CatalogError> {
+    validate_type_path_segments(type_path)?;
+    let (crate_name, module, name) = parse_type_path(type_path)?;
     let catalogue_crate = document
         .get("crate_name")
         .and_then(serde_json::Value::as_str)
         .ok_or_else(|| schema_error("catalogue is missing a string `crate_name`"))?;
-    if crate_name == catalogue_crate {
+    if crate_name != catalogue_crate {
+        return Err(schema_error(format!(
+            "type path `{type_path}` targets crate `{crate_name}`, but catalogue crate_name is `{catalogue_crate}`"
+        )));
+    }
+    let raw_key = if module.is_empty() {
+        format!("{crate_name}::{name}")
+    } else {
+        format!("{crate_name}::{module}::{name}")
+    };
+    CatalogueEntryKey::try_new(raw_key)
+        .map_err(|_| schema_error(format!("invalid catalogue entry key for `{type_path}`")))
+}
+
+fn validate_type_path_segments(type_path: &str) -> Result<(), CatalogError> {
+    for segment in type_path.split("::") {
+        if segment.is_empty() {
+            return Err(schema_error(format!(
+                "type path `{type_path}` contains an empty path segment"
+            )));
+        }
+        Identifier::new(segment.to_owned()).map_err(|error| {
+            schema_error(format!(
+                "type path `{type_path}` contains invalid path segment `{segment}`: {error}"
+            ))
+        })?;
+    }
+    Ok(())
+}
+
+fn validate_resolved_shape_path(
+    type_path: &str,
+    shape: &ImportedShape,
+) -> Result<(), CatalogError> {
+    let (_, module, name) = parse_type_path(type_path)?;
+    if shape.module_path == module && shape.name == name {
         return Ok(());
     }
-    Err(schema_error(format!(
-        "type path `{type_path}` targets crate `{crate_name}`, but catalogue crate_name is `{catalogue_crate}`"
-    )))
+    Err(schema_error(format!("resolved type shape does not match requested path `{type_path}`")))
 }
 
 #[cfg(test)]
@@ -161,11 +282,11 @@ mod tests {
             || Ok(sample_shape()),
         )
         .unwrap();
-        assert_eq!(report.entry_key, "LayerId");
+        assert_eq!(report.entry_key, "domain::tddd::LayerId");
         let written: Value =
             serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
-        assert_eq!(written["types"]["LayerId"]["action"], json!("reference"));
-        assert_eq!(written["types"]["LayerId"]["kind"]["kind"], json!("struct"));
+        assert_eq!(written["types"]["domain::tddd::LayerId"]["action"], json!("reference"));
+        assert_eq!(written["types"]["domain::tddd::LayerId"]["kind"]["kind"], json!("struct"));
     }
 
     #[test]
@@ -194,7 +315,7 @@ mod tests {
         assert!(report.holes.is_empty(), "delete tombstone must have no $todo holes");
         let written: Value =
             serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
-        let entry = &written["types"]["LayerId"];
+        let entry = &written["types"]["domain::tddd::LayerId"];
         assert_eq!(entry["action"], json!("delete"));
         assert_eq!(entry["module_path"], json!("tddd"));
         assert_eq!(entry["spec_refs"][0]["anchor"], json!("IN-01"));
@@ -253,6 +374,13 @@ mod tests {
     }
 
     #[test]
+    fn test_import_rejects_empty_type_path_segment_before_parse() {
+        let document = serde_json::json!({"crate_name": "domain"});
+        let error = fully_qualified_entry_key(&document, "domain::::LayerId").unwrap_err();
+        assert!(matches!(error, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
     fn test_import_missing_catalogue_reports_before_rustdoc() {
         // The catalogue file is never created. `import` must fail with
         // `FileMissing` ("run init first") *before* the rustdoc resolver runs,
@@ -300,5 +428,58 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(err, CatalogError::DuplicateEntry { .. }));
+    }
+
+    #[test]
+    fn test_import_duplicate_identity_rejected_for_loose_existing_key() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        document["types"] = json!({
+            "LayerId": {"module_path": "tddd"}
+        });
+        std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+        let resolver_called = std::cell::Cell::new(false);
+
+        let error = import_entry_to_file(
+            &path,
+            temp.path(),
+            &import_command(CatalogImportAction::Reference),
+            "spec.json",
+            &BTreeSet::new(),
+            || {
+                resolver_called.set(true);
+                Ok(sample_shape())
+            },
+        )
+        .unwrap_err();
+
+        assert!(matches!(error, CatalogError::DuplicateEntry { .. }));
+        assert!(!resolver_called.get(), "identity duplicate must fail before resolution");
+    }
+
+    #[test]
+    fn test_import_skips_unrelated_draft_entry_without_module_identity() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        document["types"] = json!({
+            "Other": {"module_path": {"$todo": "assign the module path"}}
+        });
+        std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+
+        let report = import_entry_to_file(
+            &path,
+            temp.path(),
+            &import_command(CatalogImportAction::Reference),
+            "spec.json",
+            &BTreeSet::new(),
+            || Ok(sample_shape()),
+        )
+        .unwrap();
+
+        assert_eq!(report.entry_key, "domain::tddd::LayerId");
     }
 }

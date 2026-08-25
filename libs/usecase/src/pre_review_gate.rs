@@ -1000,6 +1000,40 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_pre_review_gate_attributes_duplicate_qualified_entry_keys_independently() {
+        let alpha = entry_key("domain::alpha::Shared");
+        let beta = entry_key("domain::beta::Shared");
+        let statuses =
+            std::collections::HashMap::from([(task_id("T001"), TaskStatusKind::InProgress)]);
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![
+                        ContractedEntryRef::new(layer("domain"), alpha.clone()),
+                        ContractedEntryRef::new(layer("domain"), beta.clone()),
+                    ],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![
+                yellow_signal(alpha.as_str()),
+                blue_signal(beta.as_str()),
+            ])))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        let outcome = service.check(cmd("my-track", "domain")).unwrap();
+        assert_liveness_violations(
+            outcome,
+            vec![PreReviewGateViolation::NonBlueSignal(
+                ContractedEntryRef::new(layer("domain"), alpha),
+                ConfidenceSignal::Yellow,
+            )],
+        );
+    }
+
     // ── AC-07 (e): all blue + complete attribution → Passed (binary) ──────────
 
     #[test]

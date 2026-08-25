@@ -1,15 +1,24 @@
 //! Impl-block identity map construction helpers.
 //!
-//! Provides [`build_impl_identity_map`], [`normalize_impl_trait_path`],
-//! [`is_compiler_internal_trait`], and supporting utilities used by Phase 1 and
+//! Provides [`build_impl_identity_map`], [`is_compiler_internal_trait`], and
+//! supporting utilities used by Phase 1 and
 //! Phase 2 to build the `(impl_identity_string, Id)` map for trait `Impl` items.
 
 use std::collections::BTreeMap;
 
-use rustdoc_types::{Crate, Id, ItemEnum};
+use domain::tddd::Phase1Error;
+use domain::tddd::catalogue_v2::identifiers::CrateName;
+use rustdoc_types::{Crate, GenericArgs, Id, ItemEnum, ItemSummary, Path, Type};
 
-use super::format::{format_generic_args, format_type, format_type_strip_type_params};
-use super::is_local_unresolved_path;
+use crate::tddd::canonical_type_identity::{
+    DefinitionPathAuthority, canonicalize_rustdoc_generic_args_with_authority,
+    canonicalize_rustdoc_path, canonicalize_rustdoc_type_with_authority,
+};
+use crate::tddd::type_ref_parser::{core_canonical_path, render_type};
+
+use super::impl_identity_helpers::{
+    render_identity_generic_args, strip_impl_params_args, strip_impl_params_type,
+};
 
 /// Normalized path forms (both qualified and bare) for compiler-internal phantom
 /// marker traits whose `Impl` blocks are excluded from the identity map.
@@ -80,32 +89,27 @@ const COMPILER_INTERNAL_TRAIT_PATHS: &[&str] = &[
 pub(crate) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
     let without_generics = normalized_trait_name.split('<').next().unwrap_or(normalized_trait_name);
     COMPILER_INTERNAL_TRAIT_PATHS.contains(&without_generics)
+        || COMPILER_INTERNAL_TRAIT_PATHS.contains(&core_canonical_path(without_generics).as_str())
 }
 
 /// Builds a `(impl_identity_string, Id)` map for ordinary trait `Impl` items
 /// in a crate.
 ///
-/// Identity key format: `"ForTypeName: normalized_trait_path[<GenericArgs>]"`.
+/// Identity key format: `"FullyQualifiedForType: fully_qualified_trait[<GenericArgs>]"`.
 ///
-/// `for_` uses the short name from `format_type` (last path segment) to match
-/// the `ThreeWaySignal` domain contract (short-name identity for types/traits)
-/// and to ensure consistent matching between S-side impls (which carry B-origin
-/// ids in `for_.id` that may not exist in S's paths map) and C-side impls.
+/// Both sides resolve `for_` and `trait_` through their `Crate::paths` universe.
+/// The report layer may shorten an unambiguous key for display, but the map used
+/// for action matching and three-way comparison never uses a short name as its
+/// identity authority.
 ///
 /// `crate_name` is the name of the crate being indexed, used to distinguish
 /// local-crate trait paths (e.g. `my_crate::MyTrait`) from external crate paths
 /// (e.g. `serde::Serialize`).  Pass the empty string for A-side (codec) maps
 /// where trait paths use `crate::` or bare names rather than the real crate name.
 ///
-/// Trait path normalization (via `normalize_impl_trait_path`):
-/// - Local-crate trait paths (`crate::MyTrait`, bare `MyTrait`,
-///   `{crate_name}::MyTrait`) are reduced to their last segment so that S-side
-///   codec paths and C-side rustdoc paths produce the same key.
-/// - Workspace-external trait paths from `domain` and `usecase` are preserved
-///   with their canonical crate path. They are distinct trait identities even
-///   when their last path segment is the same.
-/// - External crate paths (e.g. `serde::Serialize`) are preserved verbatim to
-///   prevent collisions between distinct traits sharing the same short name.
+/// Trait paths are taken verbatim from the authoritative path summaries. A
+/// synthetic path without a summary is retained as a conservative compatibility
+/// spelling; it is never used to collapse two path-backed identities.
 ///
 /// Only **explicit, non-blanket, non-negative, non-synthetic trait impls** are
 /// included.  Only local-crate impls (crate_id == 0) are included.  Compiler-
@@ -167,7 +171,41 @@ pub(crate) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
 ///
 /// Symmetric inclusion ensures fingerprints match and no spurious `CMinusSUnionD`
 /// Red signals are generated for cross-crate impls.
-pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeMap<String, Id> {
+pub(crate) fn try_build_impl_identity_map_with_authority(
+    krate: &Crate,
+    crate_name: &str,
+    authority: &DefinitionPathAuthority,
+) -> Result<BTreeMap<String, Id>, Phase1Error> {
+    let has_identity_candidates = krate.index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(implementation)
+                if !implementation.is_negative
+                    && !implementation.is_synthetic
+                    && implementation.blanket_impl.is_none()
+                    && implementation.trait_.is_some()
+        )
+    });
+    if !has_identity_candidates {
+        return Ok(BTreeMap::new());
+    }
+    let catalogue_crate = CrateName::new(crate_name.to_owned()).or_else(|_| {
+        let root_name = krate
+            .index
+            .get(&krate.root)
+            .and_then(|root| root.name.clone())
+            .ok_or_else(|| {
+                Phase1Error::rustdoc_root_resolution(format!(
+                    "impl identity map cannot resolve paths without a valid crate root name: `{crate_name}`"
+                ))
+            })?;
+        CrateName::new(root_name).map_err(|_| {
+            Phase1Error::rustdoc_root_resolution(
+                "impl identity map found an invalid local crate root name",
+            )
+        })
+    })?;
+
     // Collect candidates: (key, for_path_raw, id) — then sort to make result
     // deterministic.
     //
@@ -211,11 +249,13 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             // normalized away from the `for_` key.
             let type_params: std::collections::BTreeSet<String> =
                 impl_.generics.params.iter().map(|p| p.name.clone()).collect();
-            let for_name = if type_params.is_empty() {
-                format_type(&impl_.for_)
-            } else {
-                format_type_strip_type_params(&impl_.for_, &type_params)
-            };
+            let for_name = identity_type_text(
+                &impl_.for_,
+                &krate.paths,
+                &type_params,
+                &catalogue_crate,
+                authority,
+            )?;
             // Raw `for_` path used as a secondary sort key for deterministic collision
             // resolution when two impls share the same short-name key (e.g. a local
             // `Error` type and an external `std::error::Error` both producing `"Error:
@@ -228,10 +268,13 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             // `ResolvedPath.path` (enforced by the catalogue codec: only the last segment
             // of an external type path is stored, e.g. `"Vec"` not `"std::vec::Vec"`).
             // This invariant makes A-origin `for_path_raw` consistent with C-side output.
-            let for_path_raw: String = match &impl_.for_ {
-                rustdoc_types::Type::ResolvedPath(p) => p.path.clone(),
-                other => format_type(other),
-            };
+            let for_path_raw = identity_type_text(
+                &impl_.for_,
+                &krate.paths,
+                &type_params,
+                &catalogue_crate,
+                authority,
+            )?;
 
             // Per ADR D4 (catalogue-schema-permissive): the `for_` external-type filter
             // is intentionally absent.  Cross-crate impls such as
@@ -249,95 +292,14 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             // preventing false identity-key collisions between user-defined and
             // stdlib/core traits that share a short name.
             //
-            // Fallback: when `trait_path.id` has no entry in `krate.paths` (A-side
-            // codec-generated synthetic Ids), fall back to `normalize_impl_trait_path`
-            // for string-based normalisation.  The catalogue codec always emits
-            // fully-qualified paths for external traits (e.g. `"core::convert::From"`)
-            // so the fallback path produces the same canonical form.
-            //
             // Generic args on the trait (e.g. `From<MyError>`) are NOT part of this base
             // path resolution: they are carried structurally in `trait_path.args` — the
             // codec emits them via `resolve_trait_ref_for_top_level` and rustdoc emits them
             // natively — and are appended to the identity key below via `format_generic_args`.
             // Both the S-side and C-side maps therefore build the same key for the same
             // logical impl without any string-based re-embedding (ADR `2026-05-20-0048` D2).
-            let normalized_trait_path = if let Some(ps) = krate.paths.get(&trait_path.id) {
-                if ps.crate_id != 0 {
-                    // External trait — use the canonical qualified path from krate.paths.
-                    // This is the same form that the catalogue codec emits for S-side
-                    // impls (e.g. `"core::convert::From"`, `"serde::Serialize"`), so
-                    // S-side and C-side keys are consistent.
-                    //
-                    // Some rustdoc versions emit short-form path segments (e.g. `["From"]`)
-                    // for well-known core/std traits even when `crate_id != 0`.  In that
-                    // case `join("::")` produces `"From"` (bare) while the S-side codec
-                    // always emits the fully-qualified `"core::convert::From"`.  To keep
-                    // both sides consistent, expand bare single-segment paths for known
-                    // core traits via `core_canonical_path`.
-                    let joined = ps.path.join("::");
-                    if !joined.contains("::") {
-                        // Single-segment path from krate.paths: the module prefix was
-                        // omitted by rustdoc.  Reconstruct the qualified path using the
-                        // actual external crate name from `krate.external_crates`.
-                        //
-                        // Rustdoc sometimes emits a bare single-segment path (e.g. `["From"]`)
-                        // for traits from core/std/alloc.  The S-side codec emits canonical
-                        // qualified paths (`"core::convert::From"` / `"std::convert::From"`),
-                        // so we must expand single-segment paths using the same canonical
-                        // function the S-side codec uses for that crate:
-                        //   - `std`  → `std_canonical_path` (e.g. `"std::convert::From"`)
-                        //   - `core` → `core_canonical_path` (e.g. `"core::convert::From"`)
-                        //   - `alloc`→ `core_canonical_path` (alloc shares core module paths)
-                        //   - other  → `"{crate_name}::{short_name}"` (e.g. `"serde::Serialize"`)
-                        let ext_crate_name = krate
-                            .external_crates
-                            .get(&ps.crate_id)
-                            .map(|ec| ec.name.as_str())
-                            .unwrap_or("core");
-                        match ext_crate_name {
-                            "std" => crate::tddd::type_ref_parser::std_canonical_path(&joined),
-                            "core" | "alloc" => {
-                                crate::tddd::type_ref_parser::core_canonical_path(&joined)
-                            }
-                            "domain" | "usecase" => format!("{ext_crate_name}::{joined}"),
-                            other => format!("{other}::{joined}"),
-                        }
-                    } else if let Some(first_seg) = ps.path.first() {
-                        // `domain` and `usecase` are external workspace crates from the
-                        // perspective of this crate. Their trait identities must retain the
-                        // canonical crate path: collapsing either to a short name would make
-                        // e.g. the two distinct `ObligationFulfillmentCachePort` traits collide.
-                        let ext_crate_name = krate
-                            .external_crates
-                            .get(&ps.crate_id)
-                            .map(|ec| ec.name.as_str())
-                            .unwrap_or("");
-                        if matches!(ext_crate_name, "domain" | "usecase") {
-                            if first_seg.as_str() == ext_crate_name {
-                                joined
-                            } else {
-                                format!("{ext_crate_name}::{joined}")
-                            }
-                        } else {
-                            ps.path.last().unwrap_or(first_seg).to_string()
-                        }
-                    } else {
-                        joined
-                    }
-                } else {
-                    // Local trait (crate_id == 0) — short name, same as the codec's
-                    // `crate::` or bare-name form.
-                    ps.path
-                        .last()
-                        .map(|s| s.as_str())
-                        .unwrap_or(trait_path.path.as_str())
-                        .to_string()
-                }
-            } else {
-                // ID not in paths: A-side codec-generated synthetic ID or anonymous item.
-                // Fall back to string-based normalisation.
-                normalize_impl_trait_path(&trait_path.path, crate_name)
-            };
+            let normalized_trait_path =
+                canonical_trait_path(trait_path, &krate.paths, &catalogue_crate, authority)?;
 
             // Skip compiler-internal phantom marker traits (StructuralPartialEq,
             // StructuralEq, TrivialClone). These cannot be declared in any workspace catalogue
@@ -406,7 +368,13 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             // Include generic args on the trait, with angle brackets so that
             // `Iterator<Item = u8>` is distinct from a trait named `IteratorItem`.
             let trait_str = if let Some(args) = &trait_path.args {
-                let rendered = format_generic_args(args);
+                let rendered = identity_generic_args(
+                    args,
+                    &krate.paths,
+                    &type_params,
+                    &catalogue_crate,
+                    authority,
+                )?;
                 if rendered.is_empty() {
                     normalized_trait_path
                 } else {
@@ -434,83 +402,71 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
     for (key, _for_path_raw, id) in candidates {
         map.entry(key).or_insert(id);
     }
-    map
+    Ok(map)
 }
 
-/// Normalizes an impl trait path string for identity-map key construction.
-///
-/// **Used as a fallback** when `krate.paths` does not contain the trait item's
-/// `Id` (A-side codec-generated synthetic Ids, anonymous items).  The primary
-/// resolution path in `build_impl_identity_map` uses `krate.paths` to obtain the
-/// fully qualified canonical path, which correctly disambiguates local from
-/// external traits sharing a short name.
-///
-/// `crate_name` is the real crate name as it appears in rustdoc paths (e.g.
-/// `"my_crate"`).  Pass `""` for A-side (codec) maps where trait paths use
-/// `crate::` or bare names rather than the real crate name.
-///
-/// Normalization rules (fallback only):
-/// - Bare identifiers (no `::`) → returned as-is.
-/// - `crate::`-, `self::`-, `super::`-prefixed paths → stripped to last segment.
-/// - Paths that start with `{crate_name}::` (local crate in rustdoc) → stripped
-///   to last segment, so `my_crate::MyTrait` produces `MyTrait` matching codec's
-///   `crate::MyTrait` → `MyTrait`.
-/// - All other paths → kept verbatim.  The catalogue codec emits qualified forms
-///   for external traits (e.g. `"core::convert::From"`, `"serde::Serialize"`) so
-///   the string is already in canonical form and requires no further transformation.
-pub(crate) fn normalize_impl_trait_path(path: &str, crate_name: &str) -> String {
-    if is_local_unresolved_path(path) {
-        // Bare name (no `::`) or relative prefix (`crate::`/`self::`/`super::`).
-        // Split off any generic args (e.g. `"From<T>"` → base=`"From"`, args=`"<T>"`).
-        let (base, args) = split_generic_args(path);
-        let short_name = base.rsplit("::").next().unwrap_or(base);
-        // Paths with a relative prefix (`crate::X`, `self::X`, `super::X`) are
-        // local-crate references; strip to the short name without attempting any
-        // core/std expansion, which would produce incorrect results (e.g.
-        // `crate::Display` must NOT expand to `core::fmt::Display`).
-        if base.contains("::") {
-            return format!("{short_name}{args}");
-        }
-        // Bare identifiers (no `::`) may be well-known core/std traits (e.g. `From`,
-        // `Display`).  Expand to the canonical fully-qualified path so the fallback
-        // normalisation matches the S-side codec, which always emits
-        // `core_canonical_path("From")` = `"core::convert::From"`.
-        // Unknown names (local/workspace traits) are kept as the bare short name.
-        // `core_canonical_path` falls back to `"core::{name}"` (only two segments)
-        // for unrecognised names, so we distinguish known expansions by checking
-        // that the result contains at least two `::` separators (three segments).
-        // The generic args are re-appended verbatim.
-        let expanded_base = crate::tddd::type_ref_parser::core_canonical_path(short_name);
-        // `core_canonical_path` falls back to `"core::{name}"` for any name it does
-        // not recognise, so the result `"core::{short_name}"` means the name is NOT
-        // a known core/std trait.  Only expand when the result has more than two
-        // segments (i.e., points to a real sub-module like `core::convert::From`).
-        let is_known_core_trait = expanded_base.matches("::").count() >= 2;
-        if is_known_core_trait {
-            // Recognized core/std trait: use the expanded qualified path.
-            format!("{expanded_base}{args}")
-        } else {
-            // Unknown bare name: keep the short name as before.
-            format!("{short_name}{args}")
-        }
-    } else if !crate_name.is_empty() && path.starts_with(&format!("{crate_name}::")) {
-        // rustdoc local trait path (e.g. `my_crate::MyTrait`) → short name.
-        path.rsplit("::").next().unwrap_or(path).to_string()
-    } else {
-        // External or unrecognised path → keep verbatim.
-        // The catalogue codec emits fully-qualified paths for external traits
-        // (e.g. `"core::convert::From"`, `"serde::Serialize"`), so no transformation
-        // is needed for A-side fallback paths.
-        path.to_string()
-    }
+/// Builds an impl identity map and propagates failures from the canonical
+/// rustdoc path resolver.
+pub(crate) fn build_impl_identity_map(
+    krate: &Crate,
+    crate_name: &str,
+    authority: &DefinitionPathAuthority,
+) -> Result<BTreeMap<String, Id>, Phase1Error> {
+    try_build_impl_identity_map_with_authority(krate, crate_name, authority)
 }
 
-/// Splits a trait path string into the base path and a trailing generic-arg suffix.
-///
-/// Returns `(base, args)` where `args` is the suffix starting at the first `<` (if any),
-/// or `(path, "")` if no generic args are present.
-///
-/// Example: `"From<CatalogueLoaderError>"` → `("From", "<CatalogueLoaderError>")`.
-pub(crate) fn split_generic_args(path: &str) -> (&str, &str) {
-    if let Some(pos) = path.find('<') { (&path[..pos], &path[pos..]) } else { (path, "") }
+/// Renders a trait path through the shared definition-path resolver.
+fn canonical_trait_path(
+    path: &Path,
+    paths: &std::collections::HashMap<Id, ItemSummary>,
+    crate_name: &CrateName,
+    authority: &DefinitionPathAuthority,
+) -> Result<String, Phase1Error> {
+    canonicalize_rustdoc_path(path, crate_name, paths, authority).map_err(|error| {
+        Phase1Error::rustdoc_root_resolution(format!(
+            "trait impl identity path `{}` could not be resolved through Crate::paths: {error}",
+            path.path
+        ))
+    })
+}
+
+/// Renders an impl owner while retaining the fully-qualified identity of every
+/// resolved path and stripping only generic parameters declared on that impl.
+fn identity_type_text(
+    ty: &Type,
+    paths: &std::collections::HashMap<Id, ItemSummary>,
+    impl_params: &std::collections::BTreeSet<String>,
+    crate_name: &CrateName,
+    authority: &DefinitionPathAuthority,
+) -> Result<String, Phase1Error> {
+    let canonical = canonicalize_rustdoc_type_with_authority(ty, crate_name, paths, authority)
+        .map_err(|error| {
+            Phase1Error::rustdoc_root_resolution(format!(
+                "impl owner identity could not be resolved through Crate::paths: {error}"
+            ))
+        })?;
+    let stripped = strip_impl_params_type(canonical, impl_params);
+    render_type(&stripped).ok_or_else(|| {
+        Phase1Error::rustdoc_root_resolution(
+            "impl owner identity contains a rustdoc type without an authoritative rendering",
+        )
+    })
+}
+
+fn identity_generic_args(
+    args: &GenericArgs,
+    paths: &std::collections::HashMap<Id, ItemSummary>,
+    impl_params: &std::collections::BTreeSet<String>,
+    crate_name: &CrateName,
+    authority: &DefinitionPathAuthority,
+) -> Result<String, Phase1Error> {
+    let canonical = canonicalize_rustdoc_generic_args_with_authority(
+        args, crate_name, paths, authority,
+    )
+    .map_err(|error| {
+        Phase1Error::rustdoc_root_resolution(format!(
+            "trait impl generic identity could not be resolved through Crate::paths: {error}"
+        ))
+    })?;
+    render_identity_generic_args(&strip_impl_params_args(canonical, impl_params))
 }

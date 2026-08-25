@@ -1,0 +1,1899 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::tddd::catalogue_linter::evaluate_catalogue_lint": {
+      "action": "modify",
+      "docs": "Evaluates catalogue-lint rules by classifying syntactically extracted TypeRef occurrences against the supplied catalogue set.",
+      "generics": [
+        {
+          "bounds": [
+            "PrimitiveOccurrenceScanner"
+          ],
+          "name": "S"
+        },
+        {
+          "bounds": [
+            "TypeRefPathExtractorPort"
+          ],
+          "name": "E"
+        }
+      ],
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "rules",
+          "ty": "&[CatalogueLinterRule]"
+        },
+        {
+          "name": "all_catalogues",
+          "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>"
+        },
+        {
+          "name": "target_layer_id",
+          "ty": "&LayerId"
+        },
+        {
+          "name": "scanner",
+          "ty": "&S"
+        },
+        {
+          "name": "extractor",
+          "ty": "&E"
+        }
+      ],
+      "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity": {
+      "action": "add",
+      "docs": "Resolves catalogue entry references to fully qualified item paths.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "reference",
+          "ty": "&TypeRef"
+        },
+        {
+          "name": "catalogue_crate",
+          "ty": "&CrateName"
+        },
+        {
+          "name": "universe",
+          "ty": "&std::collections::BTreeSet<FullyQualifiedItemPath>"
+        }
+      ],
+      "returns": "Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "module_path",
+              "ty": "ModulePath"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CrateName",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "module_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ModulePath",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Identifier",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_catalogue_entry_key",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            },
+            {
+              "name": "declared_module_path",
+              "ty": "&ModulePath"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_fully_qualified_key",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "FullyQualifiedItemPath"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "CatalogueEntryKey",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "InherentImplDeclV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "InherentImplDeclV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "InherentImplDeclV2",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "InherentImplDeclV2",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DeletionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "DeletionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "DeletionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DeletionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "NewTypeGraphCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::ExtractedTypeRefPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::TypeRefPathExtractionError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLintViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::convert::From<TypeRefPathExtractionError>"
+    },
+    {
+      "for_type": "domain::tddd::catalogue_linter::CatalogueLinterError",
+      "trait_ref": "core::convert::From<CatalogueIdentityResolutionError>"
+    },
+    {
+      "action": "add",
+      "for_type": "std::sync::Arc<T>",
+      "impl_generics": [
+        {
+          "bounds": [
+            "domain::tddd::catalogue_linter::TypeRefPathExtractorPort",
+            "?Sized"
+          ],
+          "name": "T"
+        }
+      ],
+      "trait_ref": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CatalogueIdentityResolutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "CatalogueToExtendedCratePort": {
+      "action": "modify",
+      "docs": "Secondary port for catalogue graph encoding.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "encode",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "CatalogueDocument"
+            },
+            {
+              "name": "baseline",
+              "ty": "&rustdoc_types::Crate"
+            },
+            {
+              "name": "current",
+              "ty": "&rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "domain::tddd::catalogue_linter::TypeRefPathExtractorPort": {
+      "action": "add",
+      "docs": "Secondary port for complete syntactic TypeRef occurrence extraction.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "extract",
+          "params": [
+            {
+              "name": "type_ref",
+              "ty": "&TypeRef"
+            },
+            {
+              "name": "type_parameters",
+              "ty": "&[ParamName]"
+            },
+            {
+              "name": "lifetime_parameters",
+              "ty": "&[ParamName]"
+            },
+            {
+              "name": "const_parameters",
+              "ty": "&[ParamName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CatalogueDocument": {
+      "action": "modify",
+      "docs": "Catalogue document aggregate root.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CrateName"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "types",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<CatalogueEntryKey, TypeEntry>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "traits",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<CatalogueEntryKey, TraitEntry>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "functions",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<FunctionPath, FunctionEntry>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "inherent_impls",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[InherentImplDeclV2]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_impls",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TraitImplDeclV2]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "deletions",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[DeletionRecord]"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_type",
+          "params": [
+            {
+              "name": "name",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "entry",
+              "ty": "TypeEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_trait",
+          "params": [
+            {
+              "name": "name",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "entry",
+              "ty": "TraitEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_function",
+          "params": [
+            {
+              "name": "path",
+              "ty": "FunctionPath"
+            },
+            {
+              "name": "entry",
+              "ty": "FunctionEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_inherent_impl",
+          "params": [
+            {
+              "name": "decl",
+              "ty": "InherentImplDeclV2"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_trait_impl",
+          "params": [
+            {
+              "name": "decl",
+              "ty": "TraitImplDeclV2"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_deletion",
+          "params": [
+            {
+              "name": "record",
+              "ty": "DeletionRecord"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate_filename",
+          "params": [
+            {
+              "name": "filename_stem",
+              "ty": "&CrateName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CatalogueDocumentError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::document",
+      "role": {
+        "AggregateRoot": {
+          "identity": {
+            "method_name": "crate_name"
+          }
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "CatalogueEntryKey": {
+      "action": "modify",
+      "docs": "Validated key for a catalogue entry reference.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "raw",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "CatalogueIdentityResolutionError": {
+      "action": "add",
+      "docs": "Catalogue-reference classification and resolution error for an extracted TypeRef occurrence.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AmbiguousIdentifier",
+            "payload": {
+              "fields": [
+                "Identifier",
+                "NonEmptyVec<FullyQualifiedItemPath>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnresolvedIdentifier",
+            "payload": {
+              "fields": [
+                "TypeRef"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ClassificationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::identity_resolution",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "DeletionRecord": {
+      "action": "modify",
+      "docs": "Record naming a deleted catalogue entry.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Type",
+            "payload": {
+              "fields": [
+                {
+                  "name": "name",
+                  "ty": "CatalogueEntryKey"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Trait",
+            "payload": {
+              "fields": [
+                {
+                  "name": "name",
+                  "ty": "CatalogueEntryKey"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Function",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "FunctionPath"
+                },
+                {
+                  "name": "spec_refs",
+                  "ty": "Vec<SpecRef>"
+                },
+                {
+                  "name": "informal_grounds",
+                  "ty": "Vec<InformalGroundRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[SpecRef]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "informal_grounds",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[InformalGroundRef]"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::deletions",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "FullyQualifiedItemPath": {
+      "action": "add",
+      "docs": "Fully qualified catalogue item path comprising crate, module path, and item name.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "InherentImplDeclV2": {
+      "action": "modify",
+      "docs": "Catalogue inherent-implementation declaration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "type_name",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "impl_generics",
+              "ty": "Vec<MethodGenericParam>"
+            },
+            {
+              "name": "impl_where_predicates",
+              "ty": "Vec<WherePredicateDecl>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "type_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryKey",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "impl_generics",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodGenericParam]",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "impl_where_predicates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WherePredicateDecl]",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "methods",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodDeclaration]",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::entries",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "NewTypeGraphCodecError": {
+      "action": "modify",
+      "docs": "Catalogue-to-type-graph codec error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTypeRef",
+            "payload": {
+              "fields": [
+                "TypeRef",
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AmbiguousIdentifier",
+            "payload": {
+              "fields": [
+                "Identifier",
+                "NonEmptyVec<FullyQualifiedItemPath>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnresolvedIdentifier",
+            "payload": {
+              "fields": [
+                "TypeRef"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::new_typegraph_codec_error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "TraitRefScope": {
+      "action": "modify",
+      "docs": "Scope classification for a catalogue trait reference.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SelfCrate",
+            "payload": {
+              "fields": [
+                "CatalogueEntryKey"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Workspace",
+            "payload": {
+              "fields": [
+                "CatalogueEntryKey"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "External",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::traits",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::CatalogueLintViolation": {
+      "action": "reference",
+      "docs": "Value-equatable catalogue-lint violation record carrying opaque diagnostic text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rule_kind",
+              "ty": "&'static str"
+            },
+            {
+              "name": "entry_name",
+              "ty": "impl Into<String>"
+            },
+            {
+              "name": "message",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rule_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "message",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::CatalogueLinterError": {
+      "action": "modify",
+      "docs": "Catalogue-lint evaluation error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DuplicateTypeAliasGenericParameter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                },
+                {
+                  "name": "parameter_name",
+                  "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidTypeAliasGenericParameterName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                },
+                {
+                  "name": "parameter_name",
+                  "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConflictingTypeAliasGenericParameters",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidRuleConfig",
+            "payload": {
+              "fields": [
+                "FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownLayer",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "LayerId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScanFailed",
+            "payload": {
+              "fields": [
+                "PrimitiveOccurrenceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PathExtractionFailed",
+            "payload": {
+              "fields": [
+                "TypeRefPathExtractionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "IdentityResolutionFailed",
+            "payload": {
+              "fields": [
+                "CatalogueIdentityResolutionError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::ExtractedTypeRefPath": {
+      "action": "add",
+      "docs": "One exclusively categorized occurrence from a complete TypeRef syntax inspection.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Path",
+            "payload": {
+              "fields": [
+                "TypeRef"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TypeParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LifetimeParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ConstParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AssociatedItemLabel",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::TypeRefPathExtractionError": {
+      "action": "add",
+      "docs": "Failure to extract path references from a catalogue TypeRef.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UnsupportedSyntax",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DepthLimitExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ResourceLimitExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "location",
+                  "ty": "TypeRef"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-21-type-identity-fully-qualified-paths/spec.json"
+        }
+      ]
+    }
+  }
+}

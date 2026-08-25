@@ -349,8 +349,9 @@ mod tests {
     use domain::tddd::catalogue_v2::CatalogueDocument;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::TypeEntry;
-    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath};
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::{ImplPlanDocument, InformalGroundKind, InformalGroundRef, InformalGroundSummary};
 
     /// Builds a `HashMap<String, ContentHash>` from a list of entry keys,
@@ -519,7 +520,7 @@ mod tests {
             spec_refs,
             informal_grounds,
         );
-        doc.insert_type(TypeName::new(name).unwrap(), entry);
+        doc.insert_type(CatalogueEntryKey::try_new(name.to_owned()).unwrap(), entry);
         doc
     }
 
@@ -557,7 +558,7 @@ mod tests {
                 spec_refs,
                 informal_grounds,
             );
-            doc.insert_type(TypeName::new(name).unwrap(), entry);
+            doc.insert_type(CatalogueEntryKey::try_new(name.to_owned()).unwrap(), entry);
         }
         doc
     }

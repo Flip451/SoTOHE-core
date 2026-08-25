@@ -611,8 +611,8 @@ mod tests {
 
     fn make_v3_doc_with_value_object(type_name: &str) -> CatalogueDocument {
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
-            StructShape, TypeEntry, TypeKindV2, TypeName,
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, ItemAction, ModulePath,
+            StructKind, StructShape, TypeEntry, TypeKindV2,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -633,7 +633,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new(type_name).unwrap(), entry);
+        doc.insert_type(CatalogueEntryKey::try_new(type_name.to_owned()).unwrap(), entry);
         doc
     }
 
@@ -770,8 +770,8 @@ mod tests {
         // Build a catalogue with two types: "AType" (index 0) and "ZType" (index 1).
         // BTreeMap iterates in sorted order, so "AType" < "ZType".
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
-            StructShape, TypeEntry, TypeKindV2, TypeName,
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, ItemAction, ModulePath,
+            StructKind, StructShape, TypeEntry, TypeKindV2,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -792,8 +792,11 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.insert_type(TypeName::new("AType").unwrap(), plain_entry.clone());
-        doc.insert_type(TypeName::new("ZType").unwrap(), plain_entry);
+        doc.insert_type(
+            CatalogueEntryKey::try_new("AType".to_owned()).unwrap(),
+            plain_entry.clone(),
+        );
+        doc.insert_type(CatalogueEntryKey::try_new("ZType".to_owned()).unwrap(), plain_entry);
         // Signals doc has only 1 entry (for index 0 = "AType").
         // "ZType" at index 1 has no corresponding signal → should show "—".
         let spec_signals =
@@ -821,15 +824,15 @@ mod tests {
         // signals doc the declaration-hash check did not catch. The defensive
         // `type_name` guard must fall back to "—" rather than painting 🔵 onto AType.
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
-            StructShape, TypeEntry, TypeKindV2, TypeName,
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, ItemAction, ModulePath,
+            StructKind, StructShape, TypeEntry, TypeKindV2,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         doc.insert_type(
-            TypeName::new("AType").unwrap(),
+            CatalogueEntryKey::try_new("AType".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -868,15 +871,15 @@ mod tests {
         // evaluator under the v2-compat `"value_object"` key — is still matched
         // via `section_to_signal_kind_tag`.
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
-            StructShape, TypeEntry, TypeKindV2, TypeName,
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, ItemAction, ModulePath,
+            StructKind, StructShape, TypeEntry, TypeKindV2,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         doc.insert_type(
-            TypeName::new("UserAccount").unwrap(),
+            CatalogueEntryKey::try_new("UserAccount".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -987,15 +990,15 @@ mod tests {
         // `DataRole::DomainEvent` was added without updating SECTIONS /
         // V3_EXTRA_SECTIONS, causing DomainEvent entries to be silently dropped.
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
-            StructShape, TypeEntry, TypeKindV2, TypeName,
+            CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, ItemAction, ModulePath,
+            StructKind, StructShape, TypeEntry, TypeKindV2,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         doc.insert_type(
-            TypeName::new("UserRegistered").unwrap(),
+            CatalogueEntryKey::try_new("UserRegistered".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::DomainEvent,

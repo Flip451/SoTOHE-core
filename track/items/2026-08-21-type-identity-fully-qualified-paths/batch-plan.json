@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-21-type-identity-fully-qualified-paths",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 20, "test_lines": 30}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 140, "test_lines": 120}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 55, "test_lines": 45},
+        {"scope": "infrastructure", "production_lines": 80, "test_lines": 70}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 60, "test_lines": 40},
+        {"scope": "infrastructure", "production_lines": 180, "test_lines": 130}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 130, "test_lines": 110}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T006",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 65, "test_lines": 65}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T008",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 150, "test_lines": 80},
+        {"scope": "infrastructure", "production_lines": 60, "test_lines": 40},
+        {"scope": "cli_composition", "production_lines": 20, "test_lines": 15}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T011",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 0, "test_lines": 70}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T012",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 0, "test_lines": 100}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T013",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 150, "test_lines": 140},
+        {"scope": "usecase", "production_lines": 20, "test_lines": 20},
+        {"scope": "infrastructure", "production_lines": 15, "test_lines": 10},
+        {"scope": "cli_composition", "production_lines": 10, "test_lines": 0}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T014",
+      "scope_estimates": [
+        {"scope": "usecase", "production_lines": 0, "test_lines": 55},
+        {"scope": "infrastructure", "production_lines": 0, "test_lines": 35},
+        {"scope": "cli", "production_lines": 0, "test_lines": 55}
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T015",
+      "scope_estimates": [
+        {"scope": "domain", "production_lines": 25, "test_lines": 25},
+        {"scope": "infrastructure", "production_lines": 35, "test_lines": 60}
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": ["T001", "T002", "T003"]
+    },
+    {
+      "id": "B2",
+      "task_ids": ["T004", "T008"]
+    },
+    {
+      "id": "B3",
+      "task_ids": ["T005", "T006", "T011", "T013", "T014"]
+    },
+    {
+      "id": "B4",
+      "task_ids": ["T012", "T015"]
+    }
+  ]
+}

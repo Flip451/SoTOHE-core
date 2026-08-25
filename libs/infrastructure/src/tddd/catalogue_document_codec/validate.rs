@@ -13,6 +13,28 @@ use crate::tddd::type_ref_parser::{
 
 use super::CatalogueDocumentCodecError;
 
+/// Validates the catalogue schema version represented at the wire boundary.
+///
+/// The comparison is performed against the current codec version, while error
+/// payloads remain numeric so their established diagnostics and wire semantics
+/// stay unchanged.
+pub(super) fn validate_schema_version(actual: u32) -> Result<(), CatalogueDocumentCodecError> {
+    let expected = super::SCHEMA_VERSION;
+    if actual == expected {
+        return Ok(());
+    }
+    if actual == 4 {
+        return Err(CatalogueDocumentCodecError::SchemaVersionRequiresMigration {
+            from: actual,
+            to: expected,
+            reason: "role wire format changed from string to discriminated-object in v5; \
+                     re-generate the catalogue via the type-designer agent, \
+                     then run `sotp signal calc-impl-catalog`",
+        });
+    }
+    Err(CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual, expected })
+}
+
 /// Validates that `bound_str` is syntactically well-formed as a Rust type param bound
 /// using `syn::parse_str::<syn::TypeParamBound>`.
 ///

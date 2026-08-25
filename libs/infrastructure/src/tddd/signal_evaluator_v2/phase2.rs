@@ -3,17 +3,17 @@
 //! Builds identity sets for S, D, and C, then evaluates each item against
 //! the signal table (ADR 3 D3) to produce `ThreeWaySignal`s.
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 
 use domain::tddd::catalogue_v2::ItemAction;
-use domain::tddd::{SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal};
-use rustdoc_types::Crate;
+use domain::tddd::{Phase1Error, SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal};
+use rustdoc_types::{Crate, Id};
 
-use super::structural_eq::items_structurally_equal;
-use super::{
-    RustdocTargetResolution, build_function_identity_map, build_impl_identity_map,
-    build_type_trait_identity_map,
-};
+use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
+
+use super::impl_identity::try_build_impl_identity_map_with_authority;
+use super::structural_eq::items_structurally_equal_with_authority;
+use super::{RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map};
 use domain::tddd::ExtendedCrate;
 
 /// Runs Phase 2: evaluates S / D / C and produces a `ThreeWayEvaluationReport`.
@@ -22,17 +22,20 @@ pub(super) fn phase2_evaluate(
     d: &Crate,
     c: &Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
-) -> ThreeWayEvaluationReport {
+) -> Result<ThreeWayEvaluationReport, Phase1Error> {
     let s_krate = s.krate();
 
     // Derive the crate name from C's root item so that rustdoc local-trait paths
     // (`my_crate::MyTrait`) can be normalized to match codec paths (`crate::MyTrait`).
     let crate_name = c.index.get(&c.root).and_then(|item| item.name.as_deref()).unwrap_or("");
+    let definition_paths =
+        DefinitionPathAuthority::from_path_maps(&c.paths, &[&s_krate.paths, &d.paths]);
 
-    // Build identity sets.
-    // Phase 2 uses short-name keys for types/traits, matching the `ThreeWaySignal`
-    // domain contract (item_name = short name for types/traits; FunctionPath for functions).
-    let s_types = build_type_trait_identity_map(s_krate);
+    // Build identity sets. Type/trait maps use complete paths; the signal label
+    // is reduced to a short name only when that short name is unambiguous across
+    // S, D, and C. This keeps existing reports readable without allowing the
+    // display label to decide identity.
+    let s_types = build_type_trait_identity_map(s_krate)?;
     let s_fns = build_function_identity_map(s_krate, rustdoc_root);
 
     // S inherits B-seeded impl blocks whose trait paths are in rustdoc format
@@ -43,13 +46,14 @@ pub(super) fn phase2_evaluate(
     // ADR `2026-05-20-0048` D4): action-driven insertion in Phase 1 (builder.rs)
     // now places each TraitImplDeclV2 into S according to its own declared action,
     // so B-side impls cannot shadow A-side impls for the same identity key.
-    let s_impls = build_impl_identity_map(s_krate, crate_name);
-    let d_types = build_type_trait_identity_map(d);
+    let s_impls =
+        try_build_impl_identity_map_with_authority(s_krate, crate_name, &definition_paths)?;
+    let d_types = build_type_trait_identity_map(d)?;
     let d_fns = build_function_identity_map(d, rustdoc_root);
-    let d_impls = build_impl_identity_map(d, crate_name);
-    let c_types = build_type_trait_identity_map(c);
+    let d_impls = try_build_impl_identity_map_with_authority(d, crate_name, &definition_paths)?;
+    let c_types = build_type_trait_identity_map(c)?;
     let c_fns = build_function_identity_map(c, rustdoc_root);
-    let c_impls = build_impl_identity_map(c, crate_name);
+    let c_impls = try_build_impl_identity_map_with_authority(c, crate_name, &definition_paths)?;
 
     // Build a secondary lookup for C impls keyed by their generic-args-stripped form.
     //
@@ -91,17 +95,30 @@ pub(super) fn phase2_evaluate(
             // Item in S ∩ C.
             let c_item = c.index.get(c_id);
             let structurally_equal = match (s_item, c_item) {
-                (Some(si), Some(ci)) => {
-                    items_structurally_equal(si, ci, &s_krate.index, &c.index, crate_name)
-                }
+                (Some(si), Some(ci)) => items_structurally_equal_with_authority(
+                    si,
+                    ci,
+                    &s_krate.index,
+                    &c.index,
+                    &s_krate.paths,
+                    &c.paths,
+                    crate_name,
+                    &definition_paths,
+                ),
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(name.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                region,
+            ));
         } else {
             // Item in S \ C.
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(name.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                region,
+            ));
         }
     }
 
@@ -113,9 +130,16 @@ pub(super) fn phase2_evaluate(
         if let Some(c_id) = c_fns.get(fn_path.as_str()) {
             let c_item = c.index.get(c_id);
             let structurally_equal = match (s_item, c_item) {
-                (Some(si), Some(ci)) => {
-                    items_structurally_equal(si, ci, &s_krate.index, &c.index, crate_name)
-                }
+                (Some(si), Some(ci)) => items_structurally_equal_with_authority(
+                    si,
+                    ci,
+                    &s_krate.index,
+                    &c.index,
+                    &s_krate.paths,
+                    &c.paths,
+                    crate_name,
+                    &definition_paths,
+                ),
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
@@ -163,17 +187,30 @@ pub(super) fn phase2_evaluate(
                 true
             } else {
                 match (s_item, c_item) {
-                    (Some(si), Some(ci)) => {
-                        items_structurally_equal(si, ci, &s_krate.index, &c.index, crate_name)
-                    }
+                    (Some(si), Some(ci)) => items_structurally_equal_with_authority(
+                        si,
+                        ci,
+                        &s_krate.index,
+                        &c.index,
+                        &s_krate.paths,
+                        &c.paths,
+                        crate_name,
+                        &definition_paths,
+                    ),
                     _ => false,
                 }
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(key.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                region,
+            ));
         } else {
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(key.clone(), region));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                region,
+            ));
         }
     }
 
@@ -181,10 +218,16 @@ pub(super) fn phase2_evaluate(
     for name in d_types.keys() {
         if c_types.contains_key(name.as_str()) {
             // D ∩ C: delete in progress.
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::DIntersectC,
+            ));
         } else {
             // D \ C: delete achieved.
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::DMinusC));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::DMinusC,
+            ));
         }
     }
 
@@ -213,16 +256,25 @@ pub(super) fn phase2_evaluate(
     for key in d_impls.keys() {
         if c_impls.contains_key(key.as_str()) {
             // Exact match: D key found verbatim in C.
-            signals.push(ThreeWaySignal::new(key.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                SignalRegion::DIntersectC,
+            ));
         } else if let Some(&stripped_c_id) = c_impls_stripped.get(key.as_str()) {
             // Stripped match: C has a generic-args version of this D key.
             // Record the exact C key consumed so CMinusSUnionD can skip it.
             if let Some(c_key) = c_impl_id_to_key.get(&stripped_c_id) {
                 c_matched_via_stripped.insert(c_key);
             }
-            signals.push(ThreeWaySignal::new(key.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                SignalRegion::DIntersectC,
+            ));
         } else {
-            signals.push(ThreeWaySignal::new(key.clone(), SignalRegion::DMinusC));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                SignalRegion::DMinusC,
+            ));
         }
     }
 
@@ -232,7 +284,10 @@ pub(super) fn phase2_evaluate(
         s_types.keys().chain(d_types.keys()).map(String::as_str).collect();
     for name in c_types.keys() {
         if !s_union_d_types.contains(name.as_str()) {
-            signals.push(ThreeWaySignal::new(name.clone(), SignalRegion::CMinusSUnionD));
+            signals.push(ThreeWaySignal::new(
+                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+                SignalRegion::CMinusSUnionD,
+            ));
         }
     }
 
@@ -269,11 +324,100 @@ pub(super) fn phase2_evaluate(
                 // C impl was already covered by an S/D-vs-C stripped-key match.
                 continue;
             }
-            signals.push(ThreeWaySignal::new(key.clone(), SignalRegion::CMinusSUnionD));
+            signals.push(ThreeWaySignal::new(
+                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+                SignalRegion::CMinusSUnionD,
+            ));
         }
     }
 
-    ThreeWayEvaluationReport::new(signals)
+    Ok(ThreeWayEvaluationReport::new(signals))
+}
+
+/// Returns the report label for a type/trait identity.
+///
+/// A short label is retained for the normal, unambiguous case. If two distinct
+/// fully-qualified identities share that short name, the full identity remains
+/// in the report so the output cannot merge the two targets after the evaluator
+/// has kept them separate internally.
+fn type_signal_name(identity_key: &str, identity_maps: &[&BTreeMap<String, Id>]) -> String {
+    let short_name = identity_key.rsplit("::").next().unwrap_or(identity_key);
+    let matching_identities: HashSet<&str> = identity_maps
+        .iter()
+        .flat_map(|map| map.keys().map(String::as_str))
+        .filter(|candidate| candidate.rsplit("::").next().unwrap_or(candidate) == short_name)
+        .collect();
+
+    if matching_identities.len() > 1 { identity_key.to_owned() } else { short_name.to_owned() }
+}
+
+/// Keeps the established short display for an unambiguous impl while retaining
+/// the full owner/trait identity when same-named impls coexist.
+fn impl_signal_name(
+    identity_key: &str,
+    identity_maps: &[&BTreeMap<String, Id>],
+    crate_name: &str,
+) -> String {
+    let Some((owner, trait_path)) = identity_key.split_once(": ") else {
+        return identity_key.to_owned();
+    };
+    let owner_base = owner.split('<').next().unwrap_or(owner);
+    let owner_short = owner_base.rsplit("::").next().unwrap_or(owner_base);
+    let trait_short = trait_path
+        .split('<')
+        .next()
+        .unwrap_or(trait_path)
+        .rsplit("::")
+        .next()
+        .unwrap_or(trait_path);
+    let trait_base = trait_path.split('<').next().unwrap_or(trait_path);
+    let trait_suffix = trait_path.strip_prefix(trait_base).unwrap_or("");
+    let trait_display = if !crate_name.is_empty()
+        && (trait_base == crate_name || trait_base.starts_with(&format!("{crate_name}::")))
+    {
+        format!("{trait_short}{trait_suffix}")
+    } else if trait_base.contains("::") {
+        format!("{trait_base}{trait_suffix}")
+    } else {
+        format!("{trait_short}{trait_suffix}")
+    };
+    let short = format!("{owner_short}: {trait_display}");
+    // Owner identity must remain qualified whenever two different fully
+    // qualified owners share the same short name.  Comparing the combined
+    // owner/trait pair is insufficient: `alpha::Input: alpha::Port` and
+    // `beta::Input: beta::OtherPort` have distinct short pairs, but shortening
+    // both owners would still make the resulting signal index cross-join them.
+    let matching_owners: HashSet<&str> = identity_maps
+        .iter()
+        .flat_map(|map| map.keys().map(String::as_str))
+        .filter_map(|candidate| {
+            candidate.split_once(": ").map(|(candidate_owner, _)| candidate_owner)
+        })
+        .filter(|candidate_owner| impl_owner_short(candidate_owner) == owner_short)
+        .collect();
+    if matching_owners.len() > 1 {
+        return identity_key.to_owned();
+    }
+
+    let matching: HashSet<&str> = identity_maps
+        .iter()
+        .flat_map(|map| map.keys().map(String::as_str))
+        .filter(|candidate| {
+            let Some((candidate_owner, candidate_trait)) = candidate.split_once(": ") else {
+                return false;
+            };
+            let candidate_trait_base = candidate_trait.split('<').next().unwrap_or(candidate_trait);
+            impl_owner_short(candidate_owner) == owner_short
+                && candidate_trait_base.rsplit("::").next().unwrap_or(candidate_trait_base)
+                    == trait_short
+        })
+        .collect();
+    if matching.len() > 1 { identity_key.to_owned() } else { short }
+}
+
+fn impl_owner_short(owner: &str) -> &str {
+    let owner_base = owner.split('<').next().unwrap_or(owner);
+    owner_base.rsplit("::").next().unwrap_or(owner_base)
 }
 
 /// Strips generic args from the trait part of an impl identity key.
@@ -325,5 +469,46 @@ pub(super) fn s_minus_c_region(action: ItemAction) -> SignalRegion {
         ItemAction::Reference => SignalRegion::SMinusC_Reference,
         // Delete should never appear in S, treat as Reference.
         ItemAction::Delete => SignalRegion::SMinusC_Reference,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::impl_signal_name;
+    use rustdoc_types::Id;
+    use std::collections::BTreeMap;
+
+    #[test]
+    fn test_impl_signal_name_qualifies_shared_owner_with_distinct_traits() {
+        let mut alpha = BTreeMap::new();
+        alpha.insert("domain::alpha::Input: domain::alpha::Port".to_owned(), Id(1));
+        let mut beta = BTreeMap::new();
+        beta.insert("domain::beta::Input: domain::beta::OtherPort".to_owned(), Id(2));
+        let maps = [&alpha, &beta];
+
+        assert_eq!(
+            impl_signal_name("domain::alpha::Input: domain::alpha::Port", &maps, "domain",),
+            "domain::alpha::Input: domain::alpha::Port"
+        );
+        assert_eq!(
+            impl_signal_name("domain::beta::Input: domain::beta::OtherPort", &maps, "domain",),
+            "domain::beta::Input: domain::beta::OtherPort"
+        );
+    }
+
+    #[test]
+    fn test_impl_signal_name_strips_generic_owner_before_shortening() {
+        let mut identities = BTreeMap::new();
+        identities.insert("domain::Wrapper<domain::alpha::Input>: domain::Port".to_owned(), Id(1));
+        let maps = [&identities];
+
+        assert_eq!(
+            impl_signal_name(
+                "domain::Wrapper<domain::alpha::Input>: domain::Port",
+                &maps,
+                "domain",
+            ),
+            "Wrapper: Port"
+        );
     }
 }

@@ -27,12 +27,19 @@ pub(super) struct Phase1State {
     pub(super) d_index: HashMap<Id, Item>,
     /// paths map for D.
     pub(super) d_paths: HashMap<Id, ItemSummary>,
-    /// short_name → Id for types/traits currently in S.
+    /// short_name → Id for unresolved catalogue type references currently in S.
+    ///
+    /// This is an input-resolution compatibility map, not the identity map.
+    /// Full type/trait identity is tracked by `s_type_identity_to_id` below.
     pub(super) s_type_name_to_id: BTreeMap<String, Id>,
+    /// fully-qualified type/trait identity → Id for items currently in S.
+    pub(super) s_type_identity_to_id: BTreeMap<String, Id>,
     /// function_path_string → Id for functions currently in S.
     pub(super) s_fn_path_to_id: BTreeMap<String, Id>,
-    /// short_name → Id for types/traits currently in D.
+    /// short_name → Id for unresolved catalogue type references currently in D.
     pub(super) d_type_name_to_id: BTreeMap<String, Id>,
+    /// fully-qualified type/trait identity → Id for items currently in D.
+    pub(super) d_type_identity_to_id: BTreeMap<String, Id>,
     /// function_path_string → Id for functions in D.
     pub(super) d_fn_path_to_id: BTreeMap<String, Id>,
     /// Pre-built remap for every B-side Id → fresh S Id.
@@ -73,8 +80,10 @@ impl Phase1State {
             d_index: HashMap::new(),
             d_paths: HashMap::new(),
             s_type_name_to_id: BTreeMap::new(),
+            s_type_identity_to_id: BTreeMap::new(),
             s_fn_path_to_id: BTreeMap::new(),
             d_type_name_to_id: BTreeMap::new(),
+            d_type_identity_to_id: BTreeMap::new(),
             d_fn_path_to_id: BTreeMap::new(),
             b_id_remap: HashMap::new(),
             a_id_remap: HashMap::new(),
@@ -90,10 +99,14 @@ impl Phase1State {
     /// Inserts a type/trait item into S at a *specific* Id (for Modify: keep same Id position).
     pub(super) fn insert_s_type_at(&mut self, id: Id, item: Item, action: ItemAction) {
         let name = item.name.clone().unwrap_or_default();
+        let identity_key = self.s_paths.get(&id).map(|summary| summary.path.join("::"));
         let mut new_item = item;
         new_item.id = id;
         self.s_index.insert(id, new_item);
         self.s_actions.insert(id, action);
+        if let Some(identity_key) = identity_key.filter(|key| !key.is_empty()) {
+            self.s_type_identity_to_id.insert(identity_key, id);
+        }
         if !name.is_empty() {
             self.s_type_name_to_id.insert(name, id);
         }
@@ -169,6 +182,10 @@ impl Phase1State {
             let path_summary = self.s_paths.remove(&s_id);
             self.d_index.insert(new_id, new_item);
             if let Some(ps) = path_summary {
+                let identity_key = ps.path.join("::");
+                if !identity_key.is_empty() {
+                    self.d_type_identity_to_id.insert(identity_key, new_id);
+                }
                 self.d_paths.insert(new_id, ps);
             }
             if !name.is_empty() {
@@ -253,6 +270,7 @@ impl Phase1State {
         self.s_actions.remove(&s_id);
         // Remove from s name map
         self.s_type_name_to_id.retain(|_, v| *v != s_id);
+        self.s_type_identity_to_id.retain(|_, v| *v != s_id);
     }
 
     /// Moves a function from S to D.
@@ -272,9 +290,9 @@ impl Phase1State {
         self.s_fn_path_to_id.remove(&fn_path);
     }
 
-    /// Returns the Id of a type/trait currently in S by short name.
-    pub(super) fn s_type_id(&self, name: &str) -> Option<Id> {
-        self.s_type_name_to_id.get(name).copied()
+    /// Returns the Id of a type/trait currently in S by fully-qualified identity.
+    pub(super) fn s_type_id(&self, identity: &str) -> Option<Id> {
+        self.s_type_identity_to_id.get(identity).copied()
     }
 
     /// Returns the Id of a function currently in S by FunctionPath string.

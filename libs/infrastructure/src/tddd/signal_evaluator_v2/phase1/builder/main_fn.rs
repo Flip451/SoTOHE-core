@@ -1,6 +1,6 @@
 //! Phase 1 main entry-point: builds S and D from A (catalogue TypeGraph) and B (baseline).
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use domain::tddd::ExtendedCrate;
 use domain::tddd::Phase1Error;
@@ -11,7 +11,9 @@ use super::super::super::collect_refs::{collect_referenced_ids, item_has_unresol
 use super::super::super::external_crates::{
     build_external_crates_for_scope, patch_paths_crate_ids, patch_paths_crate_ids_extra,
 };
+use super::super::super::impl_identity::build_impl_identity_map;
 use super::super::super::resolution::resolve_unresolved_in_item;
+use super::super::super::resolve_type::resolve_type;
 use super::super::super::{
     RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map,
 };
@@ -23,6 +25,7 @@ use super::super::state::Phase1State;
 use super::phase16_check::check_dangling_ids;
 use super::rewrite::{make_root_module_item, rewrite_type_ref_ids_in_item};
 use super::step55_impls::process_standalone_impls;
+use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
 
 // ---------------------------------------------------------------------------
 // Main Phase 1 entry-point
@@ -43,8 +46,15 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     b: &Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
 ) -> Result<(ExtendedCrate, Crate), Phase1Error> {
-    // Determine crate name from B's root item.
-    let crate_name = b.index.get(&b.root).and_then(|item| item.name.clone()).unwrap_or_default();
+    // Determine the package crate name from a root item. B is preferred for
+    // normal evaluations, but an empty baseline must use A's root rather than
+    // guessing from an impl owner or an arbitrary path-table entry.
+    let crate_name = b
+        .index
+        .get(&b.root)
+        .and_then(|item| item.name.clone())
+        .or_else(|| a.krate().index.get(&a.krate().root).and_then(|item| item.name.clone()))
+        .unwrap_or_default();
 
     // Seed the fresh-Id counter above the highest Id already used by B so that
     // initial allocations do not clash with B-side Ids.
@@ -65,10 +75,14 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     }
 
     // --- Step 1: Build B identity maps ---
-    let b_types = build_type_trait_identity_map(b);
+    let b_types = build_type_trait_identity_map(b)?;
     let b_fns = build_function_identity_map(b, rustdoc_root);
 
     // --- Step 2: Seed S with all B items as implicit Reference ---
+    //
+    // `b_types` is keyed by the complete `Crate::paths` identity, so same-name
+    // items in different modules are independent entries rather than a single
+    // short-name winner.
     for b_id in b_types.values() {
         if let Some(b_item) = b.index.get(b_id) {
             let path = b.paths.get(b_id).map(|ps| ps.path.clone());
@@ -142,7 +156,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
 
     // --- Step 3: Build A identity maps ---
     let (a_krate, a_item_actions) = a.into_parts();
-    let a_types = build_type_trait_identity_map(&a_krate);
+    let a_types = build_type_trait_identity_map(&a_krate)?;
     let a_fns = build_function_identity_map(&a_krate, rustdoc_root);
 
     // --- Pre-step (A-side): Build A-wide Id remap (T008, IN-10) ---
@@ -162,7 +176,15 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     // Process A types/traits.
     for (a_name, a_id) in &a_types {
         let action = a_item_actions.get(a_id).copied().unwrap_or(ItemAction::Reference);
-        let in_b = b_types.contains_key(a_name.as_str());
+        // Delete tombstones may arrive as a short catalogue key even though the
+        // baseline identity map is fully qualified. Resolve that spelling before
+        // the action contradiction checks; never let a short-name lookup select
+        // one member of an ambiguous baseline pair.
+        let action_identity = match action {
+            ItemAction::Delete => resolve_delete_identity(a_name, &b_types)?,
+            _ => a_name.clone(),
+        };
+        let in_b = b_types.contains_key(action_identity.as_str());
 
         let a_item = match a_krate.index.get(a_id) {
             Some(item) => item.clone(),
@@ -173,7 +195,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             ItemAction::Add => {
                 if in_b {
                     return Err(Phase1Error::action_contradiction(format!(
-                        "action=Add declared for '{a_name}' but it already exists in baseline"
+                        "action=Add declared for '{action_identity}' but it already exists in baseline"
                     )));
                 }
                 let path = a_krate.paths.get(a_id).map(|ps| ps.path.clone());
@@ -188,12 +210,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             ItemAction::Modify => {
                 if !in_b {
                     return Err(Phase1Error::action_contradiction(format!(
-                        "action=Modify declared for '{a_name}' but it does not exist in baseline"
+                        "action=Modify declared for '{action_identity}' but it does not exist in baseline"
                     )));
                 }
-                let s_id = state.s_type_id(a_name).ok_or_else(|| {
+                let s_id = state.s_type_id(action_identity.as_str()).ok_or_else(|| {
                     Phase1Error::action_contradiction(format!(
-                        "action=Modify: '{a_name}' expected in S but not found (internal error)"
+                        "action=Modify: '{action_identity}' expected in S but not found (internal error)"
                     ))
                 })?;
                 if let Some(b_item_in_s) = state.s_index.get(&s_id).cloned() {
@@ -214,7 +236,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             ItemAction::Reference => {
                 if !in_b {
                     return Err(Phase1Error::action_contradiction(format!(
-                        "action=Reference declared for '{a_name}' but it does not exist in baseline"
+                        "action=Reference declared for '{action_identity}' but it does not exist in baseline"
                     )));
                 }
                 // S already has B's item as Reference — no change needed.
@@ -222,12 +244,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             ItemAction::Delete => {
                 if !in_b {
                     return Err(Phase1Error::action_contradiction(format!(
-                        "action=Delete declared for '{a_name}' but it does not exist in baseline"
+                        "action=Delete declared for '{action_identity}' but it does not exist in baseline"
                     )));
                 }
-                let s_id = state.s_type_id(a_name).ok_or_else(|| {
+                let s_id = state.s_type_id(action_identity.as_str()).ok_or_else(|| {
                     Phase1Error::action_contradiction(format!(
-                        "action=Delete: '{a_name}' expected in S but not found (internal error)"
+                        "action=Delete: '{action_identity}' expected in S but not found (internal error)"
                     ))
                 })?;
                 state.move_type_to_d(s_id);
@@ -298,7 +320,14 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     }
 
     // --- Step 5.5: A-side unified trait-impl insertion loop (ADR `2026-05-20-0048` D4) ---
-    process_standalone_impls(&mut state, &a_krate, &a_item_actions, b, &crate_name)?;
+    // Use one baseline-backed authority for both maps.  This keeps aliases such
+    // as the public `std::iter::Iterator` path and its core definition on the
+    // same identity while still allowing A-only catalogue definitions through
+    // the fallback path universe.
+    let definition_paths = DefinitionPathAuthority::from_path_maps(&b.paths, &[&a_krate.paths]);
+    let a_impl_map = build_impl_identity_map(&a_krate, &crate_name, &definition_paths)?;
+    let b_impl_map = build_impl_identity_map(b, &crate_name, &definition_paths)?;
+    process_standalone_impls(&mut state, &a_krate, &a_item_actions, b, &a_impl_map, &b_impl_map)?;
 
     // --- Phase 1.45: A-side type-ref id remapping (local + external) ---
     //
@@ -314,8 +343,8 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                 if a_ps.crate_id != 0 {
                     return None;
                 }
-                let name = a_ps.path.last()?.as_str();
-                let s_id = state.s_type_name_to_id.get(name)?;
+                let identity_key = a_ps.path.join("::");
+                let s_id = state.s_type_identity_to_id.get(&identity_key)?;
                 Some((a_id, *s_id))
             })
             .collect();
@@ -357,7 +386,11 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     }
 
     // --- Phase 1.5: Closed-world unresolved-marker resolution ---
-    let s_known_names: HashSet<String> = state.s_type_name_to_id.keys().cloned().collect();
+    // Phase 1.5 resolves only through authoritative fully-qualified identities.
+    // Keep the short-name map for legacy child-transfer bookkeeping, but never
+    // let it choose an Id for a TypeRef: same-named declarations may coexist in
+    // different modules.
+    let s_known_names: HashSet<String> = state.s_type_identity_to_id.keys().cloned().collect();
 
     let items_with_markers: Vec<(Id, String)> = state
         .s_index
@@ -376,7 +409,10 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             Some(i) => i,
             None => continue,
         };
-        let resolved = resolve_unresolved_in_item(item, &s_known_names, &state.s_type_name_to_id)?;
+        let item =
+            resolve_unresolved_impl_trait_path(item, &s_known_names, &state.s_type_identity_to_id)?;
+        let resolved =
+            resolve_unresolved_in_item(item, &s_known_names, &state.s_type_identity_to_id)?;
         state.s_index.insert(item_id, resolved);
         let _ = item_name; // used in error reporting inside resolve_unresolved_in_item
     }
@@ -492,8 +528,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     let d_root_id = state.alloc_id();
 
     // Build root module item for S.
-    let mut s_top_ids: Vec<Id> =
-        state.s_type_name_to_id.values().chain(state.s_fn_path_to_id.values()).copied().collect();
+    let mut s_top_ids: Vec<Id> = state
+        .s_type_identity_to_id
+        .values()
+        .chain(state.s_fn_path_to_id.values())
+        .copied()
+        .collect();
     s_top_ids.sort_by_key(|id| id.0);
     let s_root_item = make_root_module_item(s_root_id, crate_name.clone(), s_top_ids);
     state.s_index.insert(s_root_id, s_root_item);
@@ -511,8 +551,12 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     let s = ExtendedCrate::new(s_krate, state.s_actions);
 
     // Build root module item for D.
-    let mut d_top_ids: Vec<Id> =
-        state.d_type_name_to_id.values().chain(state.d_fn_path_to_id.values()).copied().collect();
+    let mut d_top_ids: Vec<Id> = state
+        .d_type_identity_to_id
+        .values()
+        .chain(state.d_fn_path_to_id.values())
+        .copied()
+        .collect();
     d_top_ids.sort_by_key(|id| id.0);
     let d_root_item = make_root_module_item(d_root_id, crate_name.clone(), d_top_ids);
     state.d_index.insert(d_root_id, d_root_item);
@@ -529,4 +573,71 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     };
 
     Ok((s, d))
+}
+
+/// Resolves a type/trait delete tombstone against the frozen baseline identity map.
+///
+/// Live catalogue entries have already crossed the codec's canonical identity
+/// boundary. A tombstone is identity-only, however, and older catalogue files may
+/// still spell it as a bare name. The baseline is the only authoritative universe
+/// for that lookup: an exact qualified key wins, one short-name candidate is
+/// accepted, and both ambiguous and unresolved spellings fail closed before the
+/// action contradiction branch is reached.
+fn resolve_delete_identity(
+    raw_name: &str,
+    baseline_types: &BTreeMap<String, Id>,
+) -> Result<String, Phase1Error> {
+    if baseline_types.contains_key(raw_name) {
+        return Ok(raw_name.to_owned());
+    }
+    if raw_name.contains("::") {
+        return Err(Phase1Error::action_contradiction(format!(
+            "action=Delete tombstone '{raw_name}' is unresolved in baseline rustdoc paths"
+        )));
+    }
+
+    let candidates = baseline_types
+        .keys()
+        .filter(|identity| identity.rsplit("::").next() == Some(raw_name))
+        .cloned()
+        .collect::<Vec<_>>();
+    match candidates.as_slice() {
+        [identity] => Ok(identity.clone()),
+        [] => Err(Phase1Error::action_contradiction(format!(
+            "action=Delete tombstone '{raw_name}' is unresolved in baseline rustdoc paths"
+        ))),
+        _ => Err(Phase1Error::action_contradiction(format!(
+            "action=Delete tombstone '{raw_name}' is ambiguous in baseline rustdoc paths; candidates: {}",
+            candidates.join(", ")
+        ))),
+    }
+}
+
+/// Resolves an impl's trait path through the suffix-aware TypeRef resolver before
+/// the item-level legacy driver sees it. The driver still owns all other nested
+/// resolution, but its Impl branch historically looked up only the final segment
+/// in the identity map.
+fn resolve_unresolved_impl_trait_path(
+    mut item: rustdoc_types::Item,
+    known_names: &HashSet<String>,
+    identity_to_id: &BTreeMap<String, Id>,
+) -> Result<rustdoc_types::Item, Phase1Error> {
+    let rustdoc_types::ItemEnum::Impl(mut implementation) = item.inner else {
+        return Ok(item);
+    };
+    if let Some(trait_path) = implementation.trait_.take() {
+        let resolved = resolve_type(
+            rustdoc_types::Type::ResolvedPath(trait_path),
+            known_names,
+            identity_to_id,
+        )?;
+        let rustdoc_types::Type::ResolvedPath(trait_path) = resolved else {
+            return Err(Phase1Error::unresolved_type_ref(
+                "trait impl path did not resolve to a path",
+            ));
+        };
+        implementation.trait_ = Some(trait_path);
+    }
+    item.inner = rustdoc_types::ItemEnum::Impl(implementation);
+    Ok(item)
 }

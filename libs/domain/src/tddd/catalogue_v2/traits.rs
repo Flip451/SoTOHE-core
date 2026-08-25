@@ -18,9 +18,10 @@
 //!
 //! Old fields `trait_name`, `origin_crate`, `generic_args` are removed.
 
-use crate::tddd::catalogue_v2::identifiers::{CrateName, TraitName, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{Identifier, TypeRef};
 use crate::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
 use crate::tddd::catalogue_v2::roles::ItemAction;
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 /// Workspace-member crate names in path-identifier form (SoT: `architecture-rules.json`).
 const WORKSPACE_CRATES: &[&str] =
@@ -30,17 +31,9 @@ const WORKSPACE_CRATES: &[&str] =
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TraitRefScope {
     /// A bare self-crate trait name (no path qualifier).
-    SelfCrate {
-        /// The bare trait name.
-        bare_name: TraitName,
-    },
+    SelfCrate(CatalogueEntryKey),
     /// A workspace-member-qualified trait (e.g. `usecase::Foo`).
-    Workspace {
-        /// The workspace-member crate the trait lives in.
-        crate_name: CrateName,
-        /// The bare trait name (last path segment).
-        bare_name: TraitName,
-    },
+    Workspace(CatalogueEntryKey),
     /// An external (non-workspace) trait (e.g. `std::fmt::Display`).
     External,
 }
@@ -195,20 +188,18 @@ impl TraitImplDeclV2 {
             return TraitRefScope::External;
         }
         let segments: Vec<&str> = base.split("::").collect();
-        if segments.iter().any(|segment| segment.is_empty()) {
+        if segments.iter().any(|segment| Identifier::new(*segment).is_err()) {
             return TraitRefScope::External;
         }
         match segments.as_slice() {
-            [bare] => match TraitName::new(*bare) {
-                Ok(bare_name) => TraitRefScope::SelfCrate { bare_name },
+            [bare] => match CatalogueEntryKey::try_new((*bare).to_owned()) {
+                Ok(key) => TraitRefScope::SelfCrate(key),
                 Err(_) => TraitRefScope::External,
             },
-            [first, .., last] if WORKSPACE_CRATES.contains(first) => {
-                match (CrateName::new(*first), TraitName::new(*last)) {
-                    (Ok(crate_name), Ok(bare_name)) => {
-                        TraitRefScope::Workspace { crate_name, bare_name }
-                    }
-                    _ => TraitRefScope::External,
+            [first, ..] if WORKSPACE_CRATES.contains(first) => {
+                match CatalogueEntryKey::try_new(base.to_owned()) {
+                    Ok(key) => TraitRefScope::Workspace(key),
+                    Err(_) => TraitRefScope::External,
                 }
             }
             _ => TraitRefScope::External,
@@ -234,15 +225,40 @@ mod tests {
             TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("Foo").unwrap());
         assert!(matches!(
             local.trait_ref_scope(),
-            TraitRefScope::SelfCrate { bare_name } if bare_name.as_str() == "MyTrait"
+            TraitRefScope::SelfCrate(key) if key.as_str() == "MyTrait"
         ));
 
         let generic =
             TraitImplDeclV2::new(TypeRef::new("MyTrait<T>").unwrap(), TypeRef::new("Foo").unwrap());
         assert!(matches!(
             generic.trait_ref_scope(),
-            TraitRefScope::SelfCrate { bare_name } if bare_name.as_str() == "MyTrait"
+            TraitRefScope::SelfCrate(key) if key.as_str() == "MyTrait"
         ));
+    }
+
+    #[test]
+    fn test_trait_ref_scope_preserves_qualified_same_name_paths() {
+        let alpha = TraitImplDeclV2::new(
+            TypeRef::new("domain::alpha::Shared<T>").unwrap(),
+            TypeRef::new("domain::alpha::Input").unwrap(),
+        );
+        let beta = TraitImplDeclV2::new(
+            TypeRef::new("domain::beta::Shared<T>").unwrap(),
+            TypeRef::new("domain::beta::Input").unwrap(),
+        );
+
+        let alpha_key = match alpha.trait_ref_scope() {
+            TraitRefScope::Workspace(key) => key,
+            other => panic!("expected alpha workspace identity, got {other:?}"),
+        };
+        let beta_key = match beta.trait_ref_scope() {
+            TraitRefScope::Workspace(key) => key,
+            other => panic!("expected beta workspace identity, got {other:?}"),
+        };
+
+        assert_eq!(alpha_key.as_str(), "domain::alpha::Shared");
+        assert_eq!(beta_key.as_str(), "domain::beta::Shared");
+        assert_ne!(alpha_key, beta_key, "same short names must retain distinct qualified keys");
     }
 
     #[test]
@@ -256,8 +272,7 @@ mod tests {
             );
             assert!(matches!(
                 decl.trait_ref_scope(),
-                TraitRefScope::Workspace { crate_name, bare_name }
-                    if crate_name.as_str() == crate_id && bare_name.as_str() == "Bar"
+                TraitRefScope::Workspace(key) if key.as_str() == format!("{crate_id}::Bar")
             ));
         }
     }
@@ -273,7 +288,15 @@ mod tests {
 
     #[test]
     fn test_trait_ref_scope_external_for_malformed_path_segments() {
-        for trait_ref in ["Foo::", "domain::", "::Foo", "domain::::Foo"] {
+        for trait_ref in [
+            "Foo::",
+            "domain::",
+            "::Foo",
+            "domain::::Foo",
+            "domain::bad-name",
+            "domain::9Bad",
+            "bad-name",
+        ] {
             let decl = TraitImplDeclV2::new(
                 TypeRef::new(trait_ref).unwrap(),
                 TypeRef::new("Foo").unwrap(),

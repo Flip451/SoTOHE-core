@@ -48,7 +48,7 @@ pub(super) fn emit_entry<'a>(
         Vec<&'a domain::tddd::catalogue_v2::methods::MethodDeclaration>,
     >,
     node_index: &NodeIndex,
-    trait_index: &BTreeMap<(String, String), String>,
+    trait_index: &NodeIndex,
     layer: &str,
     crate_name: &str,
 ) -> Result<(), ContractMapRendererError> {
@@ -63,10 +63,10 @@ pub(super) fn emit_entry<'a>(
             // points at the subgraph container id (which would break Dagre/ELK layout).
             let rep_node_id = type_rep_node_id(layer, crate_name, type_name);
 
-            // Build entry subgraph label: full module path + name (U-6d-iii).
+            // Build entry subgraph label: full module path + terminal name (U-6d-iii).
             let label = build_entry_label(type_entry.module_path(), type_name);
             // Short name used as the representative node label (matches subgraph title).
-            let short_name = type_name;
+            let short_name = terminal_entry_name(type_name);
 
             // T005: entry subgraph (empty subgraph even with 0 methods, AC-02).
             subgraph_lines.push(format!("  subgraph {entry_sg_id}[\"{label}\"]"));
@@ -129,7 +129,7 @@ pub(super) fn emit_entry<'a>(
                                     trait_index,
                                     crate_name,
                                     None, // variant payloads have no Self context
-                                );
+                                )?;
                                 for target_id in &target_ids {
                                     let (arrow, _) =
                                         edge_arrow_label(&style.edge, "variant_payload")?;
@@ -146,7 +146,7 @@ pub(super) fn emit_entry<'a>(
                                     trait_index,
                                     crate_name,
                                     None, // variant fields have no Self context
-                                );
+                                )?;
                                 for target_id in &target_ids {
                                     let (arrow, _) =
                                         edge_arrow_label(&style.edge, "variant_payload")?;
@@ -181,7 +181,7 @@ pub(super) fn emit_entry<'a>(
             )?;
 
             // T006: inherent_impls methods aggregated into this type subgraph (AC-04).
-            if let Some(extra_methods) = inherent_methods.get(*type_name) {
+            if let Some(extra_methods) = inherent_methods.get(rep_node_id.as_str()) {
                 let method_refs: Vec<&domain::tddd::catalogue_v2::methods::MethodDeclaration> =
                     extra_methods.to_vec();
                 emit_method_nodes(
@@ -223,7 +223,7 @@ pub(super) fn emit_entry<'a>(
                     crate_name,
                     None, // type alias targets have no Self context
                     &generic_names,
-                );
+                )?;
                 for target_id in &target_ids {
                     let (arrow, label) = edge_arrow_label(&style.edge, "alias")?;
                     edge_lines.push(edge_line(&rep_node_id, arrow, label, target_id));
@@ -248,7 +248,7 @@ pub(super) fn emit_entry<'a>(
                                 trait_index,
                                 crate_name,
                                 None, // struct fields have no Self context
-                            );
+                            )?;
                             for target_id in &target_ids {
                                 let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
                                 edge_lines.push(edge_line(
@@ -281,7 +281,7 @@ pub(super) fn emit_entry<'a>(
                                 trait_index,
                                 crate_name,
                                 None, // tuple struct fields have no Self context
-                            );
+                            )?;
                             for target_id in &target_ids {
                                 let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
                                 edge_lines.push(edge_line(
@@ -319,7 +319,7 @@ pub(super) fn emit_entry<'a>(
             // The representative node id is the sole valid edge target for this trait.
             let rep_node_id = trait_rep_node_id(layer, crate_name, trait_name);
             let label = build_entry_label(trait_entry.module_path(), trait_name);
-            let short_name = trait_name;
+            let short_name = terminal_entry_name(trait_name);
 
             // T005: trait entry subgraph (empty even with 0 methods, AC-02).
             subgraph_lines.push(format!("  subgraph {entry_sg_id}[\"{label}\"]"));
@@ -416,7 +416,7 @@ pub(super) fn emit_entry<'a>(
                     trait_index,
                     crate_name,
                     None, // free functions have no Self context
-                );
+                )?;
                 for target_id in &target_ids {
                     let (param_arrow, param_label) = edge_arrow_label(&style.edge, "method_param")?;
                     edge_lines.push(edge_line(&fn_node_id, param_arrow, param_label, target_id));
@@ -428,7 +428,7 @@ pub(super) fn emit_entry<'a>(
                 trait_index,
                 crate_name,
                 None, // free functions have no Self context
-            );
+            )?;
             for ret_target in &ret_targets {
                 let (ret_arrow, ret_label) = edge_arrow_label(&style.edge, "method_returns")?;
                 edge_lines.push(edge_line(&fn_node_id, ret_arrow, ret_label, ret_target));
@@ -458,7 +458,12 @@ fn build_entry_label(
     module_path: &domain::tddd::catalogue_v2::identifiers::ModulePath,
     name: &str,
 ) -> String {
+    let name = terminal_entry_name(name);
     if module_path.is_root() { name.to_string() } else { format!("{module_path}::{name}") }
+}
+
+fn terminal_entry_name(name: &str) -> &str {
+    name.rsplit("::").next().unwrap_or(name)
 }
 
 /// Resolve a TypeRef target node, substituting `self_node_id` for the `"Self"` keyword
@@ -477,10 +482,10 @@ fn build_entry_label(
 fn resolve_method_type_refs(
     type_ref_str: &str,
     node_index: &NodeIndex,
-    trait_index: &BTreeMap<(String, String), String>,
+    trait_index: &NodeIndex,
     current_crate: &str,
     self_node_id: Option<&str>,
-) -> Vec<String> {
+) -> Result<Vec<String>, ContractMapRendererError> {
     // Delegate to resolve_type_ref_node_ids, forwarding self_node_id so that
     // "Self" in both top-level (`"Self"`) and nested (`"Option<Self>"`,
     // `"Result<Self, E>"`) positions is substituted correctly.
@@ -504,7 +509,7 @@ pub(super) fn emit_method_nodes<'a>(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     node_index: &NodeIndex,
-    trait_index: &BTreeMap<(String, String), String>,
+    trait_index: &NodeIndex,
     current_crate: &str,
     // The node_id of the enclosing entry subgraph, used to resolve `"Self"` TypeRef
     // to the current type's node instead of a ghost node (OS-04 / fallback policy).
@@ -542,7 +547,7 @@ pub(super) fn emit_method_nodes<'a>(
                 trait_index,
                 current_crate,
                 self_node_id,
-            );
+            )?;
             for target_id in &target_ids {
                 let (param_arrow, param_label) = edge_arrow_label(&style.edge, "method_param")?;
                 edge_lines.push(edge_line(&method_node_id, param_arrow, param_label, target_id));
@@ -562,7 +567,7 @@ pub(super) fn emit_method_nodes<'a>(
             trait_index,
             current_crate,
             self_node_id,
-        );
+        )?;
         let is_transition = transition_method_names.contains(&method_name_str);
         if is_transition {
             for target_id in &returns_targets {
@@ -578,4 +583,19 @@ pub(super) fn emit_method_nodes<'a>(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use super::build_entry_label;
+    use domain::tddd::catalogue_v2::ModulePath;
+
+    #[test]
+    fn test_build_entry_label_uses_terminal_name_for_qualified_entry_key() {
+        let module_path =
+            ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path");
+
+        assert_eq!(build_entry_label(&module_path, "domain::alpha::Shared"), "alpha::Shared");
+    }
 }

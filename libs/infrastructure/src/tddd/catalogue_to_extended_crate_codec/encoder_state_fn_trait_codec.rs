@@ -1,28 +1,26 @@
 //! `EncoderState` methods for encoding `TraitEntry`, `FunctionEntry`, methods,
 //! and trait-impl resolution.
 
+use domain::tddd::NewTypeGraphCodecError;
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry};
-use domain::tddd::catalogue_v2::{FunctionPath, MethodDeclaration, ModulePath, TraitName};
+use domain::tddd::catalogue_v2::{CatalogueEntryKey, FunctionPath, MethodDeclaration, ModulePath};
 use rustdoc_types::{
     FunctionHeader, FunctionSignature, GenericBound, Id, ItemEnum, ItemKind, ItemSummary, Path,
     Trait, Type,
 };
 
-use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
-
 use super::encoder::EncoderState;
-use super::helpers::{
-    is_bare_generic_name, make_item, make_item_with_crate_id, receiver_type, rewrite_generic_types,
-};
+use super::helpers::{make_item, make_item_with_crate_id, receiver_type};
+use super::{entry_item_name, invalid_type_ref};
 
 impl EncoderState {
     /// Encodes a `TraitEntry` into a `Trait` item.
     pub(super) fn encode_trait(
         &mut self,
         trait_id: Id,
-        trait_name: &TraitName,
+        trait_name: &CatalogueEntryKey,
         entry: &TraitEntry,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
@@ -50,7 +48,7 @@ impl EncoderState {
         let mut all_items = self.encode_method_items(
             &methods,
             false,
-            trait_name.as_str(),
+            entry_item_name(trait_name),
             &module_path,
             &trait_generic_names,
         )?;
@@ -69,7 +67,7 @@ impl EncoderState {
             for seg in module_path.segments() {
                 path_segs.push(seg.as_str().to_string());
             }
-            path_segs.push(trait_name.as_str().to_string());
+            path_segs.push(entry_item_name(trait_name).to_string());
             path_segs.push(assoc_type.name.to_string());
             self.paths.insert(
                 id,
@@ -91,7 +89,7 @@ impl EncoderState {
             for seg in module_path.segments() {
                 path_segs.push(seg.as_str().to_string());
             }
-            path_segs.push(trait_name.as_str().to_string());
+            path_segs.push(entry_item_name(trait_name).to_string());
             path_segs.push(assoc_const.name.to_string());
             self.paths.insert(
                 id,
@@ -113,7 +111,7 @@ impl EncoderState {
 
         let trait_item = make_item(
             trait_id,
-            Some(trait_name.as_str().to_string()),
+            Some(entry_item_name(trait_name).to_string()),
             docs,
             ItemEnum::Trait(Trait {
                 is_auto: false,
@@ -126,7 +124,7 @@ impl EncoderState {
             }),
         );
         self.index.insert(trait_id, trait_item);
-        self.register_path(trait_id, ItemKind::Trait, trait_name.as_str(), &module_path);
+        self.register_path(trait_id, ItemKind::Trait, entry_item_name(trait_name), &module_path);
         Ok(())
     }
 
@@ -136,7 +134,7 @@ impl EncoderState {
         fn_id: Id,
         fn_path: &FunctionPath,
         entry: &FunctionEntry,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    ) -> Result<(), NewTypeGraphCodecError> {
         let module_path = fn_path.module_path.clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
         let is_async = entry.is_async();
@@ -156,30 +154,13 @@ impl EncoderState {
 
         let mut inputs: Vec<(String, Type)> = vec![];
         for (pname, pty_str) in params {
-            let pty = if !generic_names.is_empty() && is_bare_generic_name(&pty_str, &generic_names)
-            {
-                Type::Generic(pty_str.trim().to_string())
-            } else {
-                let raw = self.parse_type_ref_str(&pty_str)?;
-                if generic_names.is_empty() {
-                    raw
-                } else {
-                    rewrite_generic_types(raw, &generic_names)
-                }
-            };
+            let pty = self.parse_type_ref_str_with_generics(&pty_str, &generic_names)?;
             inputs.push((pname, pty));
         }
         let output = if returns_str == "()" {
             None
-        } else if !generic_names.is_empty() && is_bare_generic_name(&returns_str, &generic_names) {
-            Some(Type::Generic(returns_str.trim().to_string()))
         } else {
-            let raw = self.parse_type_ref_str(&returns_str)?;
-            Some(if generic_names.is_empty() {
-                raw
-            } else {
-                rewrite_generic_types(raw, &generic_names)
-            })
+            Some(self.parse_type_ref_str_with_generics(&returns_str, &generic_names)?)
         };
 
         // Encode function-level generics in the maximally-desugared where form.
@@ -260,7 +241,7 @@ impl EncoderState {
         parent_name: &str,
         parent_module_path: &ModulePath,
         outer_generic_names: &[&str],
-    ) -> Result<Vec<Id>, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Vec<Id>, NewTypeGraphCodecError> {
         let mut ids = vec![];
         for method in methods {
             let method_id = self.alloc_id();
@@ -284,18 +265,8 @@ impl EncoderState {
             // The S-side must match exactly; otherwise Phase 1 reports
             // `UnresolvedTypeRef` and Phase 2 structural comparison mismatches.
             //
-            // Strategy:
-            // 1. For a bare single-word type string that matches a known generic name
-            //    (method-level OR outer impl-level, e.g. `"T"`, `"From"`, `"Display"`),
-            //    produce `Type::Generic` directly WITHOUT calling `parse_type_ref_str`.
-            //    This avoids the STD_PRELUDE_TYPES expansion that `parse_type_ref_str`
-            //    applies to well-known names: e.g. a generic named `"From"` would
-            //    otherwise be expanded to the canonical path `"std::convert::From"`,
-            //    which `rewrite_generic_types` would then fail to rewrite back (it
-            //    checks for single-segment bare paths with no `::` in them).
-            // 2. For all other type strings, parse via `parse_type_ref_str` (composite
-            //    types, references, generics-in-generics like `Option<T>`) and then call
-            //    `rewrite_generic_types` to replace any inner bare generic occurrences.
+            // The shared syn-backed parser classifies generic parameters before resolving
+            // catalogue or prelude paths, including nested generic arguments.
             let method_generic_names: Vec<&str> =
                 method.generics().iter().map(|g| g.name.as_str()).collect();
             // Combine outer (impl-level) and method-level generic names. Outer names come
@@ -313,38 +284,13 @@ impl EncoderState {
                 .map(|p| (p.name.as_str().to_string(), p.ty.as_str().to_string()))
                 .collect();
             for (pname, pty_str) in param_pairs {
-                let pty = if !generic_names.is_empty()
-                    && is_bare_generic_name(&pty_str, &generic_names)
-                {
-                    // Bare single-word name that is a method generic: emit directly.
-                    // Trim so that whitespace-padded strings (e.g. " T ") produce the
-                    // same `Type::Generic("T")` that the normal parser would emit.
-                    Type::Generic(pty_str.trim().to_string())
-                } else {
-                    let raw = self.parse_type_ref_str(&pty_str)?;
-                    if generic_names.is_empty() {
-                        raw
-                    } else {
-                        rewrite_generic_types(raw, &generic_names)
-                    }
-                };
+                let pty = self.parse_type_ref_str_with_generics(&pty_str, &generic_names)?;
                 inputs.push((pname, pty));
             }
             let output = if returns_str == "()" {
                 None
-            } else if !generic_names.is_empty()
-                && is_bare_generic_name(&returns_str, &generic_names)
-            {
-                // Trim so that whitespace-padded strings produce the same
-                // `Type::Generic("T")` that the normal parser would emit.
-                Some(Type::Generic(returns_str.trim().to_string()))
             } else {
-                let raw = self.parse_type_ref_str(&returns_str)?;
-                Some(if generic_names.is_empty() {
-                    raw
-                } else {
-                    rewrite_generic_types(raw, &generic_names)
-                })
+                Some(self.parse_type_ref_str_with_generics(&returns_str, &generic_names)?)
             };
 
             // Encode method-level generics in the maximally-desugared where form.
@@ -436,61 +382,25 @@ impl EncoderState {
     pub(super) fn resolve_trait_ref_for_top_level(
         &mut self,
         trait_ref_str: &str,
-    ) -> Result<Path, CatalogueToExtendedCrateCodecError> {
-        // Normalize self-crate-prefixed trait refs to their short name before parsing,
-        // so that `my_crate::MyTrait` resolves as a local catalogue entry (crate_id = 0)
-        // rather than being spuriously registered as an external crate reference.
-        //
-        // Without this step, `parse_type_ref_str("my_crate::MyTrait")` sees a
-        // multi-segment path whose first segment is not a Rust path keyword (`crate` /
-        // `self` / `super`), so it calls `emit_external_crate("my_crate")` and eventually
-        // produces a `Path.id` that ends up in `krate.paths` with `crate_id != 0`.
-        // `build_impl_identity_map` then treats it as an external trait and keeps the full
-        // `"my_crate::MyTrait"` in the identity key, while the C-side rustdoc entry has
-        // `crate_id == 0` (local trait) and emits the bare short name `"MyTrait"`.  The
-        // resulting key mismatch causes Reference / Modify / Delete entries to miss their
-        // B-side counterpart and Add entries to collide with existing B-side impls.
-        //
-        // Algorithm:
-        //   1. If `trait_ref_str` starts with `"{crate_name}::"`, strip that prefix.
-        //   2. Separate base path from generic args (first `<`).
-        //   3. Take the last `::` segment of the remaining base (handles sub-module paths
-        //      like `my_crate::module::MyTrait` → `MyTrait`).
-        //   4. Rejoin with the generic-arg suffix.
-        //
-        // The resulting normalized string (e.g. `"MyTrait"` or `"MyTrait<Foo>"`) is then
-        // resolved via `parse_type_ref_str` → `resolve_local("MyTrait")` → local id.
-        //
-        // For non-self-crate trait refs (external crates or bare names already without
-        // a crate prefix), `trait_ref_str` is passed through unchanged.
-        //
-        // The parsed `Path` is returned verbatim: `path` is the canonical base path and
-        // `args` carries the structured generic args (ADR `2026-05-20-0048` D2).
-        let crate_prefix = format!("{}::", self.crate_name.as_str());
-        let normalized_owned: Option<String> =
-            if let Some(after_prefix) = trait_ref_str.strip_prefix(crate_prefix.as_str()) {
-                // Separate base path from generic args to avoid splitting on `::` inside `<>`.
-                let angle_pos = after_prefix.find('<').unwrap_or(after_prefix.len());
-                let base = &after_prefix[..angle_pos];
-                let args = &after_prefix[angle_pos..];
-                // Last segment of the base (strips sub-module path if present).
-                let last_seg = base.rsplit("::").next().unwrap_or(base);
-                Some(format!("{last_seg}{args}"))
-            } else {
-                None
-            };
-        let normalized_str: &str = normalized_owned.as_deref().unwrap_or(trait_ref_str);
-
-        let parsed_ty = self.parse_type_ref_str(normalized_str)?;
+        generic_names: &[&str],
+    ) -> Result<Path, NewTypeGraphCodecError> {
+        // Preserve the source path through parsing. The post-parser resolver maps both
+        // short and qualified spellings to the rustdoc-path identity and deliberately does
+        // not collapse a qualified reference to its last segment.
+        let parsed_ty = if generic_names.is_empty() {
+            self.parse_type_ref_str(trait_ref_str)?
+        } else {
+            self.parse_type_ref_str_with_generics(trait_ref_str, generic_names)?
+        };
         match parsed_ty {
             Type::ResolvedPath(p) => Ok(p),
-            other => Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                type_ref: trait_ref_str.to_string(),
-                reason: format!(
+            other => Err(invalid_type_ref(
+                trait_ref_str,
+                format!(
                     "trait_ref must resolve to a path type, got {:?}",
                     std::mem::discriminant(&other)
                 ),
-            }),
+            )),
         }
     }
 }

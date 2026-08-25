@@ -2,9 +2,9 @@
 //!
 //! All items are `pub(super)` — implementation details of the render module.
 
-use std::collections::BTreeMap;
+use domain::tddd::ContractMapRendererError;
 
-use super::node_index::{NodeIndex, strip_generics};
+use super::node_index::{NodeIndex, reject_unsupported_prefixes};
 
 // ---------------------------------------------------------------------------
 // syn-based type-expression extraction
@@ -135,7 +135,9 @@ fn collect_path_generic_type_candidates(path: &syn::Path, candidates: &mut TypeR
 
 /// Return a path in the same `::`-joined form used by catalogue references.
 fn path_as_string(path: &syn::Path) -> String {
-    path.segments.iter().map(|seg| seg.ident.to_string()).collect::<Vec<_>>().join("::")
+    let segments =
+        path.segments.iter().map(|seg| seg.ident.to_string()).collect::<Vec<_>>().join("::");
+    if path.leading_colon.is_some() { format!("::{segments}") } else { segments }
 }
 
 /// Resolve a `TypeRef` string to **all** rendered mermaid node IDs that it references.
@@ -164,13 +166,19 @@ fn path_as_string(path: &syn::Path) -> String {
 /// This upholds ADR 2026-04-17-1528 §D1: edges only between **declared** types.
 /// `current_crate` is forwarded to `NodeIndex::resolve` as a tie-breaker for bare
 /// TypeRef names that appear in multiple crates.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a TypeRef uses a
+/// relative `self::` / `super::` prefix or a leading `::` that cannot be
+/// interpreted without the referring module context.
 pub(crate) fn resolve_type_ref_node_ids(
     type_ref_str: &str,
     node_index: &NodeIndex,
-    trait_index: &BTreeMap<(String, String), String>,
+    trait_index: &NodeIndex,
     current_crate: &str,
     self_node_id: Option<&str>,
-) -> Vec<String> {
+) -> Result<Vec<String>, ContractMapRendererError> {
     resolve_type_ref_node_ids_with_generics(
         type_ref_str,
         node_index,
@@ -189,16 +197,17 @@ pub(crate) fn resolve_type_ref_node_ids(
 pub(crate) fn resolve_type_ref_node_ids_with_generics(
     type_ref_str: &str,
     node_index: &NodeIndex,
-    trait_index: &BTreeMap<(String, String), String>,
+    trait_index: &NodeIndex,
     current_crate: &str,
     self_node_id: Option<&str>,
     generic_params: &[&str],
-) -> Vec<String> {
+) -> Result<Vec<String>, ContractMapRendererError> {
     // Parse with syn; fall back silently on malformed input.
     let syn_type = match syn::parse_str::<syn::Type>(type_ref_str) {
         Ok(t) => t,
-        Err(_) => return Vec::new(),
+        Err(_) => return Ok(Vec::new()),
     };
+    reject_unsupported_prefixes(&syn_type, current_crate)?;
 
     let mut candidates = TypeRefCandidates::default();
     collect_type_names_from_syn(&syn_type, &mut candidates);
@@ -228,17 +237,22 @@ pub(crate) fn resolve_type_ref_node_ids_with_generics(
         if !candidate.is_absolute && generic_params.contains(&candidate_root) {
             continue;
         }
-        if let Some(node_id) = node_index.resolve(&candidate.name, current_crate) {
+        let lookup_name = if candidate.is_absolute && !candidate.name.starts_with("::") {
+            format!("::{}", candidate.name)
+        } else {
+            candidate.name.clone()
+        };
+        if let Some(node_id) = node_index.resolve(&lookup_name, current_crate)? {
             push_unique_node_id(&mut resolved, node_id);
         }
     }
 
     for candidate in &candidates.trait_names {
-        if let Some(node_id) = resolve_trait_ref_node_id(candidate, current_crate, trait_index) {
+        if let Some(node_id) = resolve_trait_ref_node_id(candidate, current_crate, trait_index)? {
             push_unique_node_id(&mut resolved, node_id);
         }
     }
-    resolved
+    Ok(resolved)
 }
 
 /// Add a node id to the resolved union only once.
@@ -265,73 +279,101 @@ fn push_unique_node_id(resolved: &mut Vec<String>, node_id: &str) {
 ///   looking up `(crate, trait_name)` in the trait index. If not found, silent skip
 ///   (workspace-external; std / third-party; CN-10 / AC-06).
 ///
-/// Returns `None` (silent skip) for workspace-external trait refs not present in any
-/// provided catalogue.
+/// Returns `Ok(None)` (silent skip) for workspace-external trait refs not present in any
+/// provided catalogue. Unsupported relative or leading-absolute prefixes return the
+/// renderer's typed error instead of being rewritten.
 pub(crate) fn resolve_trait_subgraph<'a>(
     trait_ref_str: &str,
     current_crate: &str,
-    trait_index: &'a BTreeMap<(String, String), String>,
-) -> Option<&'a str> {
+    trait_index: &'a NodeIndex,
+) -> Result<Option<&'a str>, ContractMapRendererError> {
     resolve_trait_ref_node_id(trait_ref_str, current_crate, trait_index)
 }
 
 /// Resolve a trait reference through the shared four-step trait lookup policy.
 ///
-/// Bare names resolve in the current crate. `crate::`, `self::`, and `super::` paths
-/// are normalised to the current crate and their last segment. Other qualified paths
-/// use their first segment as the crate and their last segment as the trait. Missing
-/// entries are workspace-external or undeclared and therefore silently skipped.
+/// Bare names resolve in the current crate. `crate::` paths retain the existing
+/// crate-relative policy. `self::`, `super::`, and leading-absolute paths are
+/// rejected because this renderer has no referring module context. Other qualified
+/// paths use the shared node-index resolver; missing entries are workspace-external
+/// or undeclared and therefore silently skipped.
 fn resolve_trait_ref_node_id<'a>(
     trait_ref_str: &str,
     current_crate: &str,
-    trait_index: &'a BTreeMap<(String, String), String>,
-) -> Option<&'a str> {
-    // Strip generic suffix first so that `"MyTrait<crate::Foo>"` is treated as
-    // `"MyTrait"` (bare) rather than being classified as qualified because the
-    // generic argument contains `::`.
-    let trait_path = strip_generics(trait_ref_str);
-    if trait_path.is_empty() {
-        return None;
-    }
-
-    let trait_name = trait_path.rsplit("::").next().filter(|name| !name.is_empty())?;
-    let target_crate = if trait_path.contains("::") {
-        if trait_path.starts_with("crate::")
-            || trait_path.starts_with("self::")
-            || trait_path.starts_with("super::")
-        {
-            current_crate
-        } else {
-            trait_path.split("::").next().filter(|name| !name.is_empty())?
-        }
-    } else {
-        current_crate
-    };
-
-    let key = (target_crate.to_string(), trait_name.to_string());
-    trait_index.get(&key).map(|node_id| node_id.as_str())
+    trait_index: &'a NodeIndex,
+) -> Result<Option<&'a str>, ContractMapRendererError> {
+    trait_index.resolve(trait_ref_str, current_crate)
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
-    use std::collections::BTreeMap;
-
     use super::{NodeIndex, resolve_type_ref_node_ids_with_generics};
+    use domain::tddd::ContractMapRendererError;
 
     #[test]
-    fn test_resolve_absolute_path_with_generic_named_as_crate() {
+    fn test_resolve_leading_absolute_path_fails_closed() {
         let mut node_index = NodeIndex::new();
         node_index.insert("T", "Item", "T_Item".to_owned());
+        let trait_index = NodeIndex::new();
 
-        let resolved = resolve_type_ref_node_ids_with_generics(
+        let error = resolve_type_ref_node_ids_with_generics(
             "::T::Item",
             &node_index,
-            &BTreeMap::new(),
+            &trait_index,
             "domain",
             None,
             &["T"],
-        );
+        )
+        .unwrap_err();
 
-        assert_eq!(resolved, ["T_Item"]);
+        assert!(matches!(error, ContractMapRendererError::RenderFailed { .. }));
+    }
+
+    #[test]
+    fn test_resolve_fully_qualified_path_uses_declared_identity() {
+        use domain::tddd::catalogue_v2::{CatalogueEntryKey, CrateName, ModulePath};
+
+        let mut node_index = NodeIndex::new();
+        let crate_name = CrateName::new("domain".to_owned()).unwrap();
+        let key = CatalogueEntryKey::try_new("domain::T::Item".to_owned()).unwrap();
+        let module = ModulePath::root();
+        node_index.insert_catalogue_entry(&crate_name, &key, &module, "local_item".to_owned());
+        let trait_index = NodeIndex::new();
+
+        let resolved = resolve_type_ref_node_ids_with_generics(
+            "domain::T::Item",
+            &node_index,
+            &trait_index,
+            "domain",
+            None,
+            &[],
+        )
+        .unwrap();
+
+        assert_eq!(resolved, ["local_item"]);
+    }
+
+    #[test]
+    fn test_resolve_type_ref_rejects_unsupported_prefixes_before_candidate_extraction() {
+        let node_index = NodeIndex::new();
+        let trait_index = NodeIndex::new();
+
+        for type_ref in ["<super::Input as Trait>::Assoc", "impl super::Port", "fn(super::Input)"] {
+            let error = resolve_type_ref_node_ids_with_generics(
+                type_ref,
+                &node_index,
+                &trait_index,
+                "domain",
+                None,
+                &[],
+            )
+            .unwrap_err();
+            let ContractMapRendererError::RenderFailed { reason } = error else {
+                panic!("unsupported prefix must return RenderFailed: {type_ref}");
+            };
+            assert!(reason.contains("super::"), "diagnostic lost unsupported spelling: {reason}");
+            assert!(reason.contains("crate 'domain'"), "diagnostic lost location: {reason}");
+        }
     }
 }

@@ -5,6 +5,7 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use domain::plan_ref::SpecElementId;
+use domain::tddd::semantic_verify::CatalogueEntryKey;
 use serde_json::{Value, json};
 use usecase::catalog_gen::{CatalogCiteCommand, CatalogError, CatalogWriteReport};
 
@@ -47,15 +48,68 @@ fn cite_anchors_in_file(
     for anchor in &command.anchors {
         validated.push(validate_anchor(anchor, spec_anchors)?);
     }
-    let section = resolve_entry_section(&document, &command.entry)?;
-    append_spec_refs(&mut document, section, &command.entry, spec_file, &validated)?;
+    let (section, entry_key) = resolve_requested_entry(&document, &command.entry)?;
+    append_spec_refs(&mut document, section, entry_key.as_str(), spec_file, &validated)?;
     write_catalogue(path, trusted_root, &document)?;
-    let holes = scan_entry_holes(&document, section, &command.entry);
+    let holes = scan_entry_holes(&document, section, entry_key.as_str());
     Ok(CatalogWriteReport {
         file_path: path.display().to_string(),
-        entry_key: command.entry.clone(),
+        entry_key: entry_key.as_str().to_owned(),
         holes,
     })
+}
+
+/// Resolve a cite argument to the exact key stored in the catalogue.
+///
+/// Qualified arguments use an exact map lookup.  A bare argument remains a
+/// supported input spelling for existing command workflows, but may select a
+/// qualified key only when that tail is unique across the type and trait
+/// sections. Function keys retain their existing exact-match behavior.
+/// The write and report always use the exact qualified key.
+fn resolve_requested_entry(
+    document: &Value,
+    requested: &str,
+) -> Result<(&'static str, CatalogueEntryKey), CatalogError> {
+    let requested_key = CatalogueEntryKey::try_new(requested.to_owned())
+        .map_err(|_| schema_error("catalogue entry key must not be empty"))?;
+    let exact_sections: Vec<&'static str> = ["types", "traits", "functions"]
+        .into_iter()
+        .filter(|&section| document.get(section).and_then(|value| value.get(requested)).is_some())
+        .collect();
+    if !exact_sections.is_empty() {
+        return Ok((resolve_entry_section(document, requested)?, requested_key));
+    }
+    if requested.contains("::") {
+        return Err(schema_error(format!("entry `{requested}` not found in catalogue")));
+    }
+
+    let mut candidates: Vec<(&'static str, CatalogueEntryKey)> = Vec::new();
+    for section in ["types", "traits"] {
+        let Some(object) = document.get(section).and_then(Value::as_object) else {
+            continue;
+        };
+        for key in object.keys() {
+            if key.rsplit("::").next() == Some(requested) {
+                let key = CatalogueEntryKey::try_new(key.clone())
+                    .map_err(|_| schema_error("catalogue contains an empty entry key"))?;
+                candidates.push((section, key));
+            }
+        }
+    }
+    match candidates.as_slice() {
+        [(section, key)] => Ok((*section, key.clone())),
+        [] => Err(schema_error(format!("entry `{requested}` not found in catalogue"))),
+        candidates => {
+            let labels = candidates
+                .iter()
+                .map(|(section, key)| format!("{section}.{}", key.as_str()))
+                .collect::<Vec<_>>();
+            Err(schema_error(format!(
+                "entry `{requested}` is ambiguous across qualified catalogue keys ({})",
+                labels.join(", ")
+            )))
+        }
+    }
 }
 
 /// Append `{ file, anchor }` refs to `document[section][entry].spec_refs`,
@@ -159,6 +213,48 @@ mod tests {
         let written: Value =
             serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
         assert_eq!(written["types"]["Foo"]["spec_refs"][0]["anchor"], json!("IN-01"));
+    }
+
+    #[test]
+    fn test_cite_appends_anchor_to_qualified_entry_key() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        let value = json!({
+            "schema_version": 5,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": {
+                "domain::alpha::Foo": {
+                    "role": { "ValueObject": {} },
+                    "spec_refs": []
+                },
+                "domain::beta::Foo": {
+                    "role": { "ValueObject": {} },
+                    "spec_refs": []
+                }
+            },
+            "traits": {},
+            "functions": {}
+        });
+        std::fs::write(&path, serde_json::to_string_pretty(&value).unwrap()).unwrap();
+
+        let report = cite_anchors_in_file(
+            &path,
+            temp.path(),
+            &cite_command("domain::alpha::Foo", "IN-01"),
+            "spec.json",
+            &anchors(),
+        )
+        .unwrap();
+
+        assert_eq!(report.entry_key, "domain::alpha::Foo");
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        assert_eq!(
+            written["types"]["domain::alpha::Foo"]["spec_refs"][0]["anchor"],
+            json!("IN-01")
+        );
+        assert!(written["types"]["domain::beta::Foo"]["spec_refs"].as_array().unwrap().is_empty());
     }
 
     #[test]

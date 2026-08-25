@@ -8,8 +8,8 @@
 //! Inputs: `a: ExtendedCrate` (Catalogue-derived TypeGraph A), `b: rustdoc_types::Crate`
 //! (Baseline TypeGraph B).
 //!
-//! 1. Build identity → Id maps for B (short names for Struct/Enum/TypeAlias/Trait,
-//!    FunctionPath strings for Function items via `Crate::paths`).
+//! 1. Build identity → Id maps for B (fully-qualified paths from `Crate::paths`
+//!    for Struct/Enum/TypeAlias/Trait, FunctionPath strings for Function items).
 //! 2. Start S by taking all B items as implicit Reference entries; assign fresh Ids.
 //! 3. Apply each A item by its declared action (Add / Modify / Reference / Delete),
 //!    returning `Phase1Error::ActionContradiction` on declare inconsistencies.
@@ -28,15 +28,15 @@
 //!
 //! ## Structural equality (ADR 3 D3)
 //!
-//! Types/traits/functions are compared by converting `rustdoc_types::Type` fields to
-//! short-name strings via an internal `format_type` helper (L1 resolution, module paths
-//! stripped). This matches the catalogue L1 representation so A-derived and rustdoc-derived
-//! items compare symmetrically.
+//! Types/traits/functions retain the established structural formatter for shape comparison,
+//! while every available `Crate::paths` identity is checked before that formatter runs. This
+//! keeps A-derived and rustdoc-derived items symmetric without allowing same-named declarations
+//! in different modules to collapse to one short-name identity.
 //!
 //! ## Module structure
 //!
 //! - `format`          — `format_type`, `format_generic_args`, `format_generic_bounds`, etc.
-//! - `structural_eq`   — `items_structurally_equal` (dispatch + struct/enum comparisons)
+//! - `structural_eq`   — `items_structurally_equal_with_paths` (dispatch + struct/enum comparisons)
 //! - `generics_eq`     — `generics_structurally_equal`, `build_trait_method_map`, `fn_sigs_*`
 //! - `phase2`          — `phase2_evaluate` and S/D/C region helpers
 //! - `resolve_type`    — `resolve_type` and friends (Phase 1.5 Id rewriting)
@@ -61,11 +61,13 @@ use crate::schema_export::{RustdocTargetResolution, resolve_rustdoc_root_name};
 // ---------------------------------------------------------------------------
 
 pub(super) mod alias_lexical;
+pub(super) mod alias_structural_eq;
 pub(super) mod collect_refs;
 pub(super) mod external_crates;
 pub(crate) mod format;
 pub(super) mod generics_eq;
 pub(super) mod impl_identity;
+pub(super) mod impl_identity_helpers;
 pub(super) mod phase1;
 pub(super) mod phase2;
 pub(super) mod resolution;
@@ -79,9 +81,19 @@ pub(super) mod tests;
 use phase1::phase1_build_s_and_d_with_rustdoc_root;
 use phase2::phase2_evaluate;
 
-pub(super) use impl_identity::build_impl_identity_map;
 #[cfg(test)]
-pub(crate) use impl_identity::{is_compiler_internal_trait, normalize_impl_trait_path};
+pub(super) fn build_impl_identity_map(
+    krate: &rustdoc_types::Crate,
+    crate_name: &str,
+) -> Result<std::collections::BTreeMap<String, rustdoc_types::Id>, domain::tddd::Phase1Error> {
+    let authority = crate::tddd::canonical_type_identity::DefinitionPathAuthority::from_path_maps(
+        &krate.paths,
+        &[],
+    );
+    impl_identity::build_impl_identity_map(krate, crate_name, &authority)
+}
+#[cfg(test)]
+pub(crate) use impl_identity::is_compiler_internal_trait;
 
 // ---------------------------------------------------------------------------
 // SignalEvaluatorV2 — secondary adapter
@@ -139,51 +151,66 @@ impl SignalEvaluatorPort for SignalEvaluatorV2 {
 // Identity helpers (shared across phase1 and phase2 submodules)
 // ---------------------------------------------------------------------------
 
-/// Build a `(short_name, Id)` map for types and traits in a `rustdoc_types::Crate`.
+/// Build a `(fully_qualified_path, Id)` map for types and traits in a
+/// `rustdoc_types::Crate`.
 ///
-/// Identity key: short name (last path segment, e.g. `"User"`) for
-/// `ItemEnum::Struct | Enum | TypeAlias | Trait`.  Items not matching these
-/// kinds are skipped.
+/// Identity keys are the complete `Crate::paths` entries (crate, module path,
+/// and item name) for `ItemEnum::Struct | Enum | TypeAlias | Trait`.
 ///
-/// Used in Phase 1 where the catalogue operates at L1 (short-name) resolution
-/// and for Phase 1 action matching between A and B.
+/// Used in Phase 1 for action matching between A and B and in Phase 2 for
+/// matching S/D/C items. Short names remain a separate input-resolution and
+/// display concern; they must not decide which rustdoc item represents an
+/// identity.
 ///
-/// When two items share the same short name (same-name types in different
-/// modules), the item whose full path in `krate.paths` is lexicographically
-/// smaller is preferred so that the result is deterministic regardless of
-/// `HashMap` iteration order.
-pub(super) fn build_type_trait_identity_map(krate: &Crate) -> BTreeMap<String, Id> {
-    // Collect candidates: (short_name, full_path_string, id).
-    let mut candidates: Vec<(String, String, Id)> = Vec::new();
+/// A valid rustdoc crate cannot expose two different local items at the same
+/// fully-qualified path. The `(path, id)` ordering still makes malformed or
+/// synthetic fixtures deterministic without collapsing distinct module paths.
+///
+/// # Errors
+///
+/// Returns `Phase1Error::RustdocRootResolution` when a local type or trait has
+/// no non-empty authoritative entry in `Crate::paths`. Identity construction
+/// is fail-closed: a missing path must not silently remove an item from Phase 1
+/// or Phase 2.
+pub(super) fn build_type_trait_identity_map(
+    krate: &Crate,
+) -> Result<BTreeMap<String, Id>, Phase1Error> {
+    // Collect candidates from `Crate::paths`, which is the authoritative source
+    // for local type/trait identity. `Item::name` is intentionally not used as
+    // the key because it omits the module path and is therefore ambiguous.
+    let mut candidates: Vec<(String, Id)> = Vec::new();
     for (id, item) in &krate.index {
         // Only include local crate items (crate_id == 0 means "this crate").
         if item.crate_id != 0 {
             continue;
         }
         if is_type_or_trait_item(item) {
-            if let Some(name) = &item.name {
-                if !name.is_empty() {
-                    let full_path =
-                        krate.paths.get(id).map(|s| s.path.join("::")).unwrap_or_default();
-                    candidates.push((name.clone(), full_path, *id));
-                }
+            let item_name = item.name.as_deref().unwrap_or("<unnamed>");
+            let path_summary = krate.paths.get(id).ok_or_else(|| {
+                Phase1Error::rustdoc_root_resolution(format!(
+                    "local type/trait `{item_name}` (id {}) has no authoritative Crate::paths entry",
+                    id.0
+                ))
+            })?;
+            let identity_key = path_summary.path.join("::");
+            if identity_key.is_empty() {
+                return Err(Phase1Error::rustdoc_root_resolution(format!(
+                    "local type/trait `{item_name}` (id {}) has an empty authoritative Crate::paths path",
+                    id.0
+                )));
             }
+            candidates.push((identity_key, *id));
         }
     }
-    // Sort by (short_name, full_path, id) so that for each short name, the
-    // lexicographically smallest full path wins — deterministic across crates.
-    // The third key (id.0: u32) breaks ties when two items share the same
-    // short name and full path (e.g. both have an empty path because neither
-    // appears in krate.paths), preventing sort_unstable from producing
-    // non-deterministic output that would cause a type/trait name collision to
-    // flip between Yellow and Red across CI runs.
-    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)).then(a.2.0.cmp(&b.2.0)));
+    // Keep duplicate-path handling deterministic for synthetic inputs. Distinct
+    // full paths are retained independently, including same-name items in
+    // different modules.
+    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.0.cmp(&b.1.0)));
     let mut map: BTreeMap<String, Id> = BTreeMap::new();
-    for (name, _, id) in candidates {
-        // entry().or_insert keeps the first (= lexicographically smallest path).
-        map.entry(name).or_insert(id);
+    for (identity_key, id) in candidates {
+        map.entry(identity_key).or_insert(id);
     }
-    map
+    Ok(map)
 }
 
 /// Build a `(function_path_string, Id)` map for free function items in a `rustdoc_types::Crate`.
@@ -332,7 +359,7 @@ impl EvaluationEngine {
             resolve_function_rustdoc_root(&self.a, &self.b, &self.c, &self.workspace_root)?;
         let (s, d) =
             phase1_build_s_and_d_with_rustdoc_root(self.a, &self.b, rustdoc_root.as_ref())?;
-        let report = phase2_evaluate(&s, &d, &self.c, rustdoc_root.as_ref());
+        let report = phase2_evaluate(&s, &d, &self.c, rustdoc_root.as_ref())?;
         Ok(report)
     }
 }

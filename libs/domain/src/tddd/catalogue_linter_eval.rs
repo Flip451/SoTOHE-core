@@ -7,105 +7,95 @@
 //! Cross-layer type-role resolution helpers live in the sibling submodule
 //! `eval_helpers` (file `catalogue_linter_eval_helpers.rs`).
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use super::eval_layer_signature;
 use super::eval_primitives;
 use super::helpers::{
-    bare_name_in_type_ref, collect_methods_for_type, contract_role_type_ref, entry_role_kind,
-    field_type_refs, field_vec_is_empty, function_entries_for_target, has_trait_impl,
-    identity_accessor_name, invariants_for_role, struct_has_public_fields,
-    trait_entries_for_target, type_entries_for_target, validate_contract_role_field,
-    validate_data_role_field,
+    collect_methods_for_type, contract_role_type_ref, entry_role_kind, field_type_refs,
+    field_vec_is_empty, function_entries_for_target, has_trait_impl, identity_accessor_name,
+    invariants_for_role, struct_has_public_fields, trait_entries_for_target,
+    type_entries_for_target, validate_contract_role_field, validate_data_role_field,
 };
 use super::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
-    FreeText, RoleKind, RolePayloadField,
+    FreeText, RoleKind, RolePayloadField, TypeRefPathExtractorPort,
 };
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::roles::{InvariantPredicate, ItemAction, NonEmptyVec, SelfReceiver};
+use crate::tddd::catalogue_v2::identifiers::{
+    CrateName, FullyQualifiedItemPath, ParamName, TypeRef,
+};
+use crate::tddd::catalogue_v2::roles::{InvariantPredicate, ItemAction, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner;
 
-// Cross-layer lookup helpers (strip_ref_sigils, resolve_type_role,
-// sig_type_contains_entry, find_in_catalogue, etc.)
+// Cross-layer lookup helpers used by the rules that retain name-based
+// attribution semantics. The three identity-sensitive rules below use the
+// shared domain resolver directly.
 #[path = "catalogue_linter_eval_helpers.rs"]
 pub(super) mod eval_helpers;
 
-use eval_helpers::{resolve_type_role, sig_type_contains_entry};
+use eval_helpers::sig_type_contains_entry;
 
 #[path = "catalogue_linter_eval_composition_root.rs"]
 mod eval_composition_root;
 
-fn ensure_target_can_produce_type_ref_checks(
-    rule_kind: &str,
-    target_roles: &[RoleKind],
-    target_field: RolePayloadField,
-) -> Result<(), CatalogueLinterError> {
-    let effective_roles =
-        if target_roles.is_empty() { RoleKind::ALL.as_slice() } else { target_roles };
-    if let Some(bad_role) =
-        effective_roles.iter().find(|role| !role.carries_type_ref_field(target_field))
-    {
-        let role_names = if target_roles.is_empty() {
-            "all roles".to_owned()
-        } else {
-            effective_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ")
-        };
-        return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-            "{}: target_field '{}' is not carried by role '{}' in target_roles [{}]; \
-             every target role must carry the field to avoid silent skips",
-            rule_kind,
-            target_field,
-            bad_role.variant_name(),
-            role_names
-        ))));
-    }
-    Ok(())
+#[path = "catalogue_linter_eval_external_refs.rs"]
+mod eval_external_refs;
+
+#[path = "catalogue_linter_identity.rs"]
+mod identity;
+
+#[path = "catalogue_linter_eval_config.rs"]
+mod eval_config;
+
+use eval_config::{
+    ensure_layers_exist, ensure_target_can_produce_data_role_field_checks,
+    ensure_target_can_produce_type_ref_checks,
+};
+use identity::{
+    CatalogueIdentityContext, TypeRefInspectionContext, build_declared_identities,
+    declared_identity_universe, generic_parameter_names, resolution_message,
+    resolve_reference_identities, role_constraint_failure,
+};
+
+/// Owned identity context reused while the entrypoint inspects every TypeRef
+/// in one catalogue. The resolution itself remains delegated to the existing
+/// T013 identity adapter below; this wrapper only keeps its derived declaration
+/// universe alive across the preflight traversal.
+pub(super) struct CatalogueTypeRefIdentityContext {
+    catalogue_crate: CrateName,
+    universe: BTreeSet<FullyQualifiedItemPath>,
 }
 
-fn ensure_target_can_produce_data_role_field_checks(
-    rule_kind: &str,
-    target_roles: &[RoleKind],
-    target_field: RolePayloadField,
-) -> Result<(), CatalogueLinterError> {
-    let effective_roles =
-        if target_roles.is_empty() { RoleKind::DATA_ROLES.as_slice() } else { target_roles };
-    // Every target role must carry the field.  A role that does not carry the
-    // field will always see an empty vec in `field_vec_is_empty`, causing
-    // FieldNonEmpty to fire as a false positive or FieldEmpty to silently pass
-    // for every entry (D19 fail-closed).
-    if let Some(bad_role) =
-        effective_roles.iter().find(|role| !role.carries_data_role_field(target_field))
-    {
-        let role_names = if target_roles.is_empty() {
-            "all DataRole roles".to_owned()
-        } else {
-            effective_roles.iter().map(|role| role.variant_name()).collect::<Vec<_>>().join(", ")
-        };
-        return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-            "{}: target_field '{}' is not carried by role '{}' in target_roles [{}]; \
-             every target role must carry the field to avoid false positives",
-            rule_kind,
-            target_field,
-            bad_role.variant_name(),
-            role_names
-        ))));
-    }
-    Ok(())
-}
-
-fn ensure_layers_exist(
-    layers: &NonEmptyVec<LayerId>,
+pub(super) fn build_type_ref_identity_context(
     all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    catalogue_crate: &CrateName,
+) -> Result<CatalogueTypeRefIdentityContext, CatalogueLinterError> {
+    let entries = build_declared_identities(all_catalogues)?;
+    Ok(CatalogueTypeRefIdentityContext {
+        catalogue_crate: catalogue_crate.clone(),
+        universe: declared_identity_universe(&entries),
+    })
+}
+
+pub(super) fn inspect_type_ref<E: TypeRefPathExtractorPort>(
+    context: &CatalogueTypeRefIdentityContext,
+    type_ref: &TypeRef,
+    type_parameters: &[ParamName],
+    lifetime_parameters: &[ParamName],
+    const_parameters: &[ParamName],
+    extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
-    for layer_id in layers.as_slice() {
-        if !all_catalogues.contains_key(layer_id) {
-            return Err(CatalogueLinterError::UnknownLayer { layer_id: layer_id.clone() });
-        }
-    }
-    Ok(())
+    let identity_context = CatalogueIdentityContext {
+        catalogue_crate: &context.catalogue_crate,
+        universe: &context.universe,
+        entries: &[],
+    };
+    let inspection =
+        TypeRefInspectionContext { type_parameters, lifetime_parameters, const_parameters };
+    resolve_reference_identities(type_ref, identity_context, extractor, inspection).map(|_| ())
 }
 
 /// Evaluate `rules` against the catalogue identified by `target_layer_id`
@@ -137,11 +127,12 @@ fn ensure_layers_exist(
 /// Returns [`CatalogueLinterError::ScanFailed`] when a `ForbidPrimitiveInTypes`
 /// rule's underlying [`PrimitiveOccurrenceScanner::scan`] call fails (e.g. a
 /// catalogue `TypeRef` string that does not parse as valid Rust syntax).
-pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
+pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtractorPort>(
     rules: &[CatalogueLinterRule],
     all_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
     target_layer_id: &LayerId,
     scanner: &S,
+    extractor: &E,
 ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
     let catalogue = all_catalogues
         .get(target_layer_id)
@@ -250,41 +241,58 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     rule.target().target_roles(),
                     field,
                 )?;
+                let declared_identities = build_declared_identities(all_catalogues)?;
+                let identity_universe = declared_identity_universe(&declared_identities);
+                let identity_context = CatalogueIdentityContext {
+                    catalogue_crate: catalogue.crate_name(),
+                    universe: &identity_universe,
+                    entries: &declared_identities,
+                };
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     for type_ref in field_type_refs(entry.role(), field) {
-                        let ref_str = type_ref.as_str();
-                        if resolve_type_role(ref_str, all_catalogues, target_layer_id)
-                            != Some(*expected_role)
-                        {
+                        if let Some(message) = role_constraint_failure(
+                            type_ref,
+                            *expected_role,
+                            identity_context,
+                            field,
+                            extractor,
+                            inspection,
+                        ) {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),
-                                format!(
-                                    "type '{}' referenced in field '{}' does not declare role '{}'",
-                                    ref_str,
-                                    target_field,
-                                    expected_role.variant_name()
-                                ),
+                                message,
                             ));
                         }
                     }
                 }
 
                 for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     if let Some(type_ref) = contract_role_type_ref(entry.role(), field) {
-                        let ref_str = type_ref.as_str();
-                        if resolve_type_role(ref_str, all_catalogues, target_layer_id)
-                            != Some(*expected_role)
-                        {
+                        if let Some(message) = role_constraint_failure(
+                            type_ref,
+                            *expected_role,
+                            identity_context,
+                            field,
+                            extractor,
+                            inspection,
+                        ) {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),
-                                format!(
-                                    "type '{}' referenced in field '{}' does not declare role '{}'",
-                                    ref_str,
-                                    target_field,
-                                    expected_role.variant_name()
-                                ),
+                                message,
                             ));
                         }
                     }
@@ -292,9 +300,15 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
             }
 
             CatalogueLinterRuleKind::TraitImplRequired { required_traits } => {
-                for (name, _entry) in type_entries_for_target(catalogue, rule.target()) {
+                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
                     for trait_name in required_traits.as_slice() {
-                        if !has_trait_impl(catalogue, name.as_str(), trait_name.as_str()) {
+                        if !has_trait_impl(
+                            catalogue,
+                            name.as_str(),
+                            entry.module_path(),
+                            trait_name.as_str(),
+                            extractor,
+                        )? {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),
                                 name.as_str(),
@@ -504,128 +518,64 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     rule.target().target_roles(),
                     *target_field,
                 )?;
-                // Key by the tail segment of the TypeRef so that bare `OrderLine` and
-                // path-qualified `domain::OrderLine` are treated as the same type and the
-                // D11 exclusive-member uniqueness check cannot be bypassed by mixing forms.
-                let mut seen: std::collections::HashMap<String, String> =
-                    std::collections::HashMap::new();
+                let declared_identities = build_declared_identities(all_catalogues)?;
+                let identity_universe = declared_identity_universe(&declared_identities);
+                let identity_context = CatalogueIdentityContext {
+                    catalogue_crate: catalogue.crate_name(),
+                    universe: &identity_universe,
+                    entries: &declared_identities,
+                };
+                let mut seen: BTreeMap<FullyQualifiedItemPath, String> = BTreeMap::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
+                    let type_parameters = generic_parameter_names(entry.generics());
+                    let inspection = TypeRefInspectionContext {
+                        type_parameters: &type_parameters,
+                        lifetime_parameters: &[],
+                        const_parameters: &[],
+                    };
                     for type_ref in field_type_refs(entry.role(), *target_field) {
-                        let ref_str = type_ref.as_str();
-                        let canonical = ref_str.split("::").last().unwrap_or(ref_str).to_owned();
-                        if let Some(prev_entry) = seen.get(&canonical) {
-                            if prev_entry.as_str() != name.as_str() {
-                                violations.push(CatalogueLintViolation::new(
-                                    rule.kind().discriminant_name(),
-                                    name.as_str(),
-                                    format!(
-                                        "type '{}' in field '{}' already belongs to entry '{}'",
-                                        ref_str, target_field, prev_entry
-                                    ),
-                                ));
+                        match resolve_reference_identities(
+                            type_ref,
+                            identity_context,
+                            extractor,
+                            inspection,
+                        ) {
+                            Ok(identities) => {
+                                for identity in identities {
+                                    if let Some(prev_entry) = seen.get(&identity) {
+                                        if prev_entry.as_str() != name.as_str() {
+                                            violations.push(CatalogueLintViolation::new(
+                                                rule.kind().discriminant_name(),
+                                                name.as_str(),
+                                                format!(
+                                                    "type '{}' in field '{}' already belongs to entry '{}'",
+                                                    identity, target_field, prev_entry
+                                                ),
+                                            ));
+                                        }
+                                    } else {
+                                        seen.insert(identity, name.as_str().to_owned());
+                                    }
+                                }
                             }
-                        } else {
-                            seen.insert(canonical, name.as_str().to_owned());
+                            Err(error) => violations.push(CatalogueLintViolation::new(
+                                rule.kind().discriminant_name(),
+                                name.as_str(),
+                                resolution_message(type_ref, &error),
+                            )),
                         }
                     }
                 }
             }
 
             CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field } => {
-                // Per ADR D6/D11, this rule is defined only for `exclusive_members`.
-                // Other DataRole fields do not have external-reference-in-methods
-                // semantics in the minimum-core rule set (D19 fail-closed).
-                if *target_field != RolePayloadField::ExclusiveMembers {
-                    return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-                        "NoExternalReferenceInMethods: unsupported target_field '{}'; \
-                         only 'exclusive_members' is supported (ADR D6/D11)",
-                        target_field
-                    ))));
-                }
-                ensure_target_can_produce_type_ref_checks(
-                    rule.kind().discriminant_name(),
-                    rule.target().target_roles(),
+                violations.extend(eval_external_refs::evaluate_no_external_reference_in_methods(
+                    rule,
                     *target_field,
-                )?;
-                let mut agg_exclusive: Vec<(String, Vec<String>)> = Vec::new();
-                for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    let refs = field_type_refs(entry.role(), *target_field)
-                        .iter()
-                        .map(|r| r.as_str().to_owned())
-                        .collect();
-                    agg_exclusive.push((name.as_str().to_owned(), refs));
-                }
-                for (agg_name, exclusive_refs) in &agg_exclusive {
-                    if exclusive_refs.is_empty() {
-                        continue;
-                    }
-                    // Build a set of bare-name tails for the boundary (aggregate + its
-                    // exclusive members + its shared_value_objects).
-                    let inside_bare: std::collections::HashSet<String> = {
-                        let mut set = std::collections::HashSet::new();
-                        // The aggregate itself.
-                        let agg_tail = agg_name.split("::").last().unwrap_or(agg_name).to_owned();
-                        set.insert(agg_tail);
-                        // Exclusive members.
-                        for r in exclusive_refs {
-                            let tail = r.split("::").last().unwrap_or(r.as_str()).to_owned();
-                            set.insert(tail);
-                        }
-                        // Shared value objects of this aggregate.
-                        // Exclude delete-action aggregates: a deleted aggregate's
-                        // shared_value_objects no longer define the boundary set.
-                        if let Some((_name, entry)) = catalogue.types().iter().find(|(n, e)| {
-                            n.as_str() == agg_name.as_str() && e.action() != ItemAction::Delete
-                        }) {
-                            // "shared_value_objects" is a recognised field name — always succeeds.
-                            for r in
-                                field_type_refs(entry.role(), RolePayloadField::SharedValueObjects)
-                            {
-                                let tail =
-                                    r.as_str().split("::").last().unwrap_or(r.as_str()).to_owned();
-                                set.insert(tail);
-                            }
-                        }
-                        set
-                    };
-                    // Exclude delete-action entries: a deleted type cannot have methods
-                    // that violate the exclusivity boundary.
-                    for (other_name, other_entry) in
-                        catalogue.types().iter().filter(|(_, e)| e.action() != ItemAction::Delete)
-                    {
-                        let other_bare =
-                            other_name.as_str().split("::").last().unwrap_or(other_name.as_str());
-                        if inside_bare.contains(other_bare) {
-                            continue;
-                        }
-                        let all_methods =
-                            collect_methods_for_type(catalogue, other_entry, other_name.as_str())?;
-                        for exclusive_type in exclusive_refs {
-                            // Use the bare tail of the exclusive member for delimiter-boundary
-                            // matching so that Vec<OrderLine>, Option<OrderLine>, &OrderLine,
-                            // and path-qualified forms are all detected.
-                            let bare = exclusive_type
-                                .split("::")
-                                .last()
-                                .unwrap_or(exclusive_type.as_str());
-                            let found_in_methods = all_methods.iter().any(|m| {
-                                m.params.iter().any(|p| bare_name_in_type_ref(p.ty.as_str(), bare))
-                                    || bare_name_in_type_ref(m.returns.as_str(), bare)
-                            });
-                            if found_in_methods {
-                                violations.push(CatalogueLintViolation::new(
-                                    rule.kind().discriminant_name(),
-                                    agg_name.as_str(),
-                                    format!(
-                                        "exclusive member '{}' is referenced in methods of external entry '{}'",
-                                        exclusive_type,
-                                        other_name.as_str()
-                                    ),
-                                ));
-                            }
-                        }
-                    }
-                }
+                    catalogue,
+                    all_catalogues,
+                    extractor,
+                )?);
             }
 
             CatalogueLinterRuleKind::NoPublicField => {
@@ -681,6 +631,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     catalogue,
                     all_catalogues,
                     target_layer_id,
+                    extractor,
                 )?)
             }
         }

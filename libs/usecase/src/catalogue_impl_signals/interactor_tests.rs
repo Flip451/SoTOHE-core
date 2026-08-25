@@ -17,6 +17,7 @@ use domain::tddd::catalogue_v2::{
     BaselineCaptureIoError, CatalogueDocument, CatalogueDocumentLoaderError,
     CatalogueDocumentLoaderPort, CrateName, RustdocBaselineCapturePort, RustdocCratePort,
     RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
+    TypeRef,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use domain::tddd::signal_evaluator::phase1_error::Phase1Error;
@@ -25,6 +26,7 @@ use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 // ThreeWaySignal is not pub-re-exported from the parent module, so it cannot be
 // reached via `use super::*` and must be imported explicitly here.
 use domain::tddd::signal_evaluator::region::{ThreeWayEvaluationReport, ThreeWaySignal};
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::{SymlinkGuardError, SymlinkGuardPort, TrackId};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, Id, Item, ItemEnum, ItemKind, ItemSummary, Module, Struct, Visibility,
@@ -181,8 +183,13 @@ impl domain::tddd::CatalogueToExtendedCratePort for FailingCodec {
     fn encode(
         &self,
         _doc: CatalogueDocument,
+        _baseline: &Crate,
+        _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
-        Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef("stub".to_owned()))
+        Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(
+            TypeRef::new("stub").unwrap(),
+            DiagnosticMessage::try_new("stub diagnostic".to_owned()).unwrap(),
+        ))
     }
 }
 
@@ -529,6 +536,8 @@ impl domain::tddd::CatalogueToExtendedCratePort for CatalogueGatedItemCodec {
     fn encode(
         &self,
         _doc: CatalogueDocument,
+        _baseline: &Crate,
+        _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         Ok(ExtendedCrate::new(rustdoc_crate_with_gated_public_item(), BTreeMap::new()))
     }
@@ -603,8 +612,45 @@ impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
     fn encode(
         &self,
         _doc: CatalogueDocument,
+        _baseline: &Crate,
+        _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
+    }
+}
+
+struct RecordingExtendedCrateCodec {
+    observed: Arc<Mutex<Option<(Crate, Crate)>>>,
+}
+
+impl domain::tddd::CatalogueToExtendedCratePort for RecordingExtendedCrateCodec {
+    fn encode(
+        &self,
+        _doc: CatalogueDocument,
+        baseline: &Crate,
+        current: &Crate,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        *self.observed.lock().unwrap() = Some((baseline.clone(), current.clone()));
+        Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
+    }
+}
+
+struct DistinguishableRustdocPort {
+    baseline: Crate,
+    current: Crate,
+}
+
+impl RustdocCratePort for DistinguishableRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
+        Ok(self.baseline.clone())
+    }
+
+    fn capture_current(
+        &self,
+        _crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
+        Ok(self.current.clone())
     }
 }
 
@@ -709,6 +755,32 @@ pub(super) fn build_interactor_with_guard(
         feature_declaration,
         symlink_guard,
     )
+}
+
+#[test]
+fn test_run_codec_receives_baseline_and_current_crates_in_order() {
+    let mut expected_baseline = empty_rustdoc_crate();
+    expected_baseline.crate_version = Some("baseline-fixture".to_owned());
+    let mut expected_current = empty_rustdoc_crate();
+    expected_current.crate_version = Some("current-fixture".to_owned());
+    let observed = Arc::new(Mutex::new(None));
+    let interactor = build_interactor(
+        Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
+        Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(DistinguishableRustdocPort {
+            baseline: expected_baseline.clone(),
+            current: expected_current.clone(),
+        }),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    let (actual_baseline, actual_current) = observed.lock().unwrap().take().unwrap();
+    assert_eq!(actual_baseline, expected_baseline);
+    assert_eq!(actual_current, expected_current);
 }
 
 // -------------------------------------------------------------------------
@@ -816,7 +888,7 @@ fn test_run_ext_crate_conversion_failure_returns_ext_crate_conversion_error() {
         Arc::new(StubLoader { doc }),
         Arc::new(FailingCodec),
         Arc::new(EmptyEvaluator),
-        Arc::new(NeverCalledRustdocPort),
+        Arc::new(EmptyRustdocPort),
         Arc::new(StubLayerBindings { bindings: vec![binding] }),
     );
     let err =

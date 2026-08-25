@@ -1,8 +1,10 @@
 //! System adapter for the active-track catalogue-lint port.
 
 use std::path::Path;
+use std::sync::Arc;
 
 use domain::TrackId;
+use domain::tddd::catalogue_linter::TypeRefPathExtractorPort;
 use usecase::catalogue_lint_workflow::{
     RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintError, RunCatalogueLintInteractor,
 };
@@ -18,7 +20,17 @@ use crate::tddd::syn_primitive_occurrence_scanner::SynPrimitiveOccurrenceScanner
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
 
 /// System-backed adapter for active-track catalogue linting.
-pub struct SystemTrackCatalogueLintActiveAdapter;
+pub struct SystemTrackCatalogueLintActiveAdapter {
+    extractor: Arc<dyn TypeRefPathExtractorPort>,
+}
+
+impl SystemTrackCatalogueLintActiveAdapter {
+    /// Creates the active-track adapter with the parser-authoritative extractor.
+    #[must_use]
+    pub fn new(extractor: Arc<dyn TypeRefPathExtractorPort>) -> Self {
+        Self { extractor }
+    }
+}
 
 impl TrackCatalogueLintActivePort for SystemTrackCatalogueLintActiveAdapter {
     fn execute(
@@ -39,11 +51,11 @@ impl TrackCatalogueLintActivePort for SystemTrackCatalogueLintActiveAdapter {
 
         let items_dir = workspace_root.join("track/items");
         let track_dir = items_dir.join(track_id.as_ref());
-        let config_path = command
-            .rules_file
-            .as_ref()
-            .map(|rules_file| rules_file.as_path().to_path_buf())
-            .unwrap_or_else(|| workspace_root.join(".harness/catalogue-lint/config.json"));
+        let config_path = crate::track_lifecycle::tddd::lint::resolve_config_path(
+            workspace_root,
+            command.rules_file.as_ref(),
+        )
+        .map_err(execution_failed)?;
         ensure_config_file(&config_path)?;
 
         for binding in &bindings {
@@ -72,8 +84,12 @@ impl TrackCatalogueLintActivePort for SystemTrackCatalogueLintActiveAdapter {
 
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.to_path_buf());
         let config_loader = FsLintConfigLoader::new(config_path);
-        let interactor =
-            RunCatalogueLintInteractor::new(loader, config_loader, SynPrimitiveOccurrenceScanner);
+        let interactor = RunCatalogueLintInteractor::new(
+            loader,
+            config_loader,
+            SynPrimitiveOccurrenceScanner,
+            self.extractor.clone(),
+        );
         let runner: &dyn RunCatalogueLint = &interactor;
         let mut layers = Vec::new();
 
@@ -146,8 +162,11 @@ fn execution_failed(message: impl Into<String>) -> TrackCatalogueLintActiveError
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use std::fs;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
 
     use super::*;
+    use crate::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter;
     use usecase::track_lifecycle::{TrackSelection, TrackWorkspaceRoot};
 
     fn command(root: &std::path::Path) -> TrackCatalogueLintActiveCommand {
@@ -185,10 +204,454 @@ mod tests {
             .expect("lint config is written");
     }
 
+    fn write_identity_fixture(root: &std::path::Path) {
+        write_rules(root);
+        fs::create_dir_all(root.join("track/items/lint-track")).expect("track directory exists");
+        fs::create_dir_all(root.join(".harness/catalogue-lint"))
+            .expect("lint config directory exists");
+        fs::write(
+            root.join(".harness/catalogue-lint/config.json"),
+            r#"{
+              "schema_version": 1,
+              "rules": [{
+                "target_roles": ["UseCase"],
+                "kind": {"ReferencedRoleConstraint": {
+                  "target_field": "handles",
+                  "expected_role": "DomainEvent"
+                }}
+              }]
+            }"#,
+        )
+        .expect("lint config is written");
+        fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::Event": {
+                  "action": "add",
+                  "role": {"DomainEvent": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::Event": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesAlphaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::alpha::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesBetaEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::beta::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::HandlesExternalEvent": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["external_crate::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("catalogue fixture is written");
+    }
+
+    fn write_incomplete_identity_fixture(root: &std::path::Path) {
+        write_identity_fixture(root);
+        fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::IncompleteTypeRef": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["("]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("incomplete catalogue fixture is written");
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_adapters_forward_injected_extractor_and_identity_rules() {
+        struct RecordingExtractor {
+            calls: Arc<AtomicUsize>,
+            parser: SynTypeRefPathExtractorAdapter,
+        }
+
+        impl domain::tddd::catalogue_linter::TypeRefPathExtractorPort for RecordingExtractor {
+            fn extract(
+                &self,
+                type_ref: &domain::tddd::catalogue_v2::identifiers::TypeRef,
+                type_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                lifetime_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+                const_parameters: &[domain::tddd::catalogue_v2::identifiers::ParamName],
+            ) -> Result<
+                Vec<domain::tddd::catalogue_linter::ExtractedTypeRefPath>,
+                domain::tddd::catalogue_linter::TypeRefPathExtractionError,
+            > {
+                self.calls.fetch_add(1, Ordering::SeqCst);
+                self.parser.extract(
+                    type_ref,
+                    type_parameters,
+                    lifetime_parameters,
+                    const_parameters,
+                )
+            }
+        }
+
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        let root = workspace.path();
+        fs::write(
+            root.join("architecture-rules.json"),
+            r#"{
+              "version": 2,
+              "layers": [{
+                "crate": "domain",
+                "tddd": {"enabled": true, "catalogue_file": "domain-types.json"}
+              }]
+            }"#,
+        )
+        .expect("architecture rules are written");
+        fs::create_dir_all(root.join(".harness/catalogue-lint"))
+            .expect("lint config directory exists");
+        fs::write(
+            root.join(".harness/catalogue-lint/config.json"),
+            r#"{
+              "schema_version": 1,
+              "rules": [
+                {
+                  "target_roles": ["UseCase"],
+                  "kind": {"ReferencedRoleConstraint": {
+                    "target_field": "handles",
+                    "expected_role": "DomainEvent"
+                  }}
+                },
+                {
+                  "target_roles": ["AggregateRoot"],
+                  "kind": {"FieldElementUniqueAcrossEntries": {
+                    "target_field": "exclusive_members"
+                  }}
+                },
+                {
+                  "target_roles": ["AggregateRoot"],
+                  "kind": {"NoExternalReferenceInMethods": {
+                    "target_field": "exclusive_members"
+                  }}
+                }
+              ]
+            }"#,
+        )
+        .expect("lint config is written");
+        fs::create_dir_all(root.join("track/items/lint-track")).expect("track directory exists");
+        fs::write(
+            root.join("track/items/lint-track/domain-types.json"),
+            r#"{
+              "schema_version": 5,
+              "crate_name": "domain",
+              "layer": "domain",
+              "types": {
+                "domain::alpha::Event": {
+                  "action": "add",
+                  "role": {"DomainEvent": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::Event": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::Entity": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::Entity": {
+                  "action": "add",
+                  "role": {"ValueObject": {}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::AggregateA": {
+                  "action": "add",
+                  "role": {"AggregateRoot": {
+                    "identity": {"method_name": "id"},
+                    "invariants": [],
+                    "exclusive_members": [
+                      "std::not_a_real_wrapper<&'static domain::alpha::Entity>"
+                    ],
+                    "shared_value_objects": [],
+                    "emits": []
+                  }},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::beta::AggregateB": {
+                  "action": "add",
+                  "role": {"AggregateRoot": {
+                    "identity": {"method_name": "id"},
+                    "invariants": [],
+                    "exclusive_members": [
+                      "std::not_a_real_wrapper<*const domain::beta::Entity>"
+                    ],
+                    "shared_value_objects": [],
+                    "emits": []
+                  }},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "beta",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::AggregateAmbiguous": {
+                  "action": "add",
+                  "role": {"AggregateRoot": {
+                    "identity": {"method_name": "id"},
+                    "invariants": [],
+                    "exclusive_members": ["Entity"],
+                    "shared_value_objects": [],
+                    "emits": []
+                  }},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::ExternalService": {
+                  "action": "add",
+                  "role": {"DomainService": {"emits": []}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [{
+                    "action": "add",
+                    "has_default_impl": false,
+                    "is_async": false,
+                    "name": "read_entity",
+                    "params": [],
+                    "receiver": "&self",
+                    "returns": "std::not_a_real_wrapper<&'static domain::alpha::Entity>"
+                  }],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::UseCaseValid": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": [
+                    "std::not_a_real_wrapper<&'static domain::alpha::Event>"
+                  ]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::UseCaseAmbiguous": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                },
+                "domain::alpha::UseCaseUnresolved": {
+                  "action": "add",
+                  "role": {"UseCase": {"handles": ["domain::missing::Event"]}},
+                  "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+                  "methods": [],
+                  "module_path": "alpha",
+                  "spec_refs": [],
+                  "informal_grounds": []
+                }
+              },
+              "traits": {},
+              "functions": {}
+            }"#,
+        )
+        .expect("catalogue fixture is written");
+
+        let calls = Arc::new(AtomicUsize::new(0));
+        let extractor: Arc<dyn domain::tddd::catalogue_linter::TypeRefPathExtractorPort> =
+            Arc::new(RecordingExtractor {
+                calls: calls.clone(),
+                parser: SynTypeRefPathExtractorAdapter,
+            });
+        let active_adapter = SystemTrackCatalogueLintActiveAdapter::new(extractor.clone());
+        let error = match active_adapter
+            .execute(TrackId::try_new("lint-track").expect("track id is valid"), command(root))
+        {
+            Ok(_) => {
+                panic!("ambiguous catalogue identities must fail closed before rule evaluation")
+            }
+            Err(error) => error,
+        };
+        let diagnostic = error.to_string();
+        assert!(diagnostic.contains("ambiguous identifier"));
+        assert!(diagnostic.contains("Identifier(\"alpha\")"));
+        assert!(diagnostic.contains("Identifier(\"beta\")"));
+        assert!(
+            calls.load(Ordering::SeqCst) > 0,
+            "the active adapter must forward the injected extractor before reporting the identity error"
+        );
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_resolves_qualified_same_named_paths_and_external_references()
+     {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_identity_fixture(workspace.path());
+
+        let result =
+            SystemTrackCatalogueLintActiveAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+                .execute(
+                    TrackId::try_new("lint-track").expect("track id is valid"),
+                    command(workspace.path()),
+                )
+                .expect("qualified and external references are accepted by the active adapter");
+        let TrackCatalogueLintActiveResult::Checked { layers } = result else {
+            panic!("materialized catalogue must be checked");
+        };
+
+        assert_eq!(layers.len(), 1);
+        let Some(layer) = layers.first() else {
+            panic!("one checked layer is expected");
+        };
+        assert_eq!(layer.layer.as_ref(), "domain");
+        assert_eq!(layer.violations.len(), 1);
+        let Some(violation) = layer.violations.first() else {
+            panic!("the beta reference must produce one role violation");
+        };
+        assert_eq!(violation.entry_name(), "domain::alpha::HandlesBetaEvent");
+        assert!(violation.message().contains("ValueObject"));
+        assert!(violation.message().contains("DomainEvent"));
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_keeps_same_named_fully_qualified_results_separate()
+    {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_identity_fixture(workspace.path());
+
+        let fixture =
+            fs::read_to_string(workspace.path().join("track/items/lint-track/domain-types.json"))
+                .expect("identity fixture is readable");
+        // The adapter fixture contains same-named declarations on two distinct
+        // fully qualified paths, and both qualified references must stay separate.
+        assert!(fixture.contains("\"domain::alpha::Event\""));
+        assert!(fixture.contains("\"domain::beta::Event\""));
+        assert!(fixture.contains("\"handles\": [\"domain::alpha::Event\"]"));
+        assert!(fixture.contains("\"handles\": [\"domain::beta::Event\"]"));
+
+        let result =
+            SystemTrackCatalogueLintActiveAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+                .execute(
+                    TrackId::try_new("lint-track").expect("track id is valid"),
+                    command(workspace.path()),
+                )
+                .expect("same-named fully qualified identities must not produce DanglingId");
+        let TrackCatalogueLintActiveResult::Checked { layers } = result else {
+            panic!("materialized catalogue must be checked");
+        };
+
+        assert_eq!(layers.len(), 1);
+        let Some(layer) = layers.first() else {
+            panic!("one checked layer is expected");
+        };
+        let violation_names =
+            layer.violations.iter().map(|violation| violation.entry_name()).collect::<Vec<_>>();
+        assert_eq!(
+            violation_names,
+            vec!["domain::alpha::HandlesBetaEvent"],
+            "the beta result must not be joined with the alpha result"
+        );
+        assert!(
+            !layer.violations.iter().any(|violation| violation.message().contains("DanglingId"))
+        );
+    }
+
+    #[test]
+    fn test_system_catalogue_lint_active_adapter_reports_incomplete_typeref_location() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        write_incomplete_identity_fixture(workspace.path());
+
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
+            TrackId::try_new("lint-track").expect("track id is valid"),
+            command(workspace.path()),
+        ) {
+            Ok(_) => panic!("incomplete TypeRef inspection must fail closed"),
+            Err(error) => error,
+        };
+        let diagnostic = error.to_string();
+        assert!(diagnostic.contains("unsupported TypeRef syntax"));
+        assert!(diagnostic.contains("("));
+    }
+
     #[test]
     fn test_system_track_catalogue_lint_active_adapter_missing_rules_returns_execution_error() {
         let workspace = tempfile::tempdir().expect("temporary workspace exists");
-        let error = match SystemTrackCatalogueLintActiveAdapter.execute(
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
             TrackId::try_new("lint-track").expect("track id is valid"),
             command(workspace.path()),
         ) {
@@ -207,12 +670,13 @@ mod tests {
         write_rules(workspace.path());
         write_config(workspace.path());
 
-        let result = SystemTrackCatalogueLintActiveAdapter
-            .execute(
-                TrackId::try_new("lint-track").expect("track id is valid"),
-                command(workspace.path()),
-            )
-            .expect("absent catalogue is skipped");
+        let result =
+            SystemTrackCatalogueLintActiveAdapter::new(Arc::new(SynTypeRefPathExtractorAdapter))
+                .execute(
+                    TrackId::try_new("lint-track").expect("track id is valid"),
+                    command(workspace.path()),
+                )
+                .expect("absent catalogue is skipped");
 
         assert!(matches!(
             result,
@@ -228,7 +692,10 @@ mod tests {
             .expect("track directory exists");
         write_rules(workspace.path());
 
-        let error = match SystemTrackCatalogueLintActiveAdapter.execute(
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
             TrackId::try_new("lint-track").expect("track id is valid"),
             command(workspace.path()),
         ) {
@@ -237,6 +704,35 @@ mod tests {
         };
 
         assert!(error.to_string().contains("lint config not found"));
+    }
+
+    #[test]
+    fn test_system_track_catalogue_lint_active_adapter_rules_file_outside_workspace_fails_closed() {
+        let workspace = tempfile::tempdir().expect("temporary workspace exists");
+        let outside = tempfile::tempdir().expect("outside config exists");
+        write_rules(workspace.path());
+        let rules = outside.path().join("rules.json");
+        fs::write(&rules, r#"{"schema_version":1,"rules":[]}"#)
+            .expect("outside rules file is written");
+        let mut command = command(workspace.path());
+        command.rules_file = Some(
+            usecase::track_lifecycle::tddd::lint::TrackLintRulesFile::try_new(rules)
+                .expect("rules file is valid"),
+        );
+
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(TrackId::try_new("lint-track").expect("track id is valid"), command)
+        {
+            Ok(_) => panic!("outside rules file must fail closed"),
+            Err(error) => error,
+        };
+
+        assert!(
+            error.to_string().contains("outside the workspace trusted root"),
+            "outside rules file must fail closed: {error}"
+        );
     }
 
     #[test]
@@ -249,7 +745,10 @@ mod tests {
         fs::create_dir_all(workspace.path().join(".harness/catalogue-lint/config.json"))
             .expect("directory occupies the lint config path");
 
-        let error = match SystemTrackCatalogueLintActiveAdapter.execute(
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
             TrackId::try_new("lint-track").expect("track id is valid"),
             command(workspace.path()),
         ) {
@@ -278,7 +777,10 @@ mod tests {
         std::os::unix::fs::symlink(&target, config_dir.join("config.json"))
             .expect("lint config symlink is created");
 
-        let error = match SystemTrackCatalogueLintActiveAdapter.execute(
+        let error = match SystemTrackCatalogueLintActiveAdapter::new(Arc::new(
+            SynTypeRefPathExtractorAdapter,
+        ))
+        .execute(
             TrackId::try_new("lint-track").expect("track id is valid"),
             command(workspace.path()),
         ) {

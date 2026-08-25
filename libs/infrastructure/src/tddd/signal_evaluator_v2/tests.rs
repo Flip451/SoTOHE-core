@@ -5,7 +5,9 @@
 use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::catalogue_v2::ItemAction;
-use domain::tddd::{ExtendedCrate, Phase1Error, SignalEvaluatorPort, SignalRegion};
+use domain::tddd::{
+    CatalogueToExtendedCratePort, ExtendedCrate, Phase1Error, SignalEvaluatorPort, SignalRegion,
+};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, FunctionHeader, FunctionSignature, Generics, Id, Item, ItemEnum,
     ItemKind, ItemSummary, Module, Struct, StructKind, Target, Type, Visibility,
@@ -28,6 +30,57 @@ fn empty_crate() -> Crate {
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     }
+}
+
+fn encode_catalogue_doc(
+    doc: domain::tddd::catalogue_v2::CatalogueDocument,
+) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+    let mut paths = HashMap::new();
+    let mut next_id = 1;
+    for (key, entry) in doc.types() {
+        let mut path = vec![doc.crate_name().as_str().to_owned()];
+        path.extend(
+            entry.module_path().segments().iter().map(|segment| segment.as_str().to_owned()),
+        );
+        path.push(key.as_str().rsplit("::").next().unwrap_or(key.as_str()).to_owned());
+        paths.insert(Id(next_id), ItemSummary { crate_id: 0, path, kind: ItemKind::Struct });
+        next_id += 1;
+    }
+    for (key, entry) in doc.traits() {
+        let mut path = vec![doc.crate_name().as_str().to_owned()];
+        path.extend(
+            entry.module_path().segments().iter().map(|segment| segment.as_str().to_owned()),
+        );
+        path.push(key.as_str().rsplit("::").next().unwrap_or(key.as_str()).to_owned());
+        paths.insert(Id(next_id), ItemSummary { crate_id: 0, path, kind: ItemKind::Trait });
+        next_id += 1;
+    }
+    for (path, kind) in [
+        (vec!["std", "vec", "Vec"], ItemKind::Struct),
+        (vec!["std", "clone", "Clone"], ItemKind::Trait),
+        (vec!["core", "fmt", "Display"], ItemKind::Trait),
+    ] {
+        paths.insert(
+            Id(next_id),
+            ItemSummary { crate_id: 0, path: path.into_iter().map(str::to_owned).collect(), kind },
+        );
+        next_id += 1;
+    }
+    let authoritative = Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: HashMap::new(),
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new().encode(
+        doc,
+        &authoritative,
+        &authoritative,
+    )
 }
 
 fn empty_generics() -> Generics {
@@ -108,6 +161,132 @@ fn extended_crate_with_struct(
     let mut actions = BTreeMap::new();
     actions.insert(struct_id, action);
     ExtendedCrate::new(krate, actions)
+}
+
+/// A baseline may contain same-name public types under different modules. The
+/// Phase 1 seed must retain both full-path identities because another baseline
+/// item can refer specifically to either one by its rustdoc Id.
+#[test]
+fn test_phase1_duplicate_type_paths_seed_both_targets_without_dangling_id() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::Path as RdPath;
+
+    let crate_name = "fixture";
+    let root_id = Id(0);
+    let holder_id = Id(1);
+    let module_a_type_id = Id(2);
+    let module_b_type_id = Id(3);
+    let field_id = Id(4);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![holder_id, module_a_type_id, module_b_type_id]),
+    );
+    index.insert(
+        holder_id,
+        make_item(
+            holder_id,
+            Some("Holder"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![field_id], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        ),
+    );
+    index.insert(
+        field_id,
+        make_item(
+            field_id,
+            Some("selected"),
+            ItemEnum::StructField(Type::ResolvedPath(RdPath {
+                path: "module_b::SameName".to_string(),
+                id: module_b_type_id,
+                args: None,
+            })),
+        ),
+    );
+    index.insert(module_a_type_id, struct_item(module_a_type_id, "SameName"));
+    index.insert(module_b_type_id, struct_item(module_b_type_id, "SameName"));
+
+    paths.insert(
+        holder_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Holder".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        module_a_type_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "module_a".to_string(), "SameName".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        module_b_type_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "module_b".to_string(), "SameName".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    let baseline = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let catalogue = ExtendedCrate::new(empty_crate(), BTreeMap::new());
+
+    let (s, _d) = phase1_build_s_and_d(catalogue, &baseline)
+        .expect("same-name types with distinct paths must both be seeded into S");
+
+    let same_name_paths: Vec<Vec<String>> = s
+        .krate()
+        .paths
+        .values()
+        .filter(|summary| summary.path.last().is_some_and(|name| name == "SameName"))
+        .map(|summary| summary.path.clone())
+        .collect();
+    assert_eq!(same_name_paths.len(), 2, "both module-qualified types must remain in S");
+    assert!(same_name_paths.contains(&vec![
+        crate_name.to_string(),
+        "module_a".to_string(),
+        "SameName".to_string(),
+    ]));
+    assert!(same_name_paths.contains(&vec![
+        crate_name.to_string(),
+        "module_b".to_string(),
+        "SameName".to_string(),
+    ]));
+
+    let holder_field = s
+        .krate()
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::StructField(Type::ResolvedPath(path))
+                if item.name.as_deref() == Some("selected") =>
+            {
+                Some(path)
+            }
+            _ => None,
+        })
+        .expect("the reference-bearing field must be present in S");
+    assert!(
+        s.krate().index.contains_key(&holder_field.id),
+        "the remapped field reference must resolve to the module_b target in S"
+    );
 }
 
 fn simple_fn_item(id: Id, fn_name: &str, is_async: bool) -> Item {
@@ -791,6 +970,34 @@ fn test_phase1_error_dangling_id_after_delete_yields_dangling_id_error() {
 // -----------------------------------------------------------------------
 
 #[test]
+fn test_type_identity_map_missing_paths_entry_returns_typed_error() {
+    let mut krate = simple_crate_with_struct("fixture", "MissingPath");
+    krate.paths.remove(&Id(1));
+
+    let error = super::build_type_trait_identity_map(&krate)
+        .expect_err("a local type without an authoritative path must fail closed");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)));
+    let message = error.to_string();
+    assert!(message.contains("MissingPath"));
+    assert!(message.contains("Crate::paths"));
+}
+
+#[test]
+fn test_impl_identity_map_missing_paths_entry_returns_typed_error() {
+    let mut krate = crate_with_trait_impl("fixture", "Owner", "MissingTrait");
+    krate.paths.remove(&Id(9999));
+
+    let error = super::build_impl_identity_map(&krate, "fixture")
+        .expect_err("an impl trait without an authoritative path must fail closed");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)));
+    let message = error.to_string();
+    assert!(message.contains("MissingTrait"));
+    assert!(message.contains("Crate::paths"));
+}
+
+#[test]
 fn test_function_identity_uses_function_path() {
     // A has function at path ["my_crate", "module", "compute"] (Add); B has no such
     // function; C has the same function → SIntersectC_Match_Add.
@@ -915,13 +1122,10 @@ fn test_s_intersect_c_match_reference_is_skipped_in_report() {
 
 /// Helper: build a crate with a struct that has a trait impl item (any trait).
 ///
-/// The trait ID (`Id(9999)`) is NOT inserted into `krate.paths`, so
-/// `build_impl_identity_map` uses the string-based fallback
-/// (`normalize_impl_trait_path`) to compute the identity key.  This matches
-/// the A-side (catalogue codec) code path where synthetic trait IDs have no
-/// `paths` entry.
+/// The trait ID is registered in the authoritative path universe, matching the
+/// fail-closed identity-map contract used by the evaluator.
 fn crate_with_trait_impl(crate_name: &str, struct_name: &str, trait_name: &str) -> Crate {
-    use rustdoc_types::{Impl, Path as RdPath};
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
 
     let root_id = Id(0);
     let struct_id = Id(1);
@@ -941,11 +1145,35 @@ fn crate_with_trait_impl(crate_name: &str, struct_name: &str, trait_name: &str) 
         },
     );
 
+    let (trait_path, external_crate_name) = match trait_name {
+        "Clone" => ("core::clone::Clone".to_owned(), "core"),
+        "Copy" => ("core::marker::Copy".to_owned(), "core"),
+        "Debug" => ("core::fmt::Debug".to_owned(), "core"),
+        other => (format!("strum::{other}"), "strum"),
+    };
+    paths.insert(
+        Id(9999),
+        ItemSummary {
+            crate_id: 1,
+            path: trait_path.split("::").map(str::to_owned).collect(),
+            kind: ItemKind::Trait,
+        },
+    );
+    let mut external_crates = HashMap::new();
+    external_crates.insert(
+        1,
+        ExternalCrate {
+            name: external_crate_name.to_owned(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
     let trait_impl = Impl {
         is_unsafe: false,
         generics: empty_generics(),
         provided_trait_methods: vec![],
-        trait_: Some(RdPath { path: trait_name.to_string(), id: Id(9999), args: None }),
+        trait_: Some(RdPath { path: trait_path, id: Id(9999), args: None }),
         for_: rustdoc_types::Type::ResolvedPath(RdPath {
             path: struct_name.to_string(),
             id: struct_id,
@@ -964,7 +1192,7 @@ fn crate_with_trait_impl(crate_name: &str, struct_name: &str, trait_name: &str) 
         includes_private: false,
         index,
         paths,
-        external_crates: HashMap::new(),
+        external_crates,
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     }
@@ -1165,21 +1393,27 @@ fn test_impl_identity_map_when_workspace_traits_share_short_name_retains_both_cr
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
     assert_eq!(map.len(), 2, "the two workspace traits must not collide by short name");
     assert!(
-        map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {domain_trait_path}")),
+        map.contains_key(&format!(
+            "{crate_name}::JsonObligationFulfillmentCacheCodec: {domain_trait_path}"
+        )),
         "the baseline domain trait identity must retain its canonical path; keys: {:?}",
         map.keys().collect::<Vec<_>>()
     );
     assert!(
-        map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {usecase_trait_path}")),
+        map.contains_key(&format!(
+            "{crate_name}::JsonObligationFulfillmentCacheCodec: {usecase_trait_path}"
+        )),
         "the catalogue usecase add identity must retain its canonical path; keys: {:?}",
         map.keys().collect::<Vec<_>>()
     );
     assert!(
-        !map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {trait_short_name}")),
+        !map.contains_key(&format!(
+            "{crate_name}::JsonObligationFulfillmentCacheCodec: {trait_short_name}"
+        )),
         "a collapsed short-name identity must not be produced"
     );
 }
@@ -1319,9 +1553,9 @@ fn test_t039_derive_traits_no_longer_filtered() {
         ("Clone", "core::clone::Clone"),
         ("Copy", "core::marker::Copy"),
         ("Debug", "core::fmt::Debug"),
-        // IntoStaticStr is not a known core trait; normalize_impl_trait_path keeps
-        // the bare short name unchanged.
-        ("IntoStaticStr", "IntoStaticStr"),
+        // IntoStaticStr is an external trait; its fully-qualified rustdoc identity
+        // remains distinct from any same-named workspace declaration.
+        ("IntoStaticStr", "strum::IntoStaticStr"),
     ] {
         let a = ExtendedCrate::new(empty_crate(), BTreeMap::new());
         let b = empty_crate();
@@ -1401,58 +1635,115 @@ fn test_t039_compiler_internal_trait_classifier_scope() {
 }
 
 // ---------------------------------------------------------------------------
-// normalize_impl_trait_path unit tests
+// Canonical impl-trait boundary tests. The historical test names are retained
+// because test-bindings.json refers to them.
 // ---------------------------------------------------------------------------
+
+fn canonical_impl_trait_path(
+    source: &str,
+    definitions: &[(&str, ItemKind)],
+) -> Result<String, domain::tddd::NewTypeGraphCodecError> {
+    use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
+    use domain::tddd::catalogue_v2::{CrateName, TypeRef};
+
+    let paths = definitions
+        .iter()
+        .enumerate()
+        .map(|(index, (path, kind))| {
+            (
+                Id((index + 1) as u32),
+                ItemSummary {
+                    crate_id: 0,
+                    path: path.split("::").map(str::to_owned).collect(),
+                    kind: *kind,
+                },
+            )
+        })
+        .collect::<HashMap<_, _>>();
+    let type_ref = TypeRef::new(source.to_owned()).expect("test TypeRef is non-empty");
+    let crate_name = CrateName::new("my_crate").expect("test crate name is valid");
+    canonicalize_catalogue_type_ref(&type_ref, &crate_name, &paths, &[])
+        .map(|identity| identity.to_string())
+}
 
 #[test]
 fn test_normalize_impl_trait_path_bare_known_core_trait_expands_to_qualified() {
-    use super::normalize_impl_trait_path;
-    // Bare `From` → expanded to canonical three-segment path.
-    assert_eq!(normalize_impl_trait_path("From", "my_crate"), "core::convert::From");
-    // Bare `Display` → expanded to `core::fmt::Display`.
-    assert_eq!(normalize_impl_trait_path("Display", "my_crate"), "core::fmt::Display");
+    let definitions =
+        [("core::convert::From", ItemKind::Trait), ("core::fmt::Display", ItemKind::Trait)];
+    assert_eq!(
+        canonical_impl_trait_path("From", &definitions).expect("From resolves"),
+        "core::convert::From"
+    );
+    assert_eq!(
+        canonical_impl_trait_path("Display", &definitions).expect("Display resolves"),
+        "core::fmt::Display"
+    );
 }
 
 #[test]
 fn test_normalize_impl_trait_path_crate_prefix_does_not_expand_to_core() {
-    use super::normalize_impl_trait_path;
-    // `crate::Display` is a local-crate type, NOT `core::fmt::Display`.
-    // Must strip to short name, not expand via core_canonical_path.
-    assert_eq!(normalize_impl_trait_path("crate::Display", "my_crate"), "Display");
-    assert_eq!(normalize_impl_trait_path("crate::MyTrait", "my_crate"), "MyTrait");
+    let definitions = [
+        ("my_crate::Display", ItemKind::Trait),
+        ("my_crate::MyTrait", ItemKind::Trait),
+        ("core::fmt::Display", ItemKind::Trait),
+    ];
+    assert_eq!(
+        canonical_impl_trait_path("crate::Display", &definitions).expect("local Display resolves"),
+        "my_crate::Display"
+    );
+    assert_eq!(
+        canonical_impl_trait_path("crate::MyTrait", &definitions).expect("local MyTrait resolves"),
+        "my_crate::MyTrait"
+    );
 }
 
 #[test]
 fn test_normalize_impl_trait_path_self_and_super_prefix_strips_to_short_name() {
-    use super::normalize_impl_trait_path;
-    assert_eq!(normalize_impl_trait_path("self::Foo", "my_crate"), "Foo");
-    assert_eq!(normalize_impl_trait_path("super::Bar", "my_crate"), "Bar");
+    let definitions = [("my_crate::Foo", ItemKind::Trait), ("my_crate::Bar", ItemKind::Trait)];
+    assert!(canonical_impl_trait_path("self::Foo", &definitions).is_err());
+    assert!(canonical_impl_trait_path("super::Bar", &definitions).is_err());
 }
 
 #[test]
 fn test_normalize_impl_trait_path_local_crate_rustdoc_path_strips_to_short_name() {
-    use super::normalize_impl_trait_path;
-    // rustdoc emits `my_crate::MyTrait` for local traits.
-    assert_eq!(normalize_impl_trait_path("my_crate::MyTrait", "my_crate"), "MyTrait");
+    let definitions = [("my_crate::MyTrait", ItemKind::Trait)];
+    assert_eq!(
+        canonical_impl_trait_path("my_crate::MyTrait", &definitions)
+            .expect("local rustdoc path resolves"),
+        "my_crate::MyTrait"
+    );
 }
 
 #[test]
 fn test_normalize_impl_trait_path_external_path_preserved_verbatim() {
-    use super::normalize_impl_trait_path;
-    assert_eq!(normalize_impl_trait_path("serde::Serialize", "my_crate"), "serde::Serialize");
-    assert_eq!(normalize_impl_trait_path("core::convert::From", "my_crate"), "core::convert::From");
+    let definitions =
+        [("serde::Serialize", ItemKind::Trait), ("core::convert::From", ItemKind::Trait)];
+    assert_eq!(
+        canonical_impl_trait_path("serde::Serialize", &definitions).expect("serde resolves"),
+        "serde::Serialize"
+    );
+    assert_eq!(
+        canonical_impl_trait_path("core::convert::From", &definitions).expect("From resolves"),
+        "core::convert::From"
+    );
 }
 
 #[test]
 fn test_normalize_impl_trait_path_preserves_generic_args() {
-    use super::normalize_impl_trait_path;
-    // Bare known trait with generic args.
+    let definitions = [
+        ("core::convert::From", ItemKind::Trait),
+        ("alloc::string::String", ItemKind::Struct),
+        ("my_crate::MyTrait", ItemKind::Trait),
+    ];
     assert_eq!(
-        normalize_impl_trait_path("From<String>", "my_crate"),
-        "core::convert::From<String>"
+        canonical_impl_trait_path("From<String>", &definitions).expect("generic From resolves"),
+        "core::convert::From<alloc::string::String>"
     );
-    // crate:: prefix with generic args — strip prefix, keep args.
-    assert_eq!(normalize_impl_trait_path("crate::MyTrait<u32>", "my_crate"), "MyTrait<u32>");
+    assert_eq!(
+        canonical_impl_trait_path("crate::MyTrait<u32>", &definitions)
+            .expect("generic local trait resolves"),
+        "my_crate::MyTrait<u32>"
+    );
 }
 
 // -----------------------------------------------------------------------
@@ -2491,13 +2782,13 @@ fn test_t043_generic_impl_matches_catalogue_key_without_type_params() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
     // After T043, the impl-block type param `S` is stripped from `for_`, producing:
     //   "TaskOperationInteractor: TaskOperationService"
     // NOT the pre-T043 form:
     //   "TaskOperationInteractor<S>: TaskOperationService"
-    let expected_key = "TaskOperationInteractor: TaskOperationService";
+    let expected_key = "my_crate::TaskOperationInteractor: my_crate::TaskOperationService";
     assert!(
         map.contains_key(expected_key),
         "T043(a): impl<S> TaskOperationInteractor<S>: TaskOperationService must produce key \
@@ -2505,7 +2796,7 @@ fn test_t043_generic_impl_matches_catalogue_key_without_type_params() {
         map.keys().collect::<Vec<_>>()
     );
     // Verify the old (pre-T043) key is absent.
-    let old_key = "TaskOperationInteractor<S>: TaskOperationService";
+    let old_key = "my_crate::TaskOperationInteractor<S>: my_crate::TaskOperationService";
     assert!(
         !map.contains_key(old_key),
         "T043(a): old key with type param '{old_key}' must NOT be present after T043 fix; \
@@ -2579,10 +2870,10 @@ fn test_t043_non_generic_impl_still_matches_blue() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
     // Non-generic impl must produce the expected key unchanged.
-    let expected_key = "Foo: SymlinkGuardPort";
+    let expected_key = "my_crate::Foo: my_crate::SymlinkGuardPort";
     assert!(
         map.contains_key(expected_key),
         "T043(b): non-generic impl must produce key '{expected_key}' unchanged; \
@@ -2628,6 +2919,14 @@ fn test_t043_concrete_type_args_preserved_in_identity_key() {
             crate_id: 1,
             path: vec!["ext_crate".to_string(), "Bar".to_string()],
             kind: ItemKind::Trait,
+        },
+    );
+    paths.insert(
+        Id(100),
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["std".to_owned(), "vec".to_owned(), "Vec".to_owned()],
+            kind: ItemKind::Struct,
         },
     );
 
@@ -2683,7 +2982,7 @@ fn test_t043_concrete_type_args_preserved_in_identity_key() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
     // The key must include the concrete arg `Vec<u32>` — stripping must not occur
     // because `Vec<u32>` is NOT a type parameter of the impl block.
     let key_with_vec = map.keys().find(|k| k.contains("Vec<u32>") || k.contains("Vec"));
@@ -2777,9 +3076,9 @@ fn test_t043_lifetime_params_stripped_from_identity_key() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
     // After stripping the lifetime arg, the key must be `"Foo: Bar"` (no `<'a>`).
-    let expected_key = "Foo: Bar";
+    let expected_key = "my_crate::Foo: my_crate::Bar";
     assert!(
         map.contains_key(expected_key),
         "T043(d): lifetime param 'a must be stripped from for_ key; \
@@ -3035,12 +3334,12 @@ fn test_t012_cross_crate_target_impl_included_in_identity_map() {
         "external_crate",
     );
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
     // The identity key is formed as "{for_name}: {trait_str}".
     // `for_name` = `format_type(&impl_.for_)` = last path segment of `ExternalType` = "ExternalType".
     // `trait_str` = normalized local trait = "MyLocalTrait" (local trait → stripped to short name).
-    let expected_key = "ExternalType: MyLocalTrait";
+    let expected_key = "external_crate::ExternalType: my_crate::MyLocalTrait";
     assert!(
         map.contains_key(expected_key),
         "T012: cross-crate target impl `impl MyLocalTrait for ExternalType` must be included \
@@ -3134,11 +3433,10 @@ fn test_t012_local_crate_target_impl_still_included_in_identity_map() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
-    // Both `for_` (local → short name "LocalType") and `trait_` (local → short name "LocalTrait")
-    // produce the key "LocalType: LocalTrait".
-    let expected_key = "LocalType: LocalTrait";
+    // Both local sides retain their fully-qualified rustdoc identities.
+    let expected_key = "my_crate::LocalType: my_crate::LocalTrait";
     assert!(
         map.contains_key(expected_key),
         "T012 regression: local-crate impl `impl LocalTrait for LocalType` must still be included \
@@ -3245,7 +3543,7 @@ fn test_t012_excluded_impl_variants_still_excluded() {
             format_version: FORMAT_VERSION,
             target: Target { triple: String::new(), target_features: vec![] },
         };
-        let map = build_impl_identity_map(&krate, crate_name);
+        let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
         assert!(
             map.is_empty(),
             "T012: inherent impl (no trait) must be excluded; keys: {:?}",
@@ -3344,7 +3642,7 @@ fn test_t012_excluded_impl_variants_still_excluded() {
             format_version: FORMAT_VERSION,
             target: Target { triple: String::new(), target_features: vec![] },
         };
-        let map = build_impl_identity_map(&krate, crate_name);
+        let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
         assert!(
             map.is_empty(),
             "T012: negative impl must be excluded; keys: {:?}",
@@ -3519,35 +3817,21 @@ fn test_t012_collision_tiebreaker_uses_for_path_not_id() {
         target: Target { triple: String::new(), target_features: vec![] },
     };
 
-    let map = build_impl_identity_map(&krate, crate_name);
+    let map = build_impl_identity_map(&krate, crate_name).expect("valid impl identity fixture");
 
-    // Both impls produce the same short-name key "MyError: MyTrait" (collision).
-    // The map must contain exactly one entry.
+    // The fully-qualified identities are distinct and must both survive.
     assert_eq!(
         map.len(),
-        1,
-        "T012 collision tiebreaker: exactly one impl must survive; all keys: {:?}",
+        2,
+        "T012 identity map: both qualified impls must survive; all keys: {:?}",
         map.keys().collect::<Vec<_>>()
     );
     assert!(
-        map.contains_key("MyError: MyTrait"),
-        "T012 collision tiebreaker: the surviving key must be \"MyError: MyTrait\"; \
+        map.contains_key("my_crate::MyError: my_crate::MyTrait")
+            && map.contains_key("ext_crate::MyError: my_crate::MyTrait"),
+        "T012 identity map: both qualified keys must be present; \
          all keys: {:?}",
         map.keys().collect::<Vec<_>>()
-    );
-
-    // The for_path_raw tiebreaker must pick the impl with the lexicographically smaller
-    // path string regardless of Id ordering:
-    //   "MyError" < "ext_crate::MyError"  → impl_short_path_id (Id 10) wins
-    // Without the tiebreaker, impl_qualified_path_id (Id 4, the SMALLER id) would win instead.
-    let surviving_id = map["MyError: MyTrait"];
-    assert_eq!(
-        surviving_id, impl_short_path_id,
-        "T012 collision tiebreaker: the impl with the lexicographically smaller for_path_raw \
-         must win, regardless of Id ordering. Expected impl_short_path_id={:?} \
-         (for_path_raw=\"MyError\"), got {:?}. \
-         An id-only sort would have kept impl_qualified_path_id={:?} (Id 4, smaller).",
-        impl_short_path_id, surviving_id, impl_qualified_path_id
     );
 }
 
@@ -3632,21 +3916,19 @@ fn test_t043_hrtb_function_pointer_binders_preserved() {
 /// verifies the full A-codec → evaluator pipeline.
 #[test]
 fn test_impl_block_generics_symmetric_compare_blue() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::TypeEntry;
     use domain::tddd::catalogue_v2::methods::MethodGenericParam;
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
     use rustdoc_types::{
         GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
         WherePredicate,
     };
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -3669,7 +3951,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
     );
 
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -3690,7 +3972,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
     // Also register the local trait "MyTrait" (needed for local trait id resolution).
     use domain::tddd::catalogue_v2::entries::TraitEntry;
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3707,7 +3989,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
         ),
     );
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // Verify A-side actually encoded impl_generics: the codec must emit a trait Impl item
     // with non-empty `generics.params` — a Blue signal alone cannot prove this because the
@@ -3806,6 +4088,14 @@ fn test_impl_block_generics_symmetric_compare_blue() {
             kind: ItemKind::Trait,
         },
     );
+    c_paths.insert(
+        Id(999),
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["std".to_owned(), "clone".to_owned(), "Clone".to_owned()],
+            kind: ItemKind::Trait,
+        },
+    );
 
     // `impl<T: Clone> MyTrait for Foo`
     // C-side rustdoc: generics.params = [T (type param)], where_predicates = [T: Clone]
@@ -3882,20 +4172,16 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 /// so the existing Blue evaluation is retained.
 #[test]
 fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
-    use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName,
-    };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath};
     use rustdoc_types::{
         GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
         WherePredicate,
     };
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -3911,7 +4197,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         TraitImplDeclV2::new(CatTypeRef::new("MyTrait").unwrap(), CatTypeRef::new("Foo").unwrap());
 
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -3930,7 +4216,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
     );
     doc.push_trait_impl(trait_impl);
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3947,7 +4233,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         ),
     );
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // Verify A-side emits empty generics for old catalogue (impl_generics: []).
     // Without this check the test would pass even if the codec started emitting non-empty
@@ -4035,6 +4321,14 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         ItemSummary {
             crate_id: 0,
             path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    c_paths.insert(
+        Id(999),
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["std".to_owned(), "clone".to_owned(), "Clone".to_owned()],
             kind: ItemKind::Trait,
         },
     );
@@ -4485,17 +4779,15 @@ fn test_t009_for_external_impl_for_is_not_overwritten_with_self_crate_id() {
 #[test]
 #[allow(clippy::panic)]
 fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
     use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
-
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
 
     let crate_name = "my_crate";
     let mut doc = CatalogueDocument::new(
@@ -4506,7 +4798,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
 
     // Declare `MyTrait` (self-crate trait, Add).
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -4525,7 +4817,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
 
     // Declare `SelfType` (self-crate type, Add).
     doc.insert_type(
-        TypeName::new("SelfType").unwrap(),
+        CatalogueEntryKey::try_new("SelfType".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::ItemAction::Add,
             DataRole::value_object(),
@@ -4555,7 +4847,7 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
         TypeRef::new("SelfType").unwrap(),
     ));
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_catalogue_doc(doc).unwrap();
 
     // B: empty baseline.
     let b = empty_crate();
@@ -4762,5 +5054,586 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
         "ADR0048 Reassess-When #1 (Case A): `impl core::fmt::Display for SelfType` with Add \
          action must evaluate Blue when C has the same impl; got region={:?}",
         case_a_signal.unwrap().region()
+    );
+}
+
+#[test]
+fn test_impl_identity_evaluator_matches_std_reexport_to_core_definition_path() {
+    use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::composite::{
+        StructKind as CatalogueStructKind, StructShape, TypeKindV2,
+    };
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::DataRole;
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, TypeRef as CatalogueTypeRef,
+    };
+    use rustdoc_types::{ExternalCrate, Impl, Path as RustdocPath};
+
+    let crate_name = "fixture";
+    let mut document = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).expect("valid fixture crate"),
+        LayerId::try_new("domain").expect("valid fixture layer"),
+    );
+    document.insert_type(
+        CatalogueEntryKey::try_new("Widget".to_owned()).expect("valid widget key"),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(CatalogueStructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    document.push_trait_impl(TraitImplDeclV2::new(
+        CatalogueTypeRef::new("std::iter::Iterator".to_owned()).expect("valid trait ref"),
+        CatalogueTypeRef::new("Widget".to_owned()).expect("valid owner ref"),
+    ));
+
+    let mut authoritative_paths = HashMap::new();
+    authoritative_paths.insert(
+        Id(1),
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_owned(), "Widget".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    authoritative_paths.insert(
+        Id(2),
+        ItemSummary {
+            crate_id: 1,
+            path: vec![
+                "core".to_owned(),
+                "iter".to_owned(),
+                "traits".to_owned(),
+                "iterator".to_owned(),
+                "Iterator".to_owned(),
+            ],
+            kind: ItemKind::Trait,
+        },
+    );
+    let authoritative = Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: HashMap::new(),
+        paths: authoritative_paths,
+        external_crates: HashMap::from([(
+            1,
+            ExternalCrate {
+                name: "core".to_owned(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        )]),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
+        .encode(document, &authoritative, &authoritative)
+        .expect("the catalogue std re-export must resolve through the core definition path");
+
+    let root_id = Id(0);
+    let widget_id = Id(1);
+    let impl_id = Id(2);
+    let core_iterator_id = Id(3);
+    let mut c_index = HashMap::new();
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![widget_id]));
+    c_index.insert(
+        widget_id,
+        make_item(
+            widget_id,
+            Some("Widget"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    c_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(RustdocPath {
+                    path: "std::iter::Iterator".to_owned(),
+                    id: core_iterator_id,
+                    args: None,
+                }),
+                for_: Type::ResolvedPath(RustdocPath {
+                    path: "Widget".to_owned(),
+                    id: widget_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: HashMap::from([
+            (
+                widget_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "Widget".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                core_iterator_id,
+                ItemSummary {
+                    crate_id: 1,
+                    path: vec![
+                        "core".to_owned(),
+                        "iter".to_owned(),
+                        "traits".to_owned(),
+                        "iterator".to_owned(),
+                        "Iterator".to_owned(),
+                    ],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]),
+        external_crates: HashMap::from([(
+            1,
+            ExternalCrate {
+                name: "core".to_owned(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        )]),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let report =
+        SignalEvaluatorV2::new().evaluate(a, empty_crate(), c).expect("evaluation succeeds");
+    let signal = report
+        .iter()
+        .find(|signal| {
+            signal.item_name().contains("Widget") && signal.item_name().contains("Iterator")
+        })
+        .expect("the impl identity signal must be present");
+    assert!(signal.signal().is_blue(), "std re-export and core definition must match: {signal:?}");
+}
+
+#[test]
+fn test_phase1_standalone_impl_uses_baseline_authority_for_std_public_path() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{ExternalCrate, Impl, Path as RustdocPath};
+
+    let root_id = Id(0);
+    let widget_id = Id(1);
+    let impl_id = Id(2);
+    let iterator_id = Id(3);
+    let mut index = HashMap::new();
+    index.insert(root_id, root_module_item(root_id, "fixture", vec![widget_id, impl_id]));
+    index.insert(widget_id, struct_item(widget_id, "Widget"));
+    index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(RustdocPath {
+                    path: "std::iter::Iterator".to_owned(),
+                    id: iterator_id,
+                    args: None,
+                }),
+                for_: Type::ResolvedPath(RustdocPath {
+                    path: "Widget".to_owned(),
+                    id: widget_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    let paths = HashMap::from([
+        (
+            widget_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        ),
+        (
+            iterator_id,
+            ItemSummary {
+                crate_id: 1,
+                path: vec!["std".to_owned(), "iter".to_owned(), "Iterator".to_owned()],
+                kind: ItemKind::Trait,
+            },
+        ),
+    ]);
+    let a = ExtendedCrate::new(
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::from([(
+                1,
+                ExternalCrate {
+                    name: "std".to_owned(),
+                    html_root_url: None,
+                    path: std::path::PathBuf::new(),
+                },
+            )]),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        },
+        BTreeMap::from([(widget_id, ItemAction::Reference), (impl_id, ItemAction::Reference)]),
+    );
+    let b = crate_with_external_trait_impl(
+        "fixture",
+        "Widget",
+        &["core", "iter", "traits", "iterator", "Iterator"],
+        "core",
+    );
+
+    phase1_build_s_and_d(a, &b)
+        .expect("Phase 1 must match std public spelling to the baseline core definition");
+}
+
+#[test]
+fn test_phase1_standalone_impl_invalid_rustdoc_path_propagates_typed_error() {
+    use super::phase1::phase1_build_s_and_d;
+
+    let mut baseline = crate_with_external_trait_impl(
+        "fixture",
+        "Widget",
+        &["core", "iter", "traits", "iterator", "Iterator"],
+        "core",
+    );
+    baseline.paths.remove(&Id(9999));
+
+    let error = phase1_build_s_and_d(ExtendedCrate::new(empty_crate(), BTreeMap::new()), &baseline)
+        .expect_err("an invalid baseline impl path must not be treated as zero impls");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)), "got: {error:?}");
+    assert!(error.to_string().contains("Crate::paths"), "got: {error}");
+}
+
+fn duplicate_name_baseline() -> Crate {
+    let root_id = Id(0);
+    let alpha_id = Id(1);
+    let beta_id = Id(2);
+    let crate_name = "fixture";
+    let mut index = HashMap::new();
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![alpha_id, beta_id]));
+    index.insert(alpha_id, struct_item(alpha_id, "SameName"));
+    index.insert(beta_id, struct_item(beta_id, "SameName"));
+    let mut paths = HashMap::new();
+    paths.insert(
+        alpha_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_owned(), "alpha".to_owned(), "SameName".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        beta_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_owned(), "beta".to_owned(), "SameName".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    }
+}
+
+fn short_type_action_crate(type_name: &str, action: ItemAction) -> ExtendedCrate {
+    let root_id = Id(0);
+    let type_id = Id(1);
+    let crate_name = "fixture";
+    let mut index = HashMap::new();
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![type_id]));
+    index.insert(type_id, struct_item(type_id, type_name));
+    let mut paths = HashMap::new();
+    paths.insert(
+        type_id,
+        ItemSummary { crate_id: 0, path: vec![type_name.to_owned()], kind: ItemKind::Struct },
+    );
+    let mut actions = BTreeMap::new();
+    actions.insert(type_id, action);
+    ExtendedCrate::new(
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        },
+        actions,
+    )
+}
+
+#[test]
+fn test_t005_delete_tombstone_resolves_unique_and_rejects_ambiguous_baseline_identity() {
+    use super::phase1::phase1_build_s_and_d;
+
+    let unique_baseline = simple_crate_with_struct("fixture", "Legacy");
+    let unique_catalogue = short_type_action_crate("Legacy", ItemAction::Delete);
+    let (_s, deleted) = phase1_build_s_and_d(unique_catalogue, &unique_baseline)
+        .expect("a unique short delete tombstone must resolve against baseline paths");
+    assert!(
+        deleted.paths.values().any(|summary| summary.path == ["fixture", "Legacy"]),
+        "the unique tombstone must move the fully-qualified baseline identity into D"
+    );
+
+    let ambiguous_catalogue = short_type_action_crate("SameName", ItemAction::Delete);
+    let error = phase1_build_s_and_d(ambiguous_catalogue, &duplicate_name_baseline())
+        .expect_err("an ambiguous short tombstone must fail before action matching");
+    let message = error.to_string();
+    assert!(message.contains("ambiguous"), "got: {message}");
+    assert!(message.contains("fixture::alpha::SameName"), "got: {message}");
+    assert!(message.contains("fixture::beta::SameName"), "got: {message}");
+}
+
+#[test]
+fn test_t005_unresolved_short_name_type_ref_fails_closed_without_short_name_fallback() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::Path as RustdocPath;
+
+    let root_id = Id(0);
+    let holder_id = Id(1);
+    let field_id = Id(2);
+    let mut index = HashMap::new();
+    index.insert(root_id, root_module_item(root_id, "fixture", vec![holder_id]));
+    index.insert(
+        holder_id,
+        make_item(
+            holder_id,
+            Some("Holder"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![field_id], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        ),
+    );
+    index.insert(
+        field_id,
+        make_item(
+            field_id,
+            Some("value"),
+            ItemEnum::StructField(Type::ResolvedPath(RustdocPath {
+                path: "SameName".to_owned(),
+                id: Id(crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID),
+                args: None,
+            })),
+        ),
+    );
+    let mut paths = HashMap::new();
+    paths.insert(
+        holder_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec!["fixture".to_owned(), "Holder".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let mut actions = BTreeMap::new();
+    actions.insert(holder_id, ItemAction::Add);
+    let catalogue = ExtendedCrate::new(
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        },
+        actions,
+    );
+
+    let error = phase1_build_s_and_d(catalogue, &duplicate_name_baseline())
+        .expect_err("a duplicate short TypeRef must not resolve by insertion order");
+    let message = error.to_string();
+    assert!(message.contains("ambiguous"), "got: {message}");
+    assert!(message.contains("fixture::alpha::SameName"), "got: {message}");
+    assert!(message.contains("fixture::beta::SameName"), "got: {message}");
+}
+
+// -----------------------------------------------------------------------
+// T012: duplicate-module evaluator integration (AC-02 / AC-07)
+// -----------------------------------------------------------------------
+
+#[test]
+fn test_t012_duplicate_module_impl_and_generic_identities_remain_distinct() {
+    use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::{InherentImplDeclV2, TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
+    };
+
+    let crate_name = "domain";
+    let mut document = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+
+    for module in ["alpha", "beta"] {
+        let module_path = ModulePath::from_segments(vec![module.to_owned()]).unwrap();
+        document.insert_type(
+            CatalogueEntryKey::try_new(format!("{module}::Input")).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                module_path.clone(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        document.insert_trait(
+            CatalogueEntryKey::try_new(format!("{module}::Port")).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                module_path,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        // The qualified trait argument is part of the impl identity. The two
+        // rows are otherwise structurally identical, so a short-name map would
+        // collapse them or select one according to insertion order.
+        document.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new(format!("{crate_name}::{module}::Port<{crate_name}::{module}::Input>"))
+                .unwrap(),
+            TypeRef::new(format!("{crate_name}::{module}::Input")).unwrap(),
+        ));
+        // Keep the generic inherent-impl shape in both modules. Inherent impls
+        // are not trait identity rows, but their generic blocks participate in
+        // structural comparison for the owning type.
+        document.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new(format!("{module}::Input")).unwrap(),
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            vec![],
+        ));
+    }
+
+    let a = encode_catalogue_doc(document).unwrap();
+    let identities = super::build_type_trait_identity_map(a.krate()).unwrap();
+    assert_eq!(identities.len(), 4, "both module-qualified type/trait identities must survive");
+    for identity in
+        ["domain::alpha::Input", "domain::beta::Input", "domain::alpha::Port", "domain::beta::Port"]
+    {
+        assert!(identities.contains_key(identity), "missing identity {identity}: {identities:?}");
+    }
+
+    let impl_identities = super::build_impl_identity_map(a.krate(), crate_name).unwrap();
+    assert_eq!(impl_identities.len(), 2, "both qualified trait impls must remain indexed");
+    for module in ["alpha", "beta"] {
+        let expected_prefix = format!("domain::{module}::Input: domain::{module}::Port");
+        assert!(
+            impl_identities.keys().any(|key| key.starts_with(&expected_prefix)),
+            "missing qualified impl identity {expected_prefix}: {impl_identities:?}"
+        );
+    }
+
+    // Reuse the codec's fully-qualified graph as an independent current graph
+    // with the same paths but no catalogue actions. This exercises Phase 1 and
+    // Phase 2 together, including generic argument normalization and path-based
+    // selection rather than relying on the source Item Ids.
+    let c = a.krate().clone();
+    let report = SignalEvaluatorV2::new().evaluate(a, empty_crate(), c).unwrap();
+    for module in ["alpha", "beta"] {
+        let expected_prefix = format!("domain::{module}::Input: domain::{module}::Port");
+        let signal = report.iter().find(|signal| signal.item_name().starts_with(&expected_prefix));
+        assert!(
+            signal.is_some(),
+            "missing duplicate-module impl signal {expected_prefix}; all signals: {:?}",
+            report.iter().map(|signal| signal.item_name()).collect::<Vec<_>>()
+        );
+        let signal = signal.expect("signal existence asserted above");
+        assert!(
+            signal.signal().is_blue(),
+            "qualified impl {expected_prefix} must match independently: {signal:?}"
+        );
+    }
+
+    let names = report.iter().map(|signal| signal.item_name()).collect::<Vec<_>>();
+    assert!(
+        names.iter().any(|name| name.starts_with("domain::alpha::Input: domain::alpha::Port")),
+        "alpha impl must retain its qualified owner and trait: {names:?}"
+    );
+    assert!(
+        names.iter().any(|name| name.starts_with("domain::beta::Input: domain::beta::Port")),
+        "beta impl must retain its qualified owner and trait: {names:?}"
+    );
+    assert!(
+        names.iter().all(|name| {
+            !((name.starts_with("domain::alpha::Input:") && name.contains("domain::beta::Port"))
+                || (name.starts_with("domain::beta::Input:")
+                    && name.contains("domain::alpha::Port")))
+        }),
+        "duplicate-module results must not cross-join owners and traits: {names:?}"
     );
 }

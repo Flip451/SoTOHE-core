@@ -9,7 +9,8 @@ use std::collections::BTreeSet;
 use domain::plan_ref::SpecElementId;
 use domain::tddd::LayerId;
 use domain::tddd::catalog_gen::CatalogEntryKind;
-use domain::tddd::catalogue_v2::{CrateName, TypeName};
+use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::semantic_verify::CatalogueEntryKey;
 use serde_json::{Map, Value, json};
 use usecase::catalog_gen::{CatalogAddCommand, CatalogError};
 
@@ -379,7 +380,7 @@ fn build_inherent_impls(command: &CatalogAddCommand) -> Result<Vec<Value>, Catal
     if command.inherent_methods.is_empty() {
         return Ok(Vec::new());
     }
-    let type_name = TypeName::new(command.name.clone()).map_err(|err| {
+    let type_name = CatalogueEntryKey::try_new(command.name.clone()).map_err(|err| {
         schema_error(format!("inherent impl type_name `{}` is invalid: {err}", command.name))
     })?;
     let methods = parse_list(&command.inherent_methods, parse_method)?;

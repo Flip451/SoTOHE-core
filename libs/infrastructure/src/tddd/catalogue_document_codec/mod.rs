@@ -37,7 +37,7 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use serde::{Deserialize, de};
 use thiserror::Error;
 
@@ -55,6 +55,7 @@ mod validate;
 use decode::dto_to_domain;
 use dto::SchemaVersionProbe;
 use encode::domain_to_dto;
+use validate::validate_schema_version;
 
 // ---------------------------------------------------------------------------
 // Supported schema version
@@ -244,29 +245,7 @@ impl CatalogueDocumentCodec {
     ) -> Result<CatalogueDocument, CatalogueDocumentCodecError> {
         // Phase 1: check schema_version before full parse.
         let version_probe: SchemaVersionProbe = serde_json::from_str(json)?;
-        match version_probe.schema_version {
-            v if v == SCHEMA_VERSION => {
-                // Supported version — proceed to full parse below.
-            }
-            4 => {
-                // v4 → v5 is a breaking change: TypeEntry.role wire format changed from a bare
-                // string to a discriminated-object. Attempting a full parse would produce a
-                // JSON type error, which is confusing. Reject with an actionable migration gate.
-                return Err(CatalogueDocumentCodecError::SchemaVersionRequiresMigration {
-                    from: 4,
-                    to: SCHEMA_VERSION,
-                    reason: "role wire format changed from string to discriminated-object in v5; \
-                             re-generate the catalogue via the type-designer agent, \
-                             then run `sotp signal calc-impl-catalog`",
-                });
-            }
-            actual => {
-                return Err(CatalogueDocumentCodecError::UnsupportedSchemaVersion {
-                    actual,
-                    expected: SCHEMA_VERSION,
-                });
-            }
-        }
+        validate_schema_version(version_probe.schema_version)?;
 
         // Phase 2: full parse.
         let dto: dto::CatalogueDocumentDto = serde_json::from_str(json)?;
@@ -352,11 +331,11 @@ mod tests {
     use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FunctionName, FunctionPath, ModulePath, ParamName, TraitName, TypeName,
+        CrateName, FunctionName, FunctionPath, ModulePath, ParamName,
     };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
     use domain::tddd::catalogue_v2::{
-        BoundOp, DeletionRecord, MethodGenericParam, TypeRef, WherePredicateDecl,
+        BoundOp, CatalogueEntryKey, DeletionRecord, MethodGenericParam, TypeRef, WherePredicateDecl,
     };
 
     fn minimal_v5_json(crate_name: &str, layer: &str) -> String {
@@ -500,7 +479,8 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
 
-        assert_eq!(value["schema_version"], SCHEMA_VERSION);
+        assert_eq!(value["schema_version"].as_u64(), Some(u64::from(SCHEMA_VERSION)));
+        assert!(value["schema_version"].is_number());
         let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(decoded.schema_version(), SCHEMA_VERSION);
     }
@@ -565,6 +545,17 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_schema_version_zero_returns_existing_unsupported_schema_version() {
+        let json = r#"{"schema_version": 0, "crate_name": "domain", "layer": "domain"}"#;
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+
+        assert!(matches!(
+            err,
+            CatalogueDocumentCodecError::UnsupportedSchemaVersion { actual: 0, expected: 5 }
+        ));
+    }
+
+    #[test]
     fn test_decode_schema_version_4_returns_migration_required_error() {
         // Schema version 4 → v5 is a known breaking change (TypeEntry.role wire format
         // changed from bare string to discriminated-object). v4 catalogues must be
@@ -606,6 +597,211 @@ mod tests {
         let json = minimal_v5_json("domain", "domain");
         let err = CatalogueDocumentCodec::decode(&json, "usecase").unwrap_err();
         assert!(matches!(err, CatalogueDocumentCodecError::CrateNameMismatch { .. }), "{err:?}");
+    }
+
+    #[test]
+    fn test_decode_preserves_qualified_type_key_and_module_path_as_written() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "domain::a::Thing": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "module_path": "b"
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
+        assert_eq!(doc.types().get(&key).unwrap().module_path().to_string(), "b");
+    }
+
+    #[test]
+    fn test_decode_preserves_qualified_trait_key_and_module_path_as_written() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "domain::a::Thing": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "module_path": "b"
+    }
+  },
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
+        assert_eq!(doc.traits().get(&key).unwrap().module_path().to_string(), "b");
+    }
+
+    #[test]
+    fn test_decode_accepts_loose_catalogue_key_notation() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "domain::bad-name": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let key = CatalogueEntryKey::try_new("domain::bad-name".to_owned()).unwrap();
+        assert!(doc.types().contains_key(&key));
+    }
+
+    #[test]
+    fn test_decode_preserves_distinct_catalogue_key_spellings() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "a::Thing": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "module_path": "a"
+    },
+    "domain::a::Thing": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "module_path": "a"
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        assert_eq!(doc.types().len(), 2);
+        assert!(
+            doc.types().contains_key(&CatalogueEntryKey::try_new("a::Thing".to_owned()).unwrap())
+        );
+        assert!(
+            doc.types()
+                .contains_key(&CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap())
+        );
+    }
+
+    #[test]
+    fn test_encode_preserves_qualified_key_and_module_path_mismatch_as_written() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["b".to_owned()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap(), entry);
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(encoded.contains("\"domain::a::Thing\""));
+        assert!(encoded.contains("\"module_path\": \"b\""));
+    }
+
+    #[test]
+    fn test_encode_preserves_distinct_catalogue_key_spellings() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["a".to_owned()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(CatalogueEntryKey::try_new("a::Thing".to_owned()).unwrap(), entry.clone());
+        doc.insert_type(CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap(), entry);
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(encoded.contains("\"a::Thing\""));
+        assert!(encoded.contains("\"domain::a::Thing\""));
+    }
+
+    #[test]
+    fn test_decode_rejects_qualified_type_delete_key_and_module_path_mismatch() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "alpha::GoneType": {
+      "action": "delete",
+      "module_path": "b"
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            err.to_string().contains("alpha::GoneType")
+                && err.to_string().contains("module_path 'alpha'")
+                && err.to_string().contains("module_path is 'b'"),
+            "qualified key/module mismatch must fail closed with both identities: {err}"
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_qualified_trait_delete_key_and_module_path_mismatch() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "alpha::GonePort": {
+      "action": "delete",
+      "module_path": "b"
+    }
+  },
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            err.to_string().contains("alpha::GonePort")
+                && err.to_string().contains("module_path 'alpha'")
+                && err.to_string().contains("module_path is 'b'"),
+            "qualified key/module mismatch must fail closed with both identities: {err}"
+        );
     }
 
     #[test]
@@ -1219,7 +1415,7 @@ mod tests {
             LayerId::try_new("domain").unwrap(),
         );
         doc.insert_type(
-            TypeName::new("RelaxedAlias").unwrap(),
+            CatalogueEntryKey::try_new("RelaxedAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1381,7 +1577,7 @@ mod tests {
         );
         let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
         doc.insert_type(
-            TypeName::new("BadAlias").unwrap(),
+            CatalogueEntryKey::try_new("BadAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1416,7 +1612,7 @@ mod tests {
         );
         let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
         doc.insert_type(
-            TypeName::new("BadLegacyAlias").unwrap(),
+            CatalogueEntryKey::try_new("BadLegacyAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1448,7 +1644,7 @@ mod tests {
         );
         let wildcard = MethodGenericParam { name: ParamName::new("_").unwrap(), bounds: vec![] };
         doc.insert_type(
-            TypeName::new("BadAlias").unwrap(),
+            CatalogueEntryKey::try_new("BadAlias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1482,7 +1678,7 @@ mod tests {
             LayerId::try_new("domain").unwrap(),
         );
         doc.insert_type(
-            TypeName::new("BadAliasBound").unwrap(),
+            CatalogueEntryKey::try_new("BadAliasBound".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1665,7 +1861,7 @@ mod tests {
       "action": "add",
       "role": { "SecondaryPort": {} },
       "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["Clone"] }],
-      "supertrait_bounds": ["Parent"],
+      "supertrait_bounds": ["Clone"],
       "methods": [
         {
           "name": "get",
@@ -1693,8 +1889,43 @@ mod tests {
         // The acceptance must survive the full DTO-to-evaluator flow: the
         // structural encoder processes bounds / returns with the same context.
         use domain::tddd::CatalogueToExtendedCratePort;
+        let mut paths = std::collections::HashMap::new();
+        paths.insert(
+            rustdoc_types::Id(1),
+            rustdoc_types::ItemSummary {
+                crate_id: 0,
+                path: vec!["domain".to_owned(), "KeywordTrait".to_owned()],
+                kind: rustdoc_types::ItemKind::Trait,
+            },
+        );
+        paths.insert(
+            rustdoc_types::Id(2),
+            rustdoc_types::ItemSummary {
+                crate_id: 0,
+                path: vec!["std".to_owned(), "clone".to_owned(), "Clone".to_owned()],
+                kind: rustdoc_types::ItemKind::Trait,
+            },
+        );
+        paths.insert(
+            rustdoc_types::Id(3),
+            rustdoc_types::ItemSummary {
+                crate_id: 0,
+                path: vec!["std".to_owned(), "marker".to_owned(), "Send".to_owned()],
+                kind: rustdoc_types::ItemKind::Trait,
+            },
+        );
+        let authoritative = rustdoc_types::Crate {
+            root: rustdoc_types::Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: std::collections::HashMap::new(),
+            paths,
+            external_crates: std::collections::HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+        };
         crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-            .encode(doc2)
+            .encode(doc2, &authoritative, &authoritative)
             .expect("keyword generic context must survive the extended-crate encoding");
     }
 
@@ -1819,15 +2050,33 @@ mod tests {
         assert!(doc.types().is_empty(), "delete entry must not become a live type entry");
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
-            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
-                assert_eq!(name.as_str(), "OldType");
-                assert_eq!(module_path.to_string(), "tddd::foo");
+            DeletionRecord::Type { name, spec_refs, informal_grounds } => {
+                assert_eq!(name.as_str(), "tddd::foo::OldType");
                 assert_eq!(spec_refs.len(), 1);
                 assert_eq!(spec_refs[0].anchor.as_ref(), "IN-01");
                 assert!(informal_grounds.is_empty());
             }
             other => panic!("expected Type deletion, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_decode_type_delete_tombstone_canonicalizes_module_path_into_identity() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "tddd" }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Type deletion");
+        };
+        assert_eq!(name.as_str(), "tddd::GoneType");
     }
 
     #[test]
@@ -1844,14 +2093,32 @@ mod tests {
         assert!(doc.traits().is_empty());
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
-            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
+            DeletionRecord::Trait { name, spec_refs, informal_grounds } => {
                 assert_eq!(name.as_str(), "OldPort");
-                assert!(module_path.is_root(), "absent module_path decodes as crate root");
                 assert!(spec_refs.is_empty());
                 assert!(informal_grounds.is_empty());
             }
             other => panic!("expected Trait deletion, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_decode_trait_delete_tombstone_canonicalizes_module_path_into_identity() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "GonePort": { "action": "delete", "module_path": "tddd" }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Trait deletion");
+        };
+        assert_eq!(name.as_str(), "tddd::GonePort");
     }
 
     #[test]
@@ -1984,7 +2251,10 @@ mod tests {
         assert_eq!(doc.types().len(), 1, "one live type entry");
         assert_eq!(doc.deletions().len(), 1, "one deletion record");
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
-        assert!(encoded.contains("\"GoneType\""), "tombstone re-encodes into the map: {encoded}");
+        assert!(
+            encoded.contains("\"tddd::GoneType\""),
+            "tombstone key retains its canonical module-qualified identity: {encoded}"
+        );
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2);
     }
@@ -2007,8 +2277,7 @@ mod tests {
 }"#;
         let mut doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         doc.push_deletion(DeletionRecord::Type {
-            name: TypeName::new("LiveType").unwrap(),
-            module_path: ModulePath::root(),
+            name: CatalogueEntryKey::try_new("LiveType".to_owned()).unwrap(),
             spec_refs: vec![],
             informal_grounds: vec![],
         });
@@ -2034,8 +2303,7 @@ mod tests {
 }"#;
         let mut doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         doc.push_deletion(DeletionRecord::Trait {
-            name: TraitName::new("LivePort").unwrap(),
-            module_path: ModulePath::root(),
+            name: CatalogueEntryKey::try_new("LivePort".to_owned()).unwrap(),
             spec_refs: vec![],
             informal_grounds: vec![],
         });
@@ -2891,7 +3159,10 @@ mod tests {
 }"#;
 
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let entry = doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap();
+        let entry = doc
+            .traits()
+            .get(&CatalogueEntryKey::try_new("LegacyPort".to_owned()).unwrap())
+            .unwrap();
         assert!(entry.spec_refs().is_empty());
         assert_eq!(entry.methods().len(), 1);
         assert!(entry.methods()[0].spec_refs().is_empty());
@@ -2932,8 +3203,11 @@ mod tests {
   "functions": {}
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let method =
-            &doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap().methods()[0];
+        let method = &doc
+            .traits()
+            .get(&CatalogueEntryKey::try_new("LegacyPort".to_owned()).unwrap())
+            .unwrap()
+            .methods()[0];
         assert_eq!(method.action(), ItemAction::Add);
     }
 
@@ -3631,9 +3905,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.inherent_impls().len(), 1);
-        assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
-        assert_eq!(doc.inherent_impls()[0].methods.len(), 1);
-        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[0].type_name().as_str(), "Email");
+        assert_eq!(doc.inherent_impls()[0].methods().len(), 1);
+        assert_eq!(doc.inherent_impls()[0].methods()[0].name().as_str(), "as_str");
     }
 
     #[test]
@@ -3682,10 +3956,10 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.inherent_impls().len(), 2, "two impl blocks must be decoded as two entries");
-        assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
-        assert_eq!(doc.inherent_impls()[1].type_name.as_str(), "Email");
-        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
-        assert_eq!(doc.inherent_impls()[1].methods[0].name().as_str(), "validate");
+        assert_eq!(doc.inherent_impls()[0].type_name().as_str(), "Email");
+        assert_eq!(doc.inherent_impls()[1].type_name().as_str(), "Email");
+        assert_eq!(doc.inherent_impls()[0].methods()[0].name().as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[1].methods()[0].name().as_str(), "validate");
     }
 
     #[test]
@@ -3712,12 +3986,12 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let impl_block = &doc.inherent_impls()[0];
-        assert_eq!(impl_block.type_name.as_str(), "Container");
-        assert_eq!(impl_block.impl_generics.len(), 1);
-        assert_eq!(impl_block.impl_generics[0].name.as_str(), "T");
-        assert_eq!(impl_block.impl_generics[0].bounds[0].as_str(), "Clone");
-        assert_eq!(impl_block.impl_where_predicates.len(), 1);
-        assert_eq!(impl_block.impl_where_predicates[0].lhs.as_str(), "Vec<T>");
+        assert_eq!(impl_block.type_name().as_str(), "Container");
+        assert_eq!(impl_block.impl_generics().len(), 1);
+        assert_eq!(impl_block.impl_generics()[0].name.as_str(), "T");
+        assert_eq!(impl_block.impl_generics()[0].bounds[0].as_str(), "Clone");
+        assert_eq!(impl_block.impl_where_predicates().len(), 1);
+        assert_eq!(impl_block.impl_where_predicates()[0].lhs.as_str(), "Vec<T>");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
@@ -3777,7 +4051,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let impl_block = &doc.inherent_impls()[0];
-        assert_eq!(impl_block.impl_generics[0].name.as_str(), "type");
+        assert_eq!(impl_block.impl_generics()[0].name.as_str(), "type");
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2, "keyword impl generic must round-trip for non-alias entries");

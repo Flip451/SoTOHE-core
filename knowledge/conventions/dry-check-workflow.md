@@ -9,10 +9,15 @@ RFP（review fix phase）の 2 フェーズ実行順序のルール。
 
 `.harness/config/agent-profiles.json` に 2 つの専用 capability が登録されている。
 
-| capability | 役割 | provider |
+| capability | 役割 | 現在の provider |
 |---|---|---|
-| `dry-checker` | DRY 違反の判定役（agent、`CodexDryChecker` が呼ぶ） | codex |
+| `dry-checker` | DRY 違反の判定役（agent） | codex |
 | `dry-fix-lead`（dfl） | DFP で DRY 違反のみを修正する修正役 | codex |
+
+`provider` 列は現在の routing であり、受理しうる provider の集合ではない。どちらの
+capability も codex と grok の実装経路を持ち、grok は `grok-sandbox` の admission と
+model 一致を満たした場合にだけ選べる。それ以外の provider を設定すると fail-closed になる。
+可能なセットの一覧は `README.md` の typed-pipeline 節が SSoT である。
 
 `review-fix-lead`（rfl）は review 指摘専用であり、DRY 違反の修正を担わない。
 `dry-checker` / `dry-fix-lead` は `reviewer` / `review-fix-lead` とは別 capability であり、
@@ -62,7 +67,7 @@ sotp dry write \
 
 - diff 対象フラグメントを検索して dry-checker agent に判定させ、結果を `dry-check.json` に追記する。
 - dry-check.json への書き込みはこのコマンドのみ。dfl / rfl が直接書き込まない。
-- `--items-dir` のデフォルトは `track/items`、`--model` のデフォルトは `codex`、`--capability-name` のデフォルトは `dry-checker`。現行実装は `agent-profiles.json` を読まず、これらの CLI 引数を `CodexDryChecker` に渡す。
+- `--items-dir` のデフォルトは `track/items`、`--capability-name` のデフォルトは `dry-checker`。`--model` は任意の上書きで、未指定なら `DryCheckServiceFactoryAdapter` が `.harness/config/agent-profiles.json` の `dry-checker` capability から fast / final lane の provider・model・reasoning effort を解決する。解決された provider に応じて `CodexDryChecker` または `GrokDryChecker` を構築し、fast と final で異なる provider も許可する（Grok は sandbox admission と model 一致を満たす場合だけ選択される）。
 - 成功時は exit 0、エラー時は非 0。
 
 ### 出力（stdout）
@@ -73,7 +78,7 @@ sotp dry write \
 - `candidate_fragment_ref.path()` / `.content_hash().as_str()` — 候補フラグメントのパスとハッシュ（識別子）
 - `refactor_proposal.as_str()` — dfl 向けのリファクタ提案テキスト（必ず非空）
 
-`DryCheckFinding` の `changed_fragment_ref` / `candidate_fragment_ref` は `FragmentRef`（path + content_hash の識別子ペア）で、agent の JSON 出力には含まれない。CLI adapter（`CodexDryChecker`）が実際の `CodeFragment` から SHA-256 を計算して付与する。
+`DryCheckFinding` の `changed_fragment_ref` / `candidate_fragment_ref` は `FragmentRef`（path + content_hash の識別子ペア）で、agent の JSON 出力には含まれない。選択された provider adapter（`CodexDryChecker` / `GrokDryChecker`）が共通 parser で実際の `CodeFragment` から SHA-256 を計算して `DryCheckFinding` を構築し、provider-neutral な `DryCheckAgentJudgment` を返す。usecase interactor はその judgment を分解して永続化するとともに、coverage と `DryCheckPairKey` 用の FragmentRef を別途導出する。
 
 ---
 

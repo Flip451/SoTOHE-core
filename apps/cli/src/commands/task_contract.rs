@@ -316,6 +316,28 @@ mod tests {
     }
 
     #[test]
+    fn test_task_contract_check_preserves_qualified_filter_text_for_driver_validation() {
+        // The command surface carries the layer filter as an opaque string;
+        // it must not split or shorten path-shaped text before the driver
+        // validates it alongside the task-contract attribution artifacts.
+        let cmd = parse_task_contract(&[
+            "task-contract",
+            "check",
+            "--layer",
+            "domain::alpha::Shared",
+            "--track-id",
+            "my-track",
+        ]);
+        match cmd {
+            TaskContractCommand::Check(args) => {
+                assert_eq!(args.layer.as_deref(), Some("domain::alpha::Shared"));
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
+            }
+            other => panic!("expected Check, got {other:?}"),
+        }
+    }
+
+    #[test]
     fn test_task_contract_unknown_subcommand_is_rejected() {
         let result = TestCli::try_parse_from(["task-contract", "unknown-subcmd"]);
         assert!(result.is_err(), "unrecognized task-contract subcommand must be rejected by clap");

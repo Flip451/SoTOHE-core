@@ -10,7 +10,6 @@ use domain::tddd::Phase1Error;
 use domain::tddd::catalogue_v2::ItemAction;
 use rustdoc_types::{Crate, Id, ItemEnum};
 
-use super::super::super::build_impl_identity_map;
 use super::super::child_items::{
     insert_a_item_tree_into_s, move_standalone_impl_children_to_d, remap_child_ids_in_item,
     remove_b_children_from_s,
@@ -31,13 +30,9 @@ pub(crate) fn process_standalone_impls(
     a_krate: &rustdoc_types::Crate,
     a_item_actions: &BTreeMap<Id, ItemAction>,
     b: &Crate,
-    crate_name: &str,
+    a_impl_map: &BTreeMap<String, Id>,
+    b_impl_map: &BTreeMap<String, Id>,
 ) -> Result<(), Phase1Error> {
-    // Build B-side impl identity map to find matching B impls for Modify/Reference/Delete.
-    // Pass the real crate name so that when rustdoc omits a local trait from `krate.paths`
-    // and the fallback `normalize_impl_trait_path` runs, `my_crate::MyTrait` is stripped
-    // to `MyTrait` — consistent with Phase 2's S/D/C maps (which also pass `crate_name`).
-    let b_impl_map = build_impl_identity_map(b, crate_name);
     // Invert: B identity key → corresponding S-side Id (after b_id_remap renumbering).
     let b_key_to_s_id: std::collections::BTreeMap<&str, Id> = b_impl_map
         .iter()
@@ -47,12 +42,9 @@ pub(crate) fn process_standalone_impls(
         })
         .collect();
 
-    // Build A-side impl identity map to get each standalone A impl's identity key.
-    // Pass the real crate name for symmetric crate-name normalization.
-    let a_impl_map = build_impl_identity_map(a_krate, crate_name);
     // Invert A map: A-side Id → identity key string.
     let a_id_to_key: HashMap<Id, String> =
-        a_impl_map.into_iter().map(|(key, id)| (id, key)).collect();
+        a_impl_map.iter().map(|(key, &id)| (id, key.clone())).collect();
 
     // Collect impl Ids that are reachable via A-side type/trait subtree traversal in Step 4.
     // An impl is "reachable" iff it is listed in the `impls` field of a Struct or Enum

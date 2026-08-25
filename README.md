@@ -132,15 +132,43 @@ dispatch 経路だけが行う。
 ```
 
 `reviewer` や `review-fix-lead` など `execution_mode = "typed-pipeline"` の capability は専用の
-固定出力経路を持ち、`model_provider` を generic dispatch のようには転送しない。そのため、
-typed-pipeline の provider gate は `codex` のままであり、外部 provider への routing を設定で
-有効化できない。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の typed-pipeline capability としての
-verdict envelope / structured output 準拠も未検証である。この未検証状態は、接続経路が実際に
-選択されることを意味しない。provider ごとの status と更新条件は、次の表で管理する。
+固定出力経路を持ち、`model_provider` を generic dispatch のようには転送しない。そのため
+typed-pipeline の provider gate が受理するのは、**専用の typed adapter を実装した組み込み
+provider だけ**である。
+
+次の表は、各 typed-pipeline capability が **受理しうる provider の集合**を宣言する。実際に
+どれが選ばれているかは `.harness/config/agent-profiles.json` が決めるので、この表は現在の
+routing ではなく可能なセットを示す。集合の外の provider を設定すると fail-closed になる。
+
+| typed-pipeline capability | 受理しうる provider |
+|---|---|
+| `reviewer` | `codex` / `claude` / `grok`† |
+| `review-fix-lead` | `codex` / `claude` / `grok`† |
+| `ref-verifier-chain1` / `ref-verifier-chain2` | `codex` / `claude` / `grok`† |
+| `obligation-fulfillment-verifier` / `waiver-verifier` | 同上 (reference 検証 runner を共有) |
+| `dry-checker` / `dry-fix-lead` | `codex` / `grok`† |
+| `pr-reviewer` | `codex` |
+
+`claude` 解決は Agent tool の subagent ではなく headless subprocess として動く。
+`review-fix-lead` だけは例外で、`claude` 解決時に wrapper が subagent-dispatch sentinel を
+返し、呼び出し側がそれを受けて subagent を起動する。`fast_provider` / `fast_model` を持つ
+capability は fast lane と final lane で別の provider を選べるので、いずれの lane も上表の
+集合に収まっている必要がある。† `grok` は provider 名だけで有効になるのではなく、対象
+capability の adapter 定義に許可された `grok-sandbox` があり、宣言 model (あれば) が profile
+model と一致する admission が必要である。`grok-sandbox` の宣言がない配布 adapter では
+Grok の解決は fail-closed になる。`reviewer` / `review-fix-lead` / `dry-fix-lead` は
+model override も profile model と一致し、`dry-checker` は fast / final の両 model の定義が
+admission される必要がある。条件を満たさない設定は fail-closed になる。
+
+いずれの capability も `model_provider` を転送しないため、**外部 provider への routing は
+typed-pipeline では設定で有効化できない**。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の
+typed-pipeline capability としての verdict envelope / structured output 準拠も未検証である。
+この未検証状態は、接続経路が実際に選択されることを意味しない。provider ごとの status と
+更新条件は、次の表で管理する。
 
 ### typed-pipeline の検証ステータス
 
-`typed-pipeline` の provider gate が `codex` のまま維持されることと、外部 provider が
+typed-pipeline の provider gate が上表の組み込み provider に限定されることと、外部 provider が
 typed-pipeline の出力契約に準拠することは別の判定である。現時点では、次の provider は
 すべて **未検証** として扱う。
 

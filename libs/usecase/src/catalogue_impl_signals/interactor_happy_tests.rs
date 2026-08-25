@@ -31,6 +31,8 @@ impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
     fn encode(
         &self,
         _doc: CatalogueDocument,
+        _baseline: &rustdoc_types::Crate,
+        _current: &rustdoc_types::Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         use std::collections::BTreeMap;
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))

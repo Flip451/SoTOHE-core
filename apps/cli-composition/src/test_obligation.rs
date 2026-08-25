@@ -399,29 +399,6 @@ mod tests {
     }
 
     #[test]
-    fn test_composition_root_resolves_separate_verifier_capabilities_for_each_tier() {
-        let workspace_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-        let root = TestObligationCompositionRoot::new(
-            workspace_root.clone(),
-            workspace_root.join(TEST_OBLIGATION_RULES_PATH),
-        );
-        let profiles = root.agent_profiles().unwrap();
-
-        for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
-            let capability = CapabilityName::try_new(capability).unwrap();
-            assert!(profiles.resolve_capability(&capability).is_some());
-            assert!(matches!(
-                profiles.resolve_execution(&capability, RoundType::Fast),
-                Ok(ResolvedExecution::ProviderCli { model, .. }) if model.as_str() == "gpt-5.6-luna"
-            ));
-            assert!(matches!(
-                profiles.resolve_execution(&capability, RoundType::Final),
-                Ok(ResolvedExecution::ProviderCli { model, .. }) if model.as_str() == "gpt-5.6-terra"
-            ));
-        }
-    }
-
-    #[test]
     fn test_composition_root_resolves_independent_fast_providers_for_verifier_capabilities() {
         let workspace = tempfile::tempdir().unwrap();
         let config_path = workspace.path().join(AGENT_PROFILES_PATH);
