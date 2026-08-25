@@ -12,6 +12,8 @@ directory already exists"), calling `create_dir_all` before the check silently v
 a precondition or invariant, validate the directory's presence BEFORE calling `create_dir_all`.
 Only call `create_dir_all` when directory creation is the intended behavior.
 
+> **強制先**: review 観点 — infrastructure scope
+
 ## Pattern
 
 ```rust
@@ -53,6 +55,9 @@ directory). However, if a guard depended on the parent directory's absence, the
 ## When to Apply
 
 - Any infrastructure adapter that persists files to disk
+  > **強制先**: review 観点 — infrastructure scope
 - Any path where directory existence is checked as a precondition
+  > **強制先**: review 観点 — infrastructure scope
 - Review `create_dir_all` calls in code review: verify that directory creation is the
   intended behavior, not an accidental side effect that voids a guard
+  > **強制先**: review 観点 — infrastructure scope

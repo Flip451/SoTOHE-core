@@ -29,11 +29,15 @@ required_for:
   - `spec-designer` / `impl-planner` / `adr-editor` の owned artifact
   - role が確定済みで構造変更を伴わない `action: "modify"` 編集 (フィールド追加など) ※ role 変更を含む場合は本 convention 対象
 
+> **強制先**: review 観点 — types scope
+
 ## Rules
 
 ### R1. Layer-Kind Compatibility (層 × kind 互換マトリクス)
 
 `<layer>-types.json` の各 entry は、層と kind の組合せを以下の表に従う。Forbidden の組合せを起草してはならない。
+
+> **強制先**: 機械 lint — bin/sotp catalogue-lint check-active-track
 
 > **v5 schema (schema_version=5) の対応**: 現行 catalogue は `schema_version: 5` で、 **role 軸 × kind 軸** の 2 軸構造を採る。 type-designer は v5 format で `<layer>-types.json` を起草する。 本マトリクスの「role」列は **role フィールドの値** に対応する (`DataRole` / `ContractRole` / `FunctionRole` の variant 名)。 type-designer は role と layer の組合せを本マトリクスで確認する。
 >
@@ -43,6 +47,8 @@ required_for:
 > - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済みで、codec は受け付けない。
 >
 > 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) は `.harness/reference/catalogue-schema.md` を参照する。対応する symbol は `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` である。
+
+> **強制先**: 機械 lint — bin/sotp catalogue-lint check-active-track
 
 | role (v5) | domain | usecase | infrastructure | cli | cli_composition | cli_driver | 配置根拠 |
 |---|---|---|---|---|---|---|---|
@@ -74,19 +80,31 @@ required_for:
 
 R1 の全 role には、出荷 catalogue-lint config の `KindLayerConstraint` がある。各 rule の `permitted_layers` は表の `✓` と `△` の層を許可し、その補集合である `✗` を active track で拒否する。lint は `✓` と `△` の区別や根拠の妥当性を機械判定しない。
 
+> **強制先**: 機械 lint — bin/sotp catalogue-lint check-active-track
+
 `ValueObject` は domain / usecase / infrastructure のいずれへ置く場合も、ユビキタス言語、不変条件の所有、複数 application operation を越えた意味の安定性、persistence・CLI・workflow 都合からの独立性を根拠として決める。same-track domain-internal inbound reference は domain model での利用を示す補助証拠として記録してよいが、その不在だけで拒否してはならない。application boundary にのみ意味を持つ値は usecase の `Dto` / `Command` / `Query` / `ValueObject` として置く。配置の semantic classification と根拠は catalogue の `docs` または track の review 記録に残し、reviewer が照合する。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
+
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
+
+> **強制先**: 機械 lint — bin/sotp catalogue-lint check-active-track
 
 #### Port placement tie-break
 
 port が domain の不変条件または aggregate の語彙で説明できるなら domain に置く。アプリケーションのオーケストレーションが必要とする技術的能力なら usecase に置く。たとえば aggregate の永続化は domain の `Repository`、レビュー実行や差分取得の能力は usecase の `SecondaryPort` として分類する。
 
+> **強制先**: review 観点 — types / domain / usecase scope
+
 R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` のうち `for_type` が `SecondaryAdapter` 型を指す entry の `trait_ref` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
+
+> **強制先**: review 観点 — types scope
 
 #### CQRS separation evidence
 
 `Command` と `Query` を別 Interactor / ApplicationService に分離するのは、side effect、required collaborator、possible error、consistency boundary、または read/write model の少なくとも一つに操作固有の実質的な非対称性がある場合だけである。分離する catalogue は、該当次元、具体的な操作差、分離根拠を `docs` または review 可能な track 記録に残す。read と write の両方があることや role が利用可能なことだけでは分離理由にならない。
+
+> **強制先**: review 観点 — types / usecase scope
 
 ### R2. Free Function Preference (stateless behavior は FreeFunction)
 
@@ -95,7 +113,9 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 - top-level の pub fn (struct や trait の method ではない)
 - またはゼロフィールド struct で、その「struct」が表す唯一の責務が 1 つの pub fn 呼び出しに帰着する
 - 内部 state を持たない (struct field なし、または `()` のみ)
-- 依存注入を必要としない (依存ありなら `role: Interactor` / `role: UseCase` / `role: SecondaryAdapter`)
+- 依存注入を必要としない (依存ありなら、usecase は `role: UseCase` の具体型を既定とし、D2 の条件が成立する場合だけ `role: Interactor` + `role: ApplicationService`、infrastructure は `role: SecondaryAdapter`)
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
 判定例:
 
@@ -103,11 +123,17 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 - `evaluate_adr_decision(entry: &AdrDecisionEntry) -> AdrSignal` → `role: FreeFunction`
 - `EvaluateAdrDecision { /* zero fields */ } impl { fn evaluate(&self, ...) -> ... }` → 設計を `role: FreeFunction` に折り畳む。zero-field struct は wrapping だけで意味を加えない
 
-例外: トレイト境界に組み込む必要がある (`Arc<dyn Service>` で渡したい等) 場合は `role: Interactor` + `role: ApplicationService` ペアを使う。`FreeFunction` は trait 境界に組み込めない。
+#### 必要駆動の抽象
+
+port trait とその実装は、(a) 複数の実装が現存する、または (b) テスト境界で差し替えが必要な場合に限って導入する。共有所有だけを理由に `Arc<dyn Service>` や `role: Interactor` + `role: ApplicationService` ペアを導入してはならない。共有所有だけなら `Arc<具象型>` を既定とし、条件が後から成立した時点で trait を切り出す。既存の抽象ペアは改訂後の規約に合わせて遡及解体しない。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
 ### R3. ValueObject Semantic Restriction
 
 `role: ValueObject` は値等価で識別される値を表す。自身の値から新しい値または述語を導出する side-effect-free な method は許容する。一方、依存または外部リソースを扱う behavior 中心の service 的 struct は ValueObject ではない。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
 | OK (ValueObject) | NG (ValueObject 違反) |
 |---|---|
@@ -118,13 +144,17 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 
 判定は構造条件より意味論を優先する。値等価で識別され、method がその値だけから値または述語を導出するなら ValueObject である。依存、外部 resource、または service の責務を中心にするなら ValueObject ではない。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
+
 behavior を持つ struct は以下のいずれかに振り分ける:
 
 - 依存なし stateless → `role: FreeFunction` (R2)
-- 依存あり (port を呼び出す) → `role: Interactor` (usecase) または `role: SecondaryAdapter` (infrastructure)
+- 依存あり (port を呼び出す) → usecase では、共有所有だけなら `role: UseCase` の具体型を `Arc<具象型>` で扱う。複数実装またはテスト境界の差し替えが必要な場合だけ `role: ApplicationService` + `role: Interactor` の組を導入する。infrastructure では `role: SecondaryAdapter` (port 実装)
 - 集約構築 → `role: Factory`
 - 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 値の同一性ではなく domain behavior を中心にする struct → `role: DomainService` (R6)
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 
 ### R4. Kind Distribution Reconnaissance (起草前の偵察義務)
 
@@ -141,9 +171,13 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 例: ADR が「parse」「evaluate」のような stateless behavior を要求しているのに、過去 track で類似機能が `role: FreeFunction` で実装されている場合、当該 track でも `role: FreeFunction` を採用する。`role: UseCase` / `role: ValueObject` を選択した場合、その rationale を `docs` フィールドに記録する。
 
+> **強制先**: review 観点 — types scope
+
 ### R5. No Fallback Rule (catch-all 禁止)
 
 「他の role が完全に fit しない」という理由で `role: ValueObject` または `role: UseCase` を catch-all として採用してはならない。
+
+> **強制先**: review 観点 — types scope
 
 判断手順:
 
@@ -153,11 +187,15 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 4. それでも確定しない場合 → 起草を止め、`## Open Questions` に「role が確定しない理由」と「検討した候補とその却下理由」を列挙して orchestrator に escalation
 5. orchestrator は ADR / spec の補強 (adr-editor / spec-designer の re-invoke) または user 判断を仰ぐ
 
-`role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは `role: Interactor` (依存あり) / `role: SecondaryAdapter` (port 実装) / `role: DomainService` (R6: field を持つ domain behavior)。`role: ValueObject` を選ぶ前に、これらの候補を必ず検討する。
+> **強制先**: review 観点 — types / harness-policy scope
+
+`role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは、依存を持つ usecase の具体型としての `role: UseCase`、D2 の複数実装またはテスト差し替え条件が成立した場合の `role: Interactor`、`role: SecondaryAdapter` (port 実装)、または `role: DomainService` (R6: field を持つ domain behavior) である。`role: ValueObject` を選ぶ前に、これらの候補を必ず検討する。
+
+> **強制先**: review 観点 — types scope
 
 ### R6. DomainService Selection Criteria (domain behavior の住所)
 
-値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、`role: Interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
+値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、`role: Interactor` (D2 の条件を満たす ApplicationService trait 実装である usecase 層の型) との混同を防ぐため、以下の全条件を満たす場合に採用する。
 
 採用条件 (AND):
 
@@ -165,26 +203,37 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - `kind.shape.fields` >= 1 field (state を保持する; ゼロフィールドは R2 の `FreeFunction` 候補)
 - `methods` >= 1 entry (domain behavior を持つ; 導出 method だけなら R3 の `ValueObject` 候補)
 - 状態遷移なし (ある場合は typestate pattern — R3 の振り分け)
-- `ApplicationService` / `SecondaryPort` の実装ではない (実装する場合は `role: Interactor` / `role: SecondaryAdapter`)
+- `ApplicationService` / `SecondaryPort` の実装ではない (D2 の条件を満たして ApplicationService を実装する場合は `role: Interactor`、port 実装なら `role: SecondaryAdapter`)
 - 配置層は domain (default) / usecase (要根拠 — trans-domain な application logic で domain knowledge を集約する場合のみ、`docs` フィールドに根拠を記録) / infrastructure (forbidden)
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 
 判定例:
 
 - `PolicyEvaluator { rules: Vec<Rule> }` + `evaluate(&self, ctx: &Context) -> Decision` → `role: DomainService` (state あり、behavior あり、依存なし)
 - `Email(String)` + `new()` / `normalized()` → `role: ValueObject` (R3: 値からの side-effect-free な導出)
 - `parse_yaml(input: &str) -> Result<...>` → `role: FreeFunction` (R2: state なし、依存なし)
-- `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: Interactor` (R1: 依存あり、usecase 層)
+- `RegisterUserUseCase { repo: Arc<dyn UserRepository> }` を `Arc<RegisterUserUseCase>` で共有し、`execute(&self, cmd) -> ...` を持たせる → `role: UseCase` (D2: repository port 自体の複数実装 / test seam は保ちつつ、service は具体型を既定)
+- `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: Interactor` (R1: ApplicationService 自体に複数実装がある、または service 自体をテスト境界で差し替える必要がある場合だけ。repository port の seam だけでは不十分)
 
 ### R7. Cross-Track Port Reference (SecondaryAdapter が参照する port は当該 track catalogue に declare する)
 
 top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照する trait (port) は、当該 track の `<layer>-types.json` のいずれかに `traits` エントリとして存在することが必須である。role は port の性質に応じて `SecondaryPort` (汎用 driven port) または `Repository` (aggregate root の永続化 port) のいずれかを選ぶ (R1 参照)。
 
+> **強制先**: review 観点 — types scope
+
 当該 track で改変しない baseline 由来の port は `action: "reference"` で declare する。declare 漏れは contract-map renderer のグローバル trait index (`build_trait_index`) の lookup が unmatched となり、`SecondaryAdapter -.impl.-> port` edge が silently skip される。
+
+> **強制先**: review 観点 — types scope
 
 #### declare 義務
 
 - top-level `trait_impls[]` に `for_type: <SecondaryAdapter 型>` + `trait_ref: <port>` の entry を書いた以上、対応する `traits` entry (role は `SecondaryPort` または `Repository`) を当該 track の catalogue に作成する責任は type-designer に帰属する
+
+  > **強制先**: review 観点 — types scope
 - 当該 track で変更しない baseline 由来の port は `action: "reference"` で declare し catalogue への exposure を確保する
+
+  > **強制先**: review 観点 — types scope
 
 #### `action: "reference"` の semantics
 
@@ -192,6 +241,8 @@ top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の�
 - catalogue への exposure (contract-map / graph 描画) を成立させるための declare
 - type-signal evaluator は `reference` action に対して「完全一致のみ Blue、不一致はすべて Red」として評価する (modify の Yellow 吸収は適用されない)
 - baseline port の `methods` は baseline 当時の全 method を列挙する (method 型宣言の完全形規範 R8 は `reference` action でも同様に要求される)
+
+  > **強制先**: review 観点 — types scope
 
 #### declare 漏れの影響
 
@@ -206,19 +257,27 @@ contract-map renderer のグローバル trait index (`build_trait_index`) は�
 - `params[].ty` (FunctionEntry の関数パラメータ)
 - `returns` (FunctionEntry の戻り型)
 
+> **強制先**: review 観点 — types scope
+
 #### 禁止対象 wrapper 名 (generic 引数なし単独宣言)
 
 `Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`
 
 これらが具象型を伴わず単独で宣言された場合、contract-map renderer の `extract_type_names()` は wrapper 名 token しか返さず、内部具象型への edge が生まれない。
 
+> **強制先**: review 観点 — types scope
+
 #### lint ゲート
 
 bare wrapper 名のみの宣言を catalogue の codec / verify CLI が schema validation で reject する lint を後続作業として組み込む。実装前は設計レビューで確認する (過渡期間)。
 
+> **強制先**: review 観点 — types scope
+
 ### R9. No Primitive Obsession (制約ある概念を生 primitive で宣言しない)
 
 catalogue の field / payload / param / returns / map キーで、検証可能な制約・有限値集合・ドメイン的意味を持つ概念を生 primitive (`String` / `i32` / `bool` 等) で宣言してはならない。値オブジェクト (`role: ValueObject` の `tuple` shape newtype、または有限値集合の `enum`) を定義して使う。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 
 対象フィールド:
 
@@ -226,6 +285,8 @@ catalogue の field / payload / param / returns / map キーで、検証可能�
 - `kind.variants[].payload` の field 型 (enum payload)
 - `methods[].params[].ty` / `methods[].returns` / FunctionEntry の `params[].ty` / `returns`
 - `BTreeMap` / `HashMap` のキー型 (有限集合 → enum、識別子 → 検証付き newtype)
+
+> **強制先**: review 観点 — types scope
 
 判断手順:
 
@@ -238,7 +299,11 @@ catalogue の field / payload / param / returns / map キーで、検証可能�
    - **config キー / filter 値が domain 概念を名指すなら、それは概念への参照である**。`[role.<RoleName>]` の RoleName、`[edge.<EdgeKind>]` の EdgeKind、`include_function_roles` の各 FunctionRole 等、有限の domain 概念集合を名指すキー/値は「ただの設定文字列」ではなく、当該 domain enum (serde は infra mirror 経由) で型付ける。「open-ended だから String」「runtime で検証するから String」は R9 違反
    - 対応する enum が未だ無ければ、R1 の semantic evidence で配置を判定する。ユビキタス言語・不変条件・operation を越えた安定性・delivery/persistence/workflow からの独立性がある domain 概念なら R10 に従い domain enum を新設する。application boundary にのみ意味を持つ値なら、usecase の `Dto` / `Command` / `Query` / `ValueObject` として型付ける。いずれの場合も生 String へ退避してはならない。生 String 可は color / mermaid 構文のような domain 的意味を持たない提示専用値のみ
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
+
 draft が本ルールに違反する (制約ある概念を生 primitive で宣言している) 場合、orchestrator レビュー前に self-reject して値オブジェクト化する。
+
+> **強制先**: review 観点 — types scope
 
 判定例:
 
@@ -253,7 +318,11 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 
 R10 を適用する前に R1 の semantic-first evidence で候補を分類する。ユビキタス言語に属し、不変条件を所有し、複数 application operation を越えて意味が安定し、persistence・CLI・workflow の都合から独立して存在するなら domain 概念である。same-track domain-internal inbound reference はその利用を示す補助証拠であり、欠如だけで domain 配置を拒否しない。application boundary にのみ意味を持つ値は usecase の `Dto` / `Command` / `Query` / `ValueObject` として型付ける。
 
+> **強制先**: review 観点 — types / domain / usecase scope
+
 R1 で domain 概念と分類された概念 (ユビキタス言語に現れる名詞: 識別子・数量・分類・ポリシー・状態 等) は、必ず **ドメインオブジェクト** として R1 マトリクスで domain 層に合法な role (`ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `Specification` / `Factory` / `ErrorType` — R1 マトリクスの domain 列を参照) のいずれかでモデル化し、**domain 層の `domain-types.json` に定義する**。どの層がそれを消費するかは問わない。R9 が「概念を生 primitive にしない」を、本 R10 が「domain 概念のドメインオブジェクト化 + domain 層配置 + カタログ宣言」を担う。role 選定は R1–R6 の判断木 (R3: ValueObject 制限 / R6: DomainService 選定基準 等) に従う。
+
+> **強制先**: review 観点 — types / domain scope
 
 論理連鎖 (なぜ概念が省略不能か):
 
@@ -263,6 +332,8 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 4. `pub` 型は **カタログ宣言が必須** (カタログは public rustdoc API surface を写す。source に在る pub 型がカタログ未宣言なら signal evaluator の `CMinusSUnionD` = 🔴)
 5. ∴ **各 domain 概念は省略不能で domain catalogue に宣言される**。R1 で usecase 境界値と分類された候補は、その usecase catalogue に宣言される
 
+> **強制先**: review 観点 — types / domain / usecase scope
+
 ただし手順 4 の signal 裏打ち (`CMinusSUnionD` 🔴) は **実装後** にしか効かない (計画段階では概念が source に未在のため、カタログから省いても赤にならない)。よって R10 は **計画段階** で概念のモデル化・配置・宣言を保証する上流ルールであり、R9 / 12c と同じく **信号機評価とは別軸** (全緑でも R10 充足を意味しない)。
 
 **serde / domain 純粋性を概念モデリング省略の口実にしてはならない**:
@@ -270,10 +341,14 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 - domain を serde-free に保つことは、R1 で domain 概念と分類された概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある domain 概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
 - 「serde が要るから infra の生 struct に留める」「R1 の分類をせずに概念をカタログから省略する」は **いずれも R10 違反**。R1 で usecase 境界値と分類された候補は、domain ではなく usecase catalogue に型付けて宣言する。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
+
 判別 (R1 による分類):
 
 - ドメイン的意味 (ドメインエキスパートとの会話に現れるか)、不変条件の所有、operation を越えた意味の安定性、delivery/persistence/workflow からの独立性を合わせて判断する。serde / 外部形式 / 表示の都合は判別に **関与しない** (それは配置ではなく DTO 変換の問題)。same-track inbound reference は補助証拠であり、意味分類を置き換えない。
 - ドメイン的意味を一切持たない純粋な技術ノブ (adapter 内部のバッファサイズ・リトライ回数等) は domain に置かない。R1〜R6 を適用しても role または配置が確定しない場合は、R5 に従い `## Open Questions` に escalation し、曖昧さだけを理由に domain に配置してはならない。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 
 判定例:
 
@@ -299,7 +374,7 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 - `AdrFrontMatterCodec` (parse method を持つ struct) を `role: ValueObject` で起草 (R3 違反: behavior を持つ)
   - 正しい修正: `parse_adr_frontmatter` を `role: FreeFunction` に分解 (R2)
 - `AdrSignalsVerifyAdapter` を `role: UseCase` で `infrastructure-types.json` に起草 (R1 違反: `UseCase` は usecase ONLY)
-  - 正しい修正: usecase 層に `role: Interactor` + `role: ApplicationService` ペアを置き、infrastructure には `role: SecondaryAdapter` を置く
+  - 正しい修正: R1 の層配置違反を直し、複数実装またはテスト境界での差し替えが必要かを確認する。必要な場合だけ usecase 層に `role: Interactor` + `role: ApplicationService` ペアを置き、infrastructure には `role: SecondaryAdapter` を置く。共有所有だけなら `Arc<具象型>` を既定とし、不要な抽象は追加しない
 - 状態遷移を持つ ADR decision を `role: ValueObject` + `kind: { "kind": "enum" }` (`DecisionStatus { Proposed, Accepted, ... }`) で起草し、別 entry に `role: ValueObject` + `kind: { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false } }` (`status: DecisionStatus`, `implemented_in: Option<String>`) を置く (R3 違反 + 決定木違反)
   - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 「他の role が fit しないので」という理由で `role: ValueObject` を選ぶ (R5 違反)
@@ -314,26 +389,60 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 
 type-designer 自身および reviewer は draft 段階で以下を確認する:
 
+> **強制先**: review 観点 — types scope
+
 - [ ] 各 entry の `role` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか、`DomainService` は infrastructure 層に置かれていないか)
+
+  > **強制先**: review 観点 — types scope
 - [ ] zero-field struct + 1 method の entry がないか (あれば R2: `role: FreeFunction` に折り畳めないか確認)
+
+  > **強制先**: review 観点 — types scope
 - [ ] `role: ValueObject` の entry がすべて R3 を満たすか (値等価で識別され、`methods` が生成時に不変条件を確立する constructor / validation、または自身の値から値または述語を導出する side-effect-free なものに限られるか。依存や外部リソースを扱う service 的 behavior がないか。typestate state の entry は遷移メソッドを `methods` に持つ)
+
+  > **強制先**: review 観点 — types scope
 - [ ] R6 の採用条件を満たし、値等価で識別される ValueObject (R3) ではない service 中心の field + behavior を持つ domain struct が `role: DomainService` で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
+
+  > **強制先**: review 観点 — types / domain scope
 - [ ] role 起草前に偵察 (R4) を実施したか (近接 track の role 分布を確認したか)
+
+  > **強制先**: review 観点 — types scope
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
+
+  > **強制先**: review 観点 — types scope
 - [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `traits` エントリ (role は `SecondaryPort` または `Repository`) として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
+
+  > **強制先**: review 観点 — types scope
 - [ ] `methods[].returns` / `methods[].params[].ty` (TypeEntry / TraitEntry) および FunctionEntry の `returns` / `params[].ty` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
+
+  > **強制先**: review 観点 — types scope
 - [ ] field / payload / param / returns / map キーで、制約ある概念を生 primitive (`String` 等) で宣言していないか (R9)。制約があれば値オブジェクト (newtype / enum) を定義しているか。**`role: Dto` / serde 境界も例外ではない** — 概念を名指す map キー・filter 値は domain enum (serde は infra mirror enum 経由) で型付けているか。生 primitive は color / 自由ラベル等の真に不透明な提示専用値のみで、その場合 `docs` に根拠が記録されているか
+
+  > **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 - [ ] `ValueObject` 候補を R1 の semantic-first evidence (ユビキタス言語、不変条件、operation を越えた安定性、delivery/persistence/workflow からの独立性) で分類し、根拠を記録したか。domain 概念は R1 マトリクスで domain 層に合法な role (ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / ErrorType) のいずれかで domain 層に定義し、domain catalogue に宣言しているか (R10)。same-track inbound reference は補助証拠としてのみ扱ったか。application boundary 値は usecase の `Dto` / `Command` / `Query` / `ValueObject` として型付け、usecase catalogue に宣言しているか。serde / 外部形式の都合を口実に、R1 の分類をせずに概念を infra 生 struct に留めたりカタログから省略したりしていないか。外部形式が要る domain 概念は「domain オブジェクト + infra `role: Dto`」の対で表現しているか
+
+  > **強制先**: review 観点 — types / domain / usecase / infrastructure scope
 - [ ] R1〜R10 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
+
+  > **強制先**: review 観点 — types / harness-policy scope
 
 ## Enforcement
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
+
+  > **強制先**: review 観点 — types scope
 - 第二線: `bin/sotp catalogue-lint check-active-track` が、出荷 catalogue-lint config の `KindLayerConstraint` で active track の R1 forbidden role × layer 組合せを signal 評価より先に reject する。これは config を消費する lint gate であり、将来候補の codec validation とは別の機構である
+
+  > **強制先**: 機械 lint — bin/sotp catalogue-lint check-active-track
 - 第三線: track ごとの reviewer briefing (`tmp/reviewer-runtime/briefing-{scope}.md`) で本 convention を参照し、R1〜R10 の checklist を review 観点として明示する。`.harness/custom/review-prompts/<scope>.md` は利用者所有の severity policy であり、framework methodology の enforcement source にはしない
+
+  > **強制先**: review 観点 — types / harness-policy scope
 - 第四線: `bin/sotp signal calc-impl-catalog` の signal 評価 (catalogue → spec の trace integrity)。role 違反は第二線で signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
+  > **強制先**: review 観点 — harness-policy scope
+
 将来の自動化候補: catalogue validation で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の validation で reject する (`forbidden` 組合せ → codec error)。
+
+> **強制先**: 強制なし (明記) — 自動化は将来候補で現行機構なし
 
 ## Related Documents
 

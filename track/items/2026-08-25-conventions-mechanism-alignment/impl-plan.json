@@ -62,22 +62,19 @@
   "schema_version": 2,
   "tasks": [
     {
-      "commit_hash": null,
       "description": "Update `knowledge/conventions/enforce-by-mechanism.md` with D1's required enforcement-destination annotation rule, then inventory and annotate normative requirements in `dry-check-workflow.md`, `filesystem-persistence-guard.md`, `language-policy.md`, `nightly-dev-tool.md`, `no-backward-compat.md`, `security.md`, `shell-parsing.md`, `source-attribution.md`, and `workflow-ceremony-minimization.md`; validate the finite convention set in harness-policy review. D1; IN-01; CN-01; OUT-02; AC-01.",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T001"
       ],
       "description": "Revise `knowledge/conventions/type-designer-kind-selection.md` and `knowledge/conventions/prefer-type-safe-abstractions.md` for necessity-driven abstraction, and annotate the normative requirements in `prefer-type-safe-abstractions.md` with T001's taxonomy. D2; IN-01; IN-02; OUT-01; AC-01; AC-02.",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T001"
       ],
@@ -86,22 +83,19 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T001"
       ],
       "description": "Create `knowledge/conventions/environment-assumptions.md`, annotate its rules with T001's taxonomy, annotate the existing normative Maintenance Rules in `knowledge/conventions/README.md` with the same taxonomy, and update the convention index. IN-01; IN-04; CN-02; OUT-03; AC-01; AC-04.",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "Update `.harness/custom/review-prompts/domain.md`, `.harness/custom/review-prompts/usecase.md`, `.harness/custom/review-prompts/infrastructure.md`, `.harness/custom/review-prompts/cli.md`, `.harness/custom/review-prompts/cli_composition.md`, `.harness/custom/review-prompts/cli_driver.md`, and `.harness/custom/review-prompts/spec.md`; add the required review questions. IN-05; CN-03; OUT-03; AC-05.",
       "id": "T005",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T002"
       ],
@@ -110,7 +104,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T006"
       ],
@@ -119,7 +112,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T007"
       ],
