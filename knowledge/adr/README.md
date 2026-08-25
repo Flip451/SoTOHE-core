@@ -269,6 +269,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 | [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
 | [欠ける typed-pipeline 専用経路に grok を割り当て可能にする](2026-08-18-1534-grok-configurable-for-all-capabilities.md) | Proposed | 2026-08-18 |
+| [オーケストレーターの文脈摂取を規律化する](2026-08-22-0145-orchestrator-context-discipline.md) | Proposed | 2026-08-22 |
 
 ### テスト・CI ツーリング
 
