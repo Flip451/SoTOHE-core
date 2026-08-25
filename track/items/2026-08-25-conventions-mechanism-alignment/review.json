@@ -1434,6 +1434,20 @@
           "hash": "rvw1:sha256:004102523a47ba9354517c2a3da14c19ab64cd14fb5f57cb8c4baff29cf075ac",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:27:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a38c87e9faf6a9fd73aceb3677280a504fc2dfdf71f551697ede574fa0f86f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:30:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a38c87e9faf6a9fd73aceb3677280a504fc2dfdf71f551697ede574fa0f86f6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1676,6 +1690,57 @@
           "at": "2026-08-25T20:38:12Z",
           "findings": [],
           "hash": "rvw1:sha256:0c0bfab85626eaf74176230d3c3598801da435e5305e65ac518533272bf6a07a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:28:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66d458ddc0ef296d90655daa0670a6ca5ff910771b6854ed96ba19b9fd491c8e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:33:39Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 13,
+              "message": "The R1 rewrite removed the `層名を変更する場合` heading, but this ownership guidance still directs consumers to that section. The resulting dead reference obscures the required `permitted_layers` synchronization procedure; point it to the replacement section or restore the heading.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract-conformance",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 218,
+              "message": "R4 is normatively weaker than the workspace counterpart: the workspace requires reconnaissance alongside the named preparation steps, while the overlay makes that sequencing optional and additionally permits reconnaissance to be omitted when no completed track exists. The governing D1/AC-17 contract permits consumer-facing wording differences but not changed requirements, so exported consumers receive a different rule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:66d458ddc0ef296d90655daa0670a6ca5ff910771b6854ed96ba19b9fd491c8e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:37:11Z",
+          "findings": [
+            {
+              "category": "contract-conformance",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 464,
+              "message": "The R4 body now matches the workspace requirement, but this checklist item still adds a consumer-only fallback where confirming that no reference track exists satisfies reconnaissance. The workspace checklist has no such allowance, and R4 requires sampling 1–3 completed tracks, so the document remains internally inconsistent and violates the D1/AC-17 synchronization contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2273d6a92df7c98ecf1255e89e22036343ec86b3b26e68febaa8174d9b360a54",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:39:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a0fb161b328e37537bf8ef97a1c5a2e41e8ac17f879710e527a6a8ef3d5a5ce",
           "type": "final",
           "verdict": "zero_findings"
         }

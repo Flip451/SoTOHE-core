@@ -185,6 +185,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "b96d3e0e1d1bb9846814b8b02e9777bd7b63b638",
       "depends_on": [
         "T012"
       ],
@@ -198,7 +199,7 @@
       ],
       "description": "Synchronize the role-by-layer portion of `overlay/knowledge/conventions/type-designer-kind-selection.md`. IN-13; AC-13.",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "a9af152ad6bf4c7960ce5c26b24d43343a7e57b2",
@@ -219,6 +220,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "b96d3e0e1d1bb9846814b8b02e9777bd7b63b638",
       "depends_on": [
         "T003"
       ],
@@ -250,7 +252,7 @@
       ],
       "description": "Create a fresh template export, run `bin/sotp template check-convention-shipping`, and compare its eight shipped convention files with the workspace contracts. AC-09; AC-10; AC-11; AC-12; AC-13; AC-14; AC-15; AC-16; AC-17; AC-18; AC-19; AC-20.",
       "id": "T019",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
