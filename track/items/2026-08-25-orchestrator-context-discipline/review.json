@@ -681,6 +681,42 @@
           "hash": "rvw1:sha256:89d99f4b420039166eb27b31967aa0f4d4d39e1752fa5062c76a7603f00fcee9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:58:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:968a76d94cebc1d2139d25c2a4e29e2f62d2234b7d6bf02c22210e78100720f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:04:07Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 55,
+              "message": "`$track-pr-review` の承認を「the only other pause」と断定した直後に、refresh handoff を第3の sanctioned interaction と追加しており、pause の列挙が内部矛盾しています。必須 refresh を省略可能と誤読させないよう、「only other」を「second」に変えるか、3種類を一度だけ明示的に列挙してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:968a76d94cebc1d2139d25c2a4e29e2f62d2234b7d6bf02c22210e78100720f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43f3049e0acd2f2fd3c9e7bfc2d60e6c4dd9a6164b4d1fcdea0c0aeb26b7891f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:10:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43f3049e0acd2f2fd3c9e7bfc2d60e6c4dd9a6164b4d1fcdea0c0aeb26b7891f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

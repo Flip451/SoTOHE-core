@@ -51,11 +51,13 @@ or failure-recovery procedures here.
 - The workflow SSoT's autonomy constraint yields to the Phase 0 interaction boundary governed
   by `.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. That
   convention is the sole normative source for Phase 0; this skill states no procedure of its
-  own for that phase. The only
-  other pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
-  Deviations at its terminal state requires that workflow's explicit user approval. No other
-  step pauses for user confirmation; the invocation-time input acquisition (skill note 1)
-  happens before Step 1 begins and is outside this pause accounting.
+  own for that phase. Exactly three interactions are sanctioned after Phase 0: (1) that Phase 0
+  boundary; (2) the pause inherited from the delegated `$track-pr-review` workflow — recording
+  Accepted Deviations at its terminal state requires that workflow's explicit user approval;
+  (3) the parent-session refresh handoffs in skill note 5 — at each of the workflow SSoT's
+  refresh boundaries the Codex root asks the user to start a fresh session and stops, and the
+  re-invoked run resumes from persisted state. No other step pauses for user confirmation; the invocation-time input acquisition (skill note 1) happens before
+  Step 1 begins and is outside this pause accounting.
 
 ### (5) Parent-session refresh points
 

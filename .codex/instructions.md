@@ -83,6 +83,9 @@ Use the gate aggregates via `cargo make` and single workflow operations via guar
 - `bin/sotp pr push`
 - `bin/sotp pr ensure-pr`
 - `bin/sotp pr review-cycle`
+- `bin/sotp track transition <task-id> <state> [--commit-hash <hash>]` (task-state transitions
+  are performed only by the root orchestrator session, at the points the full-cycle workflow
+  SSoT fixes)
 
 Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,
 `git show`, `git rev-parse`, `git ls-files`, and `git notes show/list`.
