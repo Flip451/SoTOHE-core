@@ -968,6 +968,211 @@
           "hash": "rvw1:sha256:c1cded24efdd55449d684b2933dadb28db2152076910b317e9b1fb2a5fbd57da",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:42:45Z",
+          "findings": [
+            {
+              "category": "capability-routing-mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 99,
+              "message": "The PR-review SSoT mandates routing every non-ADR review-scope correction—including catalogue and plan changes—to `implementer`, but `implementer` explicitly forbids direct `batch-plan.json` edits and the review-fix capability forbids direct `<layer>-types.json` edits because those belong to `impl-planner`/`type-designer`. Such findings therefore have no executable delegated route. Route by artifact owner or explicitly exempt these artifacts.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary-cross",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 83,
+              "message": "The newly authorized focused PR-finding path in `implementer` is still guarded by an unconditional re-entry prerequisite requiring types-scope and impl-plan-scope review convergence. This can reject focused policy/documentation corrections before they are started, despite the PR workflow directing all non-ADR findings to this capability and allowing taskless focused dispatches. The prerequisite needs a focused-PR exception or the workflow must specify how to converge these unrelated upstream scopes first.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:51773913c54539435a73ff49fa848fe2adeb4d28467e2d4481b35a9dc382bda7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:54:39Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 38,
+              "message": "This Codex adapter still mandates sending every delegated PR finding, including review-scope artifacts, to `implementer`, but the workflow SSoT now routes writer-owned spec, catalogue, and plan artifacts to `spec-designer`, `type-designer`, and `impl-planner`. A finding on one of those artifacts would therefore be misrouted when this adapter is used.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 14,
+              "message": "This Claude adapter still says every non-ADR review-scope correction must be dispatched to `implementer`, contradicting the workflow SSoT and policy contracts that route writer-owned spec, catalogue, and plan artifacts to their respective phase capabilities. Claude execution can consequently misroute those PR findings.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fff84b587b8a37416e72b75a378fc4c3cdd9695a36ac2d602b8c3a76742e2a51",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:00:34Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 15,
+              "message": "The capability contract still says focused PR-finding corrections are routed to `implementer`, but the updated workflow and policy route writer-owned spec, catalogue, and plan findings to `spec-designer`, `type-designer`, and `impl-planner`. This contract can therefore misroute those findings or cause the wrong capability to be selected. Narrow this statement to implementer-owned corrections and refer writer-owned findings to their phase workflows.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9099a1d47080b19132b30bc459d3c8d756dc2038128a998f61861296d9307fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:03:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd276ad2266feaf334b47f4efd68ca2ea22f6c006114bae2b19e763dedddd96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:11:50Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "Writer-owned spec/type corrections invoke only the affected phase and then proceed directly to local review and commit. Those phase workflows are single-shot: the plan workflow owns downstream catalogue/plan regeneration and ref-verification refresh. A spec or catalogue edit therefore leaves downstream artifacts and ref-verifier approvals stale, causing the guarded commit to fail or preserving inconsistent SoT state. Re-enter the ordered planning descent from the affected phase before convergence and commit.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 104,
+              "message": "The route includes “generated plan views,” but the normal impl-plan workflow never regenerates `plan.md`, and the impl-planner contract forbids writing generated plan views outside conflict preparation. A PR finding against `plan.md` therefore survives this delegation and repeats. Route view freshness through the sanctioned views-sync operation while keeping semantic corrections with the JSON owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 94,
+              "message": "A `delegated-pr-finding` dispatch skips all catalogue and impl-plan convergence checks based only on its briefing and current diff. Since the PR-review workflow requires only initialized metadata and permits incomplete tracks, this allows source corrections before Phase 0–3 planning has converged, contradicting the mandatory planning gate. Exempt focused corrections from task-id/`in_progress` requirements only; retain a Phase-3/direct-upstream admission check or enforce it in PR-review Step 0.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd276ad2266feaf334b47f4efd68ca2ea22f6c006114bae2b19e763dedddd96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:21:14Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "The new handoff cannot enter planning at the affected phase. The `plan` workflow has no partial-entry argument and its documented sequence starts by invoking Phase 0 `init`, whose contract requires the configured base branch; `pr-review` is already on `track/<id>`. This route therefore fails before downstream regeneration (and would also rerun the just-completed writer). Use the existing partial-reentry/post-routing descent surface or explicitly dispatch the downstream phase sequence.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 199,
+              "message": "The Failure/recovery route still says owner workflow → local review → commit, omitting Step 3's newly mandatory downstream planning descent. The same stale order remains in `.claude/commands/track/pr-review.md:27`, `implementation-delegation.md:60`, `review-protocol.md:78`, `sot-reentry-sequencing.md:56`, and `task-completion.md:37`. Following any of those instructions after a spec/type correction leaves downstream artifacts and ref-verifier approvals stale. Synchronize every surface with the corrected ordering.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "This policy still routes generated plan views through the impl-planner’s normal `impl-plan` workflow. The current PR-review SSoT correctly routes them through views-sync because impl-planner forbids writing `plan.md` and normal impl-plan does not regenerate it. `review-protocol.md:76` repeats the stale ownership mapping, so a policy-driven repair of a `plan.md` finding cannot change the target file.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 35,
+              "message": "This still treats a taskless `delegated-pr-finding` briefing and current diff as a separate admission path from normal re-entry. The updated implementer contract now says tasklessness waives only task IDs/`in_progress` and still requires Phase 3 plus catalogue, ref-verifier, types-review, and impl-plan-review convergence. An orchestrator following this policy will omit required admission evidence and the implementer must reject the dispatch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9c53a7dc68ed4cf5237306d96b9deb661a0bfdd2496c9016233f716e9a6d8cb8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:30:45Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "Step 2 has already applied the correction by running the affected phase workflow, but Step 3 instructs the orchestrator to enter that same phase again. In the diagnose post-routing contract, the affected-phase writer dispatch is the first descent step; after it completes, the orchestrator should reconverge that phase and continue with the next downstream phase. Re-running a normal writer is not a no-op—it rewrites its owned artifacts (impl-planner rewrites all four plan artifacts), so it can overwrite the focused correction or lifecycle state. Treat the completed correction as the affected-phase dispatch and begin post-routing convergence/descent from there.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f02e8de1f590abde3e113b96ca97125542a5e2e0333bd477d4fcfce596b59781",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:36:00Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 98,
+              "message": "The owner-routing list is narrower than the implementer contract. After removing `review-fix-lead` as the generic PR-finding transport, this workflow and both adapters delegate only source changes and ordinary policy/documentation files; non-ADR review-scope artifacts such as harness configuration, settings, manifests, or build files are neither covered by that list nor owned by a phase writer. An actionable PR finding on such a file therefore has no delegation path and cannot reach the recovery clause. Route every named non-ADR review-scope artifact within the implementer boundary to `implementer`, while retaining the explicit writer/verdict exclusions, and align both adapters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:94b4cd09aa1bc3561792358c0a05e2858ab3ffeba26920872a2dd2d012aabcdb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:44:25Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary-cross",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 35,
+              "message": "The SoT re-entry policy now requires every taskless `delegated-pr-finding` dispatch to verify Phase 3, catalogue/ref-verify convergence, and types/impl-plan review convergence before editing. This contradicts the `implementer` capability contract, which treats a taskless focused PR correction as exempt from those unrelated plan-task prerequisites and admits it from the focused briefing/current diff. The policy can therefore block implementer-owned PR fixes that the PR workflow explicitly routes directly to `implementer`. Align the policy with the focused-dispatch exception or update the capability/workflow consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:520efb13fe4f6e224d4e99a0d22a71427944d9890d8607be7b659bd68c8611ac",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:49:42Z",
+          "findings": [
+            {
+              "category": "command-wiring-breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 93,
+              "message": "Step 3 requires every actionable PR finding to use a `dispatch_mode: delegated-pr-finding` focused briefing, but writer-owned fixes are then sent through the normal `spec-design`/`type-design`/`impl-plan` phase-entry workflows, which each require their own configured writer briefing and path. The PR workflow never defines how the focused PR comment/request is transferred into that phase-specific briefing or which briefing is passed to `phase enter`, so writer-owned PR findings have no fully wired dispatch path. Separate the implementer focused briefing from the phase-writer briefing and specify the handoff.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53d24a3ceb13730b639b6391cab1dc5f5d5791fb6d6807c9d7226fa0632c52c8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:54:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e8f7a014f8145dfdd596c72752f2edfe9f17a421c91398d841e430f9825ff2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e8f7a014f8145dfdd596c72752f2edfe9f17a421c91398d841e430f9825ff2a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

@@ -32,9 +32,9 @@
 
 ### PR finding の修正主体
 
-PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとの focused briefing を作成し、実装変更を `implementer`、review-scope の修正を `review-fix-lead` に委譲する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
+PR review の actionable finding が編集を要求する場合、orchestrator は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、spec / catalogue / plan の SoT artifacts はそれぞれ `spec-designer` / `type-designer` / `impl-planner` の通常 writer workflow が扱う。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。writer-owned artifact の修正後は完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させ、生成された plan view を sanctioned views-sync operation で更新してから local review を `zero_findings` まで収束させる。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは implementer-owned non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
-委譲先の完了報告後、orchestrator は local review を `zero_findings` まで収束させ、`commit` workflow を完了してから PR review を再実行する。タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
+委譲先の完了報告後、writer-owned artifact の修正であれば上記の partial-reentry / post-routing descent を完了させ、生成された plan view を sanctioned views-sync operation で更新したうえで、orchestrator は local review を `zero_findings` まで収束させ、`commit` workflow を完了してから PR review を再実行する。タスク状態の変更や完了報告はこの修正経路を代替せず、状態遷移は引き続き orchestrator が専管する。
 
 ### アーキテクチャ変更を含むタスク
 

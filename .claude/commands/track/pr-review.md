@@ -11,26 +11,24 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
 ## Claude Code invocation constraints
 
 - **Finding-fix dispatch**: the push / PR / review-cycle commands run from the orchestrator
-  host. Follow Step 3 of the workflow SSoT for the finding-fix procedure. For implementation
-  corrections, dispatch `implementer` with:
+  host. Follow Step 3 of the workflow SSoT for the finding-fix procedure. For implementer-owned
+  non-ADR implementation or any named non-ADR review-scope artifact within its boundary, dispatch `implementer` with:
   ```
   bin/sotp capability exec implementer --host claude --briefing-file <path>
   ```
-  If the dispatcher returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the matching
-  Claude Agent tool with the returned briefing path and discipline body. For review-scope fixes,
-  dispatch the `review-fix-lead` lane through the provider-neutral wrapper:
-  ```
-  cargo make track-local-review-fix -- --scope <scope> \
-    --briefing-file <path> \
-    --round-type fast|final
-  ```
-  If the wrapper exits `64` with `SUBAGENT_DISPATCH_REQUIRED`, parse its payload and spawn the
-  `review-fix-lead` Claude subagent as instructed. Do not branch on the configured
-  `review-fix-lead` provider; the wrapper resolves it.
+  The briefing must carry `dispatch_mode: delegated-pr-finding`; source-editing briefings also
+  carry the architecture constraints required by the workflow SSoT. If the dispatcher returns
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the matching Claude Agent tool with the
+  returned briefing path and discipline body. Writer-owned spec, catalogue, and plan artifacts
+  use their owning phase workflow from the SSoT, not this focused implementer dispatch;
+  `review-fix-lead` remains the normal scope-review lane until its wrapper supports a typed
+  focused mode.
 
-- **Convergence and commit**: after the delegated capability reports completion, run
-  `/track:review` to convergence and `/track:commit` before re-running this command. The Claude
-  root may edit directly only as recovery after a failed delegation for non-ADR findings. A
+- **Convergence and commit**: after the delegated capability reports completion, use the
+  workflow SSoT's partial-reentry / post-routing descent for any writer-owned correction, then
+  run `/track:review` to convergence and `/track:commit` before re-running this command. The Claude
+  root may edit directly only as recovery after a failed delegation for implementer-owned
+  non-ADR findings. A
   finding requiring an edit to `knowledge/adr/*.md` must go through the review workflow SSoT's
   `ADR-scope repair lane` and is never edited by the Claude root or `review-fix-lead`; apply the
   same local-convergence and commit sequence afterward.

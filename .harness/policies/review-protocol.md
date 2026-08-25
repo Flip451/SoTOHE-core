@@ -73,9 +73,9 @@ bypass が動かすのは判定の**時期**だけで、判定の要否ではな
 
 ### PR finding の修正経路
 
-PR review で actionable finding が返った場合、orchestrator は finding ごとに comment、対象 path / line、track context、requested correction を含む focused briefing を作り、実装変更は `implementer`、review-scope の修正は `review-fix-lead` へ委譲する。親コンテキストでの inline edit は通常経路にしてはならず、委譲先が scoped change を適用して completion を返すまで修正済みと扱わない。
+PR review で actionable finding が返った場合、orchestrator は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作り、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、`spec.json` とその生成 view は `spec-designer` の `spec-design`、`<layer>-types.json` とその生成 view は `type-designer` の `type-design`、`impl-plan.json`、`task-coverage.json`、`task-contract.json`、`batch-plan.json` は `impl-planner` の `impl-plan` の通常 writer workflow が扱う。生成された plan view は sanctioned views-sync operation で更新する。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。親コンテキストでの inline edit は通常経路にしてはならず、委譲先が scoped change を適用して completion を返すまで修正済みと扱わない。
 
-委譲先の completion 後、orchestrator は local review workflow を `zero_findings` まで収束させ、`commit` workflow で修正をコミットしてから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として許すが、これは non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
+委譲先の completion 後、writer-owned artifact の修正であれば完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させる。生成された plan view は sanctioned views-sync operation で更新する。その後、orchestrator は local review workflow を `zero_findings` まで収束させ、`commit` workflow で修正をコミットしてから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として許すが、これは implementer-owned non-ADR finding に限る。writer-owned artifact はその owner workflow に戻し、親が inline edit してはならない。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
 ### レビュー対象サイズ
 
