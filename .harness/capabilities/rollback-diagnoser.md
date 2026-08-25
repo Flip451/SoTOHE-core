@@ -40,8 +40,10 @@ The capability is invoked by the orchestrator in three primary scenarios:
 
 ## Context files (mandatory pre-read)
 
-Before rendering a routing decision, the capability MUST read the following artifacts for the
-active track. The track id is taken from the current branch (`track/<id>`).
+Before rendering a routing decision, the capability MUST read the exact artifact paths listed in
+the dispatch briefing for the active track. The track id is taken from the current branch
+(`track/<id>`). The orchestrator supplies the diagnostic and CLI summary context but does not
+bulk-read these artifact bodies for the hand-off.
 
 - `track/items/<track-id>/spec.json` — Phase 1 behavioral contract (spec ↔ ADR grounding).
 - `track/items/<track-id>/<layer>-types.json` for **every** TDDD-enabled layer (per
@@ -151,13 +153,16 @@ writer subagent — it is diagnose-only and has no task-state transition authori
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Diagnostic text: the Blocked summary / reviewer finding / external comment that triggered the
   invocation
 - Track id (resolved from the current branch by the calling orchestrator)
-- Context: relevant ADR paths, the failing spec element ids (when known), and any other framing
-  the orchestrator wants the routing judgment to consider
+- Briefing file with exact paths for the relevant spec, per-layer catalogues, implementation-plan
+  artifacts, signal snapshots, ADRs, source files, and resolved conventions, as applicable to the
+  finding
+- Context: failing spec element ids (when known), and any other framing the orchestrator wants the
+  routing judgment to consider
 
 ### Out-of-scope
 

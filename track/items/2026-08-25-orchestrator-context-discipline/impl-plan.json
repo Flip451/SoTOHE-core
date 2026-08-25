@@ -126,7 +126,7 @@
     {
       "description": "`.harness/workflows/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の長時間 gate / evaluate 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
@@ -140,7 +140,7 @@
       ],
       "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -148,7 +148,7 @@
       ],
       "description": "`.harness/capabilities/*.md` の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -199,6 +199,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
       "depends_on": [
         "T001"
       ],
@@ -207,6 +208,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
       "depends_on": [
         "T002"
       ],
@@ -220,9 +222,10 @@
       ],
       "description": "`.claude/commands/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
       "depends_on": [
         "T004"
       ],
@@ -236,9 +239,10 @@
       ],
       "description": "`.agents/skills/track-{plan,spec-design,type-design,impl-plan,implement,review}/SKILL.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、OS-02、CN-01、CN-03、AC-01。",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
       "depends_on": [
         "T002"
       ],
@@ -252,7 +256,7 @@
       ],
       "description": "`.agents/skills/track-{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}/SKILL.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-03。",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
@@ -275,7 +279,7 @@
       ],
       "description": "`README.md` と `.harness/policies/consumer-ownership.md` の provider compatibility ownership、runtime 文書の self-contained 表現、enforcement boundary の記述を更新する。IN-05、OS-01、CN-01、CN-02、AC-06。",
       "id": "T016",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",

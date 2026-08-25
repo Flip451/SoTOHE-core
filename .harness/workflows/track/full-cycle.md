@@ -38,8 +38,11 @@ Sub-workflows used:
 
 ### Step 0: Build an execution plan (required before any execution)
 
-Read every sub-workflow definition referenced in this workflow and extract their decision points
-into a concrete execution plan. Treat them as a state machine to execute, not background reading.
+Use the track CLI summaries, declared batch state, and selected task briefing as the primary
+intake. Do not bulk-read every referenced sub-workflow definition before execution. Treat each
+referenced workflow as its own SSoT and open its body only for the active handoff or a targeted
+diff/blocker investigation. Follow the referenced workflow's own contract; where it delegates
+work, its delegated capability owns that detailed procedure.
 
 **Step 0a: Load the declared batches**
 
@@ -65,6 +68,15 @@ participates in DFP, Review, Commit, and post-commit task hash backfill).
 Within the batch, run `implement` in dependency order for `todo` / `in_progress` tasks only,
 honouring the `depends_on` edges declared in `impl-plan.json` (lower-layer first where no
 edge dictates otherwise). DonePending tasks keep their position for downstream gates.
+
+### Long-running gate waiting
+
+Every long-running capability dispatch, workflow, or gate wrapper in this loop is one blocking
+call whose terminal result is read once. If the host backgrounds a call, read the result once
+after the single completion notification. Do not poll logs, re-run status probes, or add
+fire-and-forget launches; any internal CLI or workflow loop remains owned by the called unit.
+`bin/sotp test-obligation evaluate` is only a synchronous repair step on the orchestrator host,
+never a background launch or a commit-gate prerequisite; the commit gate runs `check`.
 
 ### Execution (per batch)
 
@@ -93,7 +105,7 @@ same batch.
 
 Test-obligation handoff: a catalogue-bearing track enters this loop already enrolled
 (`obligations.json` + `test-bindings.json` from the `type-design` workflow's terminal derive
-step, ADR 2026-07-23-0240 D1). The `implement` workflow's Step 4 authors binding increments
+step). The `implement` workflow's Step 4 authors binding increments
 against those obligations per batch; this workflow adds no enrollment decision of its own,
 and the commit gate's `sotp test-obligation check` fail-closes if the artifacts are missing.
 

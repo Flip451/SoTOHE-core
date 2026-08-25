@@ -20,11 +20,13 @@ fixes; it never edits `dry-check.json` directly.
 The orchestrator invokes this capability with:
 
 - Track ID
-- Briefing file path (the orchestrator may supply a briefing file for context)
+- Briefing file path containing the DRY findings, CLI-summary/current-diff context, architecture
+  constraints, and exact artifact paths relevant to the assigned fix
 
 The fixer dispatch (provider / model) is auto-resolved from `capabilities.dry-fix-lead` in
-`.harness/config/agent-profiles.json`; the orchestrator does not pass it. This capability may
-edit any file in the workspace (see Scope Ownership).
+`.harness/config/agent-profiles.json`; the orchestrator does not pass it or pre-read the briefing's
+artifact bodies. This capability reads the exact paths listed in the briefing itself and may edit
+any file in the workspace (see Scope Ownership).
 
 ## Scope ownership
 

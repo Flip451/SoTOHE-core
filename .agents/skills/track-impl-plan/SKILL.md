@@ -32,7 +32,18 @@ or failure-recovery procedures here.
   gate verdict and error details back to the caller (`$track-plan`), which owns re-invocation
   and the `max_retry` counter. Do not re-dispatch `impl-planner` from inside this skill.
 
-### (4) Reporting format
+### (4) Context intake
+
+- Follow the workflow SSoT's summary-first context intake: take progress, review necessity,
+  obligation state, and catalogue state from the CLI summaries it names (`bin/sotp track resolve`,
+  `bin/sotp track task-counts`, `bin/sotp track next-task`, `bin/sotp review results`,
+  `bin/sotp test-obligation results`, `bin/sotp catalog check`, `bin/sotp ref-verify results`).
+- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
+  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
+  blocker it names. Convention paths are listed in each delegated briefing and read by the
+  delegated capability, not by this root session.
+
+### (5) Reporting format
 
 - On successful completion, print: `IMPL_PLAN_STATUS: completed — impl-plan.json written, coverage and batch-plan gates passed`
 - On gate failure or block (either gate), print: `IMPL_PLAN_STATUS: blocked — <reason>`

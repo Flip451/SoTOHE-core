@@ -8,10 +8,10 @@
 ## Mission
 
 Run GitHub PR-based review via the `pr-reviewer` capability. The workflow pushes the track
-branch, creates or reuses a PR, triggers an automated PR review cycle (trigger → poll → parse),
-and handles the results loop until the reviewer signals explicit zero findings (👍) or the user
-approves an Accepted Deviations exception. This workflow does NOT merge the PR; merging is a
-separate caller decision.
+branch, creates or reuses a PR, invokes the CLI-owned automated PR review cycle, and handles the
+results loop until the reviewer signals explicit zero findings (👍) or the user approves an
+Accepted Deviations exception. This workflow does NOT merge the PR; merging is a separate caller
+decision.
 
 ## Inputs
 
@@ -58,11 +58,17 @@ This creates a new PR or reuses an existing one for this track branch.
 
 **Step 2: Trigger review**
 
-Run the full cycle which handles trigger, poll, and parse:
+Run the full cycle once as a single blocking call; the CLI owns its trigger, poll, and parse
+behavior:
 
 ```
 bin/sotp pr review-cycle
 ```
+
+At the next wake-up, read the command's terminal result once. If the host backgrounds the call,
+read that result once after the single completion notification. Do not add a manual polling loop,
+periodic PR-status probe, or fire-and-forget launch around the CLI; its internal poller is the
+only poller in this workflow.
 
 This executes `sotp pr review-cycle`, which:
 
@@ -125,8 +131,8 @@ Use a numbered list format, not table format (more reliably parsed by automated 
 
 **Async handling**:
 
-The review is asynchronous. After posting the review request, the workflow polls GitHub API.
-If the poll times out:
+The review is asynchronous, but the workflow makes one blocking `review-cycle` invocation; its
+internal poller waits for the matching review. If that command returns a timeout:
 
 - No reviewer activity: suggests the automated review integration is not installed on the repo.
 - Reviewer active but no review: the review is still in progress. Try again later.

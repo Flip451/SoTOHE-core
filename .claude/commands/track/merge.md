@@ -10,7 +10,7 @@ User invokes this command as `/track:merge`. `$ARGUMENTS` supplies the PR number
 
 This invocation is the user's single normal-path merge approval. Present the required terminal
 audit, but after a clean audit do not ask for another yes/no confirmation: continue to remote-CI
-polling and merge when green. A user decision remains necessary only for a real terminal-audit
+wait and merge when green. A user decision remains necessary only for a real terminal-audit
 misclassification, a post-outcome head-OID mismatch that invalidates that audit, or an
 admitted-draft recovery directed by the workflow SSoT.
 
@@ -34,6 +34,12 @@ admitted-draft recovery directed by the workflow SSoT.
 - **Strict-gate block handling**: route every strict merge-signal gate block from the merge
   command through the workflow SSoT's block-triage lane. Enter adjudication recovery only when
   that lane directs it; this adapter does not restate or perform either lane.
+
+### Gate waiting
+
+- `bin/sotp pr wait-and-merge` owns the CI wait: run it as one blocking call and read its result
+  once. Do not wrap it in a polling loop or re-check PR status periodically; if the host
+  backgrounds the call, read the result once after the single completion notification.
 
 ## Report format
 

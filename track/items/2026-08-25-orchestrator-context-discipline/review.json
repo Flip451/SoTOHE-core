@@ -324,6 +324,86 @@
           "hash": "rvw1:sha256:f49d2c6ec5d504f50b66770e2dd26937a11e2fd8db70e59795a601aeba5694c9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:31:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 41,
+              "message": "The full-cycle SSoT still requires reading every referenced sub-workflow before execution, contradicting the summary-first intake rule that forbids bulk-reading full sub-workflow texts and makes targeted artifact/blocker reads the default.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "message": "The Codex full-cycle adapter says `$track-implement` owns task-state transitions, but the implement SSoT states that only the orchestrator performs transitions. This can route task transitions to the wrong owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "runtime-document boundary",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 105,
+              "message": "This runtime workflow document retains a dated ADR citation, violating the self-contained runtime-document rule and CN-01’s no-dated-ADR-citation requirement.",
+              "severity": "P2"
+            },
+            {
+              "category": "runtime-document boundary",
+              "file": ".harness/workflows/track/obligation-fulfillment.md",
+              "line": 7,
+              "message": "This runtime workflow document retains a dated ADR citation, violating the self-contained runtime-document rule and CN-01’s no-dated-ADR-citation requirement.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:783e435be73e753e31c648df8fafbede5a707494e1ff82233d78649ee06b4633",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:39:32Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 43,
+              "message": "The revised full-cycle SSoT now says each referenced workflow's detailed procedure is owned by its delegated capability, but `commit.md` is explicitly a standalone workflow with no delegated capability. This misstates ownership and can route the caller to a nonexistent owner; refer to the referenced workflow/adapter itself instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f354066769c3942d8a68b13cf2a5c9939599c8e3bcf14adf71510dc127462d2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:42:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40f2f6242f5ed6480b87a549dafcf9a941aed31f8385d411c1bf60aeca33ee57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:53:35Z",
+          "findings": [
+            {
+              "category": "capability-workflow mismatch",
+              "file": ".harness/capabilities/dry-fix-lead.md",
+              "line": 27,
+              "message": "新契約は orchestrator が briefing 対象 artifact を事前に読まず、exact path を渡すと規定していますが、呼び出し元の `dry-check` workflow は依然として Step 0b で `spec.md` と `plan.md` を無条件に読み、その内容から briefing を生成します。これは summary-first intake と capability/workflow wiring の矛盾です。Step 0b を CLI summaries と exact paths の受け渡しに変更し、Architecture Constraints に必要な箇所だけ targeted read にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40f2f6242f5ed6480b87a549dafcf9a941aed31f8385d411c1bf60aeca33ee57",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:59:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c079d718bfe9241c03ad2d29c920cdc7c7d1afc4751d1302a0a7e3c284e54f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -597,6 +677,20 @@
           "at": "2026-08-25T08:31:21Z",
           "findings": [],
           "hash": "rvw1:sha256:53577b73026cfe166760741680ed81a670765510709f12d20a923702528cfad6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:29:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79d21369965b7ec8734abcd671122bf08353060a6c6d7ae0e36d4d69a6e353a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:31:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79d21369965b7ec8734abcd671122bf08353060a6c6d7ae0e36d4d69a6e353a7",
           "type": "final",
           "verdict": "zero_findings"
         }

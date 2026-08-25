@@ -19,9 +19,13 @@ layer の id、path、依存方向は `architecture-rules.json` が持つ。本 
 
 ## Rules
 
+### R0. 委譲時の context intake
+
+委譲元は、track の進行・review 必要性・obligation 状態・catalogue 状態を、workflow が指定する CLI summary (`bin/sotp track resolve`、`bin/sotp track task-counts`、`bin/sotp track next-task`、`bin/sotp review results`、`bin/sotp test-obligation results`、`bin/sotp catalog check`、`bin/sotp ref-verify results`) と task briefing から取得する。これらを一次情報とし、`*-types.json`、`review.json`、bindings JSON、full sub-workflow texts、`Related Conventions` list を委譲開始時に一括で開かない。差分または blocker を調査する場合に限り対象 artifact body を開く。convention path は dispatcher が briefing に記載し、委譲元は `Related Conventions` list を列挙・読まず、delegated capability がその path を読む。
+
 ### R1. 委譲時に architecture 制約を注入する
 
-source を編集する capability への依頼には `## Architecture Constraints` 節を必ず含める。節の内容は track の ADR と rendered plan view から抽出し、次を明示する。
+source を編集する capability への依頼には `## Architecture Constraints` 節を必ず含める。節の内容は task briefing と CLI summary を一次情報とし、設計上の配置を確定する必要がある場合に限り、briefing が示す track の ADR と rendered plan view の該当部分から抽出して、次を明示する。
 
 | 項目 | 抽出元 |
 | --- | --- |

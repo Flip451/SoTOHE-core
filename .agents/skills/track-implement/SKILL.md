@@ -35,7 +35,18 @@ or failure-recovery procedures here.
   command, sequencing, and timing live in the workflow SSoT — do not restate them here.
 - CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 5).
 
-### (4) Reporting format
+### (4) Context intake
+
+- Follow the workflow SSoT's summary-first context intake: take progress, review necessity,
+  obligation state, and catalogue state from the CLI summaries it names (`bin/sotp track resolve`,
+  `bin/sotp track task-counts`, `bin/sotp track next-task`, `bin/sotp review results`,
+  `bin/sotp test-obligation results`, `bin/sotp catalog check`, `bin/sotp ref-verify results`).
+- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
+  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
+  blocker it names. Convention paths are listed in each delegated briefing and read by the
+  delegated capability, not by this root session.
+
+### (5) Reporting format
 
 - On successful completion, print: `IMPLEMENT_STATUS: completed — <n> tasks implemented, CI passing` (implementation handoff only; the orchestrator owns any task-state transition per the workflow SSoT)
 - On failure or block, print: `IMPLEMENT_STATUS: blocked — task <id>: <reason>`

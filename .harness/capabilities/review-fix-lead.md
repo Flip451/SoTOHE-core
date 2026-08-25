@@ -21,12 +21,15 @@ within its assigned modification boundary.
 The orchestrator invokes this capability with:
 
 - Track ID and scope name
-- Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`)
+- Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`) containing the CLI-summary and
+  current-diff scope context, the exact spec / plan / task / catalogue paths needed for the
+  review, and the resolved convention paths (possibly none)
 - `round_type` (`fast` or `final`) — single value, fixed for the capability's lifetime
 
 The reviewer model is auto-resolved by `bin/sotp review local` from `agent-profiles.json`; the
-orchestrator does not pass it. The modification boundary is self-resolved by this capability
-(see Scope Ownership).
+orchestrator does not pass it or bulk-read the briefing's artifact bodies. This capability reads
+the listed paths itself. The modification boundary is self-resolved by this capability (see Scope
+Ownership).
 
 ## Scope ownership (CRITICAL)
 

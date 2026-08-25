@@ -43,16 +43,21 @@ If the briefing asks for:
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Track id and feature name
-- Briefing file path with:
-  - Target ADR path(s) under `knowledge/adr/`
+- Briefing file containing:
+  - Exact path to `track/items/<id>/metadata.json`
+  - Exact target ADR path(s) under `knowledge/adr/`
   - Any explicit constraints carried over from the ADR
   - Prior `spec.json` excerpt when updating an existing track
 - The project-wide conventions the dispatcher resolved for this capability, delivered with the
   dispatch rather than through the briefing file. That resolution is the complete convention
   input, including when it resolves to zero documents.
+
+The orchestrator supplies phase and verification summaries as dispatch context and does not
+bulk-read the listed artifact bodies during intake. The capability reads the exact paths in the
+briefing and the resolved convention paths itself.
 
 ### Internal pipeline (all executed by the specialist)
 
@@ -76,7 +81,8 @@ If the briefing asks for:
 2. **## Spec summary** — bullet list of written `spec.json` elements (element id → one-line purpose) and the updated `related_conventions[]` entries
 3. **## Signal evaluation** — blue / yellow / red counts per spec section (in_scope / out_of_scope / constraints / acceptance_criteria / goal). For every 🔴 element, also list the spec element id and the target ADR path cited by that element so the orchestrator can brief `adr-editor` without reading `spec.json`. A short note on yellow elements is also useful.
 4. **## Open Questions** — items requiring user or ADR clarification
-5. **## Ref integrity notes** — citations the orchestrator should double-check against the ADR / convention contents post-write
+5. **## Ref integrity notes** — citations and paths for targeted ADR / convention follow-up when
+   a diff or blocker requires it
 
 Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` selections. Those belong in the ADR (illustrative only, with `<!-- illustrative, non-canonical -->` markers) or in the type-designer's catalogue entries.
 

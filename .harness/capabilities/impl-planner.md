@@ -50,14 +50,21 @@ If the briefing asks for:
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Track id and feature name
-- `track/items/<id>/spec.json` — the behavioral contract (authoritative for what the plan must cover)
-- Per-layer type catalogues `track/items/<id>/<layer>-types.json` for `tddd.enabled` layers — informs which types need implementation work
-- Relevant ADR(s) under `knowledge/adr/` — may dictate task ordering or batching constraints
-- Prior `impl-plan.json` / `task-coverage.json` excerpt when updating an existing track
-- Briefing file path with any explicit constraints on task granularity or ordering
+- Briefing file with the exact paths to `track/items/<id>/spec.json`, each relevant per-layer
+  type catalogue, and the ADR(s) under `knowledge/adr/`; it also carries any prior plan excerpt
+  and explicit constraints on task granularity or ordering
+- The spec path is authoritative for plan coverage; the catalogue paths inform which types need
+  implementation work; and the ADR paths may dictate task ordering or batching constraints
+- Prior `impl-plan.json` / `task-coverage.json` excerpts when updating an existing track
+- The project-wide conventions resolved for this capability, delivered with the dispatch —
+  project-specific plan rules and patterns (may be empty)
+
+The orchestrator supplies progress, review, obligation, and catalogue summaries as dispatch
+context and does not bulk-read the listed artifact bodies during intake. This capability reads
+the exact paths in the briefing and the resolved convention paths itself.
 
 ### Internal pipeline (all executed by the specialist)
 

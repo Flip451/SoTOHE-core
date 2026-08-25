@@ -76,15 +76,20 @@ The type-designer operates on decisions already made at the ADR + spec level —
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Track id and layer scope (one or more of `tddd.enabled` layers from `architecture-rules.json`)
-- `track/items/<id>/spec.json` — behavioral contract (authoritative for what must be expressible via the type catalogue)
-- Relevant ADR(s) under `knowledge/adr/` — design decisions, rejected alternatives, layer placement constraints. Per `.harness/policies/pre-track-adr-authoring.md`, an ADR must exist before design starts
-- Existing catalogue file (if incremental update) — `track/items/<id>/<catalogue_file>`
-- Existing baseline file (if any) — `track/items/<id>/<catalogue-stem>-baseline.json`
+- Briefing file with the exact paths to `track/items/<id>/spec.json`, the relevant ADR(s) under
+  `knowledge/adr/`, and `architecture-rules.json`; when this is an incremental update, it also
+  names the existing catalogue and baseline paths
+- The cited ADRs provide design decisions, rejected alternatives, and layer-placement constraints;
+  an ADR must exist before design starts
 - The project-wide conventions resolved for this capability, delivered with the dispatch — project-specific type-design rules and patterns (may be empty)
 - `.harness/reference/catalogue-schema.md` for reading generated entries, judging `$todo` fill-ins, and verifying hand-adjustments
+
+The orchestrator supplies phase, catalogue, and verification summaries as dispatch context and
+does not bulk-read catalogue bodies to prepare the hand-off. This capability reads the exact
+artifact paths in the briefing and the resolved convention paths itself.
 
 ### Internal pipeline (all executed by this capability, per layer in scope)
 
@@ -283,7 +288,12 @@ Plus once at the end:
 
 3. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
 
-The orchestrator's responsibility is signal-based phase gate evaluation only. Catalogue entries written, per-action rationale, and cross-partition migration summaries remain in the catalogue files (`<layer>-types.json`) and rendered views (`<layer>-types.md` via `sync_rendered_views`, `contract-map.md`); the orchestrator can read those directly when needed and they are not echoed in this final message. The 12c attestation enumerations are the exception — they are required in the final message.
+The orchestrator's responsibility is signal-based phase gate evaluation only. Catalogue entries
+written, per-action rationale, and cross-partition migration summaries remain in the catalogue
+files (`<layer>-types.json`) and rendered views (`<layer>-types.md` via `sync_rendered_views`,
+`contract-map.md`); those bodies are for targeted diff or blocker investigation, not routine
+phase-state intake, and are not echoed in this final message. The 12c attestation enumerations
+are the exception — they are required in the final message.
 
 Do NOT emit Rust code, module trees, or inline trait signatures outside the catalogue fields.
 

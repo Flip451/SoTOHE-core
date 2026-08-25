@@ -45,6 +45,13 @@ Prerequisites: Codex Cloud GitHub App must be installed; `gh` CLI must be authen
 `.harness/config/agent-profiles.json` and fails if the provider is not `codex`; surface that
 error and direct the user to use `/track:review` instead.
 
+### Gate waiting
+
+- `bin/sotp pr review-cycle` owns the trigger → poll → parse sequence internally: run it as one
+  blocking call and read its result once. Do not add a manual polling loop or periodic PR-status
+  probes around it; if the host backgrounds the call, read the result once after the single
+  completion notification, then apply the workflow SSoT's stale-review handling.
+
 ## Report format
 
 After execution, summarize:

@@ -37,7 +37,15 @@ shapes, the declaration × anchor triangulation rule) lives in
 - Codex-specific detail: scratch backups and scratch copies live under `tmp/` (the
   sandbox-writable scratch root).
 
-### (4) Reporting format
+### (4) Gate waiting
+
+- Each implementer round and each orchestrator-host `bin/sotp test-obligation evaluate` is run as
+  one blocking call whose result is read once; `evaluate` is a synchronous repair step, never a
+  background or fire-and-forget launch, and `check` — not `evaluate` — is what the commit gate
+  runs. Do not poll for round completion; if the host backgrounds a call, read the result once
+  after the single completion notification.
+
+### (5) Reporting format
 
 - Report per-round: records repaired by method (bind-existing / new-test / waiver-convert),
   tests added (file + test name), and any untouched remainder as exact

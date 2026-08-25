@@ -22,12 +22,15 @@ The orchestrator invokes this capability with:
 
 - Track id and current branch context.
 - One or more task ids from `impl-plan.json`.
-- Relevant task descriptions, spec anchors, and catalogue entries.
+- A briefing file containing the selected task descriptions, spec anchors, and exact paths to the
+  relevant spec, plan, metadata, task-contract, and catalogue artifacts.
+- The resolved convention paths delivered alongside the briefing (possibly none).
 - Optional briefing notes that narrow target files or constraints.
 
-The implementer must read the current track's `spec.md`, `plan.md`, `metadata.json`, and any
-conventions listed in the rendered track documents before changing code. Prefer canonical blocks
-and catalogue JSON for exact contracts.
+The implementer reads the exact artifact and convention paths named in the briefing before
+changing code. It does not derive the convention set from a rendered track document or require
+the orchestrator to pre-read those bodies. Prefer canonical blocks and catalogue JSON for exact
+contracts.
 
 ## Scope Ownership
 

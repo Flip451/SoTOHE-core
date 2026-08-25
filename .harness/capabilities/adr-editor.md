@@ -79,10 +79,10 @@ The briefing from the orchestrator must include:
 - The originating input verbatim (🔴 signal element(s) and citations / review finding /
   proposal / user adjudication), and on re-invocation after a guardian verdict, that
   verdict's `alternative` / `no_change_rationale` / resolution relayed verbatim
-- `merge_target`: the effective branch strategy's merge target value, resolved by the
-  orchestrator before invocation (from `metadata.json#branch_strategy_snapshot.merge_target`
-  in a track context, else `.harness/config/branch-strategy.json#merge_target`) — used for
-  the pre-merge / post-merge detection in Editing rules
+- `merge_target`: the effective branch strategy's merge target value, supplied in the briefing;
+  the briefing also names its exact source path (`track/items/<track-id>/metadata.json` in a track
+  context, otherwise `.harness/config/branch-strategy.json`) for any targeted verification — used
+  for the pre-merge / post-merge detection in Editing rules
 - An explicit instruction: "edit the working tree only; do not commit, do not snapshot"
 
 ## Boundary with other capabilities
