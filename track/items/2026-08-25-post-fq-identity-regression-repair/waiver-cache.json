@@ -1,0 +1,173 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+      },
+      "key": {
+        "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
+        "declaration_hash": "e5ddbbc7c53b9274a833f67e594e8ea696c64518fcadb69d882d25cf83d6e1d5",
+        "waived_reason_hash": "3d46ed26e44581b70736b2fff43e28e5bd738860e08bc1dbe1a0ed853940bf9f"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "params: [ParamDeclaration { name: ParamName(Identifier(\"reference\")), ty: TypeRef(\"&TypeRef\") }, ParamDeclaration { name: ParamName(Identifier(\"catalogue_crate\")), ty: TypeRef(\"&CrateName\") }, ParamDeclaration { name: ParamName(Identifier(\"universe\")), ty: TypeRef(\"&std::collections::BTreeSet<FullyQualifiedItemPath>\") }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
+        "declaration_hash": "2ca0951c06a2b9b26f0f668298e61cd9301e789074601347ad45abd16345b3ed",
+        "waived_reason_hash": "f9b902263c7f5986467eb14e82cbf951cf80f36555e472f4dfeb45da5ed1060f"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "経路別の add 型の黙認、生名 fallback、又は個別 fallback を残さない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      "key": {
+        "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
+        "declaration_hash": "2ca0951c06a2b9b26f0f668298e61cd9301e789074601347ad45abd16345b3ed",
+        "waived_reason_hash": "f3ceebd0e4233cde574bcfff0697bc1939d157ba9529643915c4d5e5e4b06260"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "params: [ParamDeclaration { name: ParamName(Identifier(\"type_ref\")), ty: TypeRef(\"&domain::tddd::catalogue_v2::identifiers::TypeRef\") }, ParamDeclaration { name: ParamName(Identifier(\"catalogue_crate\")), ty: TypeRef(\"&domain::tddd::catalogue_v2::identifiers::CrateName\") }, ParamDeclaration { name: ParamName(Identifier(\"rustdoc_paths\")), ty: TypeRef(\"&std::collections::HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>\") }, ParamDeclaration { name: ParamName(Identifier(\"generic_params\")), ty: TypeRef(\"&[domain::tddd::catalogue_v2::identifiers::ParamName]\") }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace"
+      },
+      "key": {
+        "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
+        "declaration_hash": "3fb2899dec11aafd8a9f1ff0b4c61d047d681bda1abd80f25f8baeacd5a295f0",
+        "waived_reason_hash": "bc1f071ec63b8c98a573084d4dc8d73978e94d8ea1852eb988175af7090604c4"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Namespace-scoped catalogue identity lookup helper.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
+        "declaration_hash": "d7efaf2dc7a080d9b3d738d9831b63415a5a44fc63717caeb744370a80e88e00",
+        "waived_reason_hash": "4b89a826e1114f83d75a9204a7db71185e1c1c47a9145023b921a19190f9cebf"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Adapter-layer value for one canonical type identity after catalogue-crate and rustdoc-root normalization; it is infrastructure-scoped because it represents reconciliation output rather than domain vocabulary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
+        "declaration_hash": "692c3b410e3cabdca3b951c09ffc14b90450a3a79aadaa22aa4a776b2075a346",
+        "waived_reason_hash": "5f9a0aa44949a6f76a9e1b30b9d1d070476b4804bd19e983cfea325b9bedd5f1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity",
+        "item_identifier": "voluntary:CO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Adapter-layer value for one canonical type identity after catalogue-crate and rustdoc-root normalization; it is infrastructure-scoped because it represents reconciliation output rather than domain vocabulary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2"
+      },
+      "key": {
+        "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
+        "declaration_hash": "d4e490444c0dd38db0aae4768c0487a545cb1a6ad1d6b807f7f462a2d3b026de",
+        "waived_reason_hash": "6837abad4cd3eea4d8ac0ed2de27ae85343b85cd37f63bbfcd33375507beb55c"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2",
+        "item_identifier": "voluntary:CO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-08-25-post-fq-identity-regression-repair"
+}

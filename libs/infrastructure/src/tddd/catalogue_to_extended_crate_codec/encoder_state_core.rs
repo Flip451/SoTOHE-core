@@ -4,6 +4,7 @@
 //! TypeRef parsing and external-id resolution live in the sibling module
 //! `encoder_state_type_ref_parsing` to keep each file within the 700-line limit.
 
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, FullyQualifiedItemPath};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueEntryKey, CrateName, MethodGenericParam, ModulePath, TypeRef,
     WherePredicateDecl,
@@ -20,6 +21,22 @@ use super::invalid_type_ref;
 use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
 
 impl EncoderState {
+    pub(super) fn effective_module_path(
+        &self,
+        key: &CatalogueEntryKey,
+        namespace: CatalogueItemNamespace,
+        fallback: &ModulePath,
+    ) -> ModulePath {
+        let prefix = match namespace {
+            CatalogueItemNamespace::Type => "type",
+            CatalogueItemNamespace::Trait => "trait",
+        };
+        self.resolved_entry_module_paths
+            .get(&format!("{prefix}:{}", key.as_str()))
+            .cloned()
+            .unwrap_or_else(|| fallback.clone())
+    }
+
     pub(super) fn alloc_id(&mut self) -> Id {
         let id = Id(self.next_id);
         self.next_id += 1;
@@ -48,6 +65,58 @@ impl EncoderState {
         )?;
         self.local_id_for_identity(&identity)?
             .ok_or_else(|| invalid_type_ref(&path, "catalogue entry identity is not registered"))
+    }
+
+    pub(super) fn local_id_for_catalogue_key(
+        &self,
+        key: &CatalogueEntryKey,
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+    ) -> Result<Id, NewTypeGraphCodecError> {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+                &self.crate_name,
+                key,
+                declared_module_path,
+            ),
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+                    &self.crate_name,
+                    key,
+                    declared_module_path,
+                )
+            }
+        }
+        .map_err(|error| {
+            invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+        })?;
+        if key.as_str().contains("::") {
+            if let (Some(declared), Some(actual)) = (declared_module_path, identity.module_path()) {
+                if declared != actual {
+                    return Err(invalid_type_ref(
+                        key.as_str(),
+                        format!(
+                            "catalogue key '{}' implies module_path '{}', but entry module_path is '{}',",
+                            key.as_str(),
+                            actual,
+                            declared
+                        ),
+                    ));
+                }
+            }
+        }
+        let source =
+            if identity.is_placed() { identity.to_string() } else { key.as_str().to_owned() };
+        let type_ref = TypeRef::new(source.clone())
+            .map_err(|_| invalid_type_ref(&source, "catalogue entry path is empty"))?;
+        let canonical = canonicalize_catalogue_type_ref(
+            &type_ref,
+            &self.crate_name,
+            &self.resolution_paths,
+            &[],
+        )?;
+        self.local_id_for_identity(&canonical)?
+            .ok_or_else(|| invalid_type_ref(&source, "catalogue entry identity is not registered"))
     }
 
     pub(super) fn resolved_catalogue_key_path(

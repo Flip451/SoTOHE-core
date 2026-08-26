@@ -48,8 +48,8 @@ mod inherent;
 mod trait_roles;
 
 pub(super) use identity::{
-    declaration_identity, resolve_catalogue_reference, resolve_named_type_entry,
-    resolve_named_type_key, trait_declaration_text_for_reference,
+    resolve_catalogue_reference, resolve_named_type_entry, resolve_named_type_key,
+    trait_declaration_text_for_reference,
 };
 use trait_roles::{TraitRoleEntry, index_trait_roles, resolve_trait_role};
 

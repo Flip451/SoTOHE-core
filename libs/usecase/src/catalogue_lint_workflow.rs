@@ -690,7 +690,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -735,7 +735,7 @@ mod tests {
             methods,
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -872,11 +872,11 @@ mod tests {
                 use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
 
                 let reference = |value: &str| {
-                    ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap())
+                    ExtractedTypeRefPath::type_path(TypeRef::new(value.to_owned()).unwrap())
                 };
                 let wrapped = |value: &str| {
                     vec![
-                        ExtractedTypeRefPath::Path(
+                        ExtractedTypeRefPath::type_path(
                             TypeRef::new("std::ghost::UnknownWrapper".to_owned()).unwrap(),
                         ),
                         reference(value),
@@ -917,7 +917,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -937,7 +937,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -1033,7 +1033,7 @@ mod tests {
                 )],
                 vec![],
                 vec![],
-                module("alpha"),
+                Some(module("alpha")),
                 None,
                 vec![],
                 vec![],
@@ -1106,7 +1106,7 @@ mod tests {
                 use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
 
                 let reference = |value: &str| {
-                    ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap())
+                    ExtractedTypeRefPath::type_path(TypeRef::new(value.to_owned()).unwrap())
                 };
                 match type_ref.as_str() {
                     "std::ghost::UnknownWrapper<&'static domain::alpha::Event>" => Ok(vec![
@@ -1137,7 +1137,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -1812,7 +1812,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1827,7 +1827,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],

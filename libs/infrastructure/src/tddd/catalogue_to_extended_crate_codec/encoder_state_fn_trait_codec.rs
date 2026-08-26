@@ -21,7 +21,12 @@ impl EncoderState {
         trait_name: &CatalogueEntryKey,
         entry: &TraitEntry,
     ) -> Result<(), NewTypeGraphCodecError> {
-        let module_path = entry.module_path().clone();
+        let declared_module_path = entry.module_path().cloned().unwrap_or_default();
+        let module_path = self.effective_module_path(
+            trait_name,
+            domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Trait,
+            &declared_module_path,
+        );
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Encode trait-level generics (IN-07, ADR `2026-05-18-1223` D2).

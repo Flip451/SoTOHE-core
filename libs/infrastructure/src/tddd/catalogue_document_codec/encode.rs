@@ -17,7 +17,6 @@ use domain::tddd::catalogue_v2::{
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
 use super::CatalogueDocumentCodecError;
-use super::SCHEMA_VERSION;
 use super::dto::{
     AssocConstDeclDto, AssocTypeDeclDto, BoundOpDto, CatalogueDocumentDto, FieldDeclDto,
     FunctionEntryDto, InherentImplDeclDto, MethodDeclarationDto, MethodGenericParamDto, ParamDto,
@@ -34,6 +33,7 @@ use super::validate::{
     validate_type_alias_target, validate_type_alias_where_predicates,
     validate_type_ref_str_with_generics,
 };
+use super::{EXPLICIT_ROOT_MODULE_PATH, SCHEMA_VERSION};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -197,11 +197,19 @@ pub(super) fn type_entry_to_dto(
         methods,
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path().to_string(),
+        module_path: encode_module_path(entry.module_path()),
         docs: entry.docs().map(|d| d.as_str().to_owned()),
         spec_refs: spec_refs_to_dtos(entry.spec_refs()),
         informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
+}
+
+fn encode_module_path(module_path: Option<&domain::tddd::catalogue_v2::ModulePath>) -> String {
+    match module_path {
+        None => String::new(),
+        Some(module_path) if module_path.is_root() => EXPLICIT_ROOT_MODULE_PATH.to_owned(),
+        Some(module_path) => module_path.to_string(),
+    }
 }
 
 fn data_role_to_dto(role: &DataRole) -> DataRoleDto {
@@ -548,7 +556,7 @@ pub(super) fn trait_entry_to_dto(
             .collect(),
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path().to_string(),
+        module_path: encode_module_path(entry.module_path()),
         docs: entry.docs().map(|d| d.as_str().to_owned()),
         spec_refs: spec_refs_to_dtos(entry.spec_refs()),
         informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),

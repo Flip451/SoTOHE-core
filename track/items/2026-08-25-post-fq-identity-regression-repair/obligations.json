@@ -1,0 +1,329 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+      "declaration_hash": "7bc4d91543dc2db5c7b10baefbe05a143bd2afa78d18a5a5ea6e178bb7d0d9d9",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace",
+      "declaration_hash": "79c7c78c3f08158940cc3cf7f2db087561cb7338afc4ab50934e5761990bdb95",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace",
+      "declaration_hash": "0fc7c49bb1b2b054b7623c681e42a4f6b70d345bd509e1baeea98b12d664d6a4",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+      "declaration_hash": "d1b4cddc684ad40c5462e46346ff314d390cf55997f44e8bfd9dba1a17d78210",
+      "id": {
+        "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+      "declaration_hash": "37386ccb879631cb74cb99214f13cc177aed1de14343087648eaba01955e4448",
+      "id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "declaration_hash": "03f5f53d9880d658e700033a3dd4bd19d30863ce22f74f6aa06c45309c2e39c8",
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::catalog_gen::CatalogPort' of infrastructure::tddd::catalog_gen::FsCatalogAdapter",
+      "declaration_hash": "2833d7ad0e48d738adb34cbc4258b7b50a060176a7cc92da6e5d51a014b7c5d5",
+      "id": {
+        "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter",
+        "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort' of infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+      "declaration_hash": "99546abe02144bc45b0f4691591b78ef24a9d2ac8dfa76b5a48dbe459ee3b0bc",
+      "id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::signal_evaluator::port::SignalEvaluatorPort' of infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2",
+      "declaration_hash": "6b350fe0811168d0ff2916919563d338693358a39f2580b62cbbb9769cbbc3f5",
+      "id": {
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2",
+        "item_identifier": "trait_impl:domain::tddd::signal_evaluator::port::SignalEvaluatorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-08-25-post-fq-identity-regression-repair"
+}

@@ -116,7 +116,7 @@ pub(super) fn build_type_signal_identity_index(
             &mut index,
             catalogue_crate,
             key.as_str(),
-            entry.module_path(),
+            &entry.module_path().cloned().unwrap_or_default(),
             entry.action(),
             rustdoc_paths,
         )?;
@@ -126,7 +126,7 @@ pub(super) fn build_type_signal_identity_index(
             &mut index,
             catalogue_crate,
             key.as_str(),
-            entry.module_path(),
+            &entry.module_path().cloned().unwrap_or_default(),
             entry.action(),
             rustdoc_paths,
         )?;
@@ -347,46 +347,44 @@ pub(super) fn build_type_signals_from_report<'a>(
                     }
                 }
             }
+        } else if kind_tag_map.contains_key(name) {
+            record_plain_signal(
+                &mut acc,
+                &mut order,
+                name.to_owned(),
+                confidence,
+                found_in_c,
+                false,
+            );
         } else {
-            if kind_tag_map.contains_key(name) {
-                record_plain_signal(
+            match identity_index.declaration_candidates(name) {
+                Some(keys) if keys.len() > 1 => {
+                    for key in keys.clone() {
+                        record_plain_signal(
+                            &mut acc, &mut order, key, confidence, found_in_c, true,
+                        );
+                    }
+                }
+                Some(keys) if keys.len() == 1 => {
+                    if let Some(key) = keys.first() {
+                        record_plain_signal(
+                            &mut acc,
+                            &mut order,
+                            key.clone(),
+                            confidence,
+                            found_in_c,
+                            false,
+                        );
+                    }
+                }
+                _ => record_plain_signal(
                     &mut acc,
                     &mut order,
                     name.to_owned(),
                     confidence,
                     found_in_c,
                     false,
-                );
-            } else {
-                match identity_index.declaration_candidates(name) {
-                    Some(keys) if keys.len() > 1 => {
-                        for key in keys.clone() {
-                            record_plain_signal(
-                                &mut acc, &mut order, key, confidence, found_in_c, true,
-                            );
-                        }
-                    }
-                    Some(keys) if keys.len() == 1 => {
-                        if let Some(key) = keys.first() {
-                            record_plain_signal(
-                                &mut acc,
-                                &mut order,
-                                key.clone(),
-                                confidence,
-                                found_in_c,
-                                false,
-                            );
-                        }
-                    }
-                    _ => record_plain_signal(
-                        &mut acc,
-                        &mut order,
-                        name.to_owned(),
-                        confidence,
-                        found_in_c,
-                        false,
-                    ),
-                }
+                ),
             }
         }
     }
@@ -596,7 +594,9 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path"),
+                Some(
+                    ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path"),
+                ),
                 None,
                 vec![],
                 vec![],
@@ -666,7 +666,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
-                    module_path.clone(),
+                    Some(module_path.clone()),
                     None,
                     vec![],
                     vec![],
@@ -683,7 +683,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
-                    module_path,
+                    Some(module_path),
                     None,
                     vec![],
                     vec![],

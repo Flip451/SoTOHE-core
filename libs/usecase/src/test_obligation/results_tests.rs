@@ -442,7 +442,7 @@ fn status_catalogue() -> CatalogueDocument {
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1174,7 +1174,7 @@ fn test_results_does_not_report_unbound_anchorless_obligation_as_missing() {
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             Vec::new(),
             Vec::new(),

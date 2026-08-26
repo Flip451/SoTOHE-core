@@ -13,7 +13,6 @@ use domain::tddd::catalogue_v2::{
 };
 use std::str::FromStr;
 
-use super::CatalogueDocumentCodecError;
 use super::decode_assoc::{assoc_const_decl_from_dto, assoc_type_decl_from_dto};
 use super::decode_impls::{
     function_entry_from_dto, inherent_impl_from_dto, method_decl_from_dto_with_outer_generics,
@@ -30,6 +29,7 @@ use super::validate::{
     validate_type_alias_generic_names, validate_type_alias_relaxed_bounds,
     validate_type_alias_target, validate_type_alias_where_predicates,
 };
+use super::{CatalogueDocumentCodecError, EXPLICIT_ROOT_MODULE_PATH};
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 // Keep the path-only validator referenced for callers outside top-level impl slots.
 const _: fn(&str) -> Result<(), String> = super::validate::validate_trait_ref_is_path;
@@ -175,13 +175,13 @@ fn tombstone_entry_key(
                 entry_name: entry_name.to_owned(),
                 reason: format!("invalid catalogue entry identity: {error}"),
             })?;
-    if !tombstone.module_path.is_empty() && identity.module_path() != &module_path {
+    if !tombstone.module_path.is_empty() && identity.module_path() != Some(&module_path) {
         return Err(CatalogueDocumentCodecError::InvalidEntry {
             entry_name: entry_name.to_owned(),
             reason: format!(
                 "tombstone key '{entry_name}' identifies module_path '{}', but tombstone \
                  module_path is '{}'",
-                identity.module_path(),
+                identity.module_path().map_or_else(|| "<unplaced>".to_owned(), ToString::to_string),
                 tombstone.module_path
             ),
         });
@@ -251,12 +251,8 @@ pub(super) fn type_entry_from_dto(
         validate_type_alias_relaxed_bounds(name, effective_generics, &where_predicates)?;
     }
 
-    let module_path = if dto.module_path.is_empty() {
-        ModulePath::root()
-    } else {
-        ModulePath::from_str(&dto.module_path)
-            .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
-    };
+    let module_path = decode_module_path(&dto.module_path)
+        .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?;
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -479,12 +475,8 @@ pub(super) fn trait_entry_from_dto(
 
     let role = contract_role_from_dto(name, dto.role)?;
 
-    let module_path = if dto.module_path.is_empty() {
-        ModulePath::root()
-    } else {
-        ModulePath::from_str(&dto.module_path)
-            .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
-    };
+    let module_path = decode_module_path(&dto.module_path)
+        .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?;
     let generics = method_generics_from_dtos(name, dto.generics)?;
     let generic_names = generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
     let methods = dto
@@ -547,4 +539,16 @@ pub(super) fn trait_entry_from_dto(
         spec_refs,
         informal_grounds,
     ))
+}
+
+fn decode_module_path(
+    module_path: &str,
+) -> Result<Option<ModulePath>, domain::tddd::catalogue_v2::identifiers::IdentifierError> {
+    if module_path.is_empty() {
+        Ok(None)
+    } else if module_path == EXPLICIT_ROOT_MODULE_PATH {
+        Ok(Some(ModulePath::root()))
+    } else {
+        ModulePath::from_str(module_path).map(Some)
+    }
 }

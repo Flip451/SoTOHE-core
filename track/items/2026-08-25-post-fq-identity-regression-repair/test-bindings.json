@@ -1,0 +1,406 @@
+{
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-01"}},
+      "reason": "The declared domain surface is a pure lookup over the supplied BTreeSet; it has no route handles or root metadata from which to inspect codec, type-signal, deletion, or Phase 1 construction. The entry-level combined-universe behavior is verified by test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches, which passes baseline/current/catalogue identities through this helper; construction provenance outside this API is not observable here."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_impl_for_type_uses_catalogue_stored_key_for_qualified_owner"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_impl_for_type_ambiguous_catalogue_identity_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_impl_for_type_duplicate_canonical_identity_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_impl_for_type_unresolved_fails_closed"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_add_types_can_reference_each_other_without_rustdoc_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_modify_can_reference_add_and_absent_type_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::canonical_type_identity::tests",
+          "test_name": "test_canonicalize_catalogue_type_ref_observes_value_identity_and_rejects_absent_reference"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-01"}},
+      "reason": "This declared canonicalization operation can verify the shared identity result it receives, but cannot observe every codec, type-signal, deletion, and Phase 1 caller from its own API. Cross-route convergence is verified by the construction-level test test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2 in infrastructure::tddd::signal_evaluator_v2::tests, which feeds one codec-built graph through Phase 1 and SignalEvaluatorV2 and asserts the same qualified NewType identity and deletion result; the route-specific construction is outside this function."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-02"}},
+      "reason": "The declared canonicalize_catalogue_type_ref surface receives a catalogue crate and an already-built rustdoc path map but no rustdoc-root metadata or alias provenance. Its normalized-input behavior is observed by test_canonicalize_catalogue_type_ref_observes_value_identity_and_rejects_absent_reference, while production root translation is observed at test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths; exactly-once provenance is not observable inside this function."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2",
+        "item_identifier": "trait_impl:domain::tddd::signal_evaluator::port::SignalEvaluatorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_function_identity_bin_root_alias_matches_crate_root_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_type_add_from_catalogue_codec_uses_synthetic_summary_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_type_modify_with_differing_rustdoc_root_uses_catalogue_package_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "reason": "AC-03's action and candidate-cardinality branches do not belong to the declared lookup-only entry resolve_catalogue_identity_in_namespace. The owning entry resolve_catalogue_identity_for_action_in_namespace receives ItemAction plus baseline/current identity sets; its Add baseline-collision, unique-current, multiple-current, and absent-current branches, together with Modify/Delete/Reference baseline-resolution and fail-closed branches, are verified by test_resolve_catalogue_identity_for_action_applies_d3_placement_rules, test_resolve_catalogue_identity_for_action_omitted_delete_and_reference_resolve_unique_baseline, test_resolve_catalogue_identity_for_action_omitted_delete_requires_baseline_candidate, and test_resolve_catalogue_identity_for_action_omitted_reference_requires_baseline_candidate in domain::tddd::catalogue_v2::identity_resolution::tests. The waiver is limited to this action-aware AC-03 edge; the lookup entry's namespace and combined-universe behavior remains bound separately."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TypeEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_omitted_module_path_resolves_against_current_candidates"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_explicit_module_path_matches_exact_type_namespace_only"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_delete_and_reference_resolve_against_baseline"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TypeEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_omitted_module_path_resolves_against_current_candidates"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_explicit_module_path_matches_exact_type_namespace_only"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_delete_and_reference_resolve_against_baseline"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TypeEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_omitted_module_path_resolves_against_current_candidates"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_explicit_module_path_matches_exact_type_namespace_only"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_type_entry_delete_and_reference_resolve_against_baseline"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TraitEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_omitted_module_path_resolves_in_trait_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_delete_and_reference_resolve_against_baseline"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_explicit_path_and_actions_fail_closed_on_collisions"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TraitEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_omitted_module_path_resolves_in_trait_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_explicit_path_and_actions_fail_closed_on_collisions"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_delete_and_reference_resolve_against_baseline"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::entries::TraitEntry", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_omitted_module_path_resolves_in_trait_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_modify_omitted_module_path_requires_one_baseline_candidate"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_explicit_path_and_actions_fail_closed_on_collisions"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_delete_and_reference_resolve_against_baseline"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::entries::tests", "test_name": "test_trait_entry_modify_delete_reference_fail_on_multiple_baseline_candidates"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_fully_qualified_item_path_preserves_omitted_placement_and_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_fully_qualified_item_path_new_stores_components"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_resolve_catalogue_identity_namespace_keeps_same_named_type_and_trait_separate"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_fully_qualified_item_path_preserves_omitted_placement_and_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_resolve_catalogue_identity_uses_declared_module_for_bare_key"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_resolve_catalogue_identity_uses_qualified_module"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_parse_fully_qualified_identity_preserves_module_path"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_parse_fully_qualified_identity_rejects_bare_key"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_fully_qualified_item_path_preserves_omitted_placement_and_namespace"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_fully_qualified_item_path_new_stores_components"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_fully_qualified_item_path_display_includes_crate_module_and_name"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_resolve_catalogue_identity_uses_declared_module_for_bare_key"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_parse_fully_qualified_identity_preserves_module_path"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_catalogue_entry_key_parse_fully_qualified_identity_rejects_bare_key"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identifiers_tests", "test_name": "test_fully_qualified_item_path_ac03_covers_unique_and_fail_closed_resolution"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-01"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::canonical_type_identity::tests", "test_name": "test_canonicalize_catalogue_type_ref_observes_value_identity_and_rejects_absent_reference"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_catalogue_add_types_can_reference_each_other_without_rustdoc_paths"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::canonical_type_identity::tests", "test_name": "test_canonicalize_catalogue_type_ref_observes_value_identity_and_rejects_absent_reference"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-01"}},
+      "reason": "CanonicalTypeIdentity is an opaque value object with only as_str; it cannot observe whether all downstream routes share one resolution-set construction. The cross-route invariant is verified by the construction-level test test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2 in infrastructure::tddd::signal_evaluator_v2::tests, which compares the codec/Phase 1 identity map with evaluator output; it belongs to route-owned entries, not this value-object declaration."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-02"}},
+      "reason": "CanonicalTypeIdentity exposes the normalized result but not the caller or alias provenance, so exactly-once root-alias application cannot be tested at this value-object entry. The construction-level tests test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths in infrastructure::tddd::catalogue_to_extended_crate_codec_tests and test_function_identity_bin_root_alias_matches_crate_root_path in infrastructure::tddd::signal_evaluator_v2::tests verify alias normalization and the canonical root identity at their owning routes."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-01"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::signal_evaluator_v2::tests", "test_name": "test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::signal_evaluator_v2::tests", "test_name": "test_signal_evaluator_ambiguous_catalogue_reference_fails_closed_without_fallback"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::signal_evaluator_v2::tests", "test_name": "test_signal_evaluator_absent_catalogue_reference_fails_closed_without_raw_key_fallback"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-02"}},
+      "reason": "The evaluator entry can verify its canonical function and type identities, but cannot prove exactly-once alias application across catalogue import and the other resolution routes from its adapter API. That cross-route provenance is verified by the construction-level tests test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2 in infrastructure::tddd::signal_evaluator_v2::tests and test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths in infrastructure::tddd::catalogue_to_extended_crate_codec_tests, which assert shared qualified identities and one-time catalogue/rustdoc root normalization."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::signal_evaluator_v2::tests", "test_name": "test_function_identity_bin_root_alias_matches_crate_root_path"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::signal_evaluator_v2::tests", "test_name": "test_type_modify_with_differing_rustdoc_root_uses_catalogue_package_identity"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_for_action_applies_d3_placement_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_for_action_omitted_delete_and_reference_resolve_unique_baseline"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_for_action_omitted_delete_requires_baseline_candidate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_for_action_omitted_reference_requires_baseline_candidate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_for_action_qualified_near_match_fails_closed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::entries::tests",
+          "test_name": "test_type_entry_delete_and_reference_resolve_against_baseline"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::entries::tests",
+          "test_name": "test_trait_entry_delete_and_reference_resolve_against_baseline"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::entries::tests",
+          "test_name": "test_trait_entry_modify_delete_reference_fail_on_multiple_baseline_candidates"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_namespace_keeps_same_named_type_and_trait_separate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_ambiguous_short_name_reports_all_candidates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_unique_short_name_returns_fully_qualified_path"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_crate_prefixed_path_returns_exact_identity"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_in_namespace_resolves_combined_rustdoc_and_catalogue_add_universe"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_catalogue_identity_in_namespace_absent_combined_universe_fails_closed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_resolve_catalogue_identity_namespace_keeps_same_named_type_and_trait_separate"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_fully_qualified_item_path_preserves_omitted_placement_and_namespace"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests", "test_name": "test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_classifies_nested_trait_inside_type_slot_by_occurrence"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_classifies_nested_type_inside_trait_slot_by_occurrence"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_rejects_ambiguous_trait_bound_namespace"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_collects_dyn_and_impl_trait_bounds"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_splits_qself_into_self_and_trait_paths"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_classifies_nested_trait_inside_type_slot_by_occurrence"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_classifies_nested_type_inside_trait_slot_by_occurrence"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_lint_preflight_rejects_ambiguous_trait_bound_namespace"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_collects_dyn_and_impl_trait_bounds"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_splits_qself_into_self_and_trait_paths"}
+      ]
+    }
+  ],
+  "track_id": "2026-08-25-post-fq-identity-regression-repair"
+}

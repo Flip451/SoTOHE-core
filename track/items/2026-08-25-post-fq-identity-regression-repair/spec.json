@@ -1,0 +1,196 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "catalogue が宣言する未実装 add 型を含め、add 型同士の相互参照、modify 型から add 型への参照、および宣言順序に依存しない参照解決が成功する。rustdoc と catalogue のいずれにも存在しない参照は fail-closed で拒否される。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "module_path を省略した add は、baseline に同名があれば fail-closed とし、baseline に同名がなく current に同名が一つだけあるときその実装済み identity に解決し、current に複数候補があるときは明示指定を求めて fail-closed とし、候補がないときは module 未確定の未実装 identity として扱う。modify、delete、reference は baseline に同名が一つだけある場合にのみ解決する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-01",
+      "text": "baseline と current の rustdoc paths および catalogue 宣言を合わせた解決集合は一箇所で構築し、codec、type-signal identity index、deletion 処理、Phase 1 definition-path authority の各解決経路は同じ結果を使用する。経路別の add 型の黙認、生名 fallback、又は個別 fallback を残さない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-02",
+      "text": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。経路ごとの別名適用は残さない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-03",
+      "text": "module_path の省略は crate root ではなく配置未指定を表す。明示 module_path 又は修飾 key は完全一致で照合し、catalogue crate 内では type と trait の namespace を分けて同名を比較する。曖昧又は根拠不足の解決は fail-closed とする。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-04",
+      "text": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "完全修飾 identity の解決を一貫した fail-closed な解決集合と正準化に基づかせ、実装前 add 型、bin root 別名、module_path 省略による回帰を解消する。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "rustdoc paths と catalogue の add 宣言を統合した解決集合を用い、catalogue 由来の合成 summary を含む型 identity の解決を行うこと。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          },
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "module_path 省略時の add、modify、delete、reference の identity 解決規則、および namespace-aware な同名比較を実現すること。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "一つの crate に複数の bin target があり root 別名が一対一でなくなる構成への対応は本 track の対象外とする。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 14,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "完全修飾識別の add 型・bin root 別名リグレッションを修復する",
+  "version": "1.0"
+}

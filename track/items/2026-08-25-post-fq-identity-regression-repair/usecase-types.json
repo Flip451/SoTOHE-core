@@ -1,0 +1,227 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "DeriveTestObligationsInteractor",
+      "trait_ref": "DeriveTestObligationsApplicationService"
+    }
+  ],
+  "traits": {
+    "CatalogPort": {
+      "action": "reference",
+      "docs": "Catalog command port referenced by this track as the catalog-import route (IN-02); synchronous filesystem execution is deliberate for bounded single-request CLI operations. Method error subsets are traced from the FsCatalogAdapter verb and helper call paths.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileExists, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "init",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogInitReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::DuplicateEntry, CatalogError::AnchorNotFound, CatalogError::InvalidRole, CatalogError::ParseFragment, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogAddCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::DuplicateEntry, CatalogError::AnchorNotFound, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "import",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogImportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::AnchorNotFound, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cite",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogCiteCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::SchemaInvalid or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "query",
+              "ty": "CatalogCheckQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogCheckReport, CatalogError>"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "usecase::test_obligation::derive::DeriveTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Owns test-obligation artifact derivation, including the trait-impl carrier identity resolution surface; see IN-04 / CO-04 / AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "track_status_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort + Send + Sync>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "projector",
+              "ty": "domain::tddd::test_obligation::projection::RoleObligationItemsProjector"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
+}

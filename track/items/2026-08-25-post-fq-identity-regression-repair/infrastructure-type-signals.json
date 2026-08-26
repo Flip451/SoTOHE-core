@@ -1,0 +1,54 @@
+{
+  "baseline_hash": "2a4ecf9e9fbc9505be6c7166469528531aa4537f5290c1e514b42033e6e74d2c",
+  "declaration_hash": "bce5c082ed22331914a0c12a025917a40ad9988ed00354c697127207f29f367e",
+  "generated_at": "2026-08-26T03:37:24Z",
+  "head_commit": "6482856780358db1470552f450ec6826c566021d",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+    },
+    {
+      "found_items": [
+        "usecase::catalog_gen::CatalogPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::catalog_gen::FsCatalogAdapter"
+    },
+    {
+      "found_items": [
+        "domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+    },
+    {
+      "found_items": [
+        "domain::tddd::signal_evaluator::port::SignalEvaluatorPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+    }
+  ]
+}

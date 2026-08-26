@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-post-fq-identity-regression-repair",
+  "entries": {
+    "T001": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::entries::TraitEntry"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::entries::TypeEntry"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      }
+    ],
+    "T004": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
+      }
+    ],
+    "T006": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ],
+    "T007": [
+      {
+        "layer": "domain",
+        "entry_key": "SignalEvaluatorPort"
+      }
+    ],
+    "T008": [
+      {
+        "layer": "usecase",
+        "entry_key": "CatalogPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter"
+      }
+    ]
+  }
+}

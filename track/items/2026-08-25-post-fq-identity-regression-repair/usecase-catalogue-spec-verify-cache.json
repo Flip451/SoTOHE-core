@@ -1,0 +1,150 @@
+{
+  "entries": [
+    {
+      "claim_hash": "0024f276df610bffb9285ee56990af0671ac1ccf0e802cc8612cb8116e46088c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "66b79499a80b47f977d4954e0eb36d38adb7805cdc4642fe66c70caa54030c50",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0024f276df610bffb9285ee56990af0671ac1ccf0e802cc8612cb8116e46088c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d46be988ba4df1d191b3b159d4067db2250363a9b3966e563a152cd9fc0a4b7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0024f276df610bffb9285ee56990af0671ac1ccf0e802cc8612cb8116e46088c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "957611ae8bc068f2bedadb93824f292582fdae5690d25ef0116bffcd1cad5c7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "259dbd0f48734f0f384b25b1fb09ff93ccd3612c41d348927166b65ac3092832",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a7b6e0b38e8d51bb8b86e296b000921f765c0ef377b4758c78cff02e500f208f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。経路ごとの別名適用は残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2e10807a145f0ef89c44562aea4b988fb51acaf9afa48868a70e4878729fc5eb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

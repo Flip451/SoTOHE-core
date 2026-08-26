@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "05c64b30f37dc23c8bbfc1eb0b20b9e77033cd0e45ca28332bb43a125abd28e4",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "0024f276df610bffb9285ee56990af0671ac1ccf0e802cc8612cb8116e46088c",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "signal": "blue",
+      "type_name": "CatalogPort"
+    }
+  ]
+}

@@ -17,9 +17,9 @@ use crate::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
 use crate::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
-use crate::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, ParamName, TypeRef};
 use crate::tddd::catalogue_v2::methods::{
-    MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
+    BoundOp, MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
@@ -88,7 +88,13 @@ fn inspect_type_kind<E: TypeRefPathExtractorPort>(
             StructShape::Unit => {}
             StructShape::Tuple { fields, .. } => {
                 for type_ref in fields {
-                    inspect(type_ref, type_parameters, context, extractor)?;
+                    inspect(
+                        type_ref,
+                        type_parameters,
+                        context,
+                        CatalogueItemNamespace::Type,
+                        extractor,
+                    )?;
                 }
             }
             StructShape::Plain { fields, .. } => {
@@ -103,7 +109,13 @@ fn inspect_type_kind<E: TypeRefPathExtractorPort>(
                     VariantPayload::Unit => {}
                     VariantPayload::Tuple(fields) => {
                         for type_ref in fields {
-                            inspect(type_ref, type_parameters, context, extractor)?;
+                            inspect(
+                                type_ref,
+                                type_parameters,
+                                context,
+                                CatalogueItemNamespace::Type,
+                                extractor,
+                            )?;
                         }
                     }
                     VariantPayload::Struct(fields) => {
@@ -116,7 +128,7 @@ fn inspect_type_kind<E: TypeRefPathExtractorPort>(
         }
         TypeKindV2::TypeAlias { target, generics } => {
             extend_parameter_names(type_parameters, generics);
-            inspect(target, type_parameters, context, extractor)?;
+            inspect(target, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
             inspect_generic_bounds(generics, type_parameters, context, extractor)?;
         }
     }
@@ -132,7 +144,7 @@ fn inspect_trait_entry<E: TypeRefPathExtractorPort>(
     inspect_generic_bounds(entry.generics(), &type_parameters, context, extractor)?;
     inspect_where_predicates(entry.where_predicates(), &type_parameters, context, extractor)?;
     for bound in entry.supertrait_bounds() {
-        inspect(bound, &type_parameters, context, extractor)?;
+        inspect(bound, &type_parameters, context, CatalogueItemNamespace::Trait, extractor)?;
     }
     for assoc_type in entry.assoc_types() {
         inspect_assoc_type(assoc_type, &type_parameters, context, extractor)?;
@@ -161,8 +173,20 @@ fn inspect_trait_impl<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     let type_parameters = parameter_names(impl_decl.impl_generics());
-    inspect(impl_decl.trait_ref(), &type_parameters, context, extractor)?;
-    inspect(impl_decl.for_type(), &type_parameters, context, extractor)?;
+    inspect(
+        impl_decl.trait_ref(),
+        &type_parameters,
+        context,
+        CatalogueItemNamespace::Trait,
+        extractor,
+    )?;
+    inspect(
+        impl_decl.for_type(),
+        &type_parameters,
+        context,
+        CatalogueItemNamespace::Type,
+        extractor,
+    )?;
     inspect_generic_bounds(impl_decl.impl_generics(), &type_parameters, context, extractor)?;
     inspect_where_predicates(
         impl_decl.impl_where_predicates(),
@@ -184,7 +208,7 @@ fn inspect_inherent_impl<E: TypeRefPathExtractorPort>(
             impl_decl.type_name().as_str()
         )))
     })?;
-    inspect(&owner, &type_parameters, context, extractor)?;
+    inspect(&owner, &type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
     inspect_generic_bounds(impl_decl.impl_generics(), &type_parameters, context, extractor)?;
     inspect_where_predicates(
         impl_decl.impl_where_predicates(),
@@ -225,9 +249,9 @@ fn inspect_params_and_return<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     for param in params {
-        inspect(&param.ty, type_parameters, context, extractor)?;
+        inspect(&param.ty, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
     }
-    inspect(returns, type_parameters, context, extractor)
+    inspect(returns, type_parameters, context, CatalogueItemNamespace::Type, extractor)
 }
 
 fn inspect_generic_bounds<E: TypeRefPathExtractorPort>(
@@ -238,7 +262,7 @@ fn inspect_generic_bounds<E: TypeRefPathExtractorPort>(
 ) -> Result<(), CatalogueLinterError> {
     for generic in generics {
         for bound in &generic.bounds {
-            inspect(bound, type_parameters, context, extractor)?;
+            inspect(bound, type_parameters, context, CatalogueItemNamespace::Trait, extractor)?;
         }
     }
     Ok(())
@@ -251,9 +275,13 @@ fn inspect_where_predicates<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     for predicate in predicates {
-        inspect(&predicate.lhs, type_parameters, context, extractor)?;
+        inspect(&predicate.lhs, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
+        let rhs_namespace = match predicate.operator {
+            BoundOp::Bound => CatalogueItemNamespace::Trait,
+            BoundOp::Equal => CatalogueItemNamespace::Type,
+        };
         for bound in &predicate.rhs {
-            inspect(bound, type_parameters, context, extractor)?;
+            inspect(bound, type_parameters, context, rhs_namespace, extractor)?;
         }
     }
     Ok(())
@@ -266,10 +294,10 @@ fn inspect_assoc_type<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     for bound in &assoc_type.bounds {
-        inspect(bound, type_parameters, context, extractor)?;
+        inspect(bound, type_parameters, context, CatalogueItemNamespace::Trait, extractor)?;
     }
     if let Some(default) = &assoc_type.default {
-        inspect(default, type_parameters, context, extractor)?;
+        inspect(default, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
     }
     Ok(())
 }
@@ -280,7 +308,7 @@ fn inspect_assoc_const<E: TypeRefPathExtractorPort>(
     context: &CatalogueTypeRefIdentityContext,
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
-    inspect(&assoc_const.ty, type_parameters, context, extractor)
+    inspect(&assoc_const.ty, type_parameters, context, CatalogueItemNamespace::Type, extractor)
 }
 
 fn inspect_field<E: TypeRefPathExtractorPort>(
@@ -289,7 +317,7 @@ fn inspect_field<E: TypeRefPathExtractorPort>(
     context: &CatalogueTypeRefIdentityContext,
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
-    inspect(&field.ty, type_parameters, context, extractor)
+    inspect(&field.ty, type_parameters, context, CatalogueItemNamespace::Type, extractor)
 }
 
 fn inspect_data_role<E: TypeRefPathExtractorPort>(
@@ -337,7 +365,7 @@ fn inspect_contract_role<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     if let ContractRole::Repository { aggregate } = role {
-        inspect(aggregate, type_parameters, context, extractor)?;
+        inspect(aggregate, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
     }
     Ok(())
 }
@@ -349,7 +377,7 @@ fn inspect_all<E: TypeRefPathExtractorPort>(
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     for type_ref in type_refs {
-        inspect(type_ref, type_parameters, context, extractor)?;
+        inspect(type_ref, type_parameters, context, CatalogueItemNamespace::Type, extractor)?;
     }
     Ok(())
 }
@@ -358,9 +386,10 @@ fn inspect<E: TypeRefPathExtractorPort>(
     type_ref: &TypeRef,
     type_parameters: &[ParamName],
     context: &CatalogueTypeRefIdentityContext,
+    namespace: CatalogueItemNamespace,
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
-    inspect_type_ref(context, type_ref, type_parameters, &[], &[], extractor)
+    inspect_type_ref(context, type_ref, type_parameters, &[], &[], namespace, extractor)
 }
 
 fn parameter_names(generics: &[MethodGenericParam]) -> Vec<ParamName> {

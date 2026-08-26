@@ -349,7 +349,7 @@ fn domain_service_type(
         methods,
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         None,
         spec_refs,
         vec![],
@@ -419,7 +419,7 @@ fn value_object_entry_with_module(
         vec![],
         vec![],
         vec![],
-        module_path,
+        Some(module_path),
         None,
         vec![spec_ref("IN-05")],
         vec![],
@@ -457,7 +457,7 @@ fn secondary_port_catalogue(
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             spec_refs,
             vec![],
@@ -476,7 +476,24 @@ fn trait_entry(role: ContractRole, anchor: &str) -> TraitEntry {
         vec![],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
+        None,
+        vec![spec_ref(anchor)],
+        vec![],
+    )
+}
+
+fn unplaced_trait_entry(role: ContractRole, anchor: &str) -> TraitEntry {
+    TraitEntry::new(
+        ItemAction::Add,
+        role,
+        vec![method_with_spec_refs("execute", vec![spec_ref(anchor)])],
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        None,
         None,
         vec![spec_ref(anchor)],
         vec![],
@@ -493,7 +510,7 @@ fn trait_entry_in_module(role: ContractRole, anchor: &str, module: &str) -> Trai
         vec![],
         vec![],
         vec![],
-        ModulePath::from_segments(vec![module.to_owned()]).unwrap(),
+        Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
         None,
         vec![spec_ref(anchor)],
         vec![],
@@ -537,7 +554,7 @@ fn fulfillment_cache_port_entry(docs: Option<DocString>) -> TraitEntry {
         vec![],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         docs,
         vec![spec_ref("AC-06")],
         vec![],
@@ -660,7 +677,7 @@ fn test_derivation_reads_secondary_port_methods_and_saves_stable_obligations() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref("AC-03")],
             vec![],
@@ -744,7 +761,7 @@ fn test_spec_document_loader_port_load_method_derives_contract_obligation() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref("IN-07")],
             vec![],
@@ -1202,7 +1219,7 @@ fn test_type_entry_add_method_without_spec_refs_is_rejected() {
         vec![method_with_action("compute", ItemAction::Add, vec![])],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         None,
         vec![spec_ref("IN-13")],
         vec![],
@@ -1233,7 +1250,7 @@ fn test_type_entry_omitted_method_action_does_not_inherit_parent() {
         vec![omitted_add],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         None,
         vec![spec_ref("IN-13")],
         vec![],
@@ -1426,7 +1443,7 @@ fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocu
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             docs,
             vec![spec_ref("AC-03")],
             vec![],
@@ -1554,7 +1571,7 @@ fn with_docs(entry: TypeEntry) -> TypeEntry {
         entry.methods().to_vec(),
         entry.generics().to_vec(),
         entry.where_predicates().to_vec(),
-        entry.module_path().clone(),
+        entry.module_path().cloned(),
         Some(DocString::new("changed body".to_owned())),
         entry.spec_refs().to_vec(),
         entry.informal_grounds().to_vec(),
@@ -1582,7 +1599,7 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref("IN-06")],
             vec![],
@@ -1599,11 +1616,15 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref("IN-99")],
             vec![],
         ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
     );
     doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyPort").unwrap(),
@@ -1637,6 +1658,10 @@ fn test_generic_local_trait_ref_resolves_under_closed_spelling_grammar() {
     doc.insert_trait(
         CatalogueEntryKey::try_new("Read".to_owned()).unwrap(),
         trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Adapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
     );
     doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("Read<T>").unwrap(),
@@ -1763,7 +1788,7 @@ fn test_unresolved_reference_under_local_module_is_external_and_skipped() {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
             None,
             vec![spec_ref("IN-05")],
             vec![],
@@ -1824,6 +1849,10 @@ fn test_trait_impl_declaration_resolves_self_crate_trait_from_other_catalogue() 
         trait_entry(ContractRole::SecondaryPort, "IN-06"),
     );
     let mut impl_catalogue = empty_catalogue("infrastructure", "infrastructure");
+    impl_catalogue.insert_type(
+        CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     impl_catalogue.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyPort").unwrap(),
         TypeRef::new("MyAdapter").unwrap(),
@@ -1868,6 +1897,10 @@ fn test_trait_impl_bare_ref_resolves_only_against_implementing_catalogue_crate()
         CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
         trait_entry(ContractRole::SecondaryPort, "IN-06"),
     );
+    infrastructure_catalogue.insert_type(
+        CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure_catalogue.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("Port").unwrap(),
         TypeRef::new("MyAdapter").unwrap(),
@@ -1908,6 +1941,10 @@ fn test_fs_spec_document_loader_trait_impl_derives_its_secondary_port_obligation
         trait_entry_in_module(ContractRole::SecondaryPort, "IN-07", "spec_document_loader_port"),
     );
     let mut infrastructure = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure.insert_type(
+        CatalogueEntryKey::try_new("FsSpecDocumentLoader".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("domain::spec_document_loader_port::SpecDocumentLoaderPort").unwrap(),
         TypeRef::new("FsSpecDocumentLoader").unwrap(),
@@ -1946,6 +1983,10 @@ fn test_trait_impl_declaration_hash_includes_resolved_port_contract() {
         fulfillment_cache_port_entry(None),
     );
     let mut infrastructure = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure.insert_type(
+        CatalogueEntryKey::try_new("JsonObligationFulfillmentCacheCodec".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("usecase::ObligationFulfillmentCachePort").unwrap(),
         TypeRef::new("JsonObligationFulfillmentCacheCodec").unwrap(),
@@ -2016,6 +2057,10 @@ fn test_trait_declaration_lookup_rejects_conflicting_duplicate_snapshots() {
         fulfillment_cache_port_entry(Some(DocString::new("conflicting contract".to_owned()))),
     );
     let mut infrastructure = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure.insert_type(
+        CatalogueEntryKey::try_new("JsonObligationFulfillmentCacheCodec".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("usecase::ObligationFulfillmentCachePort").unwrap(),
         TypeRef::new("JsonObligationFulfillmentCacheCodec").unwrap(),
@@ -2048,6 +2093,10 @@ fn test_trait_impl_unsupported_axis_yields_zero_even_with_minimum() {
     doc.insert_trait(
         CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
         trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
     );
     doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyPort").unwrap(),
@@ -2088,6 +2137,10 @@ fn test_workspace_qualified_trait_impl_uses_qualified_crate_trait() {
     );
 
     let mut infrastructure_doc = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure_doc.insert_type(
+        CatalogueEntryKey::try_new("MyAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure_doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("usecase::SharedPort").unwrap(),
         TypeRef::new("MyAdapter").unwrap(),
@@ -2124,6 +2177,12 @@ fn test_trait_reference_accepts_all_closed_declaration_spellings() {
         CatalogueEntryKey::try_new("SharedPort".to_owned()).unwrap(),
         trait_entry_in_module(ContractRole::SecondaryPort, "IN-06", "alpha"),
     );
+    for adapter in ["StoredKeyAdapter", "ModulePathAdapter", "CrateQualifiedAdapter"] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(adapter.to_owned()).unwrap(),
+            value_object_entry(ItemAction::Add, vec![]),
+        );
+    }
     for (trait_ref, adapter) in [
         ("SharedPort", "StoredKeyAdapter"),
         ("alpha::SharedPort", "ModulePathAdapter"),
@@ -2155,6 +2214,88 @@ fn test_trait_reference_accepts_all_closed_declaration_spellings() {
     assert!(resolved_refs.contains(&"trait_impl:SharedPort"));
     assert!(resolved_refs.contains(&"trait_impl:alpha::SharedPort"));
     assert!(resolved_refs.contains(&"trait_impl:infrastructure::alpha::SharedPort"));
+}
+
+#[test]
+fn test_unplaced_trait_rejects_crate_qualified_alias() {
+    let path = PathBuf::from("infrastructure-types.json");
+    let mut doc = empty_catalogue("infrastructure", "infrastructure");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("SharedPort".to_owned()).unwrap(),
+        unplaced_trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("UnplacedAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("QualifiedAliasAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("SharedPort").unwrap(),
+        TypeRef::new("UnplacedAdapter").unwrap(),
+    ));
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("infrastructure::SharedPort").unwrap(),
+        TypeRef::new("QualifiedAliasAdapter").unwrap(),
+    ));
+
+    let (interactor, sink) = interactor(rules_doc(), doc, &path);
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let conformance: Vec<_> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .collect();
+
+    assert_eq!(conformance.len(), 1);
+    assert_eq!(conformance[0].id().entry_key().as_str(), "UnplacedAdapter");
+    assert_eq!(conformance[0].id().item_identifier().as_str(), "trait_impl:SharedPort");
+}
+
+#[test]
+fn test_qualified_stored_trait_key_does_not_accept_short_name_alias() {
+    let path = PathBuf::from("infrastructure-types.json");
+    let mut doc = empty_catalogue("infrastructure", "infrastructure");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("infrastructure::alpha::SharedPort".to_owned()).unwrap(),
+        unplaced_trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("ModuleAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("ShortAliasAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("alpha::SharedPort").unwrap(),
+        TypeRef::new("ModuleAdapter").unwrap(),
+    ));
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("SharedPort").unwrap(),
+        TypeRef::new("ShortAliasAdapter").unwrap(),
+    ));
+
+    let (interactor, sink) = interactor(rules_doc(), doc, &path);
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let conformance: Vec<_> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .collect();
+
+    assert_eq!(conformance.len(), 1);
+    assert_eq!(conformance[0].id().entry_key().as_str(), "ModuleAdapter");
+    assert_eq!(conformance[0].id().item_identifier().as_str(), "trait_impl:alpha::SharedPort");
 }
 
 #[test]
@@ -2239,6 +2380,14 @@ fn test_trait_role_index_distinguishes_same_name_traits_by_module_path() {
     doc.insert_trait(
         CatalogueEntryKey::try_new("infrastructure::beta::SharedPort".to_owned()).unwrap(),
         trait_entry_in_module(ContractRole::SecondaryPort, "IN-99", "beta"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("AlphaAdapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "alpha"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("BetaAdapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "beta"),
     );
     doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("infrastructure::alpha::SharedPort").unwrap(),
@@ -2358,6 +2507,87 @@ fn test_trait_impl_for_type_uses_catalogue_stored_key_for_qualified_owner() {
 }
 
 #[test]
+fn test_trait_impl_for_type_ambiguous_catalogue_identity_fails_closed() {
+    let path = PathBuf::from("domain-types.json");
+    let mut doc = empty_catalogue("domain", "domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::alpha::Adapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "alpha"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::beta::Adapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "beta"),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("MyPort").unwrap(),
+        TypeRef::new("Adapter").unwrap(),
+    ));
+
+    let (interactor, _) = interactor(rules_doc(), doc, &path);
+    let result = interactor.execute(&command(vec![path]));
+    let diagnostic = format!("{result:?}");
+    assert!(result.is_err());
+    assert!(diagnostic.contains("domain::alpha::Adapter"));
+    assert!(diagnostic.contains("domain::beta::Adapter"));
+}
+
+#[test]
+fn test_trait_impl_for_type_duplicate_canonical_identity_fails_closed() {
+    let path = PathBuf::from("domain-types.json");
+    let mut doc = empty_catalogue("domain", "domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Adapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "alpha"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::alpha::Adapter".to_owned()).unwrap(),
+        value_object_entry_in_module(ItemAction::Add, vec![], "alpha"),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("MyPort").unwrap(),
+        TypeRef::new("domain::alpha::Adapter").unwrap(),
+    ));
+
+    let (interactor, _) = interactor(rules_doc(), doc, &path);
+    let result = interactor.execute(&command(vec![path]));
+    let diagnostic = format!("{result:?}");
+
+    assert!(result.is_err());
+    assert!(diagnostic.contains("conflicting catalogue type declarations"));
+    assert!(diagnostic.contains("'Adapter'"));
+    assert!(diagnostic.contains("'domain::alpha::Adapter'"));
+    assert!(diagnostic.contains("domain::alpha::Adapter"));
+}
+
+#[test]
+fn test_trait_impl_for_type_unresolved_fails_closed() {
+    let path = PathBuf::from("domain-types.json");
+    let mut doc = empty_catalogue("domain", "domain");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-06"),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("MyPort").unwrap(),
+        TypeRef::new("MissingAdapter").unwrap(),
+    ));
+
+    let (interactor, _sink) = interactor(rules_doc(), doc, &path);
+    let result = interactor.execute(&command(vec![path]));
+
+    assert!(result.is_err());
+    assert!(format!("{result:?}").contains("cannot resolve trait-impl carrier"));
+}
+
+#[test]
 fn test_trait_role_index_attributes_same_name_traits_across_catalogue_crates() {
     let domain_path = PathBuf::from("domain-types.json");
     let usecase_path = PathBuf::from("usecase-types.json");
@@ -2374,8 +2604,15 @@ fn test_trait_role_index_attributes_same_name_traits_across_catalogue_crates() {
         CatalogueEntryKey::try_new("usecase::beta::SharedPort".to_owned()).unwrap(),
         trait_entry_in_module(ContractRole::SecondaryPort, "IN-99", "beta"),
     );
-
     let mut infrastructure_doc = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure_doc.insert_type(
+        CatalogueEntryKey::try_new("infrastructure::alpha::AlphaAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
+    infrastructure_doc.insert_type(
+        CatalogueEntryKey::try_new("infrastructure::beta::BetaAdapter".to_owned()).unwrap(),
+        value_object_entry(ItemAction::Add, vec![]),
+    );
     infrastructure_doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("domain::alpha::SharedPort").unwrap(),
         TypeRef::new("infrastructure::alpha::AlphaAdapter").unwrap(),

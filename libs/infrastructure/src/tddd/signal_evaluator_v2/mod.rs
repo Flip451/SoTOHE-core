@@ -267,29 +267,17 @@ pub(super) fn build_function_identity_map(
             continue;
         }
         let Some(summary) = krate.paths.get(id) else { continue };
-        let identity_key = function_identity_key(&summary.path, rustdoc_root);
+        let identity_key =
+            crate::tddd::canonical_type_identity::canonicalize_function_identity_path(
+                &summary.path,
+                rustdoc_root.map(|translation| translation.package_name()),
+                rustdoc_root.map(|translation| translation.rustdoc_root_name()),
+            );
         if !identity_key.is_empty() {
             map.insert(identity_key, *id);
         }
     }
     map
-}
-
-fn function_identity_key(
-    path: &[String],
-    rustdoc_root: Option<&RustdocTargetResolution>,
-) -> String {
-    let Some((root, rest)) = path.split_first() else {
-        return String::new();
-    };
-    let root = root.as_str();
-    let mut segments = Vec::with_capacity(path.len());
-    let canonical_root = rustdoc_root
-        .filter(|translation| root == translation.rustdoc_root_name().as_str())
-        .map_or(root, |translation| translation.package_name().as_str());
-    segments.push(canonical_root.to_owned());
-    segments.extend(rest.iter().cloned());
-    segments.join("::")
 }
 
 /// Returns `true` if the item is a type (Struct/Enum/TypeAlias) or a Trait.

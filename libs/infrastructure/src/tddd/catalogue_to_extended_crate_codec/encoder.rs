@@ -4,7 +4,7 @@
 use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::NewTypeGraphCodecError;
-use domain::tddd::catalogue_v2::identifiers::{FullyQualifiedItemPath, Identifier};
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, FullyQualifiedItemPath};
 use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath, StructShape,
@@ -18,9 +18,12 @@ use rustdoc_types::{
 
 use super::encoder_deletions::encode_deletion_record;
 use super::helpers::{make_item, normalize_impl_for_type_path, resolved_path_type};
-use super::{entry_item_name, invalid_type_ref};
+use super::{entry_item_name, invalid_type_ref, map_identity_resolution_error, summary_identity};
 use crate::tddd::canonical_type_identity::{
     CanonicalTypeIdentity, canonicalize_catalogue_type_ref,
+};
+use domain::tddd::catalogue_v2::identity_resolution::{
+    CatalogueIdentityResolutionError, resolve_catalogue_identity_in_namespace,
 };
 
 // ---------------------------------------------------------------------------
@@ -51,6 +54,9 @@ pub(super) struct EncoderState {
     pub(super) paths: HashMap<Id, ItemSummary>,
     /// Authoritative baseline/current rustdoc paths used for reconciliation.
     pub(super) resolution_paths: HashMap<Id, ItemSummary>,
+    /// Effective placement selected for catalogue declarations during the
+    /// action-aware pre-pass.
+    pub(super) resolved_entry_module_paths: HashMap<String, ModulePath>,
     /// `crate_id` → `ExternalCrate` for `Crate::external_crates`.
     pub(super) external_crates: HashMap<u32, ExternalCrate>,
     /// `crate_name` → `crate_id` lookup for TypeRef resolution.
@@ -91,6 +97,7 @@ impl Encoder {
                 index: HashMap::new(),
                 paths: HashMap::new(),
                 resolution_paths,
+                resolved_entry_module_paths: HashMap::new(),
                 external_crates: HashMap::new(),
                 ext_name_to_id: HashMap::new(),
                 next_ext_id: 1,
@@ -115,23 +122,23 @@ impl Encoder {
         let _ = self.state.alloc_id();
 
         // Collect declarations first to avoid simultaneous document/state borrows.
-        let type_entries: Vec<(CatalogueEntryKey, ModulePath)> = self
+        let type_entries: Vec<(CatalogueEntryKey, Option<ModulePath>)> = self
             .doc
             .types()
             .iter()
-            .map(|(key, entry)| (key.clone(), entry.module_path().clone()))
+            .map(|(key, entry)| (key.clone(), entry.module_path().cloned()))
             .collect();
         for (key, module_path) in type_entries {
-            self.assign_local_entry(&key, &module_path)?;
+            self.assign_local_entry(&key, module_path.as_ref(), CatalogueItemNamespace::Type)?;
         }
-        let trait_entries: Vec<(CatalogueEntryKey, ModulePath)> = self
+        let trait_entries: Vec<(CatalogueEntryKey, Option<ModulePath>)> = self
             .doc
             .traits()
             .iter()
-            .map(|(key, entry)| (key.clone(), entry.module_path().clone()))
+            .map(|(key, entry)| (key.clone(), entry.module_path().cloned()))
             .collect();
         for (key, module_path) in trait_entries {
-            self.assign_local_entry(&key, &module_path)?;
+            self.assign_local_entry(&key, module_path.as_ref(), CatalogueItemNamespace::Trait)?;
         }
         // Functions are keyed by their full `FunctionPath` string (e.g. `"my_crate::fn"`).
         // Store them in the dedicated `fn_path_to_id` map; TypeRef identity resolution only
@@ -179,12 +186,26 @@ impl Encoder {
     fn assign_local_entry(
         &mut self,
         key: &CatalogueEntryKey,
-        module_path: &ModulePath,
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
     ) -> Result<(), NewTypeGraphCodecError> {
-        let (fully_qualified, short_name) = self.identity_for_key(key, module_path)?;
+        let (fully_qualified, short_name, module_path) =
+            self.identity_for_key(key, declared_module_path, namespace)?;
         let id = self.state.alloc_id();
-        self.state.register_path(id, ItemKind::Struct, &short_name, module_path);
-        let identity_ref = TypeRef::new(fully_qualified.to_string()).map_err(|_| {
+        let item_kind = match namespace {
+            CatalogueItemNamespace::Type => ItemKind::Struct,
+            CatalogueItemNamespace::Trait => ItemKind::Trait,
+        };
+        self.state.register_path(id, item_kind, &short_name, &module_path);
+        self.state
+            .resolved_entry_module_paths
+            .insert(entry_scope_key(key, namespace), module_path.clone());
+        let identity_ref = TypeRef::new(if fully_qualified.is_placed() {
+            fully_qualified.to_string()
+        } else {
+            key.as_str().to_owned()
+        })
+        .map_err(|_| {
             invalid_type_ref(key.as_str(), "catalogue key produced an invalid identity")
         })?;
         let identity = canonicalize_catalogue_type_ref(
@@ -225,67 +246,57 @@ impl Encoder {
                 ));
             }
         }
-        self.assign_local_entry(&effective_key, &module_path)
-    }
-
-    fn module_path_from_key(
-        &self,
-        key: &CatalogueEntryKey,
-    ) -> Result<ModulePath, NewTypeGraphCodecError> {
-        let segments: Vec<&str> = key.as_str().split("::").collect();
-        let Some((_, path_segments)) = segments.split_last() else {
-            return Err(invalid_type_ref(key.as_str(), "catalogue key has no item name"));
-        };
-        if path_segments.is_empty() {
-            return Ok(ModulePath::root());
-        }
-        let module_segments =
-            if path_segments.first().copied() == Some(self.state.crate_name.as_str()) {
-                path_segments.get(1..).unwrap_or(&[])
-            } else {
-                path_segments
-            };
-        ModulePath::from_segments(
-            module_segments.iter().map(|segment| (*segment).to_owned()).collect(),
-        )
-        .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key has an invalid module path"))
+        self.assign_local_entry(&effective_key, Some(&module_path), CatalogueItemNamespace::Type)
     }
 
     fn identity_for_key(
         &self,
         key: &CatalogueEntryKey,
-        declared_module_path: &ModulePath,
-    ) -> Result<(FullyQualifiedItemPath, String), NewTypeGraphCodecError> {
-        let segments: Vec<&str> = key.as_str().split("::").collect();
-        let Some(short_name) = segments.last().copied().filter(|name| !name.is_empty()) else {
-            return Err(invalid_type_ref(key.as_str(), "catalogue key has no item name"));
-        };
-        let item_name = Identifier::new(short_name.to_owned()).map_err(|_| {
-            invalid_type_ref(key.as_str(), "catalogue key has an invalid item name")
-        })?;
-        let module_path = if segments.len() == 1 {
-            declared_module_path.clone()
-        } else {
-            let key_module_path = self.module_path_from_key(key)?;
-            if key_module_path != *declared_module_path {
-                return Err(invalid_type_ref(
-                    key.as_str(),
-                    format!(
-                        "catalogue key '{}' implies module_path '{}', but entry module_path is '{}'",
-                        key.as_str(),
-                        key_module_path,
-                        declared_module_path
-                    ),
-                ));
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+    ) -> Result<(FullyQualifiedItemPath, String, ModulePath), NewTypeGraphCodecError> {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+                &self.state.crate_name,
+                key,
+                declared_module_path,
+            ),
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+                    &self.state.crate_name,
+                    key,
+                    declared_module_path,
+                )
             }
-            key_module_path
+        }
+        .map_err(|error| {
+            invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+        })?;
+        let identity = if identity.is_placed() {
+            identity
+        } else {
+            let universe = self
+                .state
+                .resolution_paths
+                .values()
+                .filter_map(summary_identity)
+                .collect::<std::collections::BTreeSet<_>>();
+            let reference = TypeRef::new(key.as_str().to_owned())
+                .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key has no item name"))?;
+            match resolve_catalogue_identity_in_namespace(
+                &reference,
+                &self.state.crate_name,
+                &universe,
+                Some(namespace),
+            ) {
+                Ok(resolved) => resolved,
+                Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => identity,
+                Err(error) => return Err(map_identity_resolution_error(error)),
+            }
         };
-        let fully_qualified = FullyQualifiedItemPath::new(
-            self.state.crate_name.clone(),
-            module_path.clone(),
-            item_name,
-        );
-        Ok((fully_qualified, short_name.to_owned()))
+        let short_name = identity.name().as_str().to_owned();
+        let module_path = identity.module_path().cloned().unwrap_or_else(ModulePath::root);
+        Ok((identity, short_name, module_path))
     }
 
     fn assign_function_id(&mut self, path: &str) -> Result<(), NewTypeGraphCodecError> {
@@ -364,8 +375,11 @@ impl Encoder {
 
         // Encode types.
         for (type_name, entry) in doc.types() {
-            let type_id = state
-                .local_id_for_catalogue_entry(entry.module_path(), entry_item_name(type_name))?;
+            let type_id = state.local_id_for_catalogue_key(
+                type_name,
+                entry.module_path(),
+                CatalogueItemNamespace::Type,
+            )?;
             let action = entry.action();
             match entry.kind().clone() {
                 TypeKindV2::Struct(struct_kind) => {
@@ -407,8 +421,11 @@ impl Encoder {
 
         // Encode traits.
         for (trait_name, entry) in doc.traits() {
-            let trait_id = state
-                .local_id_for_catalogue_entry(entry.module_path(), entry_item_name(trait_name))?;
+            let trait_id = state.local_id_for_catalogue_key(
+                trait_name,
+                entry.module_path(),
+                CatalogueItemNamespace::Trait,
+            )?;
             let action = entry.action();
             state.encode_trait(trait_id, trait_name, entry)?;
             item_actions.insert(trait_id, action);
@@ -629,4 +646,12 @@ impl Encoder {
 
         Ok(ExtendedCrate::new(krate, item_actions))
     }
+}
+
+fn entry_scope_key(key: &CatalogueEntryKey, namespace: CatalogueItemNamespace) -> String {
+    let prefix = match namespace {
+        CatalogueItemNamespace::Type => "type",
+        CatalogueItemNamespace::Trait => "trait",
+    };
+    format!("{prefix}:{}", key.as_str())
 }

@@ -252,6 +252,1193 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-25T23:55:10Z",
+          "findings": [
+            {
+              "category": "logic error",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 308,
+              "message": "`TraitImplRequired` は `entry.module_path()` の `None` を `ModulePath::root()` に変換して `has_trait_impl` に渡しているため、配置未指定の型を crate root に誤認します。実装が `generated::Thing` にある場合、`Thing` への required trait impl が存在しても identity 不一致として欠落報告になります。省略 placement の action-aware 解決をこの経路にも適用してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter_helpers.rs",
+              "line": 407,
+              "message": "標準外部 trait の identity seed を `FullyQualifiedItemPath::from_fully_qualified_key` で生成しており、これは互換 API として `PlacedType` を作ります。namespace discriminator 導入後も `core::fmt::Debug` 等が trait identity ではなく type identity として解決集合に入り、ドメインの type/trait namespace invariant を破っています。trait-specific constructor を使用すべきです。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:de4639b34e98450fc793f22acfd113c094a2fe7355b4605269accc47ca6cd381",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:09:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d1e2541a1e22a55d96c86d08fc3e4126590b52ba7e9854e5e7b1b15a8a91a39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T00:21:52Z",
+          "findings": [
+            {
+              "category": "domain invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 236,
+              "message": "The linter builds a combined universe containing distinct type and trait identities, but classifies every extracted path with the namespace-agnostic resolver. When a type and trait share a short name, type-only fields such as `handles` can now fail with `AmbiguousIdentifier` or resolve to the wrong local namespace, despite D3 requiring type/trait comparisons to remain separate. Carry the syntactic/expected namespace into classification and add a same-named type/trait linter regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d1e2541a1e22a55d96c86d08fc3e4126590b52ba7e9854e5e7b1b15a8a91a39",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:46:34Z",
+          "findings": [
+            {
+              "category": "typestate / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 95,
+              "message": "The rule-independent preflight inspects every TypeRef slot, including `trait_impl.trait_ref`, supertrait bounds, and generic bounds, but this newly added context hard-codes every extracted path to the Type namespace. Consequently two same-named traits referenced by a bare bound are filtered out as unresolved instead of producing the required fail-closed ambiguity; a same-named type can also be selected in their place. Namespace must be carried per extracted path occurrence (for example in `ExtractedTypeRefPath::Path`) or supplied accurately for each syntactic slot, with a trait-ambiguity regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cc270c757d809b0ed62654d6d2641f812c000b5664f04fe523dc477879d9164d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:59:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:de63ce61029c37cc9981b651045531d0814e9187344bb92a2b3a74e7d60a8685",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T01:17:41Z",
+          "findings": [
+            {
+              "category": "typestate / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 89,
+              "message": "The fix carries one namespace for the entire `TypeRef`, not for each extracted path occurrence. A bound such as `Into<Result<alpha::Event, beta::Event>>` contains a trait path plus nested type paths, so passing `Trait` here makes the nested types appear unresolved and lets their ambiguity bypass preflight; conversely, a type slot such as `Box<dyn Port>` classifies `Port` as a type. Encode `CatalogueItemNamespace` on each `ExtractedTypeRefPath::Path` occurrence and add a mixed nested type/trait regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:de63ce61029c37cc9981b651045531d0814e9187344bb92a2b3a74e7d60a8685",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T02:35:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:219ccb579ac9eba35d07c4945b1b5a50cd1f35072dbedf447d6b82eca6ee383b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:43:33Z",
+          "findings": [
+            {
+              "category": "enum-first / trait contract",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 260,
+              "message": "Root-vs-nested semantics are inferred from the occurrence’s vector index, but `TypeRefPathExtractorPort::extract` does not require root-first ordering and `ExtractedTypeRefPath::Path` does not encode path position. A conforming adapter that emits a nested path first can therefore receive the slot namespace while the actual root remains classified as `Type`, suppressing a required trait ambiguity. Encode `Root`/`Nested` in each path occurrence (or make ordering an enforced contract) instead of using `index == 0`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:219ccb579ac9eba35d07c4945b1b5a50cd1f35072dbedf447d6b82eca6ee383b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T02:56:32Z",
+          "findings": [
+            {
+              "category": "enum-first / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_linter_identity.rs",
+              "line": 262,
+              "message": "Root detection by spelling is still ambiguous when the root and a nested occurrence have the same path. For a trait slot such as `Foo<Foo>`, the parser emits both paths as type-position `Foo`; `root_path_is_anchored` returns true for both, so the nested type argument is incorrectly classified in the Trait namespace and a same-named type ambiguity is silently missed. Encode Root/Nested position on each extracted occurrence (or equivalent positional metadata) rather than deriving it from path text.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:120a73bc7132403fc8c1ee788c955fe057d316ef27aa0d3eb4f2e6a6c09ba2a5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:07:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b37eb6d74cdbd5342caffea99fdb6c89d462668ebee7855d4c06442bfa6104fd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:20:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:304886afdd146561b0fb3c98ca823dd3b5e9bb2efeaac6463c10308ecfc59053",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:24:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:304886afdd146561b0fb3c98ca823dd3b5e9bb2efeaac6463c10308ecfc59053",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T16:58:18Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 6,
+              "message": "T001 の description は「baseline/current 候補規則」「baseline 一意性」「明示 path の完全一致」「曖昧時の fail-closed」という挙動契約を散文で再記述しています。対象・操作・anchor cite に限定してください（no-upstream-restatement policy）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 12,
+              "message": "T002 の description は「add 相互参照」「modify→add」「宣言順序非依存」「未知参照拒否」などの上流挙動契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 21,
+              "message": "T003 の description は「四経路が同じ結果を使用し fail-closed を維持」という挙動契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 30,
+              "message": "T004 の description は bin target の type add/modify/reference、function path、一対一制約という上流契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 39,
+              "message": "T005 の description は完全修飾 key の記録、解決不能・曖昧 carrier の fail-closed という挙動契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 56,
+              "message": "section S1 の description は配置状態、namespace-aware 候補選択、明示・省略 path の fail-closed 挙動を再記述しています。対象・操作・anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 66,
+              "message": "section S2 の description は解決集合の一箇所構築と crate-root alias の単一通過という上流設計を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 76,
+              "message": "section S3 の description は四経路の共通結果移行と route-local fallback 撤去という上流設計を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 86,
+              "message": "section S4 の description は function identity/catalog import の共通正準化と一対一 bin target の回帰挙動を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 96,
+              "message": "section S5 の description は trait-impl carrier の完全修飾 key 解決と短名 fallback 撤去を再記述しています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5fb9d1e72a60f71d7e577d65256fcb9ebb338c95e889edc6e4048e8c842c0cb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:02:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7a79ad9765122c4dca57390cf9f0cdd6ec8306293d35066c6cc338454cf8937",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:12:41Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 21,
+              "message": "T003 names the non-existent `libs/infrastructure/src/tddd/encoder.rs`; the codec encoder is `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs`, with deletion handling in `encoder_deletions.rs`. The executor must therefore infer the load-bearing CO-01/AC-01/AC-03 write boundary. Name the actual target files explicitly.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 21,
+              "message": "T003 bundles independently verifiable migrations for the codec/deletion route (CO-01, AC-01, AC-03), type-signal identity index (CO-01, AC-01, AC-02), and Phase 1 definition-path authority (CO-01, AC-03). Because each route has its own target and regression surface, split them into separate pre-implementation tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 30,
+              "message": "T004 bundles two independently verifiable consumers: function identity in `signal_evaluator_v2` and catalog import/bin-root resolution in `catalog_gen`/`schema_export` (IN-02, CO-02, AC-02). Split these behavior units so each can be implemented and validated independently.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/batch-plan.json",
+              "line": 68,
+              "message": "B2 groups T003 and T004 despite a concrete overlapping test target: T003's Phase 1 validation and T004's function-identity validation both use `libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs`. This prevents isolated ownership within the batch; separate the tasks into different batches or assign disjoint test files explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c7a79ad9765122c4dca57390cf9f0cdd6ec8306293d35066c6cc338454cf8937",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:24:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:febd2af33f214078fcd7534e8652c79c2fe98431964f397138862baa78d1f034",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:28:14Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/batch-plan.json",
+              "line": 97,
+              "message": "After T002 runs in B1, T004, T006, and T007 are all ready and have write targets disjoint from T002's codec/canonical-identity files. Each individually fits B1's infrastructure ceiling: T004 gives 400+80=480, T006 gives 400+90=490, and T007 gives 400+70=470 (ceiling 500). Deferring all three to B2 is avoidable serialization; move at least one into B1 after T002.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:febd2af33f214078fcd7534e8652c79c2fe98431964f397138862baa78d1f034",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:32:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef0aa6c2ae6674a67afbb3d3fd93d6ba21dc01de9d64c799d3f80d456abee366",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:35:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef0aa6c2ae6674a67afbb3d3fd93d6ba21dc01de9d64c799d3f80d456abee366",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:07:41Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/batch-plan.json",
+              "line": 101,
+              "message": "T003、T006、T007、T008 はいずれも未着手で、依存先 T002 完了後に実行可能です。各タスクの production/test 対象は相互に重複せず、B1 に移しても infrastructure 合計は production 435 行・test 445 行で ceiling 500 未満です。しかし B2 に分離されており、不要なバッチ直列化が残っています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7630d5372695a4d5cd0d2f416a8f116a4848c8efdd8f218a981c97e45e1a0e18",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:09:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7630d5372695a4d5cd0d2f416a8f116a4848c8efdd8f218a981c97e45e1a0e18",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:12:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7630d5372695a4d5cd0d2f416a8f116a4848c8efdd8f218a981c97e45e1a0e18",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T23:51:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1612a93707f1821aa1d2b8723eeefee279f4b479ac578de3e7e453f868a5843d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T23:53:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1612a93707f1821aa1d2b8723eeefee279f4b479ac578de3e7e453f868a5843d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:10:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75a8d3c784f2191eccd583b03a4aee02d3251d1252bc8b4c0257176f87124dc6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:13:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75a8d3c784f2191eccd583b03a4aee02d3251d1252bc8b4c0257176f87124dc6",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-25T23:55:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf897420a6d7544ffafd18ffbeb77476db6b34a60069923eff7dcc12116a58d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T00:11:39Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 233,
+              "message": "Placed `add` declarations return before consulting the baseline. Consequently, a qualified key or explicit module path that exactly matches an existing baseline identity is accepted and encoded as `Add`, although D3 requires that collision to fail closed. Use the shared action-aware domain resolver for both placed and unplaced identities.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 283,
+              "message": "Serializing an unplaced identity omits its module segments, producing `[crate, name]`; `summary_identity` subsequently reconstructs that as a placed crate-root identity. Thus an unimplemented `add` with omitted `module_path` is emitted and resolved as crate-root rather than retaining D3's unplaced state.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 361,
+              "message": "Root-alias normalization is applied to every `Crate::paths` summary, including entries with nonzero `crate_id`. An external item whose crate name equals the binary rustdoc root is therefore rewritten into the catalogue package namespace and may resolve as a local type. Restrict alias rewriting to local summaries.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/node_index.rs",
+              "line": 266,
+              "message": "The renderer converts an omitted module path to `ModulePath::root()` before inserting the declaration into its identity index. Bare unplaced declarations therefore become concrete root identities and can receive edges as though their placement were known; the grouping and label paths make the same conversion. Preserve unplaced placement or resolve it from a qualified key instead of defaulting it to root.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf897420a6d7544ffafd18ffbeb77476db6b34a60069923eff7dcc12116a58d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:37:47Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 207,
+              "message": "For an `add` with omitted `module_path` and no baseline/current match, `identity_for_key` returns an `Unplaced*` identity, but `assign_local_entry` canonicalizes `fully_qualified.to_string()` (for example `domain::First`). The shared resolver intentionally does not match qualified paths to unplaced identities, so valid unimplemented adds such as the mutual `First`/`Second` case fail closed instead of being encoded. Use the original bare key when the identity is unplaced.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2f839a5763edfdfc839485496b4029bd2905baf0f77d5e9d3d8baa6d4974ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:57:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:61ea9219813420644b768cbec3c6e7a54b4bb907dae091e8095454ed7700905d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T01:16:55Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 160,
+              "message": "`encode_doc` still constructs baseline/current rustdoc paths from every catalogue declaration, including `Add` entries. The action-aware D3 resolver therefore sees each add as an existing baseline collision; 67 of the 101 codec tests currently fail before exercising their intended behavior. This also recreates the substitute resolution universe explicitly forbidden by T002. Keep only genuine baseline/current and external paths, letting production construction synthesize catalogue adds.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 96,
+              "message": "The signal-evaluator fixture independently injects all catalogue types and traits into both authoritative rustdoc inputs. Five of the 69 evaluator tests consequently fail in codec setup with `UnresolvedIdentifier` instead of reaching evaluation. Build scenario-accurate baseline/current crates and let the production resolution-set constructor supply add declarations.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 357,
+              "message": "The new qualified-baseline-collision regression test is itself red: the codec rejects the collision as `UnresolvedIdentifier(\"domain::generated::Thing\")`, while the test and candidate-bearing collision contract require `AmbiguousIdentifier`. The final test suite cannot pass until the qualified collision preserves the intended typed diagnostic or the assertion is aligned with the approved contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "serde_codec",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 200,
+              "message": "Encoding maps both `None` and `Some(ModulePath::root())` to the same empty string, while decoding an empty string always produces `None`. A bare explicitly root-placed type or trait therefore round-trips as unplaced and is subsequently resolved under different D3 rules. Preserve the distinction between an omitted field and an explicitly empty root path in the DTO conversion.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 216,
+              "message": "The renderer classifies every entry with `module_path == None` as unplaced without considering that a qualified catalogue key itself supplies explicit placement. For example, `domain::alpha::Thing` with an omitted field is indexed as the placed `alpha` identity but rendered under `<unplaced>::Thing` outside the `alpha` module subgraph. Derive the effective placement from both key and optional field, as required by D3.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:61ea9219813420644b768cbec3c6e7a54b4bb907dae091e8095454ed7700905d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T01:49:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc3d6384080f7210a86581062bcab07741e2e7cc931ebf98138aa309777fba20",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:35:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9735af9e680fd550ba398ffd52ec35959a4933887f707ed8e6602dfde60b752f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:42:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9735af9e680fd550ba398ffd52ec35959a4933887f707ed8e6602dfde60b752f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T16:21:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bcccbf11ebbfb677f446c66ad966d9690b11034065d2d991871e657b7229e40b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:23:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bcccbf11ebbfb677f446c66ad966d9690b11034065d2d991871e657b7229e40b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:07:45Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 81,
+              "message": "This CO-01 waiver does not name the verifying construction-level test; it only defers cross-route convergence to separate entries and later B2 tasks, contrary to the B1 waiver requirement.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 210,
+              "message": "This CO-01 waiver does not name any verifying construction-level test and only refers generically to route-owned entries, leaving the waived cross-route invariant unsubstantiated.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 215,
+              "message": "This CO-02 waiver does not name a verifying construction-level test; saying the behavior requires testing a different route is an unsubstantiated deferral under the B1 waiver requirement.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 229,
+              "message": "This CO-02 waiver does not name the verifying construction-level test for exactly-once alias application and only states that the provenance is outside the adapter API.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1db0254fe3818ba8d0e0b7183052726166405564ca931404187b07229161f60",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:10:39Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 81,
+              "message": "The current CO-01 waiver reason changed after its verdict was frozen, so `bin/sotp test-obligation check` fails with `ReasonChanged`; the artifact must be re-evaluated before it can pass the gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 210,
+              "message": "The current CO-01 waiver reason changed after its verdict was frozen, so `bin/sotp test-obligation check` fails with `ReasonChanged`; the artifact must be re-evaluated before it can pass the gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 215,
+              "message": "The current CO-02 waiver reason changed after its verdict was frozen, so `bin/sotp test-obligation check` fails with `ReasonChanged`; the artifact must be re-evaluated before it can pass the gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 229,
+              "message": "The current CO-02 waiver reason changed after its verdict was frozen, so `bin/sotp test-obligation check` fails with `ReasonChanged`; the artifact must be re-evaluated before it can pass the gate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:03820d52865059d2741449aea05cc3326989ecd0cffa2ecb457d01fffba8b8e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:12:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03820d52865059d2741449aea05cc3326989ecd0cffa2ecb457d01fffba8b8e9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:15:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03820d52865059d2741449aea05cc3326989ecd0cffa2ecb457d01fffba8b8e9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T23:56:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19721e3a2f6fc118f292f00a2a8525e70ef52d123e2a4f7861c171fe87c73131",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T23:59:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19721e3a2f6fc118f292f00a2a8525e70ef52d123e2a4f7861c171fe87c73131",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:15:03Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 24,
+              "message": "The fulfillment binding for DeriveTestObligationsInteractor covers the IN-04 edge with tests whose bodies changed after verdict freezing; `bin/sotp test-obligation check` therefore fails with `TestChanged` and this binding is not currently gate-valid.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 24,
+              "message": "The fulfillment binding for DeriveTestObligationsInteractor covers the CO-04 edge with tests whose bodies changed after verdict freezing; `bin/sotp test-obligation check` therefore fails with `TestChanged` and this binding is not currently gate-valid.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 24,
+              "message": "The fulfillment binding for DeriveTestObligationsInteractor covers the AC-04 edge with tests whose bodies changed after verdict freezing; `bin/sotp test-obligation check` therefore fails with `TestChanged` and this binding is not currently gate-valid.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1db8ddddc5de2b69820386047f0afa396d43f59df21d2d9f8dc4ce601a38133c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:33:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ad369d660362dfd50a874236216fca9369644131476b41c3801adb22ff09a6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:35:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ad369d660362dfd50a874236216fca9369644131476b41c3801adb22ff09a6b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T13:03:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ca865fbbf2294859dc4da10b994ebf46c88e811b36e17a12c9d695843cd40a3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:08:07Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json",
+              "line": 31,
+              "message": "AC-03 does not specify D3's fail-closed result when an omitted-module_path `add` collides with a same-named baseline item. Its add cases all assume that the baseline name is absent, while CO-03 only rejects ambiguous or insufficiently grounded resolution; an existing baseline match is neither. An implementation that accepts this duplicate could therefore satisfy every stated AC, leaving GO-01's fail-closed module_path repair without deterministic acceptance coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5ca865fbbf2294859dc4da10b994ebf46c88e811b36e17a12c9d695843cd40a3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:11:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e0fc72d4639a538408937113a08b31247ae308dd90a8bfaaedf19d88a3304a6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:30:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e13845822a70c3abe93e8b55c6e163912c12186231c38d1f1e9c72237ed186",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:32:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e13845822a70c3abe93e8b55c6e163912c12186231c38d1f1e9c72237ed186",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T13:59:33Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 638,
+              "message": "`domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath` cannot represent D3's unplaced add identity: its `module_path` remains mandatory (`ModulePath` and `&ModulePath`), while `from_catalogue_entry_key` accepts `Option<&ModulePath>`. The `None` case therefore has no valid `Self` representation, despite D3 requiring a crate/name identity with unresolved module placement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:61f92def0e81779c01bcba5e1163eda42d20cddad5109ece57379197403ff0b0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:18:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08b3f86c0d7dfab3a20654d34f700196c9790940e3eea69965947446a7772a7f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:31:42Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 646,
+              "message": "`domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath` cannot represent D3's separate type/trait namespaces: both variants carry only crate/module/name, and `resolve_catalogue_identity` receives a single `BTreeSet<FullyQualifiedItemPath>` with no namespace discriminator. An unplaced add type and trait with the same name therefore collapse to one set element. Add namespace information to the identity universe so the required namespace-aware comparison is expressible.",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 4,
+              "message": "CO-03/AC-03 has no declared enforcement owner. `domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` receives neither `ItemAction` nor separate baseline/current sets, and `FullyQualifiedItemPath::from_catalogue_entry_key` likewise cannot apply the action-aware omission rules. The codec entry that does receive catalogue, baseline, and current data is not grounded to IN-03/CO-03/AC-03. Name exactly one capable owner for D3's fail-closed decisions and rejection data.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 9,
+              "message": "`usecase::CatalogPort` exposes filesystem-shaped operations (`items_dir: &Path`, implemented by `FsCatalogAdapter`) as an entirely synchronous port, but its docs do not acknowledge or justify the blocking choice. This prevents an I/O adapter from expressing async behavior through the port; document the deliberate sync boundary or correct the port color.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 6,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity` restates CO-01/CO-03 and AC-01/AC-03 by describing the single universe, fail-closed rejection, and absence of route-specific fallback. Replace the behavioral sentence with a concise target/purpose plus anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 140,
+              "message": "`CatalogueToExtendedCratePort` restates D1/IN-01 by saying catalogue encoding proceeds through the shared canonical identity-resolution set. Keep only the port purpose and anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 187,
+              "message": "`SignalEvaluatorPort` restates D2/IN-02 by specifying that its implementation consumes canonicalized type and function identities. Replace that behavioral clause with concise anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 236,
+              "message": "`domain::tddd::catalogue_v2::entries::TraitEntry` restates CO-03/AC-03 by explaining that omitted `module_path` means unspecified rather than crate-root placement. Refer to the anchors without reproducing the rule, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 454,
+              "message": "`domain::tddd::catalogue_v2::entries::TypeEntry` restates CO-03/AC-03 by explaining that omitted `module_path` means unspecified rather than crate-root placement. Refer to the anchors without reproducing the rule, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 646,
+              "message": "`domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath` restates D3's payload semantics and the rationale that omission must not be confused with crate root. Retain only the necessary type-shape description and anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 9,
+              "message": "`usecase::CatalogPort` restates IN-02/CO-02/AC-02 by describing the catalog-import delegation and canonicalization route. Replace that route behavior with a concise port purpose plus anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 6,
+              "message": "`infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref` restates D1/D2 by specifying the unified rustdoc/add set and exactly-once root-alias application. Replace the behavioral contract with a concise operation plus anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 58,
+              "message": "`infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer` restates CO-01/CO-02 by enumerating the routes that use the shared canonical identity path. Keep only the operation and anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 165,
+              "message": "`infrastructure::tddd::catalog_gen::FsCatalogAdapter` restates D2/CO-02 by stating that catalog import now uses the single package/root-alias resolution path. Preserve the independent adapter-placement rationale but replace this behavioral clause with anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 204,
+              "message": "`infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec` restates D1/CO-01 by enumerating the baseline/current/add resolution set and removal of per-route fallbacks. Replace that behavior with a concise adapter purpose plus anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 247,
+              "message": "`infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2` restates D1/D2 by specifying shared-authority canonicalization and prohibiting downstream alias reapplication. Replace the behavioral sentence with a concise adapter purpose plus anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08b3f86c0d7dfab3a20654d34f700196c9790940e3eea69965947446a7772a7f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:10:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acbbe0baa3d4b65a7bfa8b1b0049722aa1a560cd93b246b757818e1d374f8d8e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:19:46Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 16,
+              "message": "`usecase::CatalogPort::init` and `CatalogPort::check` return the full `CatalogError` without documenting their producible subsets. `init` can produce only `FileExists`/`FileMissing`/`Port`, while `check` can produce only `FileMissing`/`SchemaInvalid`/`Port`; callers must otherwise handle structurally unreachable variants such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, and `ParseFragment`. Add per-method subset documentation or use narrower error types.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:acbbe0baa3d4b65a7bfa8b1b0049722aa1a560cd93b246b757818e1d374f8d8e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:31:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9850ec4a6e702794adf86dcc4f4f71fc5808f5fc2ead3abd8fde69a3d6ecb94c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:34:59Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 79,
+              "message": "`usecase::CatalogPort::cite` still returns the full `CatalogError` without documenting its producible subset. This operation can produce `FileMissing`, `AnchorNotFound`, `SchemaInvalid`, and `Port`, but cannot structurally produce `FileExists`, `DuplicateEntry`, `InvalidRole`, or `ParseFragment`. Add per-method subset documentation or use a narrower error type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9850ec4a6e702794adf86dcc4f4f71fc5808f5fc2ead3abd8fde69a3d6ecb94c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:39:41Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 79,
+              "message": "`usecase::CatalogPort::cite` returns the full `CatalogError` without documenting its producible subset. This operation can produce `FileMissing`, `AnchorNotFound`, `SchemaInvalid`, and `Port`, but cannot structurally produce `FileExists`, `DuplicateEntry`, `InvalidRole`, or `ParseFragment`. Add per-method subset documentation or use a narrower error type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9850ec4a6e702794adf86dcc4f4f71fc5808f5fc2ead3abd8fde69a3d6ecb94c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:53:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18e3e4910d2b21e2f84ff5dd75977849fab5368650bc33f8caa2d27143658190",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:56:58Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 29,
+              "message": "`usecase::CatalogPort::init` and `CatalogPort::check` document `CatalogError::FileMissing` as producible, but neither method can return it: `init` treats absent targets as the normal creation case, while `check` converts absent catalogues into `Skipped`/`Blocked` reports. `init` can instead return `SchemaInvalid` while constructing a skeleton from invalid layer/crate binding data, which its declared subset omits. Correct the documented subsets (`init`: `FileExists`/`SchemaInvalid`/`Port`; `check`: `SchemaInvalid`/`Port`).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:18e3e4910d2b21e2f84ff5dd75977849fab5368650bc33f8caa2d27143658190",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:10:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f84b6ddc69ea59a33115999220e2f0ae71369bd7c089709957123404a210fc78",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:13:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f84b6ddc69ea59a33115999220e2f0ae71369bd7c089709957123404a210fc78",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:48:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181ec62f6975d8af3531e8c5d43a63cd50f58bc628954452702de9d90ec43eec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:51:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181ec62f6975d8af3531e8c5d43a63cd50f58bc628954452702de9d90ec43eec",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:43:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2943fa1e99c75a7edef175bf65dbe9e233f0e6d00700351f185a2b330e739d2f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:47:35Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action` is grounded to D3 but carries no namespace, while `resolve_catalogue_identity_for_action_in_namespace` accepts `Option<CatalogueItemNamespace>`. For an unimplemented `add` with empty baseline/current sets, no candidate can reveal whether the identity is a type or trait; the `None` state therefore permits an add-trait request to become an unscoped/type identity instead of `UnplacedTrait`. Make the namespace required on the action-aware contract (or provide separate type/trait APIs) so this illegal state is unrepresentable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2943fa1e99c75a7edef175bf65dbe9e233f0e6d00700351f185a2b330e739d2f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:51:58Z",
+          "findings": [
+            {
+              "category": "duplicated structural declaration",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action` and `resolve_catalogue_identity_for_action_in_namespace` are both `action: add` entries with identical parameter lists (including required `CatalogueItemNamespace`), return type, role, and spec grounding. They therefore declare two public names for the same action- and namespace-aware operation. Consolidate them into one contract instead of maintaining duplicate resolution surfaces.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8e60b78e1aa599ceee49a861a2ce14e77f0c3e473950db43f9c6b402e29bfcd2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:05:36Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action` is a namespace-agnostic action-aware contract even though D3 requires type/trait namespace separation. Its wrapper passes `None` to the namespaced resolver, whose unplaced-add path defaults `None` to `CatalogueItemNamespace::Type`; an add-trait request with no candidates can therefore be represented as `UnplacedType` rather than `UnplacedTrait`. Require the namespace or expose separate type/trait APIs so this illegal state is unrepresentable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d8922a98e5b0829dc1f42f91585dfbff1cc879d2c9a5d0688fc36d266495032",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:08:41Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "`domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action` is grounded to D3 but carries no namespace, and its companion `resolve_catalogue_identity_for_action_in_namespace` still permits `namespace: None`. AC-03 requires an empty-candidate `add` to produce either an unplaced type or unplaced trait identity, which cannot be selected without a required namespace. The namespace-agnostic/`None` state therefore leaves the action-aware contract unable to represent an unimplemented add trait correctly. Make `CatalogueItemNamespace` mandatory for action-aware resolution or provide separate type/trait APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d8922a98e5b0829dc1f42f91585dfbff1cc879d2c9a5d0688fc36d266495032",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:22:00Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "REVIEW_FIX_STATUS: failed — The P1 finding requires editing `domain-types.json`, but the review-fix-lead capability must not edit catalogue files; `type-designer` is the required owner. Make `CatalogueItemNamespace` mandatory for action-aware resolution or provide separate type/trait APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6baf302117a02caf2979223393d09dc00f69981d5b92da437ecda15e833f0a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:23:15Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 52,
+              "message": "REVIEW_FIX_STATUS: failed — The finding requires editing `domain-types.json`, but the review-fix-lead capability must not edit catalogue files; `type-designer` is the required owner. Make the action-aware resolver namespace-required or provide separate type/trait APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fe6baf302117a02caf2979223393d09dc00f69981d5b92da437ecda15e833f0a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:24:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6baf302117a02caf2979223393d09dc00f69981d5b92da437ecda15e833f0a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:26:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6baf302117a02caf2979223393d09dc00f69981d5b92da437ecda15e833f0a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:57:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fd24af41b93680de1e17773779c75019af37ae113bb0ec45cc9ca28ea7ab4fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T23:00:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fd24af41b93680de1e17773779c75019af37ae113bb0ec45cc9ca28ea7ab4fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:24:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:85e47bd7958d3546476e89c7817a0fe20a11f17a7969294b9a596205540c7b26",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:27:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:85e47bd7958d3546476e89c7817a0fe20a11f17a7969294b9a596205540c7b26",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-25T23:54:23Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 116,
+              "message": "`resolve_named_type_entry` converts every domain resolution error—including `AmbiguousIdentifier` and `ClassificationFailed`—to `Ok(None)`. An ambiguous local inherent-impl owner is therefore silently skipped and its method obligations are omitted instead of failing closed with a diagnostic. Match only the explicit external/unresolved case and propagate ambiguity/classification errors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1278e148a6fdf3625416b07b312117f8a9376542a6f50cefd5cdc90d7183ed2c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:08:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:07a956bc91d7bda3b9f48c87334a26af99759bbd4e7cd8942b98bbf25a5e7b0d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T00:18:19Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 158,
+              "message": "`resolve_named_type_key` converts `UnresolvedIdentifier` into `Ok(None)`, which the caller silently skips. A missing or misspelled `trait_impls[].for_type` therefore produces no `contract_conformance` obligation while derivation still succeeds. AC-04/CO-04 require unresolved carriers, not only ambiguous ones, to fail closed; propagate a diagnostic instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 59,
+              "message": "`declaration_identity_in_namespace` derives aliases from the optional raw `module_path` and always adds `crate::Name`. When placement is omitted, this incorrectly treats an unplaced trait as crate-root; when a qualified stored key supplies the module, it fabricates aliases that ignore that module. This can resolve a qualified trait reference to the wrong declaration, contrary to CO-03's exact-placement semantics. Delegate matching to the domain resolver or derive spellings from `FullyQualifiedItemPath` without inventing qualified aliases for unplaced identities.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:07a956bc91d7bda3b9f48c87334a26af99759bbd4e7cd8942b98bbf25a5e7b0d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:34:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:581f8c02982783d03db6d17c1f793e967b85c13b8f592471aae8a40a0e070385",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T00:46:59Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/identity.rs",
+              "line": 172,
+              "message": "`catalogue_type_identity_map` collects directly into a `BTreeMap`, so distinct catalogue keys that canonicalize to the same `FullyQualifiedItemPath` silently overwrite each other. For example, `Adapter` with module `alpha` and `domain::alpha::Adapter` both denote the same type identity; `for_type` then resolves to whichever raw key was inserted last instead of failing closed, making the obligation carrier and task-contract attribution arbitrary. Use checked insertion and reject duplicate canonical owners, with regression coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:581f8c02982783d03db6d17c1f793e967b85c13b8f592471aae8a40a0e070385",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T00:57:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:894dcae97daee10beb4f5bd0932985814bcd71bc1f10530849237c0b0a19836b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T01:02:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:894dcae97daee10beb4f5bd0932985814bcd71bc1f10530849237c0b0a19836b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:12:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a298d13159d7db6bf70fc08b0926052e913a976b679d37b207d913aa87860c5e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:19:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a298d13159d7db6bf70fc08b0926052e913a976b679d37b207d913aa87860c5e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

@@ -69,6 +69,14 @@ use validate::validate_schema_version;
 /// Schema-version 3 and below are rejected with `UnsupportedSchemaVersion` (no migration path).
 pub const SCHEMA_VERSION: u32 = 5;
 
+/// Wire marker for an explicitly declared crate-root placement.
+///
+/// The DTO keeps `module_path` as a string for schema compatibility, so an
+/// omitted placement and an explicit empty [`ModulePath`] need distinct values
+/// on the wire. The empty string remains the legacy omitted-placement value;
+/// this marker is emitted only for `Some(ModulePath::root())`.
+pub(super) const EXPLICIT_ROOT_MODULE_PATH: &str = ".";
+
 // ---------------------------------------------------------------------------
 // StrictMap — duplicate-key-rejecting BTreeMap deserializer
 // ---------------------------------------------------------------------------
@@ -328,8 +336,8 @@ mod tests {
     use super::*;
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::ItemAction;
-    use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
-    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
         CrateName, FunctionName, FunctionPath, ModulePath, ParamName,
     };
@@ -619,7 +627,10 @@ mod tests {
 
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
-        assert_eq!(doc.types().get(&key).unwrap().module_path().to_string(), "b");
+        assert_eq!(
+            doc.types().get(&key).unwrap().module_path().map(ToString::to_string),
+            Some("b".to_owned())
+        );
     }
 
     #[test]
@@ -641,7 +652,10 @@ mod tests {
 
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
-        assert_eq!(doc.traits().get(&key).unwrap().module_path().to_string(), "b");
+        assert_eq!(
+            doc.traits().get(&key).unwrap().module_path().map(ToString::to_string),
+            Some("b".to_owned())
+        );
     }
 
     #[test]
@@ -715,7 +729,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["b".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["b".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],
@@ -725,6 +739,77 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         assert!(encoded.contains("\"domain::a::Thing\""));
         assert!(encoded.contains("\"module_path\": \"b\""));
+    }
+
+    #[test]
+    fn test_encode_decode_preserves_omitted_and_explicit_root_placement() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let unit = || TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        doc.insert_type(
+            CatalogueEntryKey::try_new("RootPlaced".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit(),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Unplaced".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit(),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("RootPort".to_owned()).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["RootPlaced"]["module_path"], ".");
+        assert_eq!(value["types"]["Unplaced"]["module_path"], "");
+        assert_eq!(value["traits"]["RootPort"]["module_path"], ".");
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        let root_key = CatalogueEntryKey::try_new("RootPlaced".to_owned()).unwrap();
+        let unplaced_key = CatalogueEntryKey::try_new("Unplaced".to_owned()).unwrap();
+        let port_key = CatalogueEntryKey::try_new("RootPort".to_owned()).unwrap();
+        assert!(decoded.types()[&root_key].module_path().is_some_and(ModulePath::is_root));
+        assert_eq!(decoded.types()[&unplaced_key].module_path(), None);
+        assert!(decoded.traits()[&port_key].module_path().is_some_and(ModulePath::is_root));
     }
 
     #[test]
@@ -741,7 +826,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["a".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["a".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],
@@ -1433,7 +1518,7 @@ mod tests {
                     rhs: vec![TypeRef::new("/* relaxed */ ?Sized").unwrap()],
                     operator: BoundOp::Bound,
                 }],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1588,7 +1673,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1620,7 +1705,7 @@ mod tests {
                 vec![],
                 vec![duplicate.clone(), duplicate],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1655,7 +1740,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1692,7 +1777,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1857,7 +1942,7 @@ mod tests {
   "layer": "domain",
   "types": {},
   "traits": {
-    "KeywordTrait": {
+    "domain::KeywordTrait": {
       "action": "add",
       "role": { "SecondaryPort": {} },
       "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["Clone"] }],
@@ -1890,14 +1975,6 @@ mod tests {
         // structural encoder processes bounds / returns with the same context.
         use domain::tddd::CatalogueToExtendedCratePort;
         let mut paths = std::collections::HashMap::new();
-        paths.insert(
-            rustdoc_types::Id(1),
-            rustdoc_types::ItemSummary {
-                crate_id: 0,
-                path: vec!["domain".to_owned(), "KeywordTrait".to_owned()],
-                kind: rustdoc_types::ItemKind::Trait,
-            },
-        );
         paths.insert(
             rustdoc_types::Id(2),
             rustdoc_types::ItemSummary {
