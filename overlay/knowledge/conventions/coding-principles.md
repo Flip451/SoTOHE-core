@@ -125,6 +125,10 @@ async runtime の採用や強制の緩和は、ADR の決定事項として扱�
 
 > **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
 
+入力 port の 1 trait 規則は、入力 port trait を置く場合の粒度を定める。R2 の stateless 判定であっても、R1 で application-only の user-facing use-case entrypoint と分類する top-level `pub fn` は `FreeFunction` 判定から除外し、`role: UseCaseFunction` としてモデル化する。その entrypoint は port trait も Interactor も持たず、driver はその関数を直接呼び出す。この形は 1 trait 規則の対象外である。後からその操作に入力 port trait を導入する時点で、1 ユースケース 1 trait・実行メソッド 1 つの規則に従う。
+
+> **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
+
 command と query を混載する facade port を新設してはならない。この禁止は未移行の文脈にも適用する。既存の facade port や既存の単一 interactor 注入は、この規約だけを理由に遡及改修しない。
 
 > **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope

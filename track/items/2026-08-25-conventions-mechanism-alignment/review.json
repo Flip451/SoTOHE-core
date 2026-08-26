@@ -1282,6 +1282,42 @@
           "hash": "rvw1:sha256:2b1b219c85b3051f5893884ae66da3a346f3d64a5821d608f8bd936bd136f138",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:15:38Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 164,
+              "message": "追加された UseCaseFunction 例外が、このファイルの R2 と矛盾しています。R2 は「top-level の pub fn」を stateless 条件に該当する場合は常に role: FreeFunction と規定しているため、同じ条件の user-facing top-level pub fn を role: UseCaseFunction とする規則は同時に成立しません。R2 に明示的な例外または分類条件を追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 120,
+              "message": "coding-principles.md の UseCaseFunction 例外は、対応する type-designer-kind-selection.md の R2 が top-level pub fn を FreeFunction と一律指定しているため、同ファイル内の規約体系と整合しません。UseCaseFunction の条件を R2 の FreeFunction 判定から除外する旨を明記する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:96d2dd40e243f3f2dd8f0ea82bf23619d73db532cdc232e1cd60d89d65f371cf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:19:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5603c1c8ce74112c8d1edc596315fa0a26774293175c174029d801e3e53d3cda",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:25:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5603c1c8ce74112c8d1edc596315fa0a26774293175c174029d801e3e53d3cda",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2048,6 +2084,42 @@
           "at": "2026-08-26T04:47:33Z",
           "findings": [],
           "hash": "rvw1:sha256:c0bccc52c9b8546a61c278f50b9c44da123edb0906f672f429e9346423be2304",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:15:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f87560f557308c2dfa1d91fb66530172c9572b9d27d4984117b5b97d4a3530",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:20:10Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/coding-principles.md",
+              "line": 128,
+              "message": "The shipped rule weakens the workspace requirement into a conditional: “when modeled as UseCaseFunction.” It omits the mandatory R1 classification and exclusion from FreeFunction selection, so a fresh export can classify an application-only, stateless user-facing entrypoint as FreeFunction. Mirror the workspace wording so the normative requirement is preserved.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 143,
+              "message": "The new exemption conflicts with R2 below, which still requires every stateless, dependency-free top-level pub fn to be a FreeFunction. The workspace counterpart resolves this by explicitly excluding R1-classified application-only user-facing entrypoints from R2; the overlay omits that paragraph. Add the same R2 exception and enforcement annotation so fresh exports receive consistent UseCaseFunction guidance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d6f87560f557308c2dfa1d91fb66530172c9572b9d27d4984117b5b97d4a3530",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:23:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:863f17e16a26dae191b3c6e66835535bd4a569b0455fe2f1d60932b56986ecef",
           "type": "final",
           "verdict": "zero_findings"
         }

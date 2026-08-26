@@ -140,6 +140,10 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 
 > **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
 
+入力 port の 1 trait 規則は、入力 port trait を置く場合の粒度を定める。R2 の条件を満たす stateless な user-facing 操作を top-level `pub fn`（`role: UseCaseFunction`）としてモデル化した場合、その entrypoint は port trait も Interactor も持たず、driver はその関数を直接呼び出す。この形は 1 trait 規則の対象外である。後からその操作に入力 port trait を導入する時点で、1 ユースケース 1 trait・実行メソッド 1 つの規則に従う。
+
+> **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
+
 command と query を混載する `*Service` などの facade port を新設してはならない。この禁止は未移行の文脈にも適用する。既存の facade port や既存の単一 interactor 注入は、この規約だけを理由に遡及改修しない。
 
 > **強制先**: review 観点 — types / usecase / cli_driver / cli_composition scope
@@ -167,6 +171,8 @@ command と query を混載する `*Service` などの facade port を新設し�
 - またはゼロフィールド struct で、その「struct」が表す唯一の責務が 1 つの pub fn 呼び出しに帰着する
 - 内部 state を持たない (struct field なし、または `()` のみ)
 - 依存注入を必要としない (依存があるなら、まず structure-required port か任意の service-level 抽象かを分類する。structure-required port は D2 の必要性テストではなく支配するアーキテクチャ規則に従い、任意の service-level 抽象は D2 の条件に従う。application の任意の service-level 抽象は、条件成立時だけ `role: Interactor` + `role: ApplicationService` とし、その他は `role: UseCase` の具体型を既定とする。driven adapter は `role: SecondaryAdapter`)
+
+ただし、R1 で application-only の user-facing use-case entrypoint と分類される top-level `pub fn` は、この `FreeFunction` 判定の対象外として `role: UseCaseFunction` で起草する。したがって、R2 の top-level `pub fn` 判定は `UseCaseFunction` ではない stateless function に適用する。
 
 > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
 
