@@ -19,6 +19,7 @@ use super::import_shape::{
     ImportedShape, build_delete_entry, build_import_entry, parse_type_path, resolve_shape,
 };
 use super::validate::load_spec_anchors;
+use crate::tddd::catalogue_document_codec::EXPLICIT_ROOT_MODULE_PATH;
 
 /// Import an existing type into the layer's catalogue.
 ///
@@ -167,7 +168,10 @@ fn existing_module_path(
     let module = module_value.as_str().ok_or_else(|| {
         schema_error(format!("existing entry `{raw_key}` has an invalid `module_path`"))
     })?;
-    if module.is_empty() {
+    // The document codec writes `Some(ModulePath::root())` as the explicit
+    // root marker; decode it here exactly as `CatalogueDocumentCodec` does so
+    // an explicit-root entry compares by identity instead of failing to parse.
+    if module.is_empty() || module == EXPLICIT_ROOT_MODULE_PATH {
         return Ok(ModulePath::root());
     }
     ModulePath::from_str(module).map_err(|error| {
@@ -455,6 +459,72 @@ mod tests {
             &path,
             temp.path(),
             &import_command(CatalogImportAction::Reference),
+            "spec.json",
+            &BTreeSet::new(),
+            || {
+                resolver_called.set(true);
+                Ok(sample_shape())
+            },
+        )
+        .unwrap_err();
+
+        assert!(matches!(error, CatalogError::DuplicateEntry { .. }));
+        assert!(!resolver_called.get(), "identity duplicate must fail before resolution");
+    }
+
+    #[test]
+    fn test_import_accepts_distinct_identity_beside_explicit_root_entry() {
+        // `CatalogueDocumentCodec` encodes `Some(ModulePath::root())` as ".".
+        // A same-named entry placed at the crate root is a different identity
+        // from `domain::tddd::LayerId`, so the import must proceed instead of
+        // rejecting "." as an invalid module path.
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        document["types"] = json!({
+            "LayerId": {"module_path": EXPLICIT_ROOT_MODULE_PATH}
+        });
+        std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+
+        let report = import_entry_to_file(
+            &path,
+            temp.path(),
+            &import_command(CatalogImportAction::Reference),
+            "spec.json",
+            &BTreeSet::new(),
+            || Ok(sample_shape()),
+        )
+        .expect("an explicit-root entry with the same name is a distinct identity");
+
+        assert_eq!(report.entry_key, "domain::tddd::LayerId");
+    }
+
+    #[test]
+    fn test_import_duplicate_identity_rejected_for_explicit_root_entry() {
+        // The explicit root marker resolves to `ModulePath::root()`, so importing
+        // the crate-root `domain::LayerId` beside a bare `LayerId` placed at "."
+        // is the same identity and must be rejected before resolution.
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        document["types"] = json!({
+            "LayerId": {"module_path": EXPLICIT_ROOT_MODULE_PATH}
+        });
+        std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+        let command = CatalogImportCommand {
+            layer: LayerId::try_new("domain").unwrap(),
+            type_path: "domain::LayerId".to_owned(),
+            action: CatalogImportAction::Reference,
+            anchors: vec![],
+        };
+        let resolver_called = std::cell::Cell::new(false);
+
+        let error = import_entry_to_file(
+            &path,
+            temp.path(),
+            &command,
             "spec.json",
             &BTreeSet::new(),
             || {

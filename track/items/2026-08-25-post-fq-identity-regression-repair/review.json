@@ -1135,6 +1135,71 @@
           "hash": "rvw1:sha256:b28e98a57f22b940d3eb1610fc6f56b8c68e7a2e172bdf3f011d2c22714cc58d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:49:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:623422e116a539451b943dd8566844c5e73d5020e19bfdbc57ecfab93dd6300d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T13:01:28Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs",
+              "line": 38,
+              "message": "When `rustdoc_root` is `None` (the normal non-alias path), this unconditional call still reaches `canonicalize_rustdoc_paths`, whose `None` branch deep-clones the entire rustdoc `Crate` while leaving it unchanged. Because rustdoc input size is unbounded and resource limits remain undeclared, evaluation now requires memory for a second complete external artifact and can OOM/abort instead of returning a typed error. Borrow `c` unchanged when no translation exists, and canonicalize owned data in place when translation is required.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:623422e116a539451b943dd8566844c5e73d5020e19bfdbc57ecfab93dd6300d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T13:11:46Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs",
+              "line": 43,
+              "message": "The no-alias branch now borrows `c`, but the actual bin-alias path still calls `canonicalize_rustdoc_paths`, which deep-clones the entire externally derived `Crate` and retains both copies throughout Phase 2 even though only `paths` changes. Rustdoc input size is unbounded and the resource-limit declaration remains `TODO`, so a supported large bin target can OOM/abort instead of producing a typed result. Move the owned current crate into Phase 2 and canonicalize its paths in place, or otherwise avoid cloning `index` and the other unchanged fields.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f1ea379c89b5b2fda98ba99a0d855d00b763f34783ac8ade14ad60263745077f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T13:19:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7970642886ff22ee6ff17cb46c496bd90f51909ea72213906433063d38e0a061",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T13:24:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7970642886ff22ee6ff17cb46c496bd90f51909ea72213906433063d38e0a061",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T13:51:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf384a9438a85f53bf859e438499387857862e86a2491654fe18d525b3efd556",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T13:56:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf384a9438a85f53bf859e438499387857862e86a2491654fe18d525b3efd556",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

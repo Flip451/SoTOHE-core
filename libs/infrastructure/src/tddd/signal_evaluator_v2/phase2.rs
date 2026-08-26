@@ -12,6 +12,7 @@ use rustdoc_types::{Crate, Id};
 use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
 
 use super::impl_identity::try_build_impl_identity_map_with_authority;
+use super::phase1::rustdoc_authority::canonicalize_rustdoc_paths_in_place;
 use super::structural_eq::items_structurally_equal_with_authority;
 use super::{
     RustdocTargetResolution, TypeTraitIdentityKey, TypeTraitIdentityMap,
@@ -23,10 +24,24 @@ use domain::tddd::ExtendedCrate;
 pub(super) fn phase2_evaluate(
     s: &ExtendedCrate,
     d: &Crate,
-    c: &Crate,
+    mut c: Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
 ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
     let s_krate = s.krate();
+
+    // D2: the bin-root alias is applied once, through the same canonicalization
+    // the baseline crossed in Phase 1. C's type/trait identities and definition
+    // paths must speak the catalogue package root before they are compared
+    // against S and D; otherwise a bin target whose rustdoc root differs from
+    // its package name splits every matching item into `SMinusC` plus
+    // `CMinusSUnionD`. The crate is owned here and only its `paths` summaries
+    // are rewritten, so an externally sized rustdoc artifact is never cloned.
+    canonicalize_rustdoc_paths_in_place(
+        &mut c,
+        rustdoc_root.map(|resolution| resolution.package_name()),
+        rustdoc_root.map(|resolution| resolution.rustdoc_root_name()),
+    );
+    let c = &c;
 
     // Derive the crate name from C's root item so that rustdoc local-trait paths
     // (`my_crate::MyTrait`) can be normalized to match codec paths (`crate::MyTrait`).

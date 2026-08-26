@@ -1500,6 +1500,28 @@ fn test_type_modify_with_differing_rustdoc_root_uses_catalogue_package_identity(
 }
 
 #[test]
+fn test_type_modify_with_bin_rustdoc_root_paths_canonicalizes_current_before_phase2() {
+    // Real bin-target rustdoc: the root item and every path carry the target
+    // name (`sotp`) while the catalogue speaks the package name (`cli`). Phase 1
+    // canonicalizes the baseline; Phase 2 must canonicalize the current crate
+    // the same way or the one modified type splits into `SMinusC_Modify` plus
+    // `CMinusSUnionD`.
+    let a = extended_crate_with_struct("cli", "User", ItemAction::Modify);
+    let b = simple_crate_with_struct("sotp", "User");
+    let c = simple_crate_with_struct("sotp", "User");
+    let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .expect("workspace root must exist");
+
+    let report = SignalEvaluatorV2::with_workspace_root(workspace_root).evaluate(a, b, c).unwrap();
+    let user_signals: Vec<_> =
+        report.iter().filter(|signal| signal.item_name().ends_with("User")).collect();
+    assert_eq!(user_signals.len(), 1, "one identity must yield one signal: {report:?}");
+    assert_eq!(user_signals[0].region(), SignalRegion::SIntersectC_Match_Modify);
+}
+
+#[test]
 fn test_function_identity_one_segment_path_reports_root_function() {
     let fn_path = &["compute"];
     let a_krate = simple_crate_with_fn("my_crate", fn_path);

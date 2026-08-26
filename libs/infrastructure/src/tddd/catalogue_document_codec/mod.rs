@@ -75,7 +75,7 @@ pub const SCHEMA_VERSION: u32 = 5;
 /// omitted placement and an explicit empty [`ModulePath`] need distinct values
 /// on the wire. The empty string remains the legacy omitted-placement value;
 /// this marker is emitted only for `Some(ModulePath::root())`.
-pub(super) const EXPLICIT_ROOT_MODULE_PATH: &str = ".";
+pub(crate) const EXPLICIT_ROOT_MODULE_PATH: &str = ".";
 
 // ---------------------------------------------------------------------------
 // StrictMap — duplicate-key-rejecting BTreeMap deserializer

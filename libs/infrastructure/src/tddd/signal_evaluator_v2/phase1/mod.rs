@@ -13,7 +13,7 @@ mod builder;
 mod child_items;
 mod state;
 
-mod rustdoc_authority {
+pub(super) mod rustdoc_authority {
     use std::collections::{HashMap, HashSet};
 
     use domain::tddd::Phase1Error;
@@ -47,6 +47,27 @@ mod rustdoc_authority {
             })
             .collect();
         canonical
+    }
+
+    /// Rewrites the local `Crate::paths` roots of an owned crate in place.
+    ///
+    /// Only the `paths` summaries change; `index` and every other field are
+    /// left untouched, so no second copy of an externally sized rustdoc
+    /// artifact is ever held.
+    pub(in crate::tddd::signal_evaluator_v2) fn canonicalize_rustdoc_paths_in_place(
+        krate: &mut Crate,
+        package_name: Option<&CrateName>,
+        rustdoc_root_name: Option<&CrateName>,
+    ) {
+        let Some(package_name) = package_name else {
+            return;
+        };
+        for summary in krate.paths.values_mut() {
+            if summary.crate_id == 0 {
+                summary.path =
+                    canonicalize_rustdoc_root_path(&summary.path, package_name, rustdoc_root_name);
+            }
+        }
     }
 
     pub(super) fn merge_definition_path_maps(

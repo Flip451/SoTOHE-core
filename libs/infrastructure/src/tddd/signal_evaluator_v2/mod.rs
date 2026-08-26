@@ -434,7 +434,7 @@ impl EvaluationEngine {
             resolve_function_rustdoc_root(&self.a, &self.b, &self.c, &self.workspace_root)?;
         let (s, d) =
             phase1_build_s_and_d_with_rustdoc_root(self.a, &self.b, rustdoc_root.as_ref())?;
-        let report = phase2_evaluate(&s, &d, &self.c, rustdoc_root.as_ref())?;
+        let report = phase2_evaluate(&s, &d, self.c, rustdoc_root.as_ref())?;
         Ok(report)
     }
 }
