@@ -15,6 +15,11 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the plan workflow SSoT's `Summary-first context intake`. Use its
+  CLI summaries as the primary context; do not bulk-read track artifacts, type catalogues,
+  review or binding JSON, or full sub-workflow texts. Open artifact bodies only for a targeted
+  diff or blocker investigation. Do not enumerate or read a `Related Conventions` list; the
+  dispatcher supplies resolved convention paths to delegated capabilities.
 - **Progress tracking**: when `TaskCreate` is available, use it to register Phase 0–3 steps
   and Termination as tasks. When it is unavailable, report the same phase boundaries and
   termination progress in text and continue the workflow.

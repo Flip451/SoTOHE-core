@@ -12,6 +12,22 @@ required_for:
 
 バグパターンが発見されたとき、lint ルールや convention doc で「やってはいけない」を追加するのではなく、そのバグクラスを型システムや標準ライブラリで根本的に排除する方法を優先すること。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_composition / cli_driver scope
+
+## 必要駆動の抽象
+
+候補はまず、アーキテクチャが要求する structure-required port とその実装の組か、層の内部で任意に追加する service-level 抽象かを分類する。ユースケース自身の入力ポートは、1 ユースケース 1 trait・実行メソッド 1 つの `ApplicationService` inbound port と、その `Interactor` 実装からなる structure-required な組であり、複数の実装や service 自体のテスト境界での差し替えがなくても、必要性テストではなくアーキテクチャ規則に従って導入する。層を越える依存を表す `SecondaryPort` と aggregate の永続化を表す `Repository` も同じく structure-required ports として扱う。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
+
+structure-required な入力ポートの組の上に同じ service を共有するためだけに第二の trait と実装を重ねたり、その他の任意の service-level 抽象を追加したりしてはならない。これらの任意 abstraction は、複数の実装が現存するか、service 自体をテスト境界で差し替える必要がある場合だけ導入する。共有所有だけなら `Arc<具象型>` を既定とし、条件が後から成立したときに trait を切り出す。structure-required な `ApplicationService` + `Interactor` の組、`SecondaryPort`、`Repository` は、この禁止の対象ではなく、単一実装でも支配するアーキテクチャ規則に従う。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli_driver scope
+
+既存の抽象ペアは、改訂後の規約に合わせて遡及解体しない。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
+
 ## Rationale
 
 - **Lint ルールは破られる**: convention doc やメモリに記録されたルールは忘れられる。CI ルールも例外追加で形骸化する。
@@ -22,11 +38,17 @@ required_for:
 
 バグパターン発見時:
 
+次の順で、型または既存 crate による解決可能性を確認する。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_composition / cli_driver scope
+
 1. **標準ライブラリ / 既存 crate で排除可能か?**
    - `serde` typed deserialization → `serde_json::Value` 手動走査の排除
    - `syn` AST パース → 行ベースヒューリスティックの排除
    - `conch-parser` → hand-rolled shell tokenizer の排除
    - **可能なら採用** (最優先)
+
+   > **強制先**: review 観点 — domain / usecase / infrastructure / cli scope
 
 2. **型で表現可能か?**
    - Newtype pattern で不正値を構築不能にする
@@ -34,10 +56,14 @@ required_for:
    - 状態遷移がある場合は typestate + 遷移関数を第一候補にする
    - **可能なら採用**
 
+   > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
+
 3. **上記で対応不可能な場合のみ**:
    - CI lint (`architecture-rules.json`, clippy)
    - Convention doc
    - メモリ / behavioral rule (最後の手段)
+
+   > **強制先**: review 観点 — harness-policy scope
 
 ## Examples
 
@@ -53,6 +79,8 @@ required_for:
 ## Make Illegal States Unrepresentable
 
 型システムで不正な状態を表現不可能にする。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_composition / cli_driver scope
 
 ### Newtype パターン：プリミティブ値の制約
 
@@ -74,6 +102,8 @@ impl Email {
 
 状態ごとに持つべきデータが異なる場合、**struct + runtime validation ではなく enum の variant にデータを持たせる**。
 これにより不正な組み合わせがコンパイル時に排除される。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
 
 ```rust
 // Bad: struct + runtime validation — 不正状態がメモリ上に存在しうる
@@ -106,6 +136,8 @@ enum Verdict {
 | struct + constructor validation で cross-field 制約 | → enum で構造的に排除できないか検討 |
 | 型で表現できない制約（例: Vec の non-empty） | → constructor validation は OK（型レベルの限界） |
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
+
 **プロジェクト内の良い例：**
 - `CodeHash`: `NotRecorded` | `Pending` | `Computed(String)` — 3 状態を struct + Option で表現せず enum
 - `ReviewGroupState`: `NoRounds` | `FastOnly(R)` | `FinalOnly(R)` | `BothRounds { fast, final }` — 組み合わせごとに variant
@@ -115,6 +147,8 @@ enum Verdict {
 
 状態遷移がある場合、**単一の型 + status フィールド + runtime 遷移チェック** ではなく、
 **状態ごとに別の型** を定義して遷移メソッドの引数/戻り値で正しい遷移のみを許可する。
+
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
 
 ```rust
 // Bad: runtime で遷移を検証 — 不正遷移がコンパイルを通る
@@ -157,6 +191,8 @@ impl Review<FastPassed> {
 - **状態遷移がある**（少しでも）→ **typestate + 遷移関数を優先**
 - typestate は「遷移の有無」で判断する。遷移が少しでもあれば typestate を第一候補にする。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
+
 | 要件 | 推奨パターン |
 |---|---|
 | 有限の値の集合（遷移なし） | → **enum-first** |
@@ -166,26 +202,39 @@ impl Review<FastPassed> {
 | 状態が永続化から復元される（serde 必要） | → domain 層は **typestate**、infrastructure 層で serde 対応 enum DTO に変換（ヘキサゴナル分離） |
 | 状態数が多く組み合わせ爆発する | → enum + runtime validation（typestate の型爆発を避けるエスケープハッチ） |
 
+> **強制先**: review 観点 — types / domain / infrastructure scope
+
 **typestate が適さないケース（エスケープハッチ）：**
 - 状態数が多い（型の数が爆発する）
 - 状態遷移がデータ駆動（外部入力で遷移先が決まる）
 
 これらの場合は enum + runtime validation が現実的。ただし「typestate で表現できないか」を最初に検討すること。
 
+> **強制先**: review 観点 — types / domain / usecase / infrastructure scope
+
 **永続化が必要な場合：**
 domain 層では typestate を維持し、infrastructure 層で serde 対応 enum DTO と相互変換する。
 - domain → DTO: `From<Review<State>> for ReviewStatusDto`
 - DTO → domain: `TryFrom<ReviewStatusDto> for Review<State>`（fallible — 不正な状態復元は `Result` で報告）
 
+> **強制先**: review 観点 — types / domain / infrastructure scope
+
 domain 層の型安全性を永続化の都合で妥協しない（ヘキサゴナルアーキテクチャの原則）。
+
+> **強制先**: review 観点 — domain / infrastructure scope
 
 ## Review Checklist
 
 - [ ] 不正状態が型レベルで排除されているか（struct + runtime validation より enum/typestate を優先）
+  > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
 - [ ] プリミティブ値の制約は Newtype パターンで表現されているか
+  > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
 - [ ] 状態遷移がある場合、typestate パターンを検討したか
+  > **強制先**: review 観点 — types / domain / usecase / infrastructure / cli / cli_driver scope
 - [ ] serde が必要な場合、domain 層の typestate は維持されているか（infrastructure 層で DTO 変換）
+  > **強制先**: review 観点 — types / domain / infrastructure scope
 - [ ] 外部データのデシリアライズは typed deserialization を使っているか
+  > **強制先**: review 観点 — infrastructure scope
 
 ## Decision Reference
 

@@ -10,23 +10,33 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 
 - 適用対象: track 成果物 (metadata.json / spec.json / 型カタログ / impl-plan / task-coverage / task-contract)、schema
   定義、CI gate の規則、codec フォーマット、CLI サブコマンドの interface
+
+> **強制先**: review 観点 — harness-policy scope
+
 - 適用外:
   - 純粋なバグ修正 (semantic 同値だが実装誤りの訂正)
   - crate 公開 API の semver を保つ範囲の変更 (adopter 側の compile 互換を別規約で保証する場合)
+
+> **強制先**: review 観点 — harness-policy scope
 
 ## Rules
 
 - **新 schema / behavior を導入する際、archive 済み / completed track には遡及適用しない**。対象は
   「新 schema の下で作業しうる active track」に限定する
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan scope
 - **non-active track (branch を持たない / merged 済み / archive 済み) は write で protect する**。
   filesystem / codec / CLI / active-track guard レベルで、write 経路自体が非 active を拒否する設計と
   する
+  > **強制先**: review 観点 — infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan scope
 - **active track は新 rule 即時適用**。grace period や opt-out を default に組み込まない (暫定
   migration toggle は Exceptions 参照)
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan scope
 - **migration 用の暫定 compatibility layer / alias / 旧 schema 読み込みは最小限**に抑える。一度導入
   した暫定 layer は撤去 trigger を Reassess When に明記する
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan scope
 - **ADR で schema / rule 変更を決定する際は、遡及非適用の方針を Consequences に明示**し、
   legacy track / 旧 schema への挙動を記録する
+  > **強制先**: review 観点 — adr scope
 
 ## Examples
 
@@ -46,23 +56,33 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 - **template 採用者向けの恒久的 opt-in flag** (`tddd.enabled`, `catalogue_spec_signal.enabled` 等) は
   migration 用の暫定 toggle ではなく「利用者が恒久的に選択する設計自由度」として残す。これは本
   convention の撤去対象外。
+  > **強制先**: review 観点 — harness-policy scope
 - **security-critical な fix** (既存脆弱性の修正、認証境界の修正) は本 convention より優先し、必要なら
   非 active track にも遡及適用する。ただし遡及適用を行う際は、全 write guard 層 (filesystem / codec /
   CLI / active-track guard) を協調してバイパスする経路を別 ADR で定義してから実施する。バイパス機構は
   「security-critical fix 専用」の制約を明示した設計にし、汎用 admin 権限として開放してはならない。
   override ADR なしに write guard を迂回することは禁止
+  > **強制先**: review 観点 — adr / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - **探索的 drafting 段階** の throwaway artifact は本 convention の対象外 (production merge 前の試行
   コードは自由に捨てて良い)
+  > **強制先**: 強制なし (明記) — production merge 前の throwaway artifact
 
 ## Review Checklist
 
 - [ ] 新 rule / schema の導入で archive / completed track を書き換えようとしていないか
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan / harness-policy scope
 - [ ] active track への適用に不必要な grace period / opt-out を default で設けていないか
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan / harness-policy scope
 - [ ] 暫定 compatibility layer / alias が ADR の撤去 trigger なしに積み残されていないか
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / spec / types / impl-plan / harness-policy scope
 - [ ] template 採用者向けの恒久 opt-in flag を「暫定 migration toggle」と混同していないか
+  > **強制先**: review 観点 — harness-policy scope
 - [ ] ADR Consequences で遡及非適用と legacy 挙動を明示しているか
+  > **強制先**: review 観点 — adr scope
 - [ ] security-critical 遡及適用を行う場合、全 write guard 層のバイパス経路を定義した override ADR が先行して存在するか
+  > **強制先**: review 観点 — adr / domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] そのバイパス機構が「security-critical fix 専用」に設計されており、汎用 admin 権限として開放されていないか
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 
 ## Decision Reference
 

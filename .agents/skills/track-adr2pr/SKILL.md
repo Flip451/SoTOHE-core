@@ -15,11 +15,16 @@ or failure-recovery procedures here.
 
 - Triggered via `$track-adr2pr` in a Codex skill mention surface.
 - Can also be force-loaded with `codex exec` by referencing this skill file.
-- Feature name and primary ADR filename are optional at invocation: an explicitly supplied
-  value always takes precedence, and any missing value is resolved and user-confirmed per the
-  workflow SSoT's input-acquisition contract (conversation context resolution, one
-  confirmation of the completed pair, candidate selection when resolution is not unique)
-  before `$track-init` receives both values explicitly.
+- Before any input acquisition, check whether the current branch is an initialized
+  `track/<id>` with `metadata.json`. On that re-invocation path (including every resumed run
+  after a refresh handoff, skill note 5) skip feature / ADR resolution, user confirmation, and
+  `$track-init` forwarding entirely; the workflow SSoT's Step 1 derives the first incomplete
+  lifecycle boundary from persisted state and resumes there.
+- Only when the track needs initialization are the feature name and primary ADR filename
+  acquired: an explicitly supplied value always takes precedence, and any missing value is
+  resolved and user-confirmed per the workflow SSoT's input-acquisition contract (conversation
+  context resolution, one confirmation of the completed pair, candidate selection when
+  resolution is not unique) before `$track-init` receives both values explicitly.
 
 ### (2) Sandbox constraint
 
@@ -51,13 +56,26 @@ or failure-recovery procedures here.
 - The workflow SSoT's autonomy constraint yields to the Phase 0 interaction boundary governed
   by `.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. That
   convention is the sole normative source for Phase 0; this skill states no procedure of its
-  own for that phase. The only
-  other pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
-  Deviations at its terminal state requires that workflow's explicit user approval. No other
-  step pauses for user confirmation; the invocation-time input acquisition (skill note 1)
-  happens before Step 1 begins and is outside this pause accounting.
+  own for that phase. Exactly three interactions are sanctioned after Phase 0: (1) that Phase 0
+  boundary; (2) the pause inherited from the delegated `$track-pr-review` workflow — recording
+  Accepted Deviations at its terminal state requires that workflow's explicit user approval;
+  (3) the parent-session refresh handoffs in skill note 5 — at each of the workflow SSoT's
+  refresh boundaries the Codex root asks the user to start a fresh session and stops, and the
+  re-invoked run resumes from persisted state. No other step pauses for user confirmation; the invocation-time input acquisition (skill note 1) happens before
+  Step 1 begins and is outside this pause accounting.
 
-### (5) Reporting format
+### (5) Parent-session refresh points
+
+- The workflow SSoT fixes the parent-session refresh boundaries (after the plan-artifacts
+  commit, after the first implementation batch, at PR-lane start) and what may be discarded
+  there; this skill adds no boundary of its own.
+- Codex has no automatic session refresh. At each boundary, ask the user in plain prose to
+  start a fresh Codex session that re-invokes `$track-adr2pr` on the same `track/<id>` branch.
+  The re-invoked run resumes at the step the workflow SSoT derives from the persisted state
+  (commits, plan artifacts, task states) rather than replaying earlier steps. Do not add
+  host-specific backgrounding, notification-format, or compaction handling here.
+
+### (6) Reporting format
 
 - On successful completion (only when the final `$track-pr-review` step reaches a terminal
   state per `.harness/workflows/track/adr2pr.md` — machine PASS, or Accepted Deviations

@@ -40,8 +40,10 @@ The capability is invoked by the orchestrator in three primary scenarios:
 
 ## Context files (mandatory pre-read)
 
-Before rendering a routing decision, the capability MUST read the following artifacts for the
-active track. The track id is taken from the current branch (`track/<id>`).
+Before rendering a routing decision, the capability MUST read the exact artifact paths listed in
+the dispatch briefing for the active track. The track id is taken from the current branch
+(`track/<id>`). The orchestrator supplies the diagnostic and CLI summary context but does not
+bulk-read these artifact bodies for the hand-off.
 
 - `track/items/<track-id>/spec.json` — Phase 1 behavioral contract (spec ↔ ADR grounding).
 - `track/items/<track-id>/<layer>-types.json` for **every** TDDD-enabled layer (per
@@ -112,7 +114,12 @@ The judgment may sometimes need to call true read-only `bin/sotp` inspection sub
 (`ref-verify results`, `task-contract coverage`, `task-contract check`, `review results`) to
 inspect the current gate state. It must not run mutating refresh commands such as `signal calc-*`;
 signal refresh is orchestrator-owned before invocation, and this capability reads the persisted
-signal JSON artifacts.
+signal JSON artifacts. Invoke each inspection command as one blocking call and read its terminal
+output once; if the host backgrounds it, read the result once after the single completion
+notification. Never poll for completion, run repeated status probes, or launch an inspection
+fire-and-forget. This capability never runs `bin/sotp test-obligation evaluate`; that command is
+an orchestrator-host-owned synchronous repair step, not a diagnosis operation or a commit
+prerequisite.
 
 ## Output contract
 
@@ -151,13 +158,16 @@ writer subagent — it is diagnose-only and has no task-state transition authori
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Diagnostic text: the Blocked summary / reviewer finding / external comment that triggered the
   invocation
 - Track id (resolved from the current branch by the calling orchestrator)
-- Context: relevant ADR paths, the failing spec element ids (when known), and any other framing
-  the orchestrator wants the routing judgment to consider
+- Briefing file with exact paths for the relevant spec, per-layer catalogues, implementation-plan
+  artifacts, signal snapshots, ADRs, source files, and resolved conventions, as applicable to the
+  finding
+- Context: failing spec element ids (when known), and any other framing the orchestrator wants the
+  routing judgment to consider
 
 ### Out-of-scope
 
@@ -175,3 +185,21 @@ writer subagent — it is diagnose-only and has no task-state transition authori
 
 The structured object described under **Output contract**. The orchestrator reads this output
 verbatim and dispatches the corresponding writer (or applies a source edit for `impl`).
+
+## Session continuity and resume
+
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted routing judgment. This diagnose-only capability
+writes no durable verdict state. The hand-off is the current briefing, diagnostic input, exact
+context-file paths, and read-only gate summaries named by the dispatch.
+
+After a parent refresh, the dispatcher must issue a fresh briefing carrying the current
+diagnostic verbatim, the relevant spec / catalogue / plan / ADR paths, current CLI summaries,
+and any routing framing needed by this contract. A fresh dispatch, or a dispatch that changes
+concern, starts from that briefing. Only an explicit `sotp capability exec --resume` for the same
+track and capability continues a capability session. Fresh and resumed dispatches re-specify
+every execution flag (model, sandbox, and effort); a failed or expired resume, or a
+provider/model mismatch, falls back to a fresh session. On resume, first check whether the
+briefing, diagnostic, context files, or gate summaries changed since the prior capability
+session, and re-read every changed input before returning a routing decision.

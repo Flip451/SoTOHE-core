@@ -10,6 +10,12 @@ User invokes this command as `/track:type-design`. No arguments.
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the type-design workflow SSoT's `Summary-first context intake`.
+  Use CLI summaries as the primary context; do not bulk-read `*-types.json`, review or binding
+  JSON, full sub-workflow texts, or a `Related Conventions` list. Open only a targeted diff or
+  the body named by a blocker; the dispatcher supplies exact catalogue and convention paths to
+  the delegated capability.
+
 Write a briefing to `tmp/type-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/spec.json` path

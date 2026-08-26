@@ -24,9 +24,21 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 | spec-design (spec-designer) | ADR の収束 (`adr_user` chain) |
 | type-design (type-designer) | spec の収束 (`spec_adr` chain) |
 | impl-plan (impl-planner) | カタログの収束 (`catalog_spec` chain) |
-| 実装 (implementer) | カタログの収束 **かつ** impl-plan スコープ review 収束 (下記例外あり) |
+| 実装 (plan-task / implementer) | カタログの収束 **かつ** impl-plan スコープ review 収束 (下記例外あり) |
 
 各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する (SoT Chain の layer skip 禁止と同型)。
+
+## 親セッション更新後の再入
+
+`adr2pr` の親セッション更新点は、計画成果物コミット成功後で Step 9 開始前、Step 9 の最初の実装バッチ完了後で残りのバッチ継続前、および Step 10 の PR レーン開始時で `pr-review` 呼出し前である。これらの境界では親コンテキストを破棄してよく、再入する orchestrator は git、track artifacts、track / review summary、宣言済みの batch / task state、および read-only git state から最初の未完了 lifecycle boundary を再構成する。
+
+セッション更新は通常の Phase / plan-task の再開 Prerequisite を満たしたことを意味しない。通常の再入時にも直上流 1 層の収束要件を確認し、過去の親コンテキストや in-memory state を根拠に下流フェーズを再開してはならない。`dispatch_mode: delegated-pr-finding` の taskless focused correction は通常の Phase / plan-task 再入とは別の admission path であり、focused briefing と current diff が requested correction の根拠となるため、Phase 3 の存在や direct-upstream の catalogue、ref-verify、types-scope review、impl-plan-scope review の収束を再確認する必要はない。ただし、named non-ADR correction が implementer の boundary 内にあり、writer-owned SoT artifact を対象にしていないことは確認する。部分完了した step は最初の未完了 sub-step から続け、永続状態の証拠が曖昧または相反する場合は再実行や skip をせず停止して報告する。
+
+これは orchestrator の session boundary だけを定める規律であり、host 固有の backgrounding threshold、通知形式、または compaction timing は定めない。host が自動更新できない場合の再入は user に要求してよい。
+
+### 再収束ゲートの待機
+
+再収束に必要な capability、workflow、または gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わない。「列挙可能になり次第」は定期的な照会を意味せず、呼び出し側 workflow の terminal result を受けた後に次の許可された処理へ進むことを意味する。`bin/sotp test-obligation evaluate` が必要な場合も、obligation repair のための orchestrator host 上の同期 step に限り、commit prerequisite にはしない。
 
 ## 即時突き返し規則
 
@@ -34,13 +46,14 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - 「後でまとめて直す」「変更の有無を判定して続行する」は禁止する — 収束の有効性判定という裁量を挟まない。
 - 上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させる。再収束 (上記 3 要素) まで、その下流のフェーズは再開禁止。意味論検証要素の判定は item 2 のとおり当該 chain の指摘に限る — 列挙 abort 中に fresh 検証を生成できないことは再開を妨げず、列挙可能になり次第の検証で当該 chain の指摘が出れば即時に上流へ戻る。
 - **artifact 編集に対する例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容される。この例外は本規律 (順次処理) 上のものに限る — 遷移は上流 rollback も下流停止も要求しない。ただし hash ベースの commit gate が要求する impl-plan final `zero_findings` review refresh (`.harness/workflows/track/full-cycle.md` の lifecycle tail) は引き続き必須であり、本例外はそれを免除しない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。
-- **guarded base-merge conflict source-repair exception**: guarded merge conflict 中に限り、orchestrator は既存 hunk の選択・編集を pre-gate 実行可能化のためだけに行える。placeholder・意味追加は禁止し、対象 path を記録する。既存 hunk の選択だけで pre-gate を通せない場合は、designated writer を `conflict-preparation` mode で起動し、既存 hunk の解消と derived artifact の再生成だけを許す。base-induced drift が conflict hunk を持たない場合は、影響 chain の順序に従う normal writer/implementer reconciliation と chain-limited review を先に実行し、global pre-gate はその chain 再収束後に要求する。上流再収束後には designated writer を通常 mode で必ず再実行する。ADR に触れた場合は直ちに `adr-diagnoser` の verdict を取得する。この境界を通常の Phase 再入へ一般化しない。
+- **guarded base-merge conflict source-repair exception**: guarded merge conflict 中に限り、orchestrator は既存 hunk の選択・編集を pre-gate 実行可能化のためだけに行える。placeholder・意味追加は禁止し、対象 path を記録する。既存 hunk の選択だけで pre-gate を通せない場合は、designated writer を `conflict-preparation` mode で起動し、既存 hunk の解消と derived artifact の再生成だけを許す。base-induced drift が conflict hunk を持たない場合は、影響 chain の順序に従う normal writer/implementer reconciliation と chain-limited review を先に実行し、global pre-gate はその chain 再収束後に要求する。上流再収束後には designated writer を通常 mode で必ず再実行する。ADR に触れた場合は直ちに `adr-diagnoser` の verdict を取得する。この境界を通常の Phase 再入へ一般化せず、review / PR finding の通常修正経路にも流用しない。
 
 ## 役割分担
 
 - **回帰先の判定**: `rollback-diagnoser`。出力は勧告であり、orchestrator が `reason` を不十分と判断すれば override し得る (既存どおり)。
 - **Prerequisite の充足確認と降下順序の遵守**: dispatch する orchestrator。
 - **各 writer capability**: 自分の再開 Prerequisite が briefing 上満たされていない場合、通常 mode では作業せず orchestrator へ差し戻す。`conflict-preparation` mode のみ、guarded merge conflict の既存 hunk 解消と derived artifact 再生成に限り起動できる。
+- **PR finding の修正**: actionable finding ごとに orchestrator が `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作り、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer`、spec / catalogue / plan の SoT artifacts はそれぞれ `spec-designer` / `type-designer` / `impl-planner` の通常 writer workflow が扱う。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。taskless focused correction は通常の Phase / plan-task 再入の収束要件ではなく、focused briefing と current diff に基づいて implementer が admission する。writer-owned artifact の修正後は完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させ、生成された plan view を sanctioned views-sync operation で更新してから local review を `zero_findings` まで収束させ、`commit` workflow を経て PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは implementer-owned non-ADR finding に限る。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
 
 ## Examples
 
@@ -53,14 +66,15 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 ## Exceptions
 
-- `impl-plan` の task ステータス遷移または guarded base-merge conflict source-repair (上記「即時突き返し規則」の明示例外) のみ。意味論検証の chain 限定 (item 2) は例外ではなく判定基準そのものである。追加の例外は別途裁定する。
+- `impl-plan` の task ステータス遷移、taskless `delegated-pr-finding` の focused correction、または guarded base-merge conflict source-repair (上記「即時突き返し規則」の明示例外) のみ。taskless focused correction は focused briefing / current diff による admission と implementer boundary 内の named non-ADR correction に限る。意味論検証の chain 限定 (item 2) は例外ではなく判定基準そのものである。追加の例外は別途裁定する。
 
 ## Review Checklist
 
 - [ ] 上流 SoT の編集後、その下流フェーズを再開する前に、当該 chain に適用される再収束要素を確認したか
 - [ ] 再開 Prerequisite の検査を直上流 1 層に限定しているか (上位層の再検査を重複させない)
+- [ ] 親セッション更新後の再入で、最初の未完了 boundary と直上流の収束を永続状態から確認したか
 - [ ] 上流編集の必要性の発見時に下流作業を即時中断したか
-- [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移または D2 conflict-recovery source-repair 以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
+- [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移、taskless focused PR correction、または D2 conflict-recovery source-repair 以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
 - [ ] 信号の許容値や ref-verify の対応表を本書や下流文書に複製していないか
 
 ## Decision Reference

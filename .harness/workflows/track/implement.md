@@ -7,9 +7,10 @@
 
 ## Mission
 
-Run parallel interactive implementation for the current track. The orchestrator reads the
-approved implementation plan, marks selected tasks `in_progress`, delegates implementation using
-the available parallelism of the execution environment, and runs CI to verify correctness.
+Run parallel interactive implementation for the current track. The orchestrator consumes the
+approved plan through CLI summaries and selected task briefings, marks selected tasks
+`in_progress`, delegates implementation using the available parallelism of the execution
+environment, and runs CI to verify correctness.
 Implementer runs report completion; only the orchestrator performs task-state transitions. It
 marks tasks `done` once CI passes and the DRY fix phase closes — before review, so the review
 sees the final task state and the transition diff does not invalidate an approved round — and
@@ -22,32 +23,55 @@ transitions, review, then the `commit` workflow.
 
 - **Current branch** — must match `track/<id>`. The track id is resolved from this branch.
   If the branch does not match this pattern, stop immediately and report the situation.
-- **Track context** — `spec.md`, `plan.md`, `metadata.json`, and all conventions listed in
-  `## Related Conventions (Required Reading)` in `spec.md` (or `plan.md` for legacy tracks).
-  Use the corresponding `<layer>-types.json` catalogue entries for exact type signatures,
-  trait definitions, and module trees; use `impl-plan.json` for task execution detail. Rendered
-  views provide context but do not replace those machine-readable sources.
-- **ADR pre-check** — if `spec.md` or `plan.md` references an ADR under `knowledge/adr/`,
-  read the ADR and verify that the target task's description is consistent with the ADR's
-  design (layer placement, error types, behavioral contracts). Fix `metadata.json` (then
-  `bin/sotp track views sync`) before writing code if discrepancies are found. The ADR is the
-  source of truth for design decisions.
+- **Track context** — CLI summaries for the active track, the selected task briefing, and the
+  exact artifact paths needed by the delegated implementer. The implementer reads the relevant
+  spec, plan, metadata, catalogue entries, and task contract from those paths; the orchestrator
+  does not bulk-read them. Rendered views provide context but do not replace the capability's
+  machine-readable inputs.
+- **Upstream design consistency** — the approved spec/plan and phase summaries are the design
+  input. Do not perform a separate ADR pre-check, read ADR bodies during normal intake, or edit
+  `metadata.json` to repair a discrepancy. The delegated implementer receives the exact paths
+  from its briefing and owns implementation-side verification. If a briefing, summary, or
+  blocker exposes a design inconsistency, stop implementation and route it to the owning
+  spec/plan phase (and, where applicable, the ADR-edit lane) before writing code.
 - **Optional scope notes** — caller-supplied hints (target module, constraints, priority) that
   narrow the set of tasks to implement.
+
+## Summary-first context intake
+
+Before selecting or dispatching tasks, collect these summaries:
+
+- `bin/sotp track resolve`, `bin/sotp track task-counts`, and `bin/sotp track next-task` for
+  phase and progress;
+- `bin/sotp review results` for the scopes that need review;
+- `bin/sotp test-obligation results` for enrollment and fulfillment state when the track is
+  enrolled; and
+- `bin/sotp catalog check` plus `bin/sotp ref-verify results --chain 2 --filter all` for catalogue
+  completion and catalogue-to-specification state.
+
+Treat the command output and the task briefing as primary. Do not open `*-types.json`,
+`review.json`, bindings JSON, full sub-workflow texts, or a `Related Conventions` list during
+intake. Open only a targeted diff or the artifact body named by a blocker. The dispatcher lists
+resolved convention paths alongside the implementer briefing (possibly none); the delegated
+capability reads those paths, while the orchestrator does not enumerate or read conventions
+itself.
 
 ## Sequence
 
 **Step 1: Resolve track and validate context**
 
 1. Resolve the current track:
-   - If the current git branch matches `track/<id>`, use that track.
-   - Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
-   - If no materialized active track is found on a `track/<id>` branch, stop immediately and
-     report the situation. Do not transition tasks or write implementation code.
-2. Read `spec.md`, `plan.md`, and `metadata.json`. Read every convention file listed in
-   `## Related Conventions (Required Reading)`.
-3. Identify the target task(s) from the approved plan. If scope notes are provided, map them
-   to the relevant plan scope.
+   - Require the current git branch to match `track/<id>` and resolve the track id from that
+     branch.
+   - If the branch does not match this pattern or the matching track is not materialized, stop
+     immediately and report the situation. Do not fall back to another active track, transition
+     tasks, or write implementation code.
+2. Use the summaries above to identify the target task(s) from the approved plan. If scope notes
+   are provided, map them to the relevant plan scope.
+3. Prepare each implementer briefing with the selected task ids, the summary output, exact
+   artifact paths, and the convention paths supplied by the dispatcher. The delegated capability
+   reads those paths and reports any upstream or scope conflict; the orchestrator opens an
+   artifact body only for a diff or blocker investigation.
 
 **Step 2: Orchestrator marks tasks in_progress**
 
@@ -80,9 +104,10 @@ Parallelism rules:
 **Step 4: Test-obligation binding increments**
 
 Enrollment is not decided here: `obligations.json` and `test-bindings.json` are
-materialized by the `type-design` workflow's mandatory terminal derive step (ADR
-2026-07-23-0240 D1), and `bin/sotp test-obligation check` applies the artifact-presence
-policy in ADR 2026-07-23-0240 D2. This step is limited to incremental binding authoring
+materialized by the `type-design` workflow's mandatory terminal derive step, and
+`bin/sotp test-obligation check` applies the artifact-presence policy. Use
+`bin/sotp test-obligation results` as the obligation-state summary before entering this step.
+This step is limited to incremental binding authoring
 against those already-enrolled obligations: run the `obligation-fulfillment` workflow
 (`.harness/workflows/track/obligation-fulfillment.md`) — it owns the author → totality →
 evaluate → repair loop, including the split between implementer-side authoring and

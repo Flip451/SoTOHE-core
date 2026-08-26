@@ -31,7 +31,13 @@ or failure-recovery procedures here.
   if the wrapper does not support the resolved provider, report the failure and stop (fail-closed).
 - DRY gate verification uses `bin/sotp dry check-approved --track-id <id>`.
 
-### (4) Reporting format
+### (4) Gate waiting
+
+- The DRY fix wrapper is a long-running gate: run it as one blocking call and read its terminal
+  status once. Do not poll its output or re-run status probes; if the host backgrounds the call,
+  read the result once after the single completion notification.
+
+### (5) Reporting format
 
 - On successful completion, print: `DRY_CHECK_STATUS: completed — DRY gate APPROVED`
 - On failure or block, print: `DRY_CHECK_STATUS: blocked — <n> unresolved pairs: <reason>`

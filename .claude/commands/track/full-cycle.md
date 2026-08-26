@@ -6,7 +6,8 @@ description: Run the declared-batch implement → DRY check → review → commi
 
 ## Invocation
 
-User invokes this command as `/track:full-cycle`. No arguments.
+User invokes this command as `/track:full-cycle`. No arguments are required; a workflow caller
+may pass the SSoT's `--single-batch` option when it needs a one-batch return.
 
 ## Claude Code invocation constraints
 
@@ -22,6 +23,15 @@ Key tool interactions:
 - Batch declaration: Read `track/items/<id>/batch-plan.json` (read-only — impl-planner is its sole writer)
 - Staging: `bin/sotp git add-all`
 - Task transitions: run `bin/sotp track transition` from the orchestrator host. The command's sequencing, timing, and ownership boundary live in the workflow SSoT (`.harness/workflows/track/full-cycle.md` Step 1d / Step 3) — do not restate them here.
+
+### Gate waiting
+
+- Every long-running gate in the loop (implementer dispatch, DRY fix wrapper, review-fix wrapper,
+  `cargo make ci`, `cargo make track-commit-message`) is run as one blocking call whose result is
+  read once. Do not poll logs or re-run status probes; if the host backgrounds a call, read the
+  result once after the single completion notification.
+- `bin/sotp test-obligation evaluate` is only a synchronous step inside repair work on the
+  orchestrator host; never launch it in the background or as a commit-gate prerequisite.
 
 ## Report format
 

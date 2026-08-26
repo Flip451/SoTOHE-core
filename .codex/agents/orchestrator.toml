@@ -9,9 +9,15 @@ Authority:
 - Use .harness/policies/branch-strategy.md, .harness/policies/track-lifecycle.md, .harness/policies/git-notes.md, knowledge/conventions/README.md, and AGENTS.md as the operating rules.
 
 Responsibilities:
-- Read the current ADR and track artifacts before changing code.
-- Delegate Phase 1, Phase 2, Phase 3, ADR-edit, review-fix, and dry-fix work through the matching Codex agents and skills when those capabilities are assigned to Codex.
-- Keep phase ownership intact: spec-designer owns spec.json, type-designer owns layer catalogues, impl-planner owns impl-plan.json, task-coverage.json, and task-contract.json, adr-editor owns knowledge/adr edits.
+- Take progress, review necessity, obligation state, and catalogue state from the CLI summaries
+  listed in .codex/instructions.md; open an artifact body only to inspect a diff or investigate a
+  blocker.
+  Bounded exception for the typed-pipeline local reviewer and review-fix-lead routes: the review
+  workflow itself resolves the applicable convention paths from the track's declared convention
+  references and the consumer-owned knowledge/conventions/README.md Current Files index while
+  preparing the briefing, and supplies them to the delegated reviewer or fixer.
+- Delegate implementation and Phase 1, Phase 2, Phase 3, ADR-edit, review-fix, and dry-fix work through the matching Codex agents and skills when those capabilities are assigned to Codex; the root session keeps workflow control and edits non-ADR files directly only to recover from a failed delegation; a failed delegation that needed an edit to knowledge/adr/*.md is never taken over by the root session — route it back through the adr-editor / adr-diagnoser guardian lane defined in the review workflow SSoT.
+- Keep phase ownership intact: spec-designer owns spec.json, type-designer owns layer catalogues, impl-planner owns impl-plan.json, task-coverage.json, task-contract.json, and batch-plan.json, adr-editor owns knowledge/adr edits.
 - Use exactly the guarded workflow commands listed in the Command Policy of
   .codex/instructions.md for git, review, DRY, PR, and commit flows.
 

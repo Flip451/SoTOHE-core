@@ -18,6 +18,12 @@ requires `grok-sandbox` admission: if the profile routes `dry-fix-lead` to a pro
 wrapper does not support, or to grok without that admission, the dispatch fails — report that
 failure to the user and stop (fail-closed). Do NOT fall back to a direct Agent-tool dispatch.
 
+### Gate waiting
+
+- The DRY fix wrapper is a long-running gate: run it as one blocking call and read its terminal
+  status once. Do not poll its output or re-run status probes; if the host backgrounds the call,
+  read the result once after the single completion notification.
+
 ## Report format
 
 After execution, summarize:

@@ -11,6 +11,12 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 - Applies to: 新しい CI ゲート / verifier / `cargo make verify-*` / `sotp verify *` / signal を追加・拡張するとき、あるいは既存ゲートの存続を判断するとき。
 - Does not apply to: 設定ファイルそのものを**提供**すること（テンプレートが `.claude/settings.json` や `.codex/*` のデフォルトを同梱し、docs で意図を説明するのは正しい。問題は「変更を CI で hard-fail させる enforcement」だけ）。
 
+## Runtime-document boundary
+
+Runtime-instruction documents — workflow SSoT、policy / capability 文書、provider rules など、agent または運用者が実行時に読む文書 — は self-contained でなければならない。動作と境界を文書自身に記述し、特定 ADR の日付 ID や path を実行条件として引用しない。
+
+この self-contained ルールと provider compatibility 設定の扱いは、文書化して review する運用境界であり、consumer の設定値、ファイル存在、常時適用状態、または散文の正確な文言を CI の hard-fail 条件にはしない。CI で enforce するのは SoTOHE 自身の方法論と framework コードの整合性である。
+
 ## Rules
 
 - **SoTOHE が enforce してよい領域**（CI ゲート可）:
@@ -19,7 +25,8 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
   - architecture rule — `architecture-rules.json` の層依存方向。
   - **framework 自身のコード**の品質 — `sotp` CLI と `libs/*` の fmt / clippy / test / no-panic / DRY。
 - **利用者が所有する領域**（提供 + docs のみ。CI 強制しない）:
-  - provider / agent 設定 — `.claude/settings.json`（permission allow/deny ＝利用者のセキュリティ姿勢）、`.codex/*`（config / rules / hooks / agents）、model / provider / skill / hook の選択。
+  - provider / agent 設定 — `.claude/settings.json`（`permissions.allow` / deny rules ＝利用者のセキュリティ姿勢）、Claude Code / Codex の provider-side compatibility / loader 設定（`.claude/rules/orchestrator.md`、`.codex/instructions.md`、`.codex/rules/default.rules` を常時適用する設定を含む）、`.codex/*`（config / rules / hooks / agents）、model / provider / skill / hook の選択。
+  - PR reviewer 向け guidance — `.harness/custom/review-prompts/pr-review.md` は review workflow が読み込む文書であり、root orchestrator の always-applied rules 面とは別に管理する。
   - signal gate 設定 — `.harness/config/signal-gates.json`（SoT Chain の各ゲートの strictness）。SoTOHE は推奨デフォルトを同梱し docs で意図を説明するが、CI で強制しない。
     - `commit_gate.impl_catalog: "interim"` は TDDD の構造的必然（カタログ宣言フェーズで Yellow `RustSourceAbsent` が出るため、commit 時に strict にするとコミット不能になる）。
     - `commit_gate.adr_user: "interim"` は SoTOHE のワークフロー選択（ADR Yellow → エスカレーションをどのコミットでも着地させられるよう commit 時は lax にし、merge 時に strict に切り替えて PR キューで保証する）。
