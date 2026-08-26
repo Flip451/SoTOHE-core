@@ -1017,6 +1017,51 @@ fn test_type_identity_map_missing_paths_entry_returns_typed_error() {
 }
 
 #[test]
+fn test_type_identity_map_rejects_type_and_trait_sharing_one_path() {
+    // Rust keeps types and traits in one namespace, so a single fully-qualified
+    // path can never name both; the identity map must fail closed instead of
+    // silently discarding one of the two items.
+    let mut krate = simple_crate_with_struct("fixture", "Shared");
+    let trait_id = Id(2);
+    krate.index.insert(
+        trait_id,
+        make_item(
+            trait_id,
+            Some("Shared"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    krate.paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec!["fixture".to_string(), "Shared".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    if let Some(ItemEnum::Module(module)) = krate.index.get_mut(&Id(0)).map(|item| &mut item.inner)
+    {
+        module.items.push(trait_id);
+    }
+
+    let error = super::build_type_trait_identity_map(&krate)
+        .expect_err("a type and a trait sharing one path must fail closed");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)));
+    let message = error.to_string();
+    assert!(message.contains("fixture::Shared"));
+    assert!(message.contains("cannot share one fully-qualified path"));
+}
+
+#[test]
 fn test_impl_identity_map_missing_paths_entry_returns_typed_error() {
     let mut krate = crate_with_trait_impl("fixture", "Owner", "MissingTrait");
     krate.paths.remove(&Id(9999));

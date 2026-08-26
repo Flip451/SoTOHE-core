@@ -168,21 +168,22 @@ impl CatalogueToExtendedCratePort for CatalogueToExtendedCrateCodec {
 /// can reference a type before rustdoc contains its implementation. Omitted
 /// placement is resolved against the current set when there is exactly one
 /// candidate; otherwise it remains unplaced or fails closed according to D3.
-fn resolution_paths_for_catalogue(
+pub(super) fn resolution_paths_for_catalogue(
     doc: &CatalogueDocument,
     baseline: &Crate,
     current: &Crate,
 ) -> Result<HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
     let baseline_paths = normalized_paths_for_doc(baseline, doc.crate_name());
     let current_paths = normalized_paths_for_doc(current, doc.crate_name());
-    let mut paths = merge_authoritative_paths(&baseline_paths, &current_paths);
+    let mut paths = merge_authoritative_paths(&baseline_paths, &current_paths)?;
     let baseline_identities = paths_from_map(&baseline_paths);
     let current_identities = paths_from_map(&current_paths);
     let mut known_paths = paths
         .values()
         .map(|summary| (summary.path.clone(), path_namespace(summary.kind)))
         .collect::<HashSet<_>>();
-    let mut next_id = paths.keys().map(|id| id.0).max().unwrap_or(0).saturating_add(1);
+    let mut used_ids = paths.keys().copied().collect::<HashSet<_>>();
+    let mut next_id = used_ids.iter().map(|id| id.0).max().unwrap_or(0).saturating_add(1);
 
     for (key, entry) in doc.types() {
         if entry.action() != ItemAction::Add {
@@ -200,9 +201,10 @@ fn resolution_paths_for_catalogue(
             &mut paths,
             &mut known_paths,
             &mut next_id,
+            &mut used_ids,
             &identity,
             rustdoc_types::ItemKind::Struct,
-        );
+        )?;
     }
     for (key, entry) in doc.traits() {
         if entry.action() != ItemAction::Add {
@@ -220,9 +222,10 @@ fn resolution_paths_for_catalogue(
             &mut paths,
             &mut known_paths,
             &mut next_id,
+            &mut used_ids,
             &identity,
             rustdoc_types::ItemKind::Trait,
-        );
+        )?;
     }
     Ok(paths)
 }
@@ -273,18 +276,20 @@ fn insert_synthetic_summary(
     paths: &mut HashMap<Id, ItemSummary>,
     known_paths: &mut HashSet<(Vec<String>, PathNamespace)>,
     next_id: &mut u32,
+    used_ids: &mut HashSet<Id>,
     identity: &FullyQualifiedItemPath,
     kind: rustdoc_types::ItemKind,
-) {
+) -> Result<(), NewTypeGraphCodecError> {
     let path = identity_path(identity);
     let namespace = path_namespace(kind);
     if !known_paths.insert((path.clone(), namespace)) {
-        return;
+        return Ok(());
     }
-    let id = Id(*next_id);
-    *next_id = (*next_id).saturating_add(1);
+    let id = next_unused_id(next_id, used_ids)
+        .ok_or_else(|| invalid_type_ref("catalogue paths", "no unused item id remains"))?;
     let crate_id = if identity.is_placed() { 0 } else { SYNTHETIC_UNPLACED_CRATE_ID };
     paths.insert(id, ItemSummary { crate_id, path, kind });
+    Ok(())
 }
 
 fn identity_path(identity: &FullyQualifiedItemPath) -> Vec<String> {
@@ -337,11 +342,12 @@ fn summary_identity(summary: &ItemSummary) -> Option<FullyQualifiedItemPath> {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used)]
 fn authoritative_paths(baseline: &Crate, current: &Crate) -> HashMap<Id, ItemSummary> {
-    merge_authoritative_paths(&baseline.paths, &current.paths)
+    merge_authoritative_paths(&baseline.paths, &current.paths).expect("path ids must be available")
 }
 
-fn normalized_paths_for_doc(
+pub(super) fn normalized_paths_for_doc(
     krate: &Crate,
     package_name: &domain::tddd::catalogue_v2::CrateName,
 ) -> HashMap<Id, ItemSummary> {
@@ -368,36 +374,55 @@ fn normalized_paths_for_doc(
 fn merge_authoritative_paths(
     baseline: &HashMap<Id, ItemSummary>,
     current: &HashMap<Id, ItemSummary>,
-) -> HashMap<Id, ItemSummary> {
+) -> Result<HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
     let mut paths = baseline.clone();
+    // Both rustdoc runs allocate Ids independently. Reserve the complete input
+    // union before allocating a replacement so a current-only Id that has not
+    // been visited yet cannot be overwritten by a remapped baseline collision.
+    let mut used_ids = baseline.keys().chain(current.keys()).copied().collect::<HashSet<_>>();
     let mut known_paths = paths
         .values()
         .map(|summary| (summary.path.clone(), path_namespace(summary.kind)))
         .collect::<HashSet<_>>();
-    let mut next_id = paths.keys().map(|id| id.0).max().unwrap_or(0).saturating_add(1);
-    for (id, summary) in current {
+    let mut next_id = used_ids.iter().map(|id| id.0).max().unwrap_or(0).saturating_add(1);
+    let mut current_entries = current.iter().collect::<Vec<_>>();
+    current_entries.sort_unstable_by_key(|(id, _)| id.0);
+    for (&id, summary) in current_entries {
         // Baseline and current rustdoc crates assign ids independently. The same
         // identity therefore commonly appears under two ids; retaining both would
         // make a bare catalogue path look ambiguous even though it names one item.
         if known_paths.contains(&(summary.path.clone(), path_namespace(summary.kind))) {
             continue;
         }
-        match paths.get(id) {
+        match paths.get(&id) {
             Some(existing)
                 if existing.path == summary.path
                     && path_namespace(existing.kind) == path_namespace(summary.kind) => {}
             Some(_) => {
-                paths.insert(Id(next_id), summary.clone());
+                let fresh_id = next_unused_id(&mut next_id, &mut used_ids).ok_or_else(|| {
+                    invalid_type_ref("rustdoc paths", "no unused item id remains")
+                })?;
+                paths.insert(fresh_id, summary.clone());
                 known_paths.insert((summary.path.clone(), path_namespace(summary.kind)));
-                next_id = next_id.saturating_add(1);
             }
             None => {
-                paths.insert(*id, summary.clone());
+                paths.insert(id, summary.clone());
                 known_paths.insert((summary.path.clone(), path_namespace(summary.kind)));
             }
         }
     }
-    paths
+    Ok(paths)
+}
+
+fn next_unused_id(next_id: &mut u32, used_ids: &mut HashSet<Id>) -> Option<Id> {
+    loop {
+        let candidate = Id(*next_id);
+        if used_ids.insert(candidate) {
+            *next_id = (*next_id).checked_add(1).map_or(u32::MAX, |next| next);
+            return Some(candidate);
+        }
+        *next_id = (*next_id).checked_add(1)?;
+    }
 }
 
 #[cfg(test)]

@@ -4,6 +4,8 @@
 //! TypeRef parsing and external-id resolution live in the sibling module
 //! `encoder_state_type_ref_parsing` to keep each file within the 700-line limit.
 
+use std::collections::HashMap;
+
 use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, FullyQualifiedItemPath};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueEntryKey, CrateName, MethodGenericParam, ModulePath, TypeRef,
@@ -18,9 +20,28 @@ use domain::tddd::NewTypeGraphCodecError;
 
 use super::encoder::EncoderState;
 use super::invalid_type_ref;
-use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
+use crate::tddd::canonical_type_identity::{
+    SYNTHETIC_UNPLACED_CRATE_ID, canonicalize_catalogue_type_ref,
+};
 
 impl EncoderState {
+    pub(super) fn resolution_paths_for_namespace(
+        &self,
+        namespace: CatalogueItemNamespace,
+    ) -> HashMap<rustdoc_types::Id, ItemSummary> {
+        self.resolution_paths
+            .iter()
+            .filter(|(_, summary)| {
+                matches!(
+                    (namespace, super::path_namespace(summary.kind)),
+                    (CatalogueItemNamespace::Type, super::PathNamespace::Type)
+                        | (CatalogueItemNamespace::Trait, super::PathNamespace::Trait)
+                )
+            })
+            .map(|(id, summary)| (*id, summary.clone()))
+            .collect()
+    }
+
     pub(super) fn effective_module_path(
         &self,
         key: &CatalogueEntryKey,
@@ -41,30 +62,6 @@ impl EncoderState {
         let id = Id(self.next_id);
         self.next_id += 1;
         id
-    }
-
-    pub(super) fn local_id_for_catalogue_entry(
-        &self,
-        module_path: &ModulePath,
-        item_name: &str,
-    ) -> Result<Id, NewTypeGraphCodecError> {
-        let mut path = self.crate_name.as_str().to_owned();
-        for segment in module_path.segments() {
-            path.push_str("::");
-            path.push_str(segment.as_str());
-        }
-        path.push_str("::");
-        path.push_str(item_name);
-        let type_ref = TypeRef::new(path.clone())
-            .map_err(|_| invalid_type_ref(&path, "catalogue entry path is empty"))?;
-        let identity = canonicalize_catalogue_type_ref(
-            &type_ref,
-            &self.crate_name,
-            &self.resolution_paths,
-            &[],
-        )?;
-        self.local_id_for_identity(&identity)?
-            .ok_or_else(|| invalid_type_ref(&path, "catalogue entry identity is not registered"))
     }
 
     pub(super) fn local_id_for_catalogue_key(
@@ -109,51 +106,11 @@ impl EncoderState {
             if identity.is_placed() { identity.to_string() } else { key.as_str().to_owned() };
         let type_ref = TypeRef::new(source.clone())
             .map_err(|_| invalid_type_ref(&source, "catalogue entry path is empty"))?;
-        let canonical = canonicalize_catalogue_type_ref(
-            &type_ref,
-            &self.crate_name,
-            &self.resolution_paths,
-            &[],
-        )?;
-        self.local_id_for_identity(&canonical)?
+        let namespace_paths = self.resolution_paths_for_namespace(namespace);
+        let canonical =
+            canonicalize_catalogue_type_ref(&type_ref, &self.crate_name, &namespace_paths, &[])?;
+        self.local_id_for_identity_in_namespace(&canonical, namespace)?
             .ok_or_else(|| invalid_type_ref(&source, "catalogue entry identity is not registered"))
-    }
-
-    pub(super) fn resolved_catalogue_key_path(
-        &self,
-        key: &CatalogueEntryKey,
-    ) -> Result<(CatalogueEntryKey, String, ModulePath), NewTypeGraphCodecError> {
-        let type_ref = TypeRef::new(key.as_str().to_owned())
-            .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key is empty"))?;
-        let effective_key = match canonicalize_catalogue_type_ref(
-            &type_ref,
-            &self.crate_name,
-            &self.resolution_paths,
-            &[],
-        ) {
-            Ok(identity) => CatalogueEntryKey::try_new(identity.as_str().to_owned())
-                .map_err(|_| invalid_type_ref(key.as_str(), "canonical identity is empty"))?,
-            Err(error) => return Err(error),
-        };
-        let segments = effective_key.as_str().split("::").collect::<Vec<_>>();
-        let Some(item_name) = segments.last().copied().filter(|name| !name.is_empty()) else {
-            return Err(invalid_type_ref(key.as_str(), "catalogue key has no item name"));
-        };
-        let item_name = item_name.to_owned();
-        let path_segments =
-            segments.iter().take(segments.len().saturating_sub(1)).copied().collect::<Vec<_>>();
-        let skip_crate_name =
-            usize::from(path_segments.first().copied() == Some(self.crate_name.as_str()));
-        let module_segments = path_segments
-            .iter()
-            .copied()
-            .skip(skip_crate_name)
-            .map(str::to_owned)
-            .collect::<Vec<_>>();
-        let module_path = ModulePath::from_segments(module_segments).map_err(|_| {
-            invalid_type_ref(key.as_str(), "catalogue key has an invalid module path")
-        })?;
-        Ok((effective_key, item_name, module_path))
     }
 
     /// Ensures an external crate is registered and returns its `crate_id`.
@@ -248,11 +205,11 @@ impl EncoderState {
         for g in generics_decl {
             let mut bounds: Vec<GenericBound> = Vec::with_capacity(g.bounds.len());
             for b in &g.bounds {
-                let bound = if preserve_bound_spelling {
-                    self.encode_and_validate_bound_preserving_spelling(b.as_str(), generic_names)?
-                } else {
-                    self.encode_and_validate_bound(b.as_str(), generic_names)?
-                };
+                let bound = self.encode_bound_with_trait_root(
+                    b.as_str(),
+                    generic_names,
+                    preserve_bound_spelling,
+                )?;
                 bounds.push(bound);
             }
             params.push(GenericParamDef {
@@ -307,14 +264,11 @@ impl EncoderState {
                 BoundOp::Bound => {
                     let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
                     for b in &w.rhs {
-                        let bound = if preserve_bound_spelling {
-                            self.encode_and_validate_bound_preserving_spelling(
-                                b.as_str(),
-                                generic_names,
-                            )?
-                        } else {
-                            self.encode_and_validate_bound(b.as_str(), generic_names)?
-                        };
+                        let bound = self.encode_bound_with_trait_root(
+                            b.as_str(),
+                            generic_names,
+                            preserve_bound_spelling,
+                        )?;
                         bounds.push(bound);
                     }
                     where_predicates.push(WherePredicate::BoundPredicate {
@@ -375,6 +329,31 @@ impl EncoderState {
         Ok(Generics { params, where_predicates })
     }
 
+    pub(super) fn encode_bound_with_trait_root(
+        &mut self,
+        bound: &str,
+        generic_names: &[&str],
+        preserve_bound_spelling: bool,
+    ) -> Result<GenericBound, NewTypeGraphCodecError> {
+        let previous_root_namespace = self.pending_root_namespace;
+        // The ordinary bound resolver handles the root path itself. Only the
+        // `~const` parser shortcut calls `resolve_external_type_ids` directly,
+        // so it needs the root namespace hint here. Nested generic arguments
+        // must continue to use their normal type namespace.
+        self.pending_root_namespace = if bound.starts_with("~const ") {
+            Some(CatalogueItemNamespace::Trait)
+        } else {
+            previous_root_namespace
+        };
+        let result = if preserve_bound_spelling {
+            self.encode_and_validate_bound_preserving_spelling(bound, generic_names)
+        } else {
+            self.encode_and_validate_bound(bound, generic_names)
+        };
+        self.pending_root_namespace = previous_root_namespace;
+        result
+    }
+
     /// Builds `[crate_name, ...module_path, item_name]` path segments.
     pub(super) fn build_path_segments(
         crate_name: &CrateName,
@@ -389,9 +368,26 @@ impl EncoderState {
         segments
     }
 
+    /// Registers an item path using an already resolved catalogue identity.
+    ///
+    /// An unplaced identity retains the adapter-owned synthetic crate id instead of
+    /// being silently represented as a crate-root placement.
+    pub(super) fn register_identity_path(
+        &mut self,
+        id: Id,
+        kind: ItemKind,
+        identity: &FullyQualifiedItemPath,
+    ) {
+        let path = super::identity_path(identity);
+        let crate_id = if identity.is_placed() { 0 } else { SYNTHETIC_UNPLACED_CRATE_ID };
+        let summary = ItemSummary { crate_id, path, kind };
+        self.paths.insert(id, summary);
+    }
+
     /// Registers an `ItemSummary` in `Crate::paths` using the document crate name.
     ///
-    /// Always uses `self.crate_name` as the crate component and `crate_id: 0` (local crate).
+    /// An existing synthetic unplaced marker is preserved because the type/trait
+    /// encoding pass calls this method after identity assignment.
     /// Use `register_path_for_crate` when the effective crate name may differ.
     pub(super) fn register_path(
         &mut self,
@@ -401,7 +397,12 @@ impl EncoderState {
         module_path: &ModulePath,
     ) {
         let path = Self::build_path_segments(&self.crate_name.clone(), module_path, item_name);
-        let summary = ItemSummary { crate_id: 0, path, kind };
+        let crate_id = self
+            .paths
+            .get(&id)
+            .filter(|summary| summary.crate_id == SYNTHETIC_UNPLACED_CRATE_ID)
+            .map_or(0, |summary| summary.crate_id);
+        let summary = ItemSummary { crate_id, path, kind };
         self.paths.insert(id, summary);
     }
 

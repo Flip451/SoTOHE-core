@@ -167,6 +167,30 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
+        "declaration_hash": "cc3979c16291dd3a1ae5e15c04a4612c8e7331c4dc7c09608d0b45a00eff4b33",
+        "waived_reason_hash": "55908a80a9cd93d5aecafe6f6d1d9f892d456d15367cc94b9ecd796e8ab76e41"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Stateless CatalogueToExtendedCratePort adapter",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-25-post-fq-identity-regression-repair"

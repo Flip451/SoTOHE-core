@@ -105,13 +105,19 @@ impl EncoderState {
 
         // Encode supertrait bounds as GenericBound::TraitBound entries.
         // Each bound string (e.g. "Send", "Sync", "Into<T>") is parsed via
-        // `encode_and_validate_bound` with `trait_generic_names` so that:
+        // `encode_bound_with_trait_root` with `trait_generic_names` so that:
         //   - generic args land in `Path.args` (not embedded in `Path.path`)
         //   - trait-level generics in bound args (e.g. `T` in `Into<T>`) are
         //     rewritten to `Type::Generic` rather than an unresolved-marker path.
+        //   - a `~const` bound resolves its root in the trait namespace (the same
+        //     hint the generic-bound routes use), so `trait Child: ~const Local` encodes.
         let mut bounds: Vec<GenericBound> = Vec::with_capacity(entry.supertrait_bounds().len());
         for b in entry.supertrait_bounds() {
-            bounds.push(self.encode_and_validate_bound(b.as_str(), &trait_generic_names)?);
+            bounds.push(self.encode_bound_with_trait_root(
+                b.as_str(),
+                &trait_generic_names,
+                false,
+            )?);
         }
 
         let trait_item = make_item(

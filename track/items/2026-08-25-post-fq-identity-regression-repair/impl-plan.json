@@ -62,11 +62,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "6381ecbb46f89d10cdd04c39a27996a6da798a93",
       "description": "Modify libs/domain/src/tddd/catalogue_v2/identity_resolution.rs, identifiers.rs, entries.rs, libs/domain/src/tddd/catalogue_linter.rs, and their tests for placement-aware catalogue identity, namespace-aware extracted type-reference classification, and omitted-module_path resolution. Anchors: IN-01, IN-03, CO-03, AC-03.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "6381ecbb46f89d10cdd04c39a27996a6da798a93",
       "depends_on": [
         "T001"
       ],
@@ -80,9 +82,10 @@
       ],
       "description": "Update libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs and encoder_deletions.rs for the codec and deletion routes, with regression coverage only in libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs; use T002's shared resolution set and remove route-local add/deletion fallbacks. Anchors: IN-01, IN-02, IN-03, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03.",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "6381ecbb46f89d10cdd04c39a27996a6da798a93",
       "depends_on": [
         "T002"
       ],
@@ -91,6 +94,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "6381ecbb46f89d10cdd04c39a27996a6da798a93",
       "depends_on": [
         "T001"
       ],
@@ -104,7 +108,7 @@
       ],
       "description": "Update libs/infrastructure/src/tddd/type_signals_evaluator.rs and libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs for the type-signal identity index, with route regression coverage only in the inline tests in type_signals_evaluator.rs; use T002's shared resolution set and remove add tolerance and raw-key fallback behavior. Anchors: IN-01, IN-02, CO-01, CO-02, AC-01, AC-02.",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -112,7 +116,7 @@
       ],
       "description": "Update libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs and phase1/mod.rs for Phase 1 definition-path authority, adding its regression coverage only in a dedicated libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/definition_path_authority_tests.rs; use T002's shared resolution set and remove the Phase 1-specific fallback. Anchors: IN-01, IN-02, IN-03, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03.",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -120,7 +124,7 @@
       ],
       "description": "Update catalog-import and bin-root handling in libs/infrastructure/src/tddd/catalog_gen/import_shape.rs and libs/infrastructure/src/schema_export/bin_target.rs, with catalog-import tests only in libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs and bin-target tests only in libs/infrastructure/src/schema_export_tests.rs; remove their local alias handling. Anchors: IN-02, OS-01, CO-02, AC-02.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

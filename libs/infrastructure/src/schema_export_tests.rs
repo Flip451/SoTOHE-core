@@ -25,6 +25,25 @@ mod tests {
     }
 
     #[test]
+    fn test_bin_target_resolution_canonicalizes_rustdoc_root_path_for_catalogue() {
+        let resolution = crate::schema_export::bin_target::resolve_rustdoc_root_name(
+            &workspace_root(),
+            &CrateName::new("cli").unwrap(),
+        )
+        .unwrap();
+        let path = vec![
+            resolution.rustdoc_root_name().as_str().to_owned(),
+            "commands".to_owned(),
+            "run".to_owned(),
+        ];
+
+        assert_eq!(
+            resolution.canonicalize_rustdoc_path(&path),
+            vec!["cli".to_owned(), "commands".to_owned(), "run".to_owned()]
+        );
+    }
+
+    #[test]
     #[ignore = "requires nightly toolchain"]
     fn export_domain_crate_contains_known_types() {
         let exporter = RustdocSchemaExporter::new(workspace_root());

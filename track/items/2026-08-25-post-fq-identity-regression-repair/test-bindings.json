@@ -400,6 +400,229 @@
         {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_collects_dyn_and_impl_trait_bounds"},
         {"layer": "infrastructure", "module_path": "infrastructure::tddd::type_ref_parser::path_extractor_tests", "test_name": "test_syn_type_ref_path_extractor_splits_qself_into_self_and_trait_paths"}
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_uses_catalogue_adds_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_resolves_add_impl_owner_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_rejects_impl_owner_absent_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluates_shared_catalogue_identity_and_function_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_mutual_add_and_modify_references_in_declaration_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_all_type_actions_and_modify_function_under_bin_root_alias"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter",
+        "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_fs_catalog_adapter_uses_catalog_port_without_compatibility_delegation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_fs_catalog_adapter_add_import_and_cite_write_track_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_catalog_import_matches_bin_root_through_shared_identity_canonicalization"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_catalog_import_all_actions_and_function_resolve_bin_root_through_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_catalog_import_key_equals_shared_root_canonicalization_byte_for_byte"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_catalog_import_root_alias_is_single_application_and_library_root_is_idempotent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
+          "test_name": "test_catalog_import_unrelated_root_fails_with_shared_canonicalization_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_add_types_can_reference_each_other_without_rustdoc_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_and_trait_deletions_keep_namespace_specific_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_catalogue_modify_can_reference_add_and_absent_type_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_without_current_is_unplaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_rejects_multiple_current_candidates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_deletion_record_emits_delete_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_trait_deletion_record_emits_delete_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_deletion_record_emits_delete_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-01"}},
+      "reason": "CatalogueToExtendedCrateCodec::encode receives baseline and current rustdoc crates and exposes only the codec-built ExtendedCrate; its adapter API cannot observe whether the independent type-signal index, deletion handling, and Phase 1 authority consume the same resolution set. Codec-local construction is verified by test_encode_catalogue_add_types_can_reference_each_other_without_rustdoc_paths, test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity, test_resolution_paths_preserve_unplaced_add_identity, and test_resolution_paths_do_not_alias_external_rustdoc_root in infrastructure::tddd::catalogue_to_extended_crate_codec_tests. Cross-route convergence is verified at the owning construction tests, including test_execute_type_signals_evaluates_shared_catalogue_identity_and_function_path in infrastructure::tddd::type_signals_evaluator::tests and test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_and_phase2 in infrastructure::tddd::signal_evaluator_v2::tests; that provenance is not observable inside this codec entry."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_public_std_reexports_preserve_adapter_spelling_and_resolve_definition_paths"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_without_current_is_unplaced"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_rejects_multiple_current_candidates"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_rejects_baseline_name_collision"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_catalogue_modify_can_reference_add_and_absent_type_fails_closed"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_type_deletion_record_emits_delete_action"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_trait_deletion_record_emits_delete_action"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_function_deletion_record_emits_delete_action"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "CO-03"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_type_and_trait_deletions_keep_namespace_specific_identities"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_same_path_type_and_trait_use_separate_namespaces"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_resolution_set_distinguishes_omitted_and_explicit_root_placement"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec", "anchor_id": {"file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_rejects_baseline_name_collision"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_rejects_multiple_current_candidates"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_add_without_current_is_unplaced"},
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests", "test_name": "test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity"}
+      ]
     }
   ],
   "track_id": "2026-08-25-post-fq-identity-regression-repair"

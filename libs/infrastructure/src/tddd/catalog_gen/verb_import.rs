@@ -33,6 +33,15 @@ pub(super) fn run(
     items_dir: &Path,
     command: CatalogImportCommand,
 ) -> Result<CatalogWriteReport, CatalogError> {
+    run_with_resolver(track_id, items_dir, command, resolve_shape)
+}
+
+pub(super) fn run_with_resolver(
+    track_id: &str,
+    items_dir: &Path,
+    command: CatalogImportCommand,
+    resolve: fn(&Path, &str) -> Result<ImportedShape, CatalogError>,
+) -> Result<CatalogWriteReport, CatalogError> {
     let bindings = load_bindings(items_dir)?;
     let dir = track_dir(items_dir, track_id)?;
     let path = catalogue_path(&dir, &bindings, &command.layer)?;
@@ -40,7 +49,7 @@ pub(super) fn run(
     let spec_anchors = load_spec_anchors(&dir, items_dir)?;
     let root = workspace_root(items_dir);
     import_entry_to_file(&path, items_dir, &command, &spec_file, &spec_anchors, || {
-        resolve_shape(&root, &command.type_path)
+        resolve(&root, &command.type_path)
     })
 }
 

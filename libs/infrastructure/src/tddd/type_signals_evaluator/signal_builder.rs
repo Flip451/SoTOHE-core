@@ -2,10 +2,10 @@
 
 use std::collections::{BTreeMap, HashMap};
 
-use domain::tddd::NewTypeGraphCodecError;
-use domain::tddd::catalogue_v2::roles::ItemAction;
+use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FullyQualifiedItemPath, ParamName, TypeRef,
+    CatalogueDocument, CrateName, DeletionRecord, FullyQualifiedItemPath, ModulePath, ParamName,
+    TypeRef,
 };
 use domain::{ConfidenceSignal, TypeSignal};
 use rustdoc_types::{Id, ItemSummary};
@@ -110,14 +110,15 @@ pub(super) fn build_type_signal_identity_index(
 ) -> Result<TypeSignalIdentityIndex, String> {
     let mut index = TypeSignalIdentityIndex::default();
     let catalogue_crate = catalogue.crate_name();
+    let type_paths = paths_for_namespace(rustdoc_paths, CatalogueItemNamespace::Type);
 
     for (key, entry) in catalogue.types() {
         add_entry_identity(
             &mut index,
             catalogue_crate,
             key.as_str(),
-            &entry.module_path().cloned().unwrap_or_default(),
-            entry.action(),
+            entry.module_path(),
+            CatalogueItemNamespace::Type,
             rustdoc_paths,
         )?;
     }
@@ -126,18 +127,19 @@ pub(super) fn build_type_signal_identity_index(
             &mut index,
             catalogue_crate,
             key.as_str(),
-            &entry.module_path().cloned().unwrap_or_default(),
-            entry.action(),
+            entry.module_path(),
+            CatalogueItemNamespace::Trait,
             rustdoc_paths,
         )?;
     }
 
     for deletion in catalogue.deletions() {
-        let key = match deletion {
-            DeletionRecord::Type { name, .. } | DeletionRecord::Trait { name, .. } => name,
+        let (key, namespace) = match deletion {
+            DeletionRecord::Type { name, .. } => (name, CatalogueItemNamespace::Type),
+            DeletionRecord::Trait { name, .. } => (name, CatalogueItemNamespace::Trait),
             DeletionRecord::Function { .. } => continue,
         };
-        add_deletion_identity(&mut index, catalogue_crate, key.as_str(), rustdoc_paths)?;
+        add_deletion_identity(&mut index, catalogue_crate, key.as_str(), namespace, rustdoc_paths)?;
     }
 
     for trait_impl in catalogue.trait_impls() {
@@ -146,37 +148,26 @@ pub(super) fn build_type_signal_identity_index(
             .iter()
             .map(|param| param.name.clone())
             .collect::<Vec<ParamName>>();
-        let canonical = match canonicalize_catalogue_type_ref(
+        let canonical = canonicalize_catalogue_type_ref(
             trait_impl.for_type(),
             catalogue_crate,
-            rustdoc_paths,
+            &type_paths,
             &generic_params,
-        ) {
-            Ok(canonical) => Some(canonical),
-            Err(NewTypeGraphCodecError::UnresolvedIdentifier(_))
-                if matches!(trait_impl.action(), ItemAction::Add | ItemAction::Delete) =>
-            {
-                None
-            }
-            Err(error) => {
-                return Err(format!(
-                    "cannot canonicalize type-signal impl owner '{}': {error}",
-                    trait_impl.for_type()
-                ));
-            }
-        };
+        )
+        .map_err(|error| {
+            format!(
+                "cannot canonicalize type-signal impl owner '{}': {error}",
+                trait_impl.for_type()
+            )
+        })?;
 
         // A local type entry owns its impl rows.  External/self types that are
-        // not declared in this catalogue retain the fully qualified for_type
-        // spelling as their signal entry key.
-        let owner_key = match canonical.as_ref() {
-            Some(canonical) => declaration_key_for_canonical(&index, canonical.as_str()),
-            None => declaration_key_for_raw_owner(&index, trait_impl.for_type().as_str()),
-        }
-        .unwrap_or_else(|| trait_impl.for_type().as_str().to_owned());
-        if let Some(canonical) = canonical {
-            index.add_impl_alias(canonical.as_str(), &owner_key);
-        }
+        // not declared in this catalogue retain their canonical fully qualified
+        // identity as their signal entry key. A raw short-name key is never an
+        // identity fallback.
+        let owner_key = declaration_key_for_canonical(&index, canonical.as_str())
+            .unwrap_or_else(|| canonical.as_str().to_owned());
+        index.add_impl_alias(canonical.as_str(), &owner_key);
         index.add_impl_alias(trait_impl.for_type().as_str(), &owner_key);
         index.add_impl_alias(strip_generic_suffix(trait_impl.for_type().as_str()), &owner_key);
         index.add_impl_alias(short_name(trait_impl.for_type().as_str()), &owner_key);
@@ -189,28 +180,37 @@ fn add_entry_identity(
     index: &mut TypeSignalIdentityIndex,
     catalogue_crate: &CrateName,
     key: &str,
-    module_path: &domain::tddd::catalogue_v2::ModulePath,
-    action: ItemAction,
+    declared_module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
     rustdoc_paths: &HashMap<Id, ItemSummary>,
 ) -> Result<(), String> {
     let entry_key = domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(key.to_owned())
         .map_err(|error| format!("invalid catalogue entry key '{key}': {error}"))?;
-    let identity =
-        FullyQualifiedItemPath::from_catalogue_entry_key(catalogue_crate, &entry_key, module_path)
-            .map_err(|error| format!("cannot construct catalogue identity for '{key}': {error}"))?;
+    let identity = match namespace {
+        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+            catalogue_crate,
+            &entry_key,
+            declared_module_path,
+        ),
+        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+            catalogue_crate,
+            &entry_key,
+            declared_module_path,
+        ),
+    }
+    .map_err(|error| format!("cannot construct catalogue identity for '{key}': {error}"))?;
     let identity_text = identity.to_string();
     index.add_alias(key, key);
     index.add_alias(&identity_text, key);
     index.add_alias(short_name(key), key);
-    let identity_ref = TypeRef::new(identity.to_string())
-        .map_err(|error| format!("cannot construct TypeRef for '{key}': {error}"))?;
-    match canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, rustdoc_paths, &[]) {
-        Ok(canonical) => index.add_canonical(canonical.as_str(), key),
-        Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) if action == ItemAction::Add => {}
-        Err(error) => {
-            return Err(format!("cannot canonicalize catalogue entry '{key}': {error}"));
-        }
-    }
+    let identity_ref =
+        TypeRef::new(if identity.is_placed() { identity_text } else { key.to_owned() })
+            .map_err(|error| format!("cannot construct TypeRef for '{key}': {error}"))?;
+    let namespace_paths = paths_for_namespace(rustdoc_paths, namespace);
+    let canonical =
+        canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, &namespace_paths, &[])
+            .map_err(|error| format!("cannot canonicalize catalogue entry '{key}': {error}"))?;
+    index.add_canonical(canonical.as_str(), key);
     Ok(())
 }
 
@@ -218,6 +218,7 @@ fn add_deletion_identity(
     index: &mut TypeSignalIdentityIndex,
     catalogue_crate: &CrateName,
     key: &str,
+    namespace: CatalogueItemNamespace,
     rustdoc_paths: &HashMap<Id, ItemSummary>,
 ) -> Result<(), String> {
     let _entry_key = domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(key.to_owned())
@@ -226,16 +227,40 @@ fn add_deletion_identity(
         .map_err(|error| format!("cannot construct TypeRef for '{key}': {error}"))?;
     index.add_alias(key, key);
     index.add_alias(short_name(key), key);
-    match canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, rustdoc_paths, &[]) {
-        Ok(canonical) => index.add_canonical(canonical.as_str(), key),
-        Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) => {
-            index.add_canonical(key, key);
-        }
-        Err(error) => {
-            return Err(format!("cannot canonicalize catalogue deletion '{key}': {error}"));
-        }
+    let namespace_paths = paths_for_namespace(rustdoc_paths, namespace);
+    let canonical =
+        canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, &namespace_paths, &[])
+            .map_err(|error| format!("cannot canonicalize catalogue deletion '{key}': {error}"))?;
+    if canonical.as_str().is_empty() {
+        return Err(format!("cannot canonicalize catalogue deletion '{key}'"));
     }
+    index.add_canonical(canonical.as_str(), key);
     Ok(())
+}
+
+fn paths_for_namespace(
+    rustdoc_paths: &HashMap<Id, ItemSummary>,
+    namespace: CatalogueItemNamespace,
+) -> HashMap<Id, ItemSummary> {
+    rustdoc_paths
+        .iter()
+        .filter(|(_, summary)| match namespace {
+            CatalogueItemNamespace::Type => matches!(
+                summary.kind,
+                rustdoc_types::ItemKind::Struct
+                    | rustdoc_types::ItemKind::Union
+                    | rustdoc_types::ItemKind::Enum
+                    | rustdoc_types::ItemKind::TypeAlias
+                    | rustdoc_types::ItemKind::ExternType
+                    | rustdoc_types::ItemKind::Primitive
+            ),
+            CatalogueItemNamespace::Trait => matches!(
+                summary.kind,
+                rustdoc_types::ItemKind::Trait | rustdoc_types::ItemKind::TraitAlias
+            ),
+        })
+        .map(|(&id, summary)| (id, summary.clone()))
+        .collect()
 }
 
 fn add_unique(map: &mut BTreeMap<String, Vec<String>>, alias: &str, key: &str) {
@@ -261,15 +286,6 @@ fn declaration_key_for_canonical(
     unique_key(index.canonical_to_keys.get(canonical))
         .or_else(|| unique_key(index.canonical_to_keys.get(owner_identity)))
         .map(ToOwned::to_owned)
-}
-
-fn declaration_key_for_raw_owner(index: &TypeSignalIdentityIndex, raw: &str) -> Option<String> {
-    let outer = strip_generic_suffix(raw);
-    [raw, outer].into_iter().find_map(|candidate| {
-        index
-            .declaration_candidates(candidate)
-            .and_then(|keys| (keys.len() == 1).then(|| keys.into_iter().next()).flatten())
-    })
 }
 
 fn add_candidates(candidates: &mut Vec<String>, keys: Option<&Vec<String>>) {
@@ -518,11 +534,16 @@ mod tests {
         build_type_signal_identity_index, build_type_signals_from_report,
     };
     use domain::tddd::LayerId;
-    use domain::tddd::catalogue_v2::roles::ItemAction;
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath,
+        CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath, TypeRef,
     };
     use domain::tddd::signal_evaluator::region::{SignalRegion, ThreeWaySignal};
+    use rustdoc_types::{Id, ItemKind, ItemSummary};
 
     #[test]
     fn test_build_type_signals_joins_short_impl_owner_to_qualified_entry() {
@@ -621,22 +642,20 @@ mod tests {
                 kind: ItemKind::Struct,
             },
         )]);
-        for rustdoc_paths in [rustdoc_paths, HashMap::new()] {
-            let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
-                .expect("generic impl owner identity indexes successfully");
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("generic impl owner identity indexes successfully");
 
-            let signals = vec![ThreeWaySignal::new(
-                "domain::alpha::Wrapper<T>: domain::ports::Port".to_owned(),
-                SignalRegion::SIntersectC_Match_Add,
-            )];
-            let kinds = BTreeMap::from([("domain::alpha::Wrapper".to_owned(), vec!["struct"])]);
-            let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+        let signals = vec![ThreeWaySignal::new(
+            "domain::alpha::Wrapper<T>: domain::ports::Port".to_owned(),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+        let kinds = BTreeMap::from([("domain::alpha::Wrapper".to_owned(), vec!["struct"])]);
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
 
-            assert_eq!(built.len(), 1);
-            assert_eq!(built[0].type_name(), "domain::alpha::Wrapper");
-            assert_eq!(built[0].kind_tag(), "struct");
-            assert_eq!(built[0].found_items(), &["domain::ports::Port"]);
-        }
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), "domain::alpha::Wrapper");
+        assert_eq!(built[0].kind_tag(), "struct");
+        assert_eq!(built[0].found_items(), &["domain::ports::Port"]);
     }
 
     #[test]
@@ -902,28 +921,88 @@ mod tests {
     }
 
     #[test]
-    fn test_build_identity_index_preserves_unresolved_add_entry_alias() {
+    fn test_build_identity_index_rejects_add_entry_absent_from_resolution_set() {
         let mut index = TypeSignalIdentityIndex::default();
         let crate_name = CrateName::new("domain").expect("valid crate name");
 
-        add_entry_identity(
+        let error = add_entry_identity(
             &mut index,
             &crate_name,
             "domain::new::Added",
-            &ModulePath::root(),
-            ItemAction::Add,
+            None,
+            CatalogueItemNamespace::Type,
             &HashMap::new(),
         )
-        .expect("unimplemented add entry remains indexable");
+        .expect_err("an add absent from the shared resolution set must fail closed");
 
-        assert_eq!(
-            index.declaration_candidates("domain::new::Added"),
-            Some(vec!["domain::new::Added".to_owned()])
+        assert!(error.contains("cannot canonicalize catalogue entry"));
+    }
+
+    #[test]
+    fn test_build_identity_index_resolves_impl_owner_in_type_namespace() {
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
         );
-        assert_eq!(
-            index.declaration_candidates("Added"),
-            Some(vec!["domain::new::Added".to_owned()])
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Shared".to_owned()).expect("valid type key"),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
         );
+        catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Shared".to_owned()).expect("valid trait key"),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("SomeTrait").expect("valid trait reference"),
+            TypeRef::new("Shared").expect("valid type reference"),
+        ));
+
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+
+        build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("for_type must resolve in the type namespace only");
     }
 
     #[test]
@@ -945,7 +1024,25 @@ mod tests {
             informal_grounds: vec![],
         });
 
-        let index = build_type_signal_identity_index(&catalogue, &HashMap::new())
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "RemovedType".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "old".to_owned(), "RemovedTrait".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
             .expect("deletion identities remain indexable");
 
         assert_eq!(
@@ -959,17 +1056,29 @@ mod tests {
     }
 
     #[test]
-    fn test_add_deletion_identity_preserves_bare_catalogue_key() {
+    fn test_add_deletion_identity_uses_authoritative_catalogue_key() {
         let mut index = TypeSignalIdentityIndex::default();
         let crate_name = CrateName::new("infrastructure").expect("valid crate name");
 
+        let rustdoc_paths = HashMap::from([(
+            Id(1),
+            ItemSummary {
+                crate_id: 0,
+                path: vec![
+                    "infrastructure".to_owned(),
+                    "CatalogueToExtendedCrateCodecError".to_owned(),
+                ],
+                kind: ItemKind::Struct,
+            },
+        )]);
         add_deletion_identity(
             &mut index,
             &crate_name,
             "CatalogueToExtendedCrateCodecError",
-            &HashMap::new(),
+            CatalogueItemNamespace::Type,
+            &rustdoc_paths,
         )
-        .expect("legacy bare deletion key remains indexable");
+        .expect("deletion key resolves through the shared resolution set");
 
         assert_eq!(
             index.declaration_candidates("CatalogueToExtendedCrateCodecError"),

@@ -611,6 +611,20 @@
           "hash": "rvw1:sha256:75a8d3c784f2191eccd583b03a4aee02d3251d1252bc8b4c0257176f87124dc6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T06:47:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:32a0806886c69340f73df4ae6fb9288aa435cc54c316097bd95a838d88c2d001",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T06:50:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:32a0806886c69340f73df4ae6fb9288aa435cc54c316097bd95a838d88c2d001",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -742,6 +756,282 @@
           "at": "2026-08-26T02:42:49Z",
           "findings": [],
           "hash": "rvw1:sha256:9735af9e680fd550ba398ffd52ec35959a4933887f707ed8e6602dfde60b752f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T07:01:34Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 201,
+              "message": "Unplaced catalogue additions are registered with `register_path`, which always emits `crate_id: 0`. This converts an unresolved/unplaced identity into a placed crate-root identity in the encoded `Crate::paths`; Phase 1 and downstream consumers then treat the add as `crate::Name` rather than an unplaced declaration, defeating the synthetic unplaced marker and corrupting identity reconciliation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d762f30f7cdfe7c9c4c300994d577fba55cf4bb06b6e8f7fba024e7ab2097aa",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T07:10:34Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 201,
+              "message": "Unplaced catalogue additions are still registered through `register_path`, which always emits `crate_id: 0`. The encoded `Crate::paths` therefore presents an unresolved/unplaced addition as a placed crate-root identity; Phase 1 and downstream consumers can reconcile it as `crate::Name`, defeating the synthetic unplaced marker and changing identity semantics.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4c9f817a62ceb5d7bb58ec4b7984d99fc97384af19fd7cadede29b16073ac205",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T07:17:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b44f482118777461bd31b1d0bfa84b9d64c8f9faaef2b826df3b2ab468b1e0c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T07:32:43Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 390,
+              "message": "`merge_authoritative_paths` chooses `next_id` from baseline IDs only and does not reserve IDs already present in `current`. For example, with baseline IDs `{5, 10}` and current IDs `{11: A, 5: B}`, if ID 11 is visited first, remapping ID 5 subsequently overwrites `A` at ID 11. Because iteration order is unspecified, the shared resolution set can silently and nondeterministically lose an authoritative path. Allocate from the complete baseline/current ID union or probe for an unused ID before insertion.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 623,
+              "message": "`merge_definition_path_maps` recreates a route-local resolution map and allocates replacement IDs using only the baseline maximum. If a non-colliding catalogue entry already occupies `next_id`, a later colliding entry overwrites it, depending on `HashMap` iteration order. Phase 1 can therefore lose definition paths and misresolve impl identities. Consume the shared resolution set, or reserve/probe the complete ID union.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 356,
+              "message": "The Phase 1 remap classifies every nonzero `crate_id` as external. This includes `SYNTHETIC_UNPLACED_CRATE_ID`, which denotes a local add whose module is unresolved. Such additions are excluded from the local remap and mutual add references are redirected to fresh external IDs, while their placement marker is lost downstream. Treat the synthetic marker as local-unplaced and preserve it through S construction.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 167,
+              "message": "Phase 1 still builds a single path-string map for both types and traits. `build_type_trait_identity_map` keys entries only by `summary.path.join(\"::\")`, so when the codec emits a type and trait with the same catalogue path, one ID is silently discarded and its action never reaches evaluation. Phase 1 must retain the namespace in its identity key or use separate type and trait maps.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 83,
+              "message": "`local_id_for_path` canonicalizes against the unfiltered type-and-trait universe and then uses the unfiltered local identity index. With a type and trait sharing a catalogue path, a valid type-position reference such as a field of type `Shared` becomes `AmbiguousIdentifier`. Thread the syntactic namespace into this lookup and use the corresponding namespace-filtered paths/index.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 150,
+              "message": "A trait impl's `for_type` is necessarily in the type namespace, but its canonicalization receives the complete type-and-trait resolution set. If a type and trait share the same path, type-signal indexing fails as ambiguous even though the owner is unambiguously the type. Canonicalize `for_type` using the type-only path set.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b44f482118777461bd31b1d0bfa84b9d64c8f9faaef2b826df3b2ab468b1e0c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:22:29Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 195,
+              "message": "Phase 1 still collapses type and trait identities into the same `BTreeMap<String, Id>` keyed only by `summary.path.join(\"::\")`. A catalogue/rustdoc input containing same-path entries in the two supported namespaces causes one identity to be silently discarded, so its action and references are omitted or misresolved. Preserve the namespace in the identity key or maintain separate maps.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0807e021ac0aabeae40ebe887ac13f5c6ad6fd48a641d5bac18cd21eb1c08271",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:22:45Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 185,
+              "message": "After `merge_authoritative_paths` remaps a baseline/current ID collision above the input maximum, this resets `next_id` from the original input IDs rather than the merged map. For baseline IDs `{5,10}` and current IDs `{5,11}`, the merge allocates ID 12; the first catalogue-only `add` then also uses ID 12 and silently overwrites that authoritative current path. Seed synthetic allocation from the merged paths or use the same checked unused-ID allocator.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 229,
+              "message": "Namespace enforcement only applies when a path carries the unresolved/std marker. A path ID already assigned by the parser is returned unchanged, even if its item belongs to the opposite namespace; the added Type→Trait fallback also deliberately crosses namespaces. Consequently a type slot can bind to a trait, while a trait reference can bind to a same-named type. Revalidate every local ID against the requested namespace and remove the cross-namespace fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 167,
+              "message": "Phase 1 still consumes `build_type_trait_identity_map`, whose key contains only the joined path and not `CatalogueItemNamespace`. The codec now permits a type and trait at the same catalogue path, but this map silently retains one ID, so the other declaration and its action never reach Phase 1. Use namespace-bearing keys or separate type and trait maps throughout Phase 1 state.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 604,
+              "message": "The production portion of this module is about 725 lines after excluding both `#[cfg(test)]` sections, exceeding the repository's 700-line production-module maximum. Move the newly added rustdoc canonicalization/definition-path merge helpers into a cohesive sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0807e021ac0aabeae40ebe887ac13f5c6ad6fd48a641d5bac18cd21eb1c08271",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:25:31Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 195,
+              "message": "Phase 1 still collapses type and trait identities into one `BTreeMap<String, Id>` keyed only by `summary.path.join(\"::\")`. With the namespace-aware catalogue now allowing same-path type and trait declarations, one entry is silently discarded by `or_insert`, so its action and references are omitted or misresolved. Preserve the namespace in the identity key or use separate maps.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0807e021ac0aabeae40ebe887ac13f5c6ad6fd48a641d5bac18cd21eb1c08271",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:39:06Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 185,
+              "message": "`resolution_paths_for_catalogue` seeds synthetic-add allocation from the maximum input ID, but `merge_authoritative_paths` may already allocate a remapped current path above that maximum. A subsequent synthetic add can reuse the remapped ID and overwrite an authoritative path. Seed from the merged map or share the checked unused-ID allocator.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 229,
+              "message": "`local_id_for_path_with_legacy_trait_fallback` still resolves type-namespace paths against the trait namespace when type resolution fails. This permits a type-position reference to bind to a trait and violates namespace isolation; remove the cross-namespace fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 167,
+              "message": "Phase 1 still uses the path-only `build_type_trait_identity_map` throughout its A/B identity processing. The new namespace-aware codec can produce type and trait declarations with the same path, but the map retains only one entry, silently dropping the other action from Phase 1.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 604,
+              "message": "The production portion of `phase1/builder/main_fn.rs` runs through line 732 (the test module starts at line 735), exceeding the repository’s 700-line production-module maximum. Move the newly added canonicalization and ID-merge helpers into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:de39242790dc0d87cf70c94f3da88163463d10287502f2c39cb8348d607e6692",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T09:04:26Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 185,
+              "message": "After `merge_authoritative_paths` remaps an ID collision, the merged map may contain an allocated ID above the original baseline/current maximum. `resolution_paths_for_catalogue` nevertheless seeds synthetic-add allocation from that original maximum, so the first catalogue-only add can reuse the remapped ID and overwrite an authoritative path. Seed from the merged map or use the checked unused-ID allocator.",
+              "severity": "P1"
+            },
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 229,
+              "message": "`local_id_for_path_with_legacy_trait_fallback` still retries type-namespace resolution in the trait namespace, and already-assigned parser IDs bypass namespace validation entirely. A type-position reference can therefore bind to a trait or another wrong-namespace identity. Revalidate assigned local IDs against the requested namespace and remove the cross-namespace fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 604,
+              "message": "The production portion of `phase1/builder/main_fn.rs` extends to approximately line 732 before the test module, exceeding the repository’s 700-line production-module maximum. Move the added canonicalization and definition-path merge helpers into a cohesive sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac9215cfbd663926d9d79d3de24f7f074d2a83a86a8fd1a52555497728552d0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T09:07:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac9215cfbd663926d9d79d3de24f7f074d2a83a86a8fd1a52555497728552d0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:42:55Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
+              "line": 349,
+              "message": "Type-alias spelling preservation changes namespace semantics. A `GenericBound::TraitBound` must resolve its root in the trait namespace, but the preserving route reuses a parser-assigned type namespace; the `~const` shortcut explicitly sets `Type`. Thus a valid local `~const LocalTrait` alias bound is rejected as a type lookup, while an alias bound naming a known local type can be encoded as a trait bound. Preserve the spelling only—always resolve bound roots as `Trait` and nested generic arguments as `Type`.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 100,
+              "message": "This production module is 713 lines and has no test-only section to exclude, exceeding the repository's 700-line production-module maximum. Move the new namespace-policy/state behavior or another cohesive responsibility into an existing sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3a738fa98b10dd0ef3c0411fa44deaed002046afad34186cc1030bed1e05a479",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T09:55:12Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_resolution.rs",
+              "line": 104,
+              "message": "The trait-root hint for `~const` bounds is applied only by `encode_bound_with_trait_root`, but trait declaration supertraits still call `encode_and_validate_bound` directly. That parser shortcut reaches this function with no pending hint, defaults the root to `Type`, and rejects a valid local declaration such as `trait Child: ~const LocalTrait`. Centralize the trait namespace in bound parsing or route every bound caller through the helper, with a supertrait regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3bdc53df700123b251696ea7af3f8911f07cf9bf0b6519ac2b506d4e2ac9449f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T10:05:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f84516af0ff909cd7192a2ff051df7164eea11e26dbd4d2fec0e6ed1e495354",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:09:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f84516af0ff909cd7192a2ff051df7164eea11e26dbd4d2fec0e6ed1e495354",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -903,6 +1193,27 @@
           "at": "2026-08-26T03:35:41Z",
           "findings": [],
           "hash": "rvw1:sha256:9ad369d660362dfd50a874236216fca9369644131476b41c3801adb22ff09a6b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T06:48:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b65ed9e4d4bb755d40e91192b8e4db7e03e1df25e574f6a1abb7715e3ad2b8aa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T06:54:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b65ed9e4d4bb755d40e91192b8e4db7e03e1df25e574f6a1abb7715e3ad2b8aa",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T06:56:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b65ed9e4d4bb755d40e91192b8e4db7e03e1df25e574f6a1abb7715e3ad2b8aa",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -50,7 +50,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use domain::tddd::ExtendedCrate;
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::catalogue_v2::{CatalogueItemNamespace, CrateName};
 use domain::tddd::{Phase1Error, SignalEvaluatorPort, ThreeWayEvaluationReport};
 use rustdoc_types::{Crate, Id, Item, ItemEnum, ItemKind};
 
@@ -178,7 +178,7 @@ pub(super) fn build_type_trait_identity_map(
     // Collect candidates from `Crate::paths`, which is the authoritative source
     // for local type/trait identity. `Item::name` is intentionally not used as
     // the key because it omits the module path and is therefore ambiguous.
-    let mut candidates: Vec<(String, Id)> = Vec::new();
+    let mut candidates: Vec<(String, ItemKind, Id)> = Vec::new();
     for (id, item) in &krate.index {
         // Only include local crate items (crate_id == 0 means "this crate").
         if item.crate_id != 0 {
@@ -199,16 +199,44 @@ pub(super) fn build_type_trait_identity_map(
                     id.0
                 )));
             }
-            candidates.push((identity_key, *id));
+            candidates.push((identity_key, item_kind_from_inner(&item.inner), *id));
         }
     }
     // Keep duplicate-path handling deterministic for synthetic inputs. Distinct
     // full paths are retained independently, including same-name items in
-    // different modules.
-    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.0.cmp(&b.1.0)));
+    // different modules. The public map remains path-keyed for signal-name
+    // compatibility, but namespace is validated before a path is inserted so
+    // no type/trait declaration can be silently discarded.
+    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.2.0.cmp(&b.2.0)));
     let mut map: BTreeMap<String, Id> = BTreeMap::new();
-    for (identity_key, id) in candidates {
-        map.entry(identity_key).or_insert(id);
+    let mut namespaces: BTreeMap<String, CatalogueItemNamespace> = BTreeMap::new();
+    for (identity_key, kind, id) in candidates {
+        let namespace = if matches!(kind, ItemKind::Trait | ItemKind::TraitAlias) {
+            CatalogueItemNamespace::Trait
+        } else {
+            CatalogueItemNamespace::Type
+        };
+        if let Some(existing_id) = map.get(&identity_key) {
+            let Some(&existing_namespace) = namespaces.get(&identity_key) else {
+                return Err(Phase1Error::rustdoc_root_resolution(format!(
+                    "identity `{identity_key}` has no recorded namespace"
+                )));
+            };
+            if existing_namespace != namespace {
+                return Err(Phase1Error::rustdoc_root_resolution(format!(
+                    "identity `{identity_key}` names both namespaces ({existing_namespace:?} and {namespace:?}); a type and a trait cannot share one fully-qualified path"
+                )));
+            }
+            if *existing_id != id {
+                return Err(Phase1Error::rustdoc_root_resolution(format!(
+                    "identity `{identity_key}` has multiple {namespace:?} declarations (ids {} and {}); duplicate fully-qualified paths are invalid",
+                    existing_id.0, id.0,
+                )));
+            }
+            continue;
+        }
+        namespaces.insert(identity_key.clone(), namespace);
+        map.insert(identity_key, id);
     }
     Ok(map)
 }

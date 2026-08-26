@@ -7,8 +7,11 @@
 use std::collections::BTreeMap;
 
 use domain::tddd::NewTypeGraphCodecError;
+use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use domain::tddd::catalogue_v2::roles::ItemAction;
-use domain::tddd::catalogue_v2::{CatalogueEntryKey, DeletionRecord, FunctionPath, ModulePath};
+use domain::tddd::catalogue_v2::{
+    CatalogueEntryKey, DeletionRecord, FunctionPath, ModulePath, TypeRef,
+};
 use rustdoc_types::{
     FunctionHeader, FunctionSignature, Id, ItemEnum, ItemKind, Struct, StructKind,
     Trait as RustdocTrait,
@@ -17,6 +20,7 @@ use rustdoc_types::{
 use super::encoder::EncoderState;
 use super::helpers::{empty_generics, make_item, make_item_with_crate_id};
 use super::invalid_type_ref;
+use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
 
 pub(super) fn encode_deletion_record(
     state: &mut EncoderState,
@@ -24,8 +28,12 @@ pub(super) fn encode_deletion_record(
     record: &DeletionRecord,
 ) -> Result<(), NewTypeGraphCodecError> {
     match record {
-        DeletionRecord::Type { name, .. } => encode_type_deletion(state, item_actions, name),
-        DeletionRecord::Trait { name, .. } => encode_trait_deletion(state, item_actions, name),
+        DeletionRecord::Type { name, .. } => {
+            encode_type_deletion(state, item_actions, name, CatalogueItemNamespace::Type)
+        }
+        DeletionRecord::Trait { name, .. } => {
+            encode_trait_deletion(state, item_actions, name, CatalogueItemNamespace::Trait)
+        }
         DeletionRecord::Function { path, .. } => {
             encode_function_deletion(state, item_actions, path)
         }
@@ -36,9 +44,9 @@ fn encode_type_deletion(
     state: &mut EncoderState,
     item_actions: &mut BTreeMap<Id, ItemAction>,
     name: &CatalogueEntryKey,
+    namespace: CatalogueItemNamespace,
 ) -> Result<(), NewTypeGraphCodecError> {
-    let (_, item_name, module_path) = state.resolved_catalogue_key_path(name)?;
-    let type_id = deletion_local_id(state, &module_path, &item_name)?;
+    let (type_id, item_name, module_path) = deletion_local_id(state, name, namespace)?;
     let item = make_item(
         type_id,
         Some(item_name.to_owned()),
@@ -59,9 +67,9 @@ fn encode_trait_deletion(
     state: &mut EncoderState,
     item_actions: &mut BTreeMap<Id, ItemAction>,
     name: &CatalogueEntryKey,
+    namespace: CatalogueItemNamespace,
 ) -> Result<(), NewTypeGraphCodecError> {
-    let (_, item_name, module_path) = state.resolved_catalogue_key_path(name)?;
-    let trait_id = deletion_local_id(state, &module_path, &item_name)?;
+    let (trait_id, item_name, module_path) = deletion_local_id(state, name, namespace)?;
     let item = make_item(
         trait_id,
         Some(item_name.to_owned()),
@@ -127,8 +135,24 @@ fn encode_function_deletion(
 
 fn deletion_local_id(
     state: &EncoderState,
-    module_path: &ModulePath,
-    item_name: &str,
-) -> Result<Id, NewTypeGraphCodecError> {
-    state.local_id_for_catalogue_entry(module_path, item_name)
+    key: &CatalogueEntryKey,
+    namespace: CatalogueItemNamespace,
+) -> Result<(Id, String, ModulePath), NewTypeGraphCodecError> {
+    let identity = state.resolve_catalogue_key_identity(key, namespace)?;
+    let item_name = identity.name().as_str().to_owned();
+    let module_path = identity.module_path().cloned().ok_or_else(|| {
+        invalid_type_ref(
+            key.as_str(),
+            "delete catalogue identity has no authoritative module placement",
+        )
+    })?;
+    let identity_ref = TypeRef::new(identity.to_string())
+        .map_err(|_| invalid_type_ref(key.as_str(), "delete catalogue identity is invalid"))?;
+    let namespace_paths = state.resolution_paths_for_namespace(namespace);
+    let canonical =
+        canonicalize_catalogue_type_ref(&identity_ref, &state.crate_name, &namespace_paths, &[])?;
+    let id = state.local_id_for_identity_in_namespace(&canonical, namespace)?.ok_or_else(|| {
+        invalid_type_ref(key.as_str(), "delete catalogue identity is not registered")
+    })?;
+    Ok((id, item_name, module_path))
 }

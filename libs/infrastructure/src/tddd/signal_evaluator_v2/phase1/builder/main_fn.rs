@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 use domain::tddd::ExtendedCrate;
 use domain::tddd::Phase1Error;
-use domain::tddd::catalogue_v2::ItemAction;
+use domain::tddd::catalogue_v2::{CrateName, ItemAction};
 use rustdoc_types::{Crate, FORMAT_VERSION, Id, Target};
 
 use super::super::super::collect_refs::{collect_referenced_ids, item_has_unresolved_marker};
@@ -21,11 +21,12 @@ use super::super::child_items::{
     insert_a_item_tree_into_s, insert_b_item_tree_into_s, remap_and_copy_a_children_to_s,
     remap_child_ids_in_item, remove_b_children_from_s,
 };
+use super::super::rustdoc_authority::{canonicalize_rustdoc_paths, merge_definition_path_maps};
 use super::super::state::Phase1State;
 use super::phase16_check::check_dangling_ids;
 use super::rewrite::{make_root_module_item, rewrite_type_ref_ids_in_item};
 use super::step55_impls::process_standalone_impls;
-use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
+use crate::tddd::canonical_type_identity::{DefinitionPathAuthority, SYNTHETIC_UNPLACED_CRATE_ID};
 
 // ---------------------------------------------------------------------------
 // Main Phase 1 entry-point
@@ -46,15 +47,21 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     b: &Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
 ) -> Result<(ExtendedCrate, Crate), Phase1Error> {
-    // Determine the package crate name from a root item. B is preferred for
-    // normal evaluations, but an empty baseline must use A's root rather than
-    // guessing from an impl owner or an arbitrary path-table entry.
-    let crate_name = b
-        .index
-        .get(&b.root)
-        .and_then(|item| item.name.clone())
+    // Prefer the resolved package root and then the catalogue root.
+    let crate_name = rustdoc_root
+        .map(|resolution| resolution.package_name().as_str().to_owned())
         .or_else(|| a.krate().index.get(&a.krate().root).and_then(|item| item.name.clone()))
+        .or_else(|| b.index.get(&b.root).and_then(|item| item.name.clone()))
         .unwrap_or_default();
+
+    // Canonicalize baseline paths before building Phase 1 identity maps.
+    let package_name = CrateName::new(crate_name.clone()).ok();
+    let canonical_b = canonicalize_rustdoc_paths(
+        b,
+        package_name.as_ref(),
+        rustdoc_root.map(|resolution| resolution.rustdoc_root_name()),
+    );
+    let b = &canonical_b;
 
     // Seed the fresh-Id counter above the highest Id already used by B so that
     // initial allocations do not clash with B-side Ids.
@@ -198,14 +205,27 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                         "action=Add declared for '{action_identity}' but it already exists in baseline"
                     )));
                 }
-                let path = a_krate.paths.get(a_id).map(|ps| ps.path.clone());
-                insert_a_item_tree_into_s(
+                let source_path = a_krate.paths.get(a_id).cloned();
+                let path = source_path.as_ref().map(|summary| summary.path.clone());
+                let s_id = insert_a_item_tree_into_s(
                     &mut state,
                     a_item,
                     ItemAction::Add,
                     path,
                     &a_krate.index,
                 );
+                // `insert_a_item_tree_into_s` writes local-looking summaries for
+                // every A item. Restore the adapter-owned marker for an omitted
+                // catalogue placement so an unplaced add remains distinct from a
+                // crate-root definition in the S graph.
+                if source_path
+                    .as_ref()
+                    .is_some_and(|summary| summary.crate_id == SYNTHETIC_UNPLACED_CRATE_ID)
+                {
+                    if let Some(summary) = state.s_paths.get_mut(&s_id) {
+                        summary.crate_id = SYNTHETIC_UNPLACED_CRATE_ID;
+                    }
+                }
             }
             ItemAction::Modify => {
                 if !in_b {
@@ -319,12 +339,17 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
         }
     }
 
-    // --- Step 5.5: A-side unified trait-impl insertion loop (ADR `2026-05-20-0048` D4) ---
-    // Use one baseline-backed authority for both maps.  This keeps aliases such
-    // as the public `std::iter::Iterator` path and its core definition on the
-    // same identity while still allowing A-only catalogue definitions through
-    // the fallback path universe.
-    let definition_paths = DefinitionPathAuthority::from_path_maps(&b.paths, &[&a_krate.paths]);
+    // --- Step 5.5: unified trait-impl insertion with one canonical authority ---
+    let catalogue_definition_paths = a_krate
+        .paths
+        .iter()
+        .filter(|(_, summary)| {
+            summary.crate_id == 0 || summary.crate_id == SYNTHETIC_UNPLACED_CRATE_ID
+        })
+        .map(|(&id, summary)| (id, summary.clone()))
+        .collect::<HashMap<_, _>>();
+    let definition_path_map = merge_definition_path_maps(&b.paths, &catalogue_definition_paths)?;
+    let definition_paths = DefinitionPathAuthority::from_path_maps(&definition_path_map, &[]);
     let a_impl_map = build_impl_identity_map(&a_krate, &crate_name, &definition_paths)?;
     let b_impl_map = build_impl_identity_map(b, &crate_name, &definition_paths)?;
     process_standalone_impls(&mut state, &a_krate, &a_item_actions, b, &a_impl_map, &b_impl_map)?;
@@ -340,7 +365,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             .paths
             .iter()
             .filter_map(|(&a_id, a_ps)| {
-                if a_ps.crate_id != 0 {
+                if a_ps.crate_id != 0 && a_ps.crate_id != SYNTHETIC_UNPLACED_CRATE_ID {
                     return None;
                 }
                 let identity_key = a_ps.path.join("::");
@@ -354,7 +379,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
         let a_external_paths: Vec<(Id, rustdoc_types::ItemSummary)> = a_krate
             .paths
             .iter()
-            .filter(|&(_, a_ps)| a_ps.crate_id != 0)
+            .filter(|&(_, a_ps)| a_ps.crate_id != 0 && a_ps.crate_id != SYNTHETIC_UNPLACED_CRATE_ID)
             .map(|(&a_id, a_ps)| (a_id, a_ps.clone()))
             .collect();
         for (old_id, path_summary) in a_external_paths {
@@ -446,7 +471,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
 
         // Track A-side path ids already in s_paths from Phase 1.45.
         for (&id, ps) in &state.s_paths {
-            if ps.crate_id != 0 {
+            if ps.crate_id != 0 && ps.crate_id != SYNTHETIC_UNPLACED_CRATE_ID {
                 a_side_path_ids.insert(id);
             }
         }
@@ -457,7 +482,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                 continue;
             }
             if let Some(ps) = a_krate.paths.get(&ref_id) {
-                if ps.crate_id != 0 {
+                if ps.crate_id != 0 && ps.crate_id != SYNTHETIC_UNPLACED_CRATE_ID {
                     state.s_paths.insert(ref_id, ps.clone());
                     a_side_path_ids.insert(ref_id);
                     continue;
@@ -640,4 +665,43 @@ fn resolve_unresolved_impl_trait_path(
     }
     item.inner = rustdoc_types::ItemEnum::Impl(implementation);
     Ok(item)
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use super::merge_definition_path_maps;
+    use rustdoc_types::{Id, ItemKind, ItemSummary};
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_merge_definition_paths_reserves_catalogue_ids_before_remapping() {
+        let summary = |name: &str| ItemSummary {
+            crate_id: 0,
+            path: vec!["domain".to_owned(), name.to_owned()],
+            kind: ItemKind::Struct,
+        };
+        let baseline =
+            HashMap::from([(Id(5), summary("BaselineA")), (Id(10), summary("BaselineB"))]);
+        let catalogue = HashMap::from([
+            (Id(5), summary("CatalogueAtBaselineId")),
+            (Id(11), summary("CatalogueOnly")),
+        ]);
+
+        let merged = merge_definition_path_maps(&baseline, &catalogue)
+            .expect("the merged definition paths must retain every summary");
+
+        assert_eq!(merged.len(), 4);
+        for expected in [
+            ["domain", "BaselineA"],
+            ["domain", "BaselineB"],
+            ["domain", "CatalogueAtBaselineId"],
+            ["domain", "CatalogueOnly"],
+        ] {
+            assert!(
+                merged.values().any(|summary| summary.path == expected),
+                "merged paths must retain {expected:?}"
+            );
+        }
+    }
 }
