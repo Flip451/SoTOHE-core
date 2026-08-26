@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-26T07:55:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3895133c86d521b3fab2bd04e4923e82b20bfb33386c9652380559bd6147feab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T07:58:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3895133c86d521b3fab2bd04e4923e82b20bfb33386c9652380559bd6147feab",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:11:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b337ea212b03f6007156844510fc3bd2496526ee5a3fc4369623c4aaa06f47d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:16:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b337ea212b03f6007156844510fc3bd2496526ee5a3fc4369623c4aaa06f47d3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
