@@ -18,4 +18,4 @@ GO-02 and GO-03 → T002. .harness/workflows/track/adr2pr.md, .claude/commands/t
 
 > Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
 
-- [x] **T002**: Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
+- [x] **T002**: Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07. (`5871d42672c7d4f395de190fcae20f446b9e9523`)
