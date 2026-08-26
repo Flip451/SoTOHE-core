@@ -1,0 +1,43 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 13, yellow: 0, red: 0 }
+---
+
+# Bounded-wait termination assertions for descendant-process tests
+
+## Goal
+
+- [GO-01] 子孫プロセスの終了保証を、即時の単発状態観測ではなく、有界時間内の再観測により最終的な非存在として検証する。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1]
+
+## Scope
+
+### In Scope
+- [IN-01] Unix/Linux cfg の `libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs` にある `test_version_probe_terminates_descendant_after_clean_pipe_drain` を、有界待ちによる再観測の検証様式へ変更する。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [IN-02] 終了保証の判定では、対象が終端状態に達したか消滅するまで再観測し、遷移中の中間状態の観測を失敗として扱わない。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+
+### Out of Scope
+- [OUT-01] `TrustedLaunchContext::run_version_probe` とその子孫 cleanup を含む production の終了保証実装は変更しない。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [OUT-02] 同型の即時観測テストを repository 全体で探索または変更することは、この track の対象外とする。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+
+## Constraints
+- [CN-01] 再観測には有限の時間上限を設け、失敗はその上限を超過した場合に限る。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [CN-02] 対象テストの子孫プロセス終了を再観測する有界待ちには、秒単位で表す固定された有限の時間上限を設け、その上限は対象テストごとの名前付き定数として再観測処理にのみ適用する。上限が過大でも終了保証の判定を誤らせず、超過時のみ失敗とする。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [CN-05] 既存テストの probe script の detached background child について、kernel に reap されて消滅した場合と、非実行中の zombie として残る場合のいずれも、D1 が要求する「終端状態に達した、または消滅した」を満たす。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+
+## Acceptance Criteria
+- [ ] [AC-01] 対象テストは、即時の単発 `/proc/<pid>/stat` 状態 assert に依存せず、終端状態または対象消滅を確認して成功する。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [ ] [AC-02] 対象テストの有界待ち上限は、秒単位で設定される名前付きのテストごとの定数で表される。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [ ] [AC-03] 対象テストは、有界待ちの時間上限を超過した場合にのみ失敗する。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [ ] [AC-04] production の `TrustedLaunchContext::run_version_probe` と子孫 cleanup の差分は空である。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+- [ ] [AC-05] 遷移中の状態を一度以上観測しても、時間上限内に終端状態または消滅を観測できれば対象テストは成功する。 [adr: knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md#D1] [tasks: T001]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/coding-principles.md#Rules
+- knowledge/conventions/testing.md#Testing Convention
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 13  🟡 0  🔴 0
+

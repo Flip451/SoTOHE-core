@@ -32,6 +32,151 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:19:41Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 6,
+              "message": "`S1` の description は、anchor cite だけで参照すべき挙動契約（即時 assertion の置換、bounded re-observation、production 実装を変更しないこと、scope の限定）を散文で再記述しています。`target + operation + anchor cite` に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 23,
+              "message": "`T001` の description は、名前付き秒単位定数、終端状態または消滅の受入れ、遷移状態の許容、上限超過時のみ失敗、Linux gating、production 差分ゼロ、全体 sweep 非実施という上流 spec/ADR の挙動契約・制約を散文で再記述しています。対象・操作・anchor cite のみに縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b46d1d2db9a893ac19b8334e930f63d712641f9cac8fbe87b442576d994a5a92",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T09:23:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63e9ab19040b24d93dcc03dddc34174b0bd15860ffcf19dc9a35b9f61a687643",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:28:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63e9ab19040b24d93dcc03dddc34174b0bd15860ffcf19dc9a35b9f61a687643",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:06:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4302403978b177affffa1e3fd22bc21b30f914dd0e7306b838f46456d42a289b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:09:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4302403978b177affffa1e3fd22bc21b30f914dd0e7306b838f46456d42a289b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-26T08:24:57Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 11,
+              "message": "この仕様は `/proc/<pid>/stat`、Unix/Linux のプロセス状態、有限の実行時間上限に依存するが、`environment-assumptions.md` の宣言欄は未記入で、仕様にもこれらの環境前提・資源上限の適用範囲が十分に記録されていない。",
+              "severity": "major"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 95,
+              "message": "`prefer-type-safe-abstractions.md` は型安全な抽象化の規約であり、今回の bounded-wait によるプロセス終了テスト変更とは自明に無関係である。関連 convention としてのナラティブ参照が壊れている。",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:eeb850720438bc81e3f2d2d305f3eca5a79177be746cb649c43d0bb92792f259",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:39:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d173611a000cdb215b9db7e53dcc777499098d00bef138816ab9568c6d800d00",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:44:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d173611a000cdb215b9db7e53dcc777499098d00bef138816ab9568c6d800d00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:48:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:400cc74d9c88195a1e9bd634b1f6662ce488bca41ff40d28addddbf2d353df5a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:51:36Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 73,
+              "message": "CN-02 は有界待ちの適用範囲と超過時の動作を定めているが、時間上限の単位を記録していない。AC-02 も「名前付きの定数」とするだけなので、下流工程が単位を推測する必要があり、環境前提規約が要求する resource limit の単位宣言を満たさない。",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:400cc74d9c88195a1e9bd634b1f6662ce488bca41ff40d28addddbf2d353df5a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:55:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82b419ba9be43716999d3d314f43b98a43ba391068ef140115c8b0e92ae67535",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:07:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0a56925420d3af4788998b3e5668fc5e74dcceed81d0e8b1b20feb0efd2efc5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:12:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0a56925420d3af4788998b3e5668fc5e74dcceed81d0e8b1b20feb0efd2efc5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
