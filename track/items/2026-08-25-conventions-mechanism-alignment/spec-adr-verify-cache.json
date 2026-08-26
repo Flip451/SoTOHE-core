@@ -217,7 +217,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -263,7 +263,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_hash": "2d8e8cc0283c370d96ea19347f8ba8e877a84ed19387b9b3f91885c572737092",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -272,7 +272,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。string から Command または Query へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから対応する入力境界を呼び出す。",
         "kind": "pass"
       }
     },
@@ -401,7 +401,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -424,7 +424,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -433,7 +433,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`2026-08-20-1043-conventions-mechanism-alignment.md` D2 の必要性テストは、役割名ではなく導入理由で適用範囲を決める。",
+        "citation": "「`2026-08-20-1043-conventions-mechanism-alignment.md` D2 の必要性テストは、役割名ではなく導入理由で適用範囲を決める。」",
         "kind": "pass"
       }
     },
@@ -447,7 +447,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -456,7 +456,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "新しいテンプレート出力は、この対応を満たす改訂済みの初期規約集合を出荷する。",
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
         "kind": "pass"
       }
     },
@@ -493,7 +493,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -502,7 +502,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
         "kind": "pass"
       }
     },
@@ -516,7 +516,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_hash": "2d8e8cc0283c370d96ea19347f8ba8e877a84ed19387b9b3f91885c572737092",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -525,7 +525,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。」「string から Command または Query へのパースは usecase 所有の boundary 型が担い、cli はそのパースを一度だけ呼び出してから対応する入力境界を呼び出す。",
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
         "kind": "pass"
       }
     },
@@ -539,7 +539,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -585,7 +585,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -631,7 +631,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -677,7 +677,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -723,7 +723,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -769,7 +769,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -778,7 +778,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。",
         "kind": "pass"
       }
     },
@@ -792,7 +792,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -815,7 +815,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1022,7 +1022,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1068,7 +1068,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_hash": "2d8e8cc0283c370d96ea19347f8ba8e877a84ed19387b9b3f91885c572737092",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1206,7 +1206,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1229,7 +1229,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1252,7 +1252,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1298,7 +1298,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1321,7 +1321,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "42cb3c600a9a0adef685bdc37dd069d1300321316f0d660809ee0419bd89b6fa",
+      "evidence_hash": "2d8e8cc0283c370d96ea19347f8ba8e877a84ed19387b9b3f91885c572737092",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1330,7 +1330,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。",
+        "citation": "command usecase の入力境界は検証済み Command 型を 1 個だけ受け取り、query usecase の入力境界は検証済み Query 型を 1 個だけ受け取る。」「cli はそのパースを一度だけ呼び出してから対応する入力境界を呼び出す。",
         "kind": "pass"
       }
     },
@@ -1344,7 +1344,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1390,7 +1390,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1436,7 +1436,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1482,7 +1482,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1491,7 +1491,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "環境前提の初期値は、宣言の枠と記入指針だけを含める。",
+        "citation": "環境前提の初期値は、宣言の枠と記入指針だけを含める。platform、protocol、encoding、resource limit、concurrency model その他のプロジェクト固有の前提を既定値として含めない。",
         "kind": "pass"
       }
     },
@@ -1528,7 +1528,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1551,7 +1551,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1560,7 +1560,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。\n\n環境前提の初期値は、宣言の枠と記入指針だけを含める。",
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。",
         "kind": "pass"
       }
     },
@@ -1574,7 +1574,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1583,7 +1583,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。",
+        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な\n要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、\nプロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求\nまたは強制機構の対応を省略・変更してはならない。",
         "kind": "pass"
       }
     },
@@ -1620,7 +1620,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1629,7 +1629,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`overlay/knowledge/conventions/` の初期値は、対応する workspace の規約と同じ規範的な要求および各要求の強制機構の対応注記を含む。相違は consumer が読むための所有権説明、プロジェクト固有の値を置かない説明、その他の consumer 向けの表現に限る。規範的な要求または強制機構の対応を省略・変更してはならない。",
+        "citation": "出荷する初期値には、現在改訂された structure-required port の必要性テストの例外と、検証済み Command / Query の規則も含める。",
         "kind": "pass"
       }
     },
@@ -1643,7 +1643,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "73a140fb3e5bb54f6875d4b0c099850accd29171733efe1ad349858ebf5af82a",
+      "evidence_hash": "72e3b5940d7a72dd9c49655d50062d869aefeba8f766b7fd0c8b5ad59beb89da",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1652,7 +1652,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「次の port trait は必要性テストの対象外とし、複数実装またはテスト差し替えの有無で導入可否を判断しない。」また、「この二つは、必要性テストではなく支配するアーキテクチャ規則に従って導入する structure-required ports である。」",
+        "citation": "次の port trait は必要性テストの対象外とし、複数実装またはテスト差し替えの有無で導入可否を判断しない。",
         "kind": "pass"
       }
     },
@@ -1666,7 +1666,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "974367cf19815a66b3ee89554c5f00c897dc67d783f7d00d7841b8b4e958704d",
+      "evidence_hash": "73f3d7aef482fc4060eab75c26c0c79039404b0a39c367ae0054679375c60b26",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
