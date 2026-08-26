@@ -155,27 +155,28 @@ Run `bin/sotp git add-all` after the final review round.
 Invoke the `commit` workflow. Generate the commit message per Constraint 2. This is the second
 commit on the track branch.
 
-**Parent-session refresh points and resume.** Refresh the parent session at these fixed boundaries:
+**Parent-session refresh points and resume.** These are the fixed boundaries at which the parent
+session may be refreshed and from which any invocation can resume from durable state:
 
 - After the plan-artifacts commit in Step 8 succeeds, before starting Step 9.
 - After the first implementation batch in Step 9 completes, before continuing with any
   remaining full-cycle batches or the lifecycle tail.
 - At the start of the PR lane in Step 10, before invoking `pr-review`.
 
-Each boundary is a one-way handoff. The invocation that reaches a boundary must honor it and
-stop before the next operation. An invocation that resumes directly at the step after a boundary
-is, by definition, already post-refresh and must start that step without stopping at the same
-boundary again. The resume derivation from persisted git and track state is the evidence that the
-refresh occurred; no additional durable refresh state is introduced. Thus a resume that lands at
-Step 9 after the plan-artifacts commit starts Step 9, a resume that lands at Step 9 after the
-first implementation batch invokes the normal continuation, and a resume that lands at Step 10
-after all batches and the lifecycle tail are complete invokes `pr-review`.
+A boundary is not a stop. On a host with automatic context management, the invocation continues
+into the next step. On a host without automatic context management, the orchestrator may request
+a refresh and, if it does, stops at that boundary; the re-invocation resumes at that boundary.
+The resume derivation from persisted git and track state is the evidence that the refresh occurred;
+no additional durable refresh state is introduced. Thus a resume that lands at Step 9 after the
+plan-artifacts commit starts Step 9, a resume that lands at Step 9 after the first implementation
+batch invokes the normal continuation, and a resume that lands at Step 10 after all batches and
+the lifecycle tail are complete invokes `pr-review`.
 
 Step 9 uses the caller-requested `--single-batch` mode for the first unfinished declared batch
 after Step 8. That mode drains the declared batch, including any runtime admission-split
-execution units, and returns before the lifecycle tail. After that invocation returns, refresh
-the parent session before continuing; the resumed invocation reconstructs the first unfinished
-lifecycle boundary from durable state.
+execution units, and returns before the lifecycle tail. After that invocation returns, continue
+with the normal Step 9 invocation; a refreshed or re-invoked session reconstructs the first
+unfinished lifecycle boundary from durable state.
 
 At each boundary, git and the track artifacts are the machine state, so the parent context may
 be discarded and reconstructed from them. On every invocation for an existing track, reconstruct
@@ -203,11 +204,10 @@ backgrounding thresholds, notification formats, or compaction timing.
 For the first unfinished declared batch after Step 8, invoke the `full-cycle` workflow
 (`.harness/workflows/track/full-cycle.md`) once with `--single-batch`. It drains that declared
 batch, including any runtime admission-split execution units, and returns before the lifecycle
-tail. After it returns successfully, apply the parent-session refresh point above. On the
-resumed Step 9, and on any later Step 9 entry after that first batch commit, invoke `full-cycle`
-without the option (the default `normal` mode); it resumes at the first unfinished lifecycle
-boundary and consumes the remaining batches or runs the lifecycle tail. See that workflow's
-SSoT for the full internal state machine.
+tail. After it returns successfully, the same or a resumed invocation continues with `full-cycle`
+in normal mode; it resumes at the first unfinished lifecycle boundary and consumes the remaining
+batches or runs the lifecycle tail. On any later Step 9 entry, invoke `full-cycle` without the
+option (the default `normal` mode). See that workflow's SSoT for the full internal state machine.
 
 **Step 10: pr-review workflow**
 
@@ -282,7 +282,7 @@ or retry by using the review-request path.
 | 5 | Phase 1-3 gates (per `plan` SSoT loop rules) | proceed / escalate / stop |
 | 6 | `review` check-approved exit 0 (plan artifacts) | proceed / blocked |
 | 8 | `commit` CI + git commit OK | proceed / ERROR |
-| 9 | `full-cycle` reaches the requested return and, after refresh when needed, all batches are committed | proceed / stop |
+| 9 | `full-cycle` reaches the requested return and all batches are committed | proceed / stop |
 | 10 | `pr-review` reaches a terminal state: machine PASS (explicit zero findings) or user-approved Accepted Deviations | terminal / loop |
 | 11 | One independently posted all-protected-source terminal-audit comment, or a reported non-fatal posting/preparation failure | complete / reported |
 

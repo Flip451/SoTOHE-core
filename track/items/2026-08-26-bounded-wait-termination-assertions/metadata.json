@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-26-bounded-wait-termination-assertions",
+  "title": "Bounded-wait termination assertions for descendant-process tests",
+  "branch": "track/2026-08-26-bounded-wait-termination-assertions",
+  "created_at": "2026-08-26T07:51:48Z",
+  "updated_at": "2026-08-26T07:51:48Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

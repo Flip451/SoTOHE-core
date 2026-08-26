@@ -1,0 +1,377 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-26T07:55:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3895133c86d521b3fab2bd04e4923e82b20bfb33386c9652380559bd6147feab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T07:58:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3895133c86d521b3fab2bd04e4923e82b20bfb33386c9652380559bd6147feab",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:11:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b337ea212b03f6007156844510fc3bd2496526ee5a3fc4369623c4aaa06f47d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:16:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b337ea212b03f6007156844510fc3bd2496526ee5a3fc4369623c4aaa06f47d3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-26T12:39:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eec1ccca112606c76c21423eac67bfef986f3a3ca5642bd222b7a7947560786a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:44:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 59,
+              "message": "The interaction count contradicts note (5): this says exactly two interactions are sanctioned, while note (5) additionally permits asking the user for a refresh on hosts without automatic context management. That makes the CN-07 fallback simultaneously allowed and excluded by the adapter’s autonomy accounting. Count only unconditional approval pauses, or explicitly include the conditional refresh interaction in the accounting.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:eec1ccca112606c76c21423eac67bfef986f3a3ca5642bd222b7a7947560786a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T12:51:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a3587407ca9d556af9ba2d83f174d564a50918238745bfcd3588a0889f26c1b1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:19:41Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 6,
+              "message": "`S1` の description は、anchor cite だけで参照すべき挙動契約（即時 assertion の置換、bounded re-observation、production 実装を変更しないこと、scope の限定）を散文で再記述しています。`target + operation + anchor cite` に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 23,
+              "message": "`T001` の description は、名前付き秒単位定数、終端状態または消滅の受入れ、遷移状態の許容、上限超過時のみ失敗、Linux gating、production 差分ゼロ、全体 sweep 非実施という上流 spec/ADR の挙動契約・制約を散文で再記述しています。対象・操作・anchor cite のみに縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b46d1d2db9a893ac19b8334e930f63d712641f9cac8fbe87b442576d994a5a92",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T09:23:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63e9ab19040b24d93dcc03dddc34174b0bd15860ffcf19dc9a35b9f61a687643",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:28:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63e9ab19040b24d93dcc03dddc34174b0bd15860ffcf19dc9a35b9f61a687643",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:35:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8a9336c0f5d68532797a04f8047000dd34edf53969d404d33f9e617d4cdd30b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:38:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8a9336c0f5d68532797a04f8047000dd34edf53969d404d33f9e617d4cdd30b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:10:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 16,
+              "message": "S2 description restates the upstream D4 behavior contract (“retain the three durable-state resume boundaries… allow hosts… without stopping… optional route…”). Keep only target + operation + anchor cite, per no-upstream-restatement policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 40,
+              "message": "T002 description repeats the same upstream D4 behavior contract instead of referring to it solely by anchor. Remove the behavioral prose and retain target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e5eafff83d97b6db1a04de3c9fcbfed115fa2e675be5e75ccd5b0ee6d3ee66af",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T12:21:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44a029781c30d6e395635cf9e7691f6aefa1829286572ae69091a5bec80357f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:25:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44a029781c30d6e395635cf9e7691f6aefa1829286572ae69091a5bec80357f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:39:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e7e4bb79a5d037b320e597842f62256fb4194748add40b0bb4327c6663d84f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:42:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e7e4bb79a5d037b320e597842f62256fb4194748add40b0bb4327c6663d84f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:57:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08bbe03daf08fa4fd30f65528455fa399caff129429fe6438c5de83b8acf660c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T13:00:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08bbe03daf08fa4fd30f65528455fa399caff129429fe6438c5de83b8acf660c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-26T10:21:11Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 789,
+              "message": "The polling loop treats any `/bin/kill -0 <pid>` failure as proof that the intended descendant vanished. Because only the numeric PID is recorded, PID reuse can make an unrelated process appear to be the descendant and cause a false timeout/failure during the five-second wait. Capture and compare a process identity (for example Linux `/proc/<pid>/stat` start time) or use an equivalent identity-safe mechanism before accepting the result.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d7f0f090addffd564fd00b2495b6fb32a4349728877bb7d5c97cd48afe142484",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T10:32:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1dc771992646e0d6688376b72f8afbaf5ddcd3dd30159ed94a6abb6001e1cc9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:39:47Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 796,
+              "message": "Linux 分岐は `/proc/<pid>/stat` が常に読め、field 22 の start-time 形式であることを新たに必須化しています。しかし、この前提は spec にも未記入の `environment-assumptions.md` にも宣言されていません。procfs が未 mount・制限された Linux 環境では `descendant.stat` が空になり、ここで有界待ち前に panic して AC-03 に反します。前提を正式に宣言するか、identity snapshot を optional にして観測不能を時間上限まで transitional として扱ってください（未宣言の前提への依存）。",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 837,
+              "message": "`process_start_time != expected_start_time` は元の子孫プロセスが既に消滅し、その PID が再利用された証拠です。これを transitional として扱うと、再利用先の無関係なプロセスが5秒以上生存した場合、cleanup が成功していてもテストが timeout し、AC-01 の「対象消滅なら成功」に反します。identity mismatch では成功終了してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1dc771992646e0d6688376b72f8afbaf5ddcd3dd30159ed94a6abb6001e1cc9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T10:47:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4456b9cb7a2f2c71c883cacc71b82e7348378716ddb8de37a97a4aaae8381701",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:06:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4302403978b177affffa1e3fd22bc21b30f914dd0e7306b838f46456d42a289b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:09:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4302403978b177affffa1e3fd22bc21b30f914dd0e7306b838f46456d42a289b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-26T08:24:57Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 11,
+              "message": "この仕様は `/proc/<pid>/stat`、Unix/Linux のプロセス状態、有限の実行時間上限に依存するが、`environment-assumptions.md` の宣言欄は未記入で、仕様にもこれらの環境前提・資源上限の適用範囲が十分に記録されていない。",
+              "severity": "major"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 95,
+              "message": "`prefer-type-safe-abstractions.md` は型安全な抽象化の規約であり、今回の bounded-wait によるプロセス終了テスト変更とは自明に無関係である。関連 convention としてのナラティブ参照が壊れている。",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:eeb850720438bc81e3f2d2d305f3eca5a79177be746cb649c43d0bb92792f259",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:39:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d173611a000cdb215b9db7e53dcc777499098d00bef138816ab9568c6d800d00",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:44:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d173611a000cdb215b9db7e53dcc777499098d00bef138816ab9568c6d800d00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:48:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:400cc74d9c88195a1e9bd634b1f6662ce488bca41ff40d28addddbf2d353df5a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T08:51:36Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 73,
+              "message": "CN-02 は有界待ちの適用範囲と超過時の動作を定めているが、時間上限の単位を記録していない。AC-02 も「名前付きの定数」とするだけなので、下流工程が単位を推測する必要があり、環境前提規約が要求する resource limit の単位宣言を満たさない。",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:400cc74d9c88195a1e9bd634b1f6662ce488bca41ff40d28addddbf2d353df5a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T08:55:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82b419ba9be43716999d3d314f43b98a43ba391068ef140115c8b0e92ae67535",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:47:52Z",
+          "findings": [
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 175,
+              "message": "`related_conventions` に `prefer-type-safe-abstractions.md` を参照しているが、この spec の変更対象（有界待ちテストおよび workflow の context boundary）と同規約の型安全 abstraction 方針との関連がなく、ナラティブ上の壊れた cross-reference になっている。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:5450b72b0e0499f77dd8f9db46acb74637982875ead5c58581ff6223c667592a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T11:51:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd0753ac898d5e3299fc6ea23806cf10a01d6d9eb1816dff8b5424b5f6189b60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:58:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd0753ac898d5e3299fc6ea23806cf10a01d6d9eb1816dff8b5424b5f6189b60",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-26T09:07:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0a56925420d3af4788998b3e5668fc5e74dcceed81d0e8b1b20feb0efd2efc5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T09:12:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0a56925420d3af4788998b3e5668fc5e74dcceed81d0e8b1b20feb0efd2efc5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

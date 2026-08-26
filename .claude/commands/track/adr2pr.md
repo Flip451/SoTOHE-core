@@ -41,14 +41,12 @@ track needs initialization, pass the resolved values unchanged to `/track:init <
   (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
-- **Parent-session refresh points**: use the workflow SSoT's three fixed boundaries—after the
-  plan-artifacts commit, after the first implementation batch, and at the start of the PR
-  lane. Claude Code cannot refresh the parent session from within this workflow, so announce
-  each boundary and ask the user to run `/clear` or start a fresh Claude Code session, then
-  re-invoke `/track:adr2pr` on the same `track/<id>` branch. The re-invoked command must let
-  Step 1 inspect persisted state and skip `init`, resuming at the first incomplete boundary
-  derived by the workflow SSoT. Do not add host-specific backgrounding, notification-format,
-  or compaction handling here.
+- **Parent-session refresh points**: use the workflow SSoT's three fixed boundaries as resume
+  points. Claude Code manages context automatically (compaction), so do not stop at a boundary
+  and do not ask the user to run `/clear` or start a fresh session — continue the workflow. A
+  re-invocation of `/track:adr2pr` on the same `track/<id>` branch (for any reason) still lets
+  Step 1 inspect persisted state, skip `init`, and resume at the first incomplete boundary. Do
+  not add host-specific backgrounding, notification-format, or compaction handling here.
 - **Phase 0 governing convention**: apply
   `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
   normative source for Phase 0. This adapter states no procedure of its own for that phase.
