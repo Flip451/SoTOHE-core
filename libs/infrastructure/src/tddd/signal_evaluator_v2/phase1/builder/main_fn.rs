@@ -15,7 +15,8 @@ use super::super::super::impl_identity::build_impl_identity_map;
 use super::super::super::resolution::resolve_unresolved_in_item;
 use super::super::super::resolve_type::resolve_type;
 use super::super::super::{
-    RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map,
+    RustdocTargetResolution, TypeTraitIdentityKey, TypeTraitIdentityMap,
+    build_function_identity_map, build_type_trait_identity_map,
 };
 use super::super::child_items::{
     insert_a_item_tree_into_s, insert_b_item_tree_into_s, remap_and_copy_a_children_to_s,
@@ -191,7 +192,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
             ItemAction::Delete => resolve_delete_identity(a_name, &b_types)?,
             _ => a_name.clone(),
         };
-        let in_b = b_types.contains_key(action_identity.as_str());
+        let in_b = b_types.contains_key(&action_identity);
 
         let a_item = match a_krate.index.get(a_id) {
             Some(item) => item.clone(),
@@ -233,7 +234,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                         "action=Modify declared for '{action_identity}' but it does not exist in baseline"
                     )));
                 }
-                let s_id = state.s_type_id(action_identity.as_str()).ok_or_else(|| {
+                let s_id = state.s_type_id(action_identity.path.as_str()).ok_or_else(|| {
                     Phase1Error::action_contradiction(format!(
                         "action=Modify: '{action_identity}' expected in S but not found (internal error)"
                     ))
@@ -267,7 +268,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
                         "action=Delete declared for '{action_identity}' but it does not exist in baseline"
                     )));
                 }
-                let s_id = state.s_type_id(action_identity.as_str()).ok_or_else(|| {
+                let s_id = state.s_type_id(action_identity.path.as_str()).ok_or_else(|| {
                     Phase1Error::action_contradiction(format!(
                         "action=Delete: '{action_identity}' expected in S but not found (internal error)"
                     ))
@@ -360,17 +361,24 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     // external A-side Ids, then apply `rewrite_type_ref_ids_in_item` to all A-sourced
     // items in S.
     {
-        // Build A-id → S-id map for LOCAL types.
-        let a_local_to_s_id: HashMap<Id, Id> = a_krate
-            .paths
-            .iter()
-            .filter_map(|(&a_id, a_ps)| {
-                if a_ps.crate_id != 0 && a_ps.crate_id != SYNTHETIC_UNPLACED_CRATE_ID {
-                    return None;
-                }
-                let identity_key = a_ps.path.join("::");
-                let s_id = state.s_type_identity_to_id.get(&identity_key)?;
-                Some((a_id, *s_id))
+        // Build A-id → S-id map for LOCAL types. Use the namespace-aware A/B
+        // identity maps rather than `s_type_identity_to_id`: the latter is a
+        // compatibility map keyed only by rendered path, so it cannot retain
+        // both an unplaced type and an unplaced trait whose paths are equal.
+        // Added declarations live at their preallocated A-side S ids; modified
+        // and referenced declarations replace or reuse the remapped baseline id.
+        let a_local_to_s_id: HashMap<Id, Id> = (&a_types)
+            .into_iter()
+            .filter_map(|(identity, a_id)| {
+                let action = a_item_actions.get(a_id).copied().unwrap_or(ItemAction::Reference);
+                let s_id = match action {
+                    ItemAction::Add => state.a_id_remap.get(a_id).copied(),
+                    ItemAction::Modify | ItemAction::Reference => {
+                        b_types.get(identity).and_then(|b_id| state.b_id_remap.get(b_id).copied())
+                    }
+                    ItemAction::Delete => None,
+                }?;
+                state.s_index.contains_key(&s_id).then_some((*a_id, s_id))
             })
             .collect();
 
@@ -552,14 +560,32 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     let s_root_id = state.alloc_id();
     let d_root_id = state.alloc_id();
 
-    // Build root module item for S.
-    let mut s_top_ids: Vec<Id> = state
-        .s_type_identity_to_id
-        .values()
-        .chain(state.s_fn_path_to_id.values())
-        .copied()
-        .collect();
+    // Build root module item for S from namespace-aware baseline/catalogue
+    // identities. The legacy path-only S map cannot be used here because it
+    // would drop one of two unplaced Add declarations sharing one rendered
+    // path. Deleted baseline entries have already left `s_index` and are
+    // therefore excluded by the membership check.
+    let mut s_top_ids: Vec<Id> = Vec::new();
+    for b_id in b_types.values() {
+        if let Some(s_id) = state.b_id_remap.get(b_id).copied() {
+            if state.s_index.contains_key(&s_id) {
+                s_top_ids.push(s_id);
+            }
+        }
+    }
+    for (_, a_id) in &a_types {
+        let action = a_item_actions.get(a_id).copied().unwrap_or(ItemAction::Reference);
+        if action == ItemAction::Add {
+            if let Some(s_id) = state.a_id_remap.get(a_id).copied() {
+                if state.s_index.contains_key(&s_id) {
+                    s_top_ids.push(s_id);
+                }
+            }
+        }
+    }
+    s_top_ids.extend(state.s_fn_path_to_id.values().copied());
     s_top_ids.sort_by_key(|id| id.0);
+    s_top_ids.dedup();
     let s_root_item = make_root_module_item(s_root_id, crate_name.clone(), s_top_ids);
     state.s_index.insert(s_root_id, s_root_item);
 
@@ -609,21 +635,25 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
 /// accepted, and both ambiguous and unresolved spellings fail closed before the
 /// action contradiction branch is reached.
 fn resolve_delete_identity(
-    raw_name: &str,
-    baseline_types: &BTreeMap<String, Id>,
-) -> Result<String, Phase1Error> {
-    if baseline_types.contains_key(raw_name) {
-        return Ok(raw_name.to_owned());
+    tombstone: &TypeTraitIdentityKey,
+    baseline_types: &TypeTraitIdentityMap,
+) -> Result<TypeTraitIdentityKey, Phase1Error> {
+    if baseline_types.contains_key(tombstone) {
+        return Ok(tombstone.clone());
     }
+    let raw_name = tombstone.path.as_str();
     if raw_name.contains("::") {
         return Err(Phase1Error::action_contradiction(format!(
             "action=Delete tombstone '{raw_name}' is unresolved in baseline rustdoc paths"
         )));
     }
 
+    // A tombstone only matches baseline identities of its own namespace.
     let candidates = baseline_types
         .keys()
-        .filter(|identity| identity.rsplit("::").next() == Some(raw_name))
+        .filter(|identity| {
+            identity.namespace == tombstone.namespace && identity.short_name() == raw_name
+        })
         .cloned()
         .collect::<Vec<_>>();
     match candidates.as_slice() {
@@ -633,7 +663,7 @@ fn resolve_delete_identity(
         ))),
         _ => Err(Phase1Error::action_contradiction(format!(
             "action=Delete tombstone '{raw_name}' is ambiguous in baseline rustdoc paths; candidates: {}",
-            candidates.join(", ")
+            candidates.iter().map(ToString::to_string).collect::<Vec<_>>().join(", ")
         ))),
     }
 }

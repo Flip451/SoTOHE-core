@@ -5,9 +5,9 @@
 use std::collections::{BTreeMap, HashMap};
 
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CatalogueEntryKey, CrateName, DataRole, DeletionRecord, FieldDecl,
-    FieldName, ItemAction, StructKind as CatalogueStructKind, StructShape as CatalogueStructShape,
-    TypeEntry, TypeKindV2, TypeRef,
+    CatalogueDocument, CatalogueEntryKey, CatalogueItemNamespace, CrateName, DataRole,
+    DeletionRecord, FieldDecl, FieldName, ItemAction, StructKind as CatalogueStructKind,
+    StructShape as CatalogueStructShape, TypeEntry, TypeKindV2, TypeRef,
 };
 use domain::tddd::{
     CatalogueToExtendedCratePort, ExtendedCrate, LayerId, Phase1Error, SignalEvaluatorPort,
@@ -1017,10 +1017,11 @@ fn test_type_identity_map_missing_paths_entry_returns_typed_error() {
 }
 
 #[test]
-fn test_type_identity_map_rejects_type_and_trait_sharing_one_path() {
-    // Rust keeps types and traits in one namespace, so a single fully-qualified
-    // path can never name both; the identity map must fail closed instead of
-    // silently discarding one of the two items.
+fn test_type_identity_map_keeps_type_and_trait_sharing_one_path_distinct() {
+    // A codec-synthesized graph may carry an unplaced type and an unplaced
+    // trait whose summaries both render as the same path. They are distinct
+    // namespace-aware identities and must both survive; neither may be dropped
+    // nor rejected as a collision.
     let mut krate = simple_crate_with_struct("fixture", "Shared");
     let trait_id = Id(2);
     krate.index.insert(
@@ -1052,13 +1053,26 @@ fn test_type_identity_map_rejects_type_and_trait_sharing_one_path() {
         module.items.push(trait_id);
     }
 
-    let error = super::build_type_trait_identity_map(&krate)
-        .expect_err("a type and a trait sharing one path must fail closed");
+    let identities = super::build_type_trait_identity_map(&krate)
+        .expect("a type and a trait sharing one path are distinct identities");
 
-    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)));
-    let message = error.to_string();
-    assert!(message.contains("fixture::Shared"));
-    assert!(message.contains("cannot share one fully-qualified path"));
+    assert_eq!(identities.len(), 2);
+    assert_eq!(
+        identities.get(&super::TypeTraitIdentityKey::new(
+            "fixture::Shared",
+            CatalogueItemNamespace::Type
+        )),
+        Some(&Id(1))
+    );
+    assert_eq!(
+        identities.get(&super::TypeTraitIdentityKey::new(
+            "fixture::Shared",
+            CatalogueItemNamespace::Trait
+        )),
+        Some(&trait_id)
+    );
+    assert!(identities.contains_path("fixture::Shared"));
+    assert_eq!(identities.get_by_path("fixture::Shared"), None, "bare path is ambiguous");
 }
 
 #[test]
@@ -1203,7 +1217,7 @@ fn test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_an
         .expect("Phase 1 consumes the codec graph and applies deletion actions");
     let identities = super::build_type_trait_identity_map(s.krate())
         .expect("Phase 1 identity index uses the same qualified path");
-    assert!(identities.contains_key("domain::NewType"));
+    assert!(identities.contains_path("domain::NewType"));
 
     let report = SignalEvaluatorV2::new().evaluate(a, baseline, current).unwrap();
     let signal = report.iter().find(|signal| signal.item_name() == "NewType");
@@ -1212,6 +1226,168 @@ fn test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_an
     let deleted_signal = report.iter().find(|signal| signal.item_name() == "OldType");
     assert!(deleted_signal.is_some(), "expected the deletion result in the delete set");
     assert_eq!(deleted_signal.unwrap().region(), SignalRegion::DMinusC);
+}
+
+#[test]
+fn test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct() {
+    use domain::tddd::catalogue_v2::{ContractRole, TraitEntry};
+
+    // Declaration-first catalogue: an unplaced `Add` type and an unplaced `Add`
+    // trait with the same key. Both summaries render as `domain::Shared`, yet
+    // they are distinct namespace-aware identities and must flow through
+    // Phase 1 and Phase 2 without being rejected as a path collision.
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Shared".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(CatalogueStructKind::new(CatalogueStructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Shared".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded = encode_catalogue_doc(doc).expect("codec keeps both unplaced namespaces");
+    let (mut a_krate, a_actions) = encoded.into_parts();
+    let shared_type_id = a_krate
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "Shared"] && summary.kind == ItemKind::Enum)
+        .map(|(id, _)| *id)
+        .expect("the codec must produce the Shared type");
+    let holder_id = a_krate
+        .paths
+        .iter()
+        .find(|(_, summary)| {
+            summary.path == ["domain", "Holder"] && summary.kind == ItemKind::Struct
+        })
+        .map(|(id, _)| *id)
+        .expect("the codec must produce the Holder type");
+    let holder_field_id =
+        Id(a_krate.index.keys().map(|id| id.0).max().map_or(1, |max_id| max_id + 1));
+    a_krate.index.insert(
+        holder_field_id,
+        make_item(
+            holder_field_id,
+            Some("value"),
+            ItemEnum::StructField(Type::ResolvedPath(rustdoc_types::Path {
+                path: "domain::Shared".to_owned(),
+                id: shared_type_id,
+                args: None,
+            })),
+        ),
+    );
+    let holder = a_krate.index.get_mut(&holder_id).expect("Holder item must be indexed");
+    assert!(matches!(&holder.inner, ItemEnum::Struct(_)), "Holder must be a struct");
+    let holder_structure = match &mut holder.inner {
+        ItemEnum::Struct(structure) => structure,
+        _ => return,
+    };
+    holder_structure.kind =
+        StructKind::Plain { fields: vec![holder_field_id], has_stripped_fields: false };
+    let a = ExtendedCrate::new(a_krate, a_actions);
+    let (s, _d) = super::phase1::phase1_build_s_and_d(a.clone(), &empty_crate())
+        .expect("Phase 1 admits an unplaced type and trait sharing one key");
+    let identities = super::build_type_trait_identity_map(s.krate())
+        .expect("Phase 1 identity index keeps both namespaces");
+    assert_eq!(
+        identities.len(),
+        3,
+        "both namespaces and the holder must be indexed: {identities:?}"
+    );
+    assert_eq!(identities.get_by_path("domain::Shared"), None, "bare path is ambiguous");
+
+    let shared_type_id = *identities
+        .get(&super::TypeTraitIdentityKey::new("domain::Shared", CatalogueItemNamespace::Type))
+        .expect("the unplaced Shared type must remain indexed");
+    let shared_trait_id = *identities
+        .get(&super::TypeTraitIdentityKey::new("domain::Shared", CatalogueItemNamespace::Trait))
+        .expect("the unplaced Shared trait must remain indexed");
+    let holder_id = *identities
+        .get(&super::TypeTraitIdentityKey::new("domain::Holder", CatalogueItemNamespace::Type))
+        .expect("the reference-bearing Holder must remain indexed");
+    let holder = &s.krate().index[&holder_id];
+    assert!(matches!(&holder.inner, ItemEnum::Struct(_)), "expected Holder to be a struct");
+    let holder_structure = match &holder.inner {
+        ItemEnum::Struct(structure) => structure,
+        _ => return,
+    };
+    assert!(matches!(&holder_structure.kind, StructKind::Plain { .. }), "expected a plain Holder");
+    let holder_field_id = match &holder_structure.kind {
+        StructKind::Plain { fields, .. } => *fields.first().expect("Holder has one field"),
+        _ => return,
+    };
+    let holder_field = &s.krate().index[&holder_field_id];
+    assert!(
+        matches!(&holder_field.inner, ItemEnum::StructField(Type::ResolvedPath(_))),
+        "expected Holder::value to be a resolved path"
+    );
+    let referenced_id = match &holder_field.inner {
+        ItemEnum::StructField(Type::ResolvedPath(path)) => path.id,
+        _ => return,
+    };
+    assert_eq!(
+        referenced_id, shared_type_id,
+        "a type reference must resolve to the type namespace, not the same-path trait"
+    );
+    assert_ne!(referenced_id, shared_trait_id);
+
+    let root = &s.krate().index[&s.krate().root];
+    assert!(matches!(&root.inner, ItemEnum::Module(_)), "expected S root to be a module");
+    let root_items = match &root.inner {
+        ItemEnum::Module(module) => &module.items,
+        _ => return,
+    };
+    assert!(root_items.contains(&shared_type_id), "S root must retain the Shared type");
+    assert!(root_items.contains(&shared_trait_id), "S root must retain the Shared trait");
+    assert!(root_items.contains(&holder_id), "S root must retain the reference-bearing Holder");
+
+    let report = SignalEvaluatorV2::new().evaluate(a, empty_crate(), empty_crate()).unwrap();
+    let shared: Vec<_> = report.iter().filter(|signal| signal.item_name() == "Shared").collect();
+    assert_eq!(shared.len(), 2, "one signal per namespace: {report:?}");
+    assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));
 }
 
 fn codec_derived_holder_with_unresolved_reference(reference: &str) -> ExtendedCrate {
@@ -5853,7 +6029,7 @@ fn test_t012_duplicate_module_impl_and_generic_identities_remain_distinct() {
     for identity in
         ["domain::alpha::Input", "domain::beta::Input", "domain::alpha::Port", "domain::beta::Port"]
     {
-        assert!(identities.contains_key(identity), "missing identity {identity}: {identities:?}");
+        assert!(identities.contains_path(identity), "missing identity {identity}: {identities:?}");
     }
 
     let impl_identities = super::build_impl_identity_map(a.krate(), crate_name).unwrap();

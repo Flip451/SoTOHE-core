@@ -1321,8 +1321,8 @@ fn test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities(
 
     let identities =
         crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(encoded.krate()).unwrap();
-    assert_eq!(identities.get("domain::alpha::SharedName"), Some(&type_id));
-    assert_eq!(identities.get("domain::beta::SharedName"), Some(&trait_id));
+    assert_eq!(identities.get_by_path("domain::alpha::SharedName"), Some(&type_id));
+    assert_eq!(identities.get_by_path("domain::beta::SharedName"), Some(&trait_id));
     assert_eq!(identities.len(), 2, "the evaluator must retain both full-path identities");
 }
 
@@ -1824,8 +1824,8 @@ fn test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qua
     let identities =
         crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(encoded.krate())
             .expect("type and trait identities must be indexed by fully qualified path");
-    assert_eq!(identities.get("domain::alpha::Port"), Some(&alpha_port_id));
-    assert_eq!(identities.get("domain::beta::Port"), Some(&beta_port_id));
+    assert_eq!(identities.get_by_path("domain::alpha::Port"), Some(&alpha_port_id));
+    assert_eq!(identities.get_by_path("domain::beta::Port"), Some(&beta_port_id));
 
     let alpha_scope = TraitImplDeclV2::new(
         TypeRef::new("domain::alpha::Port").unwrap(),
@@ -1845,12 +1845,12 @@ fn test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qua
     };
     assert_ne!(alpha_scope_key, beta_scope_key);
     assert_eq!(
-        identities.get(alpha_scope_key.as_str()),
+        identities.get_by_path(alpha_scope_key.as_str()),
         Some(&alpha_port_id),
         "alpha trait scope must resolve to its fully qualified rustdoc identity"
     );
     assert_eq!(
-        identities.get(beta_scope_key.as_str()),
+        identities.get_by_path(beta_scope_key.as_str()),
         Some(&beta_port_id),
         "beta trait scope must resolve to its fully qualified rustdoc identity"
     );

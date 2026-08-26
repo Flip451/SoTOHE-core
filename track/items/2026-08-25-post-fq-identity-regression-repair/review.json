@@ -1106,6 +1106,35 @@
           "hash": "rvw1:sha256:5fd4c0f833c2b044611e3d715e0c5d5779e048c3ffa134b081cbccbe1d3ff7e2",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:54:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:72b3e439c28b726b2d2119c7946e4f186b026cc20275d551278434b05827d480",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:04:36Z",
+          "findings": [
+            {
+              "category": "identity-resolution",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 373,
+              "message": "The new namespace-aware map admits an unplaced Add type and trait with the same rendered path, but Phase 1.45 still rebuilds the local A→S remap through path-only `s_type_identity_to_id`. The later trait insertion overwrites the type entry, so both original IDs map to the trait ID; fields, aliases, or method signatures referencing the type are then silently rewritten to the wrong namespace. The same path-only map also omits one declaration when constructing the S root module. Use `a_id_remap` or namespace-aware keys for remapping/root membership, and add a reference-bearing same-path type/trait regression.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:72b3e439c28b726b2d2119c7946e4f186b026cc20275d551278434b05827d480",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T12:28:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b28e98a57f22b940d3eb1610fc6f56b8c68e7a2e172bdf3f011d2c22714cc58d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

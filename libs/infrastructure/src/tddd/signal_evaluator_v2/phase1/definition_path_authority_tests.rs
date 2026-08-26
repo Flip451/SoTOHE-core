@@ -132,9 +132,9 @@ fn test_phase1_definition_path_authority_canonicalizes_bin_root_for_modified_typ
 
     let identities = crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(s.krate())
         .expect("Phase 1 must retain the canonical type identity");
-    assert!(identities.contains_key("cli::Holder"));
+    assert!(identities.contains_path("cli::Holder"));
     assert_eq!(
-        s.action_for(identities.get("cli::Holder").expect("Holder identity")),
+        s.action_for(identities.get_by_path("cli::Holder").expect("Holder identity")),
         Some(ItemAction::Modify)
     );
 }

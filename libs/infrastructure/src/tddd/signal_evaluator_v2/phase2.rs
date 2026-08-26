@@ -13,7 +13,10 @@ use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
 
 use super::impl_identity::try_build_impl_identity_map_with_authority;
 use super::structural_eq::items_structurally_equal_with_authority;
-use super::{RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map};
+use super::{
+    RustdocTargetResolution, TypeTraitIdentityKey, TypeTraitIdentityMap,
+    build_function_identity_map, build_type_trait_identity_map,
+};
 use domain::tddd::ExtendedCrate;
 
 /// Runs Phase 2: evaluates S / D / C and produces a `ThreeWayEvaluationReport`.
@@ -91,7 +94,7 @@ pub(super) fn phase2_evaluate(
         let action = s.action_for(s_id).unwrap_or(ItemAction::Reference);
         let s_item = s_krate.index.get(s_id);
 
-        if let Some(c_id) = c_types.get(name.as_str()) {
+        if let Some(c_id) = c_types.get(name) {
             // Item in S ∩ C.
             let c_item = c.index.get(c_id);
             let structurally_equal = match (s_item, c_item) {
@@ -216,7 +219,7 @@ pub(super) fn phase2_evaluate(
 
     // --- Evaluate D types/traits vs C ---
     for name in d_types.keys() {
-        if c_types.contains_key(name.as_str()) {
+        if c_types.contains_key(name) {
             // D ∩ C: delete in progress.
             signals.push(ThreeWaySignal::new(
                 type_signal_name(name, &[&s_types, &d_types, &c_types]),
@@ -280,10 +283,10 @@ pub(super) fn phase2_evaluate(
 
     // --- Evaluate C \ (S ∪ D): undeclared implementations ---
     // For each C type/trait not in S or D.
-    let s_union_d_types: HashSet<&str> =
-        s_types.keys().chain(d_types.keys()).map(String::as_str).collect();
+    let s_union_d_types: HashSet<&TypeTraitIdentityKey> =
+        s_types.keys().chain(d_types.keys()).collect();
     for name in c_types.keys() {
-        if !s_union_d_types.contains(name.as_str()) {
+        if !s_union_d_types.contains(name) {
             signals.push(ThreeWaySignal::new(
                 type_signal_name(name, &[&s_types, &d_types, &c_types]),
                 SignalRegion::CMinusSUnionD,
@@ -340,15 +343,18 @@ pub(super) fn phase2_evaluate(
 /// fully-qualified identities share that short name, the full identity remains
 /// in the report so the output cannot merge the two targets after the evaluator
 /// has kept them separate internally.
-fn type_signal_name(identity_key: &str, identity_maps: &[&BTreeMap<String, Id>]) -> String {
-    let short_name = identity_key.rsplit("::").next().unwrap_or(identity_key);
+fn type_signal_name(
+    identity_key: &TypeTraitIdentityKey,
+    identity_maps: &[&TypeTraitIdentityMap],
+) -> String {
+    let short_name = identity_key.short_name();
     let matching_identities: HashSet<&str> = identity_maps
         .iter()
-        .flat_map(|map| map.keys().map(String::as_str))
+        .flat_map(|map| map.keys().map(|candidate| candidate.path.as_str()))
         .filter(|candidate| candidate.rsplit("::").next().unwrap_or(candidate) == short_name)
         .collect();
 
-    if matching_identities.len() > 1 { identity_key.to_owned() } else { short_name.to_owned() }
+    if matching_identities.len() > 1 { identity_key.path.clone() } else { short_name.to_owned() }
 }
 
 /// Keeps the established short display for an unambiguous impl while retaining

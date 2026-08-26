@@ -509,7 +509,7 @@
       },
       "key": {
         "anchor_text_hash": "c5fb35f88b77ccd4fcf3b3a0299565f08da5138d0a5c34172327c6c83b1543e2",
-        "bound_tests_set_hash": "eb2407656732f21681445ec16b8e3050f8067df7959c377efe67b1992f0cd441",
+        "bound_tests_set_hash": "e78236293fd767d519814a66403ffb607a9228aa97220cbe5db0ca6e6da08570",
         "declaration_hash": "c568a11e127df9217b11b90622393627446d5882b8ca542e143fb0f95ea7b13c"
       },
       "obligation_id": {
@@ -518,7 +518,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let canonical_key = \"cli::commands::run\"; ... assert!(signal.is_some(), \"Expected function signal '{canonical_key}' in report\"); ... assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add); ... let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new().encode(doc, &empty, &empty).expect(\"catalogue Add declaration produces a synthetic summary\"); ... assert!(signal.is_some(), \"expected the catalogue-derived type identity\");",
+        "citation": "let canonical_key = \"cli::commands::run\"; ... assert!(signal.is_some(), \"Expected function signal '{canonical_key}' in report\"); ... let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new() ... .expect(\"catalogue Add declaration produces a synthetic summary\"); ... assert!(signal.is_some(), \"expected the catalogue-derived type identity\"); ... assert!(identities.contains_path(\"domain::NewType\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -555,7 +555,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "eb2407656732f21681445ec16b8e3050f8067df7959c377efe67b1992f0cd441",
+        "bound_tests_set_hash": "e78236293fd767d519814a66403ffb607a9228aa97220cbe5db0ca6e6da08570",
         "declaration_hash": "c568a11e127df9217b11b90622393627446d5882b8ca542e143fb0f95ea7b13c"
       },
       "obligation_id": {
@@ -564,7 +564,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"The identity key keeps the canonical catalogue FunctionPath rather than dropping the root.\" ... `let canonical_key = \"cli::commands::run\";` ... `assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);` ... `let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new().encode(doc, &empty, &empty).expect(\"catalogue Add declaration produces a synthetic summary\");` ... `assert!(identities.contains_key(\"domain::NewType\"));`",
+        "citation": "let canonical_key = \"cli::commands::run\"; ... assert!(signal.is_some(), \"Expected function signal '{canonical_key}' in report\"); ... assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1097,7 +1097,7 @@
       },
       "key": {
         "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
-        "bound_tests_set_hash": "057bdb4f99afa55f771d5df942c983ff1d2b3e28f17f56e35c753553f5588cb3",
+        "bound_tests_set_hash": "b63aa94217c8c7c73097c78383f3395a3ef920d5d4a78435003401d4d4fc164e",
         "declaration_hash": "0571ddcdeffe21d857305f5c64e79670700efbef9e29e01e679a2fbc366b22dc"
       },
       "obligation_id": {
@@ -1106,7 +1106,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()\n        .encode(doc, &baseline, &current)\n        .expect(\"codec constructs the shared add/delete identity graph\");\n    let (s, _d) = super::phase1::phase1_build_s_and_d(a.clone(), &baseline)\n        .expect(\"Phase 1 consumes the codec graph and applies deletion actions\");\n    let identities = super::build_type_trait_identity_map(s.krate())\n        .expect(\"Phase 1 identity index uses the same qualified path\");\n    assert!(identities.contains_key(\"domain::NewType\"));\n\n    let report = SignalEvaluatorV2::new().evaluate(a, baseline, current).unwrap();\n    let signal = report.iter().find(|signal| signal.item_name() == \"NewType\");\n    assert!(signal.is_some(), \"expected the shared catalogue-derived type identity\");\n    assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);\n    let deleted_signal = report.iter().find(|signal| signal.item_name() == \"OldType\");\n    assert!(deleted_signal.is_some(), \"expected the deletion result in the delete set\");\n    assert_eq!(deleted_signal.unwrap().region(), SignalRegion::DMinusC);",
+        "citation": "let (s, _d) = super::phase1::phase1_build_s_and_d(a.clone(), &baseline)\n        .expect(\"Phase 1 consumes the codec graph and applies deletion actions\");\n    let identities = super::build_type_trait_identity_map(s.krate())\n        .expect(\"Phase 1 identity index uses the same qualified path\");\n    assert!(identities.contains_path(\"domain::NewType\");\n\n    let report = SignalEvaluatorV2::new().evaluate(a, baseline, current).unwrap();",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2455,7 +2455,7 @@
       },
       "key": {
         "anchor_text_hash": "c5fb35f88b77ccd4fcf3b3a0299565f08da5138d0a5c34172327c6c83b1543e2",
-        "bound_tests_set_hash": "dccad04520a6356928c22d843db5b43348442a5a76bb8b6504acffa191d4d02b",
+        "bound_tests_set_hash": "a2d24243a288039f27898331cbd471927345e26ae23f9c194cd9c00f2a7f856e",
         "declaration_hash": "672f6b7da5a756a2ea3cc1148a54700aa7d2afa5303edfe8eb1c604acd85063c"
       },
       "obligation_id": {
@@ -2464,7 +2464,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let added_id = item_id_for_path(&encoded, &[\"domain\", \"generated\", \"AddedType\"]);\n    assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path))\n            if path.id == added_id\n    ));\n    assert_eq!(encoded.krate().paths[&added_id].path, [\"domain\", \"generated\", \"AddedType\"]);",
+        "citation": "assert_eq!(encoded.krate().paths[&id].path, [\"domain\", \"FutureType\"]);\nassert_eq!(encoded.krate().paths[&id].crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID);\nassert!(matches!(encoded.krate().index[&id].inner, ItemEnum::Struct(_)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2546,7 +2546,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "dccad04520a6356928c22d843db5b43348442a5a76bb8b6504acffa191d4d02b",
+        "bound_tests_set_hash": "a2d24243a288039f27898331cbd471927345e26ae23f9c194cd9c00f2a7f856e",
         "declaration_hash": "672f6b7da5a756a2ea3cc1148a54700aa7d2afa5303edfe8eb1c604acd85063c"
       },
       "obligation_id": {
@@ -2555,7 +2555,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"assert!(matches!(\\n        &encoded.krate().index[&fields[0]].inner,\\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id\\n    ));\"; \"assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);\"; \"assert_eq!(identities.get(\\\"domain::alpha::SharedName\\\"), Some(&type_id));\"; \"assert_eq!(encoded.krate().paths[&added_id].path, [\\\"domain\\\", \\\"generated\\\", \\\"AddedType\\\"]);\"",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id\n    ));\n    assert_eq!(encoded.krate().paths[&added_id].path, [\"cli\", \"generated\", \"AddedType\"]); ... assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);\n    assert_eq!(encoded.action_for(&id), Some(ItemAction::Add));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2719,7 +2719,7 @@
       },
       "key": {
         "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
-        "bound_tests_set_hash": "662dfdb7aea041e44503913de86c054323be4a0abeabac1a04b6cd5c791624b1",
+        "bound_tests_set_hash": "18db40d20af4662d767db2febb3ed984fb86f492f69479cd6a03f29201ea0453",
         "declaration_hash": "29639c83b06c392a353dd6f387047e3463e5a48b5c9b9ae77c8a242abafad210"
       },
       "obligation_id": {
@@ -2728,7 +2728,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(summary_identity(omitted), Some(FullyQualifiedItemPath::UnplacedType { .. }))); assert!(matches!(summary_identity(explicit), Some(FullyQualifiedItemPath::PlacedType { .. }))); assert_eq!(explicit.crate_id, 0); assert_eq!(omitted.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID); ... let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else { panic!(\"expected AmbiguousIdentifier, got {error:?}\"); }; assert_eq!(candidate_paths, vec![\"domain::a::Input\", \"domain::b::Input\"]);",
+        "citation": "assert!(matches!(summary_identity(omitted), Some(FullyQualifiedItemPath::UnplacedType { .. }))); assert!(matches!(summary_identity(explicit), Some(FullyQualifiedItemPath::PlacedType { .. }))); assert_eq!(explicit.crate_id, 0); assert_eq!(omitted.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID); ... assert_eq!(identities.get_by_path(\"domain::alpha::SharedName\"), Some(&type_id)); assert_eq!(identities.get_by_path(\"domain::beta::SharedName\"), Some(&trait_id)); ... let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else { panic!(\"expected AmbiguousIdentifier, got {error:?}\"); };",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
