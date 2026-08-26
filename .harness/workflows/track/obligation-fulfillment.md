@@ -3,8 +3,8 @@
 > Provider-agnostic workflow SSoT for driving a track's test-obligation gate from derived
 > obligations to a green `check`. The `implement` workflow (Step 4) and the `full-cycle`
 > workflow delegate here for every track holding at least one TDDD catalogue — such a track
-> is already enrolled by the `type-design` workflow's mandatory terminal derive step
-> (ADR 2026-07-23-0240 D1); enrollment is never decided here. The workflow may also be run
+> is already enrolled by the `type-design` workflow's mandatory terminal derive step;
+> enrollment is never decided here. The workflow may also be run
 > standalone to close the gate on an existing track. Authoring rules for individual binding
 > records live in the `implementer` capability contract
 > (`.harness/capabilities/implementer.md` Step 3) — this workflow owns the ORCHESTRATION
@@ -71,9 +71,14 @@ check`; it enumerates unresolved edges and existence drifts. The implementer res
 edge (`voluntary_binding` with real tests, or a canonical waiver) and repeats until the only
 remaining failure class is missing/stale verdicts — that class belongs to Step 5.
 
-**Step 5: Evaluate (orchestrator host).**
+**Step 5: Synchronous repair evaluation (orchestrator host).**
 `bin/sotp test-obligation evaluate` verifies fulfillment/waiver pairs via the routed LLM
-verifiers and freezes verdicts into the caches. Cache semantics governing the loop:
+verifiers and freezes verdicts into the caches. The orchestrator invokes it only as the
+synchronous evaluation step for the current repair round: run one blocking call, then read its
+terminal result once. If the host backgrounds the call, read the result once after the single
+completion notification. Never launch it in the background or fire-and-forget, and do not poll
+for completion or run repeated status probes. The commit gate runs `check`, not `evaluate`.
+Cache semantics governing the loop:
 
 - Verdicts freeze per hash triple; only pairs whose content changed re-verify (cost scales
   with the edit set, not the pair universe).
@@ -92,7 +97,7 @@ verifiers and freezes verdicts into the caches. Cache semantics governing the lo
    promises), write a focused test where nothing covers the intersection, or convert the
    record to the honest form (canonical waiver ⇄ fulfillment/voluntary) when the prior form
    was wrong for the edge.
-4. Re-run Step 5 (diff-only), then `check`. Converge to exit 0.
+4. Re-run Step 5 synchronously (diff-only), then `check`. Converge to exit 0.
 
 Keep exactly ONE writer editing `test-bindings.json` per round (no parallel binding editors);
 parallelism belongs inside `evaluate`, not in authoring.

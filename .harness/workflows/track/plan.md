@@ -40,6 +40,27 @@ Sub-workflows used:
   (`.harness/config/branch-strategy.json#base_branch`) for a new track, `track/<id>` for a
   track already initialized.
 
+## Summary-first context intake
+
+Once a track is active, use CLI summaries as the orchestrator's primary context for progress,
+review necessity, obligation state, and catalogue state:
+
+- `bin/sotp track resolve`, `bin/sotp track task-counts`, and `bin/sotp track next-task` report
+  phase, task progress, and the next open task.
+- `bin/sotp review results` reports which review scopes are required, approved, or empty.
+- `bin/sotp test-obligation results` reports the obligation lanes and cached fulfillment state when
+  the enrollment artifacts exist.
+- `bin/sotp catalog check` and `bin/sotp ref-verify results --chain 2 --filter all` report
+  catalogue completion and catalogue-to-specification verification state.
+
+Use the output of the phase command or delegated capability as the primary result; do not begin
+by reading all track artifacts, type catalogues, review or binding JSON, or full sub-workflow
+texts. Open an artifact body only for a targeted diff or blocker investigation, and use the
+corresponding CLI result instead of opening `review.json` or a cache to determine state. The
+orchestrator does not open a `Related Conventions` list: the capability dispatcher places the
+resolved convention paths (possibly an empty set) in the delegated briefing, and the capability
+reads those paths.
+
 ## Sequence
 
 ### Preamble: register the phase chain as tasks
@@ -113,7 +134,8 @@ The phase workflows prepare their configured briefings and enter Phase 1–3 exc
 corresponding phase entry.
 
 1. Invoke the `spec-design` workflow (`.harness/workflows/track/spec-design.md`).
-2. Read the signal result (blue / yellow / red counts + 🔴 element ids with cited ADR paths).
+2. Use the capability's signal summary (blue / yellow / red counts + 🔴 element ids with cited
+   ADR paths) without reopening `spec.json`.
 3. Apply the loop rule:
    - **🔵**: run `bin/sotp ref-verify run` (semantic review of Chain ①). On `[BLOCKED]`, treat
      as 🔴 (route to `adr-editor` or re-invoke the `spec-design` workflow depending on which
@@ -144,7 +166,7 @@ corresponding phase entry.
 ### Phase 2 loop: type-design workflow
 
 1. Invoke the `type-design` workflow (`.harness/workflows/track/type-design.md`).
-2. Read the per-layer signal result.
+2. Use the per-layer signal summary without reopening the catalogue files.
 3. Apply the loop rule:
    - **🔵 all layers**: run `bin/sotp ref-verify run` (semantic review covering Chain ① and
      Chain ②). On `[BLOCKED]`, route by owning side: catalogue-side → re-invoke the
@@ -164,7 +186,7 @@ corresponding phase entry.
 ### Phase 3 loop: impl-plan workflow
 
 1. Invoke the `impl-plan` workflow (`.harness/workflows/track/impl-plan.md`).
-2. Read BOTH binary gate verdicts (each OK / ERROR): the task-coverage gate
+2. Use BOTH binary gate summaries (each OK / ERROR): the task-coverage gate
    (`bin/sotp verify plan-artifact-refs`) and the batch-plan structural gate
    (`bin/sotp batch-plan check`).
 3. Apply the loop rule:
@@ -204,8 +226,8 @@ The orchestrator does not directly write `knowledge/adr/*.md`, `spec.json`,
 When composing a briefing for a writer capability, the briefing body MUST contain only:
 
 - Problem statement / trigger (what was observed, what symptom)
-- Context references (track state, file paths, relevant ADRs / conventions, prior edits in
-  the working tree)
+- Context references (CLI summaries, target file paths, relevant ADRs / convention paths supplied
+  in the briefing, and prior edits in the working tree)
 - Interaction contract (what the capability should report back, and operational constraints)
 
 The briefing body MUST NOT contain design prescription — anything that pre-solves the

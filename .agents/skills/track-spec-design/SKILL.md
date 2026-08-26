@@ -31,7 +31,18 @@ or failure-recovery procedures here.
   owns the back-and-forth escalation (adr-editor dispatch, retry counters). Do not dispatch
   `adr-editor` from inside this skill.
 
-### (4) Reporting format
+### (4) Context intake
+
+- Follow the workflow SSoT's summary-first context intake with the Phase 1 summaries it names:
+  `bin/sotp track resolve` for phase and blocker state; when reviewing existing work,
+  `bin/sotp review results` and `bin/sotp ref-verify results --chain 1 --filter all`; and
+  `bin/sotp test-obligation results` / `bin/sotp catalog check` only when those artifacts exist.
+- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
+  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
+  blocker it names. Convention paths are listed in each delegated briefing and read by the
+  delegated capability, not by this root session.
+
+### (5) Reporting format
 
 - On successful completion, print: `SPEC_DESIGN_STATUS: completed — spec.json written, signal blue`
 - On gate failure or block, print: `SPEC_DESIGN_STATUS: blocked — <signal>: <reason>`

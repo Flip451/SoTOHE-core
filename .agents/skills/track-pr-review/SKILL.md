@@ -30,7 +30,34 @@ or failure-recovery procedures here.
 - Codex-specific prerequisite: the **Codex Cloud GitHub App** must be installed on the
   repository so `@codex review` is acted upon.
 
-### (4) Reporting format
+### (4) Finding fixes are delegated
+
+- Follow Step 3 of the workflow SSoT for the finding-fix procedure (briefing contents,
+  capability routing, local convergence, commit, re-run, recovery). Codex-specific dispatch
+  forms only:
+  - implementer-owned corrections (source and every non-ADR artifact not owned by a phase
+    writer — policies, documentation, harness configuration, settings, manifests, build files):
+    `bin/sotp capability exec implementer --briefing-file <path>` with `--host` omitted, so
+    the dispatcher runs the provider subprocess itself (dispatcher-owned sandbox / model /
+    effort flags); never pass `--host codex` and never hand-assemble a `codex exec` command.
+  - writer-owned artifacts go to their phase writers through phase entry, as the workflow SSoT
+    routes them: prepare the configured briefing, then `bin/sotp phase enter spec-design`
+    (`spec.json` and its view), `bin/sotp phase enter type-design` (`<layer>-types.json` and
+    its views), or `bin/sotp phase enter impl-plan` (`impl-plan.json`, `task-coverage.json`,
+    `task-contract.json`, `batch-plan.json`).
+  - Do not route a focused PR finding through `cargo make track-local-review-fix`: that
+    wrapper always injects the scope-wide reviewer loop and is not a delegated-PR-finding
+    transport.
+  - local convergence and commit use `$track-review` and `$track-commit`.
+
+### (5) Gate waiting
+
+- `bin/sotp pr review-cycle` owns the trigger → poll → parse sequence internally: run it as one
+  blocking call and read its result once. Do not add a manual polling loop or periodic PR-status
+  probes around it; if the host backgrounds the call, read the result once after the single
+  completion notification, then apply the workflow SSoT's stale-review handling.
+
+### (6) Reporting format
 
 - On successful completion (only when the PR review reaches explicit zero findings or the user
   approves an Accepted Deviations exception per `.harness/workflows/track/pr-review.md`),

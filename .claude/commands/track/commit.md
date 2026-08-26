@@ -20,6 +20,14 @@ This command runs directly — no subagents. Key wrappers used:
 
 `track/registry.md` is gitignored — do NOT stage or commit it.
 
+### Gate waiting
+
+- `cargo make track-commit-message` is a long-running gate: run it as one blocking call and read
+  its exit status once. Do not poll its log, re-run status probes, or add periodic re-checks; if
+  the host backgrounds the call, read the result once after the single completion notification.
+- Do not launch `bin/sotp test-obligation evaluate` around the commit: the commit gate runs
+  `check`, and `evaluate` is only a synchronous step inside repair work on the orchestrator host.
+
 ## Report format
 
 After execution, report:

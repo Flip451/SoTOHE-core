@@ -26,11 +26,21 @@ See `.harness/capabilities/type-designer.md` for the capability's full operation
   capability handles per-layer selection internally.
 - **ADR path(s)** — paths under `knowledge/adr/` for the feature domain.
 
-Conventions are **not** an input to this workflow. The `type-designer` capability reads exactly
-the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
-that set as complete — including when it resolves to zero documents
-(`.harness/capabilities/type-designer.md` § Compliance). This workflow neither selects nor
-forwards convention paths.
+The workflow does not read or select conventions. The capability dispatcher supplies the
+resolved convention paths in the delegated briefing (possibly an empty set), and the
+`type-designer` capability reads those paths as its complete convention input.
+
+## Summary-first context intake
+
+Before opening any catalogue, use `bin/sotp track resolve` for phase and blocker state,
+`bin/sotp catalog check` for catalogue completion, and
+`bin/sotp ref-verify results --chain 2 --filter all` for the catalogue-to-specification summary.
+Use `bin/sotp review results` to determine review necessity and
+`bin/sotp test-obligation results` when enrollment state is relevant. Treat these CLI summaries
+and the capability's per-layer signal output as primary. Do not bulk-read `*-types.json`,
+`review.json`, bindings JSON, full sub-workflow texts, or a `Related Conventions` list. Open only a
+targeted diff or the body named by a blocker; the delegated capability receives and reads exact
+catalogue and convention paths from its briefing.
 
 ## Sequence
 
@@ -42,7 +52,8 @@ instruct the caller to run the `spec-design` workflow
 
 **Step 2: Review the spec scope**
 
-1. Invoke the `review` workflow's single-scope re-entry round for `spec`
+1. Use `bin/sotp review results` to determine whether the `spec` scope needs attention, then
+   invoke the `review` workflow's single-scope re-entry round for `spec`
    (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`.
 2. Confirm the current Chain 1 semantic verification with
    `bin/sotp ref-verify check-approved --chain 1`. The preceding Phase 1 loop owns any required
@@ -57,9 +68,9 @@ Prepare the configured writer briefing at `tmp/type-designer-briefing.md`. It mu
 - Path to `architecture-rules.json` (source of truth for TDDD-enabled layers)
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
 
-The briefing must **not** carry convention paths. The capability's convention set comes solely
-from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
-document an input and would leave a zero-document resolution non-authoritative.
+Do not add hand-picked convention paths to the workflow-generated file. The dispatcher supplies
+the resolved paths alongside the delegated briefing, and an empty resolved set remains
+authoritative.
 
 Then run `bin/sotp phase enter type-design`. The phase engine runs the declared pre-entry
 checks and, only when they all succeed, invokes the configured `type-designer` writer. The
@@ -82,7 +93,7 @@ per-layer signal result as the workflow output without re-reading the catalogue 
 **Step 5: Materialize test-obligation enrollment artifacts (mandatory terminal step)**
 
 After the capability returns, the workflow orchestrator materializes the track's
-test-obligation enrollment (ADR 2026-07-23-0240 D1):
+test-obligation enrollment:
 
 1. Run `bin/sotp test-obligation derive` to materialize
    `track/items/<track-id>/obligations.json`. A zero-obligation derivation still materializes
@@ -90,6 +101,8 @@ test-obligation enrollment (ADR 2026-07-23-0240 D1):
 2. If `track/items/<track-id>/test-bindings.json` does not exist, materialize it as an
    explicit records-empty authoring act: `{"track_id": "<track-id>", "records": []}`.
    An existing bindings file is left untouched.
+3. Run `bin/sotp test-obligation results` and surface its summary; do not open either enrollment
+   JSON artifact to determine obligation state.
 
 Both artifacts belong to the same commit unit as the other plan artifacts. This step is not
 conditional on any orchestrator judgment: every run of this workflow on a track with at least

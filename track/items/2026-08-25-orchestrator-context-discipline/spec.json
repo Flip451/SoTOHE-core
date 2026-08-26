@@ -1,0 +1,297 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "改訂済みオーケストレーション手順は、CLI 要約を一次情報とし、workflow 冒頭の成果物本文一括読み込みを要求せず、本文閲覧を差分またはブロッカー調査に限定している。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "PR review 手順は、指摘修正を briefing から委譲、ローカル収束、commit workflow へ進め、親の直接編集を委譲失敗時の回復としてのみ記述している。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "長時間ゲートを扱う手順は、一回のブロッキング待機、または host が background 化した場合の一回の完了通知後の結果読取りを記述し、ポーリングを指示しない。evaluate は修復作業時の同期実行としてのみ記述している。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "adr2pr 手順は、計画成果物コミット後、最初の実装バッチ後、PR レーン開始時を親セッション更新点として明記し、更新できない host では user への更新要求を許容している。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-05",
+      "text": "always-applied 面は PR reviewer 向け文書を読み込まず、orchestrator 向け rules 文書に委譲、CLI 一次情報、git 直叩き禁止の三つを明記し、ルート文書はその rules へのポインタになっている。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-06",
+      "text": "consumer-facing 文書は provider 互換 rules 設定を consumer 所有として説明する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D6",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-07",
+      "text": ".harness/config/agent-profiles.json の orchestrator default reasoning effort は中位値である。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        {
+          "anchor": "D6",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-08",
+      "text": "改訂後の各対象面を、次の固定された対応で文書内容から個別に確認し、全ての確認を満たす。workflow SSoT は CLI 要約を一次情報とし、PR 指摘修正を委譲経路とし、長時間ゲートを一回の待機（ポーリングなし、evaluate は修復時の同期実行のみ）として扱い、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を示す。thin adapter は workflow SSoT を指し、これらと異なる手順を持たない。policy/capability 文書は workflow SSoT と同じ委譲・CLI 一次情報・待機・セッション更新の境界を記述する。always-applied rules は orchestrator 向けに委譲・CLI 一次情報・git 直叩き禁止を指示する。consumer-facing 文書は provider 互換 rules 設定を consumer 所有として扱う。agent profile は orchestrator の既定 reasoning effort を中位にする。各対象面で対応する確認項目の欠落、旧指示の残存、または対象面間の明示された境界との矛盾が一つでもあれば不合格とする。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "実行時に agent または運用者へ動作を指示する文書は自己完結させ、特定 ADR の日付 ID または path を本文から参照しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D5",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "provider 側の互換 rules 設定は consumer 所有として提供と文書化に留め、設定値、ファイル存在、または散文を CI の hard-fail 条件にしない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "摂取規律は prompt-level の手順として扱い、機械強制や実行時 token metric を完了条件に追加しない。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "GL-01",
+      "text": "オーケストレーション手順が CLI 要約を一次情報とし、親コンテキストへの不要な全文摂取を避ける。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "GL-02",
+      "text": "PR 指摘の修正を含む実装判断で委譲を正規経路とし、親の直接実装を委譲失敗時の回復に限定する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "GL-03",
+      "text": "長時間ゲートの結果待ちでポーリングを指示しない。"
+    }
+  ],
+  "related_conventions": [],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "Workflow SSoT、thin adapter、policy/capability 文書、および always-applied rules surface のオーケストレーター向け手順を改訂する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "オーケストレーターが進行・レビュー要否・義務状態・カタログ照会で CLI 要約を一次情報とし、成果物本文は差分またはブロッカーの調査時にのみ開く手順を定める。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "PR 指摘の修正を briefing、implementer または review-fix-lead への委譲、ローカル収束、commit workflow の順で扱い、親の直接編集は委譲失敗時の回復に限定する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "長時間ゲートの待機、evaluate の実行、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時の親セッション更新点を手順化する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-05",
+        "text": "PR reviewer 向け文書を orchestrator の always-applied 面から分離し、短い orchestrator rules、ルートのポインタ化、consumer が所有する provider 互換設定の文書化を行う。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D6",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-06",
+        "text": ".harness/config/agent-profiles.json の orchestrator profile の既定 reasoning effort を中位にする。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "Rust コード、CLI または Makefile の stdout-format、ならびに gate stdout summary contract の変更。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D5",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "Skills catalogue を単一の入口文書へ畳み込むこと。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          },
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "OS-03",
+        "text": "ホスト固有の backgrounding threshold、通知形式、または compaction timing への適応を設計または実装すること。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 23,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "オーケストレーターの文脈摂取を規律化する",
+  "version": "1.0"
+}

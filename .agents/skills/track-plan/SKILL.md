@@ -41,7 +41,20 @@ or failure-recovery procedures here.
   `CAPABILITY_EXEC_OUTCOME: delegate-in-host`; upstream phase re-invocations go through the
   matching `$track-*` skill and its phase-entry path.
 
-### (4) Reporting format
+### (4) Context intake
+
+- Follow the workflow SSoT's summary-first context intake with the summaries it names:
+  `bin/sotp track resolve`, `bin/sotp track task-counts`, and `bin/sotp track next-task` for
+  phase and progress (zero counts / no open task before the plan exists);
+  `bin/sotp review results` for review necessity; `bin/sotp catalog check` plus
+  `bin/sotp ref-verify results --chain 2 --filter all` for catalogue state (absent catalogues
+  report `Skipped` / zero pairs); `bin/sotp test-obligation results` for obligation state.
+- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
+  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
+  blocker it names. Convention paths are listed in each delegated briefing and read by the
+  delegated capability, not by this root session.
+
+### (5) Reporting format
 
 - On successful completion, print: `PLAN_STATUS: completed — phases 0-3 done, impl-plan.json ready`
 - On gate failure or block, print: `PLAN_STATUS: blocked — phase <n>: <reason>`

@@ -1,4 +1,20 @@
+---
+paths:
+  - ".harness/**"
+  - "track/**"
+  - ".claude/commands/**"
+  - ".claude/agents/**"
+  - ".codex/**"
+  - ".agents/**"
+  - ".claude/settings.json"
+  - ".claude/permission-extensions.json"
+---
+
 # Guardrails
+
+This conditionally loaded document is a reference guardrail document for orchestrator workflow
+work. The concise always-applied root rules are in `.claude/rules/orchestrator.md`; review
+briefings are loaded by the review workflow.
 
 Core guardrails:
 

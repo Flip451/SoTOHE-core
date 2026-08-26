@@ -7,10 +7,15 @@
 
 ## Mission
 
-Own a single review scope for the single `round_type` (`fast` or `final`) the orchestrator
-assigns. Loop: review → fix → verify → re-review until the canonical reviewer reports
-`zero_findings` for that assigned `round_type`, then return a structured status to the
-orchestrator.
+For a normal review-scope assignment, own a single review scope for the single `round_type`
+(`fast` or `final`) the orchestrator assigns. Loop: review → fix → verify → re-review until the
+canonical reviewer reports `zero_findings` for that assigned `round_type`, then return a
+structured status to the orchestrator.
+
+Focused PR-finding corrections for implementer-owned changes are routed to `implementer`;
+writer-owned spec, catalogue, and plan artifacts use their owning phase workflows. This
+capability remains scope-review-only and is not a delegated PR-finding transport until its
+provider-neutral wrapper supports a typed focused mode.
 
 This capability **owns no persistent SoT artifact**. It reads reviewer verdicts from `review.json`
 via `bin/sotp review results` (never by opening `review.json` directly) and writes fixes to files
@@ -18,15 +23,24 @@ within its assigned modification boundary.
 
 ## Invocation contract
 
-The orchestrator invokes this capability with:
+The orchestrator invokes this capability in one dispatch mode:
+
+- `scope-review` — the normal review-fix loop for one assigned scope and one review round.
+
+Focused PR-finding briefings are dispatched to the owning capability instead: `implementer` for
+implementer-owned changes, or `spec-designer`, `type-designer`, and `impl-planner` through their
+phase-entry workflows for writer-owned artifacts. The caller invokes this capability with:
 
 - Track ID and scope name
-- Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`)
-- `round_type` (`fast` or `final`) — single value, fixed for the capability's lifetime
+- Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`) containing the CLI-summary and
+  current-diff scope context, the exact spec / plan / task / catalogue paths needed for the
+  review, and the resolved convention paths (possibly none).
+- `round_type` (`fast` or `final`) is a single value fixed for the capability's lifetime.
 
 The reviewer model is auto-resolved by `bin/sotp review local` from `agent-profiles.json`; the
-orchestrator does not pass it. The modification boundary is self-resolved by this capability
-(see Scope Ownership).
+orchestrator does not pass it or bulk-read the briefing's artifact bodies. This capability reads
+the listed paths itself. The modification boundary is self-resolved by this capability (see Scope
+Ownership).
 
 ## Scope ownership (CRITICAL)
 
@@ -79,6 +93,9 @@ hope that the reviewer withdraws the finding is prohibited.
 
 ## Internal pipeline
 
+The reviewer invocation and canonical verdict-confirmation pipeline below applies to this
+capability's `scope-review` dispatch.
+
 ### Reviewer invocation
 
 Always invoke the reviewer via `cargo make track-local-review`, not by calling
@@ -100,13 +117,12 @@ cargo make track-local-review -- --round-type {round_type} --group {scope} --bri
 
 Do NOT pass `--track-id`; the wrapper auto-resolves the active track from the current git branch.
 
-The reviewer subprocess legitimately runs for many minutes (`bin/sotp review local` allows it
-3600 seconds by default). When your provider's shell tool enforces a per-call timeout, set that
-timeout parameter to at least 18,120,000 ms for this invocation: the configured
-implementation-scope gate sequence may consume four 3600-second command budgets before the
-3600-second reviewer budget, with a 120-second allowance for wrapper overhead. Do not conclude
-reviewer failure from a shell-tool timeout shorter than that; a timed-out invocation kills the
-in-flight round and records nothing.
+The reviewer subprocess may run for many minutes. Invoke `cargo make track-local-review` once as
+a single blocking call and read its terminal result once. If the host backgrounds the call, read
+the result once after the single completion notification. Do not poll its output, re-run status
+probes, or launch it fire-and-forget. The `bin/sotp review results` command below is a single
+post-completion confirmation read, not a polling loop. Re-review iterations occur only after the
+review result or a state-changing fix requires another round.
 
 ### Verdict parsing and confirmation
 
@@ -147,7 +163,9 @@ Priority handling:
 
 After applying fixes:
 
-1. Run `cargo make ci-rust` to verify fixes compile.
+1. Run `cargo make ci-rust` to verify fixes compile. Treat this long-running gate as one blocking
+   call and read its terminal result once; if the host backgrounds it, read the result once after
+   the single completion notification. Do not poll its logs or status.
 2. If any fix edited source, before re-invoking the reviewer repeat the pre-review verification
    required by `.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`.
    The review-fix lead owns this repeat because its source edits occur after the earlier
@@ -185,7 +203,7 @@ Before modifying any file, verify it belongs to the correct architecture layer p
 
 ## Output contract
 
-Return exactly one of the following statuses:
+Return exactly one of the following qualified statuses:
 
 | status | meaning |
 |--------|---------|
@@ -200,7 +218,7 @@ Return exactly one of the following statuses:
 | output | fixes within one review scope + status report | source-code DRY refactors + status report | structured routing decision |
 | scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (some DRY violations span layers) | read-only |
 | trigger | orchestrator assigns scope + `round_type` | orchestrator assigns track-id for DFP | orchestrator passes diagnostic text |
-| artifact written | source files within scope boundary | source files across workspace | none |
+| artifact written | files within scope boundary | source files across workspace | none |
 | verdict source | `bin/sotp review results` (reads `review.json`) | `bin/sotp dry check-approved` (reads `dry-check.json`) | none |
 
 If the briefing asks for:
@@ -226,12 +244,22 @@ If the briefing asks for:
   recovery is to dispatch impl-planner and relaunch the scope review.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+- Do not run `bin/sotp test-obligation evaluate`; it is an orchestrator-host-owned synchronous
+  repair step, never a fire-and-forget launch or a commit prerequisite started by this capability.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (ADR, `spec.json`, type catalogues, `impl-plan.json`, the
-review briefing — as applicable) changed since that session, and re-read any that did before
-continuing. All execution flags are explicitly re-specified by the dispatcher on resume; a
-failed or expired resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted review-loop reasoning. Applied in-scope fixes, CLI-owned
+review results, and read-only git state are the durable hand-off; capability memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current scope and
+round, carrying the current findings / diff, exact spec / plan / catalogue paths, and the severity
+policy when applicable. A
+fresh dispatch, or a dispatch that changes concern, starts from that briefing. This
+typed-pipeline capability has no generic `bin/sotp capability exec --resume` route; resume it
+by re-running the canonical `track-local-review-fix` wrapper from the fresh briefing and
+persisted review state. On that re-entry, do not trust carried-over context: first check whether
+the upstream artifacts, review briefing, current diff, or persisted review result changed, and
+re-read every changed input before continuing.

@@ -64,6 +64,13 @@ If no commit message is supplied:
 
 Write the commit message to `tmp/track-commit/commit-message.txt`. Then run:
 
+`cargo make track-commit-message` is a long-running gate. Run it as one blocking call and, when
+it completes, read its terminal result once. If the host backgrounds the call, read the result
+once after the single completion notification. Do not poll its logs, re-run status probes, or add
+periodic re-checks. The commit gate runs `bin/sotp test-obligation check`; do not launch
+`bin/sotp test-obligation evaluate` as a commit prerequisite. `evaluate` is only a synchronous
+step inside repair work on the orchestrator host.
+
 ```
 cargo make track-commit-message
 ```

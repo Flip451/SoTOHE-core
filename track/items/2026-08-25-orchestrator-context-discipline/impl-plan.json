@@ -1,0 +1,330 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "`.harness/workflows/track/*.md` の対象操作を改訂する。IN-01〜IN-04、AC-01〜AC-04。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003",
+          "T004"
+        ],
+        "title": "Canonical workflow units"
+      },
+      {
+        "description": [
+          "`.harness/policies/*.md` と `.harness/capabilities/*.md` の対象操作を個別に整合させる。IN-01〜IN-04、OS-01、OS-03、CN-01、CN-03、AC-01〜AC-04。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T005",
+          "T006",
+          "T019",
+          "T020",
+          "T021",
+          "T022",
+          "T023",
+          "T024"
+        ],
+        "title": "Policy and capability units"
+      },
+      {
+        "description": [
+          "`.claude/commands/track/*.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T007",
+          "T008",
+          "T009",
+          "T010"
+        ],
+        "title": "Claude adapter units"
+      },
+      {
+        "description": [
+          "`.agents/skills/track-*/SKILL.md` の対象 adapter 操作を更新する。IN-01〜IN-04、AC-01〜AC-04。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T011",
+          "T012",
+          "T013",
+          "T014"
+        ],
+        "title": "Codex adapter units"
+      },
+      {
+        "description": [
+          "Root / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、AC-01、AC-05。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T015"
+        ],
+        "title": "Always-applied rules"
+      },
+      {
+        "description": [
+          "`README.md` と `.harness/policies/consumer-ownership.md` の所有説明を更新する。IN-05、CN-01、CN-02、AC-06。"
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T016"
+        ],
+        "title": "Consumer documentation"
+      },
+      {
+        "description": [
+          "`.harness/config/agent-profiles.json` の対象 profile default を更新する。IN-06、AC-07。"
+        ],
+        "id": "S7",
+        "task_ids": [
+          "T017"
+        ],
+        "title": "Orchestrator profile"
+      },
+      {
+        "description": [
+          "全対象面の個別確認を実行する。AC-08。"
+        ],
+        "id": "S8",
+        "task_ids": [
+          "T018"
+        ],
+        "title": "Per-surface confirmation"
+      }
+    ],
+    "summary": [
+      "GL-01 → T001, T005, T006, T007, T011, T015.",
+      "GL-02 → T002, T019, T022, T008, T012.",
+      "GL-03 → T003, T020, T023, T009, T013.",
+      "AC-01 → T001, T005, T006, T007, T011, T015.",
+      "AC-02 → T002, T019, T022, T008, T012.",
+      "AC-03 → T003, T020, T023, T009, T013.",
+      "AC-04 → T004, T021, T024, T010, T014.",
+      "AC-05 → T015; AC-06 → T016; AC-07 → T017; AC-08 → T018."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "description": "`.harness/workflows/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue intake 操作を改訂する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "description": "`.harness/workflows/track/pr-review.md` の review-fix 操作を改訂する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "description": "`.harness/workflows/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の長時間 gate / evaluate 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "description": "`.harness/workflows/track/adr2pr.md` の session-update 操作を改訂する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "`.harness/capabilities/*.md` の context / catalogue intake 操作を workflow SSoT に整合させる。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "214f42cdd78a19bab51fd90f577ad03638ea7e73",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
+      "id": "T019",
+      "status": "done"
+    },
+    {
+      "commit_hash": "4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
+      "id": "T020",
+      "status": "done"
+    },
+    {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "`.harness/policies/*.md`（`consumer-ownership.md` を除く）の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
+      "id": "T021",
+      "status": "done"
+    },
+    {
+      "commit_hash": "214f42cdd78a19bab51fd90f577ad03638ea7e73",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "`.harness/capabilities/*.md` の review-fix delegation 操作を workflow SSoT に整合させる。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
+      "id": "T022",
+      "status": "done"
+    },
+    {
+      "commit_hash": "4b9a4cf9262f35000ebadbaf84c24b91a2cdcf18",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "`.harness/capabilities/*.md` の long-gate / evaluate 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
+      "id": "T023",
+      "status": "done"
+    },
+    {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "`.harness/capabilities/*.md` の session-update 操作を workflow SSoT に整合させる。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
+      "id": "T024",
+      "status": "done"
+    },
+    {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "`.claude/commands/track/{plan,spec-design,type-design,impl-plan,implement,review}.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、CN-01、CN-03、AC-01。",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "`.claude/commands/track/pr-review.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、CN-01、CN-03、AC-02。",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "`.claude/commands/track/{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-03。",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "`.claude/commands/track/adr2pr.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-03、CN-01、CN-03、AC-04。",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "`.agents/skills/track-{plan,spec-design,type-design,impl-plan,implement,review}/SKILL.md` の context / catalogue adapter 操作を更新する。IN-01、IN-02、OS-01、OS-02、CN-01、CN-03、AC-01。",
+      "id": "T011",
+      "status": "done"
+    },
+    {
+      "commit_hash": "23fea17dcd37af18f0cddd7cc48bafe10fa17706",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "`.agents/skills/track-pr-review/SKILL.md` の review-fix adapter 操作を更新する。IN-01、IN-03、OS-01、OS-02、CN-01、CN-03、AC-02。",
+      "id": "T012",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "`.agents/skills/track-{pr-review,commit,merge,dry-check,obligation-fulfillment,full-cycle}/SKILL.md` の gate / evaluate adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-03。",
+      "id": "T013",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "`.agents/skills/track-adr2pr/SKILL.md` の session-update adapter 操作を更新する。IN-01、IN-04、OS-01、OS-02、OS-03、CN-01、CN-03、AC-04。",
+      "id": "T014",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "description": "`CLAUDE.md`、`AGENTS.md`、`.claude/rules/`、`.codex/instructions.md`、`.codex/rules/default.rules`、`.codex/agents/orchestrator.toml` の always-applied / provider rule 面を分離し、pointer を更新する。IN-01、IN-02、IN-05、OS-01、CN-01、CN-02、AC-01、AC-05。",
+      "id": "T015",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1245c37740c6b54808e92e5ff2932184c5b5fab3",
+      "depends_on": [
+        "T015"
+      ],
+      "description": "`README.md` と `.harness/policies/consumer-ownership.md` の provider compatibility ownership、runtime 文書の self-contained 表現、enforcement boundary の記述を更新する。IN-05、OS-01、CN-01、CN-02、AC-06。",
+      "id": "T016",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6ab732ece974e0cd9a244935ba998b6b18c3efdb",
+      "description": "`.harness/config/agent-profiles.json` の orchestrator profile default を更新する。IN-06、OS-01、AC-07。",
+      "id": "T017",
+      "status": "done"
+    },
+    {
+      "commit_hash": "ee34cea01db366387301dd2d4bc004f9789e039d",
+      "depends_on": [
+        "T005",
+        "T006",
+        "T019",
+        "T020",
+        "T021",
+        "T022",
+        "T023",
+        "T024",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T011",
+        "T012",
+        "T013",
+        "T014",
+        "T016",
+        "T017"
+      ],
+      "description": "Workflow SSoT、thin adapters、policy / capability、always-applied rules、consumer docs、agent profile の各対象面を個別確認する。AC-08。",
+      "id": "T018",
+      "status": "done"
+    }
+  ]
+}

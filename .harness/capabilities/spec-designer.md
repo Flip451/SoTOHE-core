@@ -43,16 +43,21 @@ If the briefing asks for:
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Track id and feature name
-- Briefing file path with:
-  - Target ADR path(s) under `knowledge/adr/`
+- Briefing file containing:
+  - Exact path to `track/items/<id>/metadata.json`
+  - Exact target ADR path(s) under `knowledge/adr/`
   - Any explicit constraints carried over from the ADR
   - Prior `spec.json` excerpt when updating an existing track
 - The project-wide conventions the dispatcher resolved for this capability, delivered with the
   dispatch rather than through the briefing file. That resolution is the complete convention
   input, including when it resolves to zero documents.
+
+The orchestrator supplies phase and verification summaries as dispatch context and does not
+bulk-read the listed artifact bodies during intake. The capability reads the exact paths in the
+briefing and the resolved convention paths itself.
 
 ### Internal pipeline (all executed by the specialist)
 
@@ -76,7 +81,8 @@ If the briefing asks for:
 2. **## Spec summary** — bullet list of written `spec.json` elements (element id → one-line purpose) and the updated `related_conventions[]` entries
 3. **## Signal evaluation** — blue / yellow / red counts per spec section (in_scope / out_of_scope / constraints / acceptance_criteria / goal). For every 🔴 element, also list the spec element id and the target ADR path cited by that element so the orchestrator can brief `adr-editor` without reading `spec.json`. A short note on yellow elements is also useful.
 4. **## Open Questions** — items requiring user or ADR clarification
-5. **## Ref integrity notes** — citations the orchestrator should double-check against the ADR / convention contents post-write
+5. **## Ref integrity notes** — citations and paths for targeted ADR / convention follow-up when
+   a diff or blocker requires it
 
 Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` selections. Those belong in the ADR (illustrative only, with `<!-- illustrative, non-canonical -->` markers) or in the type-designer's catalogue entries.
 
@@ -144,11 +150,22 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a normal re-entry dispatch re
 - Required reading before writing: every convention the dispatcher resolved for this capability, `.harness/policies/pre-track-adr-authoring.md`, `.harness/policies/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. Do not browse the project's convention directory for further documents to read — the resolution is the whole required set, and a resolution of zero documents leaves this reading step with no convention target rather than in error.
 - Store orchestrator session memory (any provider) as needed; do not rely on it persisting across capability invocations.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (the target ADRs under `knowledge/adr/` and
-`metadata.json`) changed since that session, and re-read any that did before continuing. All
-execution flags are explicitly re-specified by the dispatcher on resume; a failed or expired
-resume falls back to a fresh session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted spec draft or signal reasoning. `spec.json`, its
+CLI-written signals, generated views, and the read-only track state are the durable hand-off;
+capability memory is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current spec revision,
+carrying the track id, exact ADR / metadata paths, prior spec context when applicable, resolved
+conventions, current signal summaries, and any open question. A fresh dispatch, or a dispatch
+that changes concern, starts from that briefing. Only an explicit `sotp capability exec
+--resume` for the same track and capability continues a capability session. Fresh and resumed
+dispatches re-specify every execution flag (model, sandbox, and effort); a failed or expired
+resume, or a provider/model mismatch, falls back to a fresh session. On resume, do not trust
+carried-over context: first check whether the upstream artifacts of this assignment (the target
+ADRs, `metadata.json`, `spec.json`, or the briefing) changed, and re-read every changed input
+before
+continuing.

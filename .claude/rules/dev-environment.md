@@ -1,4 +1,21 @@
+---
+paths:
+  - "Makefile*.toml"
+  - "libs/**"
+  - "apps/**"
+  - "Cargo.toml"
+  - "Dockerfile*"
+  - "compose*.yml"
+  - "compose*.yaml"
+  - "deny.toml"
+  - "rust-toolchain.toml"
+  - "overlay/**"
+---
+
 # Development Environment (Rust)
+
+This conditionally loaded rule applies when running repository tooling; the concise root
+orchestrator rules are in `.claude/rules/orchestrator.md`.
 
 ## Toolchain
 
