@@ -49,6 +49,26 @@
       ],
       "id": "AC-05",
       "text": "遷移中の状態を一度以上観測しても、時間上限内に終端状態または消滅を観測できれば対象テストは成功する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-06",
+      "text": "`.harness/workflows/track/adr2pr.md`、`.claude/commands/track/adr2pr.md`、`.agents/skills/track-adr2pr/SKILL.md` のいずれも、自動的にコンテキストを管理する host に対して、宣言済みの境界で無条件に停止すること、または user に `/clear` や fresh session を要求することを指示しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "AC-07",
+      "text": "adr2pr の SSoT は、計画成果物 commit 後、最初の実装 batch 後、PR lane 開始時の三つの境界と、git および track artifacts からの既存の durable-state resume 導出規則を保持する。"
     }
   ],
   "constraints": [
@@ -81,6 +101,26 @@
       ],
       "id": "CN-05",
       "text": "既存テストの probe script の detached background child について、kernel に reap されて消滅した場合と、非実行中の zombie として残る場合のいずれも、D1 が要求する「終端状態に達した、または消滅した」を満たす。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "CN-06",
+      "text": "最初の implementation batch の `--single-batch` と、git および track artifacts から再開位置を導出する既存の規則は維持し、停止・handoff の意味だけを変更する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "CN-07",
+      "text": "user への refresh 要求は、自動的にコンテキストを管理できない host に限る条件付きの任意経路とし、無条件の step にしてはならない。"
     }
   ],
   "goal": [
@@ -93,6 +133,26 @@
       ],
       "id": "GO-01",
       "text": "子孫プロセスの終了保証を、即時の単発状態観測ではなく、有界時間内の再観測により最終的な非存在として検証する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "GO-02",
+      "text": "adr2pr workflow は、計画成果物 commit 後、最初の implementation batch 後、PR lane 開始時を、耐久状態から親 session を再開できる phase boundary として宣言する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        }
+      ],
+      "id": "GO-03",
+      "text": "自動的にコンテキストを管理する host は、宣言済みの phase boundary を停止せず user に refresh を要求せずに継続する。"
     }
   ],
   "related_conventions": [
@@ -127,6 +187,36 @@
         ],
         "id": "IN-02",
         "text": "終了保証の判定では、対象が終端状態に達したか消滅するまで再観測し、遷移中の中間状態の観測を失敗として扱わない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "`.harness/workflows/track/adr2pr.md` の parent-session refresh/resume contract、Step 9、gate table を、境界を refresh/resume point として宣言し、unconditional stop と one-way handoff を削除する内容へ改訂する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "`.claude/commands/track/adr2pr.md` で Claude Code の automatic compaction を automatic context management として扱い、境界ごとの `/clear` または fresh-session 要求を削除する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+          }
+        ],
+        "id": "IN-05",
+        "text": "`.agents/skills/track-adr2pr/SKILL.md` の note (5) と cross-reference を、Codex では automatic context management が無い場合にだけ refresh を要求できる内容へ改訂する。"
       }
     ],
     "out_of_scope": [
@@ -153,7 +243,7 @@
     ]
   },
   "signals": {
-    "blue": 13,
+    "blue": 22,
     "red": 0,
     "yellow": 0
   },

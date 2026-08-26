@@ -2,6 +2,7 @@
   "schema_version": 1,
   "track_id": "2026-08-26-bounded-wait-termination-assertions",
   "entries": {
-    "T001": []
+    "T001": [],
+    "T002": []
   }
 }

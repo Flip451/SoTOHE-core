@@ -84,6 +84,42 @@
           "hash": "rvw1:sha256:d8a9336c0f5d68532797a04f8047000dd34edf53969d404d33f9e617d4cdd30b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:10:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 16,
+              "message": "S2 description restates the upstream D4 behavior contract (“retain the three durable-state resume boundaries… allow hosts… without stopping… optional route…”). Keep only target + operation + anchor cite, per no-upstream-restatement policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/impl-plan.json",
+              "line": 40,
+              "message": "T002 description repeats the same upstream D4 behavior contract instead of referring to it solely by anchor. Remove the behavioral prose and retain target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e5eafff83d97b6db1a04de3c9fcbfed115fa2e675be5e75ccd5b0ee6d3ee66af",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T12:21:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44a029781c30d6e395635cf9e7691f6aefa1829286572ae69091a5bec80357f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:25:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44a029781c30d6e395635cf9e7691f6aefa1829286572ae69091a5bec80357f7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -224,6 +260,35 @@
           "at": "2026-08-26T08:55:31Z",
           "findings": [],
           "hash": "rvw1:sha256:82b419ba9be43716999d3d314f43b98a43ba391068ef140115c8b0e92ae67535",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:47:52Z",
+          "findings": [
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-26-bounded-wait-termination-assertions/spec.json",
+              "line": 175,
+              "message": "`related_conventions` に `prefer-type-safe-abstractions.md` を参照しているが、この spec の変更対象（有界待ちテストおよび workflow の context boundary）と同規約の型安全 abstraction 方針との関連がなく、ナラティブ上の壊れた cross-reference になっている。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:5450b72b0e0499f77dd8f9db46acb74637982875ead5c58581ff6223c667592a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T11:51:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd0753ac898d5e3299fc6ea23806cf10a01d6d9eb1816dff8b5424b5f6189b60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:58:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd0753ac898d5e3299fc6ea23806cf10a01d6d9eb1816dff8b5424b5f6189b60",
           "type": "final",
           "verdict": "zero_findings"
         }

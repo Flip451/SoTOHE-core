@@ -24,6 +24,52 @@
       }
     },
     {
+      "claim_hash": "603a55dbeece672e857af30bb0f62e095da3bd53c10a12929d30b5daca6acf8a",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "adr2pr workflow は、計画成果物 commit 後、最初の implementation batch 後、PR lane 開始時を、耐久状態から親 session を再開できる phase boundary として宣言する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4100181f5154c0eccbffe90e7cdc2424cfe8ffd4fdd5e3d50f3c09db6002c5d9",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "自動的にコンテキストを管理する host は、宣言済みの phase boundary を停止せず user に refresh を要求せずに継続する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "39721b5d498fb00820766718770c29c6864b85696f8d3a8a7e0a0533f92c69f0",
       "claim_origin": {
         "data": {
@@ -66,6 +112,75 @@
       },
       "verdict": {
         "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。遷移中の中間状態を観測しても失敗にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "969259ea2551bd9b19c80ef957e8d4d3e8e94def799142e7dcbd5b0d710ac9b5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "`.harness/workflows/track/adr2pr.md` の parent-session refresh/resume contract、Step 9、gate table を、境界を refresh/resume point として宣言し、unconditional stop と one-way handoff を削除する内容へ改訂する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f2917485e66fa2b1161b3c44ce080989b1cac9ae5ae038f725ab75967472a1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "`.claude/commands/track/adr2pr.md` で Claude Code の automatic compaction を automatic context management として扱い、境界ごとの `/clear` または fresh-session 要求を削除する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bdf8fe777a80918be03ade070a16b845c0ad3cb285f3478fd253264c2eeea1d7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "`.agents/skills/track-adr2pr/SKILL.md` の note (5) と cross-reference を、Codex では automatic context management が無い場合にだけ refresh を要求できる内容へ改訂する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
         "kind": "pass"
       }
     },
@@ -185,6 +300,52 @@
       }
     },
     {
+      "claim_hash": "73bb6491cf8067d5d32e81fb65b32c06270c075849b5b1d4726edc891f9f3d0d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "最初の implementation batch の `--single-batch` と、git および track artifacts から再開位置を導出する既存の規則は維持し、停止・handoff の意味だけを変更する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0584573016969d5defb07ed6e9878e40df9bc993584e3ed332d73884d49c564",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "user への refresh 要求は、自動的にコンテキストを管理できない host に限る条件付きの任意経路とし、無条件の step にしてはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "2920ebca1ffb5c869ea7a0a0c308f71594d74a3042c4271cc12d5ccf51450e50",
       "claim_origin": {
         "data": {
@@ -296,6 +457,52 @@
       },
       "verdict": {
         "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。遷移中の中間状態を観測しても失敗にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5aea3bea3754429adcb5185d3e442351efd896c4ecb8b3a1835f98e6d9f5f97d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "`.harness/workflows/track/adr2pr.md`、`.claude/commands/track/adr2pr.md`、`.agents/skills/track-adr2pr/SKILL.md` のいずれも、自動的にコンテキストを管理する host に対して、宣言済みの境界で無条件に停止すること、または user に `/clear` や fresh session を要求することを指示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41ed6bbfec53bcb72e55329508bb4358ddef359dd281dc0a5467a36e827fdef9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "adr2pr の SSoT は、計画成果物 commit 後、最初の実装 batch 後、PR lane 開始時の三つの境界と、git および track artifacts からの既存の durable-state resume 導出規則を保持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。",
         "kind": "pass"
       }
     }

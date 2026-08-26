@@ -12,12 +12,27 @@
         }
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 45,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
     {
       "id": "B1",
       "task_ids": ["T001"]
+    },
+    {
+      "id": "B2",
+      "task_ids": ["T002"]
     }
   ]
 }
