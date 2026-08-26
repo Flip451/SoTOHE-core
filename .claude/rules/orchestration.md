@@ -53,7 +53,10 @@ Treat CLI output and the delegated task briefing as primary. Do not bulk-read tr
 review or binding JSON, full workflow texts, or convention lists during intake. Open an artifact
 body only for a targeted diff or a blocker investigation. The dispatcher supplies resolved
 convention paths in each capability briefing; the delegated capability reads those paths, while
-the orchestrator does not enumerate or read conventions itself.
+the orchestrator does not enumerate or read conventions itself. The typed-pipeline local
+reviewer and review-fix-lead routes are a bounded exception: the review workflow itself resolves
+the applicable paths from the track's convention references and the consumer-owned
+`knowledge/conventions/README.md` `Current Files` index while preparing their briefings.
 
 The `adr2pr` workflow's mandatory Step 0 is a bounded exception: before executing that workflow,
 read each sub-workflow definition it enumerates to build the required execution plan. This is

@@ -26,7 +26,11 @@ by the review workflow and are not standing orchestrator instructions.
   inspect a diff or investigate a blocker; the delegated capability reads the paths its briefing
   lists. The `adr2pr` workflow's mandatory Step 0 is a bounded exception: read each
   sub-workflow definition it enumerates to build the execution plan before execution — required
-  workflow planning, not general bulk intake.
+  workflow planning, not general bulk intake. The typed-pipeline local reviewer and
+  review-fix-lead routes are a second bounded exception: the review workflow itself resolves the
+  applicable convention paths from the track's declared convention references and the
+  consumer-owned `knowledge/conventions/README.md` `Current Files` index while preparing the
+  briefing, and supplies them to the delegated reviewer or fixer.
 - Do not run direct Git mutations. Use the guarded workflow commands in the Command Policy
   below; read-only Git inspection is permitted.
 

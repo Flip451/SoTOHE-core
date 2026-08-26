@@ -4,14 +4,20 @@ The reviewer's role is **type-level / invariant-level correctness review** of
 `libs/domain/`. The domain layer is the innermost layer with **zero
 dependencies on any other crate** (`architecture-rules.json`), so violations
 of its type-safety and purity rules cascade upward. **Mechanical checks**
-(layer dependency, no `std::fs`/`std::env` in domain, doc string presence)
+(layer dependency and configured lint / verification checks)
 are handled by `cargo make check-layers` / `cargo make clippy` / `cargo make
-verify-*`, not the reviewer.
+verify-*`. Public API documentation presence is reviewed under
+`knowledge/conventions/coding-principles.md`; wording remains outside the
+reviewer's remit.
 
 ## Priority categories
 
 Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
+- **external-boundary assumptions**: What external boundaries does the diff touch (OS, process, encoding, concurrency, resource limits, time, and other versions of its own artifacts)? Enumerate operations directly reached from the changed behavior. If a depended-on assumption is in neither the spec nor the environment-assumption declaration the project owns (the convention listed under `Current Files` in `knowledge/conventions/README.md` whose purpose is declaring environment assumptions; resolve it through that index, not a fixed filename), report it as `未宣言の前提への依存`; treat unresolvable indirect boundaries the same way rather than searching exhaustively.
+- **public API documentation gap**: a public API is missing its required `///`
+  documentation or `# Errors` section. Report missing documentation, not wording
+  or style choices.
 - **primitive obsession**: raw `String` / `u64` / `i32` used where a domain
   Newtype should encode invariants (`UserId`, `EmailAddress`, `SimilarityThreshold`).
   Name the invariant the raw type leaves unenforced.
@@ -39,7 +45,8 @@ Violations of the role statement above are always reportable. The following prio
 
 ## What NOT to report
 
-- Doc string wording suggestions (CI checks doc presence; phrasing is author's call)
+- Doc string wording suggestions when the required documentation is present
+  (phrasing is author's call)
 - Adding derives (`Clone` / `Hash` / `Display`) that the catalogue contract
   intentionally omits — verify catalogue first via `<track>/domain-types.json`
 - Renaming to "better" identifiers when the existing name already matches

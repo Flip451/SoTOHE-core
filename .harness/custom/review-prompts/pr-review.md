@@ -18,18 +18,18 @@ When reviewing pull requests, focus on the following areas:
 
 ### Coding Principles
 
-- **No panics in library code**: `unwrap()`, `expect()`, `panic!()`, `todo!()`, `unreachable!()` are forbidden outside `#[cfg(test)]`. Use `?` operator and `Result` types.
+- **No panics in library code**: `unwrap()`, `expect()`, `panic!()`, `todo!()`, `unreachable!()` are forbidden outside `#[cfg(test)]`. Use `?` operator and `Result` types. The single bounded exception is a static literal secret-pattern regex at a secrecy boundary: construct it as `LazyLock<Regex>`, use an `expect` with a line-scoped allow annotation, and add a construction-validation test. An invalid static pattern is a programming error and must fail-stop; do not extend this exception to other `expect()` or `unwrap()` calls.
 - **Make illegal states unrepresentable**: Use validated domain types (e.g., `Email(String)`) instead of raw primitives.
-- **Error handling**: All errors must propagate via `Result<T, E>` with the `?` operator. No silent error swallowing.
+- **Error handling**: Errors should propagate via `Result<T, E>` with the `?` operator. An explicit exhaustive `match` is also valid for typed conversion or error-context attachment when every branch returns a `Result` and no error is discarded. No silent error swallowing.
 - **Trait-based abstraction**: Infrastructure dependencies must be behind trait boundaries (hexagonal architecture).
-- **Module size**: Aim for 200-400 lines per module, 700 max. The size limit applies to **production code only**; test code (`#[cfg(test)] mod tests` blocks, `*_tests.rs` files, `tests/` integration tests) is **exempt** and must be excluded when measuring a module against the limit. Count only the non-test lines (the code above the `#[cfg(test)]` block).
+- **Module size**: The limits are the `module_limits` declared in `architecture-rules.json` (`warn_lines` / `max_lines`; the template ships 400 / 700) and are enforced by `bin/sotp verify module-size` — judge against the configured values, not a fixed number. The size limit applies to **production code only**; test code (`#[cfg(test)] mod tests` blocks, `*_tests.rs` files, `tests/` integration tests) is **exempt** and must be excluded when measuring a module against the limit. Count only the non-test lines (the code above the `#[cfg(test)]` block).
 - **Unsafe code**: Must be minimal, commented with `// Safety:` justification, and reviewed.
 
 ### Testing
 
-- Happy path and error case tests required for all public APIs.
+- Happy path and error case tests required for all public APIs, except where the corresponding test obligation carries a reasoned waiver that passes `bin/sotp test-obligation evaluate` / `check` (the test-obligation mechanism is the quality-assurance source of truth per the testing convention listed under `Current Files` in `knowledge/conventions/README.md`; resolve it through that index, not a fixed filename).
 - Tests must be independent (no execution order dependency).
-- External dependencies (DB, API) must be mocked.
+- External dependencies (DB, API) must use deterministic fakes by default. Use a mock only when the interaction itself is the specification, such as call count, order, arguments, retry, timeout, or cancellation behavior.
 - Test naming: `test_{target}_{condition}_{expected_result}`.
 
 ### Security

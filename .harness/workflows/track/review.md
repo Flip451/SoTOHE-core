@@ -46,6 +46,10 @@ current diff, and scope file list are primary. Do not open `review.json`, bindin
 `*-types.json`, a full sub-workflow, or a `Related Conventions` list during intake. Open an
 artifact body only for a targeted diff or blocker investigation. Resolved convention paths are
 listed in each delegated briefing (possibly as an empty set) and are read by the capability.
+The local reviewer and review-fix-lead commands are typed-pipeline routes and do not run the
+generic capability dispatcher convention preflight; for those routes, this workflow must resolve
+the applicable paths from the track's declared convention references and the consumer-owned
+`knowledge/conventions/README.md` `Current Files` index while preparing the briefing.
 
 ## Sequence
 
@@ -113,8 +117,10 @@ For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope
 only when the diff or a blocker requires an anchor explaining what changed and why}
 
 ## Context Paths
-{exact spec / plan / task paths and the resolved convention paths supplied by the dispatcher;
-the delegated reviewer or fixer reads these paths}
+{exact spec / plan / task paths and the resolved convention paths; for the typed-pipeline local
+reviewer and review-fix-lead routes, the workflow resolves the convention paths from the track's
+declared convention references and the consumer-owned `knowledge/conventions/README.md` `Current
+Files` index before writing this section; the delegated reviewer or fixer reads these paths}
 
 ## Review Checklist
 {scope-specific checklist items — keep this list short and observable}
@@ -212,6 +218,12 @@ sequence declared for that scope in `.harness/config/pre-review-gates.json` (sco
 empty command vector are genuinely gate-free). The CLI resolves
 `capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`
 and dispatches to the appropriate runner. The workflow carries no provider conditional.
+
+Neither `bin/sotp review local` nor `bin/sotp review fix-local` invokes the generic capability
+dispatcher convention resolver: both are typed-pipeline entry points that construct their own
+prompts. The workflow therefore resolves the applicable convention paths before each local
+review/fix briefing and records them under `## Context Paths`; an empty set is authoritative only
+when that workflow-owned resolution was actually performed and returned no documents.
 
 The `review-fix-lead` capability self-resolves its modification boundary via
 `bin/sotp review files --scope {scope}`. The workflow does not pass scope file lists to the
