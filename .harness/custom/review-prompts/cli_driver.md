@@ -3,7 +3,7 @@
 The reviewer's role is **primary-adapter correctness review** of `apps/cli-driver/`.
 `cli_driver` is the primary (driving) adapter layer: it holds injected use-case
 ports, with one trait and one execute method per use case; it translates typed `Input`
-enums into validated use-case `Command` / `Query` values (one parse, usecase-owned boundary types), invokes exactly one single-purpose port per request,
+enums into validated use-case `Command` / `Query` values (one parse, usecase-owned boundary types), invokes exactly one single-purpose port per request (or, for a stateless operation modeled as a `UseCaseFunction` entrypoint under the consumer-owned role/layer convention resolved through the `Current Files` index in `knowledge/conventions/README.md`, calls that use-case function directly — such an entrypoint has no port trait or Interactor),
 and renders the result into a `CommandOutcome`. A Driver may hold several
 single-purpose ports for different requests; multi-step behavior belongs behind one
 use-case/application-service port. DI belongs in `cli_composition`, not here. Both
@@ -36,7 +36,10 @@ Violations of the role statement above are always reportable. The following prio
   through its injected use-case port(s). A Driver may invoke multiple injected
   single-purpose ports for different requests, but each request invokes exactly one
   port; report multi-step orchestration or decisions that belong in the usecase
-  layer. A Driver may call render-only helpers (formatters, table builders) freely.
+  layer. A direct call to a `UseCaseFunction` entrypoint is not a bypass: it is
+  that operation's sanctioned dispatch path until a port trait is introduced
+  for it. A Driver may call render-only helpers (formatters, table builders)
+  freely.
 - **boundary exposure violation**: a Driver may use usecase `Command`, `Query`,
   boundary DTO, and usecase `ValueObject` types in its public signatures for
   transport translation. Report direct domain `ValueObject` / `Entity` /

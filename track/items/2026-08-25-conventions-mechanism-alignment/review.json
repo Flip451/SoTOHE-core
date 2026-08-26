@@ -1318,6 +1318,65 @@
           "hash": "rvw1:sha256:5603c1c8ce74112c8d1edc596315fa0a26774293175c174029d801e3e53d3cda",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:39:13Z",
+          "findings": [
+            {
+              "category": "review-policy correctness",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 38,
+              "message": "The added UseCaseFunction exception was inserted before the existing sentence was completed, leaving `decisions that belong in the usecase A direct call...` and moving `layer.` to the next line. This breaks the bypassing-use-case-ports review instruction; restore `usecase layer.` before starting the exception sentence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08c126ec4717f25d676f818aafbae5a6c632ad8897bbb3325db255a2179e6b1f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:41:55Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 6,
+              "message": "The new role preamble introduces a fixed reference to `knowledge/conventions/type-designer-kind-selection.md`. The briefing states prompts must resolve consumer-owned conventions through the `knowledge/conventions/README.md` index, because consumers may rename or remove convention files. Resolve this convention through the index instead of hard-coding its path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bd498de8571ba13359d07b1469da6ae4686e95745540b8f089b365c226d39a7c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:44:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f0e980bdaea12344b442e995a76dc34e9cf8e273083b01caddb73c8937c4a763",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:49:24Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 30,
+              "message": "The new waiver rule reintroduces a fixed reference to the consumer-owned `knowledge/conventions/testing.md`. Consumers may rename or delete overlay conventions, and the consumer-ownership contract explicitly requires live `.harness/custom/review-prompts/` references to avoid fixed convention paths. After such a rename, this PR-review instruction points to a nonexistent SSoT. Make the rule self-contained or resolve the applicable convention through the `Current Files` index, as the other updated prompts do.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e980bdaea12344b442e995a76dc34e9cf8e273083b01caddb73c8937c4a763",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:53:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1340716f85263abcad6253ee13a7c1603ae4160f6e7df61e5f3a63c43eb64d79",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
