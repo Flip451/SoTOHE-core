@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011. Implement the domain, infrastructure, and usecase changes in dependency order and cover the listed anchors.
 
-## Tasks (8/11 resolved)
+## Tasks (10/11 resolved)
 
 ### S1 — Action-aware catalogue identity
 
@@ -44,6 +44,6 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011. Impl
 
 > Modify libs/domain/src/tddd/signal_evaluator/region.rs and libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs, then modify libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs, libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs, and libs/infrastructure/src/tddd/catalog_gen/verb_import.rs with their regression tests. Anchors: IN-03, IN-05, CO-03, CO-05, AC-03, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.
 
-- [~] **T009**: Modify libs/domain/src/tddd/signal_evaluator/region.rs and libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs; migrate constructor call sites in their regression tests and the affected codec and type-signal regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.
+- [x] **T009**: Modify libs/domain/src/tddd/signal_evaluator/region.rs and libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs; migrate constructor call sites in their regression tests and the affected codec and type-signal regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md. (`6732c240e57d94293ca0c40e402a89b967b03d00`)
 - [ ] **T010**: Modify libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs and libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs with their regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.
-- [~] **T011**: Modify libs/infrastructure/src/tddd/catalog_gen/verb_import.rs with its regression tests. Anchors: IN-03, CO-03, AC-03. Planning policy: .harness/policies/no-upstream-restatement.md.
+- [x] **T011**: Modify libs/infrastructure/src/tddd/catalog_gen/verb_import.rs with its regression tests. Anchors: IN-03, CO-03, AC-03. Planning policy: .harness/policies/no-upstream-restatement.md. (`6732c240e57d94293ca0c40e402a89b967b03d00`)
