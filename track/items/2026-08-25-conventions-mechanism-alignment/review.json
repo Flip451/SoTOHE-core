@@ -1239,6 +1239,35 @@
           "hash": "rvw1:sha256:342c3c43ffe85cb1faa089bada1fed025a93375265d63d9bd8747f001e3b0c3e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:18:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3764167644ce7a8d60fc5ffd2f1e0e17ad87e1c54b5724ea75360f6821ad976",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:23:49Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 89,
+              "message": "強化された trusted-root containment ルールの適用例が実装と一致していません。`reject_symlinks_below()` は対象が `trusted_root` 配下か、または `..` を含むかを検証せず、`WriteGuard::acquire()` にも containment 検査がありません。そのため `FsReviewStore::new(root.join(\"../outside/review.json\"), root)` の書き込みは外部パスを拒絶できず、「symlink / 外部書き込みを拒絶」という記述は誤りです。実際に containment を行う処理を例に含めるか、この例を symlink 拒絶だけに限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3764167644ce7a8d60fc5ffd2f1e0e17ad87e1c54b5724ea75360f6821ad976",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T04:27:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a20506a4c6e392fb19d7a1fb384b544691887c03c8e7f5cd2eb408dac33af006",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1977,6 +2006,20 @@
           "at": "2026-08-25T22:18:58Z",
           "findings": [],
           "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:19:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0beff702b2c5f788afb839097893843bcfab91f54b82fbe8169790fdad94aae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:21:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0beff702b2c5f788afb839097893843bcfab91f54b82fbe8169790fdad94aae",
           "type": "final",
           "verdict": "zero_findings"
         }

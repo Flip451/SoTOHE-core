@@ -56,35 +56,37 @@ passwords, and other credential files).
 
 ## Symlink Rejection in Infrastructure Adapters
 
-Infrastructure 層のファイル I/O アダプターは、対象ファイルと、信頼された root より下にあるすべてのディレクトリ component（中間ディレクトリを含む）の symlink を事前に拒絶する。leaf と直上の親だけを検査する実装は不十分である。
+Infrastructure 層のファイル I/O アダプターは、composition root から別途信頼して受け取る root を起点に、対象までの **すべての既存パス要素**（中間ディレクトリと leaf を含む）の symlink を事前に拒絶し、対象への相対パスを root より下に閉じる。leaf と直上の親だけを検査する実装は不十分である。
 
 ### ルール
 
 | 対象 | チェック |
 |---|---|
-| 読み書き対象ファイル（leaf） | `symlink_metadata()` で symlink なら fail-closed エラー |
-| root より下の全ディレクトリ component（中間ディレクトリを含む） | root 側から leaf に向かって順に `symlink_metadata()` で検査し、symlink なら fail-closed エラー（leaf が存在しなくても親は検査する） |
-| root ディレクトリ | CLI composition root から渡されるため信頼する |
+| trusted root | composition root から別途渡され、信頼境界として扱う。対象パスはこの root より下に閉じ、`..` などで root の外へ出る対象は fail-closed エラー |
+| root より下の各既存要素（中間ディレクトリと leaf を含む） | root から leaf に向かって順に `symlink_metadata()` で検査し、symlink なら fail-closed エラー |
+| 新規作成する leaf | 作成前に既存の全 ancestor を上記のとおり検査する |
 
 > **強制先**: review 観点 — infrastructure / cli_composition scope
 
 ### 理由
 
-- symlink 経由のファイル差し替えにより、review state や metadata が外部パスに redirect される可能性がある
-- `std::fs::read_to_string` / `atomic_write_file` は symlink を透過的に follow する
-- tamper-proof 対策として、ファイルアクセス前に symlink を検出して拒絶する
-
-### 適用例
-
-- `FsReviewStore` (review_v2): `reject_symlinks_below()` + `WriteGuard` で read/write の前に symlink / 外部書き込みを拒絶
+- symlink 経由のファイル差し替えにより、永続化した状態や metadata が外部パスへ redirect される可能性がある
+- `std::fs::read_to_string` や一般的な atomic write の実装は symlink を透過的に follow する
+- 中間ディレクトリの symlink も透過的に follow されるため、leaf と直近の親だけの検査では trusted root の外へ escape しうる
+- symlink を含まない `../` 経路でも root の外へ出られるため、symlink 検査だけでは containment にならない
 
 ### 新規アダプター追加時
 
-1. ファイル I/O の前に `symlink_metadata()` で symlink チェックを追加する
-2. symlink の場合は fail-closed でエラーを返す（silent skip 禁止）
-3. テストで symlink 拒絶を検証する（プラットフォーム対応に注意）
+1. composition root から trusted root を別途受け取り、対象への相対パスを root より下に閉じる（root の外を指す対象は fail-closed エラー）
+2. ファイル I/O の前に、root より下の既存の各 path component を root 側から順に `symlink_metadata()` で検査する
+3. symlink の場合は fail-closed でエラーを返す（silent skip 禁止）
+4. leaf と直近の親だけでなく、中間ディレクトリに置いた nested symlink と root 外への `../` 経路の拒絶もテストする（プラットフォーム対応に注意）
 
 > **強制先**: review 観点 — infrastructure scope
+
+### 適用例
+
+- `FsReviewStore` (review_v2): `reject_symlinks_below()` を read/write の前に呼び出し、対象 path の symlink component を拒絶する
 
 ## Security Boundary Failure Handling
 
