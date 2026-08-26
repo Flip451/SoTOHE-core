@@ -423,6 +423,7 @@ mod tests {
     use super::*;
     use crate::tddd::ThreeWaySignal;
     use crate::verify::tddd_layers::parse_tddd_layers;
+    use domain::FreeText;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
     fn rustdoc_json() -> String {
@@ -484,8 +485,8 @@ mod tests {
             .expect("type-signal identity indexing must consume catalogue additions");
 
         let kinds = BTreeMap::from([("AddedOnlyInCatalogue".to_owned(), vec!["struct"])]);
-        let signals = [ThreeWaySignal::new(
-            "domain::AddedOnlyInCatalogue".to_owned(),
+        let signals = [ThreeWaySignal::label(
+            FreeText::new("domain::AddedOnlyInCatalogue"),
             domain::tddd::signal_evaluator::region::SignalRegion::SIntersectC_Match_Add,
         )];
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
@@ -555,8 +556,8 @@ mod tests {
         let index = build_type_signal_identity_index(&catalogue, &resolution_paths)
             .expect("an add impl owner must resolve through the shared set");
         let kinds = BTreeMap::from([("Owner".to_owned(), vec!["struct"])]);
-        let signals = [ThreeWaySignal::new(
-            "Owner: NewTrait".to_owned(),
+        let signals = [ThreeWaySignal::label(
+            FreeText::new("Owner: NewTrait"),
             domain::tddd::signal_evaluator::region::SignalRegion::SIntersectC_Match_Add,
         )];
 

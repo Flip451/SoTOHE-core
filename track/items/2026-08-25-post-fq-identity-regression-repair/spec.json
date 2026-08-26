@@ -43,6 +43,16 @@
       ],
       "id": "AC-04",
       "text": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-05",
+      "text": "Phase 2 の three-way report と永続化される type-signal row は、同名の catalogue type と trait を namespace を含む別々の identity として保持し、双方の status が相互に混入しない。function と trait-impl signal はそれぞれの report label を保持したまま report に残る。"
     }
   ],
   "constraints": [
@@ -89,6 +99,16 @@
       ],
       "id": "CO-04",
       "text": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-05",
+      "text": "Phase 2 の three-way report identity は、解決集合に由来する catalogue item では type 又は trait の namespace を必須の identity 構成要素とし、function と trait-impl signal では report label を保持して区別する。いずれの signal も report から脱落させない。"
     }
   ],
   "goal": [
@@ -171,6 +191,16 @@
         ],
         "id": "IN-04",
         "text": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+          }
+        ],
+        "id": "IN-05",
+        "text": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
       }
     ],
     "out_of_scope": [
@@ -187,7 +217,7 @@
     ]
   },
   "signals": {
-    "blue": 14,
+    "blue": 17,
     "red": 0,
     "yellow": 0
   },

@@ -208,6 +208,29 @@
       }
     },
     {
+      "claim_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "45b44e9788179a1baa20923052bad138fb54fdec42510fbaf1b7e45ad0605943",
       "claim_origin": {
         "data": {
@@ -346,6 +369,29 @@
       }
     },
     {
+      "claim_hash": "0fa50b9685e1eddbc4d0ab3846589ea3d182e96472cf2e4ca0a2588522d60c00",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-05",
+          "section": "constraint",
+          "text_label": "Phase 2 の three-way report identity は、解決集合に由来する catalogue item では type 又は trait の namespace を必須の identity 構成要素とし、function と trait-impl signal では report label を保持して区別する。いずれの signal も report から脱落させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "5e184a87f8ca2d6f6cd7eec23ebe499c30e6549c5be1eaebe680b04796535bfd",
       "claim_origin": {
         "data": {
@@ -457,6 +503,29 @@
       },
       "verdict": {
         "citation": "解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4f26a5ac6e414c9f25a711ec2ab09b14576435c63873150b28bd891da4b71a8a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "Phase 2 の three-way report と永続化される type-signal row は、同名の catalogue type と trait を namespace を含む別々の identity として保持し、双方の status が相互に混入しない。function と trait-impl signal はそれぞれの report label を保持したまま report に残る。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
         "kind": "pass"
       }
     }

@@ -1388,6 +1388,21 @@ fn test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references
     let shared: Vec<_> = report.iter().filter(|signal| signal.item_name() == "Shared").collect();
     assert_eq!(shared.len(), 2, "one signal per namespace: {report:?}");
     assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));
+    assert_ne!(shared[0].identity(), shared[1].identity());
+    assert!(matches!(
+        shared[0].identity(),
+        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {
+            namespace: CatalogueItemNamespace::Type,
+            ..
+        }
+    ));
+    assert!(matches!(
+        shared[1].identity(),
+        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {
+            namespace: CatalogueItemNamespace::Trait,
+            ..
+        }
+    ));
 }
 
 fn codec_derived_holder_with_unresolved_reference(reference: &str) -> ExtendedCrate {

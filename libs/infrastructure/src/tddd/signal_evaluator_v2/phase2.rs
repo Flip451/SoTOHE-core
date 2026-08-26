@@ -126,15 +126,17 @@ pub(super) fn phase2_evaluate(
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 region,
             ));
         } else {
             // Item in S \ C.
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 region,
             ));
         }
@@ -161,10 +163,10 @@ pub(super) fn phase2_evaluate(
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(fn_path.clone(), region));
+            signals.push(ThreeWaySignal::label(domain::FreeText::new(fn_path.clone()), region));
         } else {
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(fn_path.clone(), region));
+            signals.push(ThreeWaySignal::label(domain::FreeText::new(fn_path.clone()), region));
         }
     }
 
@@ -219,14 +221,22 @@ pub(super) fn phase2_evaluate(
                 }
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 region,
             ));
         } else {
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 region,
             ));
         }
@@ -236,14 +246,16 @@ pub(super) fn phase2_evaluate(
     for name in d_types.keys() {
         if c_types.contains_key(name) {
             // D ∩ C: delete in progress.
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::DIntersectC,
             ));
         } else {
             // D \ C: delete achieved.
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::DMinusC,
             ));
         }
@@ -252,9 +264,15 @@ pub(super) fn phase2_evaluate(
     // --- Evaluate D functions vs C ---
     for fn_path in d_fns.keys() {
         if c_fns.contains_key(fn_path.as_str()) {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::DIntersectC,
+            ));
         } else {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::DMinusC));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::DMinusC,
+            ));
         }
     }
 
@@ -274,8 +292,12 @@ pub(super) fn phase2_evaluate(
     for key in d_impls.keys() {
         if c_impls.contains_key(key.as_str()) {
             // Exact match: D key found verbatim in C.
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DIntersectC,
             ));
         } else if let Some(&stripped_c_id) = c_impls_stripped.get(key.as_str()) {
@@ -284,13 +306,21 @@ pub(super) fn phase2_evaluate(
             if let Some(c_key) = c_impl_id_to_key.get(&stripped_c_id) {
                 c_matched_via_stripped.insert(c_key);
             }
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DIntersectC,
             ));
         } else {
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DMinusC,
             ));
         }
@@ -302,8 +332,9 @@ pub(super) fn phase2_evaluate(
         s_types.keys().chain(d_types.keys()).collect();
     for name in c_types.keys() {
         if !s_union_d_types.contains(name) {
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::CMinusSUnionD,
             ));
         }
@@ -314,7 +345,10 @@ pub(super) fn phase2_evaluate(
         s_fns.keys().chain(d_fns.keys()).map(String::as_str).collect();
     for fn_path in c_fns.keys() {
         if !s_union_d_fns.contains(fn_path.as_str()) {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::CMinusSUnionD));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::CMinusSUnionD,
+            ));
         }
     }
 
@@ -342,8 +376,12 @@ pub(super) fn phase2_evaluate(
                 // C impl was already covered by an S/D-vs-C stripped-key match.
                 continue;
             }
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::CMinusSUnionD,
             ));
         }

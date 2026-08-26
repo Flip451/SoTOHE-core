@@ -4,6 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| ThreeWaySignalIdentity | enum | add | CatalogueItem, Label | 🔵 | 🔵 |
 | domain::tddd::catalogue_linter::ExtractedTypeRefPath | enum | modify | Path, TypeParameter, LifetimeParameter, ConstParameter, AssociatedItemLabel | 🔵 | 🔵 |
 | domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace | enum | add | Type, Trait | 🔵 | 🔵 |
 | domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath | enum | modify | PlacedType, UnplacedType, PlacedTrait, UnplacedTrait | 🔵 | 🔵 |
@@ -14,6 +15,7 @@
 |------|------|--------|---------|--------|----------|
 | domain::tddd::catalogue_v2::entries::TraitEntry | value_object | modify | — | 🔵 | 🔵 |
 | domain::tddd::catalogue_v2::entries::TypeEntry | value_object | modify | — | 🔵 | 🔵 |
+| domain::tddd::signal_evaluator::region::ThreeWaySignal | value_object | modify | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 

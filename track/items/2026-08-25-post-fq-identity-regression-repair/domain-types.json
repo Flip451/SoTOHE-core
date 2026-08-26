@@ -280,6 +280,42 @@
       "action": "reference",
       "for_type": "ExtractedTypeRefPath",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
@@ -379,6 +415,75 @@
     }
   },
   "types": {
+    "ThreeWaySignalIdentity": {
+      "action": "add",
+      "docs": "Phase 2 report identity (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CatalogueItem",
+            "payload": {
+              "fields": [
+                {
+                  "name": "item_name",
+                  "ty": "FreeText"
+                },
+                {
+                  "name": "namespace",
+                  "ty": "CatalogueItemNamespace"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Label",
+            "payload": {
+              "fields": [
+                {
+                  "name": "label",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::signal_evaluator::region",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
     "domain::tddd::catalogue_linter::ExtractedTypeRefPath": {
       "action": "modify",
       "docs": "Domain-owned, value-equatable parser-occurrence classification that is stable across catalogue operations and independent of parser adapters.",
@@ -1421,6 +1526,230 @@
         "ValueObject": {}
       },
       "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::signal_evaluator::region::ThreeWaySignal": {
+      "action": "modify",
+      "docs": "Phase 2 report signal identity (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs a catalogue-item signal (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "catalogue_item",
+          "params": [
+            {
+              "name": "item_name",
+              "ty": "FreeText"
+            },
+            {
+              "name": "namespace",
+              "ty": "CatalogueItemNamespace"
+            },
+            {
+              "name": "region",
+              "ty": "SignalRegion"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Constructs a report-label signal (IN-05, CO-05, AC-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "FreeText"
+            },
+            {
+              "name": "region",
+              "ty": "SignalRegion"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Returns the report identity (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "identity",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ThreeWaySignalIdentity",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Returns the catalogue-item namespace (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "namespace",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<CatalogueItemNamespace>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "item_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "region",
+          "params": [],
+          "receiver": "&self",
+          "returns": "SignalRegion"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ThreeWaySignalKind"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator::region",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
         {
           "anchor": "IN-03",
           "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"

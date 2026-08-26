@@ -53,10 +53,22 @@
           "T005"
         ],
         "title": "Fully-qualified obligation carriers"
+      },
+      {
+        "description": [
+          "Modify libs/domain/src/tddd/signal_evaluator/region.rs and libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs, then modify libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs, libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs, and libs/infrastructure/src/tddd/catalog_gen/verb_import.rs with their regression tests. Anchors: IN-03, IN-05, CO-03, CO-05, AC-03, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md."
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011"
+        ],
+        "title": "Three-way identity repair units"
       }
     ],
     "summary": [
-      "GO-01 → T001, T002, T003, T004, T005, T006, T007, T008. Implement the domain, infrastructure, and usecase changes in dependency order and cover the listed anchors."
+      "GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011. Implement the domain, infrastructure, and usecase changes in dependency order and cover the listed anchors."
     ]
   },
   "schema_version": 2,
@@ -129,6 +141,24 @@
       "description": "Update catalog-import and bin-root handling in libs/infrastructure/src/tddd/catalog_gen/import_shape.rs and libs/infrastructure/src/schema_export/bin_target.rs, with catalog-import tests only in libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs and bin-target tests only in libs/infrastructure/src/schema_export_tests.rs; remove their local alias handling. Anchors: IN-02, OS-01, CO-02, AC-02.",
       "id": "T008",
       "status": "done"
+    },
+    {
+      "description": "Modify libs/domain/src/tddd/signal_evaluator/region.rs and libs/infrastructure/src/tddd/signal_evaluator_v2/phase2.rs; migrate constructor call sites in their regression tests and the affected codec and type-signal regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
+      "id": "T009",
+      "status": "in_progress"
+    },
+    {
+      "depends_on": [
+        "T009"
+      ],
+      "description": "Modify libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs and libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs with their regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
+      "id": "T010",
+      "status": "todo"
+    },
+    {
+      "description": "Modify libs/infrastructure/src/tddd/catalog_gen/verb_import.rs with its regression tests. Anchors: IN-03, CO-03, AC-03. Planning policy: .harness/policies/no-upstream-restatement.md.",
+      "id": "T011",
+      "status": "in_progress"
     }
   ]
 }

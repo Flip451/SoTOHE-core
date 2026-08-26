@@ -1,7 +1,12 @@
 {
-  "catalogue_declaration_hash": "9d7b5d5cac76d0247329384d1dea41e69a076d8d8a405eb134bb7744f0c6944f",
+  "catalogue_declaration_hash": "d78b165f60696a24ea1ac116cd6b5928ae4a9689961e0ea908e7e606c45d308d",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "2afd415cef17fa66a3b7da691f384d8afa050aa381537a82db85c88c5852f793",
+      "signal": "blue",
+      "type_name": "ThreeWaySignalIdentity"
+    },
     {
       "entry_hash": "bec57e5fadfb32694ffff364f063d45bf50cec6a8a9b99f44aaaec08f486ddf7",
       "signal": "blue",
@@ -26,6 +31,11 @@
       "entry_hash": "23ecfc5fabb4dad5e01a74c6f61b9420450356f30e3de2c29b1da7d67d459bd1",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath"
+    },
+    {
+      "entry_hash": "48ec95e462b7bb4366cc7b2f64631a70a21d8fe235583211cafed47d0f10cfd6",
+      "signal": "blue",
+      "type_name": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
     },
     {
       "entry_hash": "c0b9e9f6719b2a8fb3e288f4eb3cdd76aace704e8e6acd2eb96aa28f127b7e1d",

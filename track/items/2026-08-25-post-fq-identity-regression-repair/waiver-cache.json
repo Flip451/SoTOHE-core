@@ -191,6 +191,54 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "4dcfe030829a00aad8626bdef8712c9d938b395528f99cd133f42757e7e75d4a",
+        "declaration_hash": "61d0745862a0218126cc91423c1c0a22481d62d434046e8eb960e680ca264e89",
+        "waived_reason_hash": "f71b8781daa08fff7525b8df3a73ae4e7a9e4af56a098db02cc73babd60a1793"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
+        "declaration_hash": "416a56c1b70aeb173ce24fe439f0ca9a3e895b814a90e1d5155ecfdbc9717170",
+        "waived_reason_hash": "f71b8781daa08fff7525b8df3a73ae4e7a9e4af56a098db02cc73babd60a1793"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "docs: Some(DocString(\"Phase 2 report identity (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).\")), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-25-post-fq-identity-regression-repair"

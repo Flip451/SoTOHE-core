@@ -1851,7 +1851,7 @@
       },
       "key": {
         "anchor_text_hash": "c5fb35f88b77ccd4fcf3b3a0299565f08da5138d0a5c34172327c6c83b1543e2",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -1917,7 +1917,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -1926,7 +1926,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"function identity must retain the canonical package path\"; \"all type actions must share one normalized resolution set\"; \"add, modify, reference, and function identities must encode under alias\"",
+        "citation": "let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1983,7 +1983,7 @@
       },
       "key": {
         "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2049,7 +2049,7 @@
       },
       "key": {
         "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2058,7 +2058,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let normalized_current = normalized_paths_for_doc(&current, &package);\n        for expected in [\n            vec![\"cli\", \"commands\", \"Modified\"],\n            vec![\"cli\", \"commands\", \"Referenced\"],\n            vec![\"cli\", \"commands\", \"run\"],\n            vec![\"cli\", \"generated\", \"Added\"],\n        ] {\n            assert!(\n                normalized_current.values().any(|summary| summary.path == expected),\n                \"root alias must be normalized once for {expected:?}\"\n            );\n        }\n\n        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");",
+        "citation": "let normalized_current = normalized_paths_for_doc(&current, &package); ... let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current) ... build_type_signal_identity_index(&catalogue, &resolution_paths) ... assert_eq!(encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])), Some(ItemAction::Modify));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2115,7 +2115,7 @@
       },
       "key": {
         "anchor_text_hash": "57f40b733ca5b8bebc9c59ecbda9ec6a4603976a9bb8b1dddcead4cbacdc6273",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2124,7 +2124,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"// Insert the modify declaration before the add declarations. The production\\n        // pre-pass must still resolve every reference independently of declaration order.\" ... \"assert_eq!(field_target(first_id), second_id);\\n        assert_eq!(field_target(second_id), first_id);\\n        assert_eq!(field_target(holder_id), first_id);\" ... \"let error = build_type_signal_identity_index(&catalogue, &empty.paths)\\n            .expect_err(\\\"an impl owner absent from both authorities must fail closed\\\");\\n        assert!(error.contains(\\\"MissingOwner\\\"));\"",
+        "citation": "\"expect(\\\"the shared set must include both add declarations\\\")\"; \"expect(\\\"an add impl owner must resolve through the shared set\\\")\"; \"expect(\\\"all declared identities must resolve through the shared set\\\")\"; \"assert_eq!(field_target(first_id), second_id); assert_eq!(field_target(second_id), first_id); assert_eq!(field_target(holder_id), first_id);\"; \"expect_err(\\\"an impl owner absent from both authorities must fail closed\\\")\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2181,7 +2181,7 @@
       },
       "key": {
         "anchor_text_hash": "e0df45dfceffc3f0a70e284ab8c2f8786e38eb35ad517ac2da93ec6db018ada2",
-        "bound_tests_set_hash": "db27be339e369a0ecc9b89739ec3da5e675301458a469118e89f96f3e47aa64d",
+        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2190,7 +2190,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "        let baseline = rooted_crate(vec![\n            (1, vec![\"sotp\", \"commands\", \"Modified\"], rustdoc_types::ItemKind::Struct),\n            (2, vec![\"sotp\", \"commands\", \"Referenced\"], rustdoc_types::ItemKind::Struct),\n            (3, vec![\"sotp\", \"commands\", \"run\"], rustdoc_types::ItemKind::Function),\n        ]);\n        let current = rooted_crate(vec![\n            (1, vec![\"sotp\", \"commands\", \"Modified\"], rustdoc_types::ItemKind::Struct),\n            (2, vec![\"sotp\", \"commands\", \"Referenced\"], rustdoc_types::ItemKind::Struct),\n            (3, vec![\"sotp\", \"commands\", \"run\"], rustdoc_types::ItemKind::Function),\n            (4, vec![\"sotp\", \"generated\", \"Added\"], rustdoc_types::ItemKind::Struct),\n        ]);\n        let package = CrateName::new(\"cli\").unwrap();\n        let normalized_current = normalized_paths_for_doc(&current, &package);\n        for expected in [\n            vec![\"cli\", \"commands\", \"Modified\"],\n            vec![\"cli\", \"commands\", \"Referenced\"],\n            vec![\"cli\", \"commands\", \"run\"],\n            vec![\"cli\", \"generated\", \"Added\"],\n        ] {\n            assert!(\n                normalized_current.values().any(|summary| summary.path == expected),\n                \"root alias must be normalized once for {expected:?}\"\n            );\n        }\n\n        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");\n\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"generated\", \"Added\"])),\n            Some(ItemAction::Add)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Modified\"])),\n            Some(ItemAction::Modify)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Referenced\"])),\n            Some(ItemAction::Reference)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])),\n            Some(ItemAction::Modify)\n        );\n    }",
+        "citation": "        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");\n\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"generated\", \"Added\"])),\n            Some(ItemAction::Add)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Modified\"])),\n            Some(ItemAction::Modify)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Referenced\"])),\n            Some(ItemAction::Reference)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])),\n            Some(ItemAction::Modify)\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2780,6 +2780,366 @@
       },
       "verdict": {
         "citation": "\"expect(\\\"one current candidate supplies omitted placement\\\")\"; ... \"summary.path == vec![\\\"domain\\\", \\\"generated\\\", \\\"FutureType\\\"]\" ... \"expect_err(\\\"an omitted add cannot replace a baseline declaration\\\")\" ... \"expect_err(\\\"multiple current placements must fail closed\\\")\" ... \"SYNTHETIC_UNPLACED_CRATE_ID\" ... \"modify/reference must resolve one baseline identity\" ... \"delete must resolve one baseline identity\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "976f570698bceb6146e557c52b22c01e6c0e2e7addc54ae5559caf73becf6291"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(plain.namespace(), None);\n\n        let typed = ThreeWaySignal::catalogue_item(\n            FreeText::new(\"Shared\"),\n            CatalogueItemNamespace::Type,\n            SignalRegion::SIntersectC_Match_Add,\n        );\n        let trait_signal = ThreeWaySignal::catalogue_item(\n            FreeText::new(\"Shared\"),\n            CatalogueItemNamespace::Trait,\n            SignalRegion::SMinusC_Add,\n        );\n        assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");\n        assert_eq!(typed.signal(), signal_for_region(typed.region()));\n\n        let shared: Vec<_> = report.iter().filter(|signal| signal.item_name() == \"Shared\").collect();\n        assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n        assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n        assert_ne!(shared[0].identity(), shared[1].identity());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "9217795ddd5b76edfe3b26c00b510115cd36c1a9eefe4da0f5a3b0a7cf761284"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:CO-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n        typed.identity(),\n        &ThreeWaySignalIdentity::CatalogueItem {\n            item_name: FreeText::new(\"Shared\"),\n            namespace: CatalogueItemNamespace::Type,\n        }\n    );\n    assert_eq!(\n        trait_signal.identity(),\n        &ThreeWaySignalIdentity::CatalogueItem {\n            item_name: FreeText::new(\"Shared\"),\n            namespace: CatalogueItemNamespace::Trait,\n        }\n    );\n    assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "cf1d221d0df0356ef83abb302d2c8bed9be08ae91e066ccef04fe4fa5a8bc425"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n    assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n    assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "4dcfe030829a00aad8626bdef8712c9d938b395528f99cd133f42757e7e75d4a",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "fa0444ff7b84faee1ace10f115d9454b47019d2fc20c905d45b804075e0928e5"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "c1d777786dc88f0a41f96976813f70cfac982864994d5eaa412c18487ce58c7b"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:CO-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(identities.get_by_path(\"domain::Shared\"), None, \"bare path is ambiguous\");\n\n    let shared_type_id = *identities\n        .get(&super::TypeTraitIdentityKey::new(\"domain::Shared\", CatalogueItemNamespace::Type))\n        .expect(\"the unplaced Shared type must remain indexed\");\n    let shared_trait_id = *identities\n        .get(&super::TypeTraitIdentityKey::new(\"domain::Shared\", CatalogueItemNamespace::Trait))\n        .expect(\"the unplaced Shared trait must remain indexed\");\n\n    assert_eq!(\n        referenced_id, shared_type_id,\n        \"a type reference must resolve to the type namespace, not the same-path trait\"\n    );\n    assert_ne!(referenced_id, shared_trait_id);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      "key": {
+        "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "62836ce9869fa523701fe43aadeec68eace0e2b3840990344baa30ef0342f08a"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "12114c76c10ef93d0a7187127c0a0bbc85f30e07f77254e0e02090503ed4c66f"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(\n            typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(\n            trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_eq!(\n            plain.identity(),\n            &ThreeWaySignalIdentity::Label { label: FreeText::new(\"User\") }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "8a5405a8c9a1b55abc8354fcc577fe04a471501dc4203482661b7038525c9892"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:CO-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_eq!(plain.identity(),\n            &ThreeWaySignalIdentity::Label { label: FreeText::new(\"User\") }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "449498375d6b1768efa92c6c1099b0bb680ea9391acd69202d8bb9458b6582da"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n    assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n    assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::signal_evaluator::region::tests",
+          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
+        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
+        "declaration_hash": "8587c1c463b8a0e174a9301c5bc240147c72806790590a30c971ebd6f71d4460"
+      },
+      "obligation_id": {
+        "entry_key": "ThreeWaySignalIdentity",
+        "item_identifier": "voluntary:CO-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(\n            trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

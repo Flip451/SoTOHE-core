@@ -89,6 +89,18 @@
         "layer": "infrastructure",
         "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter"
       }
-    ]
+    ],
+    "T009": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ThreeWaySignalIdentity"
+      }
+    ],
+    "T010": [],
+    "T011": []
   }
 }

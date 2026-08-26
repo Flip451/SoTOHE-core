@@ -60,6 +60,7 @@ pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;
 pub use signal_evaluator::{
     Phase1Error, SignalEvaluatorPort, SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal,
-    ThreeWaySignalKind,
+    ThreeWaySignalIdentity, ThreeWaySignalKind,
 };
-// Note: `signal_for_region` is pub(crate) — use ThreeWaySignal::new() for public API.
+// Note: `signal_for_region` is pub(crate) — use the explicit ThreeWaySignal
+// constructors for the public API.

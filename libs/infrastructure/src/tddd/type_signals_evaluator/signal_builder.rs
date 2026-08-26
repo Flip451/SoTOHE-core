@@ -533,6 +533,7 @@ mod tests {
         TypeSignalIdentityIndex, add_deletion_identity, add_entry_identity,
         build_type_signal_identity_index, build_type_signals_from_report,
     };
+    use domain::FreeText;
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::TypeKindV2;
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
@@ -558,8 +559,8 @@ mod tests {
             "domain::tddd::catalogue_linter::CatalogueLinterError".to_owned(),
             vec!["error_type"],
         );
-        let signals = vec![ThreeWaySignal::new(
-            "CatalogueLinterError: From<TypeRefPathExtractionError>".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("CatalogueLinterError: From<TypeRefPathExtractionError>"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -575,8 +576,8 @@ mod tests {
         let mut index = TypeSignalIdentityIndex::default();
         index.add_impl_alias("Arc", "std::sync::Arc<T>");
 
-        let signals = vec![ThreeWaySignal::new(
-            "Arc: TypeRefPathExtractorPort".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("Arc: TypeRefPathExtractorPort"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -645,8 +646,8 @@ mod tests {
         let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
             .expect("generic impl owner identity indexes successfully");
 
-        let signals = vec![ThreeWaySignal::new(
-            "domain::alpha::Wrapper<T>: domain::ports::Port".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::alpha::Wrapper<T>: domain::ports::Port"),
             SignalRegion::SIntersectC_Match_Add,
         )];
         let kinds = BTreeMap::from([("domain::alpha::Wrapper".to_owned(), vec!["struct"])]);
@@ -758,12 +759,12 @@ mod tests {
         let identity_index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
             .expect("duplicate module identities must be indexable");
         let signals = [
-            ThreeWaySignal::new(
-                "domain::alpha::Input: domain::alpha::Port<domain::alpha::Input>".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::alpha::Input: domain::alpha::Port<domain::alpha::Input>"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new(
-                "domain::beta::Input: domain::beta::Port<domain::beta::Input>".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::beta::Input: domain::beta::Port<domain::beta::Input>"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
         ];
@@ -802,8 +803,10 @@ mod tests {
         index.add_impl_alias("Shared", "external::Shared");
         let mut kinds = std::collections::BTreeMap::new();
         kinds.insert("domain::alpha::Shared".to_owned(), vec!["struct"]);
-        let signals =
-            vec![ThreeWaySignal::new("Shared".to_owned(), SignalRegion::SIntersectC_Match_Add)];
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("Shared"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
 
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
 
@@ -820,8 +823,8 @@ mod tests {
 
         let mut kinds = std::collections::BTreeMap::new();
         kinds.insert("domain::other::Thing".to_owned(), vec!["struct"]);
-        let signals = vec![ThreeWaySignal::new(
-            "other::Thing: LocalTrait".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("other::Thing: LocalTrait"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -849,15 +852,18 @@ mod tests {
         kinds.insert("domain::alpha::Shared".to_owned(), vec!["struct"]);
         kinds.insert("domain::beta::Shared".to_owned(), vec!["struct"]);
         let signals = vec![
-            ThreeWaySignal::new(
-                "domain::alpha::Shared".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::alpha::Shared"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new(
-                "domain::beta::Shared".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::beta::Shared"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new("Shared: Clone".to_owned(), SignalRegion::SIntersectC_Match_Add),
+            ThreeWaySignal::label(
+                FreeText::new("Shared: Clone"),
+                SignalRegion::SIntersectC_Match_Add,
+            ),
         ];
 
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
@@ -873,8 +879,8 @@ mod tests {
         index.add_alias("Shared", "domain::alpha::Shared");
         index.add_alias("Shared", "domain::beta::Shared");
 
-        let signals = vec![ThreeWaySignal::new(
-            "domain::gamma::Shared: Clone".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::gamma::Shared: Clone"),
             SignalRegion::SIntersectC_Match_Add,
         )];
         let mut kinds = std::collections::BTreeMap::new();
@@ -906,8 +912,8 @@ mod tests {
             "usecase::chain::traits::SoTChain".to_owned(),
             vec!["secondary_port"],
         )]);
-        let signals = vec![ThreeWaySignal::new(
-            "usecase::chain::traits::SoTChain: ChainIdentity".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("usecase::chain::traits::SoTChain: ChainIdentity"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 

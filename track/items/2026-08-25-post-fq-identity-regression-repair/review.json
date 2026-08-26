@@ -253,6 +253,46 @@
         }
       ]
     },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-26T20:20:22Z",
+          "findings": [
+            {
+              "category": "duplicate-public-type",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 41,
+              "message": "`track_tddd` still defines a second public `TrackItemsDirectoryInput` instead of privately importing the canonical type from `track_resolution`. This preserves duplicate rustdoc/type identities and leaves the intended single-boundary type fix incomplete.",
+              "severity": "P1"
+            },
+            {
+              "category": "duplicate-public-type",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 108,
+              "message": "`TrackWorkspaceRootInput` is still publicly re-exported from `track_tddd`, and its `TryFrom<PathBuf>` implementation remains here. Keep the type and conversion implementation solely in `track_resolution` and import it privately to preserve one public rustdoc identity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba38970f5c928a456b12acd3dddd41cd07e60eb2d233a706a3613199c19221b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T20:26:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7ba38970f5c928a456b12acd3dddd41cd07e60eb2d233a706a3613199c19221b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:31:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7ba38970f5c928a456b12acd3dddd41cd07e60eb2d233a706a3613199c19221b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -391,6 +431,20 @@
           "at": "2026-08-26T03:24:53Z",
           "findings": [],
           "hash": "rvw1:sha256:304886afdd146561b0fb3c98ca823dd3b5e9bb2efeaac6463c10308ecfc59053",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T19:16:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6ad41cff360ad52985cd282585816074be645b2805659b2ee2dc2a70382619",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T19:23:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6ad41cff360ad52985cd282585816074be645b2805659b2ee2dc2a70382619",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -637,6 +691,78 @@
           "at": "2026-08-26T10:19:38Z",
           "findings": [],
           "hash": "rvw1:sha256:a65ff61784a83f64b13973385ca7b857bbb4365bcc7c40e3a759615b64f0427d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T17:57:39Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 145,
+              "message": "T009 bundles independently verifiable units—ThreeWaySignal identity/report construction, type-signal accumulation, and the unplaced-import duplicate rule—across separate production targets and regression suites. Split these before implementation, anchored to IN-05/AC-05 and IN-03/AC-03.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 59,
+              "message": "S6 restates upstream behavior in prose: “while preserving residual report labels and the D3 unplaced-import duplicate rule.” Keep only target, operation, and anchor cites; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 145,
+              "message": "T009 restates the upstream behavior contract in “accumulate namespace-aware rows without same-key type/trait status contamination” and “enforce the D3 unplaced-import duplicate rule.” Reduce the description to target + operation + anchors; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4b795c931773629d06e16293a1094bc0cada14b95495ae96c476bd0b2af4f030",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T18:07:13Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/batch-plan.json",
+              "line": 47,
+              "message": "T009 and T011 are both ready at the initial dependency frontier, have disjoint write targets (T009’s domain/Phase 2 and codec/type-signal tests versus T011’s `catalog_gen/verb_import.rs` and tests), and fit together in B1: infrastructure estimate 120 production + 120 test lines, domain estimate 90 + 60, below the 500-line ceiling. Move T011 into B1; its separate B3 is avoidable serialization.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c182661944df07d939c3810bb3cd1f25363c173fcc106c2e1ba9a7496fbc2c7c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T18:10:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8cc785c49a89704f439d288092463aba5f6bba640d9d2bfe29c9290727cb7f4f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T18:14:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8cc785c49a89704f439d288092463aba5f6bba640d9d2bfe29c9290727cb7f4f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:32:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e9ffd9121ab9b19913b76ec9578ddf34dc74532c3d9e2e91fd6bdd9e301b63c5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:35:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e9ffd9121ab9b19913b76ec9578ddf34dc74532c3d9e2e91fd6bdd9e301b63c5",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1214,6 +1340,50 @@
           "hash": "rvw1:sha256:8b57ebe3701ba2908ec67934e9673804108ff33d87fe49be0096c6da84205726",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T19:26:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcb4ebd69ef15f330ef1022dfd5a660b5aa831d6b96f8791f9e70188e6204073",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T19:35:36Z",
+          "findings": [
+            {
+              "category": "adapter correctness / lossy I/O boundary",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 118,
+              "message": "`parse_report_layers` reconstructs every report row with `ThreeWaySignal::label`, discarding the namespace now carried by catalogue type/trait signals. For a valid same-named type and trait, Phase 2 emits distinct `CatalogueItem` identities, but the Markdown transport contains only the shared item name, so this adapter returns two namespace-less identities and violates AC-05/CO-05. Preserve the typed signals across this boundary or include and decode the namespace explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fcb4ebd69ef15f330ef1022dfd5a660b5aa831d6b96f8791f9e70188e6204073",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T19:50:51Z",
+          "findings": [
+            {
+              "category": "unbounded resource use / undeclared assumption",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 45,
+              "message": "`CapturingSignalEvaluator` clones every `ThreeWayEvaluationReport`, `execute` then clones the captured report vector again, and `parse_report_layers` clones the signals once more into the result. Report cardinality is proportional to the rustdoc artifact, while this path reads generated rustdoc without a size bound and the project declares no resource limit. Large adopter crates can therefore require several simultaneous full copies of an unbounded report, reintroducing the unbounded-artifact memory risk that the Phase 2 fix explicitly removed. Move/consume the typed reports through the boundary instead of retaining clone-based side-channel copies.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7db16269b73ecc7d9a68ee4bc1d21c653bd0c675cb929e5c8ded7e28a26d050f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T20:00:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f79138ee5929ff2fb610662a2f49b2cecfe4ed6d1cb26eba4cdb820e4182af7c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1396,6 +1566,42 @@
           "hash": "rvw1:sha256:b65ed9e4d4bb755d40e91192b8e4db7e03e1df25e574f6a1abb7715e3ad2b8aa",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:37:55Z",
+          "findings": [
+            {
+              "category": "test-obligation-binding",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 1428,
+              "message": "This waiver defers the action-specific D3 verification to `catalogue_to_extended_crate_codec_tests.rs` without naming the concrete verifying test function, contrary to the scope requirement for independently auditable waiver reasons. Add the test name(s).",
+              "severity": "P2"
+            },
+            {
+              "category": "test-obligation-binding",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 1439,
+              "message": "This waiver likewise defers D3 verification without naming the concrete verifying test function. Add the test name(s) to make the rationale independently auditable.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:45738f38e9e9cf04fe039dc8cfe6ec34d73c93c8a70c6f43afebf63e646e9835",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T20:40:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:001f2a961742a280667066ca8b46a88b057dec84a156f9ef729a8996dcd2b823",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:47:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:001f2a961742a280667066ca8b46a88b057dec84a156f9ef729a8996dcd2b823",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1441,6 +1647,42 @@
           "at": "2026-08-25T16:32:43Z",
           "findings": [],
           "hash": "rvw1:sha256:e9e13845822a70c3abe93e8b55c6e163912c12186231c38d1f1e9c72237ed186",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T17:13:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea27021d82916cd5795086abf9d0409dc4dcf39b052d1370b2a4d26c0cedf223",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T17:18:47Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json",
+              "line": 59,
+              "message": "IN-05 limits the declared scope to identity and signal retention within the Phase 2 three-way report, while AC-05 additionally requires persisted type-signal rows to remain separate and their statuses not to contaminate each other. Because that downstream persistence surface is absent from the in_scope contract, Phase 3 cannot determine whether changes to row construction are authorized.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ea27021d82916cd5795086abf9d0409dc4dcf39b052d1370b2a4d26c0cedf223",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T17:25:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c3b76f2b58e72d117426418e99b0d02c3ec1dfc86b5ff3e651460eb1ae683d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T17:27:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c3b76f2b58e72d117426418e99b0d02c3ec1dfc86b5ff3e651460eb1ae683d",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1830,6 +2072,182 @@
           "hash": "rvw1:sha256:85e47bd7958d3546476e89c7817a0fe20a11f17a7969294b9a596205540c7b26",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T15:16:54Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1460,
+              "message": "`domain::tddd::signal_evaluator::region::ThreeWaySignal` の `docs` は、`String` を選ぶ理由とレポート値の性質を散文で再説明しています。下流 catalogue docs は変更対象・操作・spec anchor の参照に留め、上流契約の本文を重複させないでください（no-upstream-restatement）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:33a6dd1d2ee8825c06e1ce43932b95e3b300cecd7dd6e99041c4b94525d20644",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T15:28:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76f9edc1e819a416580244320fe67621d10ccbd4a833c811e5523d803067d53e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T15:36:14Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1528,
+              "message": "`domain::tddd::signal_evaluator::region::ThreeWaySignal` still admits the regression state: the unrestricted `new(String, SignalRegion)` constructor can create a type/trait signal whose `namespace()` is `None`. Because the raw `String` does not distinguish catalogue items from functions/impls, correctness depends on every caller choosing `new_in_namespace`; one missed path again makes same-key type and trait signals indistinguishable. Model the identity as a typed sum (catalogue item with mandatory namespace versus non-catalogue label), or otherwise make a namespace-less catalogue-item signal unconstructible.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:76f9edc1e819a416580244320fe67621d10ccbd4a833c811e5523d803067d53e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T15:58:12Z",
+          "findings": [
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 503,
+              "message": "`ThreeWaySignalLabel` の `try_new` は `ValidationError` を返す検証付きラベルを追加し、`ThreeWaySignalIdentity` の全ラベルをこの制約下に置いています。しかし IN-03 / CO-03 は namespace-aware な identity 解決だけを規定しており、ラベルの検証規則や拒否条件を規定していません。したがってこの型・メソッドの spec_refs は目的外で、未承認の入力制約を型契約へ追加しています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d38ce4d1152acedc73011f26befd2913daa7d1549e20debc340e49096362639e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T16:15:35Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 420,
+              "message": "`ThreeWaySignalIdentity` の `docs` は、`FreeText` が「既存の unconstrained report-text carrier」を再利用するという上流設計 rationale を散文で再記述しています。catalogue docs は変更対象・操作・anchor の参照に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1541,
+              "message": "`domain::tddd::signal_evaluator::region::ThreeWaySignal` の `docs` は、入力が「unconstrained report labels」であるという上流の挙動契約を再記述しています。catalogue docs は anchor cite による参照に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:7f9dce034167d9f68049f182b00b9615861fdb4194de50f55325f8b631e61eac",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T16:20:52Z",
+          "findings": [
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1593,
+              "message": "`ThreeWaySignalIdentity` の `Function` / `TraitImpl` variants、および `ThreeWaySignal::function` / `trait_impl` メソッドは、IN-03 / CO-03 / AC-03 の spec_refs で宣言されていますが、これらの anchors は unplaced catalogue type/trait の identity と type-vs-trait namespace を規定するもので、function identity や trait-implementation records の追加を根拠付けていません。追加するなら対応する仕様 anchor（少なくとも function identity は IN-02 / CO-02）を付与し、trait-impl surface は仕様化する必要があります。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08690782b41f9972a5db662dd014e4cc059d5ddd908ea207dac09c9e4699d096",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T16:35:38Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 420,
+              "message": "`ThreeWaySignalIdentity` の `docs` は、`Label` が unrestricted display label を保持するという上流の挙動契約を散文で再記述しています。catalogue docs は変更対象・操作・anchor の参照に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1578,
+              "message": "`ThreeWaySignal::label` の `docs` は、non-catalogue signal が unrestricted display label から構築されるという挙動契約を再記述しています。catalogue docs は anchor cite による参照に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            },
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 446,
+              "message": "`ThreeWaySignalIdentity::Label` variant と `ThreeWaySignal::label` method は、IN-03 / CO-03 の spec_refs で宣言されていますが、これらの anchors は unplaced catalogue type/trait の identity と type-vs-trait namespace を規定するもので、non-catalogue label identity の追加を根拠付けていません。未仕様化の identity surface を削除するか、対応する仕様 anchor を追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:c861d828139e5b88bb35ed8b16c5acc25645fe2cbbddd881310cb770b57639a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T16:50:13Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 420,
+              "message": "`ThreeWaySignalIdentity` の `docs` は「既存の trait-impl report label surface を preserve する」という上流設計 rationale / compatibility contract を散文で再記述しています。下流 catalogue docs は変更対象・操作・anchor cite に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:5ecfdf2da8ed3ca0afc1f45d282ffd2513a218e6fcabd90b322ae2a233c4fa67",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T17:03:13Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 420,
+              "message": "`ThreeWaySignalIdentity` の `docs` は、catalogue item と residual label の identity 構造を上流の挙動契約として再記述しています。下流 catalogue docs は変更対象・操作・anchor cite に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 1578,
+              "message": "`ThreeWaySignal::label` の `docs` は、residual label signal の構築という挙動契約を再記述しています。下流 catalogue docs は anchor cite による参照に留めてください（no-upstream-restatement）。",
+              "severity": "P2"
+            },
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 446,
+              "message": "`ThreeWaySignalIdentity::Label` variant と `ThreeWaySignal::label` method は residual label surface を追加していますが、IN-02 / CO-02 / AC-02 は function identity と root alias canonicalization を規定し、residual label identity の追加を根拠付けていません。対応する仕様根拠がないため、この追加 surface の spec_refs は off-topic です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:f651317c2092b17bcaea0ada3975c7dad080336a66f3556fe8d970c2e7a99309",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T17:43:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4689f0e3f310b4662f7239beff68dd81b8e459b70108ef1d2f16a675c0410724",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T17:50:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4689f0e3f310b4662f7239beff68dd81b8e459b70108ef1d2f16a675c0410724",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1926,6 +2344,35 @@
           "at": "2026-08-26T03:19:47Z",
           "findings": [],
           "hash": "rvw1:sha256:a298d13159d7db6bf70fc08b0926052e913a976b679d37b207d913aa87860c5e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:04:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e09274c60f04abfbf99f942b203b94360c9bf238f0ec318d2f94f114f06798f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T20:11:01Z",
+          "findings": [
+            {
+              "category": "spec_conformance",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 583,
+              "message": "`CatalogueItemMissingFromActualEvaluator` は catalogue 由来の `Struct` を検出しているのに、信号を `Label` として構築するため namespace が `None` になります。CO-05/AC-05 が要求する namespace 付き catalogue identity の本番経路をこのテストが迂回し、回帰を隠します。`CatalogueItemNamespace::Type` を指定して `ThreeWaySignal::catalogue_item` を使用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e09274c60f04abfbf99f942b203b94360c9bf238f0ec318d2f94f114f06798f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T20:16:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b0fb81c180b265efd52af2939c01437345a6782da43d30552aff3b0a3bdf2c4",
           "type": "final",
           "verdict": "zero_findings"
         }

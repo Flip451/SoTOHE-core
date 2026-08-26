@@ -135,9 +135,17 @@ fn reject_duplicate_identity(
             schema_error(format!("invalid existing catalogue entry key `{raw_key}`: {error}"))
         })?;
         let module_path = if raw_key.contains("::") {
-            ModulePath::root()
+            Some(ModulePath::root())
         } else {
             existing_module_path(raw_key, entry)?
+        };
+        // D3: an omitted placement is unresolved, not the crate root. Such a
+        // declaration resolves to the unique same-named current item, which is
+        // exactly what this import would place (an ambiguous current set fails
+        // closed elsewhere), so a second declaration is a duplicate. Reject it
+        // before resolution.
+        let Some(module_path) = module_path else {
+            return Err(CatalogError::DuplicateEntry { entry_key: new_name.clone() });
         };
         let existing_identity = FullyQualifiedItemPath::from_catalogue_entry_key(
             &crate_name,
@@ -158,23 +166,26 @@ fn terminal_entry_name(key: &str) -> &str {
     key.rsplit("::").next().unwrap_or(key)
 }
 
+/// Decodes an existing bare entry's placement exactly as `CatalogueDocumentCodec`
+/// does: an omitted or empty `module_path` is an unresolved placement (`None`),
+/// the explicit root marker is the crate root, and any other value is parsed.
 fn existing_module_path(
     raw_key: &str,
     entry: &serde_json::Value,
-) -> Result<ModulePath, CatalogError> {
+) -> Result<Option<ModulePath>, CatalogError> {
     let Some(module_value) = entry.get("module_path") else {
-        return Ok(ModulePath::root());
+        return Ok(None);
     };
     let module = module_value.as_str().ok_or_else(|| {
         schema_error(format!("existing entry `{raw_key}` has an invalid `module_path`"))
     })?;
-    // The document codec writes `Some(ModulePath::root())` as the explicit
-    // root marker; decode it here exactly as `CatalogueDocumentCodec` does so
-    // an explicit-root entry compares by identity instead of failing to parse.
-    if module.is_empty() || module == EXPLICIT_ROOT_MODULE_PATH {
-        return Ok(ModulePath::root());
+    if module.is_empty() {
+        return Ok(None);
     }
-    ModulePath::from_str(module).map_err(|error| {
+    if module == EXPLICIT_ROOT_MODULE_PATH {
+        return Ok(Some(ModulePath::root()));
+    }
+    ModulePath::from_str(module).map(Some).map_err(|error| {
         schema_error(format!("existing entry `{raw_key}` has invalid module_path: {error}"))
     })
 }
@@ -536,6 +547,39 @@ mod tests {
 
         assert!(matches!(error, CatalogError::DuplicateEntry { .. }));
         assert!(!resolver_called.get(), "identity duplicate must fail before resolution");
+    }
+
+    #[test]
+    fn test_import_duplicate_rejected_for_unplaced_same_name_entry() {
+        // D3: an omitted (or empty-string) `module_path` is an unresolved
+        // placement. The bare declaration resolves to the unique same-named
+        // current item, which is what this import would place, so it is a
+        // duplicate and must be rejected before resolution.
+        for module_path in [json!({}), json!({"module_path": ""})] {
+            let temp = tempfile::tempdir().unwrap();
+            let path = seed_catalogue(temp.path());
+            let mut document: Value =
+                serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+            document["types"] = json!({ "LayerId": module_path });
+            std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+            let resolver_called = std::cell::Cell::new(false);
+
+            let error = import_entry_to_file(
+                &path,
+                temp.path(),
+                &import_command(CatalogImportAction::Reference),
+                "spec.json",
+                &BTreeSet::new(),
+                || {
+                    resolver_called.set(true);
+                    Ok(sample_shape())
+                },
+            )
+            .unwrap_err();
+
+            assert!(matches!(error, CatalogError::DuplicateEntry { .. }), "{error:?}");
+            assert!(!resolver_called.get(), "unplaced duplicate must fail before resolution");
+        }
     }
 
     #[test]
