@@ -19,10 +19,9 @@
   "schema_version": 2,
   "tasks": [
     {
-      "commit_hash": null,
       "description": "Update test_version_probe_terminates_descendant_after_clean_pipe_drain in libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs to replace the immediate descendant-state assertion with bounded re-observation. IN-01; IN-02; OUT-01; OUT-02; CN-01; CN-02; CN-05; AC-01; AC-02; AC-03; AC-04; AC-05.",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

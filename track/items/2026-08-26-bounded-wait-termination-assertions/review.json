@@ -70,6 +70,75 @@
           "hash": "rvw1:sha256:63e9ab19040b24d93dcc03dddc34174b0bd15860ffcf19dc9a35b9f61a687643",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:35:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8a9336c0f5d68532797a04f8047000dd34edf53969d404d33f9e617d4cdd30b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:38:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8a9336c0f5d68532797a04f8047000dd34edf53969d404d33f9e617d4cdd30b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-26T10:21:11Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 789,
+              "message": "The polling loop treats any `/bin/kill -0 <pid>` failure as proof that the intended descendant vanished. Because only the numeric PID is recorded, PID reuse can make an unrelated process appear to be the descendant and cause a false timeout/failure during the five-second wait. Capture and compare a process identity (for example Linux `/proc/<pid>/stat` start time) or use an equivalent identity-safe mechanism before accepting the result.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d7f0f090addffd564fd00b2495b6fb32a4349728877bb7d5c97cd48afe142484",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T10:32:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1dc771992646e0d6688376b72f8afbaf5ddcd3dd30159ed94a6abb6001e1cc9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:39:47Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 796,
+              "message": "Linux 分岐は `/proc/<pid>/stat` が常に読め、field 22 の start-time 形式であることを新たに必須化しています。しかし、この前提は spec にも未記入の `environment-assumptions.md` にも宣言されていません。procfs が未 mount・制限された Linux 環境では `descendant.stat` が空になり、ここで有界待ち前に panic して AC-03 に反します。前提を正式に宣言するか、identity snapshot を optional にして観測不能を時間上限まで transitional として扱ってください（未宣言の前提への依存）。",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs",
+              "line": 837,
+              "message": "`process_start_time != expected_start_time` は元の子孫プロセスが既に消滅し、その PID が再利用された証拠です。これを transitional として扱うと、再利用先の無関係なプロセスが5秒以上生存した場合、cleanup が成功していてもテストが timeout し、AC-01 の「対象消滅なら成功」に反します。identity mismatch では成功終了してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1dc771992646e0d6688376b72f8afbaf5ddcd3dd30159ed94a6abb6001e1cc9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T10:47:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4456b9cb7a2f2c71c883cacc71b82e7348378716ddb8de37a97a4aaae8381701",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

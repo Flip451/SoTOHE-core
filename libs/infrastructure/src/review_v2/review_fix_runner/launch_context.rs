@@ -768,38 +768,99 @@ mod tests {
         std::fs::create_dir(&repository_root).expect("repository root");
         let probe = directory.path().join("detached-output-probe.sh");
         let descendant_pid = directory.path().join("descendant.pid");
-        std::fs::write(
-            &probe,
-            "#!/bin/sh\nsleep 60 </dev/null >/dev/null 2>&1 &\nprintf '%s' \"$!\" > \"${0%/*}/descendant.pid\"\nprintf 'codex 0.125.0\\n'\nexit 0\n",
-        )
-        .expect("version probe script");
+        #[cfg(target_os = "linux")]
+        let descendant_stat = directory.path().join("descendant.stat");
+        #[cfg(target_os = "linux")]
+        let probe_script = "#!/bin/sh\nsleep 60 </dev/null >/dev/null 2>&1 &\ndescendant_pid=$!\ndescendant_stat=\nIFS= read -r descendant_stat < \"/proc/$descendant_pid/stat\"\nprintf '%s' \"$descendant_pid\" > \"${0%/*}/descendant.pid\"\nprintf '%s' \"$descendant_stat\" > \"${0%/*}/descendant.stat\"\nprintf 'codex 0.125.0\\n'\nexit 0\n";
+        #[cfg(not(target_os = "linux"))]
+        let probe_script = "#!/bin/sh\nsleep 60 </dev/null >/dev/null 2>&1 &\nprintf '%s' \"$!\" > \"${0%/*}/descendant.pid\"\nprintf 'codex 0.125.0\\n'\nexit 0\n";
+        std::fs::write(&probe, probe_script).expect("version probe script");
         std::fs::set_permissions(&probe, std::fs::Permissions::from_mode(0o755))
             .expect("make probe executable");
         let context = TrustedLaunchContext { repository_root };
 
         let (status, _) =
             context.run_version_probe(probe.as_os_str(), &[]).expect("version probe must succeed");
-        let process_id = std::fs::read_to_string(descendant_pid).expect("descendant pid");
-        let still_running = Command::new("/bin/kill")
-            .args(["-0", process_id.trim()])
-            .output()
-            .expect("check descendant process")
-            .status
-            .success();
+        let process_identity = std::fs::read_to_string(descendant_pid).expect("descendant pid");
+        let process_id = process_identity.split_whitespace().next().expect("descendant pid");
+        #[cfg(target_os = "linux")]
+        fn parse_process_stat(process_stat: &str) -> Option<(String, String)> {
+            let (_, fields) = process_stat.rsplit_once(") ")?;
+            let mut fields = fields.split_whitespace();
+            let process_state = fields.next()?.to_owned();
+            let process_start_time = fields.nth(18)?.to_owned();
+            Some((process_state, process_start_time))
+        }
+
+        #[cfg(target_os = "linux")]
+        let expected_start_time = std::fs::read_to_string(descendant_stat)
+            .ok()
+            .and_then(|process_stat| parse_process_stat(&process_stat))
+            .map(|(_, process_start_time)| process_start_time);
+        const DESCENDANT_TERMINATION_TIMEOUT: Duration = Duration::from_secs(5);
+        const DESCENDANT_REOBSERVATION_INTERVAL: Duration = Duration::from_millis(25);
+
+        let observation_started = Instant::now();
+        let mut last_observed_state = String::from("not observed");
+        let descendant_terminated = loop {
+            let kill_output =
+                match Command::new("/bin/kill").args(["-0", process_id.trim()]).output() {
+                    Ok(output) => output,
+                    Err(error) => {
+                        last_observed_state = format!("kill probe unavailable: {error}");
+                        if observation_started.elapsed() >= DESCENDANT_TERMINATION_TIMEOUT {
+                            break false;
+                        }
+                        std::thread::sleep(DESCENDANT_REOBSERVATION_INTERVAL);
+                        continue;
+                    }
+                };
+
+            if !kill_output.status.success() {
+                break true;
+            }
+
+            #[cfg(target_os = "linux")]
+            {
+                let process_observation =
+                    std::fs::read_to_string(format!("/proc/{process_id}/stat"))
+                        .ok()
+                        .and_then(|process_stat| parse_process_stat(&process_stat));
+
+                if let Some((process_state, process_start_time)) = process_observation {
+                    if let Some(expected_start_time) = expected_start_time.as_deref() {
+                        if process_start_time != expected_start_time {
+                            last_observed_state = format!(
+                                "pid identity changed (start time {process_start_time} != expected {expected_start_time})"
+                            );
+                            break true;
+                        }
+                    }
+
+                    last_observed_state = process_state.clone();
+                    if process_state == "Z" {
+                        break true;
+                    }
+                } else {
+                    last_observed_state = String::from("identity unavailable");
+                }
+            }
+
+            #[cfg(not(target_os = "linux"))]
+            {
+                last_observed_state = String::from("running");
+            }
+
+            if observation_started.elapsed() >= DESCENDANT_TERMINATION_TIMEOUT {
+                break false;
+            }
+            std::thread::sleep(DESCENDANT_REOBSERVATION_INTERVAL);
+        };
 
         assert!(status.success());
-        #[cfg(target_os = "linux")]
-        if still_running {
-            let process_state =
-                std::fs::read_to_string(format!("/proc/{}/stat", process_id.trim()))
-                    .expect("inspect terminated descendant");
-            assert_eq!(
-                process_state.split_whitespace().nth(2),
-                Some("Z"),
-                "a descendant that remains visible must be a non-running zombie"
-            );
-        }
-        #[cfg(not(target_os = "linux"))]
-        assert!(!still_running, "descendant must not outlive its direct child");
+        assert!(
+            descendant_terminated,
+            "descendant termination exceeded DESCENDANT_TERMINATION_TIMEOUT ({DESCENDANT_TERMINATION_TIMEOUT:?}); last observed state: {last_observed_state}"
+        );
     }
 }
