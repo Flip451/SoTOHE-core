@@ -36,10 +36,9 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

@@ -33,6 +33,39 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-26T12:39:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eec1ccca112606c76c21423eac67bfef986f3a3ca5642bd222b7a7947560786a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:44:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 59,
+              "message": "The interaction count contradicts note (5): this says exactly two interactions are sanctioned, while note (5) additionally permits asking the user for a refresh on hosts without automatic context management. That makes the CN-07 fallback simultaneously allowed and excluded by the adapter’s autonomy accounting. Count only unconditional approval pauses, or explicitly include the conditional refresh interaction in the accounting.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:eec1ccca112606c76c21423eac67bfef986f3a3ca5642bd222b7a7947560786a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T12:51:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a3587407ca9d556af9ba2d83f174d564a50918238745bfcd3588a0889f26c1b1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -118,6 +151,20 @@
           "at": "2026-08-26T12:25:04Z",
           "findings": [],
           "hash": "rvw1:sha256:44a029781c30d6e395635cf9e7691f6aefa1829286572ae69091a5bec80357f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:39:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e7e4bb79a5d037b320e597842f62256fb4194748add40b0bb4327c6663d84f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T12:42:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e7e4bb79a5d037b320e597842f62256fb4194748add40b0bb4327c6663d84f",
           "type": "final",
           "verdict": "zero_findings"
         }

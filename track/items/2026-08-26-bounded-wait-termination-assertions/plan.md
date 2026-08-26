@@ -6,7 +6,7 @@
 GO-01 → T001. The settled task verifies eventual descendant termination with a bounded re-observation loop and leaves production cleanup behavior unchanged.
 GO-02 and GO-03 → T002. .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md: realign the parent-session refresh / resume wording. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
 
-## Tasks (1/2 resolved)
+## Tasks (2/2 resolved)
 
 ### S1 — Bounded descendant-termination observation
 
@@ -18,4 +18,4 @@ GO-02 and GO-03 → T002. .harness/workflows/track/adr2pr.md, .claude/commands/t
 
 > Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
 
-- [ ] **T002**: Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
+- [x] **T002**: Update .harness/workflows/track/adr2pr.md, .claude/commands/track/adr2pr.md, and .agents/skills/track-adr2pr/SKILL.md. Anchor: knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md#D4. GO-02; GO-03; IN-03; IN-04; IN-05; CN-06; CN-07; AC-06; AC-07.
