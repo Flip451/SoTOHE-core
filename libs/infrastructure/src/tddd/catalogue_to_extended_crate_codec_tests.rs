@@ -2788,6 +2788,91 @@ fn test_encode_undeclared_type_ref_field_returns_unresolved_identifier() {
 }
 
 #[test]
+fn test_encode_modify_present_only_in_current_fails_closed() {
+    // D3: a non-add declaration resolves against the baseline only. An identity
+    // that exists solely in the current rustdoc must be rejected, not accepted
+    // through the merged resolution set.
+    for module_path in [None, Some(ModulePath::root())] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            CatalogueEntryKey::try_new("OnlyCurrent".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Modify,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                module_path,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let baseline = rustdoc_crate_with_paths([]);
+        let current =
+            rustdoc_crate_with_paths([(1, vec!["domain", "OnlyCurrent"], ItemKind::Enum)]);
+        let error = CatalogueToExtendedCrateCodec::new()
+            .encode(doc, &baseline, &current)
+            .expect_err("a modify declaration absent from the baseline must fail closed");
+        let message = error.to_string();
+        assert!(
+            message.contains("OnlyCurrent"),
+            "error must name the rejected declaration: {message}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_delete_present_only_in_current_fails_closed() {
+    // D3: a deletion names something that existed in the baseline; a key that
+    // only the current rustdoc knows must be rejected.
+    let mut doc = make_doc("domain");
+    doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("Removed".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+    let baseline = rustdoc_crate_with_paths([]);
+    let current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "gone", "Removed"], ItemKind::Struct)]);
+    let error = CatalogueToExtendedCrateCodec::new()
+        .encode(doc, &baseline, &current)
+        .expect_err("a deletion absent from the baseline must fail closed");
+    assert!(error.to_string().contains("Removed"));
+}
+
+#[test]
+fn test_encode_non_add_external_only_name_fails_closed() {
+    // D3: an omitted non-add declaration must resolve to a local catalogue
+    // crate baseline item, not to an external rustdoc item with the same name.
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("String".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut baseline =
+        rustdoc_crate_with_paths([(1, vec!["std", "string", "String"], ItemKind::Struct)]);
+    baseline.paths.get_mut(&Id(1)).expect("fixture path exists").crate_id = 7;
+
+    let error = CatalogueToExtendedCrateCodec::new()
+        .encode(doc, &baseline, &baseline)
+        .expect_err("an external-only baseline name must not satisfy a local declaration");
+    assert!(error.to_string().contains("String"));
+}
+
+#[test]
 fn test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed() {
     let mut doc = make_doc("domain");
     doc.insert_type(
@@ -2888,6 +2973,44 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
     let ec = encode_doc(doc).unwrap();
     let has_serde = ec.krate().external_crates.values().any(|e| e.name == "serde");
     assert!(has_serde, "expected 'serde' in external_crates");
+}
+
+#[test]
+fn test_encode_trait_impl_nested_type_paths_register_only_syntax_crate_names() {
+    let mut doc = make_doc("domain");
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("serde::Serialize").unwrap(),
+        TypeRef::new("&ext::Foo").unwrap(),
+    ));
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("serde::Serialize").unwrap(),
+        TypeRef::new("(ext::Foo, other::Bar)").unwrap(),
+    ));
+
+    let mut baseline = authoritative_crate_for_doc(&doc);
+    baseline.paths.insert(
+        Id(10_000),
+        ItemSummary {
+            crate_id: 7,
+            path: vec!["other".to_owned(), "Bar".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let encoded = CatalogueToExtendedCrateCodec::new()
+        .encode(doc, &baseline, &baseline)
+        .expect("nested trait-impl type paths must encode");
+    let external_names = encoded
+        .krate()
+        .external_crates
+        .values()
+        .map(|external| external.name.as_str())
+        .collect::<Vec<_>>();
+    assert!(external_names.contains(&"ext"), "expected ext crate: {external_names:?}");
+    assert!(external_names.contains(&"other"), "expected other crate: {external_names:?}");
+    assert!(
+        !external_names.iter().any(|name| name.starts_with('&') || name.starts_with('(')),
+        "syntax punctuation must not become crate names: {external_names:?}"
+    );
 }
 
 // -----------------------------------------------------------------------

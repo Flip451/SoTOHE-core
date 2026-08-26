@@ -8,8 +8,9 @@
 //!
 //! 1. Pre-pass Id assignment: assign incremental `rustdoc_types::Id`s to all entries.
 //!    Id(0) is reserved for the root module.
-//! 2. External crate collection: gather `TraitImplDeclV2::origin_crate` names and
-//!    `TypeRef` crate prefixes to build `Crate::external_crates`.
+//! 2. External crate collection: the TypeRef parser gathers crate prefixes from
+//!    trait implementations and their nested type expressions to build
+//!    `Crate::external_crates`.
 //! 3. TypeRef parse: convert each `TypeRef` string via `syn::parse_str` into
 //!    `rustdoc_types::Type`. Unresolvable identifiers become open-world "unresolved
 //!    markers" (ADR 2 D10).
@@ -157,7 +158,13 @@ impl CatalogueToExtendedCratePort for CatalogueToExtendedCrateCodec {
         current: &Crate,
     ) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
         let resolution_paths = resolution_paths_for_catalogue(&doc, baseline, current)?;
-        Encoder::new(doc, resolution_paths).run()
+        // Non-add declarations and deletions must resolve against the baseline
+        // only (D3): keep the baseline identity set separate from the merged
+        // resolution set the add route reads.
+        let baseline_paths = normalized_paths_for_doc(baseline, doc.crate_name());
+        let baseline_identities =
+            paths_from_map_for_catalogue_crate(&baseline_paths, doc.crate_name());
+        Encoder::new(doc, resolution_paths, baseline_identities).run()
     }
 }
 
@@ -303,6 +310,18 @@ fn identity_path(identity: &FullyQualifiedItemPath) -> Vec<String> {
 
 fn paths_from_map(paths: &HashMap<Id, ItemSummary>) -> BTreeSet<FullyQualifiedItemPath> {
     paths.values().filter_map(summary_identity).collect()
+}
+
+fn paths_from_map_for_catalogue_crate(
+    paths: &HashMap<Id, ItemSummary>,
+    catalogue_crate: &domain::tddd::catalogue_v2::CrateName,
+) -> BTreeSet<FullyQualifiedItemPath> {
+    paths
+        .values()
+        .filter(|summary| summary.crate_id == 0)
+        .filter_map(summary_identity)
+        .filter(|identity| identity.crate_name() == catalogue_crate)
+        .collect()
 }
 
 fn summary_identity(summary: &ItemSummary) -> Option<FullyQualifiedItemPath> {

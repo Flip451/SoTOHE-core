@@ -1048,6 +1048,64 @@
           "hash": "rvw1:sha256:9f84516af0ff909cd7192a2ff051df7164eea11e26dbd4d2fec0e6ed1e495354",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T10:53:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:598e3cc9689950ab17748a9f5ddd2d46064cea584f199f920e2918628876d0c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T11:05:30Z",
+          "findings": [
+            {
+              "category": "identity-semantics",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 164,
+              "message": "`baseline_identities` includes external-crate paths from `Crate::paths`. For an omitted non-add key with no local baseline match, `resolve_catalogue_identity_in_namespace` can fall back to an external item with the same bare name (for example `String` or `Clone`), so modify/reference/delete is accepted instead of failing closed. Restrict the declaration/deletion baseline universe to the catalogue crate and add an external-only regression case.",
+              "severity": "P1"
+            },
+            {
+              "category": "clippy",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 385,
+              "message": "Production code directly slices strings here and again at line 387. The workspace denies `clippy::indexing_slicing`, and the no-panic convention forbids `str[range]` in adapters even when offsets come from `find`, so the required Clippy gate will fail. Use `split_once` or checked `get` access.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 99,
+              "message": "This production-only module is now 735 lines, exceeding the repository's 700-line maximum. Move a cohesive responsibility such as declaration identity resolution or external-crate collection into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:598e3cc9689950ab17748a9f5ddd2d46064cea584f199f920e2918628876d0c9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T11:17:35Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 185,
+              "message": "`extract_crate` tokenizes arbitrary `TypeRef` syntax with string splitting. Valid trait-impl targets such as `&ext::Foo` make `first_seg` equal `&ext`, so the codec registers a bogus `ExternalCrate` named `&ext` before the real parsed path is resolved. Reuse the `syn`/TypeRef parser to collect actual path roots (or rely on the later resolution pass) and add coverage for reference/compound impl targets.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9bf1420254788e3b6491fe2db09f7f2664fb3fa9d9b719c565e9c442810bec9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T11:29:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5fd4c0f833c2b044611e3d715e0c5d5779e048c3ffa134b081cbccbe1d3ff7e2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
