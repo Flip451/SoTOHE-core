@@ -30,6 +30,20 @@
           "hash": "rvw1:sha256:8fca531cbc373b8e3163fd36f1d60348bcf3151e0ef321a8e40076b3f4a8c39c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:15:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cad6e7f36c16750585b0f9fa9faa9b32081c89ab5508a3c625ea9e58cb4b9aed",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:19:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cad6e7f36c16750585b0f9fa9faa9b32081c89ab5508a3c625ea9e58cb4b9aed",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1187,6 +1201,20 @@
           "hash": "rvw1:sha256:36d2ae3a6e9e7a70560d4c94c1577bdb750d44e6250e3f31b8ce2c31f23b8f08",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:16:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:20:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1672,6 +1700,24 @@
           "at": "2026-08-25T05:26:27Z",
           "findings": [],
           "hash": "rvw1:sha256:3175eb779c7d9974e0a8d9cb73ccecf4af0982d3169f6585029092f30dd78633",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-26T02:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:22:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
           "type": "final",
           "verdict": "zero_findings"
         }
