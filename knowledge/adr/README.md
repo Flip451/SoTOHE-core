@@ -190,6 +190,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 | [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
 | [子プロセスの診断出力は末尾リングで保持し、出力量で kill しない](2026-08-14-1048-child-output-ring-capture.md) | Proposed | 2026-08-14 |
+| [シークレット秘匿の正規表現を fail-closed にする](2026-08-20-1053-sensitive-redaction-fail-closed.md) | Proposed | 2026-08-20 |
 
 ### ADR 運用
 

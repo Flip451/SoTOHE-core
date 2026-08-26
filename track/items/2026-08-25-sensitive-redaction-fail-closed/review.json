@@ -1,0 +1,195 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:02:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93329c107568ddd9bfb7c23a07f4240ac55dbc924966579f4b68950f9792145b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:06:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93329c107568ddd9bfb7c23a07f4240ac55dbc924966579f4b68950f9792145b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:25:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:30:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:51:11Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-sensitive-redaction-fail-closed/impl-plan.json",
+              "line": 6,
+              "message": "S1 の description は、fail-stop、スキップ禁止、既存挙動維持という upstream の挙動契約を散文で再記述しています。変更対象 + 操作 + anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-sensitive-redaction-fail-closed/impl-plan.json",
+              "line": 16,
+              "message": "S2 の description は、silent degradation を禁止するという upstream の挙動契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-sensitive-redaction-fail-closed/impl-plan.json",
+              "line": 33,
+              "message": "T001 の description は、fail-stop 構築、既存秘匿挙動の維持、静的リテラルの eager 検証、動的パターンと起動時コマンドの除外を散文で再記述しています。対象 + 操作 + anchor cite に簡約してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-sensitive-redaction-fail-closed/impl-plan.json",
+              "line": 39,
+              "message": "T002 の description は、silent degradation の禁止と構築・初期化失敗時の停止という upstream の挙動契約を再記述しています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9d3aeb555922ce8d3d60e23f680a15d3152f26436e3450d5baf326f997d85735",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:53:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa987de95ed616e37fcb751bc57b9a27aa68ea49742b9da56e221b8d61edc4e9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:57:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa987de95ed616e37fcb751bc57b9a27aa68ea49742b9da56e221b8d61edc4e9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:24:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d902b02c5997960702386b93449a927e89b376bf360dca24726d8664c677066",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:29:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d902b02c5997960702386b93449a927e89b376bf360dca24726d8664c677066",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:44:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9570478c4f05fa177ba050a6f2755f2104104852dce1da6ceba3071f1deb6dbe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:47:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9570478c4f05fa177ba050a6f2755f2104104852dce1da6ceba3071f1deb6dbe",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:50:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:886ce10919a031adc96768e2ff5b88ca39da0beefac551ac7bd6b19aba2675ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:56:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:886ce10919a031adc96768e2ff5b88ca39da0beefac551ac7bd6b19aba2675ba",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:24:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06ffb691ec5f1aef8e236d9e6d505653d42baa6395ea9abd28464e9c79ad7c9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:27:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06ffb691ec5f1aef8e236d9e6d505653d42baa6395ea9abd28464e9c79ad7c9f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:41:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:86939aa5d11e18da75fa5efbffe1f154d1824809c111e1eff3a67dee002d6bf0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:44:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:86939aa5d11e18da75fa5efbffe1f154d1824809c111e1eff3a67dee002d6bf0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:26:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:33:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
