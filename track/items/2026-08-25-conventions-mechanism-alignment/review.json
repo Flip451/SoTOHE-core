@@ -210,6 +210,20 @@
           "hash": "rvw1:sha256:08c41a50ccea0d5420f7a1c51d1d60ba24f1d682b49f942dfc87069300532ab7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:14:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c185122903b2653c5e0736beef3a7587f4d4e8100ffc4bd3acd1720e2691656",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:18:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c185122903b2653c5e0736beef3a7587f4d4e8100ffc4bd3acd1720e2691656",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1122,6 +1136,107 @@
           "at": "2026-08-25T22:21:32Z",
           "findings": [],
           "hash": "rvw1:sha256:69f96bb809aae17cd06cb7ac0e3e9a7512a1fc632b2c5ad535d1b710f4194760",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:17:18Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": "AGENTS.md",
+              "line": 1,
+              "message": "AGENTS.md is still marked unmerged (`UU`) in the index, so this scope cannot be committed cleanly even though the worktree text appears resolved. Resolve and stage the file before delivery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:20:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:31:35Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 21,
+              "message": "PR reviewer 用に移した規則が、秘匿境界の静的リテラル正規表現に認められた限定的な `expect` 例外を落としています。これでは正しい fail-stop 実装を automated PR reviewer が違反として扱います。`coding-principles.md` と移動前の `AGENTS.md` にある限定例外を同期してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 23,
+              "message": "エラー伝搬を `?` に限定していますが、`coding-principles.md` は、全分岐が `Result` を返してエラーを捨てない型付き変換・コンテキスト付与の exhaustive `match` を許可しています。このままでは正当な実装に誤った PR finding が出ます。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 32,
+              "message": "「外部依存は mock 必須」は `testing.md` の fake-first 規則と逆です。同規則は deterministic fake を既定とし、mock は呼出回数・順序・retry 等の interaction 自体が仕様の場合だけ許可しています。PR reviewer の規則もその境界に合わせてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/review.md",
+              "line": 47,
+              "message": "ローカル review から project convention の入力経路が消えています。ここでは `Related Conventions` を読まない一方、dispatcher が resolved paths を briefing に入れる前提ですが、`reviewer` / `review-fix-lead` は `review local` / `fix-local` の typed-pipeline であり、convention resolver を持つ generic `capability exec` を通りません。そのため briefing に規約 path を入れる主体がなく、fake-first や限定 `expect` などの規約を reviewer/fixer が読まないまま `zero_findings` にできます。review wrapper に resolver を配線するか、workflow 側で規約 path を解決して briefing に記載してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:45:52Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/rules/orchestration.md",
+              "line": 54,
+              "message": "typed-pipeline の local review では workflow 自身が convention path を解決するよう修正されましたが、この詳細 orchestration rule は依然として「dispatcher が全 capability briefing に供給し、orchestrator は列挙しない」と指示しています。`/track:review` 実行時にも読み込まれる規則なので、Claude root が workflow-owned resolution を省略し得ます。local reviewer / review-fix-lead の例外をここにも同期してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".codex/instructions.md",
+              "line": 24,
+              "message": "review SSoT は local typed-pipeline briefing の作成時に track の convention refs と `knowledge/conventions/README.md` の index を読むよう要求しますが、この Codex root rule は convention list を diff/blocker 調査時以外は開かないよう制限しています。Codex 側には Claude adapter に追加された typed-review 例外がないため、規約 path が briefing から再び欠落し得ます。該当する限定例外を Command/Context rule に追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".codex/agents/orchestrator.toml",
+              "line": 13,
+              "message": "Codex orchestrator agent の責務も artifact body を diff/blocker 時だけ開くと限定したままで、review SSoT が新たに所有する convention-index/path resolution を許可していません。`.codex/instructions.md` だけを直してもこの agent 定義が同じ処理を抑止するため、typed-pipeline local review の限定例外をこちらにも同期してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f2a317bf0ea4269228b0228de332f043602d8ac8f0915322e74e6706a13b558d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:52:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342c3c43ffe85cb1faa089bada1fed025a93375265d63d9bd8747f001e3b0c3e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:55:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342c3c43ffe85cb1faa089bada1fed025a93375265d63d9bd8747f001e3b0c3e",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -65,10 +65,13 @@ audit presented. A mismatch means the audited bytes are no longer the merge cand
 without invoking the wrapper and re-invoke this workflow from Step 0 for a fresh audit.
 
 After that clean audit and head-OID verification, invoke the wrapper without an additional
-confirmation prompt. It waits for remote CI to become green and then merges; a failing check or
-timeout still stops the workflow fail-closed.
+confirmation prompt. Run it once as a single blocking call and read its terminal result once. If
+the host backgrounds the call, read the result once after the single completion notification. Do
+not wrap it in a polling loop, re-check PR status periodically, or launch it fire-and-forget. The
+wrapper owns the remote-CI wait and merge; a failing check or timeout still stops the workflow
+fail-closed.
 
-The current wrapper re-fetches the remote ref while polling and merging without binding the
+The current wrapper re-fetches the remote ref while waiting and merging without binding the
 audited OID, so a head change inside that window is not rejected mechanically. This residual
 window is a user-adjudicated accepted operational trade-off, not an oversight: the workflow is
 user-attended at invocation and the repository is single-writer, so a head change inside the
@@ -96,14 +99,14 @@ bin/sotp pr wait-and-merge <pr_number> --method <method>    # explicit caller ov
    unresolved (not `done` or `skipped`). This is the only workflow that enforces task
    completion — push and PR review are allowed with unresolved tasks.
 2. **Strict merge-signal gate**: evaluates the signal-gate configuration at merge strictness
-   (🟡 also blocks) after the task guard and before polling. On failure, `wait-and-merge`
-   exits directly with a blocked report; it is not a polled PR check. The blocked report is
+   (🟡 also blocks) after the task guard and before the CI wait. On failure, `wait-and-merge`
+   exits directly with a blocked report; it is not a separate PR-check wait result. The blocked report is
    generic — it does not identify whether a blocking finding is an intentional 🟡 (an
    admitted delta draft awaiting the user's adjudication), and the orchestrator must not
    make that distinction by judging content. Route every strict-gate block through the
    block triage in Failure/recovery below; only a guardian-confirmed admitted draft enters
    the dedicated adjudication recovery.
-3. Polls `gh pr checks` every 15 seconds with a 10 minute timeout.
+3. Waits for `gh pr checks` to become green, stopping on a failing check or timeout.
 4. **Method resolution**: when `--method` is omitted, resolves the merge method from the PR's
    track `branch_strategy_snapshot.merge_method`; an explicit `--method` always overrides it.
 5. On all checks passed: merges via `gh pr merge --<method>`. (The follow-up implementation
@@ -132,8 +135,8 @@ After a successful merge:
 | 2    | Pre-invocation and post-outcome PR-head checks match the audited OID | pass / fail (pre-invocation mismatch → re-invoke from Step 0; post-outcome mismatch → audit-invalidating incident to the user; the in-wrapper window is the user-adjudicated accepted residual until the head-bound wrapper ships) |
 | 2    | `bin/sotp pr wait-and-merge` exits 0 | pass / fail |
 | 2    | Task completion guard passes | pass / fail |
-| 2    | Strict merge-signal gate passes before polling | pass / fail (blocked → block triage; guardian-confirmed intentional 🟡 → adjudication recovery) |
-| 2    | Polled PR checks all green | pass / fail |
+| 2    | Strict merge-signal gate passes before the CI wait | pass / fail (blocked → block triage; guardian-confirmed intentional 🟡 → adjudication recovery) |
+| 2    | PR checks are green after the wrapper's CI wait | pass / fail |
 
 The Step 1 terminal audit and the Step 2 head-OID checks are orchestrator-enforced gates
 outside `bin/sotp pr wait-and-merge`. The Step 2 task, signal, and PR-check guards are
@@ -204,8 +207,8 @@ re-invoke this workflow from Step 1 for a fresh terminal audit.
   (adr-editor restores the prior valid text, adr-diagnoser confirms the byte match, then a
   reason-less `--kind non-semantic-fix` restamp), complete any required re-processing, and
   re-invoke.
-- **Wait timeout**: inspect the pending checks (`bin/sotp pr status <pr_number>`) and either wait
-  longer (re-invoke) or diagnose the blocked check.
+- **Wait timeout**: report the pending checks from the wrapper's terminal result and stop. Do not
+  poll or re-invoke automatically.
 
 ## Outputs
 

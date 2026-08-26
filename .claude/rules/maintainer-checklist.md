@@ -1,4 +1,21 @@
+---
+paths:
+  - ".harness/**"
+  - ".claude/**"
+  - ".agents/**"
+  - ".codex/**"
+  - ".gemini/**"
+  - "knowledge/conventions/**"
+  - "architecture-rules.json"
+  - "README.md"
+  - "CLAUDE.md"
+  - "AGENTS.md"
+---
+
 # Maintainer Checklist
+
+This conditionally loaded checklist is for maintainers only; it is not an always-applied
+orchestrator rule or PR-review briefing.
 
 When changing workflow or architecture, update all affected layers together.
 

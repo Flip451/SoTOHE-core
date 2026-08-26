@@ -15,16 +15,28 @@ cycle until the DRY gate passes (Approved), the loop is exhausted with violation
 `sotp dry write` is the **sole writer** of `dry-check.json`. This capability applies source-code
 fixes; it never edits `dry-check.json` directly.
 
+## Gate waiting and evaluate boundary
+
+Run each long-running `bin/sotp` gate or `cargo make` gate as one blocking call and read its
+terminal result once. If the host backgrounds a call, read the result once after the single
+completion notification. Do not poll output, re-run status probes, or launch a gate
+fire-and-forget. The Step 4 repetitions are repair iterations after an applied fix, not polling.
+This capability never runs `bin/sotp test-obligation evaluate`: that command is an
+orchestrator-host-owned synchronous repair step and is neither fire-and-forget nor a commit
+prerequisite; the commit gate runs `check`.
+
 ## Invocation contract
 
 The orchestrator invokes this capability with:
 
 - Track ID
-- Briefing file path (the orchestrator may supply a briefing file for context)
+- Briefing file path containing the DRY findings, CLI-summary/current-diff context, architecture
+  constraints, and exact artifact paths relevant to the assigned fix
 
 The fixer dispatch (provider / model) is auto-resolved from `capabilities.dry-fix-lead` in
-`.harness/config/agent-profiles.json`; the orchestrator does not pass it. This capability may
-edit any file in the workspace (see Scope Ownership).
+`.harness/config/agent-profiles.json`; the orchestrator does not pass it or pre-read the briefing's
+artifact bodies. This capability reads the exact paths listed in the briefing itself and may edit
+any file in the workspace (see Scope Ownership).
 
 ## Scope ownership
 
@@ -187,3 +199,20 @@ If the briefing asks for:
   paths.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+
+## Session continuity and resume
+
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted DRY-loop reasoning. The durable hand-off is the current
+source diff, track state, and any `dry-check.json` result already written by the sanctioned CLI;
+in-memory violation triage is not durable.
+
+After a parent refresh, the dispatcher must issue a fresh briefing carrying the current track
+id, DRY findings / CLI summaries, current diff, architecture constraints, and exact artifact
+paths needed by this contract. A fresh dispatch, or a dispatch that changes concern, starts
+from that briefing. This typed-pipeline capability has no generic
+`bin/sotp capability exec --resume` route; resume it by re-running the canonical
+`track-local-dry-fix` wrapper from the fresh briefing and persisted state. On that re-entry,
+first check whether the briefing, source diff, and persisted DRY state changed since the prior
+capability session, and re-read every changed input before continuing.

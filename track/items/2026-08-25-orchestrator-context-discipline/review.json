@@ -1,0 +1,1727 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:22:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dde3de18e2ea2eb014b0f753562f3974af472cb50fed7300f9df3571b59ca73d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:25:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dde3de18e2ea2eb014b0f753562f3974af472cb50fed7300f9df3571b59ca73d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:29:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8fca531cbc373b8e3163fd36f1d60348bcf3151e0ef321a8e40076b3f4a8c39c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:32:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8fca531cbc373b8e3163fd36f1d60348bcf3151e0ef321a8e40076b3f4a8c39c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:15:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cad6e7f36c16750585b0f9fa9faa9b32081c89ab5508a3c625ea9e58cb4b9aed",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:19:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cad6e7f36c16750585b0f9fa9faa9b32081c89ab5508a3c625ea9e58cb4b9aed",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-25T07:09:26Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 23,
+              "message": "The implement workflow contradicts itself: Inputs require stopping when the branch is not `track/<id>` (lines 23–24), while Step 1 explicitly falls back to the latest materialized active track (lines 61–65). This makes track selection and safety behavior ambiguous; define one authoritative rule.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestration.md",
+              "line": 32,
+              "message": "The revised orchestration reference still mandates reading all track artifacts, conventions, and rule files before planning or implementation (lines 32–48), contradicting the new summary-first policy in the root rules and workflows, which forbids bulk reads and delegates convention reading. This can reintroduce the context-loading behavior the change is intended to remove.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce73395265a708794cb06f6c87f4a77e8d6194b0761dcdb309c6757380418751",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:13:27Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".codex/instructions.md",
+              "line": 21,
+              "message": "The Codex root rule forbids opening full workflow texts except for diff or blocker investigation, but `adr2pr` Step 0 requires reading every referenced sub-workflow before execution. A Codex orchestrator therefore cannot satisfy both instructions; add an explicit mandatory-workflow-planning exception or revise one side.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 9,
+              "message": "The Claude orchestration rule says full workflow texts must not be bulk-read during intake, while `adr2pr` Step 0 requires reading every referenced sub-workflow definition before execution. Clarify that the mandatory SSoT execution-plan read is an exception, otherwise Claude orchestration has conflicting context rules.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc20b1c5ee115cf31d9c9291d727e33da5185b21cbf2c4cae2eedc0eb9692c93",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:21:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35fa9446405e813761359edf2a321355d60c57f13f53bae6a78e67fabb418aa9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:35:37Z",
+          "findings": [
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 65,
+              "message": "Codex adapter が `ADR2PR_SESSION_REFRESH: <boundary>` というホスト固有の通知形式を追加しているが、workflow SSoT は notification format の追加を明示的に禁止しており、OS-03 にも反する。固定マーカーは削除し、必要なら通常のユーザー更新要求だけにする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow_state",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 67,
+              "message": "更新後に `$track-adr2pr` 全体を再実行しても、その位置から再開できない。既存 track に対する SSoT Step 1 は明示的に Step 2 へ戻すため、Step 8 後の更新でも ADR baseline review・planning・commit を再実行してしまう。境界を永続状態から判定して正しい次 step へ進む再開契約が必要。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 30,
+              "message": "summary-first 化後も ADR pre-check が orchestrator に `spec.md`／`plan.md` と ADR 本文を通常時に読ませ、矛盾時には identity-only の `metadata.json` を修正するよう指示している。同文書の「本文は diff/blocker 調査時のみ」「本文は implementer が読む」という境界と矛盾し、task contract の不整合も解消できない。検証を委譲先へ渡し、不整合は owning spec/plan phase へ戻すべき。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "新しい SSoT は actionable finding の修正を `implementer`／`review-fix-lead` に委譲すると定めた一方、現在出荷される Claude adapter は依然として `This command runs directly — no subagents` と指示している。これは briefing が例外扱いしない明示的な adapter–SSoT 矛盾であり、Claude 経路では新しい委譲境界が実行されない。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 261,
+              "message": "`adr2pr` の failure/recovery は依然として親に `fix locally, commit, re-run` と指示しており、改訂後の `pr-review` が定める briefing → capability 委譲 → local convergence → commit の経路を迂回する。ここは `pr-review` の委譲・回復契約へ委ねる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring",
+              "file": ".codex/rules/default.rules",
+              "line": 30,
+              "message": "`plan` と `implement` workflow が一次情報として要求する `bin/sotp track next-task` が、Codex の summary 一覧にも `default.rules` の新しい allow 群にも存在しない。このため Codex root だけ canonical intake を追加承認または別手段なしに実行できない。summary 一覧と allow rule の両方へ追加する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "writer_ownership",
+              "file": ".codex/instructions.md",
+              "line": 60,
+              "message": "Codex の writer mapping は `impl-planner` の所有物から `batch-plan.json` を落としているが、impl-plan workflow は同 capability を四成果物すべての sole writer と定めている。同じ欠落が `.codex/agents/orchestrator.toml` にもあり、root による直接編集を許す責任境界のずれになる。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35fa9446405e813761359edf2a321355d60c57f13f53bae6a78e67fabb418aa9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:47:02Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 86,
+              "message": "Step 1 still says that any initialized track skips only init and always starts at Step 2, contradicting the new resume contract immediately below, which requires deriving the first incomplete lifecycle boundary and may resume at Steps 5–11. Update Step 1 to delegate existing-track invocations to that persisted-state resume logic.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:af2406766ef16c193543b145e9c19780872a687c76c354becab306b7b8df75d5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:49:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:227ba2e91d78733a9592a5eaa3312ec34e5544ea732100c90cf81dc6f8119fdb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:59:32Z",
+          "findings": [
+            {
+              "category": "workflow_state",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 65,
+              "message": "Inputs still says every initialized track skips `init` and starts at Step 2, directly contradicting the new Step 1/resume contract that derives the first incomplete boundary from persisted state. A refreshed run can therefore still follow the old replay path depending on which section the orchestrator applies; update this input contract to reference persisted-state resumption.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility_boundary",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 10,
+              "message": "The mission still instructs the orchestrator to read the approved implementation plan, while the revised inputs and intake contract assign artifact-body reading to the implementer and restrict the orchestrator to CLI summaries except for diff/blocker investigation. Remove or reword this operational instruction so it unambiguously consumes the plan summary/briefing rather than `impl-plan.json`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "The revised SSoT requires actionable fixes to be delegated to `implementer` or `review-fix-lead`, but the currently shipped Claude adapter still says `This command runs directly — no subagents`. This is the explicit adapter–SSoT contradiction identified by the briefing’s exception rule; the adapter must defer its finding-fix lane to this delegated route.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:227ba2e91d78733a9592a5eaa3312ec34e5544ea732100c90cf81dc6f8119fdb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:03:28Z",
+          "findings": [
+            {
+              "category": "adapter_ssot_sync",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 88,
+              "message": "改訂後の SSoT は actionable finding の修正を `implementer` または `review-fix-lead` へ委譲すると定めているが、現在出荷される Claude adapter は依然として `This command runs directly — no subagents` と指示している。briefing が例外扱いしない明示的な adapter–SSoT 矛盾であり、adapter をこの委譲経路へ合わせる必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:385656a76ab68bd4f325925af82a37ea51bd3c89a6887237594e1939e9a04fb6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:07:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e6e66650eef3932a5b7b3cadffb6679534d2e8efbafcd8ded35e2b564be91e6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:11:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e6e66650eef3932a5b7b3cadffb6679534d2e8efbafcd8ded35e2b564be91e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:29:17Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 15,
+              "message": "On re-invocation for an already initialized track, the unconditional instruction to pass inputs to `/track:init` conflicts with the refresh/resume contract and can restart or fail the existing track instead of deriving the first incomplete boundary from persisted state. Make `/track:init` forwarding conditional on first initialization and explicitly preserve the SSoT resume behavior.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:e128b196d5adc2c269b5f30de7a9160ba6d13a91db8df069888d503b0f4816ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:31:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea4f473c9e5aae61c7293f6260f6eff17bdddfffb94f941596288cfb752e2f5b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:41:09Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 37,
+              "message": "`implementer` is currently routed to Codex, so this command returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host` without executing the fix. The skill never handles that outcome and proceeds toward local review/commit, leaving implementation PR findings unfixed. On the sentinel, invoke the matching in-host Codex capability and wait for its result.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 14,
+              "message": "Input acquisition remains unconditional before Step 1: after the mandated `/clear` refresh, a re-invocation without arguments still tries to resolve and confirm the feature/ADR—potentially prompting because conversation context was cleared—even though the SSoT limits acquisition to tracks needing initialization. Detect the existing initialized track first and skip acquisition entirely when resuming from persisted state.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:ea4f473c9e5aae61c7293f6260f6eff17bdddfffb94f941596288cfb752e2f5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:48:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:086f9a81beda010aff7b69ce84fb8bf4456ff27f67a45021ff6cd11a30083931",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:53:06Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 41,
+              "message": "The `delegate-in-host` payload names only the capability, briefing, and discipline; it never names a custom-agent-versus-skill route, and this repository has no `.codex/agents/implementer.toml`. Therefore “whichever the dispatcher names” is not executable guidance, while loading `$implementer` in the root session would violate the no-inline-fix boundary. Specify a concrete separate in-host Codex agent dispatch using the implementer skill, then wait for that agent’s completion.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:086f9a81beda010aff7b69ce84fb8bf4456ff27f67a45021ff6cd11a30083931",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:58:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d013b5e1ed7df40a24f33608efcd18d8aace34f5a7e2a589f5ef279a3cd821ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:01:20Z",
+          "findings": [
+            {
+              "category": "hook coverage gap",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 42,
+              "message": "This hand-assembled `codex exec --sandbox workspace-write` subprocess violates `.claude/rules/guardrails.md` §Sandbox and Hook Coverage Warning: Claude hooks do not intercept its writes or direct Git operations, and Rule 2 explicitly requires workspace-writing orchestrator-output capabilities to run through the dispatcher rather than a manually assembled provider command. It also omits the dispatcher-owned model/effort flags. Use a genuine in-host Codex subagent route or a guarded dispatcher-owned execution path instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d013b5e1ed7df40a24f33608efcd18d8aace34f5a7e2a589f5ef279a3cd821ad",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:06:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f49d2c6ec5d504f50b66770e2dd26937a11e2fd8db70e59795a601aeba5694c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:09:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f49d2c6ec5d504f50b66770e2dd26937a11e2fd8db70e59795a601aeba5694c9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:31:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 41,
+              "message": "The full-cycle SSoT still requires reading every referenced sub-workflow before execution, contradicting the summary-first intake rule that forbids bulk-reading full sub-workflow texts and makes targeted artifact/blocker reads the default.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "message": "The Codex full-cycle adapter says `$track-implement` owns task-state transitions, but the implement SSoT states that only the orchestrator performs transitions. This can route task transitions to the wrong owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "runtime-document boundary",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 105,
+              "message": "This runtime workflow document retains a dated ADR citation, violating the self-contained runtime-document rule and CN-01’s no-dated-ADR-citation requirement.",
+              "severity": "P2"
+            },
+            {
+              "category": "runtime-document boundary",
+              "file": ".harness/workflows/track/obligation-fulfillment.md",
+              "line": 7,
+              "message": "This runtime workflow document retains a dated ADR citation, violating the self-contained runtime-document rule and CN-01’s no-dated-ADR-citation requirement.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:783e435be73e753e31c648df8fafbede5a707494e1ff82233d78649ee06b4633",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:39:32Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 43,
+              "message": "The revised full-cycle SSoT now says each referenced workflow's detailed procedure is owned by its delegated capability, but `commit.md` is explicitly a standalone workflow with no delegated capability. This misstates ownership and can route the caller to a nonexistent owner; refer to the referenced workflow/adapter itself instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f354066769c3942d8a68b13cf2a5c9939599c8e3bcf14adf71510dc127462d2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:42:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40f2f6242f5ed6480b87a549dafcf9a941aed31f8385d411c1bf60aeca33ee57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:53:35Z",
+          "findings": [
+            {
+              "category": "capability-workflow mismatch",
+              "file": ".harness/capabilities/dry-fix-lead.md",
+              "line": 27,
+              "message": "新契約は orchestrator が briefing 対象 artifact を事前に読まず、exact path を渡すと規定していますが、呼び出し元の `dry-check` workflow は依然として Step 0b で `spec.md` と `plan.md` を無条件に読み、その内容から briefing を生成します。これは summary-first intake と capability/workflow wiring の矛盾です。Step 0b を CLI summaries と exact paths の受け渡しに変更し、Architecture Constraints に必要な箇所だけ targeted read にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40f2f6242f5ed6480b87a549dafcf9a941aed31f8385d411c1bf60aeca33ee57",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:59:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c079d718bfe9241c03ad2d29c920cdc7c7d1afc4751d1302a0a7e3c284e54f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:17:56Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 10,
+              "message": "Delegated PR findings are defined as focused corrections that return after local verification, but the capability mission still requires the full review → fix → re-review loop to zero_findings. This can broaden a PR-finding dispatch into an unrelated scope review and conflicts with the delegated route described later in the file.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "R4 adds source PR-finding delegation but does not require the mandatory `## Architecture Constraints` section from R1 in the focused briefing. The implementer invocation contract likewise lists PR-finding fields without that constraint section, allowing delegated source fixes to bypass the architecture-placement and dependency constraints required for every source-capability request.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c737570a3ea64fc995e7b9beddb4d328ab2b30a03702445f9773316271fb3b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:21:41Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 15,
+              "message": "The delegated `review-fix-lead` path now bypasses the normal review loop and only requires “local verification,” but it can modify source files within its resolved review scope. That path does not explicitly require the R2 post-edit architecture placement/dependency checks and `cargo make check-layers`, so source fixes can reach local review without the mandatory implementation-delegation verification.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5614f403f43b085365ae79c61f61cf91c2d382568db56ff256e91ad4e5ae7f2b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:23:44Z",
+          "findings": [
+            {
+              "category": "command-wiring",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 209,
+              "message": "The delegated PR-finding path still cannot satisfy this capability's output contract: it intentionally performs only the focused correction and local verification, while `completed` still requires an assigned `round_type` to produce `zero_findings` via the canonical review API. The invocation contract also still requires `round_type`, and the normal reviewer pipeline remains the only defined completion path. Add a distinct delegated-path completion/status contract and dispatch mode.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0bf6afae833e8f051aa33dba81294679f63a78dc7b6adf0fd9c44144d5c82ed0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:27:22Z",
+          "findings": [
+            {
+              "category": "command-wiring",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "The capability now requires the caller to declare `scope-review` versus `delegated-pr-finding` in the briefing because that mode determines whether the reviewer pipeline runs, but the canonical PR-finding delegation policy does not require the focused briefing to carry this dispatch-mode field. A compliant caller can therefore produce a briefing that the capability cannot safely classify, causing the delegated path to be treated as the normal review loop or vice versa.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b7892751c6787648857c49b5bc7f5c73e2b713c04cfce8e89b964826c147c254",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:29:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b46942ee8756bedcb4e49b97a283a8d5c05694a715db43de01f87e194ef3e0f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:39:59Z",
+          "findings": [
+            {
+              "category": "wiring-consistency",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "The new delegated mode is not wired into its actual callers. This policy requires `dispatch_mode: delegated-pr-finding` and, for source edits, `## Architecture Constraints`; `review-fix-lead` depends on that marker to avoid entering its scope-wide review loop. However, the operational `pr-review` SSoT and both thin adapters still define briefings with only comment, path/line, track context, and requested correction. Consequently, a normal review-fix dispatch is classified as `scope-review`, while an implementer dispatch lacks a required input. Add these fields to the caller contract or make the delegated mode inferable from the existing briefing shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 20,
+              "message": "The focused PR-finding entry point still falls through the plan-task test-obligation pipeline. Step 3 runs whenever `obligations.json` or `test-bindings.json` exists—which is normally true by PR review—and regenerates the skeleton and rewrites the track-wide bindings even for an unrelated one-finding source correction. This contradicts the newly declared correction boundary and can introduce unrelated artifact changes. Skip Step 3 for delegated PR findings unless their briefing explicitly requests obligation repair.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b46942ee8756bedcb4e49b97a283a8d5c05694a715db43de01f87e194ef3e0f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:46:13Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 36,
+              "message": "The Codex adapter's finding-fix section duplicates workflow logic owned by the PR-review SSoT: briefing preparation, capability routing, local convergence, commit/re-run sequencing, and parent-edit recovery. The adapter-SSoT policy requires adapters to retain only provider-specific invocation/tool constraints and reporting details, so this duplication can drift from `.harness/workflows/track/pr-review.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT synchronization",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 14,
+              "message": "The Claude adapter similarly duplicates the PR-review workflow's finding-fix sequence and recovery policy, including briefing contents, delegation routing, local review/commit sequencing, and direct-edit recovery. This violates the thin-adapter contract and creates a second source of truth for workflow behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:366227a123aff4f92f3ce64fac2601567989d9ea80ab77ee61fb4250897c21ab",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:53:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1933b719e6ef391068541fc692db8745a14db7bf5782cab97fd2c71a5ce8ef65",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:57:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1933b719e6ef391068541fc692db8745a14db7bf5782cab97fd2c71a5ce8ef65",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:13:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb262ff250423191e635829690ff5b87a5ceb2d5be3bfd6fd8151038e2755af6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:20:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb262ff250423191e635829690ff5b87a5ceb2d5be3bfd6fd8151038e2755af6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:57:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6793520609f27b34c07472cc93853dd2e256376bdd1071457a032b106811fe6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:07:45Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/capabilities/dry-fix-lead.md",
+              "line": 214,
+              "message": "The new resume contract routes `dry-fix-lead` through generic `sotp capability exec --resume`; the same instruction appears in `review-fix-lead`. Both profiles use `execution_mode: typed-pipeline`, while generic capability dispatch rejects every mode except `orchestrator-output`. Their canonical routes are `track-local-dry-fix` and `track-local-review-fix`, neither of which exposes this resume flag. Following this instruction therefore fails before the fixer starts. Keep typed-pipeline session handling with the canonical wrappers and limit `capability exec --resume` guidance to eligible capabilities.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/policies/task-completion.md",
+              "line": 29,
+              "message": "The resume rule makes generated `plan.md` an input for reconstructing task state. This conflicts with `impl-plan.json` being the task-state SSoT and with the summary-first contract: a stale rendered view can now create “conflicting evidence” and unnecessarily block resume. Reconstruct progress from `bin/sotp track resolve`, `task-counts`, `next-task`, review summaries, and read-only git state; open artifacts only for a resulting discrepancy or blocker.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6793520609f27b34c07472cc93853dd2e256376bdd1071457a032b106811fe6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:15:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40bb9416645c1faf604d791844381c443d8011179b4cd9914227785d5401df8f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:56:36Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 177,
+              "message": "The Failure / recovery bullet still says that if delegation fails, “parent editing is recovery only” without excluding ADR findings. This leaves a second route that conflicts with the new explicit prohibition on parent/review-fix-lead editing `knowledge/adr/*.md`; the ADR guardian lane must be the sole route everywhere in this workflow.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ee52cc93d0a34b897dcb62ecba6ede51d9b3370eb1abd2d1a6a863adda040db4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:06:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7937182496b0be288f6f0ed8c0c6d89302a72007b6ad1e2ff637ccdcf255a8c3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:24:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f13746a3f572c8dd44667a895bd63edb68850fff6a7794ecbbae220cb2406e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:31:41Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/guardrails.md",
+              "line": 2,
+              "message": "条件付き読み込みの対象に `.claude/settings.json` と `.claude/permission-extensions.json` が含まれていません。この文書の Permission Guardrails は、CI で強制されない危険な allow 追加に警告する運用面なので、permission ファイルだけを扱うセッションでは肝心の警告経路がロードされません。両パスを `paths` に追加してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/maintainer-checklist.md",
+              "line": 2,
+              "message": "このチェックリストが同期対象として明記する `architecture-rules.json`、`knowledge/conventions/**`、`.gemini/**` などが `paths` から漏れています。これらだけを変更する保守作業ではチェックリストがロードされず、「影響する全レイヤーを同時更新する」という契約を適用できません。列挙済みのアーキテクチャ面を条件に追加してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/dev-environment.md",
+              "line": 2,
+              "message": "このルールが直接説明する Docker／Compose／監査・toolchain 面 (`Dockerfile`, `compose*.yml`, `deny.toml`, `overlay/**` など) が `paths` に含まれていません。これらの tooling 設定だけを変更する場合、環境差や canonical wrapper の指示が条件付きロードされません。本文が管理する tooling surface を glob に追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4f13746a3f572c8dd44667a895bd63edb68850fff6a7794ecbbae220cb2406e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:38:03Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/orchestration.md",
+              "line": 2,
+              "message": "条件付き orchestration の `paths` は Codex skill の `.agents/**` を含む一方、同じ provider-routing surface の `.claude/agents/**` と `.codex/**` を含みません。本文は `.codex` の config/rules/hooks/agents の trust と capability routing を直接規定しているため、それらだけを扱う Claude セッションでは profile authority や dispatcher discipline がロードされません。両パターンを追加し、subagent/hook 制約を持つ `guardrails.md` の対象面も同様に揃えてください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:bf1354a3bcd4381986574da89d93509c1b08e8efe47857bb5724c0cbeb866a46",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:41:05Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": ".claude/rules/maintainer-checklist.md",
+              "line": 2,
+              "message": "条件付き maintainer checklist は `.claude/**` を対象にする一方、Codex 側の `.agents/**` と `.codex/**` を対象にしていません。本文は workflow SSoT と thin command adapters の同期を要求しているため、Claude adapter の変更時にはチェックリストがロードされますが、対応する Codex skill/provider surface だけを変更した場合にはロードされず、クロスプロバイダー同期が片側だけになります。両パターンを `paths` に追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:21453a9090ddca36cbc4ff66c393fef6587a4512e40ffb0b4bb6e27d9718a5b0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:43:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89d99f4b420039166eb27b31967aa0f4d4d39e1752fa5062c76a7603f00fcee9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:58:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:968a76d94cebc1d2139d25c2a4e29e2f62d2234b7d6bf02c22210e78100720f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:04:07Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 55,
+              "message": "`$track-pr-review` の承認を「the only other pause」と断定した直後に、refresh handoff を第3の sanctioned interaction と追加しており、pause の列挙が内部矛盾しています。必須 refresh を省略可能と誤読させないよう、「only other」を「second」に変えるか、3種類を一度だけ明示的に列挙してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:968a76d94cebc1d2139d25c2a4e29e2f62d2234b7d6bf02c22210e78100720f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43f3049e0acd2f2fd3c9e7bfc2d60e6c4dd9a6164b4d1fcdea0c0aeb26b7891f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:10:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43f3049e0acd2f2fd3c9e7bfc2d60e6c4dd9a6164b4d1fcdea0c0aeb26b7891f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:25:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7148117e52b7532231e139f9add7ad64ab1d5a2889becfb11da9f2d58e9d0cf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:29:35Z",
+          "findings": [
+            {
+              "category": "workflow-wiring",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 60,
+              "message": "The policy routes ADR findings to the `PR review workflow SSoT`'s `ADR-scope repair lane`, but `.harness/workflows/track/pr-review.md` has no such section; that workflow itself delegates to the lane in `.harness/workflows/track/review.md`. Point directly to the review workflow SSoT so executors can resolve the canonical guardian procedure.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:e7148117e52b7532231e139f9add7ad64ab1d5a2889becfb11da9f2d58e9d0cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:32:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64fd29d90aecc68c037276a2ac0d30e6ec3ac2d1a92b5cea48e2375d45c17998",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:46:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c13aa4b889eacfa63dde5d757ae25550f25a04872c5f8fdeaa9ac21de26f1355",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:49:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c13aa4b889eacfa63dde5d757ae25550f25a04872c5f8fdeaa9ac21de26f1355",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:10:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fee00f759c69e8c25afc861bd237de4b1b31114f6dbe216e49ed0e2663a8b2aa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:17:19Z",
+          "findings": [
+            {
+              "category": "workflow-contract",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 199,
+              "message": "The one-batch path explicitly continues without the fixed post-first-batch refresh. This contradicts lines 158–163 and AC-04/D4, which require a parent-session refresh after the first implementation batch even when it is the only declared batch. The lifecycle tail therefore runs with the implementation-heavy parent context. Return and refresh after that batch, then let the resumed invocation complete the tail before the separate PR-lane refresh.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow-contract",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 195,
+              "message": "`--single-batch` returns after the first Step 3 whenever any work remains, but a runtime admission split makes Step 3 commit only the admitted execution-unit prefix while the selected declared batch remains unfinished. Adr2pr will consequently refresh mid-batch and then process the rest without refreshing when that first declared batch actually completes. Either continue split execution units until the selected declared batch is complete or define and consistently consume a single-execution-unit mode.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:fee00f759c69e8c25afc861bd237de4b1b31114f6dbe216e49ed0e2663a8b2aa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:23:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b83fed1864ad7effcf2d7aa7317baf43cbc5bf1b91656b1d923930c3b351dbd7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:37:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e5d064e37d0b502a8866f3a61775cdd92e86daee7dbda8147deb083529d2f72",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:42:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e5d064e37d0b502a8866f3a61775cdd92e86daee7dbda8147deb083529d2f72",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:01:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e368a082e242195f86a6c1ab774877e679a67a7a9b5b792a65cb6cdde11a5782",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:08:28Z",
+          "findings": [
+            {
+              "category": "command-contract-drift",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 50,
+              "message": "The new impl-plan existence guard is based on a false runtime premise. `next-task` deliberately returns no open task and `task-counts` returns zero counts when `impl-plan.json` is absent; CLI tests explicitly cover successful Phase 0–2 use. The analogous guards in the three workflow SSoTs and the “fails closed” claims in five skills therefore contradict the shipped command contract and omit supported summary-first intake. Restore the unconditional summaries and remove the false claims.",
+              "severity": "P2"
+            },
+            {
+              "category": "adapter-SSoT-sync",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 48,
+              "message": "This adapter names bare `bin/sotp ref-verify results`, but its workflow SSoT requires `bin/sotp ref-verify results --chain 2 --filter all`. The bare command defaults to both chains and fail/pending filtering, so Chain 1 results can be included in the overall summary being consumed as catalogue state. Mirror the exact SSoT invocation.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:e368a082e242195f86a6c1ab774877e679a67a7a9b5b792a65cb6cdde11a5782",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:21:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:986271a21e539218c6cefddd1afa6aa66835f5beb7b84bb0080b7f37cec149f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:26:11Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT-sync",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 50,
+              "message": "The plan adapter still narrows its SSoT by running `catalog check` and Chain 2 `ref-verify results` only after catalogues exist. The plan SSoT requires these summaries once a track is active, and both commands intentionally represent absent catalogues (`catalog check` returns `Skipped`; Chain 2 reports zero pairs). This condition suppresses the primary catalogue-state intake during earlier phases and leaves adapter/SSoT timing inconsistent; remove it.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:986271a21e539218c6cefddd1afa6aa66835f5beb7b84bb0080b7f37cec149f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:31:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b44a61171ab4e043d56bc51753f5b5f698d44a38bfa74c45b66a335c2c97cb87",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:34:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b44a61171ab4e043d56bc51753f5b5f698d44a38bfa74c45b66a335c2c97cb87",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:04:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:40d07bab63f463719738a07976ef02ef66c62efb63786fb89e4d30eae9551f03",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:08:38Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 10,
+              "message": "The new unconditional rule requires `/track:plan` before every implementation path, but the canonical `/track:adr2pr` workflow explicitly says “Do NOT invoke the `plan` workflow” and instead runs `spec-design`, `type-design`, and `impl-plan` directly after initialization. Because this rule is always loaded, invoking the documented end-to-end `/track:adr2pr` flow now presents the orchestrator with contradictory mandatory instructions and can trigger a redundant or invalid Phase 0 planning run. State the semantic requirement—Phase 0–3 planning must complete before implementation—while exempting workflows such as `/track:adr2pr` that own equivalent planning sequencing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40d07bab63f463719738a07976ef02ef66c62efb63786fb89e4d30eae9551f03",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:11:29Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".claude/rules/orchestrator.md",
+              "line": 12,
+              "message": "The new `/track:adr2pr` exception was not propagated to the detailed Claude rule surface. `.claude/rules/orchestration.md:77` still says to always invoke `/track:plan` before implementation, while the new always-applied rule says end-to-end workflows own equivalent sequencing and the canonical adr2pr SSoT explicitly forbids invoking `plan` after initialization. When the conditional orchestration rule is loaded for `.claude/commands/**`, the orchestrator receives contradictory mandatory instructions and may invoke a workflow that fails on the active track branch. Align the detailed Planning Gate with this exception.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:33f90d77e55feef068a2b5a19d0c1ab3d428c898f19ced3f6aa54c5f4662437f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:14:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca30ab1307b59a4399f4c5b09aa45435ce6e36f8478ccd0dd9c9164411ca214e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:16:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca30ab1307b59a4399f4c5b09aa45435ce6e36f8478ccd0dd9c9164411ca214e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:28:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f5a4e6cd80e146822baccf42192d59c38557839a0e37ccf0f55b1360b4e066e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:33:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f5a4e6cd80e146822baccf42192d59c38557839a0e37ccf0f55b1360b4e066e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:57:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a2bdb2fa17449a522012a9b81b4bf9c17f139b5849f57daf0230f713dab3c58",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:00:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a2bdb2fa17449a522012a9b81b4bf9c17f139b5849f57daf0230f713dab3c58",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:16:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1cded24efdd55449d684b2933dadb28db2152076910b317e9b1fb2a5fbd57da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:20:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1cded24efdd55449d684b2933dadb28db2152076910b317e9b1fb2a5fbd57da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:42:45Z",
+          "findings": [
+            {
+              "category": "capability-routing-mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 99,
+              "message": "The PR-review SSoT mandates routing every non-ADR review-scope correction—including catalogue and plan changes—to `implementer`, but `implementer` explicitly forbids direct `batch-plan.json` edits and the review-fix capability forbids direct `<layer>-types.json` edits because those belong to `impl-planner`/`type-designer`. Such findings therefore have no executable delegated route. Route by artifact owner or explicitly exempt these artifacts.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary-cross",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 83,
+              "message": "The newly authorized focused PR-finding path in `implementer` is still guarded by an unconditional re-entry prerequisite requiring types-scope and impl-plan-scope review convergence. This can reject focused policy/documentation corrections before they are started, despite the PR workflow directing all non-ADR findings to this capability and allowing taskless focused dispatches. The prerequisite needs a focused-PR exception or the workflow must specify how to converge these unrelated upstream scopes first.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:51773913c54539435a73ff49fa848fe2adeb4d28467e2d4481b35a9dc382bda7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:54:39Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 38,
+              "message": "This Codex adapter still mandates sending every delegated PR finding, including review-scope artifacts, to `implementer`, but the workflow SSoT now routes writer-owned spec, catalogue, and plan artifacts to `spec-designer`, `type-designer`, and `impl-planner`. A finding on one of those artifacts would therefore be misrouted when this adapter is used.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 14,
+              "message": "This Claude adapter still says every non-ADR review-scope correction must be dispatched to `implementer`, contradicting the workflow SSoT and policy contracts that route writer-owned spec, catalogue, and plan artifacts to their respective phase capabilities. Claude execution can consequently misroute those PR findings.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fff84b587b8a37416e72b75a378fc4c3cdd9695a36ac2d602b8c3a76742e2a51",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:00:34Z",
+          "findings": [
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 15,
+              "message": "The capability contract still says focused PR-finding corrections are routed to `implementer`, but the updated workflow and policy route writer-owned spec, catalogue, and plan findings to `spec-designer`, `type-designer`, and `impl-planner`. This contract can therefore misroute those findings or cause the wrong capability to be selected. Narrow this statement to implementer-owned corrections and refer writer-owned findings to their phase workflows.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9099a1d47080b19132b30bc459d3c8d756dc2038128a998f61861296d9307fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:03:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd276ad2266feaf334b47f4efd68ca2ea22f6c006114bae2b19e763dedddd96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:11:50Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "Writer-owned spec/type corrections invoke only the affected phase and then proceed directly to local review and commit. Those phase workflows are single-shot: the plan workflow owns downstream catalogue/plan regeneration and ref-verification refresh. A spec or catalogue edit therefore leaves downstream artifacts and ref-verifier approvals stale, causing the guarded commit to fail or preserving inconsistent SoT state. Re-enter the ordered planning descent from the affected phase before convergence and commit.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 104,
+              "message": "The route includes “generated plan views,” but the normal impl-plan workflow never regenerates `plan.md`, and the impl-planner contract forbids writing generated plan views outside conflict preparation. A PR finding against `plan.md` therefore survives this delegation and repeats. Route view freshness through the sanctioned views-sync operation while keeping semantic corrections with the JSON owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/capabilities/implementer.md",
+              "line": 94,
+              "message": "A `delegated-pr-finding` dispatch skips all catalogue and impl-plan convergence checks based only on its briefing and current diff. Since the PR-review workflow requires only initialized metadata and permits incomplete tracks, this allows source corrections before Phase 0–3 planning has converged, contradicting the mandatory planning gate. Exempt focused corrections from task-id/`in_progress` requirements only; retain a Phase-3/direct-upstream admission check or enforce it in PR-review Step 0.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd276ad2266feaf334b47f4efd68ca2ea22f6c006114bae2b19e763dedddd96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:21:14Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "The new handoff cannot enter planning at the affected phase. The `plan` workflow has no partial-entry argument and its documented sequence starts by invoking Phase 0 `init`, whose contract requires the configured base branch; `pr-review` is already on `track/<id>`. This route therefore fails before downstream regeneration (and would also rerun the just-completed writer). Use the existing partial-reentry/post-routing descent surface or explicitly dispatch the downstream phase sequence.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-SSoT inconsistency",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 199,
+              "message": "The Failure/recovery route still says owner workflow → local review → commit, omitting Step 3's newly mandatory downstream planning descent. The same stale order remains in `.claude/commands/track/pr-review.md:27`, `implementation-delegation.md:60`, `review-protocol.md:78`, `sot-reentry-sequencing.md:56`, and `task-completion.md:37`. Following any of those instructions after a spec/type correction leaves downstream artifacts and ref-verifier approvals stale. Synchronize every surface with the corrected ordering.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/policies/implementation-delegation.md",
+              "line": 58,
+              "message": "This policy still routes generated plan views through the impl-planner’s normal `impl-plan` workflow. The current PR-review SSoT correctly routes them through views-sync because impl-planner forbids writing `plan.md` and normal impl-plan does not regenerate it. `review-protocol.md:76` repeats the stale ownership mapping, so a policy-driven repair of a `plan.md` finding cannot change the target file.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 35,
+              "message": "This still treats a taskless `delegated-pr-finding` briefing and current diff as a separate admission path from normal re-entry. The updated implementer contract now says tasklessness waives only task IDs/`in_progress` and still requires Phase 3 plus catalogue, ref-verifier, types-review, and impl-plan-review convergence. An orchestrator following this policy will omit required admission evidence and the implementer must reject the dispatch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9c53a7dc68ed4cf5237306d96b9deb661a0bfdd2496c9016233f716e9a6d8cb8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:30:45Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 110,
+              "message": "Step 2 has already applied the correction by running the affected phase workflow, but Step 3 instructs the orchestrator to enter that same phase again. In the diagnose post-routing contract, the affected-phase writer dispatch is the first descent step; after it completes, the orchestrator should reconverge that phase and continue with the next downstream phase. Re-running a normal writer is not a no-op—it rewrites its owned artifacts (impl-planner rewrites all four plan artifacts), so it can overwrite the focused correction or lifecycle state. Treat the completed correction as the affected-phase dispatch and begin post-routing convergence/descent from there.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f02e8de1f590abde3e113b96ca97125542a5e2e0333bd477d4fcfce596b59781",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:36:00Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 98,
+              "message": "The owner-routing list is narrower than the implementer contract. After removing `review-fix-lead` as the generic PR-finding transport, this workflow and both adapters delegate only source changes and ordinary policy/documentation files; non-ADR review-scope artifacts such as harness configuration, settings, manifests, or build files are neither covered by that list nor owned by a phase writer. An actionable PR finding on such a file therefore has no delegation path and cannot reach the recovery clause. Route every named non-ADR review-scope artifact within the implementer boundary to `implementer`, while retaining the explicit writer/verdict exclusions, and align both adapters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:94b4cd09aa1bc3561792358c0a05e2858ab3ffeba26920872a2dd2d012aabcdb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:44:25Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary-cross",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 35,
+              "message": "The SoT re-entry policy now requires every taskless `delegated-pr-finding` dispatch to verify Phase 3, catalogue/ref-verify convergence, and types/impl-plan review convergence before editing. This contradicts the `implementer` capability contract, which treats a taskless focused PR correction as exempt from those unrelated plan-task prerequisites and admits it from the focused briefing/current diff. The policy can therefore block implementer-owned PR fixes that the PR workflow explicitly routes directly to `implementer`. Align the policy with the focused-dispatch exception or update the capability/workflow consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:520efb13fe4f6e224d4e99a0d22a71427944d9890d8607be7b659bd68c8611ac",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:49:42Z",
+          "findings": [
+            {
+              "category": "command-wiring-breakage",
+              "file": ".harness/workflows/track/pr-review.md",
+              "line": 93,
+              "message": "Step 3 requires every actionable PR finding to use a `dispatch_mode: delegated-pr-finding` focused briefing, but writer-owned fixes are then sent through the normal `spec-design`/`type-design`/`impl-plan` phase-entry workflows, which each require their own configured writer briefing and path. The PR workflow never defines how the focused PR comment/request is transferred into that phase-specific briefing or which briefing is passed to `phase enter`, so writer-owned PR findings have no fully wired dispatch path. Separate the implementer focused briefing from the phase-writer briefing and specify the handoff.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53d24a3ceb13730b639b6391cab1dc5f5d5791fb6d6807c9d7226fa0632c52c8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:54:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e8f7a014f8145dfdd596c72752f2edfe9f17a421c91398d841e430f9825ff2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e8f7a014f8145dfdd596c72752f2edfe9f17a421c91398d841e430f9825ff2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:11:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:36d2ae3a6e9e7a70560d4c94c1577bdb750d44e6250e3f31b8ce2c31f23b8f08",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:15:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:36d2ae3a6e9e7a70560d4c94c1577bdb750d44e6250e3f31b8ce2c31f23b8f08",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:16:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:20:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2b9af37aa1e3afc87cffb7e4c6a65410f71f3b2c033eacf053832f955c11",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:35:40Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 6,
+              "message": "T001 bundles independently verifiable workflow-context, PR-fix delegation, long-running gate, and adr2pr session-update units; split them into separate tasks before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles independently verifiable policy and capability updates; split the units by document surface or acceptance criterion before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 21,
+              "message": "T003 bundles independently verifiable Claude adapter and Codex skill-adapter updates, including separate delegation, polling, evaluate, and catalogue-boundary checks; split the units before implementation (AC-01, AC-02, AC-03, AC-04).",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/task-coverage.json",
+              "line": 29,
+              "message": "AC-08 is mapped to every task, but none of T001–T006 describes the required per-surface validation/confirmation step. The mapping therefore does not identify a task that executes AC-08's fixed individual confirmation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior contracts in prose (CLI-summary precedence, full-read prohibition, delegation, single wait, evaluate boundary, and session-update points) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts in prose (CLI precedence, delegation, waiting, evaluate, ADR self-containment, and prompt-level enforcement) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 21,
+              "message": "T003 restates upstream adapter behavior contracts in prose (forbidden reads, direct edits, polling, evaluate handling, and catalogue behavior) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 30,
+              "message": "T004 restates upstream always-applied-rule behavior and boundaries in prose (delegation, CLI precedence, git prohibition, reviewer-detail removal, and ADR-reference prohibition) after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 40,
+              "message": "T005 restates the upstream consumer-ownership and non-hard-fail behavior contract in prose after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 49,
+              "message": "T006 restates the upstream required reasoning-effort value and preservation of other settings after the target and operation. Per .harness/policies/no-upstream-restatement.md, retain only target + operation + anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 67,
+              "message": "Section S1 restates the upstream workflow behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 77,
+              "message": "Section S2 restates the upstream policy/capability alignment contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 87,
+              "message": "Section S3 restates the upstream thin-adapter behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 97,
+              "message": "Section S4 restates the upstream always-applied-rule separation contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 107,
+              "message": "Section S5 restates the upstream consumer-ownership and non-hard-fail contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 117,
+              "message": "Section S6 restates the upstream orchestrator-profile behavior contract instead of using only target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:905bac878492960edd33897fd97a11c656afc2e59e25459424e0f4e7c35f7b52",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:52:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fb3e6630c7276bdbda7b3f7f874ae476b140c3cada802ae06380da12d7bec519",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:02:19Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 168,
+              "message": "`plan.summary` contains only acceptance-criterion mappings such as `AC-01 → T001, T005, T006, T007, T011, T015.` and omits every goal. Because goals cannot appear in `task-coverage.json`, add explicit traceability for GL-01→T001/T005/T006/T007/T011/T015, GL-02→T002/T005/T006/T008/T012, and GL-03→T003/T005/T006/T009/T013.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/task-coverage.json",
+              "line": 80,
+              "message": "`OS-03` omits T005 and T006 even though both tasks claim IN-04 and AC-03/AC-04 and revise policy/capability waiting and session-update boundaries. Add both tasks to this mapping and cite OS-03 in their descriptions so they cannot introduce the excluded host-specific backgrounding threshold, notification format, or compaction behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 132,
+              "message": "T016 edits the operational policy `.harness/policies/consumer-ownership.md`, but neither its description nor the CN-01 coverage mapping requires that document to remain self-contained and avoid a dated ADR reference. Add CN-01 attribution for T016 and its anchor to the task/section description.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 30,
+              "message": "T005 bundles four independently verifiable policy behavior units while still `todo`: CLI/context intake (AC-01), PR-fix delegation (AC-02), long-gate/evaluate handling (AC-03), and session-update handling (AC-04). Split these by behavior/document group before implementation, carrying their applicable OS/CN anchors, then re-estimate and recompose the batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 42,
+              "message": "T006 likewise bundles four independently verifiable capability-document units while still `todo`: CLI/context intake (AC-01), PR-fix delegation (AC-02), long-gate/evaluate handling (AC-03), and session-update handling (AC-04). Split these units before implementation and update coverage, estimates, dependencies, and batches accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fb3e6630c7276bdbda7b3f7f874ae476b140c3cada802ae06380da12d7bec519",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:12:19Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 180,
+              "message": "T016 is mapped to CN-01 and CN-02, but its description only updates provider-compatibility ownership wording. It does not assign the required self-contained/no-ADR-reference operation (CN-01) or the non-hard-fail configuration/documentation boundary (CN-02), so these mappings are not load-bearing executable coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a07eca73dc538bb028a3d35c54f996eaf947c710e0f815b08b6ddf69e79ddd42",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:15:32Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/impl-plan.json",
+              "line": 180,
+              "message": "T016 restates the upstream CN-01/CN-02 behavior contract in prose (self-contained documents, no ADR date/path references, consumer-owned compatibility rules, and non-hard-fail boundaries). Per `.harness/policies/no-upstream-restatement.md`, retain the target, operation, and anchor cites without re-explaining the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:43ddad9f3e0205df828fc3a0c541f47a9ca2dd6d50ce5bca411069fb7aa6fcd2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:17:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e97b838b55bd8fd5848005d7bc36b7c9ec4d0571e8d6ca1f056043f3feb0047",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:22:55Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/batch-plan.json",
+              "line": 290,
+              "message": "B2 groups T005, T019, T020, and T021 even though every task declares the same write target, `.harness/policies/*.md` excluding `consumer-ownership.md`. T005/T019/T021 are already ready at the B2 frontier and T020 becomes ready after T003, so their shared batch creates overlapping write ownership. Refine them to concrete non-overlapping policy files or place overlapping tasks in separate batches.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/batch-plan.json",
+              "line": 291,
+              "message": "B2 also groups T006, T022, T023, and T024 while all four declare `.harness/capabilities/*.md` as their write target. T006/T022/T024 are ready at the B2 frontier and T023 becomes ready after T003, leaving concurrent tasks with the same capability-file ownership. Refine their targets to disjoint files or serialize the overlapping tasks across batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e97b838b55bd8fd5848005d7bc36b7c9ec4d0571e8d6ca1f056043f3feb0047",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:31:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:092b3c2f082d37f6fe71f0372a84ea07f48efdb4d101e56b6bf02e61a531a470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:35:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:092b3c2f082d37f6fe71f0372a84ea07f48efdb4d101e56b6bf02e61a531a470",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e797b7e43f05642253349e5c23d7452a1e7eaf1df624d54309c7ec2c1ad14d93",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:11:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e797b7e43f05642253349e5c23d7452a1e7eaf1df624d54309c7ec2c1ad14d93",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:28:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53577b73026cfe166760741680ed81a670765510709f12d20a923702528cfad6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:31:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53577b73026cfe166760741680ed81a670765510709f12d20a923702528cfad6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:29:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79d21369965b7ec8734abcd671122bf08353060a6c6d7ae0e36d4d69a6e353a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:31:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79d21369965b7ec8734abcd671122bf08353060a6c6d7ae0e36d4d69a6e353a7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:16:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56d45a922986d6a175b0cdae51fb7e7933f1c1332388d60e27c20a087b8a4190",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:19:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56d45a922986d6a175b0cdae51fb7e7933f1c1332388d60e27c20a087b8a4190",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:13:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:126ee96840026532eace87126167caac4fe98b94eb74e35c109b22171d61d07c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:16:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:126ee96840026532eace87126167caac4fe98b94eb74e35c109b22171d61d07c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:56:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7aace36d0ac178b3fc7603de6c7ce810d66388bf98d9c1a1cc0ce4d448bd81f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:58:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7aace36d0ac178b3fc7603de6c7ce810d66388bf98d9c1a1cc0ce4d448bd81f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:23:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fda8038040d86f39e4c598d28087c8f0662d1fe99130bfcd546b06ee237ed18",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:26:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fda8038040d86f39e4c598d28087c8f0662d1fe99130bfcd546b06ee237ed18",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:32:22Z",
+          "findings": [
+            {
+              "category": "observations.md factual inconsistency",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/observations.md",
+              "line": 5,
+              "message": "Line 5 incorrectly attributes T011–T014 to the `.codex/` surface. Track history identifies T011–T013 as `.agents/` tasks and T014 as a workflow task; only T015 is a `.codex/` task. Correct the task/surface attribution.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:43177fff8f5aca4b6cc0d88b6eda1f655cf678eb7407af8089602c9ab21e1c40",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:34:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:04176f9a26e02b04c7979174d6897020a9471edb3dffacfcfc3e9cdfb1018ba7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:41:38Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/observations.md",
+              "line": 15,
+              "message": "「ADR が効果測定に用いる指標（呼び出し数・非キャッシュ入力・全文 read 回数・委譲回数）」は ADR の測定方針をそのまま再記述しており、観測値ではありません。今回の briefing が求める observation-only の内容と `.harness/policies/no-upstream-restatement.md` の重複防止方針に反するため、この上流説明を削除し、後続の実観測だけを残してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:04176f9a26e02b04c7979174d6897020a9471edb3dffacfcfc3e9cdfb1018ba7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:43:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:470d8685d2228c98cbb999612b81a6f21c175d3e49d9ed2d7a8f42542b005835",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:35:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1fe3ccf92ae1c681f5c8057287def5a81498fc2d45ef83c33b1479f62bbda975",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:38:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1fe3ccf92ae1c681f5c8057287def5a81498fc2d45ef83c33b1479f62bbda975",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T04:55:39Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 101,
+              "message": "AC-08 bundles six ADR anchors into one broad consistency assertion, but does not define a deterministic per-surface check for what each document must contain or how each boundary is proven consistent. Its “同じ…と矛盾しない” wording requires downstream reviewers to invent the comparison procedure, so the acceptance criterion is not sufficiently observable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c0ff98f9da6bc457527f0b0252e90856fb729dc5da3a1e08802d793b51c76cf0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:59:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:696d455656a9fd72245a27b657276a7b751aa8ef7a82c90e6e4607b42a9a9d7c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:04:18Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 51,
+              "message": "AC-05 の「短い rules 文書」には長さや構成の判定基準がなく、同じ成果物を合格・不合格のどちらにも解釈できるため決定的に観測可能な acceptance criterion ではありません。Phase 3 が「短い」の意味を発明せずに済む観測可能な条件へ置き換えるか、この主観条件を AC から外す必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 171,
+              "message": "`coding-principles.md#Purpose` は `libs/`・`apps/` の Rust 実装規約であり、Rust 変更を明示的に除外する OS-01 の文書・設定限定トラックには適用されません。実装時の必読規約になる `related_conventions` としては narrative-level で明白に off-topic です。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-25-orchestrator-context-discipline/spec.json",
+              "line": 175,
+              "message": "`prefer-type-safe-abstractions.md#Rule` はバグクラスを Rust の型システムや標準ライブラリで排除する設計規約ですが、このトラックは手順文書と設定だけを変更し、型設計も Rust 実装も行いません。この参照も契約全体に適用されず、下流の必読規約を誤誘導します。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:696d455656a9fd72245a27b657276a7b751aa8ef7a82c90e6e4607b42a9a9d7c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:08:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58bf7346adacee682918fc8dd744209a774222aa9fd18b5ca16218334f919aae",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:22:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3175eb779c7d9974e0a8d9cb73ccecf4af0982d3169f6585029092f30dd78633",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:26:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3175eb779c7d9974e0a8d9cb73ccecf4af0982d3169f6585029092f30dd78633",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-26T02:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T02:22:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

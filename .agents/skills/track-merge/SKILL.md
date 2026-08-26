@@ -24,7 +24,13 @@ Do not duplicate step sequence, gate conditions, state transitions, or failure-r
 - Do not invoke `gh pr merge`, `git merge`, `git push`, `git add`, or `git commit` directly.
 - Pass `--method` only when the user explicitly supplied a merge method.
 
-### (3) Reporting format
+### (3) Gate waiting
+
+- `bin/sotp pr wait-and-merge` owns the CI wait: run it as one blocking call and read its result
+  once. Do not wrap it in a polling loop or re-check PR status periodically; if the host
+  backgrounds the call, read the result once after the single completion notification.
+
+### (4) Reporting format
 
 - On successful completion, print: `MERGE_STATUS: completed — PR <url> merged with <method> at <commit>`.
 - On failure or block, print: `MERGE_STATUS: blocked — <reason>`.

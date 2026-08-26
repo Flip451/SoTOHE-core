@@ -21,7 +21,9 @@ Requires being on a `track/<id>` branch.
 - **Current branch** — must match `track/<id>`. If not, stop before reading any DRY config.
 - **`.harness/config/dry-check.json`** — the single source of truth for DRY enablement.
   Inspected in Step 0a. If the file is missing, treat as `enabled: false` (skip).
-- **Track context** — `spec.md` and `plan.md` for context, used to prepare the dfl briefing.
+- **Track context** — CLI summaries for the active track and DRY gate, plus the exact artifact
+  paths needed by the delegated dfl capability. The capability reads those artifact bodies from
+  its briefing; the workflow does not bulk-read them during intake.
 
 ## Sequence
 
@@ -44,9 +46,21 @@ This pre-check lives here (in the `dry-check` workflow) and NOT in `full-cycle` 
 Upstream orchestrators call this workflow and rely on its skip / completed / blocked / failed
 status without duplicating the config probe.
 
+## Summary-first context intake
+
+Before opening any track artifact, use `bin/sotp track resolve` for phase and progress and
+`bin/sotp dry check-approved --track-id <id>` for the current DRY-gate state. When the gate is
+blocked, use `bin/sotp dry results --track-id <id> --filter violation` for the cached violation
+summary. Pass the exact `spec.md`, `plan.md`, and any other required artifact paths in the dfl
+briefing without opening their bodies during normal intake. Open only targeted ADR or rendered
+plan sections when needed to populate `## Architecture Constraints`; the delegated dfl capability
+reads the briefing-listed paths itself.
+
 **Step 0b: Gather context**
 
-Use the track id resolved in Step 0a. Read `spec.md` and `plan.md` for context.
+Use the track id resolved in Step 0a and the CLI summaries above to prepare the dfl briefing. Pass
+the exact artifact paths needed for the assigned fix; do not bulk-read `spec.md` or `plan.md` for
+context.
 
 **Step 1: Launch the dfl capability**
 
@@ -60,6 +74,11 @@ output and the track context gathered in Step 0b. Regardless of the adapter's ch
 invocation, the dfl loop that runs internally is `sotp dry write` → fix DRY violations →
 `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved`, iterating until the
 gate passes or the loop is exhausted.
+
+Dispatch the dfl once as a single blocking call and read its terminal status once. If the host
+backgrounds the call, read the result once after the single completion notification. Do not poll
+its output, re-run status probes, or add a fire-and-forget launch; the internal fix loop belongs
+to dfl.
 
 `dry-fix-lead` edits source, so its briefing must carry the `## Architecture Constraints`
 section required by

@@ -50,14 +50,21 @@ If the briefing asks for:
 
 ## Contract
 
-### Input (from orchestrator prompt)
+### Input (from orchestrator dispatch)
 
 - Track id and feature name
-- `track/items/<id>/spec.json` — the behavioral contract (authoritative for what the plan must cover)
-- Per-layer type catalogues `track/items/<id>/<layer>-types.json` for `tddd.enabled` layers — informs which types need implementation work
-- Relevant ADR(s) under `knowledge/adr/` — may dictate task ordering or batching constraints
-- Prior `impl-plan.json` / `task-coverage.json` excerpt when updating an existing track
-- Briefing file path with any explicit constraints on task granularity or ordering
+- Briefing file with the exact paths to `track/items/<id>/spec.json`, each relevant per-layer
+  type catalogue, and the ADR(s) under `knowledge/adr/`; it also carries any prior plan excerpt
+  and explicit constraints on task granularity or ordering
+- The spec path is authoritative for plan coverage; the catalogue paths inform which types need
+  implementation work; and the ADR paths may dictate task ordering or batching constraints
+- Prior `impl-plan.json` / `task-coverage.json` excerpts when updating an existing track
+- The project-wide conventions resolved for this capability, delivered with the dispatch —
+  project-specific plan rules and patterns (may be empty)
+
+The orchestrator supplies progress, review, obligation, and catalogue summaries as dispatch
+context and does not bulk-read the listed artifact bodies during intake. This capability reads
+the exact paths in the briefing and the resolved convention paths itself.
 
 ### Internal pipeline (all executed by the specialist)
 
@@ -123,11 +130,21 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a normal re-entry dispatch re
 - Do not modify `spec.json`, `metadata.json`, or any catalogue file (`*-types.json`)
 - Do not write to `knowledge/research/` or `track/items/<id>/research/` — the orchestrator saves your output. Per-track output goes to `track/items/<id>/research/<timestamp>-impl-planner-<feature>.md`; track-cross analyses stay under `knowledge/research/` per the research-placement convention documented in `knowledge/conventions/`
 
-## Session resume
+## Session continuity and resume
 
-When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
-capability), do not trust context carried over from the prior session: first check whether the
-upstream artifacts of this assignment (`spec.json` and the type catalogues) changed since that
-session, and re-read any that did before continuing. All execution flags are explicitly
-re-specified by the dispatcher on resume; a failed or expired resume falls back to a fresh
-session.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers an unpersisted plan draft or decomposition reasoning. Successfully
+written plan artifacts, generated views, gate results, and read-only repository state are the
+durable hand-off; the capability's in-memory draft is not.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current planning
+revision, carrying the track id, exact spec / catalogue / ADR and plan-artifact paths, relevant
+prior excerpts, current gate summaries, and any ordering or scope constraint. A fresh dispatch,
+or a dispatch that changes concern, starts from that briefing. Only an explicit
+`sotp capability exec --resume` for the same track and capability continues a capability
+session. Fresh and resumed dispatches re-specify every execution flag (model, sandbox, and
+effort); a failed or expired resume, or a provider/model mismatch, falls back to a fresh session.
+On resume, do not trust carried-over context: first check whether the upstream artifacts of this
+assignment (`spec.json`, the type catalogues, the ADR, the plan artifacts, or the briefing)
+changed, and re-read every changed input before continuing.
