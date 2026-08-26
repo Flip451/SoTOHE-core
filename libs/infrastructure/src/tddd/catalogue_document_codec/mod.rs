@@ -2157,6 +2157,63 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_type_delete_tombstone_accepts_explicit_root_marker() {
+        // Turning an explicitly root-placed live entry into a tombstone keeps
+        // `module_path: "."`; the tombstone must decode through the same
+        // marker-aware helper as live entries instead of rejecting the marker.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Type deletion");
+        };
+        assert_eq!(name.as_str(), "GoneType");
+    }
+
+    #[test]
+    fn test_decode_trait_delete_tombstone_accepts_explicit_root_marker() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": { "OldPort": { "action": "delete", "module_path": "." } },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Trait deletion");
+        };
+        assert_eq!(name.as_str(), "OldPort");
+    }
+
+    #[test]
+    fn test_decode_type_delete_tombstone_rejects_root_marker_on_qualified_key() {
+        // A qualified key already fixes the module; an explicit root marker
+        // contradicts it and must fail closed like any other mismatch.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "tddd::GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(error.to_string().contains("tombstone key 'tddd::GoneType'"), "{error}");
+    }
+
+    #[test]
     fn test_decode_trait_delete_entry_becomes_deletion_record() {
         let json = r#"{
   "schema_version": 5,

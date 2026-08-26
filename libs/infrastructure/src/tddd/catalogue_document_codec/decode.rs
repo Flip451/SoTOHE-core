@@ -163,12 +163,16 @@ fn tombstone_entry_key(
     tombstone: &TombstoneDto,
 ) -> Result<CatalogueEntryKey, CatalogueDocumentCodecError> {
     let entry_name = entry_key.as_str();
-    let module_path = ModulePath::from_str(&tombstone.module_path).map_err(|error| {
-        CatalogueDocumentCodecError::InvalidEntry {
+    // Route the tombstone through the same marker-aware decoder as live
+    // entries: the explicit root marker written by `encode_module_path` must
+    // decode as the crate root, and a legacy empty value keeps its root
+    // meaning for tombstones (they carry no separate placement state).
+    let module_path = decode_module_path(&tombstone.module_path)
+        .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
             entry_name: entry_name.to_owned(),
             reason: format!("invalid module_path '{}': {error}", tombstone.module_path),
-        }
-    })?;
+        })?
+        .unwrap_or_else(ModulePath::root);
     let identity =
         FullyQualifiedItemPath::from_catalogue_entry_key(crate_name, entry_key, &module_path)
             .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
