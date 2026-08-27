@@ -1,19 +1,77 @@
 {
-  "baseline_hash": "0eb48f8bbfaa6b8a5d71213c72b1811be3ae6250ab5d5762b14d59aa237e7b2b",
-  "declaration_hash": "05c64b30f37dc23c8bbfc1eb0b20b9e77033cd0e45ca28332bb43a125abd28e4",
-  "generated_at": "2026-08-26T21:22:38Z",
-  "head_commit": "6732c240e57d94293ca0c40e402a89b967b03d00",
-  "schema_version": 4,
+  "baseline_hash": "8e2616adc8c0b1c7d1ede9aa77eccfd263889c51d5963a1b1a4e69868b3e0d68",
+  "declaration_hash": "64dfdf74e041655797cccf77abc6fe0cd64ce09d5e5ad2bd8cfecda1649a07ab",
+  "generated_at": "2026-08-27T22:54:51Z",
+  "head_commit": "f9d09f5810a39c8f1fbf02bcc0630afd2c6cf111",
+  "schema_version": 5,
   "signals": [
     {
       "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "AttestedCatalogueDocumentLoaderPort"
+    },
+    {
+      "found_type": true,
       "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::CoverageVerifyInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
       "signal": "blue",
       "type_name": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
     },
     {
       "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::results::TestObligationResultsInteractor"
+    },
+    {
+      "found_type": true,
       "kind_tag": "secondary_port",
+      "namespace": "trait",
       "signal": "blue",
       "type_name": "CatalogPort"
     }

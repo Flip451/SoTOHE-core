@@ -4,7 +4,8 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::types::FilePath;
-use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
+use domain::tddd::catalogue_v2::{CatalogueItemNamespace, DeletionRecord, TdddLayerBindingsPort};
+use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
 use domain::{
     AdrDecisionCommon, AdrDecisionEntry, ConfidenceSignal, DecisionGrounds, NonEmptyString,
     TrackId, evaluate_adr_decision,
@@ -28,7 +29,9 @@ use crate::verify::catalogue_spec_signals::{
 };
 use crate::verify::tddd_layers;
 
+mod coverage;
 mod freshness;
+use coverage::{impl_catalog_identity, is_safe_signal_line_text, validate_impl_catalog_coverage};
 use freshness::validate_impl_catalog_freshness;
 
 /// Secondary adapter that reads persisted signal artifacts and derives the two
@@ -294,16 +297,12 @@ impl SystemSignalReportSourceAdapter {
             for signal in document.signals() {
                 let Some(level) = report_level(signal.signal()) else { continue };
                 let reason = impl_catalog_reason(signal);
+                let identity = impl_catalog_identity(signal);
                 occurrences.push(occurrence(
                     SignalReportChain::ImplCatalog,
                     level,
-                    format!("{}:{}:{}", binding.layer_id, signal.kind_tag(), signal.type_name()),
-                    format!(
-                        "{}#{}:{}",
-                        binding.catalogue_file,
-                        signal.kind_tag(),
-                        signal.type_name()
-                    ),
+                    format!("{}:{}:{}", binding.layer_id, signal.kind_tag(), identity),
+                    format!("{}#{}:{}", binding.catalogue_file, signal.kind_tag(), identity),
                     reason,
                     location.clone(),
                 )?);
@@ -311,75 +310,6 @@ impl SystemSignalReportSourceAdapter {
         }
         Ok(occurrences)
     }
-}
-
-fn validate_impl_catalog_coverage(
-    catalogue: &domain::tddd::catalogue_v2::CatalogueDocument,
-    document: &domain::TypeSignalsDocument,
-) -> Result<(), SignalReportError> {
-    use crate::tddd::type_signals_evaluator::signal_tags::{
-        contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag,
-    };
-
-    let unavailable = || SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog);
-    let mut expected = BTreeSet::new();
-    for (name, entry) in catalogue.types() {
-        expected.insert((
-            name.as_str().to_owned(),
-            data_role_kind_tag(entry.role(), entry.kind()).to_owned(),
-        ));
-    }
-    for (name, entry) in catalogue.traits() {
-        expected
-            .insert((name.as_str().to_owned(), contract_role_kind_tag(entry.role()).to_owned()));
-    }
-    for (path, entry) in catalogue.functions() {
-        expected.insert((path.to_string(), function_role_kind_tag(entry.role()).to_owned()));
-    }
-
-    let expected_names = expected.iter().map(|(name, _)| name.clone()).collect::<BTreeSet<_>>();
-    let mut unknown_names = BTreeSet::new();
-    for signal in document.signals() {
-        if signal
-            .missing_items()
-            .iter()
-            .chain(signal.extra_items())
-            .any(|item| !is_safe_signal_line_text(item))
-        {
-            return Err(unavailable());
-        }
-        if signal.is_unknown_kind() {
-            if !is_rust_path(signal.type_name())
-                || expected_names.contains(signal.type_name())
-                || !unknown_names.insert(signal.type_name().to_owned())
-            {
-                return Err(unavailable());
-            }
-            continue;
-        }
-        if !expected.remove(&(signal.type_name().to_owned(), signal.kind_tag().to_owned())) {
-            return Err(unavailable());
-        }
-    }
-    if !expected.is_empty() {
-        return Err(unavailable());
-    }
-    Ok(())
-}
-
-fn is_safe_signal_line_text(value: &str) -> bool {
-    !value.is_empty()
-        && value.trim() == value
-        && !value
-            .chars()
-            .any(|character| character.is_control() || matches!(character, '\u{2028}' | '\u{2029}'))
-}
-
-fn is_rust_path(value: &str) -> bool {
-    is_safe_signal_line_text(value)
-        && value.split("::").all(|segment| {
-            domain::tddd::catalogue_v2::identifiers::Identifier::new(segment).is_ok()
-        })
 }
 
 fn validate_catalogue_spec_freshness(
@@ -610,11 +540,117 @@ mod tests {
     use std::process::Command;
     use std::sync::Mutex;
 
-    use domain::CommitHash;
+    use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::deletions::DeletionRecord;
+    use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, CrateName};
+    use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey};
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
+    use domain::{CommitHash, ConfidenceSignal, FreeText, Timestamp, TypeSignal};
 
     use super::*;
 
     static CWD_LOCK: Mutex<()> = Mutex::new(());
+
+    fn test_signal_document(signals: Vec<TypeSignal>) -> domain::TypeSignalsDocument {
+        domain::TypeSignalsDocument::new(
+            Timestamp::new("2026-08-27T00:00:00Z").expect("test timestamp must be valid"),
+            domain::TypeSignalsCacheKey::new(
+                type_signals_codec::declaration_hash(b"test catalogue"),
+                CommitHash::try_new("a".repeat(40)).expect("test commit must be valid"),
+                type_signals_codec::baseline_hash(b"test baseline"),
+            ),
+            signals,
+        )
+    }
+
+    fn same_name_deleted_type_and_trait_catalogue() -> CatalogueDocument {
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").expect("test crate name must be valid"),
+            LayerId::try_new("infrastructure").expect("test layer id must be valid"),
+        );
+        catalogue.push_deletion(DeletionRecord::Type {
+            name: CatalogueEntryKey::try_new("Shared".to_owned())
+                .expect("test type key must be valid"),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        catalogue.push_deletion(DeletionRecord::Trait {
+            name: CatalogueEntryKey::try_new("Shared".to_owned())
+                .expect("test trait key must be valid"),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        catalogue
+    }
+
+    fn catalogue_item_signal(
+        name: &str,
+        namespace: CatalogueItemNamespace,
+        kind_tag: &str,
+        signal: ConfidenceSignal,
+    ) -> TypeSignal {
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem { item_name: FreeText::new(name), namespace },
+            kind_tag.to_owned(),
+            signal,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        )
+    }
+
+    #[test]
+    fn test_coverage_keeps_same_name_deleted_type_and_trait_rows_independent() {
+        let catalogue = same_name_deleted_type_and_trait_catalogue();
+        let document = test_signal_document(vec![
+            catalogue_item_signal(
+                "Shared",
+                CatalogueItemNamespace::Type,
+                "unknown",
+                ConfidenceSignal::Blue,
+            ),
+            catalogue_item_signal(
+                "Shared",
+                CatalogueItemNamespace::Trait,
+                "unknown",
+                ConfidenceSignal::Yellow,
+            ),
+        ]);
+
+        validate_impl_catalog_coverage(&catalogue, &document)
+            .expect("same-name type and trait deletion identities must both be covered");
+    }
+
+    #[test]
+    fn test_coverage_keeps_label_distinct_from_same_named_catalogue_item() {
+        let catalogue =
+            CatalogueDocumentCodec::decode(infrastructure_catalogue(), "infrastructure")
+                .expect("fixture catalogue must decode");
+        let document = test_signal_document(vec![
+            catalogue_item_signal(
+                "SystemSignalReportSourceAdapter",
+                CatalogueItemNamespace::Type,
+                "secondary_adapter",
+                ConfidenceSignal::Blue,
+            ),
+            TypeSignal::new(
+                ThreeWaySignalIdentity::Label {
+                    label: FreeText::new("SystemSignalReportSourceAdapter"),
+                },
+                "unknown".to_owned(),
+                ConfidenceSignal::Red,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ),
+        ]);
+
+        validate_impl_catalog_coverage(&catalogue, &document)
+            .expect("a report label may share text with a catalogue item");
+    }
 
     #[test]
     fn test_occurrence_control_character_in_rendered_field_returns_source_unavailable() {
@@ -752,7 +788,7 @@ mod tests {
         generated_at: &str,
     ) -> String {
         serde_json::to_string_pretty(&serde_json::json!({
-            "schema_version": 4,
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": generated_at,
             "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
                 .as_digest()
@@ -762,6 +798,7 @@ mod tests {
                 .as_digest()
                 .as_str(),
             "signals": [{
+                "namespace": "type",
                 "type_name": "SystemSignalReportSourceAdapter",
                 "kind_tag": "secondary_adapter",
                 "signal": "yellow",
@@ -1249,6 +1286,7 @@ mod tests {
             "signals".to_owned(),
             serde_json::json!([{
                 "type_name": "SystemSignalReportSourceAdapter",
+                "namespace": "type",
                 "kind_tag": "secondary_adapter",
                 "signal": "yellow",
                 "found_type": true,
@@ -1290,12 +1328,14 @@ mod tests {
             serde_json::json!([
                 {
                     "type_name": "SystemSignalReportSourceAdapter",
+                    "namespace": "type",
                     "kind_tag": "secondary_adapter",
                     "signal": "yellow",
                     "found_type": true,
                 },
                 {
                     "type_name": "SystemSignalReportSourceAdapter",
+                    "namespace": "trait",
                     "kind_tag": "secondary_port",
                     "signal": "yellow",
                     "found_type": true,
@@ -1313,15 +1353,15 @@ mod tests {
 
         assert!(occurrences.iter().any(|occurrence| {
             occurrence.entry_id.to_string()
-                == "infrastructure:secondary_adapter:SystemSignalReportSourceAdapter"
+                == "infrastructure:secondary_adapter:type:SystemSignalReportSourceAdapter"
                 && occurrence.reference.to_string()
-                    == "infrastructure-types.json#secondary_adapter:SystemSignalReportSourceAdapter"
+                    == "infrastructure-types.json#secondary_adapter:type:SystemSignalReportSourceAdapter"
         }));
         assert!(occurrences.iter().any(|occurrence| {
             occurrence.entry_id.to_string()
-                == "infrastructure:secondary_port:SystemSignalReportSourceAdapter"
+                == "infrastructure:secondary_port:trait:SystemSignalReportSourceAdapter"
                 && occurrence.reference.to_string()
-                    == "infrastructure-types.json#secondary_port:SystemSignalReportSourceAdapter"
+                    == "infrastructure-types.json#secondary_port:trait:SystemSignalReportSourceAdapter"
         }));
     }
 
@@ -1348,6 +1388,7 @@ mod tests {
             "signals".to_owned(),
             serde_json::json!([{
                 "type_name": "PhantomAdapter",
+                "namespace": null,
                 "kind_tag": "secondary_adapter",
                 "signal": "yellow",
                 "found_type": true,
@@ -1375,12 +1416,14 @@ mod tests {
             serde_json::json!([
                 {
                     "type_name": "SystemSignalReportSourceAdapter",
+                    "namespace": "type",
                     "kind_tag": "secondary_adapter",
                     "signal": "blue",
                     "found_type": true,
                 },
                 {
-                    "type_name": "ImplementationOnlyType",
+                    "type_name": "std::sync::Arc<T>",
+                    "namespace": null,
                     "kind_tag": "unknown",
                     "signal": "red",
                     "found_type": true,
@@ -1404,9 +1447,9 @@ mod tests {
                 entry_id,
                 reference,
                 ..
-            }] if entry_id.to_string() == "infrastructure:unknown:ImplementationOnlyType"
+            }] if entry_id.to_string() == "infrastructure:unknown:std::sync::Arc<T>"
                 && reference.to_string()
-                    == "infrastructure-types.json#unknown:ImplementationOnlyType"
+                    == "infrastructure-types.json#unknown:std::sync::Arc<T>"
         ));
     }
 
@@ -1425,12 +1468,14 @@ mod tests {
             serde_json::json!([
                 {
                     "type_name": "SystemSignalReportSourceAdapter",
+                    "namespace": "type",
                     "kind_tag": "secondary_adapter",
                     "signal": "blue",
                     "found_type": true,
                 },
                 {
                     "type_name": "Forged\nOccurrence",
+                    "namespace": null,
                     "kind_tag": "unknown",
                     "signal": "red",
                     "found_type": true,
@@ -1449,6 +1494,7 @@ mod tests {
             "signals".to_owned(),
             serde_json::json!([{
                 "type_name": "SystemSignalReportSourceAdapter",
+                "namespace": "type",
                 "kind_tag": "secondary_adapter",
                 "signal": "yellow",
                 "found_type": true,
@@ -1791,9 +1837,9 @@ mod tests {
                 reason,
                 location,
             }] if entry_id.to_string()
-                == "infrastructure:secondary_adapter:SystemSignalReportSourceAdapter"
+                == "infrastructure:secondary_adapter:type:SystemSignalReportSourceAdapter"
                 && reference.to_string()
-                    == "infrastructure-types.json#secondary_adapter:SystemSignalReportSourceAdapter"
+                    == "infrastructure-types.json#secondary_adapter:type:SystemSignalReportSourceAdapter"
                 && reason.to_string() == "implementation does not conform to catalogue declaration"
                 && location.to_string() == "track/items/report-test/infrastructure-type-signals.json"
         ));

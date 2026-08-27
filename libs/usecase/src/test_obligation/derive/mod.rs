@@ -9,9 +9,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::SpecRef;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderPort, TrackStatusReaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{CatalogueDocument, MethodDeclaration};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
@@ -42,6 +40,7 @@ use super::{
     TestObligationCatalogueCommandInput, catalogue_artifact_path, diag, is_active_branch,
     sha256_content_hash,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 
 mod identity;
 mod inherent;
@@ -85,7 +84,7 @@ pub struct DeriveTestObligationsInteractor {
     rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
     track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
     items_dir: PathBuf,
     projector: RoleObligationItemsProjector,
@@ -98,7 +97,7 @@ impl DeriveTestObligationsInteractor {
         rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
         obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
         items_dir: PathBuf,
         projector: RoleObligationItemsProjector,
@@ -145,8 +144,11 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
         let mut catalogues: Vec<(PathBuf, CatalogueDocument)> =
             Vec::with_capacity(input.catalogue_paths().len());
         for path in input.catalogue_paths() {
-            let doc =
-                self.catalogue_reader.load(path).map_err(ObligationDeriveError::CatalogueLoad)?;
+            let doc = self
+                .catalogue_reader
+                .load(path)
+                .map_err(ObligationDeriveError::CatalogueLoad)?
+                .into_document();
             catalogues.push((path.clone(), doc));
         }
 

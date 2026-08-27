@@ -23,6 +23,7 @@ use super::invalid_type_ref;
 use crate::tddd::canonical_type_identity::{
     SYNTHETIC_UNPLACED_CRATE_ID, canonicalize_catalogue_type_ref,
 };
+use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 impl EncoderState {
     pub(super) fn resolution_paths_for_namespace(
@@ -143,8 +144,37 @@ impl EncoderState {
     /// Returns the synthetic `Id` for use in `Path.id`.  Repeated calls with the
     /// same `canonical_path` return the same `Id` (cached in
     /// `external_type_path_to_id`).
-    pub(super) fn ensure_external_type_id(&mut self, canonical_path: &str, crate_name: &str) -> Id {
+    pub(super) fn ensure_external_type_id(
+        &mut self,
+        canonical_path: &str,
+        crate_name: &str,
+        namespace: CatalogueItemNamespace,
+    ) -> Id {
+        // D3: the synthesized summary carries the namespace of the reference so
+        // the resolution set never holds one external path as both a type and a
+        // trait identity (an impl's trait path must resolve to exactly one).
+        let kind = match namespace {
+            CatalogueItemNamespace::Type => ItemKind::Struct,
+            CatalogueItemNamespace::Trait => ItemKind::Trait,
+        };
         if let Some(&cached) = self.external_type_path_to_id.get(canonical_path) {
+            let Some(summary) = self.paths.get(&cached) else {
+                self.record_resolution_error(invalid_type_ref(
+                    canonical_path,
+                    "external type cache points to a missing path summary",
+                ));
+                return Id(UNRESOLVED_CRATE_ID);
+            };
+            if summary.kind != kind {
+                self.record_resolution_error(invalid_type_ref(
+                    canonical_path,
+                    format!(
+                        "external path is already registered as {:?} and cannot be reused as {:?}",
+                        summary.kind, namespace
+                    ),
+                ));
+                return Id(UNRESOLVED_CRATE_ID);
+            }
             return cached;
         }
         let synthetic_id = self.alloc_id();
@@ -152,7 +182,7 @@ impl EncoderState {
 
         let crate_id = self.ensure_external_crate(crate_name.to_string());
         let path_segs: Vec<String> = canonical_path.split("::").map(str::to_string).collect();
-        let summary = ItemSummary { crate_id, path: path_segs, kind: ItemKind::Struct };
+        let summary = ItemSummary { crate_id, path: path_segs, kind };
         self.paths.insert(synthetic_id, summary.clone());
         synthetic_id
     }

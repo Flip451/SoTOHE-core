@@ -1609,13 +1609,13 @@ decisions:
     /// to the catalogue bytes and evaluation commit. This keeps the fixture
     /// readable while still exercising the branch-tip freshness checks.
     const TYPE_SIGNALS_MINIMAL: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "head_commit": "0000000000000000000000000000000000000000",
   "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
-    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
+    { "type_name": "TrackId", "namespace": "type", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
 }"#;
 

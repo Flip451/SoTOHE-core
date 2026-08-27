@@ -19,23 +19,67 @@
       "oversize_justification": null
     },
     {
-      "task_id": "T010",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 100,
-          "test_lines": 90
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
       "task_id": "T011",
       "scope_estimates": [
         {
           "scope": "infrastructure",
           "production_lines": 40,
           "test_lines": 30
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T012",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 80,
+          "test_lines": 60
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T010",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 300,
+          "test_lines": 170
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T014",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 140,
+          "test_lines": 80
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T013",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 80,
+          "test_lines": 60
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T015",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 70,
+          "test_lines": 40
         }
       ],
       "oversize_justification": null
@@ -47,8 +91,12 @@
       "task_ids": ["T009", "T011"]
     },
     {
-      "id": "B2",
-      "task_ids": ["T010"]
+      "id": "B3",
+      "task_ids": ["T012", "T010", "T014"]
+    },
+    {
+      "id": "B4",
+      "task_ids": ["T013", "T015"]
     }
   ]
 }

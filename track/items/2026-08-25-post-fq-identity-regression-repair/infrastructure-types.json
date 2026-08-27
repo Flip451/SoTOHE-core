@@ -197,6 +197,51 @@
       "action": "modify",
       "for_type": "SignalEvaluatorV2",
       "trait_ref": "domain::tddd::signal_evaluator::port::SignalEvaluatorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::convert::From<serde_json::error::Error>"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "delete",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "usecase::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort"
     }
   ],
   "traits": {},
@@ -399,6 +444,136 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader": {
+      "action": "modify",
+      "docs": "Supplies the attested catalogue document via a bounded, atomic no-follow filesystem read and hashes the exact bytes read so the pre-review gate resolves contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::tddd_catalogue_document_loader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError": {
+      "action": "modify",
+      "docs": "Type-signals codec error surface (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "serde_json::error::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersion"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDigest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "field",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::tddd::type_signals_doc::Sha256DigestError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidSignal",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidNamespace",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
           "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
         }
       ]

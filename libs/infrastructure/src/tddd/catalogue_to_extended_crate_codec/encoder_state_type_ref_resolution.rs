@@ -221,9 +221,11 @@ impl EncoderState {
         let new_id = if is_preserved_std_marker {
             match self.local_id_for_path(lookup_path, namespace) {
                 Ok(Some(id)) => id,
-                Ok(None) => self.ensure_external_type_id(&std_canonical_path(lookup_path), "std"),
+                Ok(None) => {
+                    self.ensure_external_type_id(&std_canonical_path(lookup_path), "std", namespace)
+                }
                 Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) => {
-                    self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
+                    self.ensure_external_type_id(&std_canonical_path(lookup_path), "std", namespace)
                 }
                 Err(error) => {
                     self.record_resolution_error(error);
@@ -241,7 +243,7 @@ impl EncoderState {
                     if let Some(colon_pos) = lookup_path.find("::") {
                         let first_seg = &lookup_path[..colon_pos];
                         if self.ext_name_to_id.contains_key(first_seg) {
-                            self.ensure_external_type_id(lookup_path, first_seg)
+                            self.ensure_external_type_id(lookup_path, first_seg, namespace)
                         } else {
                             Id(UNRESOLVED_CRATE_ID)
                         }
@@ -250,7 +252,11 @@ impl EncoderState {
                         // `Clone`) for lexical comparison.  Their bare spelling still
                         // denotes a known std external, so register the canonical path
                         // and retain the short spelling on the emitted `Path`.
-                        self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
+                        self.ensure_external_type_id(
+                            &std_canonical_path(lookup_path),
+                            "std",
+                            namespace,
+                        )
                     } else {
                         Id(UNRESOLVED_CRATE_ID)
                     }

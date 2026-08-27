@@ -4,5 +4,62 @@
   "layer": "cli_driver",
   "schema_version": 5,
   "traits": {},
-  "types": {}
+  "types": {
+    "cli_driver::task_contract::TaskContractDriver": {
+      "action": "reference",
+      "docs": "Primary adapter wired by TaskContractCompositionRoot to invoke the pre-review services that resolve contracted-entry namespaces from the attested layer catalogue (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "check_service",
+              "ty": "std::sync::Arc<dyn usecase::pre_review_gate::PreReviewGateService>"
+            },
+            {
+              "name": "coverage_service",
+              "ty": "std::sync::Arc<dyn usecase::pre_review_gate::CoverageVerifyService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TaskContractInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
 }

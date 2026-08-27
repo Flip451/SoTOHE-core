@@ -453,6 +453,7 @@ mod tests {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
         use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
         use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey};
 
@@ -485,8 +486,9 @@ mod tests {
             .expect("type-signal identity indexing must consume catalogue additions");
 
         let kinds = BTreeMap::from([("AddedOnlyInCatalogue".to_owned(), vec!["struct"])]);
-        let signals = [ThreeWaySignal::label(
+        let signals = [ThreeWaySignal::catalogue_item(
             FreeText::new("domain::AddedOnlyInCatalogue"),
+            CatalogueItemNamespace::Type,
             domain::tddd::signal_evaluator::region::SignalRegion::SIntersectC_Match_Add,
         )];
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);

@@ -1,5 +1,11 @@
 {
-  "catalogue_declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
+  "catalogue_declaration_hash": "114331fb48bcf32caad18a21f8339f26d575c46174b35f43f49d134a563bc128",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "2c2f5d89daaf5e5a0c58decde75202b32fcd6c770ac9de76a3911dd5d4a42bbf",
+      "signal": "blue",
+      "type_name": "cli_driver::task_contract::TaskContractDriver"
+    }
+  ]
 }

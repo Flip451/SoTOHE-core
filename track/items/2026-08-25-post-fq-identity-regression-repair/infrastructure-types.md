@@ -6,6 +6,12 @@
 |------|------|--------|---------|--------|----------|
 | infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity | value_object | modify | — | 🔵 | 🔵 |
 
+## Error Types
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::tddd::type_signals_codec::TypeSignalsCodecError | error_type | modify | Json, UnsupportedSchemaVersion, InvalidSchemaVersion, InvalidTimestamp, InvalidDigest, InvalidSignal, InvalidNamespace | 🔵 | 🔵 |
+
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
@@ -13,6 +19,7 @@
 | infrastructure::tddd::catalog_gen::FsCatalogAdapter | secondary_adapter | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec | secondary_adapter | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2 | secondary_adapter | modify | — | 🔵 | 🔵 |
+| infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader | secondary_adapter | modify | — | 🔵 | 🔵 |
 
 ## Free Functions
 

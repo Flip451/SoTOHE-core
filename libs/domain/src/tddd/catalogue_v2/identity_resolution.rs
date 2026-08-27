@@ -7,11 +7,12 @@
 
 use std::collections::BTreeSet;
 
-use crate::tddd::catalogue_v2::ItemAction;
 use crate::tddd::catalogue_v2::identifiers::{
     CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, Identifier, ModulePath, TypeRef,
 };
 use crate::tddd::catalogue_v2::roles::NonEmptyVec;
+use crate::tddd::catalogue_v2::{CatalogueDocument, ItemAction};
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 /// Canonical external trait identities used as the linter's standard-library
 /// seed universe. Keeping these paths beside the shared resolver ensures that
@@ -88,6 +89,64 @@ pub fn resolve_catalogue_identity(
     universe: &BTreeSet<FullyQualifiedItemPath>,
 ) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
     resolve_catalogue_identity_in_namespace(reference, catalogue_crate, universe, None)
+}
+
+/// Resolves the namespace of a task-contract entry from the catalogue section
+/// that declares it.
+///
+/// Type and trait entries are distinct identities even when their keys are the
+/// same. Function entries and deletion records for functions retain the
+/// report-label identity and therefore return `None`. A key declared in more
+/// than one live or deletion section, or in no section, is rejected instead of
+/// being assigned a namespace by convention.
+///
+/// # Errors
+///
+/// Returns [`CatalogueIdentityResolutionError::ClassificationFailed`] when the
+/// key has more than one matching live or deletion declaration. Returns
+/// [`CatalogueIdentityResolutionError::UnresolvedIdentifier`] when it is not
+/// declared in any catalogue section.
+pub fn resolve_contract_entry_namespace(
+    document: &CatalogueDocument,
+    entry_key: &CatalogueEntryKey,
+) -> Result<Option<CatalogueItemNamespace>, CatalogueIdentityResolutionError> {
+    let reference = TypeRef::from_non_empty(entry_key.as_str().to_owned());
+    let mut matches = Vec::new();
+    if document.types().contains_key(entry_key) {
+        matches.push(Some(CatalogueItemNamespace::Type));
+    }
+    if document.traits().contains_key(entry_key) {
+        matches.push(Some(CatalogueItemNamespace::Trait));
+    }
+    if document
+        .functions()
+        .keys()
+        .any(|function_path| function_path.to_string() == entry_key.as_str())
+    {
+        matches.push(None);
+    }
+    for deletion in document.deletions() {
+        match deletion {
+            crate::tddd::catalogue_v2::DeletionRecord::Type { name, .. } if name == entry_key => {
+                matches.push(Some(CatalogueItemNamespace::Type))
+            }
+            crate::tddd::catalogue_v2::DeletionRecord::Trait { name, .. } if name == entry_key => {
+                matches.push(Some(CatalogueItemNamespace::Trait))
+            }
+            crate::tddd::catalogue_v2::DeletionRecord::Function { path, .. }
+                if path.to_string() == entry_key.as_str() =>
+            {
+                matches.push(None)
+            }
+            _ => {}
+        }
+    }
+
+    match matches.as_slice() {
+        [namespace] => Ok(*namespace),
+        [] => Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference)),
+        [..] => Err(CatalogueIdentityResolutionError::ClassificationFailed { location: reference }),
+    }
 }
 
 /// Resolves a catalogue identity within one namespace.
@@ -534,7 +593,12 @@ fn segments_match(segments: &[Identifier], expected: &[&str]) -> bool {
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
+    use crate::tddd::catalogue_v2::DeletionRecord;
+    use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+    use crate::tddd::catalogue_v2::identifiers::{FunctionName, FunctionPath, ModulePath, TypeRef};
+    use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
+    use crate::tddd::layer_id::LayerId;
 
     fn identity(crate_name: &str, module: &[&str], name: &str) -> FullyQualifiedItemPath {
         FullyQualifiedItemPath::new(
@@ -554,6 +618,324 @@ mod tests {
 
     fn reference(value: &str) -> TypeRef {
         TypeRef::new(value).expect("non-empty TypeRef")
+    }
+
+    fn empty_catalogue() -> CatalogueDocument {
+        CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer id"),
+        )
+    }
+
+    fn simple_type_entry() -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn simple_trait_entry() -> TraitEntry {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn simple_function_entry() -> FunctionEntry {
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").expect("valid return type"),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn assert_contract_entry_classification_failed(
+        document: &CatalogueDocument,
+        entry_key: &CatalogueEntryKey,
+    ) {
+        assert!(matches!(
+            resolve_contract_entry_namespace(document, entry_key),
+            Err(CatalogueIdentityResolutionError::ClassificationFailed { location })
+                if location.as_str() == entry_key.as_str()
+        ));
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_uses_sections_and_fails_closed() {
+        let type_key = CatalogueEntryKey::try_new("SharedType".to_owned()).unwrap();
+        let mut type_document = empty_catalogue();
+        type_document.insert_type(type_key.clone(), simple_type_entry());
+        assert_eq!(
+            resolve_contract_entry_namespace(&type_document, &type_key),
+            Ok(Some(CatalogueItemNamespace::Type))
+        );
+
+        let trait_key = CatalogueEntryKey::try_new("SharedTrait".to_owned()).unwrap();
+        let mut trait_document = empty_catalogue();
+        trait_document.insert_trait(trait_key.clone(), simple_trait_entry());
+        assert_eq!(
+            resolve_contract_entry_namespace(&trait_document, &trait_key),
+            Ok(Some(CatalogueItemNamespace::Trait))
+        );
+
+        let function_key = CatalogueEntryKey::try_new("domain::compute".to_owned()).unwrap();
+        let function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("compute").expect("valid function name"),
+        );
+        let mut function_document = empty_catalogue();
+        function_document.insert_function(function_path, simple_function_entry());
+        assert_eq!(resolve_contract_entry_namespace(&function_document, &function_key), Ok(None));
+
+        let duplicate_key = CatalogueEntryKey::try_new("Shared".to_owned()).unwrap();
+        let mut duplicate_document = empty_catalogue();
+        duplicate_document.insert_type(duplicate_key.clone(), simple_type_entry());
+        duplicate_document.insert_trait(duplicate_key.clone(), simple_trait_entry());
+        assert!(matches!(
+            resolve_contract_entry_namespace(&duplicate_document, &duplicate_key),
+            Err(CatalogueIdentityResolutionError::ClassificationFailed { location })
+                if location.as_str() == "Shared"
+        ));
+
+        let missing_key = CatalogueEntryKey::try_new("Missing".to_owned()).unwrap();
+        let missing_document = empty_catalogue();
+        assert!(matches!(
+            resolve_contract_entry_namespace(&missing_document, &missing_key),
+            Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference))
+                if reference.as_str() == "Missing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_includes_deletions_and_rejects_all_ambiguity() {
+        let deleted_type_key = CatalogueEntryKey::try_new("DeletedType".to_owned()).unwrap();
+        let mut deleted_type_document = empty_catalogue();
+        deleted_type_document.push_deletion(DeletionRecord::Type {
+            name: deleted_type_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_type_document, &deleted_type_key),
+            Ok(Some(CatalogueItemNamespace::Type))
+        );
+
+        let deleted_trait_key = CatalogueEntryKey::try_new("DeletedTrait".to_owned()).unwrap();
+        let mut deleted_trait_document = empty_catalogue();
+        deleted_trait_document.push_deletion(DeletionRecord::Trait {
+            name: deleted_trait_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_trait_document, &deleted_trait_key),
+            Ok(Some(CatalogueItemNamespace::Trait))
+        );
+
+        let deleted_function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("deleted_function").expect("valid function name"),
+        );
+        let deleted_function_key =
+            CatalogueEntryKey::try_new(deleted_function_path.to_string()).unwrap();
+        let mut deleted_function_document = empty_catalogue();
+        deleted_function_document.push_deletion(DeletionRecord::Function {
+            path: deleted_function_path,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_function_document, &deleted_function_key),
+            Ok(None)
+        );
+
+        let shared_key = CatalogueEntryKey::try_new("domain::Shared".to_owned()).unwrap();
+        let shared_function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("Shared").expect("valid function name"),
+        );
+
+        let mut live_type_and_function = empty_catalogue();
+        live_type_and_function.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        assert_contract_entry_classification_failed(&live_type_and_function, &shared_key);
+
+        let mut live_trait_and_function = empty_catalogue();
+        live_trait_and_function.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        assert_contract_entry_classification_failed(&live_trait_and_function, &shared_key);
+
+        let mut live_type_and_trait = empty_catalogue();
+        live_type_and_trait.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_trait.insert_trait(shared_key.clone(), simple_trait_entry());
+        assert_contract_entry_classification_failed(&live_type_and_trait, &shared_key);
+
+        let mut deleted_type_and_trait = empty_catalogue();
+        deleted_type_and_trait.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_type_and_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_type_and_trait, &shared_key);
+
+        let mut deleted_type_and_function = empty_catalogue();
+        deleted_type_and_function.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_type_and_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_type_and_function, &shared_key);
+
+        let mut deleted_trait_and_function = empty_catalogue();
+        deleted_trait_and_function.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_trait_and_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_trait_and_function, &shared_key);
+
+        let mut duplicate_type_declarations = empty_catalogue();
+        duplicate_type_declarations.insert_type(shared_key.clone(), simple_type_entry());
+        duplicate_type_declarations.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&duplicate_type_declarations, &shared_key);
+
+        let mut live_type_and_deleted_trait = empty_catalogue();
+        live_type_and_deleted_trait.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_type_and_deleted_trait, &shared_key);
+
+        let mut live_type_and_deleted_function = empty_catalogue();
+        live_type_and_deleted_function.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_type_and_deleted_function, &shared_key);
+
+        let mut live_trait_and_deleted_type = empty_catalogue();
+        live_trait_and_deleted_type.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_type.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_type, &shared_key);
+
+        let mut live_trait_and_deleted_trait = empty_catalogue();
+        live_trait_and_deleted_trait.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_trait, &shared_key);
+
+        let mut live_trait_and_deleted_function = empty_catalogue();
+        live_trait_and_deleted_function.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_function, &shared_key);
+
+        let mut live_function_and_deleted_type = empty_catalogue();
+        live_function_and_deleted_type
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_type.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_function_and_deleted_type, &shared_key);
+
+        let mut live_function_and_deleted_trait = empty_catalogue();
+        live_function_and_deleted_trait
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_function_and_deleted_trait, &shared_key);
+
+        let mut live_function_and_deleted_function = empty_catalogue();
+        live_function_and_deleted_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(
+            &live_function_and_deleted_function,
+            &shared_key,
+        );
+
+        let mut duplicate_deleted_types = empty_catalogue();
+        for _ in 0..2 {
+            duplicate_deleted_types.push_deletion(DeletionRecord::Type {
+                name: shared_key.clone(),
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            });
+        }
+        assert_contract_entry_classification_failed(&duplicate_deleted_types, &shared_key);
     }
 
     #[test]

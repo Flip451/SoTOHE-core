@@ -8,16 +8,15 @@ use std::sync::{Arc, Mutex};
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort, TrackStatusReadError,
-    TrackStatusReaderPort,
+    CatalogueDocumentLoaderError, TrackStatusReadError, TrackStatusReaderPort,
 };
 use domain::tddd::catalogue_v2::roles::{
     ContractRole, DataRole, FunctionRole, InvariantDecl, InvariantPredicate, ItemAction,
 };
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DocString, InherentImplDeclV2, InvariantName, MethodDeclaration,
-    MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
-    TypeEntry, TypeKindV2, TypeRef,
+    AttestedCatalogueDocument, CatalogueDocument, CrateName, DocString, InherentImplDeclV2,
+    InvariantName, MethodDeclaration, MethodName, ModulePath, SelfReceiver, StructKind,
+    StructShape, TraitEntry, TraitImplDeclV2, TypeEntry, TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::CatalogueEntryKey;
 use domain::tddd::test_obligation::errors::{
@@ -46,6 +45,7 @@ use super::{
     DeriveTestObligationsApplicationService, DeriveTestObligationsCommand,
     DeriveTestObligationsInteractor, validate_named_catalogue_methods,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::test_obligation::TestObligationCatalogueCommandInput;
 use crate::test_obligation::obligation_declaration_text;
 
@@ -68,18 +68,26 @@ struct StubCatalogue {
     loads: Mutex<Vec<PathBuf>>,
 }
 
+fn attest_catalogue(document: CatalogueDocument) -> AttestedCatalogueDocument {
+    AttestedCatalogueDocument::attest(b"T014 test catalogue", |_| {
+        Ok::<_, std::convert::Infallible>(document)
+    })
+    .unwrap()
+}
+
 impl StubCatalogue {
     fn new(docs: HashMap<PathBuf, CatalogueDocument>) -> Self {
         Self { docs, loads: Mutex::new(Vec::new()) }
     }
 }
 
-impl CatalogueDocumentLoaderPort for StubCatalogue {
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for StubCatalogue {
+    fn load(&self, path: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
         self.loads.lock().unwrap().push(path.to_path_buf());
         self.docs
             .get(path)
             .cloned()
+            .map(attest_catalogue)
             .ok_or_else(|| CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
@@ -1388,7 +1396,7 @@ fn test_derive_validates_only_catalogues_supplied_on_the_command() {
         Arc::new(StubRules { doc: rules_doc_with_secondary_port_contract_rules() }),
         Arc::clone(&sink) as Arc<dyn ObligationsArtifactPort + Send + Sync>,
         Arc::new(StubSpec),
-        Arc::clone(&catalogues) as Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        Arc::clone(&catalogues) as Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         Arc::new(StubTrackStatus { result: Ok(TrackStatus::InProgress) }),
         PathBuf::from("track/items"),
         RoleObligationItemsProjector::new(),

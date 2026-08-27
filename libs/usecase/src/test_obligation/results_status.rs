@@ -4,7 +4,6 @@ use std::path::PathBuf;
 
 use domain::SpecDocumentLoaderPort;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
 use domain::tddd::test_obligation::errors::ObligationResultsError;
 use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
@@ -16,6 +15,7 @@ use domain::tddd::test_obligation::verdict::{
     WaiverVerdict,
 };
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::check_support::{
@@ -48,7 +48,7 @@ pub(super) fn collect_status_lane_summaries(
     fulfillment_fingerprint: &VerifierPromptFingerprint,
     waiver_fingerprint: &VerifierPromptFingerprint,
     spec_reader: &dyn SpecDocumentLoaderPort,
-    catalogue_reader: &dyn CatalogueDocumentLoaderPort,
+    catalogue_reader: &dyn AttestedCatalogueDocumentLoaderPort,
     task_contract_reader: &dyn TaskContractReaderPort,
     impl_plan_reader: &dyn ImplPlanReaderPort,
 ) -> Result<Vec<TestObligationStatusLaneSummary>, ObligationResultsError> {
@@ -362,14 +362,14 @@ fn inspect_waiver(
 
 fn load_catalogues(
     paths: &[PathBuf],
-    reader: &dyn CatalogueDocumentLoaderPort,
+    reader: &dyn AttestedCatalogueDocumentLoaderPort,
 ) -> Result<Vec<LoadedCatalogueDocument>, ObligationResultsError> {
     paths
         .iter()
         .map(|path| {
             reader
                 .load(path)
-                .map(|document| LoadedCatalogueDocument::new(path, document))
+                .map(|attested| LoadedCatalogueDocument::new(path, attested.into_document()))
                 .map_err(|error| malformed(&format!("catalogue read failed: {error:?}")))
         })
         .collect()

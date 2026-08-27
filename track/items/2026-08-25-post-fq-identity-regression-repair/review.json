@@ -253,6 +253,233 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-27T20:26:50Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli/src/commands/task_contract.rs",
+              "line": 168,
+              "message": "Both handlers now unconditionally call `TaskContractCompositionRoot::discover()`, so even an invocation with explicit `--track-id` and `--items-dir` spawns ambient `git rev-parse --show-toplevel` and trusts the process CWD, `PATH`, and repository-selection variables such as `GIT_DIR`/`GIT_WORK_TREE`. The underlying `SystemGitRepo::discover` preserves those variables, allowing another repository's root—and therefore its `architecture-rules.json`—to determine this pre-review gate's verdict; a missing Git executable or non-worktree CWD also newly blocks these explicit invocations. These process/platform assumptions are absent from the spec, while the environment-assumption declaration remains `TODO`. Declare the Git/CWD contract and use isolated or explicit workspace-root resolution before constructing both drivers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6039c7b95c6b4520c731cc8aa2c2ca46695cc2dbe934ee8ee066c01a3362a158",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:44:10Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli/src/commands/task_contract.rs",
+              "line": 168,
+              "message": "`TrackItemsDirectoryInput::workspace_root()` syntactically removes the trailing `track/items`, so both handlers now assume that every custom `--items-dir` belongs to the repository whose `architecture-rules.json` should govern the gate. For example, from repository `/repo`, `--items-dir /tmp/custom/track/items` passes validation but injects `/tmp/custom` into `TaskContractCompositionRoot`, causing the gate to read `/tmp/custom/architecture-rules.json` instead of `/repo/architecture-rules.json`. This contradicts the round intent and its composition test, which passes the repository root independently of the custom items directory; that test bypasses this faulty CLI derivation. The path-layout assumption is absent from the spec/environment declaration. Resolve and inject the repository workspace root independently of `items_dir` in both handlers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7ceef468d90ebc9a05e9f194dbf004d4d486489afa548a9967faa1814477d67d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:52:04Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli/src/commands/task_contract.rs",
+              "line": 168,
+              "message": "`std::env::current_dir()` returns the invocation directory, not the repository workspace root, and `TrackWorkspaceRootInput::try_new` only validates the path syntactically. Therefore, invoking either command from a repository subdirectory—for example `/repo/apps/cli`, even with an absolute custom `--items-dir`—injects `/repo/apps/cli` into the composition root and makes the gate look for `/repo/apps/cli/architecture-rules.json` instead of `/repo/architecture-rules.json`. This contradicts the briefing's repository-root/discovery intent and can falsely block or evaluate against the wrong rules. It also adds a direct OS-boundary read to the thin bin and relies on the undeclared assumption that CWD equals the repository root; the environment declaration remains `TODO`. Resolve the enclosing repository root behind `cli_composition`/the driver and reuse it in both handlers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:27cc99f38fe1aeb454883e68abf8f317b18618686aac51a1a7e67a33dcb88a3b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T21:27:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c3c8ab9b7198b40eee70c8f395ade042e39a53014a36a2627306ef8e3f4eab9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T22:39:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:74bb0788c22edd5b8580fdb78c93268b7003cd3400fed1e085f37f783fa0ec26",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-27T10:07:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:16:24Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 58,
+              "message": "`FsImplCatalogSignalReader` already reads `<layer>-types.json` to validate the signal document's declaration hash, while the newly wired `FsCatalogueDocumentLoader` reopens that same file later for namespace resolution. This assumes the catalogue cannot change between reads, but neither the spec nor the environment-assumption declaration guarantees such immutability. A concurrent replacement can validate against catalogue A and resolve against catalogue B, potentially producing an incorrect gate result or bypassing the first reader's 16 MiB bound before the loader's unbounded `read_to_string`. Use one shared catalogue snapshot, or bind the second bounded load to the validated declaration hash.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T11:08:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:14:30Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 58,
+              "message": "The wired signal-reader/catalogue-loader pair now correlates validation through a process-global snapshot map keyed only by catalogue path. `TaskContractDriver` is `Sync` and `handle` takes `&self`, so overlapping checks for the same path can interleave: request A can publish snapshot A, request B overwrite it with B, and A then consume B. The loader only compares B's bytes with the hash stored alongside B, not with A's signal document, so the mismatch is undetected and the gate can evaluate signals against the wrong catalogue. Neither the spec nor the environment declaration defines a single-threaded/non-reentrant guarantee. Use a request-scoped snapshot or correlate consumption with the signal document's expected declaration hash.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:53:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:58:39Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 59,
+              "message": "Wiring `FsCatalogueDocumentLoader` makes its filesystem read part of the task-contract command path, but the adapter's symlink protection is check-then-open: it inspects path components and leaf metadata before calling `File::open` without an atomic no-follow/anchored-open guarantee. With concurrency undeclared, a path component can be replaced by a symlink between inspection and open; the process can then read outside the intended tree or block while opening a special file. The later declaration-hash comparison detects changed catalogue content only after the external open/read and does not close this boundary. Use an atomic no-follow open anchored to a trusted directory and validate the opened descriptor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T14:48:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:54:16Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 21,
+              "message": "The composition root unconditionally imports and wires `FsCatalogueDocumentLoader`, whose implementation now unconditionally uses `rustix::fs`. Rustix exposes its `fs` module only under `cfg(not(windows))`, so this dependency cannot compile on Windows. Neither the track spec nor the environment declaration restricts supported platforms to non-Windows systems—the supported-platform fields remain `TODO`. Provide a cfg-gated platform implementation/wiring path, or explicitly declare the supported platform boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T15:00:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T15:06:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e04f36f4f068f0832e8935ee6c20f9c86488690cc1d850f9ebd7aa17d1e68e8a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:55:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37b42248bdaa77626481ae1de5a8ca81aad0ecd651cff7cad351085de28400ce",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:59:54Z",
+          "findings": [
+            {
+              "category": "configuration-root wiring",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 62,
+              "message": "The new `FsTdddLayerBindingsAdapter` is wired without the repository workspace root, so the interactors infer it by stripping two parents from `items_dir`. The CLI explicitly supports arbitrary `--items-dir` values such as `custom/track/items`; for that valid input the inferred root becomes `custom`, and both check and coverage try to load `custom/architecture-rules.json` instead of the repository's rules file. Pass the actual workspace root through the composition boundary or make the adapter resolve it independently of the items-directory layout.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:37b42248bdaa77626481ae1de5a8ca81aad0ecd651cff7cad351085de28400ce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:23:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6177c762aba5358ec18ad85ad47d0d001d53a1d664dbf252e01ceb1501a665ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T21:27:19Z",
+          "findings": [
+            {
+              "category": "adapter logic in composition",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 51,
+              "message": "`discover_from` implements filesystem adapter behavior directly inside the composition root: it walks ancestor paths and probes the workspace marker. `cli_composition` must remain pure DI wiring; workspace discovery belongs in an infrastructure adapter behind a port, or should be resolved before constructing this root.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/task_contract.rs",
+              "line": 54,
+              "message": "The workspace walk uses `Path::is_file()`, which collapses permission and other metadata failures into `false`. If the nearest workspace marker cannot be inspected, discovery can silently skip it and select an outer workspace's `architecture-rules.json`, wiring the command against the wrong configuration. Use a fallible metadata operation, treat only `NotFound` as absence, and propagate other failures as the typed composition error.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a52a14504f4755705c2cd9292ffd8afd027c7b7a380870d20092d41f9161131",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T22:39:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3c1b993094bb46adcef24f20144d4f171c9ff2c949cd464d06ebb951c217daf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -288,6 +515,13 @@
           "at": "2026-08-26T20:31:18Z",
           "findings": [],
           "hash": "rvw1:sha256:7ba38970f5c928a456b12acd3dddd41cd07e60eb2d233a706a3613199c19221b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T20:24:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6b9e76cd4cdcd4e60e5bcabff26cb9ba3460aa07fb95f47fc0c932a0d948613",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -445,6 +679,180 @@
           "at": "2026-08-26T19:23:00Z",
           "findings": [],
           "hash": "rvw1:sha256:3b6ad41cff360ad52985cd282585816074be645b2805659b2ee2dc2a70382619",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T04:52:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08c64e018294e6a87fc5938b0c13b50da4dc916cf3940816850618a76e2afcf8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T05:00:45Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 12,
+              "message": "`TypeSignal` の永続化 identity を namespace 付きへ変更した一方、schema version が旧形式と同じ `4` のままです。既存 v4 row は `type_name` しか持たず、現行 decoder はそれを `Label` として復元するため、cache reuse で catalogue type/trait の namespace が失われ、同名 row の status が混入し得ます。schema version を更新し、旧 row を cache miss として再生成させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08c64e018294e6a87fc5938b0c13b50da4dc916cf3940816850618a76e2afcf8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T05:39:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a09bf163ad8240957ac4274517b84879b2ccfb8fd86d3144fdd84808b395051",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T05:44:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a09bf163ad8240957ac4274517b84879b2ccfb8fd86d3144fdd84808b395051",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:47:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a09bf163ad8240957ac4274517b84879b2ccfb8fd86d3144fdd84808b395051",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:51:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a09bf163ad8240957ac4274517b84879b2ccfb8fd86d3144fdd84808b395051",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:06:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7bf3175c422a8e79c51134d1b51b90b1c9e98f69d74b9463c8eabbce98fb2639",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:13:52Z",
+          "findings": [
+            {
+              "category": "domain invariant / fail-closed resolution",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 112,
+              "message": "`resolve_contract_entry_namespace` は live な `types` / `traits` / `functions` map だけを調べていますが、`action: delete` entry は `CatalogueDocument::deletions` に分離されます。そのため type・trait・function の deletion を指す task-contract key は常に `UnresolvedIdentifier` となり、正しい deletion task が pre-review gate で無効扱いされます。3種類の `DeletionRecord` も namespace/label 分類へ含め、回帰テストを追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "enum-first / fail-closed ambiguity",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 120,
+              "message": "match は type と trait の同一 key だけを曖昧として拒否し、type+function では `Type`、trait+function では `Trait` を返します。task-contract v1 は section/namespace を持たないため、複数 section に同じ文字列 key がある場合は区別不能です。このままでは function task が同名 type/trait の signal status に結合され、誤って pass または block され得ます。function（および deletion）を含む全 section で複数一致を fail-closed にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7bf3175c422a8e79c51134d1b51b90b1c9e98f69d74b9463c8eabbce98fb2639",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T11:08:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af5b10d1eb3e22ae8e1e96dae811fa2a1967a20cab5afcff19938f7e50c4e27a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:12:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af5b10d1eb3e22ae8e1e96dae811fa2a1967a20cab5afcff19938f7e50c4e27a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T12:20:06Z",
+          "findings": [
+            {
+              "category": "typestate / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 110,
+              "message": "`load` の契約は「成功時には必ず source-byte hash が付く」としていますが、成功型は `declaration_hash: Option<_>` を持つ通常の `CatalogueDocument` のままです。`CatalogueDocument::new` で作った未 attested document を adapter が `Ok` で返せるため、呼び出し側は成功後に同じ不変条件を再検証しなければならず、`Ok` なのに freshness 証拠がない状態へ到達できます。attested 専用 wrapper、hash を必須にした loader result、または `(CatalogueDocument, CatalogueDeclarationHash)` など、成功型自体が hash の存在を保証する形にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5b0823742c47988be73275e2f82b3e7f2770ac9a525022373c695d822acf1860",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:52:53Z",
+          "findings": [
+            {
+              "category": "broken invariant in constructor",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 98,
+              "message": "`AttestedCatalogueDocument::new` is public and accepts an arbitrary `CatalogueDeclarationHash` without proving it was computed from the supplied document/source bytes. Any caller can therefore forge the attestation and make freshness validation accept a stale or unrelated catalogue. Keep construction restricted to the loader/validated proof path, or require an unforgeable attestation token.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba9855332923592c7a31bc581eb25ea33ea0264ba1733d7391dfeabb1da678f1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T14:49:26Z",
+          "findings": [
+            {
+              "category": "broken invariant in constructor",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 103,
+              "message": "`AttestedCatalogueDocument::attest` still does not enforce that the returned `CatalogueDocument` was decoded from `source`: the public caller-supplied closure may ignore its byte argument and return an unrelated document, while the hash is computed from `source`. This permits forging a mismatched document/hash pair and can let freshness validation accept stale or unrelated catalogue data. Construction must bind decoding to the source bytes through a non-bypassable loader/decoder path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23bb4179597e5f71b83c4f99c737bf22376a69da32c75bab9b0253f3ac4ed409",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T14:56:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23bb4179597e5f71b83c4f99c737bf22376a69da32c75bab9b0253f3ac4ed409",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T15:03:01Z",
+          "findings": [
+            {
+              "category": "public API documentation gap",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 103,
+              "message": "新規の公開 fallible API `AttestedCatalogueDocument::attest` に必須の `# Errors` セクションがありません。`decode(source)` が返す `E` をそのまま返す条件を公開契約として記載してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "port misplaced",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 149,
+              "message": "`CatalogueDocumentLoaderPort` は filesystem read・JSON decode・source-byte hashing という application orchestration が必要とする技術的能力を抽象化しています。domain type を返すことは innermost 配置の根拠にならず、現行 Port-placement tie-break では usecase 所有の `SecondaryPort` です。今回 return contract も変更しているため、trait を usecase 層へ移してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23bb4179597e5f71b83c4f99c737bf22376a69da32c75bab9b0253f3ac4ed409",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T17:59:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9961e61a12799e12393f5af6547bc8876e2806bdc72ebd2c83622dfc6d38d95a",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -777,6 +1185,265 @@
           "at": "2026-08-26T21:19:49Z",
           "findings": [],
           "hash": "rvw1:sha256:a9e3487850ab9d9b25543f98d79299377321b36c0d023b4833ce6925807bc9a8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T21:48:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:74403593acc73712572f19c36fe0b2c4e5b98a760492b8222c4564369ddcd3e9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T21:51:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:74403593acc73712572f19c36fe0b2c4e5b98a760492b8222c4564369ddcd3e9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T01:31:55Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 157,
+              "message": "T012 is a pre-implementation split candidate: it bundles independently verifiable domain (`catalogue.rs`/`region.rs`), infrastructure (codec/report/evaluator), and usecase (`pre_review_gate`) behavior units under one task. Split these units into separate tasks, retaining AC-05/IN-05/CO-05 anchors for each relevant unit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2e123c790cd3a9467560a11860840be9eec400b59912493972d461773e80bce2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T01:43:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b922409d23604ef1840aa734816e42ba6720649ee15df2d081448ef7b45b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T01:52:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b922409d23604ef1840aa734816e42ba6720649ee15df2d081448ef7b45b6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T01:59:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7bc4a42e2bb99201981773fbf33ed27466dc719d31db407415500cadb7d387e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T02:02:24Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 166,
+              "message": "T013 bundles two independently verifiable behavior units: namespace-aware TypeSignal JSON round-trip handling in `type_signals_codec.rs`, and namespace-aware report validation/comparison in `signal_report/mod.rs`. Each has a separate production target and regression surface for IN-05/CO-05/AC-05, so split them before implementation starts.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e7bc4a42e2bb99201981773fbf33ed27466dc719d31db407415500cadb7d387e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T02:09:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b2e4032a05686c5a87b3a287e7afcffc68485e092c8534e8e8906fee634e983c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T02:11:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b2e4032a05686c5a87b3a287e7afcffc68485e092c8534e8e8906fee634e983c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T09:00:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30beaeac4f3884d4ba6eeddb1d0e2da4ee8c6b7f63099057505f10f1354a56e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T09:03:35Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/task-contract.json",
+              "line": 122,
+              "message": "T014 attributes `PreReviewGateInteractor` and `CoverageVerifyInteractor`, but neither is a catalogue entry in `usecase-types.json`; they appear only as source-only `kind_tag: unknown` signals. `task-contract.json` is catalogue-entry attribution only, so remove these two invalid references rather than using it for liveness/stale-carrier coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 183,
+              "message": "T014 owns the catalogue entry `domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace`, but its description names only `pre_review_gate.rs` and `pre_review_gate/helpers.rs`. The executor must invent the required domain write boundary; explicitly name `libs/domain/src/tddd/catalogue_v2/identity_resolution.rs` and the resolver symbol.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:30beaeac4f3884d4ba6eeddb1d0e2da4ee8c6b7f63099057505f10f1354a56e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T09:06:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54487a5c53267ef663583af0afefbeb6779837e6259619e7eb47656389e4d87c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:06:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a996574ee0770a646db28bd594d4a975c24f761f18a50adc0ba7226fb6cc2dd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:08:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a996574ee0770a646db28bd594d4a975c24f761f18a50adc0ba7226fb6cc2dd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:04:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f26612eea68ce2d9e95647bcb4dba5a4873ca06b7f1c3897d8c28349b44893",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:07:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f26612eea68ce2d9e95647bcb4dba5a4873ca06b7f1c3897d8c28349b44893",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:09:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f26612eea68ce2d9e95647bcb4dba5a4873ca06b7f1c3897d8c28349b44893",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:11:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f26612eea68ce2d9e95647bcb4dba5a4873ca06b7f1c3897d8c28349b44893",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:52:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a104db051820e860304296818b66018812d59ea34a474631ae2b88859b32014",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:54:27Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 183,
+              "message": "T014 now owns the added `AttestedCatalogueDocument` and modified `CatalogueDocumentLoaderPort`, but its description names only the namespace resolver and pre-review-gate files. The executor must invent the load-bearing loader boundary; explicitly name `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs` and the conforming adapter in `libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs` with their regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a104db051820e860304296818b66018812d59ea34a474631ae2b88859b32014",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:57:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54f12339b70110366d38e3b3150a2d10bf7adaf4b6c237388e177a7c118178d8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:52:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:478a3ba03fd8a972602eccdf3a7cac0b35ade1d0e47c30081adc6e14af529aba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:55:17Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 183,
+              "message": "T014 now owns additional add/modify catalogue entries for `AttestedCatalogueDocumentLoaderPort`, `CatalogueImplSignalsInteractor`, `PreReviewGateError`, the check/evaluate/results test-obligation interactors, and `FsCatalogueDocumentLoader`, but its description does not name most of those application-consumer targets. The executor must invent the propagation boundary; explicitly include `libs/usecase/src/catalogue_document_loader.rs`, `catalogue_impl_signals/interactor.rs`, and the affected `test_obligation` check/evaluate/results modules with their regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:478a3ba03fd8a972602eccdf3a7cac0b35ade1d0e47c30081adc6e14af529aba",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T18:14:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/impl-plan.json",
+              "line": 183,
+              "message": "T014’s description restates upstream behavior-contract details—“binding-aware catalogue-path resolution,” “request-scoped freshness checks,” and “attested bounded atomic no-follow load”—instead of limiting the plan text to targets, operations, and anchors. Remove these behavioral/rationale phrases per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:649d819408b845727cc573729aa96ed42a0b90a1d7ed4c2a80c02ee52f0c5b31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T18:20:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8efc1ca57a66db20cf678652803ac3fab34ea38ac9e026c122ed924dca5fffc4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T18:23:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8efc1ca57a66db20cf678652803ac3fab34ea38ac9e026c122ed924dca5fffc4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T20:24:15Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/task-coverage.json",
+              "line": 6,
+              "message": "T014 explicitly cites `IN-03`, `CO-03`, and `AC-03`, but `task-coverage.json` omits T014 from all three mappings. This leaves its load-bearing D3 namespace/identity work untraced; add T014 to those mappings, or remove the D3 anchors if another task owns that work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:94b829947e009b3981000f9813c366e334adf3b2b9311ae56eea42ff0995d72b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:26:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8ef17f47cccd1f8deb29e15c9ee21af53a858a568d84b9020b8ed37e66ec55fc",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1398,6 +2065,414 @@
           "hash": "rvw1:sha256:f79138ee5929ff2fb610662a2f49b2cecfe4ed6d1cb26eba4cdb820e4182af7c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T21:56:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9a6980967e73581da5c472c5302d3b5b3cf505dd8652f6ef37e985a0bbbe333",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T22:04:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 558,
+              "message": "`accumulator_namespace` preserves the requested namespace only when the live-entry kind tags contain both a type and a trait. Deletion records contribute no kind tags, so same-named type/trait tombstones—or a live entry plus an opposite-namespace tombstone—both use `(name, None)` and their Phase 2 states are merged. This drops or contaminates a persisted row, contrary to AC-05. Namespace membership must include declarations and deletions rather than being inferred solely from role tags.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 381,
+              "message": "The exact `kind_tag_map.contains_key(name)` branch treats a display label as the authoritative stored key before namespace-aware resolution. For example, a root type stored as `domain::Shared` and a root trait stored as `Shared` both produce the Phase 2 label `Shared`; both namespace-specific signals are routed into the trait key while the type row is later synthesized as Blue. Resolve catalogue-item labels together with their namespace and filter identity-index candidates by namespace.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 490,
+              "message": "Namespace-specific rows retain every tag whose namespace is `None`. When a function path is also the fully qualified key shared by a type and trait, `free_function` is emitted from both namespace rows, while the function's label accumulator emits all type, trait, and function tags again. This creates duplicate `(type_name, kind_tag)` rows, mixes their statuses, and causes downstream coverage validation to reject the document. Namespace-less tags need a separate `None` row and must not be copied into type/trait rows.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a9a6980967e73581da5c472c5302d3b5b3cf505dd8652f6ef37e985a0bbbe333",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T22:27:14Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 535,
+              "message": "The accumulator now separates same-key type and trait tombstones internally, but serialization immediately erases that namespace: both rows have no role tag and are emitted as identical `TypeSignal::new(name, \"unknown\", ...)` identities. Two tombstones therefore fail `validate_impl_catalog_coverage` as duplicate unknown names; a tombstone beside an opposite-namespace live entry also fails because its unknown name equals an expected live name. Preserve the namespace in the persisted row identity instead of only in `AccKey`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 199,
+              "message": "Trait-impl owner selection remains namespace-blind. If a type is stored as `Shared` and a same-path trait as `domain::Shared`, `canonical_to_keys` has two keys, so `declaration_key_for_canonical` returns no unique declaration and this fallback chooses the canonical text `domain::Shared`—the trait's stored key. The impl label and its confidence/items are then accumulated into the trait row even though impl owners must resolve in the Type namespace. Filter canonical candidates by `CatalogueItemNamespace::Type` before selecting the owner key.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 509,
+              "message": "The fill pass rewrites every kind-map name through the type/trait declaration index, including namespace-less function paths. For a bare type key `Shared` and root function path `domain::Shared`, the function path uniquely aliases the type key; when the matched Reference function is suppressed from the Phase 2 report, both fill iterations collapse to `Shared`, and the direct kind-tag lookup returns only the type tag. The required `domain::Shared/free_function` row is omitted and downstream coverage rejects the document. Preserve namespace-less function keys instead of mapping them to type/trait entry keys.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b39dd065592f765e9ca617d5bf88392a9972ef77be5df2770a4ca773bde971a4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T22:40:07Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 596,
+              "message": "`unknown_signal_name` invents pseudo-entry keys such as `Shared::__sotp_type` to encode tombstone namespaces. Downstream consumers treat every `TypeSignal::type_name`—including `unknown` rows—as a catalogue entry key: the pre-review coverage gate compares it directly with raw keys from `task-contract.json`. These synthetic keys are never present there, so same-key type/trait tombstones become unconditional `OrphanEntry` violations. Preserve namespace through a typed persisted identity understood by consumers instead of altering the catalogue key.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 645,
+              "message": "`accumulator_namespace` separates rows only when an entry spans both the Type and Trait namespaces. A namespace-aware type or trait and a namespace-less function with the same exact persisted key therefore still use one `(key, None)` accumulator. For example, a type and function both keyed `domain::Shared` share their confidence/found state, and the two kind tags trigger the collision rule that forces both rows to Yellow even when both matched. Namespace-less labels must be separated whenever they coexist with a namespace-aware entry, not only when type and trait coexist.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 453,
+              "message": "After typed catalogue-item signals are handled by the `signal.namespace()` branch and impl labels by the `\": \"` branch, this remaining namespace-less path handles function labels. It still resolves them through the type/trait declaration alias index. An undeclared function label such as `domain::Shared` beside a catalogue type stored as `Shared` is therefore rewritten to the type key, contaminating that row and dropping the function's report label. Preserve the raw function label instead of routing it through `declaration_candidates`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:606e7f32796b5a3e597cf5dbfd8b2ee555dd1b44f2e3ef476b27ff9ea83960e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T23:01:01Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 574,
+              "message": "The namespace exists only in `AccKey` and is discarded when constructing persisted `TypeSignal` rows. For live same-key type/trait entries, downstream pre-review code indexes signals only by `type_name`, so the later row overwrites the earlier status (for example, a Blue trait can hide a missing Yellow/Red type). For same-key type/trait tombstones, both rows have the identical `(type_name, \"unknown\")` identity, and `validate_impl_catalog_coverage` rejects the second as a duplicate. AC-05 therefore remains broken at the persistence boundary; namespace must survive in the persisted identity and its consumers.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 649,
+              "message": "Namespace-less separation is inferred only from declared kind tags. An undeclared or delete-declared function has no `free_function` tag in `kind_tag_map`; when its report label exactly equals a declared type/trait key, `entry_needs_namespace_separation` returns false and both signals use the same `(key, None)` accumulator. The function status is then emitted as the type/trait row and its required report label disappears. The actual namespace-less signal must itself force a distinct `None` accumulator rather than relying on catalogue tag presence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6a5f5fb60a29ddc60cce3d3effd2d1dd2e3562c37f707854acb2a693351f74ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T23:29:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c4a7503eca7ee2b84249f81c85ab3776e0c3d3f8a035a8c43a8c4a083a3f427",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T23:54:19Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 502,
+              "message": "`collapse_unknown_rows` explicitly merges same-named type and trait tombstones back into one namespace-less row, combining their states with `worse_signal`. A Type `DMinusC` Blue and Trait `DIntersectC` Yellow therefore persist as one Yellow `unknown` row, directly violating AC-05’s requirement that same-named catalogue type/trait identities and statuses remain independent. The persistence model must represent the namespace rather than coalescing it away.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs",
+              "line": 489,
+              "message": "Namespace separation still does not survive `TypeSignal` construction. Live same-key type/trait rows retain the same `type_name`, so the pre-review gate’s `HashMap<type_name, signal>` overwrites one status with the other. A namespace-less function label equal to a declared type key is emitted as an `unknown` row with that same name, which `validate_impl_catalog_coverage` rejects because the name is already expected. The direct builder tests therefore produce artifacts that downstream gates cannot consume correctly; namespace/label identity must be persisted end-to-end.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e14ab67b1bca65a99503f736f03ae87e99f2f5c2ec53484182c9e6ea15e90aa9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T05:49:28Z",
+          "findings": [
+            {
+              "category": "serde codec break",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 156,
+              "message": "Schema v5 の永続化で namespace-aware identity が失われます。`signal_from_dto` は全 row を `ThreeWaySignalIdentity::Label` として復元し、DTO/`signal_to_dto` も namespace を保存しません。そのため同名の type/trait rows を encode→decode すると両方が namespace-less になり、AC-05 の identity 分離を cache 読み出し後に維持できません。DTO に namespace を追加して encode/decode し、同名 type/trait の roundtrip を検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:530f424e4b6a8747e327dc5bcb779135fff32d574d8acd2e9c33abcdef0a2ac6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T06:03:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d60858025f9b318b0bc954f11395f4c036bada2efa34589e6ecbd494a3770d6a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:16:18Z",
+          "findings": [
+            {
+              "category": "serde-codec",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 52,
+              "message": "Schema v5 uses an omitted optional `namespace` as the only wire discriminant for `ThreeWaySignalIdentity`, so a v4-shaped catalogue row with only `type_name`/`kind_tag` silently decodes as a report `Label`. The updated v5 fixtures—and the current generated artifacts—demonstrate this shape. Two same-named type/trait rows with omitted namespaces consequently collapse again in namespace-keyed consumers. Because v5 makes namespace mandatory for catalogue identities, use an explicit tagged identity representation or otherwise reject catalogue-shaped rows whose discriminant is absent instead of interpreting omission as a label.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 325,
+              "message": "`validate_impl_catalog_coverage` still validates persisted rows by `(type_name, kind_tag)` and tracks unknown rows by name alone, ignoring the new typed identity. Canonical builder output containing same-named Type and Trait tombstones therefore fails because the second `unknown` row is considered a duplicate; a valid report `Label` sharing a catalogue item's name is also rejected. Conversely, a namespace-stripped or wrong-namespace live row can satisfy the expected name/tag pair. Build expected and observed keys from `ThreeWaySignalIdentity` (including deletions and labels), and include the namespace in occurrence identity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d60858025f9b318b0bc954f11395f4c036bada2efa34589e6ecbd494a3770d6a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T06:49:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66455a9de275de2e87a138e56b14b2f48555fbd4cf9ecdf53f3c3572755223e2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:55:33Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 385,
+              "message": "Unknown-row validation still applies `is_rust_path` to both catalogue identities and report labels. Supported external trait-impl owners are persisted as `Label` identities with `kind_tag = \"unknown\"`—for example `std::sync::Arc<T>`—and the Rust-identifier parser rejects the generic suffix, making the entire signal-report source unavailable even though the label is valid producer output. Require Rust-path syntax only for `CatalogueItem` identities; validate `Label` identities with the safe-text boundary while retaining the typed duplicate/coverage checks.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:66455a9de275de2e87a138e56b14b2f48555fbd4cf9ecdf53f3c3572755223e2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T07:01:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4b849b39d9e8c990688b7ff0be70b7490aae9ae2936b48546c2f5b91e79d355",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T07:06:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4b849b39d9e8c990688b7ff0be70b7490aae9ae2936b48546c2f5b91e79d355",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T07:24:30Z",
+          "findings": [
+            {
+              "category": "serde codec break",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 53,
+              "message": "Schema v5 の `namespace` が `Option` のままなので、`value_object` や `secondary_port` など catalogue type/trait row に namespace がない payload も受理され、`Label` として扱われます。AC-05/CO-05 の「catalogue type/trait は namespace 必須」を codec 境界で保証できず、欠落した namespace を含む stale/malformed cache が silently accepted されます。kind_tag に応じて catalogue row の namespace を必須検証し、report-label のみ `None` を許可してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c47454afe2c9b396e878d14c15da450976d7ace85bcebf6643657c73f88068ff",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T10:07:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ec59132a090fe9c17a0349fb22945283a643d3db90e60c9b5f62ab81716df08",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:11:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ec59132a090fe9c17a0349fb22945283a643d3db90e60c9b5f62ab81716df08",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:09:03Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs",
+              "line": 182,
+              "message": "ローダーの symlink guard は leaf と直近の parent しか検査していません。`trusted_root` に `path.parent()` を渡しているため、`real_root/link_root/sub/domain-types.json` のように祖先ディレクトリが symlink の場合、`reject_symlinks_below` はその parent で停止し、後続の bounded read が symlink を辿ります。ファイルロード境界で全 ancestor を `symlink_metadata()` 検査する（または実際の trusted root を受け取る）必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:60431234928ef0268fe2fb8000bbd77fbcb05d28410af67feba6573279d10cef",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T11:18:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ceac1268b6d2c0c4f316cf86d7009751b5740791f9f4b9636dd043eab16c18d7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:23:37Z",
+          "findings": [
+            {
+              "category": "concurrency/resource-boundary",
+              "file": "libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs",
+              "line": 68,
+              "message": "The validated-catalogue hand-off is a process-global `HashMap` keyed only by path, with no request identity, expiry, or bound. Signal-reader calls that are not followed by this loader retain up to one bounded catalogue per distinct path indefinitely. More critically, a later unrelated command loading the same path consumes the old snapshot even after the catalogue was replaced, while concurrent commands can overwrite or consume each other’s snapshot. The loader’s hash check only compares the cached bytes with the cached hash, so it cannot detect that cross-command staleness. Make the snapshot request-scoped/tokenized (or pass it directly through the operation) and ensure abandoned snapshots are bounded and cleaned up.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ceac1268b6d2c0c4f316cf86d7009751b5740791f9f4b9636dd043eab16c18d7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:53:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f99a6df7d149f229e0b78e7c4650dcc647ba7d557957abea457511be978b7b7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:01:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f99a6df7d149f229e0b78e7c4650dcc647ba7d557957abea457511be978b7b7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:49:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:447f54123dc163298cf35eb56a7711188605834a6276568846cd5658ef5df091",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:53:49Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumption",
+              "file": "libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs",
+              "line": 127,
+              "message": "未宣言の前提への依存: `open_catalogue_file_nofollow` unconditionally assumes a Unix filesystem by anchoring traversal at `/`, using `rustix::fs::open/openat` with Unix `OFlags`, and rejecting `Component::Prefix`. The repository-owned `environment-assumptions.md` still leaves supported platforms as `TODO`, and the supplied spec/briefing does not declare a Unix-only runtime. This makes catalogue loading fail to compile or operate on Windows and other unsupported targets without an authorized platform boundary. Provide a conditional portable implementation or first declare and ground the supported-platform restriction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:447f54123dc163298cf35eb56a7711188605834a6276568846cd5658ef5df091",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T15:03:06Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumption",
+              "file": "libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs",
+              "line": 182,
+              "message": "未宣言の前提への依存: the non-Unix branch now compiles but deliberately rejects every catalogue load because atomic no-follow opening is unavailable. The repository-owned `environment-assumptions.md` still leaves supported and conditionally unsupported platforms as `TODO`, and neither the spec nor briefing declares catalogue workflows Unix-only. Encoding the restriction only in this adapter does not establish the required environment authority and makes all catalogue-dependent commands unusable on non-Unix targets. Provide a portable implementation or formally declare and ground the Unix-only platform boundary and non-Unix failure behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:025773096549b3f91128f349da8b6e246fbd42924f975481ad29d4f350fc7c6c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T17:55:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f836736434f21f8ddc1426815677cd6c5fea793b180ca37da419f662d7435a17",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:59:56Z",
+          "findings": [
+            {
+              "category": "namespace-resolution",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
+              "line": 160,
+              "message": "`ensure_external_type_id` caches solely by canonical path and retroactively changes the cached `ItemSummary.kind` from `Struct` to `Trait` when a later trait-position reference uses the same path. Every previously emitted type-position `Path` shares that ID, so its namespace silently changes based on traversal order. For example, a field typed as bare `Clone` can synthesize a Struct summary, then a later `Clone` trait bound upgrades the same ID to Trait and leaves the field pointing at a trait instead of failing closed. Treat a cross-namespace cache hit as an error (or model namespace in the cache identity with authoritative validation); never mutate the namespace of an already-issued ID.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f836736434f21f8ddc1426815677cd6c5fea793b180ca37da419f662d7435a17",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:30:05Z",
+          "findings": [
+            {
+              "category": "panic-able-adapter",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 79,
+              "message": "`saturating_add(1)` does not guarantee that `first_fresh_id` is fresh. A baseline artifact containing `Id(u32::MAX)` in `Crate::paths` leaves the counter at `u32::MAX`; the next `alloc_id` then reuses an existing path ID and `next_id += 1` either panics on overflow or wraps to the reserved root ID. Because baseline JSON is an external boundary, use checked allocation and return a typed `Phase1Error` when the ID space is exhausted.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:98cb6190c0a5a72f6b919ee2e7d6e18c2ff5ff5ae6a4f86356a789018c41721a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T21:01:26Z",
+          "findings": [
+            {
+              "category": "panic-able-adapter",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/main_fn.rs",
+              "line": 74,
+              "message": "The new guard checks only that `max_id + 1` exists, but Phase 1 always performs at least two later allocations for the S and D roots, plus any remaps. With a baseline maximum of `u32::MAX - 1`, this check succeeds, `first_fresh_id` becomes `u32::MAX`, and the first `alloc_id()` overflows `next_id`—panicking with overflow checks or wrapping into reserved IDs. The added `u32::MAX` test misses this case. Make each allocation checked and propagate `Phase1Error`, or verify sufficient headroom for every required allocation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cbbdbd3bb7b9a15d5a1011c25a0d630733674920a217c5097629ba874fee213",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T21:17:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66189746bb2c3566cac24d5682c666bc93709cbaccc11e1d06f6e1cdcb212d3c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T21:33:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e1deaffd30bb2ac0844961e12d70e1042266943c32a39f2e80ea869bac62292",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1614,6 +2689,149 @@
           "at": "2026-08-26T20:47:56Z",
           "findings": [],
           "hash": "rvw1:sha256:001f2a961742a280667066ca8b46a88b057dec84a156f9ef729a8996dcd2b823",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:47:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c9f166f1b35124d832cc849fd4c85f9a7cf3ee18fc91be04d27a7cd063ac765",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:51:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c9f166f1b35124d832cc849fd4c85f9a7cf3ee18fc91be04d27a7cd063ac765",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:05:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a63543eb25a6ddd570abb36de9384a1659115d20967bf4365868bff25a633a9c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:07:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab6a98537e86e399376358ff9de596d994691b9ec3fd4be0ceda0272e9040be3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T11:09:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab6a98537e86e399376358ff9de596d994691b9ec3fd4be0ceda0272e9040be3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:15:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d659191b15e3e15bd0200e9940961d9288c50c77f81d3abe30aded6deb09dbb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:52:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20e8f3c79658964c6e07e805f351ba1b78453b95abb266943960fcbb30d001b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:55:13Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 2065,
+              "message": "Both new waivers end by deferring the IN-05 namespace/status/label promises to unspecified “row-constructing entries,” without naming the construction-level tests that verify those promises. The only exact test named is `catalogue_hash_mismatch_fails_closed_before_namespace_resolution`, which verifies hash attestation rather than same-named type/trait separation or function/trait-impl label retention; `test_fs_catalogue_document_loader` is not an exact test name. Make each reason self-contained by naming the concrete downstream tests already bound for namespace isolation and label preservation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20e8f3c79658964c6e07e805f351ba1b78453b95abb266943960fcbb30d001b9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T14:02:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8e7c4508bbf0be29556d24b4d9a6d066a6918ab2fa7b353bf9ff936a23abb9b0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:53:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69a971a8237ec5570c7aa62ae684542a1bb70850d2e591c97e148847b25b5ff9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:56:49Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 32,
+              "message": "The fulfillment for `DeriveTestObligationsInteractor` still binds only the four IN-04/CO-04/AC-04 trait-impl identity tests, even though the current obligation now also cites IN-05 after the attested catalogue-loader wiring change. It contains neither catalogue freshness/namespace evidence nor an explicit IN-05 waiver; the obligation results consequently report this edge as a waiver failure. Add the relevant loader/gate tests or a self-contained waiver for the new edge.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 2144,
+              "message": "Six new IN-05 waivers (`CatalogueImplSignalsInteractor`, the check/evaluate/results interactors, `PreReviewGateError`, and `FsCatalogueDocumentLoader`) state that namespace, status, and label behavior is fulfilled on unspecified row-constructing entries, but name only hash/freshness and same-name gate tests. They do not name construction tests verifying function and trait-impl label retention, contrary to the briefing's requirement that a waiver identify the tests covering behavior deferred to another route. Add the concrete label-preservation tests to each applicable reason.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:69a971a8237ec5570c7aa62ae684542a1bb70850d2e591c97e148847b25b5ff9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T18:03:26Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/test-bindings.json",
+              "line": 59,
+              "message": "This new IN-05 waiver is orphaned: the current derived obligation for `DeriveTestObligationsInteractor` no longer includes an IN-05 edge, so `test-obligation check` fails with `Orphaned` and the results report a waiver failure. Remove this obsolete waiver instead of supplying evidence for an edge that is no longer part of the declaration contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3002858396dfbf9ea1cac34f7ab0e625354824d6ccfb956c780827d4424aa8a8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T18:11:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e92c46df1087537bbad3eb48b324fbfefc4b4dc0738c69736121b6be8194541d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T20:22:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cddbfab612f6fdcbc6477e958e5e0dbb1ef1ac6439bec7edcb4d00ca4bff0e42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T21:23:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f1456aa24bb858cccf20694c42a6e02703e9a0f219169fcfc04daf22b31737e8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T22:38:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94ed0839014110606fd7e36e397b74861296b418190ce38d41fd8b2e99863282",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2262,6 +3480,405 @@
           "hash": "rvw1:sha256:4689f0e3f310b4662f7239beff68dd81b8e459b70108ef1d2f16a675c0410724",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T00:14:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e87f803c682ca6c5d8d52a3abbb8e2c3c38456bc5f325f20c8316cf69ca63f2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T00:23:03Z",
+          "findings": [
+            {
+              "category": "DRY",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 577,
+              "message": "`domain::tddd::catalogue::TypeSignal` adds the same `identity(&self) -> &ThreeWaySignalIdentity` and `namespace(&self) -> Option<CatalogueItemNamespace>` surface already declared on `domain::tddd::signal_evaluator::region::ThreeWaySignal`. Both are modified domain entries exposing the identical report-identity contract, but no shared trait/reference prevents them from evolving independently. Factor this common surface through a shared abstraction.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:7e87f803c682ca6c5d8d52a3abbb8e2c3c38456bc5f325f20c8316cf69ca63f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T00:38:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:122aa7d50919a69995a15fd94d2a447d77763da4dc58e84ae79552061f7a8c13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T00:40:38Z",
+          "findings": [
+            {
+              "category": "DRY",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 598,
+              "message": "`domain::tddd::catalogue::TypeSignal` and `domain::tddd::signal_evaluator::region::ThreeWaySignal` both add the identical `identity(&self) -> &ThreeWaySignalIdentity` contract. Both entries are modified types in the domain layer, so this surface should be expressed through a shared trait (for example, a common identity-carrier abstraction) rather than two independently evolving inherent methods.",
+              "severity": "P2"
+            },
+            {
+              "category": "DRY",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 481,
+              "message": "`ThreeWaySignalIdentity` now adds `namespace(&self) -> Option<CatalogueItemNamespace>`, but `domain::tddd::signal_evaluator::region::ThreeWaySignal` still independently declares the exact same added signature. Remove the forwarding duplicate in favor of `signal.identity().namespace()`, or declare a shared trait if both direct surfaces are required.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:122aa7d50919a69995a15fd94d2a447d77763da4dc58e84ae79552061f7a8c13",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T00:57:55Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 474,
+              "message": "`SignalIdentityCarrier` is declared with role `SpecificationPort`, but its sole method is an internal shared accessor implemented by `ThreeWaySignal` and `TypeSignal`; it is not a specification port or a boundary capability. This role misclassifies the contract and should be represented with an appropriate domain abstraction or removed in favor of the established type designs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0c37c914bcb89d6acff43c9e7b52c06c44a8404b1b2970fdf5f5c68fac276b58",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T01:20:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bda64c764243bf44c598c76b675ec552813497f7428b2db0a3045166411ded56",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T01:22:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bda64c764243bf44c598c76b675ec552813497f7428b2db0a3045166411ded56",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T03:04:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb5b9b441518c0a5aa32a7c56f550ca359dd5dbf3adfdf7703874aa0fbf40b03",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T03:05:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb5b9b441518c0a5aa32a7c56f550ca359dd5dbf3adfdf7703874aa0fbf40b03",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T03:52:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50e779eb936905d052a9cb6630af6bf1f6731578717051a2fc7298491eb047f2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T03:53:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50e779eb936905d052a9cb6630af6bf1f6731578717051a2fc7298491eb047f2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T04:45:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:70595c7ce7824a73afd253fafeeadd0c67a87da9518624f2d7011aaa4e7caf00",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T04:47:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:70595c7ce7824a73afd253fafeeadd0c67a87da9518624f2d7011aaa4e7caf00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T08:26:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c882beb912f7d08dcbfcbdf5ff9b394ac37050d9b751f7ee8c07716d5534debe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T08:29:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c882beb912f7d08dcbfcbdf5ff9b394ac37050d9b751f7ee8c07716d5534debe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T08:52:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3af6b84437c89ddb30e72008b3eb3549d77fe00cdd23636d9bc9d5a3478c6155",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T08:55:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3af6b84437c89ddb30e72008b3eb3549d77fe00cdd23636d9bc9d5a3478c6155",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T09:44:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c737a631bfd31ceb89dc3e69b8ddacc8446d29585aef46e844897a9ed59ce8fe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T09:47:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c737a631bfd31ceb89dc3e69b8ddacc8446d29585aef46e844897a9ed59ce8fe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T09:59:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:288e3b7f13b5b4c3d49e10ab69f9e5da9cc7f7b9ac272b5baf5ed409b4e99eea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T10:02:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:288e3b7f13b5b4c3d49e10ab69f9e5da9cc7f7b9ac272b5baf5ed409b4e99eea",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T12:08:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45308df70d79eec1778a05d5dc91f49d1509055b0bb7901dee20fc4c8a656e34",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T12:11:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45308df70d79eec1778a05d5dc91f49d1509055b0bb7901dee20fc4c8a656e34",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T12:41:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5de4a5ff434db63eab7df8a5a2f805a5a1bee4c0712d2d6957a0f0574f8a1db3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T12:45:06Z",
+          "findings": [
+            {
+              "category": "API shape",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/domain-types.json",
+              "line": 419,
+              "message": "`CatalogueDocumentLoaderPort::load` is a synchronous port method whose name, `&Path` parameter, and loader error vocabulary all imply filesystem I/O, but the entry docs do not acknowledge or justify the synchronous choice. Document why blocking I/O is deliberate for this boundary or make the port async.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:5de4a5ff434db63eab7df8a5a2f805a5a1bee4c0712d2d6957a0f0574f8a1db3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:00:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cb00a62765310a5a60569fd53691c640a20ea6a951552a96645bd383c1b5fcd7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:02:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cb00a62765310a5a60569fd53691c640a20ea6a951552a96645bd383c1b5fcd7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:26:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91e00d78b2465a0f377265f91fecaaad74eaed2f0fb6a4854b629c82c5a49b35",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T13:28:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91e00d78b2465a0f377265f91fecaaad74eaed2f0fb6a4854b629c82c5a49b35",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:08:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7e2c876a1c8971f1e958e9cd15b89cf0fccc01312cc301d30d237667109c517",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T14:11:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7e2c876a1c8971f1e958e9cd15b89cf0fccc01312cc301d30d237667109c517",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T15:35:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:013ab7e63eb8c53e215216711f21f5c06e44117cd2269fc893d6caaec171b402",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T15:39:50Z",
+          "findings": [
+            {
+              "category": "Cross-layer contract",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+              "line": 223,
+              "message": "The domain `CatalogueDocumentLoaderPort` is deleted and replaced by `usecase::catalogue_document_loader::CatalogueDocumentLoaderPort`, but this catalogue does not declare the baseline-public `infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader` or its changed trait implementation. Declare the adapter and the old/new trait-implementation transition with baseline-correct actions; otherwise the port move lands as an undeclared adapter API mutation and the contract map loses the adapter-to-port edge.",
+              "severity": "P1"
+            },
+            {
+              "category": "Cross-layer contract",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+              "line": 164,
+              "message": "Moving `CatalogueDocumentLoaderPort` from domain to usecase also changes the public constructor signatures of baseline types `usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor`, `usecase::test_obligation::check::CheckTestObligationsInteractor`, `usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor`, and `usecase::test_obligation::results::TestObligationResultsInteractor`. None has a companion `action: modify` entry here, so four public API mutations remain undeclared. Add their post-move constructor contracts and applicable trait-implementation references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:013ab7e63eb8c53e215216711f21f5c06e44117cd2269fc893d6caaec171b402",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T16:00:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cefef2bd45c222f373191110ddab15e16156cf48515c430d8a4fbba5cc5dce11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T16:03:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cefef2bd45c222f373191110ddab15e16156cf48515c430d8a4fbba5cc5dce11",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T16:40:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03ea67b76a7c305de88381ba0bd5bdd1984385a257d67ddf38806eebd7a714b1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T16:42:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03ea67b76a7c305de88381ba0bd5bdd1984385a257d67ddf38806eebd7a714b1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:20:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8bae708018692a4a6ef7cd9a676391f15d6f1c9295bcac62b71a67665bb2edf4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:23:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8bae708018692a4a6ef7cd9a676391f15d6f1c9295bcac62b71a67665bb2edf4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:37:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28fa90cd6153e4cf3f5a29af2c9c13afcc64a39ac24ad3b3b9aa891c9337356b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T17:41:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28fa90cd6153e4cf3f5a29af2c9c13afcc64a39ac24ad3b3b9aa891c9337356b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T18:01:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b2100406dfd199d2bd232f44f19840eefe32587ecb162e64150a4f7a14ef9be",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T18:09:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b2100406dfd199d2bd232f44f19840eefe32587ecb162e64150a4f7a14ef9be",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T20:23:47Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/cli_composition-types.json",
+              "line": 49,
+              "message": "`cli_composition::task_contract::TaskContractCompositionRoot::discover` returns the crate-wide `CompositionError`, although repository discovery can only construct `CompositionError::Infrastructure`; `ConfigLoad`, `AdapterInit`, `WiringFailed`, and `Usecase` are structurally unreachable, and the catalogue docs neither identify the producible subset nor justify the broad error surface. Use a narrower error or document the subset.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a9becd71a5ec593600b2045710571838fb30c65c2f8a21bd5712c2601d8a4aed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T21:24:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f40bdbf1753b3639973d9b36332c38a3b35b57d618ff171a97832f465e79f8a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T22:39:10Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/cli_composition-types.json",
+              "line": 17,
+              "message": "`cli_composition::task_contract::TaskContractCompositionRoot` restates IN-05’s behavioral contract in its entry and `new` docs—specifically the `(type_name, namespace)` key, attested-catalogue validation, and same-named type/trait separation. Per `.harness/policies/no-upstream-restatement.md`, keep these fields to the changed wiring/constructor plus the IN-05 anchor instead of reproducing the upstream behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d333d9ccf56019d29718079523abfce88da4565696466bf6b4ec870b8508867f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T22:53:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29a413e8ec0a2802e5b207b79ca696adb0c9260ac218eed77921eafcea289afa",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2387,6 +4004,189 @@
           "at": "2026-08-26T20:16:48Z",
           "findings": [],
           "hash": "rvw1:sha256:9b0fb81c180b265efd52af2939c01437345a6782da43d30552aff3b0a3bdf2c4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T06:48:42Z",
+          "findings": [
+            {
+              "category": "namespace identity collapse",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 119,
+              "message": "`scope_entries` は `(entry_key, namespace)` で分離したのに、attribution と RI の比較は `candidate.as_str() == key` のみで namespace を無視しています。同名の Type/Trait 行の一方だけが task-contract に帰属されていても、もう一方を帰属済みとして扱い、未帰属 namespace の OrphanEntry や誤った RI 検出を逃します。比較側も namespace-aware にするか、契約側で namespace を明示的に扱ってください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ffd4fc368519a2e93806ea99bc11c28f08c4390bc5158f90d4fdfc44f163f983",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T07:24:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71d7ac75a563ce375730d8738a99556a58098b5ae15478c057172c4369908abd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T07:36:24Z",
+          "findings": [
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 90,
+              "message": "`types:` / `traits:` / `functions:` を `CatalogueEntryKey` 内の独自 selector として解釈していますが、`ContractedEntryRef::entry_key` は実際の catalogue key であり、schema v1 は namespace を表現しません。この形式は planner から生成されず、他の exact-key join とも一致しないため、同名 type/trait は「この gate だけ通る無効な contract」でしか区別できません。namespace を domain の契約参照型に持たせ、解決規則も domain に移してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 494,
+              "message": "同一 `(entry_key, namespace)` の signal row が複数あると `HashMap::insert` が後勝ちで status を黙って上書きします。`TypeSignalsDocument` と reader 境界は identity 一意性を保証していないため、Red の後に Blue がある artifact は gate を通過し、逆順なら block する順序依存になります。重複を fail-closed で拒否するか、少なくとも最悪 signal に集約してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_conformance",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 745,
+              "message": "新しい namespace 回帰テストは production では復元不能な signal を使っています。`catalogue_signal` は Trait namespace にも `kind_tag = \"struct\"` を付け、`blue_signal` は Label に `struct` を付けていますが、現行 schema はそれぞれ Trait 用 tag、Label 用 tag を要求します。Type/`struct`、Trait/`secondary_port`、Label/`free_function` のような有効な組み合わせへ fixture を分けてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_conformance",
+              "file": "libs/usecase/src/chain/impl_catalog.rs",
+              "line": 249,
+              "message": "`value_object` row を `ThreeWaySignalIdentity::Label` として構築していますが、production の type-signal schema では `value_object` は Type namespace の catalogue item です。この fixture は永続化境界を通過できない代替 universe になっているため、`CatalogueItem { namespace: Type, ... }` を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_conformance",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 704,
+              "message": "Stage 2 の mock document が `value_object` を Label identity として構築しています。production reader が受理する schema ではこの kind は Type namespace 必須なので、merge-gate tests が実際の persisted construction を迂回しています。fixture を Type catalogue identity にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71d7ac75a563ce375730d8738a99556a58098b5ae15478c057172c4369908abd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T10:07:57Z",
+          "findings": [
+            {
+              "category": "inadequate regression coverage",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 1120,
+              "message": "同名 Type/Trait の回帰テストですが、`test_catalogue()` は `Shared` を types セクションにしか登録していません。そのため `resolve_contract_entry_namespace` は常に Type を返し、Trait 行は未帰属のままで、重複 namespace の fail-closed 分岐を検証できていません。Type と Trait の両方を実際に登録し、曖昧な contract key が blocked になるケースを追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4fae4e08c72e3cb994ae2e9e3e622fc7c152c255cab1fdddee65f7378519287c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T11:08:36Z",
+          "findings": [
+            {
+              "category": "inadequate regression coverage",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 1120,
+              "message": "同名 Type/Trait の回帰テストですが、`test_catalogue()` は `Shared` を types セクションにしか登録していません。そのため `resolve_contract_entry_namespace` は常に Type を返し、Trait と同名で曖昧な catalogue entry を fail-closed にする経路を実際には検証できません。Type と Trait の両方を登録し、曖昧な contract key が coverage/liveness で blocked になるテストを追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:de95d99c0a65bf64153cab8eaf4549091eb348ea941ff513b5c938d3fbc38824",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T13:53:34Z",
+          "findings": [
+            {
+              "category": "inadequate regression coverage",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 1120,
+              "message": "同名 Type/Trait の回帰テストですが、`test_catalogue()` は `Shared` を types セクションにしか登録していません。そのため `resolve_contract_entry_namespace` は常に Type を返し、Trait と同名で曖昧な catalogue entry を fail-closed にする経路を実際には検証できません。Type と Trait の両方を登録し、曖昧な contract key が coverage/liveness で blocked になるテストを追加してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:61f6a43cbdf1b009c189bfc44803fccb76d32f16d8c4b340a953178d15046a48",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T14:49:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:add8c95bc17de6fff22efb0398790da24bda8fc6eaffc6131d7e95533d78bbda",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T15:00:39Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 121,
+              "message": "`load_catalogue` は catalogue path を `<layer>-types.json` に固定していますが、実際の filename authority は `architecture-rules.json` の `TdddLayerBinding::catalogue_file` で、任意の override が正式にサポートされています。signal reader は configured file を使って freshness を検証する一方、ここでは別の固定名を読むため、override を使う adopter では fresh signals でも gate が失敗します。binding-aware port から request-local attested catalogue を取得してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "error type confusion",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 123,
+              "message": "Catalogue の missing/I/O/decode failure と declaration-hash mismatch をすべて `TaskContractReadFailed` に変換しています。この variant の公開概念は task-contract の読取失敗であり、呼び出し側もそのように表示するため、catalogue failure が誤分類されて診断と回復経路を失います。`CatalogueReadFailed` / `CatalogueFreshnessMismatch` のような usecase-level error concept に変換してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:add8c95bc17de6fff22efb0398790da24bda8fc6eaffc6131d7e95533d78bbda",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T18:02:38Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 153,
+              "message": "`workspace_root_from_items_dir` は `items_dir` の親を2段剥がして repository root とみなしますが、task-contract CLI/reader は custom items directory を許可し、enclosing repository は別途 discovery します。例えば repository `/repo` 内の `/repo/custom/track/items` を指定すると、signal reader は `/repo/architecture-rules.json` を使う一方、この経路は `/repo/custom/architecture-rules.json` を読み、fresh artifact でも gate が失敗します。workspace root を検証済み入力として注入するか、repository-resolution port から取得してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5ccbd1bd0a687616f062015f24a9fba717a248c4f001dc04b0a4571c36b10334",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:25:27Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/pre_review_gate/helpers.rs",
+              "line": 124,
+              "message": "`load_catalogue` は独立に注入された `workspace_root` から layer binding を読み、`items_dir` 配下の artifact にその filename を適用しますが、両 path が同じ repository を指す不変条件は型にも constructor にもありません。既存 artifact reader は `items_dir` を所有する repository を discovery するため、別 repository の `--items-dir` では contract/signals は repository B から読みつつ binding は current repository A から読み、custom `catalogue_file` で誤った failure または誤った catalogue 選択になります。repository root と items directory を一つの検証済み入力に束ねるか、`items_dir` を基準に同じ port で解決してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b302d2988ab0a1106c1b3b82c7ddb6a857213fdfd517d4470f5ff30017bb0eaf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-27T20:42:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62c3eef09ca227cdf97a33b542dad89728a752a650c5d257988130c5f4c4e808",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-27T20:59:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62c3eef09ca227cdf97a33b542dad89728a752a650c5d257988130c5f4c4e808",
           "type": "final",
           "verdict": "zero_findings"
         }

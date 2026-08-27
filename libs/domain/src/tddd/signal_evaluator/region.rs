@@ -187,6 +187,17 @@ pub enum ThreeWaySignalIdentity {
     Label { label: FreeText },
 }
 
+impl ThreeWaySignalIdentity {
+    /// Returns the catalogue namespace, or `None` for a report-only label.
+    #[must_use]
+    pub fn namespace(&self) -> Option<CatalogueItemNamespace> {
+        match self {
+            Self::CatalogueItem { namespace, .. } => Some(*namespace),
+            Self::Label { .. } => None,
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // ThreeWaySignal — per-item evaluation result
 // ---------------------------------------------------------------------------
@@ -244,16 +255,6 @@ impl ThreeWaySignal {
     #[must_use]
     pub fn identity(&self) -> &ThreeWaySignalIdentity {
         &self.identity
-    }
-
-    /// Returns the namespace of a catalogue type/trait item, or `None` for a
-    /// function or trait-impl report label.
-    #[must_use]
-    pub fn namespace(&self) -> Option<CatalogueItemNamespace> {
-        match &self.identity {
-            ThreeWaySignalIdentity::CatalogueItem { namespace, .. } => Some(*namespace),
-            ThreeWaySignalIdentity::Label { .. } => None,
-        }
     }
 
     /// Returns the item identity key.
@@ -369,7 +370,7 @@ mod tests {
     fn test_three_way_signal_namespace_is_recorded_for_type_and_trait_items() {
         let plain =
             ThreeWaySignal::label(FreeText::new("User"), SignalRegion::SIntersectC_Match_Add);
-        assert_eq!(plain.namespace(), None);
+        assert_eq!(plain.identity().namespace(), None);
 
         let typed = ThreeWaySignal::catalogue_item(
             FreeText::new("Shared"),
@@ -381,8 +382,8 @@ mod tests {
             CatalogueItemNamespace::Trait,
             SignalRegion::SMinusC_Add,
         );
-        assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));
-        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));
         assert_eq!(
             typed.identity(),
             &ThreeWaySignalIdentity::CatalogueItem {

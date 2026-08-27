@@ -19,6 +19,7 @@ pub mod batch_plan;
 pub mod branch_strategy;
 pub mod capability_exec;
 pub mod catalog_gen;
+pub mod catalogue_document_loader;
 pub mod catalogue_impl_signals;
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;

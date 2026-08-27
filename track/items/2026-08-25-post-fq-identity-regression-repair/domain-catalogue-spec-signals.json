@@ -1,16 +1,31 @@
 {
-  "catalogue_declaration_hash": "d78b165f60696a24ea1ac116cd6b5928ae4a9689961e0ea908e7e606c45d308d",
+  "catalogue_declaration_hash": "309388ee95d497493832c3d03c45777fb451b1e104a814c925ed3f6ff0983689",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "2afd415cef17fa66a3b7da691f384d8afa050aa381537a82db85c88c5852f793",
+      "entry_hash": "24c9a459c2dff53cc308b98974f1db6b365a19e66741fb0528927be637a4ca02",
+      "signal": "blue",
+      "type_name": "AttestedCatalogueDocument"
+    },
+    {
+      "entry_hash": "004bc407a7502e197ae68ac72ba759dab4017c23133dc21103585ff38010f610",
       "signal": "blue",
       "type_name": "ThreeWaySignalIdentity"
+    },
+    {
+      "entry_hash": "c36ef2c620df1565c69fd43938d6e29e49830b6df68bd8eb81de3097c840d25c",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue::TypeSignal"
     },
     {
       "entry_hash": "bec57e5fadfb32694ffff364f063d45bf50cec6a8a9b99f44aaaec08f486ddf7",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+    },
+    {
+      "entry_hash": "de3e17015bd0f3ca5bcf58cea675ddb198d30bb61b071927cb1104f294b844b8",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::document::CatalogueDocument"
     },
     {
       "entry_hash": "cd0863f08ffdb8468cb6244e980b87c7a87f47f210d58a19fd43e4afd4aa2c41",
@@ -33,7 +48,7 @@
       "type_name": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath"
     },
     {
-      "entry_hash": "48ec95e462b7bb4366cc7b2f64631a70a21d8fe235583211cafed47d0f10cfd6",
+      "entry_hash": "24987f7020bb6c386064891290320a57d9f040af301d57fa416a6637abdb5063",
       "signal": "blue",
       "type_name": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
     },
@@ -61,6 +76,16 @@
       "entry_hash": "7117942f40d9f861948df857caeb1aac928be2c2b34fe8880de54fd26838dfa7",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace"
+    },
+    {
+      "entry_hash": "bd68f316b97d23b267cd3eb122f7e7b3e69c9b1fe468f8888a04f6c8826d19d6",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace"
+    },
+    {
+      "entry_hash": "8f2afa5c50b2dc2f9247080c89e153a4ffbeeec035bd58de90691aa7fbb23218",
+      "signal": "blue",
+      "type_name": "tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort"
     }
   ]
 }

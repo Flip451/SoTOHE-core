@@ -1,11 +1,51 @@
 {
-  "catalogue_declaration_hash": "05c64b30f37dc23c8bbfc1eb0b20b9e77033cd0e45ca28332bb43a125abd28e4",
+  "catalogue_declaration_hash": "64dfdf74e041655797cccf77abc6fe0cd64ce09d5e5ad2bd8cfecda1649a07ab",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "0024f276df610bffb9285ee56990af0671ac1ccf0e802cc8612cb8116e46088c",
+      "entry_hash": "de367b295486aa5615b09804c938afc81134b39db4c30edc269b6100400e216e",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "entry_hash": "7f89b057a7ba7841774cc883bad5aa15d7fa659f729d2aff1ae93bd5e6386169",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::CoverageVerifyInteractor"
+    },
+    {
+      "entry_hash": "f67de40968a114f1320aac3defa3d9b4646e1da536c4e928c77776de699a88a1",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateError"
+    },
+    {
+      "entry_hash": "7f89b057a7ba7841774cc883bad5aa15d7fa659f729d2aff1ae93bd5e6386169",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateInteractor"
+    },
+    {
+      "entry_hash": "4829a827ac2f402721bbef2b320f3d42c36fb7594ed5f3a3ee00af1624a219f8",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "10899acf4eec72806c9630a01164e26a10e551a0b40ba8e84e6de5fcd1209207",
       "signal": "blue",
       "type_name": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "6635706b0637a0a35284b3ff1643d6ae9cfc6a9288b16430f18567232bf69790",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "8de2e65ff9080be6aa35810b124777007acbbd6d1ac8785bcbf53a8b6cc6083c",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::results::TestObligationResultsInteractor"
+    },
+    {
+      "entry_hash": "96130dd76d3f078db48a3c61ad8b77de974fa4f8cac466f8779d9c0f8e83baf4",
+      "signal": "blue",
+      "type_name": "AttestedCatalogueDocumentLoaderPort"
     },
     {
       "entry_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",

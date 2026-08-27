@@ -792,7 +792,7 @@ mod tests {
     fn write_cleanup_type_signals(track_dir: &Path, baseline: &[u8]) {
         let catalogue = std::fs::read(track_dir.join("domain-types.json")).unwrap();
         let document = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-08-11T00:00:00Z",
             "declaration_hash": crate::tddd::type_signals_codec::declaration_hash(&catalogue)
                 .as_digest()
@@ -803,6 +803,7 @@ mod tests {
                 .as_str(),
             "signals": [{
                 "type_name": "TrackId",
+                "namespace": "type",
                 "kind_tag": "value_object",
                 "signal": "blue",
                 "found_type": true,

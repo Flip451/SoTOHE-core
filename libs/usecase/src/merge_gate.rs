@@ -606,8 +606,10 @@ mod tests {
         SpecElementId,
     };
     use domain::spec::{SpecRequirement, SpecScope};
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use domain::verify::Severity;
-    use domain::{ChainGateEntry, ConfidenceSignal, SignalCounts};
+    use domain::{ChainGateEntry, ConfidenceSignal, FreeText, SignalCounts};
 
     use super::*;
 
@@ -700,8 +702,11 @@ mod tests {
             .iter()
             .map(|(name, sig)| {
                 domain::tddd::catalogue::TypeSignal::new(
-                    *name,
-                    "value_object",
+                    ThreeWaySignalIdentity::CatalogueItem {
+                        item_name: FreeText::new(*name),
+                        namespace: CatalogueItemNamespace::Type,
+                    },
+                    "value_object".to_owned(),
                     *sig,
                     true,
                     vec![],

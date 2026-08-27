@@ -15,9 +15,9 @@ use std::sync::{Arc, Mutex};
 
 use domain::tddd::catalogue_v2::{
     BaselineCaptureIoError, CatalogueDocument, CatalogueDocumentLoaderError,
-    CatalogueDocumentLoaderPort, CatalogueItemNamespace, CrateName, RustdocBaselineCapturePort,
-    RustdocCratePort, RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError,
-    TdddLayerBindingsPort, TypeRef,
+    CatalogueItemNamespace, CrateName, RustdocBaselineCapturePort, RustdocCratePort,
+    RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
+    TypeRef,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use domain::tddd::signal_evaluator::phase1_error::Phase1Error;
@@ -37,6 +37,7 @@ use super::CatalogueImplSignalsInteractor;
 use crate::baseline_capture::{
     BaselineCaptureInteractor, BaselineCaptureRequest, BaselineCaptureService,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::tddd_feature_declaration::{
     TdddActualFeatureDeclarationPort, TdddActualFeatureDeclarationPortError,
     TdddBaselineFeatureDeclarationPort, TdddBaselineFeatureDeclarationPortError,
@@ -162,16 +163,28 @@ pub(super) struct StubLoader {
     pub(super) doc: CatalogueDocument,
 }
 
-impl CatalogueDocumentLoaderPort for StubLoader {
-    fn load(&self, _path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.doc.clone())
+impl AttestedCatalogueDocumentLoaderPort for StubLoader {
+    fn load(
+        &self,
+        _path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
+        Ok(domain::tddd::catalogue_v2::AttestedCatalogueDocument::attest(
+            b"T014 test catalogue",
+            |_| Ok::<_, std::convert::Infallible>(self.doc.clone()),
+        )
+        .unwrap())
     }
 }
 
 pub(super) struct FailingLoader;
 
-impl CatalogueDocumentLoaderPort for FailingLoader {
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for FailingLoader {
+    fn load(
+        &self,
+        path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
         Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
@@ -723,7 +736,7 @@ impl SymlinkGuardPort for AlwaysIoSymlinkGuard {
 // -------------------------------------------------------------------------
 
 pub(super) fn build_interactor(
-    loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc: Arc<dyn RustdocCratePort>,
@@ -741,7 +754,7 @@ pub(super) fn build_interactor(
 }
 
 pub(super) fn build_interactor_with_guard(
-    loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc: Arc<dyn RustdocCratePort>,

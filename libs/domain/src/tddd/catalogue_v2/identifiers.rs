@@ -513,6 +513,12 @@ impl TypeRef {
         Ok(Self(s))
     }
 
+    /// Creates a `TypeRef` from a value whose non-empty invariant was already
+    /// established by another domain value object.
+    pub(crate) fn from_non_empty(s: String) -> Self {
+        Self(s)
+    }
+
     /// Returns the underlying string slice.
     #[must_use]
     pub fn as_str(&self) -> &str {

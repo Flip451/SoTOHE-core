@@ -394,7 +394,7 @@ mod tests {
         let second = signals.get(1).expect("trait signal is present");
         assert_eq!(first.item_name(), "Shared");
         assert_eq!(second.item_name(), "Shared");
-        assert_eq!(first.namespace(), Some(CatalogueItemNamespace::Type));
-        assert_eq!(second.namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_eq!(first.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(second.identity().namespace(), Some(CatalogueItemNamespace::Trait));
     }
 }

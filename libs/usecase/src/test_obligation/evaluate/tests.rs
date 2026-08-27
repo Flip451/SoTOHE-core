@@ -10,13 +10,12 @@ use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, MethodDeclaration, MethodName, ModulePath, SelfReceiver,
-    StructKind, StructShape, TraitEntry, TraitImplDeclV2, TypeEntry, TypeKindV2, TypeRef,
+    AttestedCatalogueDocument, CatalogueDocument, CrateName, MethodDeclaration, MethodName,
+    ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2, TypeEntry,
+    TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier,
@@ -70,6 +69,7 @@ use super::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::test_obligation::LoadedCatalogueDocument;
 
 fn run<F: Future>(future: F) -> F::Output {
@@ -439,9 +439,12 @@ impl SpecDocumentLoaderPort for StubSpec {
 }
 
 struct StubCatalogue(CatalogueDocument);
-impl CatalogueDocumentLoaderPort for StubCatalogue {
-    fn load(&self, _p: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.0.clone())
+impl AttestedCatalogueDocumentLoaderPort for StubCatalogue {
+    fn load(&self, _p: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+        Ok(AttestedCatalogueDocument::attest(b"T014 test catalogue", |_| {
+            Ok::<_, std::convert::Infallible>(self.0.clone())
+        })
+        .unwrap())
     }
 }
 

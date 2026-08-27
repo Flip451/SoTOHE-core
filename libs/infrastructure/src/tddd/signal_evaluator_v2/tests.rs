@@ -3179,6 +3179,175 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
     );
 }
 
+/// A deleted external-trait impl for a local type must retain the local owner
+/// identity after Phase 1 remaps B-side item ids.  In particular, a remapped
+/// local id must not be read as an unrelated external `Crate::paths` id.
+#[test]
+fn test_deleted_external_trait_impl_keeps_local_owner_identity() {
+    use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::composite::{
+        StructKind as CatalogueStructKind, StructShape, TypeKindV2,
+    };
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::DataRole;
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, TypeRef,
+    };
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    let crate_name = "fixture";
+    let type_id = Id(1);
+    let impl_id = Id(2);
+    // This external path deliberately occupies the id that the old Phase 1
+    // allocator assigned to `type_id` after remapping the small baseline.
+    let valmut_id = Id(3);
+    let default_id = Id(4);
+
+    let mut baseline_index = HashMap::new();
+    baseline_index.insert(Id(0), root_module_item(Id(0), crate_name, vec![type_id]));
+    baseline_index.insert(
+        type_id,
+        make_item(
+            type_id,
+            Some("TaskContractCompositionRoot"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    baseline_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(RdPath { path: "Default".to_owned(), id: default_id, args: None }),
+                for_: Type::ResolvedPath(RdPath {
+                    path: "TaskContractCompositionRoot".to_owned(),
+                    id: type_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+
+    let mut baseline_paths = HashMap::new();
+    baseline_paths.insert(
+        type_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_owned(), "TaskContractCompositionRoot".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    baseline_paths.insert(
+        valmut_id,
+        ItemSummary {
+            crate_id: 1,
+            path: vec![
+                "alloc".to_owned(),
+                "collections".to_owned(),
+                "btree".to_owned(),
+                "node".to_owned(),
+                "marker".to_owned(),
+                "ValMut".to_owned(),
+            ],
+            kind: ItemKind::Struct,
+        },
+    );
+    baseline_paths.insert(
+        default_id,
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["core".to_owned(), "default".to_owned(), "Default".to_owned()],
+            kind: ItemKind::Trait,
+        },
+    );
+    let baseline = Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: baseline_index,
+        paths: baseline_paths,
+        external_crates: HashMap::from([(
+            1,
+            ExternalCrate {
+                name: "core".to_owned(),
+                html_root_url: None,
+                path: Default::default(),
+            },
+        )]),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let current = simple_crate_with_struct(crate_name, "TaskContractCompositionRoot");
+    let mut document = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).expect("valid crate name"),
+        LayerId::try_new("domain").expect("valid layer name"),
+    );
+    document.insert_type(
+        CatalogueEntryKey::try_new("TaskContractCompositionRoot".to_owned())
+            .expect("valid type key"),
+        TypeEntry::new(
+            ItemAction::Reference,
+            DataRole::value_object(),
+            TypeKindV2::Struct(CatalogueStructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    document.push_trait_impl(TraitImplDeclV2::from_parts(
+        ItemAction::Delete,
+        TypeRef::new("core::default::Default").expect("valid trait ref"),
+        TypeRef::new("TaskContractCompositionRoot").expect("valid owner ref"),
+        vec![],
+        vec![],
+    ));
+
+    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
+        .encode(document, &baseline, &current)
+        .expect("codec must encode the deleted trait impl");
+    let report = SignalEvaluatorV2::new()
+        .evaluate(a, baseline, current)
+        .expect("evaluator must preserve the deleted impl identity");
+
+    let report_names =
+        report.iter().map(|signal| signal.item_name().to_owned()).collect::<Vec<_>>();
+    assert_eq!(
+        report_names,
+        vec!["TaskContractCompositionRoot: core::default::Default".to_owned()],
+        "the deleted impl must not introduce any unrelated report identity"
+    );
+    assert_eq!(
+        report.iter().next().expect("the impl signal exists").region(),
+        SignalRegion::DMinusC
+    );
+    assert!(
+        report.iter().all(|signal| !signal.item_name().contains("ValMut")),
+        "an unrelated external path must never become the impl owner: {report:?}"
+    );
+}
+
 // -----------------------------------------------------------------------
 // T043 regression: generic impl identity normalization
 // -----------------------------------------------------------------------
@@ -5825,6 +5994,48 @@ fn test_phase1_standalone_impl_invalid_rustdoc_path_propagates_typed_error() {
 
     assert!(matches!(error, Phase1Error::RustdocRootResolution(_)), "got: {error:?}");
     assert!(error.to_string().contains("Crate::paths"), "got: {error}");
+}
+
+#[test]
+fn test_phase1_rejects_exhausted_baseline_item_id_space() {
+    use super::phase1::phase1_build_s_and_d;
+
+    let mut baseline = empty_crate();
+    baseline.paths.insert(
+        Id(u32::MAX),
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["external".to_owned(), "Item".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    let error = phase1_build_s_and_d(ExtendedCrate::new(empty_crate(), BTreeMap::new()), &baseline)
+        .expect_err("an exhausted baseline Id space must fail closed");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)), "got: {error:?}");
+    assert!(error.to_string().contains("item-id space"), "got: {error}");
+}
+
+#[test]
+fn test_phase1_rejects_id_space_exhausted_by_followup_allocations() {
+    use super::phase1::phase1_build_s_and_d;
+
+    let mut baseline = empty_crate();
+    baseline.paths.insert(
+        Id(u32::MAX - 1),
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["external".to_owned(), "Item".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    let error = phase1_build_s_and_d(ExtendedCrate::new(empty_crate(), BTreeMap::new()), &baseline)
+        .expect_err("follow-up Phase 1 allocations must fail closed before Id overflow");
+
+    assert!(matches!(error, Phase1Error::RustdocRootResolution(_)), "got: {error:?}");
+    assert!(error.to_string().contains("item-id space"), "got: {error}");
 }
 
 fn duplicate_name_baseline() -> Crate {

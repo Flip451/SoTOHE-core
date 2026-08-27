@@ -1,8 +1,16 @@
 {
-  "baseline_hash": "074cf6f4089f10e973e923812674ead2e4f3c63ca0e975441634d3c9a410fb2d",
-  "declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
-  "generated_at": "2026-08-26T21:23:07Z",
-  "head_commit": "6732c240e57d94293ca0c40e402a89b967b03d00",
-  "schema_version": 4,
-  "signals": []
+  "baseline_hash": "9de30656439984058a69807d26cbed29b0dde49bef8809eb6f23357849bc27bf",
+  "declaration_hash": "0461d182023632181f045fccfb20a793b80c757697d3629062f84b8529b7e460",
+  "generated_at": "2026-08-27T22:55:22Z",
+  "head_commit": "f9d09f5810a39c8f1fbf02bcc0630afd2c6cf111",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "composition_root",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_composition::task_contract::TaskContractCompositionRoot"
+    }
+  ]
 }

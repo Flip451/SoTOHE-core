@@ -24,6 +24,7 @@ use super::super::child_items::{
 };
 use super::super::rustdoc_authority::{canonicalize_rustdoc_paths, merge_definition_path_maps};
 use super::super::state::Phase1State;
+use super::d_paths::populate_d_paths;
 use super::phase16_check::check_dangling_ids;
 use super::rewrite::{make_root_module_item, rewrite_type_ref_ids_in_item};
 use super::step55_impls::process_standalone_impls;
@@ -32,15 +33,6 @@ use crate::tddd::canonical_type_identity::{DefinitionPathAuthority, SYNTHETIC_UN
 // ---------------------------------------------------------------------------
 // Main Phase 1 entry-point
 // ---------------------------------------------------------------------------
-
-/// Main Phase 1 entry-point: builds S and D from A and B.
-#[cfg(test)]
-pub(crate) fn phase1_build_s_and_d(
-    a: ExtendedCrate,
-    b: &Crate,
-) -> Result<(ExtendedCrate, Crate), Phase1Error> {
-    phase1_build_s_and_d_with_rustdoc_root(a, b, None)
-}
 
 /// Main Phase 1 entry-point with a resolved package-to-rustdoc-root translation.
 pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
@@ -64,9 +56,19 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
     );
     let b = &canonical_b;
 
-    // Seed the fresh-Id counter above the highest Id already used by B so that
-    // initial allocations do not clash with B-side Ids.
-    let first_fresh_id = b.index.keys().map(|id| id.0).max().map_or(1, |m| m + 1);
+    // Seed the fresh-Id counter above every Id in B's index *and* paths maps.
+    // `Crate::paths` contains external items that are not present in `index`;
+    // allocating into that range would make a remapped local B reference look
+    // like an unrelated external path when D is assembled (for example, a
+    // deleted impl for a local type could be labelled as `alloc::...::ValMut`).
+    let first_fresh_id =
+        b.index.keys().chain(b.paths.keys()).map(|id| id.0).max().map_or(Ok(1), |max_id| {
+            max_id.checked_add(1).ok_or_else(|| {
+                Phase1Error::rustdoc_root_resolution(
+                    "Phase 1 item-id space is exhausted by the baseline rustdoc artifact",
+                )
+            })
+        })?;
     let mut state = Phase1State::new(first_fresh_id);
 
     // --- Pre-step: Build B-wide Id remap (T037) ---
@@ -518,23 +520,7 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
 
         a_side_path_ids
     };
-    {
-        let mut d_referenced_ids: HashSet<Id> = HashSet::new();
-        for item in state.d_index.values() {
-            for id in collect_referenced_ids(item) {
-                d_referenced_ids.insert(id);
-            }
-        }
-        for &ref_id in &d_referenced_ids {
-            if let std::collections::hash_map::Entry::Vacant(e) = state.d_paths.entry(ref_id) {
-                if let Some(ps) = b.paths.get(&ref_id) {
-                    if ps.crate_id != 0 {
-                        e.insert(ps.clone());
-                    }
-                }
-            }
-        }
-    }
+    populate_d_paths(&mut state, b);
 
     let (s_external_crates, s_name_to_new_id) = build_external_crates_for_scope(
         &state.s_index,
@@ -555,10 +541,17 @@ pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
         build_external_crates_for_scope(&state.d_index, &state.d_paths, b, None, None);
     patch_paths_crate_ids(&mut state.d_paths, b, &d_name_to_new_id, None);
 
+    // All non-root allocations are complete.  Sibling helpers use the checked
+    // allocator but cannot propagate its error through their existing APIs, so
+    // convert a latched exhaustion into a typed Phase 1 error before allocating
+    // or publishing either root.
+    state.check_id_allocation()?;
+
     // Allocate fresh Phase1-managed Ids for the S and D root modules.
     // Both ids must be allocated here — before `state.s_actions` is partially moved.
     let s_root_id = state.alloc_id();
     let d_root_id = state.alloc_id();
+    state.check_id_allocation()?;
 
     // Build root module item for S from namespace-aware baseline/catalogue
     // identities. The legacy path-only S map cannot be used here because it
@@ -699,39 +692,5 @@ fn resolve_unresolved_impl_trait_path(
 
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::unwrap_used)]
-mod tests {
-    use super::merge_definition_path_maps;
-    use rustdoc_types::{Id, ItemKind, ItemSummary};
-    use std::collections::HashMap;
-
-    #[test]
-    fn test_merge_definition_paths_reserves_catalogue_ids_before_remapping() {
-        let summary = |name: &str| ItemSummary {
-            crate_id: 0,
-            path: vec!["domain".to_owned(), name.to_owned()],
-            kind: ItemKind::Struct,
-        };
-        let baseline =
-            HashMap::from([(Id(5), summary("BaselineA")), (Id(10), summary("BaselineB"))]);
-        let catalogue = HashMap::from([
-            (Id(5), summary("CatalogueAtBaselineId")),
-            (Id(11), summary("CatalogueOnly")),
-        ]);
-
-        let merged = merge_definition_path_maps(&baseline, &catalogue)
-            .expect("the merged definition paths must retain every summary");
-
-        assert_eq!(merged.len(), 4);
-        for expected in [
-            ["domain", "BaselineA"],
-            ["domain", "BaselineB"],
-            ["domain", "CatalogueAtBaselineId"],
-            ["domain", "CatalogueOnly"],
-        ] {
-            assert!(
-                merged.values().any(|summary| summary.path == expected),
-                "merged paths must retain {expected:?}"
-            );
-        }
-    }
-}
+#[path = "main_fn_tests.rs"]
+pub(crate) mod tests;

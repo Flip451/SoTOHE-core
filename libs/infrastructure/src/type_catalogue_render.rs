@@ -596,7 +596,9 @@ pub fn render_type_catalogue_v3(
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
-    use domain::{ConfidenceSignal, TypeSignal};
+    use domain::tddd::catalogue_v2::CatalogueItemNamespace;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
+    use domain::{ConfidenceSignal, FreeText, TypeSignal};
 
     use super::entry_details::for_type_local_bare_name;
     use super::*;
@@ -897,8 +899,11 @@ mod tests {
             ),
         );
         let signals = vec![TypeSignal::new(
-            "UserAccount",
-            "value_object",
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("UserAccount"),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "value_object".to_owned(),
             ConfidenceSignal::Blue,
             true,
             vec![],
@@ -956,8 +961,8 @@ mod tests {
             ),
         );
         let signals = vec![TypeSignal::new(
-            fn_path.to_string(),
-            "free_function",
+            ThreeWaySignalIdentity::Label { label: FreeText::new(fn_path.to_string()) },
+            "free_function".to_owned(),
             ConfidenceSignal::Blue,
             true,
             vec![],

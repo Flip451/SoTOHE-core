@@ -76,7 +76,7 @@ pub use traits::{TraitImplDeclV2, TraitRefScope};
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 
 pub use catalogue_impl_signals_ports::{
-    BaselineCaptureIoError, CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
+    AttestedCatalogueDocument, BaselineCaptureIoError, CatalogueDocumentLoaderError,
     RustdocBaselineCapturePort, RustdocCratePort, RustdocCratePortError, TdddLayerBinding,
     TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReadError, TrackStatusReaderPort,
 };

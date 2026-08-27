@@ -1,8 +1,16 @@
 {
-  "baseline_hash": "9dbbf55b5269b37a5b514bab51fc2eb60b499e50d8e6b62ecbfa1b4e52cc5c51",
-  "declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
-  "generated_at": "2026-08-26T21:22:57Z",
-  "head_commit": "6732c240e57d94293ca0c40e402a89b967b03d00",
-  "schema_version": 4,
-  "signals": []
+  "baseline_hash": "9f90494a9773fe885bef0640bfb1779be8059454edd095485aaa8781a7736a86",
+  "declaration_hash": "114331fb48bcf32caad18a21f8339f26d575c46174b35f43f49d134a563bc128",
+  "generated_at": "2026-08-27T22:55:12Z",
+  "head_commit": "f9d09f5810a39c8f1fbf02bcc0630afd2c6cf111",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "primary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "cli_driver::task_contract::TaskContractDriver"
+    }
+  ]
 }

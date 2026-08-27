@@ -9,7 +9,7 @@ use crate::tddd::catalogue::TypeSignal;
 use crate::{CommitHash, ContentHash, Timestamp};
 
 /// Schema version for `<layer>-type-signals.json` documents.
-pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 4;
+pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 5;
 
 /// A validated lowercase SHA-256 hexadecimal digest.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -322,6 +322,8 @@ pub fn decide_type_signals_reuse(input: &TypeSignalsReuseInput) -> TypeSignalsRe
 mod tests {
     use super::*;
     use crate::ConfidenceSignal;
+    use crate::tddd::catalogue_linter::FreeText;
+    use crate::tddd::signal_evaluator::ThreeWaySignalIdentity;
 
     const A: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     const B: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
@@ -373,8 +375,8 @@ mod tests {
             timestamp(),
             cache_key(A, 'b', A),
             vec![TypeSignal::new(
-                "Example",
-                "value_object",
+                ThreeWaySignalIdentity::Label { label: FreeText::new("Example") },
+                "value_object".to_owned(),
                 ConfidenceSignal::Blue,
                 true,
                 vec![],

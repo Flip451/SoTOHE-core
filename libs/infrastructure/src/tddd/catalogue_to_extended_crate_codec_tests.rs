@@ -1391,6 +1391,65 @@ fn test_encode_same_path_type_and_trait_use_separate_namespaces() {
 }
 
 #[test]
+fn test_encode_external_trait_reference_registers_trait_kind_summary() {
+    // D3: a synthesized external path carries the namespace of the reference.
+    // A trait in trait position must not be registered as a `Struct` summary,
+    // otherwise the resolution set holds the same path as both a type and a
+    // trait identity and impl-trait resolution becomes ambiguous.
+    let mut doc = make_doc("usecase");
+    insert_empty_enum_type(&mut doc, "Adapter");
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Clone").unwrap(),
+        TypeRef::new("Adapter").unwrap(),
+    ));
+
+    let ec = encode_doc(doc).unwrap();
+    let krate = ec.krate();
+    let trait_ids: Vec<Id> = krate
+        .index
+        .values()
+        .filter_map(|item| match &item.inner {
+            ItemEnum::Impl(impl_) => impl_.trait_.as_ref().map(|path| path.id),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(trait_ids.len(), 1, "exactly one trait impl expected");
+    let summary = krate.paths.get(&trait_ids[0]).expect("external trait summary registered");
+    assert_eq!(summary.path.last().map(String::as_str), Some("Clone"));
+    assert_eq!(summary.kind, ItemKind::Trait, "trait-position reference must be a Trait summary");
+}
+
+#[test]
+fn test_encode_external_path_reused_across_namespaces_fails_closed() {
+    let mut state = super::encoder::Encoder::new(
+        make_doc("domain"),
+        std::collections::HashMap::new(),
+        std::collections::BTreeSet::new(),
+    )
+    .state;
+    let type_id = state.ensure_external_type_id(
+        "ext::Shared",
+        "ext",
+        domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+    );
+    let trait_id = state.ensure_external_type_id(
+        "ext::Shared",
+        "ext",
+        domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Trait,
+    );
+
+    assert_eq!(trait_id, Id(UNRESOLVED_CRATE_ID));
+    assert_eq!(state.paths.get(&type_id).map(|summary| summary.kind), Some(ItemKind::Struct));
+    let Some(NewTypeGraphCodecError::InvalidTypeRef(type_ref, diagnostic)) =
+        state.resolution_error.as_ref()
+    else {
+        panic!("cross-namespace external path reuse must record an invalid-reference error");
+    };
+    assert_eq!(type_ref.as_str(), "ext::Shared");
+    assert!(diagnostic.as_str().contains("already registered"));
+}
+
+#[test]
 fn test_type_reference_to_trait_namespace_rejects_cross_namespace_fallback() {
     let mut doc = make_doc("domain");
     doc.insert_trait(

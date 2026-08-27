@@ -195,23 +195,23 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "IN-03",
+          "element_id": "IN-05",
           "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
         },
-        "entry_key": "ThreeWaySignalIdentity"
+        "entry_key": "AttestedCatalogueDocumentLoaderPort"
       },
       "key": {
-        "anchor_text_hash": "4dcfe030829a00aad8626bdef8712c9d938b395528f99cd133f42757e7e75d4a",
-        "declaration_hash": "61d0745862a0218126cc91423c1c0a22481d62d434046e8eb960e680ca264e89",
-        "waived_reason_hash": "f71b8781daa08fff7525b8df3a73ae4e7a9e4af56a098db02cc73babd60a1793"
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "635fe95caf358119fac256c1ed5b91ff13798ad36aebd389cb68cb8632e02aa3",
+        "waived_reason_hash": "ac0c6e351f6668c4a7706ec606107444c034a9791381bc56783ad9d17675abd6"
       },
       "obligation_id": {
-        "entry_key": "ThreeWaySignalIdentity",
-        "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
+        "entry_key": "AttestedCatalogueDocumentLoaderPort",
+        "item_identifier": "trait_method:load",
+        "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Supplies the attested catalogue document from a bounded, atomic no-follow filesystem read",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -219,23 +219,191 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "IN-05",
           "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
         },
-        "entry_key": "ThreeWaySignalIdentity"
+        "entry_key": "AttestedCatalogueDocument"
       },
       "key": {
-        "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
-        "declaration_hash": "416a56c1b70aeb173ce24fe439f0ca9a3e895b814a90e1d5155ecfdbc9717170",
-        "waived_reason_hash": "f71b8781daa08fff7525b8df3a73ae4e7a9e4af56a098db02cc73babd60a1793"
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "886eda645080b94e84607eb25e2c8211cf9729acd4d076025bdff9aa378143f6",
+        "waived_reason_hash": "ac0c6e351f6668c4a7706ec606107444c034a9791381bc56783ad9d17675abd6"
       },
       "obligation_id": {
-        "entry_key": "ThreeWaySignalIdentity",
-        "item_identifier": "voluntary:AC-03",
+        "entry_key": "AttestedCatalogueDocument",
+        "item_identifier": "voluntary:IN-05",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "docs: Some(DocString(\"Phase 2 report identity (IN-05, CO-05, AC-05, IN-03, CO-03, AC-03).\")), methods: []",
+        "citation": "Attests source bytes and decodes their catalogue document (IN-05).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "8eb61b4868b497b37fbf885692fb9f6995a17911eb1cd2473a50c8f4691e6d66",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "\"shape: Plain { fields: [], has_stripped_fields: true }\" and \"Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "47731145a53c62483e28184aa7d5155d2fac3d5e8276e7761d70966fdf664d33",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "b005b33e5568f78bf67b39b8cbfeff14fe1700d0085cdf857a2081104d8ea177",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "0e153c2e8566ca12507306f5ff76f60381b27f65fe49acf413ddd0a575bf00ca",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::pre_review_gate::PreReviewGateError"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "a5bc5b467a83aeffc37220acfc083811e945f043bcea860ca0ba7bdc42b122ef",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::pre_review_gate::PreReviewGateError",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "FreeText payloads are opaque diagnostics.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "36bb456054bc1e65b5415987d8c8bfc69effd35e3c098d844c4372c918c05504",
+        "waived_reason_hash": "e9ce8f0fa8fdbfd5a26cab00b199e37a5e36c153e6b06ba405f91b32ba170ae6"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader",
+        "item_identifier": "trait_impl:usecase::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "\"Supplies the attested catalogue document from a bounded, atomic no-follow filesystem read, with the exact-byte hash used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "550f5964f5082eab6f7d52dcae8633b223bd038b1aa67841367ace13d6880511",
+        "waived_reason_hash": "ead55d606c0945abb095f4307c7f2bc61daee5bd7ef70acb346232a5daf20b1d"
+      },
+      "obligation_id": {
+        "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

@@ -188,7 +188,7 @@
       "key": {
         "anchor_text_hash": "4bda28ccfc03124a27935d927e73d24d0be6e00329b8456124f5186353dcacff",
         "bound_tests_set_hash": "1dfcfb5ff9621f8055f38b8a2399f4b6884895fd6122fe9c7ab24b8c801d41a2",
-        "declaration_hash": "2c31679ef9bb90841878765008864bdffcc92ca92c1d4568210430091704556a"
+        "declaration_hash": "36f691ff018dede17d85e544842bc2237b6ad7e4125f536075ae3ea94bf604bd"
       },
       "obligation_id": {
         "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
@@ -234,7 +234,7 @@
       "key": {
         "anchor_text_hash": "7447df1e0b531543bd07a5ea3f754224a8ff3ab77c52bee72f0cd9a4cf231906",
         "bound_tests_set_hash": "1dfcfb5ff9621f8055f38b8a2399f4b6884895fd6122fe9c7ab24b8c801d41a2",
-        "declaration_hash": "2c31679ef9bb90841878765008864bdffcc92ca92c1d4568210430091704556a"
+        "declaration_hash": "36f691ff018dede17d85e544842bc2237b6ad7e4125f536075ae3ea94bf604bd"
       },
       "obligation_id": {
         "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
@@ -242,7 +242,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(conformance.id().entry_key().as_str(), \"domain::alpha::Adapter\");\n\nassert!(result.is_err());\nassert!(diagnostic.contains(\"domain::alpha::Adapter\"));\nassert!(diagnostic.contains(\"domain::beta::Adapter\"));\n\nassert!(diagnostic.contains(\"conflicting catalogue type declarations\"));\nassert!(diagnostic.contains(\"'Adapter'\"));\nassert!(diagnostic.contains(\"'domain::alpha::Adapter'\"));\n\nassert!(result.is_err());\nassert!(format!(\"{result:?}\").contains(\"cannot resolve trait-impl carrier\"));",
+        "citation": "assert_eq!(conformance.id().entry_key().as_str(), \"domain::alpha::Adapter\");\n\nassert!(result.is_err());\nassert!(diagnostic.contains(\"domain::alpha::Adapter\"));\nassert!(diagnostic.contains(\"domain::beta::Adapter\"));\n\nassert!(diagnostic.contains(\"conflicting catalogue type declarations\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -280,7 +280,7 @@
       "key": {
         "anchor_text_hash": "60453bc4bdce8dceb57e9282072e28c643d98d75c350b13707b0b45d4b762eea",
         "bound_tests_set_hash": "1dfcfb5ff9621f8055f38b8a2399f4b6884895fd6122fe9c7ab24b8c801d41a2",
-        "declaration_hash": "2c31679ef9bb90841878765008864bdffcc92ca92c1d4568210430091704556a"
+        "declaration_hash": "36f691ff018dede17d85e544842bc2237b6ad7e4125f536075ae3ea94bf604bd"
       },
       "obligation_id": {
         "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
@@ -288,7 +288,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(conformance.id().entry_key().as_str(), \"domain::alpha::Adapter\");\n\nassert!(result.is_err());\nassert!(diagnostic.contains(\"domain::alpha::Adapter\"));\nassert!(diagnostic.contains(\"domain::beta::Adapter\"));\n\nassert!(result.is_err());\nassert!(format!(\"{result:?}\").contains(\"cannot resolve trait-impl carrier\"));",
+        "citation": "assert_eq!(conformance.id().entry_key().as_str(), \"domain::alpha::Adapter\");\n\nassert!(result.is_err());\nassert!(diagnostic.contains(\"domain::alpha::Adapter\"));\nassert!(diagnostic.contains(\"domain::beta::Adapter\"));\n\nassert!(result.is_err());\nassert!(diagnostic.contains(\"conflicting catalogue type declarations\"));\n\nassert!(result.is_err());\nassert!(format!(\"{result:?}\").contains(\"cannot resolve trait-impl carrier\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1851,7 +1851,7 @@
       },
       "key": {
         "anchor_text_hash": "c5fb35f88b77ccd4fcf3b3a0299565f08da5138d0a5c34172327c6c83b1543e2",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -1860,7 +1860,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"the shared resolution set must include catalogue add declarations\");\n        let index = build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal identity indexing must consume catalogue additions\");",
+        "citation": "let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"the shared resolution set must include catalogue add declarations\");\n        let index = build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal identity indexing must consume catalogue additions\");\n\n        let kinds = BTreeMap::from([(\"AddedOnlyInCatalogue\".to_owned(), vec![\"struct\"])]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1917,7 +1917,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -1926,7 +1926,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");",
+        "citation": "        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1983,7 +1983,73 @@
       },
       "key": {
         "anchor_text_hash": "57679d466e57f86198f346081cd1b1c6c7f1fffeecdc36a38bcc0849ef5fd66c",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
+        "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\nbuild_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\nlet encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");\nassert!(\n    persisted.signals().iter().any(|signal| signal.type_name() == \"Removed\"),\n    \"deletion handling must retain the baseline identity through Phase 1\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_uses_catalogue_adds_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_resolves_add_impl_owner_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_type_signal_identity_index_rejects_impl_owner_absent_from_shared_resolution_set"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluates_shared_catalogue_identity_and_function_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_mutual_add_and_modify_references_in_declaration_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_all_type_actions_and_modify_function_under_bin_root_alias"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2042,72 +2108,6 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "CO-02",
-          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
-        "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "let normalized_current = normalized_paths_for_doc(&current, &package); ... let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current) ... build_type_signal_identity_index(&catalogue, &resolution_paths) ... assert_eq!(encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])), Some(ItemAction::Modify));",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_type_signal_identity_index_uses_catalogue_adds_from_shared_resolution_set"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_type_signal_identity_index_resolves_add_impl_owner_from_shared_resolution_set"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_type_signal_identity_index_rejects_impl_owner_absent_from_shared_resolution_set"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_evaluates_shared_catalogue_identity_and_function_path"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_resolves_mutual_add_and_modify_references_in_declaration_order"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_resolves_all_type_actions_and_modify_function_under_bin_root_alias"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
           "element_id": "AC-01",
           "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
         },
@@ -2115,7 +2115,7 @@
       },
       "key": {
         "anchor_text_hash": "57f40b733ca5b8bebc9c59ecbda9ec6a4603976a9bb8b1dddcead4cbacdc6273",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2124,7 +2124,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"expect(\\\"the shared set must include both add declarations\\\")\"; \"expect(\\\"an add impl owner must resolve through the shared set\\\")\"; \"expect(\\\"all declared identities must resolve through the shared set\\\")\"; \"assert_eq!(field_target(first_id), second_id); assert_eq!(field_target(second_id), first_id); assert_eq!(field_target(holder_id), first_id);\"; \"expect_err(\\\"an impl owner absent from both authorities must fail closed\\\")\"",
+        "citation": "\"the shared set must include both add declarations\"; \"an add impl owner must resolve through the shared set\"; \"an impl owner absent from both authorities must fail closed\"; \"mutual add and modify-to-add references must encode\"; \"assert_eq!(field_target(first_id), second_id);\\n        assert_eq!(field_target(second_id), first_id);\\n        assert_eq!(field_target(holder_id), first_id);\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2181,7 +2181,7 @@
       },
       "key": {
         "anchor_text_hash": "e0df45dfceffc3f0a70e284ab8c2f8786e38eb35ad517ac2da93ec6db018ada2",
-        "bound_tests_set_hash": "2b0963c7f58c38d3b681ae8cecb335c29c94a607d18bfcb0d2d3530a8cc81461",
+        "bound_tests_set_hash": "4f9e0c2104d609735b1f6a93f718eb83c30fdc7eadd432c753809f1ef5dd2773",
         "declaration_hash": "c3338ae238634fc4d8b442d842fe58ce7f8e4eaf567d66bcec0267506a80339a"
       },
       "obligation_id": {
@@ -2190,7 +2190,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");\n\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"generated\", \"Added\"])),\n            Some(ItemAction::Add)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Modified\"])),\n            Some(ItemAction::Modify)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Referenced\"])),\n            Some(ItemAction::Reference)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])),\n            Some(ItemAction::Modify)\n        );",
+        "citation": "let baseline = rooted_crate(vec![\n            (1, vec![\"sotp\", \"commands\", \"Modified\"], rustdoc_types::ItemKind::Struct),\n            (2, vec![\"sotp\", \"commands\", \"Referenced\"], rustdoc_types::ItemKind::Struct),\n            (3, vec![\"sotp\", \"commands\", \"run\"], rustdoc_types::ItemKind::Function),\n        ]);\n        let current = rooted_crate(vec![\n            (1, vec![\"sotp\", \"commands\", \"Modified\"], rustdoc_types::ItemKind::Struct),\n            (2, vec![\"sotp\", \"commands\", \"Referenced\"], rustdoc_types::ItemKind::Struct),\n            (3, vec![\"sotp\", \"commands\", \"run\"], rustdoc_types::ItemKind::Function),\n            (4, vec![\"sotp\", \"generated\", \"Added\"], rustdoc_types::ItemKind::Struct),\n        ]);\n        let package = CrateName::new(\"cli\").unwrap();\n        let normalized_current = normalized_paths_for_doc(&current, &package);\n        for expected in [\n            vec![\"cli\", \"commands\", \"Modified\"],\n            vec![\"cli\", \"commands\", \"Referenced\"],\n            vec![\"cli\", \"commands\", \"run\"],\n            vec![\"cli\", \"generated\", \"Added\"],\n        ] {\n            assert!(\n                normalized_current.values().any(|summary| summary.path == expected),\n                \"root alias must be normalized once for {expected:?}\"\n            );\n        }\n\n        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)\n            .expect(\"all type actions must share one normalized resolution set\");\n        build_type_signal_identity_index(&catalogue, &resolution_paths)\n            .expect(\"type-signal indexing must use the same normalized identities\");\n        let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(catalogue, &baseline, &current)\n            .expect(\"add, modify, reference, and function identities must encode under alias\");\n\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"generated\", \"Added\"])),\n            Some(ItemAction::Add)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Modified\"])),\n            Some(ItemAction::Modify)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"Referenced\"])),\n            Some(ItemAction::Reference)\n        );\n        assert_eq!(\n            encoded.action_for(&id_for(&[\"cli\", \"commands\", \"run\"])),\n            Some(ItemAction::Modify)\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2795,6 +2795,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_deleted_external_trait_impl_keeps_local_owner_identity"
         }
       ],
       "edge_id": {
@@ -2806,8 +2836,8 @@
       },
       "key": {
         "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "976f570698bceb6146e557c52b22c01e6c0e2e7addc54ae5559caf73becf6291"
+        "bound_tests_set_hash": "4bd6e9af26c68d7bcc7faf232c05dc54703cae36422f0cfbc1c864416b9bf486",
+        "declaration_hash": "a6096db4fa4d811f27d13c316c68210736bde8d141f73e04cd49aca0a7199eae"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
@@ -2815,7 +2845,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(plain.namespace(), None);\n\n        let typed = ThreeWaySignal::catalogue_item(\n            FreeText::new(\"Shared\"),\n            CatalogueItemNamespace::Type,\n            SignalRegion::SIntersectC_Match_Add,\n        );\n        let trait_signal = ThreeWaySignal::catalogue_item(\n            FreeText::new(\"Shared\"),\n            CatalogueItemNamespace::Trait,\n            SignalRegion::SMinusC_Add,\n        );\n        assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");\n        assert_eq!(typed.signal(), signal_for_region(typed.region()));\n\n        let shared: Vec<_> = report.iter().filter(|signal| signal.item_name() == \"Shared\").collect();\n        assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n        assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n        assert_ne!(shared[0].identity(), shared[1].identity());",
+        "citation": "assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");\n\n        assert_eq!(built.len(), 2, \"{built:?}\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2831,6 +2861,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_deleted_external_trait_impl_keeps_local_owner_identity"
         }
       ],
       "edge_id": {
@@ -2842,8 +2902,8 @@
       },
       "key": {
         "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "9217795ddd5b76edfe3b26c00b510115cd36c1a9eefe4da0f5a3b0a7cf761284"
+        "bound_tests_set_hash": "4bd6e9af26c68d7bcc7faf232c05dc54703cae36422f0cfbc1c864416b9bf486",
+        "declaration_hash": "21eb67266ebe5573ae9b124ec07a31ece2764625808cf1282d1e911061538baa"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
@@ -2851,7 +2911,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n        typed.identity(),\n        &ThreeWaySignalIdentity::CatalogueItem {\n            item_name: FreeText::new(\"Shared\"),\n            namespace: CatalogueItemNamespace::Type,\n        }\n    );\n    assert_eq!(\n        trait_signal.identity(),\n        &ThreeWaySignalIdentity::CatalogueItem {\n            item_name: FreeText::new(\"Shared\"),\n            namespace: CatalogueItemNamespace::Trait,\n        }\n    );\n    assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "citation": "assert_eq!(typed.identity(), &ThreeWaySignalIdentity::CatalogueItem { item_name: FreeText::new(\"Shared\"), namespace: CatalogueItemNamespace::Type, });\n        assert_eq!(trait_signal.identity(), &ThreeWaySignalIdentity::CatalogueItem { item_name: FreeText::new(\"Shared\"), namespace: CatalogueItemNamespace::Trait, });\n        assert_eq!(plain.identity(), &ThreeWaySignalIdentity::Label { label: FreeText::new(\"User\") });\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2867,6 +2927,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_deleted_external_trait_impl_keeps_local_owner_identity"
         }
       ],
       "edge_id": {
@@ -2878,8 +2968,8 @@
       },
       "key": {
         "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "cf1d221d0df0356ef83abb302d2c8bed9be08ae91e066ccef04fe4fa5a8bc425"
+        "bound_tests_set_hash": "4bd6e9af26c68d7bcc7faf232c05dc54703cae36422f0cfbc1c864416b9bf486",
+        "declaration_hash": "ee500555354d1add6648826c5e26c3fee0c3b4571787a6a9ac9a02f369df0045"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
@@ -2887,7 +2977,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n    assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n    assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
+        "citation": "assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2903,114 +2993,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
-        },
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
-      },
-      "key": {
-        "anchor_text_hash": "4dcfe030829a00aad8626bdef8712c9d938b395528f99cd133f42757e7e75d4a",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "fa0444ff7b84faee1ace10f115d9454b47019d2fc20c905d45b804075e0928e5"
-      },
-      "obligation_id": {
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
-        "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_ne!(typed, trait_signal, \"same label, different namespace\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::signal_evaluator::region::tests",
-          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
-          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-03",
-          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
-        },
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
-      },
-      "key": {
-        "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "c1d777786dc88f0a41f96976813f70cfac982864994d5eaa412c18487ce58c7b"
-      },
-      "obligation_id": {
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
-        "item_identifier": "voluntary:CO-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_eq!(identities.get_by_path(\"domain::Shared\"), None, \"bare path is ambiguous\");\n\n    let shared_type_id = *identities\n        .get(&super::TypeTraitIdentityKey::new(\"domain::Shared\", CatalogueItemNamespace::Type))\n        .expect(\"the unplaced Shared type must remain indexed\");\n    let shared_trait_id = *identities\n        .get(&super::TypeTraitIdentityKey::new(\"domain::Shared\", CatalogueItemNamespace::Trait))\n        .expect(\"the unplaced Shared trait must remain indexed\");\n\n    assert_eq!(\n        referenced_id, shared_type_id,\n        \"a type reference must resolve to the type namespace, not the same-path trait\"\n    );\n    assert_ne!(referenced_id, shared_trait_id);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::signal_evaluator::region::tests",
-          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
-          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-03",
-          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
-        },
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
-      },
-      "key": {
-        "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "62836ce9869fa523701fe43aadeec68eace0e2b3840990344baa30ef0342f08a"
-      },
-      "obligation_id": {
-        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal",
-        "item_identifier": "voluntary:AC-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::signal_evaluator::region::tests",
-          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
-          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
         }
       ],
       "edge_id": {
@@ -3022,8 +3029,8 @@
       },
       "key": {
         "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "12114c76c10ef93d0a7187127c0a0bbc85f30e07f77254e0e02090503ed4c66f"
+        "bound_tests_set_hash": "65aab2c0405862aa7efa5cb8ac105f16fae55209190001a899726fa9e26a359a",
+        "declaration_hash": "e2006e44a154b652e3da2d2d8cfb5e817c7125644e93e4373b4a7119a75b172b"
       },
       "obligation_id": {
         "entry_key": "ThreeWaySignalIdentity",
@@ -3031,7 +3038,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(\n            typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(\n            trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_eq!(\n            plain.identity(),\n            &ThreeWaySignalIdentity::Label { label: FreeText::new(\"User\") }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "citation": "assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");\n\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3047,6 +3054,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
         }
       ],
       "edge_id": {
@@ -3058,8 +3090,8 @@
       },
       "key": {
         "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "8a5405a8c9a1b55abc8354fcc577fe04a471501dc4203482661b7038525c9892"
+        "bound_tests_set_hash": "65aab2c0405862aa7efa5cb8ac105f16fae55209190001a899726fa9e26a359a",
+        "declaration_hash": "d458ff682ece1e8838cc4d037e385e879898db2f2e032e1d93253bc686adfa34"
       },
       "obligation_id": {
         "entry_key": "ThreeWaySignalIdentity",
@@ -3067,7 +3099,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(typed.namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_eq!(plain.identity(),\n            &ThreeWaySignalIdentity::Label { label: FreeText::new(\"User\") }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "citation": "assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3083,6 +3115,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
         }
       ],
       "edge_id": {
@@ -3094,8 +3151,8 @@
       },
       "key": {
         "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "449498375d6b1768efa92c6c1099b0bb680ea9391acd69202d8bb9458b6582da"
+        "bound_tests_set_hash": "65aab2c0405862aa7efa5cb8ac105f16fae55209190001a899726fa9e26a359a",
+        "declaration_hash": "a3b0b1d84b106459ff93a7e0d3780e8bceaafee2084ae8ba221064a10c12d846"
       },
       "obligation_id": {
         "entry_key": "ThreeWaySignalIdentity",
@@ -3103,7 +3160,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(shared.len(), 2, \"one signal per namespace: {report:?}\");\n    assert!(shared.iter().all(|signal| signal.region() == SignalRegion::SMinusC_Add));\n    assert_ne!(shared[0].identity(), shared[1].identity());\n    assert!(matches!(\n        shared[0].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Type,\n            ..\n        }\n    ));\n    assert!(matches!(\n        shared[1].identity(),\n        domain::tddd::ThreeWaySignalIdentity::CatalogueItem {\n            namespace: CatalogueItemNamespace::Trait,\n            ..\n        }\n    ));",
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\");\n        let type_row = built.iter().find(|row| row.kind_tag() == \"value_object\").expect(\"type row\");\n        let trait_row = built.iter().find(|row| row.kind_tag() == \"secondary_port\").expect(\"trait row\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert!(type_row.found_type());\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);\n        assert!(!trait_row.found_type());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3112,34 +3169,879 @@
       "bound_tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::signal_evaluator::region::tests",
-          "test_name": "test_three_way_signal_namespace_is_recorded_for_type_and_trait_items"
+          "module_path": "domain::tddd::catalogue::tests",
+          "test_name": "test_type_signal_identity_keeps_same_named_catalogue_rows_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "test_check_duplicate_signal_identity_returns_signal_read_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue::TypeSignal"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "7a7dcbae858315b312328a4cf426dab67faaf34f2e0d3600f316237d43fa92ec",
+        "declaration_hash": "10ae92032497e51e33608dd7be1619c7a2befd32095e2af3d51ba6c9609a31ae"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue::TypeSignal",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.type_name(), \"Shared\");\n        assert_eq!(trait_row.type_name(), \"Shared\");\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert!(type_row.found_type());\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);\n        assert!(!trait_row.found_type());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue::tests",
+          "test_name": "test_type_signal_identity_keeps_same_named_catalogue_rows_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "test_check_duplicate_signal_identity_returns_signal_read_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue::TypeSignal"
+      },
+      "key": {
+        "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
+        "bound_tests_set_hash": "7a7dcbae858315b312328a4cf426dab67faaf34f2e0d3600f316237d43fa92ec",
+        "declaration_hash": "eedbba129a7386ebbe6e17fef91d0b2a58ae2d079c32e04e362c5a5cd5627683"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue::TypeSignal",
+        "item_identifier": "voluntary:CO-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(type_signal.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_ne!(type_signal.signal(), trait_signal.signal());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue::tests",
+          "test_name": "test_type_signal_identity_keeps_same_named_catalogue_rows_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_separates_same_key_deletion_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_namespace_less_tag_in_its_own_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "test_check_duplicate_signal_identity_returns_signal_read_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue::TypeSignal"
+      },
+      "key": {
+        "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
+        "bound_tests_set_hash": "7a7dcbae858315b312328a4cf426dab67faaf34f2e0d3600f316237d43fa92ec",
+        "declaration_hash": "ac5736489c20d158877117561adae81f869cabceccc59972142d314c7dd1faaf"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue::TypeSignal",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\");\n        let type_row = built.iter().find(|row| row.kind_tag() == \"value_object\").expect(\"type row\");\n        let trait_row =\n            built.iter().find(|row| row.kind_tag() == \"secondary_port\").expect(\"trait row\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.type_name(), \"Shared\");\n        assert_eq!(trait_row.type_name(), \"Shared\");\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert!(type_row.found_type());\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);\n        assert!(!trait_row.found_type());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_contract_entry_namespace_uses_sections_and_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
           "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_namespace_less_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
         }
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "CO-03",
+          "element_id": "IN-05",
           "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
         },
-        "entry_key": "ThreeWaySignalIdentity"
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace"
       },
       "key": {
-        "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
-        "bound_tests_set_hash": "db6e28b65249dbf78e8bfb80328b75b3bad37957ae7cec259baae2cbfb18adc9",
-        "declaration_hash": "8587c1c463b8a0e174a9301c5bc240147c72806790590a30c971ebd6f71d4460"
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "464516a9ce28305e8ec87170180454253913e2c83ea739881b9296fcd419f765",
+        "declaration_hash": "98f6ef446da65e9007966acdecd735e934ef95ad98c86f811ac321f76ec1300b"
       },
       "obligation_id": {
-        "entry_key": "ThreeWaySignalIdentity",
-        "item_identifier": "voluntary:CO-03",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace",
+        "item_identifier": "entry",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            typed.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Type,\n            }\n        );\n        assert_eq!(\n            trait_signal.identity(),\n            &ThreeWaySignalIdentity::CatalogueItem {\n                item_name: FreeText::new(\"Shared\"),\n                namespace: CatalogueItemNamespace::Trait,\n            }\n        );\n        assert_ne!(typed, trait_signal, \"same label, different namespace\");",
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\");\n        let type_row = built.iter().find(|row| row.kind_tag() == \"value_object\").expect(\"type row\");\n        let trait_row =\n            built.iter().find(|row| row.kind_tag() == \"secondary_port\").expect(\"trait row\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.type_name(), \"Shared\");\n        assert_eq!(trait_row.type_name(), \"Shared\");\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert!(type_row.found_type());\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);\n        assert!(!trait_row.found_type());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_contract_entry_namespace_uses_sections_and_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_namespace_less_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace"
+      },
+      "key": {
+        "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
+        "bound_tests_set_hash": "464516a9ce28305e8ec87170180454253913e2c83ea739881b9296fcd419f765",
+        "declaration_hash": "98f6ef446da65e9007966acdecd735e934ef95ad98c86f811ac321f76ec1300b"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\");\n        let type_row = built.iter().find(|row| row.kind_tag() == \"value_object\").expect(\"type row\");\n        let trait_row =\n            built.iter().find(|row| row.kind_tag() == \"secondary_port\").expect(\"trait row\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.type_name(), \"Shared\");\n        assert_eq!(trait_row.type_name(), \"Shared\");\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identity_resolution::tests",
+          "test_name": "test_resolve_contract_entry_namespace_uses_sections_and_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_namespace_less_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace"
+      },
+      "key": {
+        "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
+        "bound_tests_set_hash": "464516a9ce28305e8ec87170180454253913e2c83ea739881b9296fcd419f765",
+        "declaration_hash": "98f6ef446da65e9007966acdecd735e934ef95ad98c86f811ac321f76ec1300b"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\"); ... assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type)); ... assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait)); ... assert_eq!(type_row.signal(), ConfidenceSignal::Blue); ... assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow); ... assert_eq!(function_row.type_name(), \"Shared\"); ... assert_eq!(function_row.signal(), ConfidenceSignal::Yellow); ... assert_eq!(built[0].found_items(), &[\"Trait\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "9330893b553e301f006be982f338bacaee3dba6d0dfe61c078f5622ffa0b66dc",
+        "declaration_hash": "a180f712805b19f8a1f8e9b6f6b802959f0e2b181e3cf6c81e40ed265eff66c7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(encoded.contains(\"\\\"namespace\\\": \\\"type\\\"\"));\n        assert!(encoded.contains(\"\\\"namespace\\\": \\\"trait\\\"\"));\n\n        let decoded = decode(&encoded).unwrap();\n        assert_eq!(decoded, document);\n        let namespaces = decoded\n            .signals()\n            .iter()\n            .map(|signal| signal.identity().namespace())\n            .collect::<Vec<_>>();\n        assert_eq!(\n            namespaces,\n            vec![Some(CatalogueItemNamespace::Type), Some(CatalogueItemNamespace::Trait)]\n        );\n        let signals = decoded.signals().iter().map(TypeSignal::signal).collect::<Vec<_>>();\n        assert_eq!(signals, vec![ConfidenceSignal::Blue, ConfidenceSignal::Yellow]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "e36d88b17eec9361909329fc10be56cc7ef98900f882f5b856b7e758c8ecb793",
+        "bound_tests_set_hash": "9330893b553e301f006be982f338bacaee3dba6d0dfe61c078f5622ffa0b66dc",
+        "declaration_hash": "75cfb635e43693793753461922d52ff02b24561c6a968bff88a8d7d007c7409a"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:CO-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(encode(&document), Err(TypeSignalsCodecError::InvalidNamespace(_)))); ... assert_eq!(namespaces, vec![Some(CatalogueItemNamespace::Type), Some(CatalogueItemNamespace::Trait)]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "abea2aa2d12a831e79ee8d52a6f04cf98f7bd051311705aa9a3aa95b1c20ca94",
+        "bound_tests_set_hash": "9330893b553e301f006be982f338bacaee3dba6d0dfe61c078f5622ffa0b66dc",
+        "declaration_hash": "e594f8d97d66c5456d7abef5c5a692f469246944352123f28bd91dfe18bb7eb1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(namespaces, vec![Some(CatalogueItemNamespace::Type), Some(CatalogueItemNamespace::Trait)]); ... assert_eq!(signals, vec![ConfidenceSignal::Blue, ConfidenceSignal::Yellow]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "custom_items_dir_uses_explicit_workspace_root_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "test_check_duplicate_signal_identity_returns_signal_read_failed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_namespace_less_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::pre_review_gate::CoverageVerifyInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "955b20c5f6237786db63e5ad73c9d6ce4c0e8f5cc32988c71337ab9e846b173c",
+        "declaration_hash": "2e288510751faaab961fcaead74c8db0944e1ed7c42ee6ad078bc52cd17801a6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::pre_review_gate::CoverageVerifyInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(built.len(), 2, \"{built:?}\");\n        let type_row = built.iter().find(|row| row.kind_tag() == \"value_object\").expect(\"type row\");\n        let trait_row =\n            built.iter().find(|row| row.kind_tag() == \"secondary_port\").expect(\"trait row\");\n        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));\n        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));\n        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);\n        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "custom_items_dir_uses_explicit_workspace_root_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_ambiguous_contract_key_fails_closed_for_same_named_rows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "catalogue_hash_mismatch_fails_closed_before_namespace_resolution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "catalogue_hash_validation_is_request_scoped_for_same_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "configured_catalogue_filename_is_used_for_namespace_resolution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate::tests",
+          "test_name": "test_check_duplicate_signal_identity_returns_signal_read_failed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_keeps_same_key_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_fills_missing_namespace_row_for_shared_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::tests",
+          "test_name": "test_signal_evaluator_unplaced_type_and_trait_sharing_one_key_keep_references_distinct"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_namespace_less_function_label"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_retains_trait_impl_label_on_owner_row"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::signal_builder::tests",
+          "test_name": "test_build_type_signals_resolves_catalogue_labels_in_their_namespace"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "usecase::pre_review_gate::PreReviewGateInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "bound_tests_set_hash": "3ae6e502bec0d89cf6c35e1435afeb6050ab923a0e2e17205ac51c5d63233e98",
+        "declaration_hash": "2e288510751faaab961fcaead74c8db0944e1ed7c42ee6ad078bc52cd17801a6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::pre_review_gate::PreReviewGateInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(message.as_str().contains(\"no unique catalogue namespace\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
