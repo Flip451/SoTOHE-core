@@ -153,12 +153,13 @@
       "status": "done"
     },
     {
+      "commit_hash": "21864697bb6ae2d39dc684f1fce90a7df2c3a46f",
       "depends_on": [
         "T009"
       ],
       "description": "Modify libs/domain/src/tddd/catalogue.rs and libs/domain/src/tddd/signal_evaluator/region.rs with their regression tests, plus the compile-driven error boundary in libs/infrastructure/src/tddd/type_signals_codec.rs. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T012",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -177,20 +178,22 @@
       "status": "todo"
     },
     {
+      "commit_hash": "21864697bb6ae2d39dc684f1fce90a7df2c3a46f",
       "depends_on": [
         "T012"
       ],
       "description": "Modify libs/domain/src/tddd/catalogue_v2/identity_resolution.rs (resolve_contract_entry_namespace) and libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs (AttestedCatalogueDocument::attest and the domain loader port); relocate the loader port in libs/usecase/src/catalogue_document_loader.rs; propagate its constructor type through libs/usecase/src/catalogue_impl_signals/interactor.rs and libs/usecase/src/test_obligation/{check,evaluate,results}.rs; modify libs/usecase/src/pre_review_gate.rs and libs/usecase/src/pre_review_gate/helpers.rs (PreReviewGateError); modify libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs; wire the loader in apps/cli-composition/src/task_contract.rs; add regression tests for each affected module. Anchors: IN-03, IN-05, CO-03, CO-05, AC-03, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T014",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "21864697bb6ae2d39dc684f1fce90a7df2c3a46f",
       "depends_on": [
         "T012"
       ],
       "description": "Modify libs/infrastructure/src/tddd/type_signals_evaluator/signal_builder.rs and libs/infrastructure/src/tddd/type_signals_evaluator/signal_tags.rs with their regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T010",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "commit_hash": "6732c240e57d94293ca0c40e402a89b967b03d00",
