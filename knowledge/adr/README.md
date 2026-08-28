@@ -149,6 +149,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [親が reference / delete のとき子 Method の spec_refs を禁止する](2026-08-18-0040-parent-forbids-method-spec-refs.md) | Proposed | 2026-08-18 |
 | [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 | [型シグナル評価の型識別を完全修飾パスで行う](2026-08-21-0055-type-identity-fully-qualified-paths.md) | Proposed | 2026-08-21 |
+| [参照先 crate の add 宣言を解決集合に加える](2026-08-28-1034-cross-crate-add-declaration-resolution.md) | Proposed | 2026-08-28 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
 
 ### トラック・ワークフロー
