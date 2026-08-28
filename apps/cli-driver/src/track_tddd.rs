@@ -903,8 +903,8 @@ mod tests {
                     layers: vec![usecase::track_lifecycle::TrackCatalogueImplLayerResult {
                         layer: domain::tddd::LayerId::try_new("usecase")
                             .expect("layer id is valid"),
-                        signals: vec![domain::tddd::ThreeWaySignal::new(
-                            "TrackInitService".to_owned(),
+                        signals: vec![domain::tddd::ThreeWaySignal::label(
+                            domain::FreeText::new("TrackInitService"),
                             domain::tddd::SignalRegion::SIntersectC_Match_Add,
                         )],
                     }],
@@ -1366,8 +1366,8 @@ mod tests {
         let outcome = render_catalogue_impl_signals_result(TrackCatalogueImplSignalsResult {
             layers: vec![usecase::track_lifecycle::TrackCatalogueImplLayerResult {
                 layer: domain::tddd::LayerId::try_new("usecase").expect("layer id is valid"),
-                signals: vec![domain::tddd::ThreeWaySignal::new(
-                    "TrackInitService".to_owned(),
+                signals: vec![domain::tddd::ThreeWaySignal::label(
+                    domain::FreeText::new("TrackInitService"),
                     domain::tddd::SignalRegion::CMinusSUnionD,
                 )],
             }],

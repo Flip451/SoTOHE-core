@@ -15,7 +15,7 @@ use std::sync::{Arc, Mutex};
 
 use domain::tddd::catalogue_v2::{
     BaselineCaptureIoError, CatalogueDocument, CatalogueDocumentLoaderError,
-    CatalogueDocumentLoaderPort, CrateName, RustdocBaselineCapturePort, RustdocCratePort,
+    CatalogueItemNamespace, CrateName, RustdocBaselineCapturePort, RustdocCratePort,
     RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
     TypeRef,
 };
@@ -27,7 +27,7 @@ use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 // reached via `use super::*` and must be imported explicitly here.
 use domain::tddd::signal_evaluator::region::{ThreeWayEvaluationReport, ThreeWaySignal};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use domain::{SymlinkGuardError, SymlinkGuardPort, TrackId};
+use domain::{FreeText, SymlinkGuardError, SymlinkGuardPort, TrackId};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, Id, Item, ItemEnum, ItemKind, ItemSummary, Module, Struct, Visibility,
 };
@@ -37,6 +37,7 @@ use super::CatalogueImplSignalsInteractor;
 use crate::baseline_capture::{
     BaselineCaptureInteractor, BaselineCaptureRequest, BaselineCaptureService,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::tddd_feature_declaration::{
     TdddActualFeatureDeclarationPort, TdddActualFeatureDeclarationPortError,
     TdddBaselineFeatureDeclarationPort, TdddBaselineFeatureDeclarationPortError,
@@ -162,16 +163,28 @@ pub(super) struct StubLoader {
     pub(super) doc: CatalogueDocument,
 }
 
-impl CatalogueDocumentLoaderPort for StubLoader {
-    fn load(&self, _path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.doc.clone())
+impl AttestedCatalogueDocumentLoaderPort for StubLoader {
+    fn load(
+        &self,
+        _path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
+        Ok(domain::tddd::catalogue_v2::AttestedCatalogueDocument::attest(
+            b"T014 test catalogue",
+            |_| Ok::<_, std::convert::Infallible>(self.doc.clone()),
+        )
+        .unwrap())
     }
 }
 
 pub(super) struct FailingLoader;
 
-impl CatalogueDocumentLoaderPort for FailingLoader {
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for FailingLoader {
+    fn load(
+        &self,
+        path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
         Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
@@ -218,7 +231,8 @@ impl SignalEvaluatorPort for SingleBlueEvaluator {
         _c: Crate,
     ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
         use domain::tddd::signal_evaluator::region::SignalRegion;
-        let signal = ThreeWaySignal::new("MyType".to_owned(), SignalRegion::SIntersectC_Match_Add);
+        let signal =
+            ThreeWaySignal::label(FreeText::new("MyType"), SignalRegion::SIntersectC_Match_Add);
         Ok(ThreeWayEvaluationReport::new(vec![signal]))
     }
 }
@@ -236,7 +250,8 @@ impl SignalEvaluatorPort for SingleRedEvaluator {
     ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
         use domain::tddd::signal_evaluator::region::SignalRegion;
         // `SMinusC_Reference` is a Red region — see signal_evaluator/region.rs.
-        let signal = ThreeWaySignal::new("RemovedType".to_owned(), SignalRegion::SMinusC_Reference);
+        let signal =
+            ThreeWaySignal::label(FreeText::new("RemovedType"), SignalRegion::SMinusC_Reference);
         Ok(ThreeWayEvaluationReport::new(vec![signal]))
     }
 }
@@ -578,8 +593,9 @@ impl SignalEvaluatorPort for CatalogueItemMissingFromActualEvaluator {
             (has_gated_item(catalogue.krate()), has_gated_item(&baseline), has_gated_item(&actual));
         self.observed_membership.lock().unwrap().push(observed);
         let signals = if observed == (true, false, false) {
-            vec![ThreeWaySignal::new(
-                "FeatureGatedPublicItem".to_owned(),
+            vec![ThreeWaySignal::catalogue_item(
+                FreeText::new("FeatureGatedPublicItem"),
+                CatalogueItemNamespace::Type,
                 domain::tddd::signal_evaluator::region::SignalRegion::SMinusC_Reference,
             )]
         } else {
@@ -720,7 +736,7 @@ impl SymlinkGuardPort for AlwaysIoSymlinkGuard {
 // -------------------------------------------------------------------------
 
 pub(super) fn build_interactor(
-    loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc: Arc<dyn RustdocCratePort>,
@@ -738,7 +754,7 @@ pub(super) fn build_interactor(
 }
 
 pub(super) fn build_interactor_with_guard(
-    loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc: Arc<dyn RustdocCratePort>,

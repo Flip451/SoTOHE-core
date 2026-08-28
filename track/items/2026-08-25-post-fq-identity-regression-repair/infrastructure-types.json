@@ -1,0 +1,602 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::repository_root_for_items_dir": {
+      "action": "add",
+      "docs": "Single repository authority for the task-contract, impl-plan, and type-signal readers so the IN-05 pre-review gate resolves layer bindings and its attested catalogue from the same repository as the artifacts.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<std::path::PathBuf, std::io::error::Error>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref": {
+      "action": "modify",
+      "docs": "Catalogue TypeRef canonicalization operation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "type_ref",
+          "ty": "&domain::tddd::catalogue_v2::identifiers::TypeRef"
+        },
+        {
+          "name": "catalogue_crate",
+          "ty": "&domain::tddd::catalogue_v2::identifiers::CrateName"
+        },
+        {
+          "name": "rustdoc_paths",
+          "ty": "&std::collections::HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>"
+        },
+        {
+          "name": "generic_params",
+          "ty": "&[domain::tddd::catalogue_v2::identifiers::ParamName]"
+        }
+      ],
+      "returns": "Result<CanonicalTypeIdentity, domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "docs": "Per-layer type-signal evaluation operation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::ids::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::feature_declaration::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "CanonicalTypeIdentity",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "usecase::catalog_gen::CatalogPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "domain::tddd::signal_evaluator::port::SignalEvaluatorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::convert::From<serde_json::error::Error>"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "delete",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsCatalogueDocumentLoader",
+      "trait_ref": "usecase::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity": {
+      "action": "modify",
+      "docs": "Adapter-layer value for one canonical type identity after catalogue-crate and rustdoc-root normalization; it is infrastructure-scoped because it represents reconciliation output rather than domain vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::canonical_type_identity",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::catalog_gen::FsCatalogAdapter": {
+      "action": "modify",
+      "docs": "Stateless filesystem catalogue adapter retained as a struct because it implements CatalogPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::catalog_gen",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec": {
+      "action": "modify",
+      "docs": "Stateless CatalogueToExtendedCratePort adapter and sole D3 catalogue identity-resolution enforcement owner.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2": {
+      "action": "modify",
+      "docs": "Three-way signal evaluator secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_workspace_root",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator_v2",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader": {
+      "action": "modify",
+      "docs": "Supplies the attested catalogue document via a bounded, atomic no-follow filesystem read and hashes the exact bytes read so the pre-review gate resolves contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::tddd_catalogue_document_loader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError": {
+      "action": "modify",
+      "docs": "Type-signals codec error surface (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "serde_json::error::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersion"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDigest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "field",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::tddd::type_signals_doc::Sha256DigestError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidSignal",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidNamespace",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
+}

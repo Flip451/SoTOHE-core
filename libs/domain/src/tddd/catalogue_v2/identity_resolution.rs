@@ -8,9 +8,11 @@
 use std::collections::BTreeSet;
 
 use crate::tddd::catalogue_v2::identifiers::{
-    CrateName, FullyQualifiedItemPath, Identifier, TypeRef,
+    CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, Identifier, ModulePath, TypeRef,
 };
 use crate::tddd::catalogue_v2::roles::NonEmptyVec;
+use crate::tddd::catalogue_v2::{CatalogueDocument, ItemAction};
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 /// Canonical external trait identities used as the linter's standard-library
 /// seed universe. Keeping these paths beside the shared resolver ensures that
@@ -48,7 +50,7 @@ pub(crate) const STANDARD_EXTERNAL_TRAIT_PATHS: &str = concat!(
 pub enum CatalogueIdentityResolutionError {
     /// More than one fully qualified identity matches the reference.
     #[error(
-        "ambiguous identifier `{identifier}`; candidates: {candidates:?}",
+        "ambiguous identifier `{identifier}`; candidates: FullyQualifiedItemPath {candidates:?}",
         identifier = .0.as_str(),
         candidates = .1.as_slice()
     )]
@@ -86,8 +88,84 @@ pub fn resolve_catalogue_identity(
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
 ) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
+    resolve_catalogue_identity_in_namespace(reference, catalogue_crate, universe, None)
+}
+
+/// Resolves the namespace of a task-contract entry from the catalogue section
+/// that declares it.
+///
+/// Type and trait entries are distinct identities even when their keys are the
+/// same. Function entries and deletion records for functions retain the
+/// report-label identity and therefore return `None`. A key declared in more
+/// than one live or deletion section, or in no section, is rejected instead of
+/// being assigned a namespace by convention.
+///
+/// # Errors
+///
+/// Returns [`CatalogueIdentityResolutionError::ClassificationFailed`] when the
+/// key has more than one matching live or deletion declaration. Returns
+/// [`CatalogueIdentityResolutionError::UnresolvedIdentifier`] when it is not
+/// declared in any catalogue section.
+pub fn resolve_contract_entry_namespace(
+    document: &CatalogueDocument,
+    entry_key: &CatalogueEntryKey,
+) -> Result<Option<CatalogueItemNamespace>, CatalogueIdentityResolutionError> {
+    let reference = TypeRef::from_non_empty(entry_key.as_str().to_owned());
+    let mut matches = Vec::new();
+    if document.types().contains_key(entry_key) {
+        matches.push(Some(CatalogueItemNamespace::Type));
+    }
+    if document.traits().contains_key(entry_key) {
+        matches.push(Some(CatalogueItemNamespace::Trait));
+    }
+    if document
+        .functions()
+        .keys()
+        .any(|function_path| function_path.to_string() == entry_key.as_str())
+    {
+        matches.push(None);
+    }
+    for deletion in document.deletions() {
+        match deletion {
+            crate::tddd::catalogue_v2::DeletionRecord::Type { name, .. } if name == entry_key => {
+                matches.push(Some(CatalogueItemNamespace::Type))
+            }
+            crate::tddd::catalogue_v2::DeletionRecord::Trait { name, .. } if name == entry_key => {
+                matches.push(Some(CatalogueItemNamespace::Trait))
+            }
+            crate::tddd::catalogue_v2::DeletionRecord::Function { path, .. }
+                if path.to_string() == entry_key.as_str() =>
+            {
+                matches.push(None)
+            }
+            _ => {}
+        }
+    }
+
+    match matches.as_slice() {
+        [namespace] => Ok(*namespace),
+        [] => Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference)),
+        [..] => Err(CatalogueIdentityResolutionError::ClassificationFailed { location: reference }),
+    }
+}
+
+/// Resolves a catalogue identity within one namespace.
+///
+/// The caller supplies a type-only or trait-only universe when the spelling is
+/// ambiguous across Rust namespaces. Keeping the namespace in the domain
+/// identity makes same-named types and traits independently representable.
+///
+/// # Errors
+///
+/// Returns the same fail-closed errors as [`resolve_catalogue_identity`].
+pub fn resolve_catalogue_identity_in_namespace(
+    reference: &TypeRef,
+    catalogue_crate: &CrateName,
+    universe: &BTreeSet<FullyQualifiedItemPath>,
+    namespace: Option<CatalogueItemNamespace>,
+) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
     let lookup = normalize_lookup(reference.as_str(), catalogue_crate);
-    let candidates = matching_candidates(&lookup, catalogue_crate, universe);
+    let candidates = matching_candidates(&lookup, catalogue_crate, universe, namespace);
 
     match candidates.as_slice() {
         [identity] => Ok(identity.clone()),
@@ -105,8 +183,90 @@ pub fn resolve_catalogue_identity(
     }
 }
 
+/// Namespace-scoped form of [`resolve_catalogue_identity_for_action_in_namespace`].
+///
+/// # Errors
+///
+/// Returns an ambiguity or unresolved error when D3 cannot establish one
+/// identity without guessing.
+pub fn resolve_catalogue_identity_for_action_in_namespace(
+    reference: &TypeRef,
+    catalogue_crate: &CrateName,
+    action: ItemAction,
+    baseline: &BTreeSet<FullyQualifiedItemPath>,
+    current: &BTreeSet<FullyQualifiedItemPath>,
+    namespace: CatalogueItemNamespace,
+) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
+    let lookup = normalize_lookup(reference.as_str(), catalogue_crate);
+    let is_unplaced_reference = !lookup.contains("::");
+    if action == ItemAction::Add {
+        let baseline_matches = if is_unplaced_reference {
+            matching_name_candidates(&lookup, catalogue_crate, baseline, Some(namespace))
+        } else {
+            matching_candidates(&lookup, catalogue_crate, baseline, Some(namespace))
+        };
+        if !baseline_matches.is_empty() {
+            return ambiguous_or_unresolved(reference, lookup.as_str(), baseline_matches);
+        }
+
+        let current_matches = if is_unplaced_reference {
+            matching_name_candidates(&lookup, catalogue_crate, current, Some(namespace))
+        } else {
+            matching_candidates(&lookup, catalogue_crate, current, Some(namespace))
+        };
+        return match current_matches.as_slice() {
+            [identity] => Ok(identity.clone()),
+            [] if is_unplaced_reference => {
+                unplaced_identity(reference, &lookup, catalogue_crate, namespace)
+            }
+            [] => {
+                let name = lookup.rsplit("::").next().unwrap_or(lookup.as_str());
+                let name = Identifier::new(name.to_owned()).map_err(|_| {
+                    CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone())
+                })?;
+                let mut path_segments = lookup.split("::").collect::<Vec<_>>();
+                let _ = path_segments.pop();
+                if path_segments.first().copied() == Some(catalogue_crate.as_str()) {
+                    let _ = path_segments.remove(0);
+                }
+                let module = path_segments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+                let module_path = ModulePath::from_segments(module).map_err(|_| {
+                    CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone())
+                })?;
+                Ok(match namespace {
+                    CatalogueItemNamespace::Type => {
+                        FullyQualifiedItemPath::new_type(catalogue_crate.clone(), module_path, name)
+                    }
+                    CatalogueItemNamespace::Trait => FullyQualifiedItemPath::new_trait(
+                        catalogue_crate.clone(),
+                        module_path,
+                        name,
+                    ),
+                })
+            }
+            [_, ..] => ambiguous_or_unresolved(
+                reference,
+                lookup.rsplit("::").next().unwrap_or(lookup.as_str()),
+                current_matches,
+            ),
+        };
+    }
+
+    let baseline_matches = matching_candidates(&lookup, catalogue_crate, baseline, Some(namespace));
+    match baseline_matches.as_slice() {
+        [identity] => Ok(identity.clone()),
+        [] => Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone())),
+        [_, ..] => ambiguous_or_unresolved(
+            reference,
+            lookup.rsplit("::").next().unwrap_or(lookup.as_str()),
+            baseline_matches,
+        ),
+    }
+}
+
 pub(crate) fn normalize_lookup(reference: &str, catalogue_crate: &CrateName) -> String {
     let lookup = reference.strip_prefix("::").unwrap_or(reference);
+    let lookup = lookup.split('<').next().unwrap_or(lookup).trim();
     lookup
         .strip_prefix("crate::")
         .map(|rest| format!("{}::{rest}", catalogue_crate.as_str()))
@@ -142,11 +302,9 @@ pub(crate) fn is_explicit_external_path(
 
     !universe.iter().any(|identity| {
         identity.crate_name() == catalogue_crate
-            && identity
-                .module_path()
-                .segments()
-                .first()
-                .is_some_and(|segment| segment.as_str() == root)
+            && identity.module_path().is_some_and(|module_path| {
+                module_path.segments().first().is_some_and(|segment| segment.as_str() == root)
+            })
     })
 }
 
@@ -154,11 +312,16 @@ fn matching_candidates(
     lookup: &str,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
+    namespace: Option<CatalogueItemNamespace>,
 ) -> Vec<FullyQualifiedItemPath> {
     if lookup.contains("::") {
         let exact = universe
             .iter()
-            .filter(|identity| identity.to_string() == lookup)
+            .filter(|identity| {
+                identity.is_placed()
+                    && identity.to_string() == lookup
+                    && namespace.is_none_or(|expected| identity.namespace() == expected)
+            })
             .cloned()
             .collect::<Vec<_>>();
         if !exact.is_empty() {
@@ -176,10 +339,17 @@ fn matching_candidates(
             let aliases = universe
                 .iter()
                 .filter(|identity| {
+                    if namespace.is_some_and(|expected| identity.namespace() != expected) {
+                        return false;
+                    }
                     matches!(identity.crate_name().as_str(), "alloc" | "core" | "std")
                         && suffix_name == identity.name().as_str()
                         && suffix_module.map_or_else(
-                            || identity.module_path().is_root(),
+                            || {
+                                identity
+                                    .module_path()
+                                    .is_some_and(|module_path| module_path.is_root())
+                            },
                             |module| standard_public_namespace_matches(module, identity),
                         )
                 })
@@ -209,7 +379,9 @@ fn matching_candidates(
         return universe
             .iter()
             .filter(|identity| {
-                identity.crate_name() == catalogue_crate && local_path(identity) == lookup
+                identity.crate_name() == catalogue_crate
+                    && local_path(identity).as_deref() == Some(lookup)
+                    && namespace.is_none_or(|expected| identity.namespace() == expected)
             })
             .cloned()
             .collect();
@@ -218,7 +390,9 @@ fn matching_candidates(
     let local = universe
         .iter()
         .filter(|identity| {
-            identity.crate_name() == catalogue_crate && identity.name().as_str() == lookup
+            identity.crate_name() == catalogue_crate
+                && identity.name().as_str() == lookup
+                && namespace.is_none_or(|expected| identity.namespace() == expected)
         })
         .cloned()
         .collect::<Vec<_>>();
@@ -226,15 +400,75 @@ fn matching_candidates(
         return local;
     }
 
-    universe.iter().filter(|identity| identity.name().as_str() == lookup).cloned().collect()
+    universe
+        .iter()
+        .filter(|identity| {
+            identity.name().as_str() == lookup
+                && namespace.is_none_or(|expected| identity.namespace() == expected)
+        })
+        .cloned()
+        .collect()
 }
 
-fn local_path(identity: &FullyQualifiedItemPath) -> String {
-    if identity.module_path().is_root() {
-        identity.name().to_string()
-    } else {
-        format!("{}::{}", identity.module_path(), identity.name())
-    }
+fn matching_name_candidates(
+    lookup: &str,
+    catalogue_crate: &CrateName,
+    universe: &BTreeSet<FullyQualifiedItemPath>,
+    namespace: Option<CatalogueItemNamespace>,
+) -> Vec<FullyQualifiedItemPath> {
+    universe
+        .iter()
+        .filter(|identity| {
+            identity.crate_name() == catalogue_crate
+                && identity.name().as_str() == lookup
+                && namespace.is_none_or(|expected| identity.namespace() == expected)
+        })
+        .cloned()
+        .collect()
+}
+
+fn local_path(identity: &FullyQualifiedItemPath) -> Option<String> {
+    identity.module_path().map(|module_path| {
+        if module_path.is_root() {
+            identity.name().to_string()
+        } else {
+            format!("{module_path}::{}", identity.name())
+        }
+    })
+}
+
+fn unplaced_identity(
+    reference: &TypeRef,
+    lookup: &str,
+    catalogue_crate: &CrateName,
+    namespace: CatalogueItemNamespace,
+) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
+    let name = Identifier::new(lookup.to_owned())
+        .map_err(|_| CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone()))?;
+    Ok(match namespace {
+        CatalogueItemNamespace::Type => {
+            FullyQualifiedItemPath::new_unplaced_type(catalogue_crate.clone(), name)
+        }
+        CatalogueItemNamespace::Trait => {
+            FullyQualifiedItemPath::new_unplaced_trait(catalogue_crate.clone(), name)
+        }
+    })
+}
+
+fn ambiguous_or_unresolved(
+    reference: &TypeRef,
+    identifier_name: &str,
+    candidates: Vec<FullyQualifiedItemPath>,
+) -> Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError> {
+    let identifier = Identifier::new(identifier_name.to_owned())
+        .map_err(|_| CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone()))?;
+    let Some((first, rest)) = candidates.split_first() else {
+        return Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference.clone()));
+    };
+    Err(CatalogueIdentityResolutionError::AmbiguousIdentifier(
+        identifier,
+        NonEmptyVec::new(first.clone(), rest.to_vec()),
+    ))
 }
 
 fn standard_public_namespace_matches(
@@ -243,7 +477,10 @@ fn standard_public_namespace_matches(
 ) -> bool {
     let public_segments =
         public_module.split("::").filter(|segment| !segment.is_empty()).collect::<Vec<_>>();
-    let candidate_segments = identity.module_path().segments();
+    let Some(candidate_module_path) = identity.module_path() else {
+        return false;
+    };
+    let candidate_segments = candidate_module_path.segments();
     let mut candidate_index = 0;
     for public_segment in &public_segments {
         let Some(candidate) = candidate_segments.get(candidate_index) else {
@@ -356,7 +593,12 @@ fn segments_match(segments: &[Identifier], expected: &[&str]) -> bool {
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
+    use crate::tddd::catalogue_v2::DeletionRecord;
+    use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+    use crate::tddd::catalogue_v2::identifiers::{FunctionName, FunctionPath, ModulePath, TypeRef};
+    use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
+    use crate::tddd::layer_id::LayerId;
 
     fn identity(crate_name: &str, module: &[&str], name: &str) -> FullyQualifiedItemPath {
         FullyQualifiedItemPath::new(
@@ -366,8 +608,334 @@ mod tests {
         )
     }
 
+    fn trait_identity(crate_name: &str, module: &[&str], name: &str) -> FullyQualifiedItemPath {
+        FullyQualifiedItemPath::new_trait(
+            CrateName::new(crate_name).expect("valid crate name"),
+            ModulePath::from_segments(module.to_vec()).expect("valid module path"),
+            Identifier::new(name).expect("valid item name"),
+        )
+    }
+
     fn reference(value: &str) -> TypeRef {
         TypeRef::new(value).expect("non-empty TypeRef")
+    }
+
+    fn empty_catalogue() -> CatalogueDocument {
+        CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer id"),
+        )
+    }
+
+    fn simple_type_entry() -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn simple_trait_entry() -> TraitEntry {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn simple_function_entry() -> FunctionEntry {
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").expect("valid return type"),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn assert_contract_entry_classification_failed(
+        document: &CatalogueDocument,
+        entry_key: &CatalogueEntryKey,
+    ) {
+        assert!(matches!(
+            resolve_contract_entry_namespace(document, entry_key),
+            Err(CatalogueIdentityResolutionError::ClassificationFailed { location })
+                if location.as_str() == entry_key.as_str()
+        ));
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_uses_sections_and_fails_closed() {
+        let type_key = CatalogueEntryKey::try_new("SharedType".to_owned()).unwrap();
+        let mut type_document = empty_catalogue();
+        type_document.insert_type(type_key.clone(), simple_type_entry());
+        assert_eq!(
+            resolve_contract_entry_namespace(&type_document, &type_key),
+            Ok(Some(CatalogueItemNamespace::Type))
+        );
+
+        let trait_key = CatalogueEntryKey::try_new("SharedTrait".to_owned()).unwrap();
+        let mut trait_document = empty_catalogue();
+        trait_document.insert_trait(trait_key.clone(), simple_trait_entry());
+        assert_eq!(
+            resolve_contract_entry_namespace(&trait_document, &trait_key),
+            Ok(Some(CatalogueItemNamespace::Trait))
+        );
+
+        let function_key = CatalogueEntryKey::try_new("domain::compute".to_owned()).unwrap();
+        let function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("compute").expect("valid function name"),
+        );
+        let mut function_document = empty_catalogue();
+        function_document.insert_function(function_path, simple_function_entry());
+        assert_eq!(resolve_contract_entry_namespace(&function_document, &function_key), Ok(None));
+
+        let duplicate_key = CatalogueEntryKey::try_new("Shared".to_owned()).unwrap();
+        let mut duplicate_document = empty_catalogue();
+        duplicate_document.insert_type(duplicate_key.clone(), simple_type_entry());
+        duplicate_document.insert_trait(duplicate_key.clone(), simple_trait_entry());
+        assert!(matches!(
+            resolve_contract_entry_namespace(&duplicate_document, &duplicate_key),
+            Err(CatalogueIdentityResolutionError::ClassificationFailed { location })
+                if location.as_str() == "Shared"
+        ));
+
+        let missing_key = CatalogueEntryKey::try_new("Missing".to_owned()).unwrap();
+        let missing_document = empty_catalogue();
+        assert!(matches!(
+            resolve_contract_entry_namespace(&missing_document, &missing_key),
+            Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(reference))
+                if reference.as_str() == "Missing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_contract_entry_namespace_includes_deletions_and_rejects_all_ambiguity() {
+        let deleted_type_key = CatalogueEntryKey::try_new("DeletedType".to_owned()).unwrap();
+        let mut deleted_type_document = empty_catalogue();
+        deleted_type_document.push_deletion(DeletionRecord::Type {
+            name: deleted_type_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_type_document, &deleted_type_key),
+            Ok(Some(CatalogueItemNamespace::Type))
+        );
+
+        let deleted_trait_key = CatalogueEntryKey::try_new("DeletedTrait".to_owned()).unwrap();
+        let mut deleted_trait_document = empty_catalogue();
+        deleted_trait_document.push_deletion(DeletionRecord::Trait {
+            name: deleted_trait_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_trait_document, &deleted_trait_key),
+            Ok(Some(CatalogueItemNamespace::Trait))
+        );
+
+        let deleted_function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("deleted_function").expect("valid function name"),
+        );
+        let deleted_function_key =
+            CatalogueEntryKey::try_new(deleted_function_path.to_string()).unwrap();
+        let mut deleted_function_document = empty_catalogue();
+        deleted_function_document.push_deletion(DeletionRecord::Function {
+            path: deleted_function_path,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_eq!(
+            resolve_contract_entry_namespace(&deleted_function_document, &deleted_function_key),
+            Ok(None)
+        );
+
+        let shared_key = CatalogueEntryKey::try_new("domain::Shared".to_owned()).unwrap();
+        let shared_function_path = FunctionPath::at_root(
+            CrateName::new("domain").expect("valid crate name"),
+            FunctionName::new("Shared").expect("valid function name"),
+        );
+
+        let mut live_type_and_function = empty_catalogue();
+        live_type_and_function.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        assert_contract_entry_classification_failed(&live_type_and_function, &shared_key);
+
+        let mut live_trait_and_function = empty_catalogue();
+        live_trait_and_function.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        assert_contract_entry_classification_failed(&live_trait_and_function, &shared_key);
+
+        let mut live_type_and_trait = empty_catalogue();
+        live_type_and_trait.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_trait.insert_trait(shared_key.clone(), simple_trait_entry());
+        assert_contract_entry_classification_failed(&live_type_and_trait, &shared_key);
+
+        let mut deleted_type_and_trait = empty_catalogue();
+        deleted_type_and_trait.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_type_and_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_type_and_trait, &shared_key);
+
+        let mut deleted_type_and_function = empty_catalogue();
+        deleted_type_and_function.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_type_and_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_type_and_function, &shared_key);
+
+        let mut deleted_trait_and_function = empty_catalogue();
+        deleted_trait_and_function.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        deleted_trait_and_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&deleted_trait_and_function, &shared_key);
+
+        let mut duplicate_type_declarations = empty_catalogue();
+        duplicate_type_declarations.insert_type(shared_key.clone(), simple_type_entry());
+        duplicate_type_declarations.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&duplicate_type_declarations, &shared_key);
+
+        let mut live_type_and_deleted_trait = empty_catalogue();
+        live_type_and_deleted_trait.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_type_and_deleted_trait, &shared_key);
+
+        let mut live_type_and_deleted_function = empty_catalogue();
+        live_type_and_deleted_function.insert_type(shared_key.clone(), simple_type_entry());
+        live_type_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_type_and_deleted_function, &shared_key);
+
+        let mut live_trait_and_deleted_type = empty_catalogue();
+        live_trait_and_deleted_type.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_type.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_type, &shared_key);
+
+        let mut live_trait_and_deleted_trait = empty_catalogue();
+        live_trait_and_deleted_trait.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_trait, &shared_key);
+
+        let mut live_trait_and_deleted_function = empty_catalogue();
+        live_trait_and_deleted_function.insert_trait(shared_key.clone(), simple_trait_entry());
+        live_trait_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_trait_and_deleted_function, &shared_key);
+
+        let mut live_function_and_deleted_type = empty_catalogue();
+        live_function_and_deleted_type
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_type.push_deletion(DeletionRecord::Type {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_function_and_deleted_type, &shared_key);
+
+        let mut live_function_and_deleted_trait = empty_catalogue();
+        live_function_and_deleted_trait
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_trait.push_deletion(DeletionRecord::Trait {
+            name: shared_key.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(&live_function_and_deleted_trait, &shared_key);
+
+        let mut live_function_and_deleted_function = empty_catalogue();
+        live_function_and_deleted_function
+            .insert_function(shared_function_path.clone(), simple_function_entry());
+        live_function_and_deleted_function.push_deletion(DeletionRecord::Function {
+            path: shared_function_path.clone(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        assert_contract_entry_classification_failed(
+            &live_function_and_deleted_function,
+            &shared_key,
+        );
+
+        let mut duplicate_deleted_types = empty_catalogue();
+        for _ in 0..2 {
+            duplicate_deleted_types.push_deletion(DeletionRecord::Type {
+                name: shared_key.clone(),
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            });
+        }
+        assert_contract_entry_classification_failed(&duplicate_deleted_types, &shared_key);
     }
 
     #[test]
@@ -760,6 +1328,395 @@ mod tests {
             error,
             CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
                 if unresolved.as_str() == "domain::beta::Event"
+        ));
+    }
+
+    #[test]
+    fn test_fully_qualified_item_path_preserves_omitted_placement_and_namespace() {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let key = crate::tddd::semantic_verify::CatalogueEntryKey::try_new("Shared".to_owned())
+            .expect("valid key");
+        let unplaced =
+            FullyQualifiedItemPath::from_type_catalogue_entry_key(&crate_name, &key, None)
+                .expect("bare key is valid");
+        assert!(matches!(unplaced, FullyQualifiedItemPath::UnplacedType { .. }));
+        assert_eq!(unplaced.module_path(), None);
+
+        let root = ModulePath::root();
+        let placed =
+            FullyQualifiedItemPath::from_type_catalogue_entry_key(&crate_name, &key, Some(&root))
+                .expect("explicit root placement is valid");
+        assert!(matches!(placed, FullyQualifiedItemPath::PlacedType { .. }));
+        assert_eq!(placed.module_path(), Some(&root));
+
+        let trait_identity =
+            FullyQualifiedItemPath::from_trait_catalogue_entry_key(&crate_name, &key, None)
+                .expect("bare trait key is valid");
+        assert!(matches!(trait_identity, FullyQualifiedItemPath::UnplacedTrait { .. }));
+        assert_ne!(unplaced, trait_identity);
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_for_action_applies_d3_placement_rules() {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let thing_reference = reference("Thing");
+        let baseline = BTreeSet::new();
+        let current = BTreeSet::from([identity("domain", &["generated"], "Thing")]);
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &thing_reference,
+            &crate_name,
+            ItemAction::Add,
+            &baseline,
+            &current,
+            CatalogueItemNamespace::Type,
+        )
+        .expect("one current candidate resolves omitted placement");
+        assert_eq!(resolved, identity("domain", &["generated"], "Thing"));
+
+        let unimplemented = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("Future"),
+            &crate_name,
+            ItemAction::Add,
+            &baseline,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .expect("an absent add remains an unplaced identity");
+        assert!(matches!(unimplemented, FullyQualifiedItemPath::UnplacedType { .. }));
+
+        let baseline_collision = BTreeSet::from([identity("domain", &["old"], "Thing")]);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &thing_reference,
+                &crate_name,
+                ItemAction::Add,
+                &baseline_collision,
+                &current,
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
+
+        let ambiguous_current = BTreeSet::from([
+            identity("domain", &["alpha"], "Thing"),
+            identity("domain", &["beta"], "Thing"),
+        ]);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &thing_reference,
+                &crate_name,
+                ItemAction::Add,
+                &baseline,
+                &ambiguous_current,
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
+
+        let modified = resolve_catalogue_identity_for_action_in_namespace(
+            &thing_reference,
+            &crate_name,
+            ItemAction::Modify,
+            &current,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .expect("existing-item actions resolve against one baseline identity");
+        assert_eq!(modified, identity("domain", &["generated"], "Thing"));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_for_action_omitted_delete_and_reference_resolve_unique_baseline()
+     {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let expected = identity("domain", &["existing"], "Thing");
+        let baseline = BTreeSet::from([expected.clone()]);
+
+        for action in [ItemAction::Delete, ItemAction::Reference] {
+            let resolved = resolve_catalogue_identity_for_action_in_namespace(
+                &reference("Thing"),
+                &crate_name,
+                action,
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Type,
+            )
+            .expect("an omitted delete/reference resolves its unique baseline identity");
+            assert_eq!(resolved, expected);
+        }
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_for_action_omitted_delete_requires_baseline_candidate() {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let current = BTreeSet::from([identity("domain", &["current"], "Thing")]);
+
+        let error = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("Thing"),
+            &crate_name,
+            ItemAction::Delete,
+            &BTreeSet::new(),
+            &current,
+            CatalogueItemNamespace::Type,
+        )
+        .expect_err("delete must fail closed without a baseline candidate");
+
+        assert!(matches!(
+            error,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                if unresolved.as_str() == "Thing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_for_action_omitted_reference_requires_baseline_candidate() {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let current = BTreeSet::from([identity("domain", &["current"], "Thing")]);
+
+        let error = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("Thing"),
+            &crate_name,
+            ItemAction::Reference,
+            &BTreeSet::new(),
+            &current,
+            CatalogueItemNamespace::Type,
+        )
+        .expect_err("reference must fail closed without a baseline candidate");
+
+        assert!(matches!(
+            error,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                if unresolved.as_str() == "Thing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_for_action_qualified_near_match_fails_closed() {
+        let crate_name = CrateName::new("domain").expect("valid crate");
+        let baseline = BTreeSet::from([identity("domain", &["alpha"], "Thing")]);
+
+        let error = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("domain::beta::Thing"),
+            &crate_name,
+            ItemAction::Reference,
+            &baseline,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .expect_err("a qualified near-match must not fall back to a suffix match");
+
+        assert!(matches!(
+            error,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                if unresolved.as_str() == "domain::beta::Thing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_namespace_keeps_same_named_type_and_trait_separate() {
+        let type_path = identity("domain", &["types"], "Shared");
+        let trait_path = trait_identity("domain", &["traits"], "Shared");
+        let universe = BTreeSet::from([type_path.clone(), trait_path.clone()]);
+        let crate_name = CrateName::new("domain").expect("valid crate");
+
+        let resolved_type = resolve_catalogue_identity_in_namespace(
+            &reference("Shared"),
+            &crate_name,
+            &universe,
+            Some(CatalogueItemNamespace::Type),
+        )
+        .expect("type namespace resolves independently");
+        let resolved_trait = resolve_catalogue_identity_in_namespace(
+            &reference("Shared"),
+            &crate_name,
+            &universe,
+            Some(CatalogueItemNamespace::Trait),
+        )
+        .expect("trait namespace resolves independently");
+        assert_eq!(resolved_type, type_path);
+        assert_eq!(resolved_trait, trait_path);
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_in_namespace_resolves_combined_rustdoc_and_catalogue_add_universe()
+     {
+        let catalogue_crate = CrateName::new("domain").expect("valid crate");
+        let rustdoc_identity = identity("domain", &["rustdoc"], "Existing");
+        let catalogue_add_identity = identity("domain", &["generated"], "Added");
+        let combined_universe =
+            BTreeSet::from([rustdoc_identity.clone(), catalogue_add_identity.clone()]);
+
+        let resolved = resolve_catalogue_identity_in_namespace(
+            &reference("Added"),
+            &catalogue_crate,
+            &combined_universe,
+            Some(CatalogueItemNamespace::Type),
+        )
+        .expect("a catalogue Add identity resolves from the combined universe");
+
+        assert_eq!(resolved, catalogue_add_identity);
+        assert_eq!(resolved.namespace(), CatalogueItemNamespace::Type);
+        assert_ne!(resolved, rustdoc_identity);
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_in_namespace_absent_combined_universe_fails_closed() {
+        let catalogue_crate = CrateName::new("domain").expect("valid crate");
+        let combined_universe = BTreeSet::from([
+            identity("domain", &["rustdoc"], "Existing"),
+            identity("domain", &["generated"], "Added"),
+        ]);
+
+        let error = resolve_catalogue_identity_in_namespace(
+            &reference("Missing"),
+            &catalogue_crate,
+            &combined_universe,
+            Some(CatalogueItemNamespace::Type),
+        )
+        .expect_err("a reference absent from rustdoc and catalogue must fail closed");
+
+        assert!(matches!(
+            error,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                if unresolved.as_str() == "Missing"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_declared_helper_covers_catalogue_universe_and_fail_closed_branches()
+     {
+        let catalogue_crate = CrateName::new("domain").expect("valid crate");
+        let first = identity("domain", &["generated"], "First");
+        let second = identity("domain", &["generated"], "Second");
+        let universe = BTreeSet::from([second.clone(), first.clone()]);
+
+        // The declared three-parameter helper resolves catalogue-derived
+        // identities from one caller-owned universe, independently of the
+        // order in which the declarations were collected.
+        assert_eq!(
+            resolve_catalogue_identity(&reference("First"), &catalogue_crate, &universe)
+                .expect("first catalogue declaration resolves"),
+            first
+        );
+        assert_eq!(
+            resolve_catalogue_identity(
+                &reference("domain::generated::Second"),
+                &catalogue_crate,
+                &universe
+            )
+            .expect("qualified second catalogue declaration resolves"),
+            second
+        );
+        let near_match = resolve_catalogue_identity(
+            &reference("domain::other::Second"),
+            &catalogue_crate,
+            &universe,
+        )
+        .expect_err("a qualified near-match must not fall back by suffix");
+        assert!(matches!(near_match, CatalogueIdentityResolutionError::UnresolvedIdentifier(_)));
+
+        // The route adapters hand the same combined universe to this
+        // declared helper. Baseline, current, and catalogue-derived entries
+        // remain independently addressable once combined by the caller.
+        let baseline_identity = identity("domain", &["baseline"], "Existing");
+        let current_identity = identity("domain", &["current"], "Current");
+        let catalogue_identity = identity("domain", &["generated"], "Added");
+        let combined_universe = BTreeSet::from([
+            baseline_identity.clone(),
+            current_identity.clone(),
+            catalogue_identity.clone(),
+        ]);
+        for (spelling, expected) in [
+            ("Existing", baseline_identity),
+            ("Current", current_identity),
+            ("Added", catalogue_identity),
+        ] {
+            assert_eq!(
+                resolve_catalogue_identity(
+                    &reference(spelling),
+                    &catalogue_crate,
+                    &combined_universe
+                )
+                .expect("combined route universe resolves through one helper"),
+                expected
+            );
+        }
+
+        let absent = resolve_catalogue_identity(&reference("Missing"), &catalogue_crate, &universe)
+            .expect_err("a reference absent from rustdoc and catalogue must fail closed");
+        assert!(matches!(absent, CatalogueIdentityResolutionError::UnresolvedIdentifier(_)));
+
+        // The unscoped helper does not collapse same-named Rust namespaces;
+        // the action-aware namespace form can then select the declared type
+        // identity without being confused by the same-named trait.
+        let shared_type = identity("domain", &["types"], "Shared");
+        let shared_trait = trait_identity("domain", &["traits"], "Shared");
+        let shared_universe = BTreeSet::from([shared_type.clone(), shared_trait.clone()]);
+        let ambiguous =
+            resolve_catalogue_identity(&reference("Shared"), &catalogue_crate, &shared_universe)
+                .expect_err("same-named type and trait must not silently collapse");
+        assert!(matches!(
+            ambiguous,
+            CatalogueIdentityResolutionError::AmbiguousIdentifier(_, candidates)
+                if candidates.as_slice().contains(&shared_type)
+                    && candidates.as_slice().contains(&shared_trait)
+        ));
+        let namespace_selected = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("Shared"),
+            &catalogue_crate,
+            ItemAction::Modify,
+            &shared_universe,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .expect("modify resolves the sole baseline candidate in its namespace");
+        assert_eq!(namespace_selected, shared_type);
+
+        // D3's Add and Modify branches are explicit: an add may resolve to a
+        // sole current candidate, while modify must reject zero and multiple
+        // baseline candidates instead of guessing.
+        let add_resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("Second"),
+            &catalogue_crate,
+            ItemAction::Add,
+            &BTreeSet::new(),
+            &BTreeSet::from([second.clone()]),
+            CatalogueItemNamespace::Type,
+        )
+        .expect("add-to-add reference resolves through the current universe");
+        assert_eq!(add_resolved, second);
+
+        let modify_without_baseline = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("First"),
+            &catalogue_crate,
+            ItemAction::Modify,
+            &BTreeSet::new(),
+            &universe,
+            CatalogueItemNamespace::Type,
+        )
+        .expect_err("modify without a baseline candidate must fail closed");
+        assert!(matches!(
+            modify_without_baseline,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(_)
+        ));
+
+        let multiple_baseline = BTreeSet::from([
+            identity("domain", &["alpha"], "First"),
+            identity("domain", &["beta"], "First"),
+        ]);
+        let modify_with_multiple_baseline = resolve_catalogue_identity_for_action_in_namespace(
+            &reference("First"),
+            &catalogue_crate,
+            ItemAction::Modify,
+            &multiple_baseline,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .expect_err("modify with multiple baseline candidates must fail closed");
+        assert!(matches!(
+            modify_with_multiple_baseline,
+            CatalogueIdentityResolutionError::AmbiguousIdentifier(_, _)
         ));
     }
 }

@@ -102,6 +102,18 @@ impl RustdocTargetResolution {
     pub fn target_kind(&self) -> RustdocTargetKind {
         self.target_kind
     }
+
+    /// Canonicalizes a rustdoc path under the package root used by catalogue
+    /// identities. Binary targets emit their target name as the path root;
+    /// the translation is delegated to the shared identity canonicalizer.
+    #[must_use]
+    pub(crate) fn canonicalize_rustdoc_path(&self, path: &[String]) -> Vec<String> {
+        crate::tddd::canonical_type_identity::canonicalize_rustdoc_root_path(
+            path,
+            &self.package_name,
+            Some(&self.rustdoc_root_name),
+        )
+    }
 }
 
 /// Failure while resolving a package's Cargo target and rustdoc root.

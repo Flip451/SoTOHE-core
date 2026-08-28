@@ -362,7 +362,7 @@ mod tests {
                 Vec::new(),
                 Vec::new(),
                 Vec::new(),
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 Vec::new(),
                 Vec::new(),

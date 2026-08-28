@@ -21,7 +21,6 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::semantic_verify::ModelTier;
 use domain::tddd::test_obligation::binding::{TestBindingRecord, TestBindingsDocument};
 use domain::tddd::test_obligation::drift::{EdgeVerdictRecord, NonEmptyEdgeVerdictRecords};
@@ -44,6 +43,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 use domain::{SpecDocumentLoaderPort, TrackId};
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 
 use super::bound_tests::ResolvedBoundTestsResolver;
@@ -289,7 +289,7 @@ pub struct EvaluateTestObligationsInteractor {
     waiver_verifier_fingerprint: VerifierPromptFingerprint,
     config: TestObligationEvaluateConfig,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
     hasher: Arc<dyn ContentHasherPort + Send + Sync>,
     resolved_bound_tests_resolver: Arc<ResolvedBoundTestsResolver>,
 }
@@ -326,7 +326,7 @@ impl EvaluateTestObligationsInteractor {
         waiver_verifier_fingerprint: VerifierPromptFingerprint,
         config: TestObligationEvaluateConfig,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         hasher: Arc<dyn ContentHasherPort + Send + Sync>,
     ) -> Self {
         // Keep every fulfillment-cache hash on the one injected strategy:
@@ -357,8 +357,11 @@ impl EvaluateTestObligationsInteractor {
     ) -> Result<Vec<LoadedCatalogueDocument>, ObligationEvaluateError> {
         let mut catalogues = Vec::with_capacity(cmd.catalogue_paths.len());
         for path in &cmd.catalogue_paths {
-            let doc =
-                self.catalogue_reader.load(path).map_err(ObligationEvaluateError::CatalogueLoad)?;
+            let doc = self
+                .catalogue_reader
+                .load(path)
+                .map_err(ObligationEvaluateError::CatalogueLoad)?
+                .into_document();
             catalogues.push(LoadedCatalogueDocument::new(path, doc));
         }
         Ok(catalogues)

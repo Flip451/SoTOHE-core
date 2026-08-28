@@ -78,7 +78,7 @@ fn test_extract_type_ref_path_context_classifies_lifetime_and_const_parameters()
         occurrences.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap(),))
     );
     assert!(!occurrences.iter().any(|occurrence| {
-        matches!(occurrence, ExtractedTypeRefPath::Path(path) if path.as_str() == "T" || path.as_str() == "N")
+        matches!(occurrence, ExtractedTypeRefPath::Path { type_ref: path, .. } if path.as_str() == "T" || path.as_str() == "N")
     }));
 }
 
@@ -2382,7 +2382,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
     use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
-    use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, ItemKind, ItemSummary, Target};
+    use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, Target};
 
     let mut doc = CatalogueDocument::new(
         2,
@@ -2400,7 +2400,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -2416,15 +2416,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     );
     doc.push_trait_impl(trait_impl);
 
-    let mut paths = std::collections::HashMap::new();
-    paths.insert(
-        rustdoc_types::Id(1),
-        ItemSummary {
-            crate_id: 0,
-            path: vec!["domain".to_owned(), "MyTrait".to_owned()],
-            kind: ItemKind::Trait,
-        },
-    );
+    let paths = std::collections::HashMap::new();
     let authoritative = Crate {
         root: rustdoc_types::Id(0),
         crate_version: None,

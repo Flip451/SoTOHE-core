@@ -12,9 +12,7 @@ use std::sync::Arc;
 use domain::SymlinkGuardPort;
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::{
-    CatalogueDocumentLoaderPort, CrateName, RustdocCratePort, TdddLayerBindingsPort,
-};
+use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, TdddLayerBindingsPort};
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
 
 use super::helpers::{map_symlink_guard_error, validate_binding_filename};
@@ -22,6 +20,7 @@ use super::service::{
     CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService, diagnostic,
 };
 use super::validate_track_id;
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 // ---------------------------------------------------------------------------
@@ -33,7 +32,7 @@ use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 /// Orchestrates per-layer A/B/C TypeGraph fetch, signal evaluator invocation,
 /// and region-by-region result formatting. All I/O is performed via injected
 /// ports (no direct infrastructure calls):
-/// - `CatalogueDocumentLoaderPort` (A-side catalogue file load)
+/// - `AttestedCatalogueDocumentLoaderPort` (A-side catalogue file load)
 /// - `CatalogueToExtendedCratePort` (A-side `CatalogueDocument` → `ExtendedCrate`)
 /// - `SignalEvaluatorPort` (Phase 1 + Phase 2 evaluation)
 /// - `RustdocCratePort` (B-side baseline load via `load_from_path`;
@@ -48,7 +47,7 @@ use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 ///
 /// [source: ADR 2026-05-11-2330 D2]
 pub struct CatalogueImplSignalsInteractor {
-    catalogue_loader: Arc<dyn CatalogueDocumentLoaderPort>,
+    catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     ext_crate_codec: Arc<dyn CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc_crate_port: Arc<dyn RustdocCratePort>,
@@ -61,7 +60,7 @@ impl CatalogueImplSignalsInteractor {
     /// Creates a new interactor with the given injected ports.
     #[must_use]
     pub fn new(
-        catalogue_loader: Arc<dyn CatalogueDocumentLoaderPort>,
+        catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
         ext_crate_codec: Arc<dyn CatalogueToExtendedCratePort>,
         evaluator: Arc<dyn SignalEvaluatorPort>,
         rustdoc_crate_port: Arc<dyn RustdocCratePort>,
@@ -86,7 +85,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
     ///
     /// For each TDDD-enabled layer (or the single layer specified by `layer`):
     ///
-    /// 1. Load `<layer>-types.json` via `CatalogueDocumentLoaderPort`.
+    /// 1. Load `<layer>-types.json` via `AttestedCatalogueDocumentLoaderPort`.
     /// 2. Convert to `ExtendedCrate` (A) via `CatalogueToExtendedCratePort`.
     /// 3. Load `<layer>-types-baseline.json` (B) via `RustdocCratePort::load_from_path`.
     /// 4. Capture current TypeGraph (C) via `RustdocCratePort::capture_current`.
@@ -210,12 +209,16 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             self.symlink_guard
                 .reject_symlinks_below(&catalogue_path, &items_dir)
                 .map_err(map_symlink_guard_error)?;
-            let doc = self.catalogue_loader.load(&catalogue_path).map_err(|e| {
-                CatalogueImplSignalsError::CatalogueLoad(
-                    typed_layer_id.clone(),
-                    diagnostic(e.to_string()),
-                )
-            })?;
+            let doc = self
+                .catalogue_loader
+                .load(&catalogue_path)
+                .map_err(|e| {
+                    CatalogueImplSignalsError::CatalogueLoad(
+                        typed_layer_id.clone(),
+                        diagnostic(e.to_string()),
+                    )
+                })?
+                .into_document();
 
             // --- Step 2: Convert CatalogueDocument → ExtendedCrate (A) ---
             // --- Step 3: Load baseline (TypeGraph B) ---

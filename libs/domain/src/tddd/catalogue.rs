@@ -21,6 +21,7 @@
 
 use crate::ConfidenceSignal;
 use crate::spec::SpecValidationError;
+use crate::tddd::signal_evaluator::ThreeWaySignalIdentity;
 // Re-exports that preserve the `catalogue::MethodDeclaration` / `catalogue::ParamDeclaration`
 // module paths after V1 types were deleted and replaced by V2 (catalogue_v2::methods).
 // All call sites have been migrated to the V2 newtype API (MethodName / ParamName / TypeRef /
@@ -238,7 +239,8 @@ impl MemberDeclaration {
 /// live scanned code). Element type of [`crate::tddd::type_signals_doc::TypeSignalsDocument`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSignal {
-    type_name: String,
+    /// Identity of the catalogue item or report label represented by this row.
+    identity: ThreeWaySignalIdentity,
     /// Canonical kind tag (e.g. `"typestate"`, `"enum"`, `"value_object"`, …).
     kind_tag: String,
     signal: ConfidenceSignal,
@@ -256,29 +258,30 @@ impl TypeSignal {
     /// Creates a new `TypeSignal`.
     #[must_use]
     pub fn new(
-        type_name: impl Into<String>,
-        kind_tag: impl Into<String>,
+        identity: ThreeWaySignalIdentity,
+        kind_tag: String,
         signal: ConfidenceSignal,
         found_type: bool,
         found_items: Vec<String>,
         missing_items: Vec<String>,
         extra_items: Vec<String>,
     ) -> Self {
-        Self {
-            type_name: type_name.into(),
-            kind_tag: kind_tag.into(),
-            signal,
-            found_type,
-            found_items,
-            missing_items,
-            extra_items,
-        }
+        Self { identity, kind_tag, signal, found_type, found_items, missing_items, extra_items }
     }
 
     /// Returns the type name.
     #[must_use]
     pub fn type_name(&self) -> &str {
-        &self.type_name
+        match &self.identity {
+            ThreeWaySignalIdentity::CatalogueItem { item_name, .. } => item_name.as_str(),
+            ThreeWaySignalIdentity::Label { label } => label.as_str(),
+        }
+    }
+
+    /// Returns the shared catalogue-item or report-label identity.
+    #[must_use]
+    pub fn identity(&self) -> &ThreeWaySignalIdentity {
+        &self.identity
     }
 
     /// Returns the canonical kind tag string.
@@ -355,6 +358,8 @@ impl TypeSignal {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_linter::FreeText;
+    use crate::tddd::catalogue_v2::CatalogueItemNamespace;
 
     // --- EnumVariantDeclaration ---
 
@@ -489,8 +494,11 @@ mod tests {
     #[test]
     fn test_type_signal_accessors() {
         let signal = TypeSignal::new(
-            "TrackStatus",
-            "enum",
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("TrackStatus"),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "enum".to_owned(),
             ConfidenceSignal::Yellow,
             true,
             vec!["Active".into()],
@@ -498,6 +506,13 @@ mod tests {
             vec!["Legacy".into()],
         );
         assert_eq!(signal.type_name(), "TrackStatus");
+        assert_eq!(
+            signal.identity(),
+            &ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("TrackStatus"),
+                namespace: CatalogueItemNamespace::Type,
+            }
+        );
         assert_eq!(signal.kind_tag(), "enum");
         assert_eq!(signal.signal(), ConfidenceSignal::Yellow);
         assert!(signal.found_type());
@@ -507,10 +522,45 @@ mod tests {
     }
 
     #[test]
+    fn test_type_signal_identity_keeps_same_named_catalogue_rows_distinct() {
+        let type_signal = TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("Shared"),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "struct".to_owned(),
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        );
+        let trait_signal = TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("Shared"),
+                namespace: CatalogueItemNamespace::Trait,
+            },
+            "secondary_port".to_owned(),
+            ConfidenceSignal::Yellow,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        );
+
+        assert_eq!(type_signal.type_name(), "Shared");
+        assert_eq!(trait_signal.type_name(), "Shared");
+        assert_ne!(type_signal.identity(), trait_signal.identity());
+        assert_eq!(type_signal.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_ne!(type_signal.signal(), trait_signal.signal());
+    }
+
+    #[test]
     fn test_type_signal_is_unknown_kind_returns_true_for_unknown_tag() {
         let signal = TypeSignal::new(
-            "_synthetic",
-            "unknown",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("_synthetic") },
+            "unknown".to_owned(),
             ConfidenceSignal::Blue,
             false,
             vec![],
@@ -523,8 +573,15 @@ mod tests {
     #[test]
     fn test_type_signal_is_unknown_kind_returns_false_for_known_tags() {
         for tag in ["enum", "struct", "typestate", "value_object", ""] {
-            let signal =
-                TypeSignal::new("T", tag, ConfidenceSignal::Blue, false, vec![], vec![], vec![]);
+            let signal = TypeSignal::new(
+                ThreeWaySignalIdentity::Label { label: FreeText::new("T") },
+                tag.to_owned(),
+                ConfidenceSignal::Blue,
+                false,
+                vec![],
+                vec![],
+                vec![],
+            );
             assert!(!signal.is_unknown_kind(), "expected false for kind_tag={tag:?}");
         }
     }

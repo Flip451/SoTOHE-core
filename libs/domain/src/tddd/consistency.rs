@@ -131,6 +131,8 @@ mod tests {
     use crate::ConfidenceSignal;
     use crate::Timestamp;
     use crate::tddd::catalogue::TypeSignal;
+    use crate::tddd::catalogue_linter::FreeText;
+    use crate::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use crate::tddd::type_signals_doc::{
         BaselineHash, CatalogueDeclarationHash, Sha256Digest, TypeSignalsCacheKey,
         TypeSignalsDocument,
@@ -141,7 +143,15 @@ mod tests {
     }
 
     fn make_signal(name: &str, kind: &str, signal: ConfidenceSignal) -> TypeSignal {
-        TypeSignal::new(name, kind, signal, true, Vec::new(), Vec::new(), Vec::new())
+        TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new(name) },
+            kind.to_owned(),
+            signal,
+            true,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )
     }
 
     fn make_doc(signals: Vec<TypeSignal>) -> TypeSignalsDocument {
@@ -240,8 +250,8 @@ mod tests {
         // A TypeSignalsDocument that contains a Red entry for "UndeclaredImpl"
         // (the CMinusSUnionD region: present in C but absent from S ∪ D).
         let doc = make_doc(vec![TypeSignal::new(
-            "UndeclaredImpl",
-            "undeclared_type",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("UndeclaredImpl") },
+            "undeclared_type".to_owned(),
             ConfidenceSignal::Red,
             /* found_type = */ true,
             Vec::new(),
@@ -268,8 +278,8 @@ mod tests {
         // A Red signal with an empty (zero-entry) catalogue scenario:
         // the evaluator still reports it (reverse-direction drift).
         let doc = make_doc(vec![TypeSignal::new(
-            "UndeclaredType",
-            "undeclared_type",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("UndeclaredType") },
+            "undeclared_type".to_owned(),
             ConfidenceSignal::Red,
             true,
             Vec::new(),
@@ -288,8 +298,8 @@ mod tests {
         // In v3 the evaluator only emits Yellow for declared entries, but the gate
         // does not need to verify that invariant — it just applies the Yellow rule.
         let doc = make_doc(vec![TypeSignal::new(
-            "SomeType",
-            "value_object",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("SomeType") },
+            "value_object".to_owned(),
             ConfidenceSignal::Yellow,
             false,
             Vec::new(),

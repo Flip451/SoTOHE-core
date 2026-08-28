@@ -50,7 +50,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use domain::tddd::ExtendedCrate;
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::catalogue_v2::{CatalogueItemNamespace, CrateName};
 use domain::tddd::{Phase1Error, SignalEvaluatorPort, ThreeWayEvaluationReport};
 use rustdoc_types::{Crate, Id, Item, ItemEnum, ItemKind};
 
@@ -151,6 +151,75 @@ impl SignalEvaluatorPort for SignalEvaluatorV2 {
 // Identity helpers (shared across phase1 and phase2 submodules)
 // ---------------------------------------------------------------------------
 
+/// Namespace-aware identity of a local type or trait.
+///
+/// The `Crate::paths` string alone is not an identity: the codec synthesizes
+/// an unplaced `Add` type and an unplaced `Add` trait that share one catalogue
+/// key as two distinct `FullyQualifiedItemPath` values whose rustdoc summaries
+/// both render as `crate::Name`. The namespace therefore travels with the path
+/// so that Phase 1 and Phase 2 compare types with types and traits with traits.
+/// Ordering is path-first so reports stay path-sorted.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(super) struct TypeTraitIdentityKey {
+    /// Fully-qualified `Crate::paths` path joined with `::`.
+    pub(super) path: String,
+    /// Namespace derived from the rustdoc item kind.
+    pub(super) namespace: CatalogueItemNamespace,
+}
+
+impl TypeTraitIdentityKey {
+    pub(super) fn new(path: impl Into<String>, namespace: CatalogueItemNamespace) -> Self {
+        Self { path: path.into(), namespace }
+    }
+
+    pub(super) fn short_name(&self) -> &str {
+        self.path.rsplit("::").next().unwrap_or(&self.path)
+    }
+}
+
+impl std::fmt::Display for TypeTraitIdentityKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.path)
+    }
+}
+
+/// `TypeTraitIdentityKey → Id` map over the local type/trait items of one crate.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(super) struct TypeTraitIdentityMap(BTreeMap<TypeTraitIdentityKey, Id>);
+
+impl TypeTraitIdentityMap {
+    /// Looks up an identity by path when exactly one namespace carries it.
+    ///
+    /// Intended for callers that hold a bare path (tests and diagnostics); when
+    /// both namespaces share the path the lookup is ambiguous and returns `None`.
+    #[cfg(test)]
+    pub(super) fn get_by_path(&self, path: &str) -> Option<&Id> {
+        let mut matches = self.0.iter().filter(|(key, _)| key.path == path).map(|(_, id)| id);
+        let first = matches.next()?;
+        if matches.next().is_some() { None } else { Some(first) }
+    }
+
+    #[cfg(test)]
+    pub(super) fn contains_path(&self, path: &str) -> bool {
+        self.0.keys().any(|key| key.path == path)
+    }
+}
+
+impl<'a> IntoIterator for &'a TypeTraitIdentityMap {
+    type Item = (&'a TypeTraitIdentityKey, &'a Id);
+    type IntoIter = std::collections::btree_map::Iter<'a, TypeTraitIdentityKey, Id>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
+    }
+}
+
+impl std::ops::Deref for TypeTraitIdentityMap {
+    type Target = BTreeMap<TypeTraitIdentityKey, Id>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 /// Build a `(fully_qualified_path, Id)` map for types and traits in a
 /// `rustdoc_types::Crate`.
 ///
@@ -163,8 +232,11 @@ impl SignalEvaluatorPort for SignalEvaluatorV2 {
 /// identity.
 ///
 /// A valid rustdoc crate cannot expose two different local items at the same
-/// fully-qualified path. The `(path, id)` ordering still makes malformed or
-/// synthetic fixtures deterministic without collapsing distinct module paths.
+/// fully-qualified path within one namespace. Codec-synthesized graphs may hold
+/// an unplaced type and an unplaced trait at the same rendered path; those are
+/// distinct identities and are both retained. The `(path, id)` ordering still
+/// makes malformed or synthetic fixtures deterministic without collapsing
+/// distinct module paths.
 ///
 /// # Errors
 ///
@@ -174,11 +246,11 @@ impl SignalEvaluatorPort for SignalEvaluatorV2 {
 /// or Phase 2.
 pub(super) fn build_type_trait_identity_map(
     krate: &Crate,
-) -> Result<BTreeMap<String, Id>, Phase1Error> {
+) -> Result<TypeTraitIdentityMap, Phase1Error> {
     // Collect candidates from `Crate::paths`, which is the authoritative source
     // for local type/trait identity. `Item::name` is intentionally not used as
     // the key because it omits the module path and is therefore ambiguous.
-    let mut candidates: Vec<(String, Id)> = Vec::new();
+    let mut candidates: Vec<(TypeTraitIdentityKey, Id)> = Vec::new();
     for (id, item) in &krate.index {
         // Only include local crate items (crate_id == 0 means "this crate").
         if item.crate_id != 0 {
@@ -192,25 +264,40 @@ pub(super) fn build_type_trait_identity_map(
                     id.0
                 ))
             })?;
-            let identity_key = path_summary.path.join("::");
-            if identity_key.is_empty() {
+            let path = path_summary.path.join("::");
+            if path.is_empty() {
                 return Err(Phase1Error::rustdoc_root_resolution(format!(
                     "local type/trait `{item_name}` (id {}) has an empty authoritative Crate::paths path",
                     id.0
                 )));
             }
-            candidates.push((identity_key, *id));
+            let namespace = match item_kind_from_inner(&item.inner) {
+                ItemKind::Trait | ItemKind::TraitAlias => CatalogueItemNamespace::Trait,
+                _ => CatalogueItemNamespace::Type,
+            };
+            candidates.push((TypeTraitIdentityKey::new(path, namespace), *id));
         }
     }
     // Keep duplicate-path handling deterministic for synthetic inputs. Distinct
     // full paths are retained independently, including same-name items in
-    // different modules.
+    // different modules and a type/trait pair sharing one rendered path. Two
+    // declarations of the same namespace at one path are invalid and fail closed
+    // so no type/trait declaration can be silently discarded.
     candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.0.cmp(&b.1.0)));
-    let mut map: BTreeMap<String, Id> = BTreeMap::new();
-    for (identity_key, id) in candidates {
-        map.entry(identity_key).or_insert(id);
+    let mut map: BTreeMap<TypeTraitIdentityKey, Id> = BTreeMap::new();
+    for (key, id) in candidates {
+        if let Some(existing_id) = map.get(&key) {
+            if *existing_id != id {
+                return Err(Phase1Error::rustdoc_root_resolution(format!(
+                    "identity `{key}` has multiple {:?} declarations (ids {} and {}); duplicate fully-qualified paths are invalid",
+                    key.namespace, existing_id.0, id.0,
+                )));
+            }
+            continue;
+        }
+        map.insert(key, id);
     }
-    Ok(map)
+    Ok(TypeTraitIdentityMap(map))
 }
 
 /// Build a `(function_path_string, Id)` map for free function items in a `rustdoc_types::Crate`.
@@ -267,29 +354,17 @@ pub(super) fn build_function_identity_map(
             continue;
         }
         let Some(summary) = krate.paths.get(id) else { continue };
-        let identity_key = function_identity_key(&summary.path, rustdoc_root);
+        let identity_key =
+            crate::tddd::canonical_type_identity::canonicalize_function_identity_path(
+                &summary.path,
+                rustdoc_root.map(|translation| translation.package_name()),
+                rustdoc_root.map(|translation| translation.rustdoc_root_name()),
+            );
         if !identity_key.is_empty() {
             map.insert(identity_key, *id);
         }
     }
     map
-}
-
-fn function_identity_key(
-    path: &[String],
-    rustdoc_root: Option<&RustdocTargetResolution>,
-) -> String {
-    let Some((root, rest)) = path.split_first() else {
-        return String::new();
-    };
-    let root = root.as_str();
-    let mut segments = Vec::with_capacity(path.len());
-    let canonical_root = rustdoc_root
-        .filter(|translation| root == translation.rustdoc_root_name().as_str())
-        .map_or(root, |translation| translation.package_name().as_str());
-    segments.push(canonical_root.to_owned());
-    segments.extend(rest.iter().cloned());
-    segments.join("::")
 }
 
 /// Returns `true` if the item is a type (Struct/Enum/TypeAlias) or a Trait.
@@ -359,7 +434,7 @@ impl EvaluationEngine {
             resolve_function_rustdoc_root(&self.a, &self.b, &self.c, &self.workspace_root)?;
         let (s, d) =
             phase1_build_s_and_d_with_rustdoc_root(self.a, &self.b, rustdoc_root.as_ref())?;
-        let report = phase2_evaluate(&s, &d, &self.c, rustdoc_root.as_ref())?;
+        let report = phase2_evaluate(&s, &d, self.c, rustdoc_root.as_ref())?;
         Ok(report)
     }
 }

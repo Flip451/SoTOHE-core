@@ -6,15 +6,15 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use domain::SpecDocumentLoaderPort;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TypeEntry, TypeKindV2,
+    AttestedCatalogueDocument, CatalogueDocument, CrateName, ModulePath, StructKind, StructShape,
+    TypeEntry, TypeKindV2,
 };
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::binding::{
@@ -206,11 +206,8 @@ impl SpecDocumentLoaderPort for UnusedSpecReader {
 }
 
 struct UnusedCatalogueReader;
-impl CatalogueDocumentLoaderPort for UnusedCatalogueReader {
-    fn load(
-        &self,
-        path: &Path,
-    ) -> Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for UnusedCatalogueReader {
+    fn load(&self, path: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
         Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
@@ -260,9 +257,15 @@ impl SpecDocumentLoaderPort for StatusSpecReader {
 }
 
 struct StatusCatalogueReader(CatalogueDocument);
-impl CatalogueDocumentLoaderPort for StatusCatalogueReader {
-    fn load(&self, _path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.0.clone())
+impl AttestedCatalogueDocumentLoaderPort for StatusCatalogueReader {
+    fn load(
+        &self,
+        _path: &Path,
+    ) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+        Ok(AttestedCatalogueDocument::attest(b"T014 test catalogue", |_| {
+            Ok::<_, std::convert::Infallible>(self.0.clone())
+        })
+        .unwrap())
     }
 }
 
@@ -442,7 +445,7 @@ fn status_catalogue() -> CatalogueDocument {
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1174,7 +1177,7 @@ fn test_results_does_not_report_unbound_anchorless_obligation_as_missing() {
             Vec::new(),
             Vec::new(),
             Vec::new(),
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             Vec::new(),
             Vec::new(),

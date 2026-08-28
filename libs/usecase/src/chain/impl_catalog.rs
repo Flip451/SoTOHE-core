@@ -196,9 +196,11 @@ mod tests {
 
     use crate::chain::test_support::{assert_persisted_chain_bounds, call_sotchain_check};
     use crate::chain::traits::LoadablePersistedChain;
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use domain::{
-        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, PersistedSoTChainGate, Strictness,
-        Timestamp, TypeSignal, TypeSignalsDocument, verify::Severity,
+        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, FreeText, PersistedSoTChainGate,
+        Strictness, Timestamp, TypeSignal, TypeSignalsDocument, verify::Severity,
     };
 
     use super::{ImplCatalogChain, ImplCatalogInput, ImplCatalogStaleError};
@@ -244,7 +246,18 @@ mod tests {
     }
 
     fn make_type_signal(name: &str, sig: ConfidenceSignal) -> TypeSignal {
-        TypeSignal::new(name, "value_object", sig, true, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new(name),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "value_object".to_owned(),
+            sig,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     fn make_doc(declaration_hash: &str, signals: Vec<TypeSignal>) -> TypeSignalsDocument {

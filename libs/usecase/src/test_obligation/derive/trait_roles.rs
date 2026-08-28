@@ -2,6 +2,7 @@
 
 use std::path::PathBuf;
 
+use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use domain::tddd::catalogue_v2::roles::ContractRole;
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, TraitEntry, TraitImplDeclV2, TraitRefScope, TypeRef,
@@ -9,7 +10,8 @@ use domain::tddd::catalogue_v2::{
 use domain::tddd::test_obligation::ids::{DiagnosticMessage, TestObligationAnchorId};
 
 use super::identity::CatalogueDeclarationIdentity;
-use super::{anchors_from_spec_refs, declaration_identity, diag, resolve_catalogue_reference};
+use super::identity::declaration_identity_in_namespace;
+use super::{anchors_from_spec_refs, diag, resolve_catalogue_reference};
 
 /// Trait metadata needed to derive obligations for matching `trait_impl`s.
 pub(super) struct TraitRoleEntry {
@@ -28,7 +30,12 @@ pub(super) fn index_trait_roles(
     let mut index = Vec::new();
     for (_, catalogue) in catalogues {
         for (name, entry) in catalogue.traits() {
-            let identity = declaration_identity(catalogue.crate_name(), name, entry.module_path())?;
+            let identity = declaration_identity_in_namespace(
+                catalogue.crate_name(),
+                name,
+                entry.module_path(),
+                CatalogueItemNamespace::Trait,
+            )?;
             let anchors = anchors_from_spec_refs(entry.spec_refs())?;
             let declaration_text = format!("{entry:?}");
             if let Some(existing) =

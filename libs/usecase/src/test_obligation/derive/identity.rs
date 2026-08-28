@@ -1,20 +1,25 @@
 //! Closed catalogue spelling matching shared by obligation derivation consumers.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use domain::tddd::catalogue_v2::entries::TypeEntry;
-use domain::tddd::catalogue_v2::identifiers::{CrateName, FullyQualifiedItemPath, TypeRef};
+use domain::tddd::catalogue_v2::identifiers::{
+    CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, ModulePath, TypeRef,
+};
+use domain::tddd::catalogue_v2::identity_resolution::{
+    CatalogueIdentityResolutionError, resolve_catalogue_identity_in_namespace,
+};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CatalogueEntryKey, ModulePath, TraitEntry, TraitImplDeclV2, TraitRefScope,
+    CatalogueDocument, CatalogueEntryKey, TraitEntry, TraitImplDeclV2, TraitRefScope,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 
-use super::{catalogue_key, diag};
+use super::diag;
 
 /// The finite declaration-owned spelling set used by derive-time identity matching.
 ///
 /// `stored_key` is retained as the downstream catalogue identity. The other two
-/// spellings are constructed from the declaration's module and crate context.
+/// spellings are derived from the domain-resolved identity's explicit placement.
 /// Raw references are checked first; a domain-owned generic-free outer path may
 /// be checked second without parsing or rewriting the reference here.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -43,25 +48,22 @@ impl CatalogueDeclarationIdentity {
 }
 
 /// Builds the finite spelling set for one catalogue declaration.
-pub(crate) fn declaration_identity(
+pub(crate) fn declaration_identity_in_namespace(
     crate_name: &CrateName,
     stored_key: &CatalogueEntryKey,
-    module_path: &ModulePath,
+    module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
 ) -> Result<CatalogueDeclarationIdentity, DiagnosticMessage> {
-    let key_identity = declaration_key_identity(crate_name, stored_key, module_path)?;
-    let name = key_identity.name().as_str();
-    let local_spelling = join_module_and_name(module_path, name);
-    let fully_qualified_path = FullyQualifiedItemPath::new(
-        crate_name.clone(),
-        module_path.clone(),
-        key_identity.name().clone(),
-    );
-    let crate_spelling = format!("{}::{local_spelling}", crate_name.as_str());
-    let accepted_spellings =
-        [stored_key.as_str(), local_spelling.as_str(), crate_spelling.as_str()]
-            .into_iter()
-            .map(str::to_owned)
-            .collect();
+    let key_identity = declaration_key_identity(crate_name, stored_key, module_path, namespace)?;
+    let name = key_identity.name().as_str().to_owned();
+    let fully_qualified_path = key_identity;
+    let mut accepted_spellings = BTreeSet::from([stored_key.as_str().to_owned()]);
+    if let Some(module_path) = fully_qualified_path.module_path() {
+        accepted_spellings.insert(join_module_and_name(module_path, &name));
+        accepted_spellings.insert(fully_qualified_path.to_string());
+    } else {
+        accepted_spellings.insert(name);
+    }
 
     Ok(CatalogueDeclarationIdentity {
         stored_key: stored_key.clone(),
@@ -103,45 +105,89 @@ pub(crate) fn resolve_named_type_entry<'a>(
 ) -> Result<Option<(&'a CatalogueEntryKey, &'a TypeEntry)>, DiagnosticMessage> {
     let type_ref = TypeRef::new(reference.as_str().to_owned())
         .map_err(|error| diag(&format!("invalid inherent_impl type_name: {error}")))?;
-    let identities = catalogue_type_identities(catalogue)?;
-    let Some(identity) = resolve_catalogue_reference(&type_ref, &identities)? else {
-        return Ok(None);
+    let identities = catalogue_type_identity_map(catalogue)?;
+    let universe = identities.keys().cloned().collect::<BTreeSet<_>>();
+    let identity = match resolve_catalogue_identity_in_namespace(
+        &type_ref,
+        catalogue.crate_name(),
+        &universe,
+        Some(CatalogueItemNamespace::Type),
+    ) {
+        Ok(identity) => identity,
+        Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => return Ok(None),
+        Err(error) => {
+            return Err(diag(&format!(
+                "cannot resolve inherent_impl owner '{}': {error}",
+                reference.as_str()
+            )));
+        }
     };
-    catalogue.types().iter().find(|(key, _)| *key == identity.stored_key()).map(Some).ok_or_else(
-        || {
-            diag(&format!(
-                "catalogue type declaration '{}' disappeared while resolving inherent_impl owner",
-                identity.stored_key().as_str()
-            ))
-        },
-    )
+    let Some(key) = identities.get(&identity) else {
+        return Err(diag(&format!(
+            "catalogue type declaration '{}' disappeared while resolving inherent_impl owner",
+            identity
+        )));
+    };
+    catalogue.types().get_key_value(key).map(Some).ok_or_else(|| {
+        diag(&format!(
+            "catalogue type declaration '{}' disappeared while resolving inherent_impl owner",
+            key.as_str()
+        ))
+    })
 }
 
 /// Resolves a self type to its catalogue-stored key when it is local.
 ///
-/// External or absent self types retain their verbatim source spelling because
-/// trait implementations may legitimately target types outside this catalogue.
-/// Ambiguous local identities remain errors and never fall back to a short key.
+/// External or absent self types are rejected for obligation-carrier derivation:
+/// a carrier must be backed by one catalogue type declaration. Ambiguous local
+/// identities remain errors and never fall back to a short key.
 pub(crate) fn resolve_named_type_key(
     catalogue: &CatalogueDocument,
     reference: &TypeRef,
 ) -> Result<CatalogueEntryKey, DiagnosticMessage> {
-    let identities = catalogue_type_identities(catalogue)?;
-    match resolve_catalogue_reference(reference, &identities)? {
-        Some(identity) => Ok(identity.stored_key().clone()),
-        None => catalogue_key(reference.as_str()),
-    }
+    let identities = catalogue_type_identity_map(catalogue)?;
+    let universe = identities.keys().cloned().collect::<BTreeSet<_>>();
+    let identity = match resolve_catalogue_identity_in_namespace(
+        reference,
+        catalogue.crate_name(),
+        &universe,
+        Some(CatalogueItemNamespace::Type),
+    ) {
+        Ok(identity) => identity,
+        Err(error) => {
+            return Err(diag(&format!(
+                "cannot resolve trait-impl carrier '{}': {error}",
+                reference
+            )));
+        }
+    };
+    identities.get(&identity).cloned().ok_or_else(|| {
+        diag(&format!("catalogue identity '{}' has no owning type declaration", identity))
+    })
 }
 
-/// Builds the type-only declaration universe for one catalogue.
-pub(crate) fn catalogue_type_identities(
+fn catalogue_type_identity_map(
     catalogue: &CatalogueDocument,
-) -> Result<Vec<CatalogueDeclarationIdentity>, DiagnosticMessage> {
-    catalogue
-        .types()
-        .iter()
-        .map(|(key, entry)| declaration_identity(catalogue.crate_name(), key, entry.module_path()))
-        .collect()
+) -> Result<BTreeMap<FullyQualifiedItemPath, CatalogueEntryKey>, DiagnosticMessage> {
+    let mut identities: BTreeMap<FullyQualifiedItemPath, CatalogueEntryKey> = BTreeMap::new();
+    for (key, entry) in catalogue.types() {
+        let identity = declaration_key_identity(
+            catalogue.crate_name(),
+            key,
+            entry.module_path(),
+            CatalogueItemNamespace::Type,
+        )?;
+        if let Some(existing_key) = identities.get(&identity) {
+            return Err(diag(&format!(
+                "conflicting catalogue type declarations '{}' and '{}' resolve to the same identity '{}'",
+                existing_key.as_str(),
+                key.as_str(),
+                identity
+            )));
+        }
+        identities.insert(identity, key.clone());
+    }
+    Ok(identities)
 }
 
 /// Builds the trait-only declaration universe for all supplied catalogues.
@@ -155,7 +201,12 @@ pub(crate) fn catalogues_trait_identities(
     let mut declarations: Vec<(CatalogueDeclarationIdentity, TraitEntry)> = Vec::new();
     for catalogue in catalogues {
         for (key, entry) in catalogue.traits() {
-            let identity = declaration_identity(catalogue.crate_name(), key, entry.module_path())?;
+            let identity = declaration_identity_in_namespace(
+                catalogue.crate_name(),
+                key,
+                entry.module_path(),
+                CatalogueItemNamespace::Trait,
+            )?;
             if let Some((_, existing_entry)) =
                 declarations.iter().find(|(existing, _)| *existing == identity)
             {
@@ -184,7 +235,12 @@ pub(crate) fn trait_declaration_text_for_reference(
     };
     for catalogue in catalogues {
         for (key, entry) in catalogue.traits() {
-            let candidate = declaration_identity(catalogue.crate_name(), key, entry.module_path())?;
+            let candidate = declaration_identity_in_namespace(
+                catalogue.crate_name(),
+                key,
+                entry.module_path(),
+                CatalogueItemNamespace::Trait,
+            )?;
             if candidate == *identity {
                 return Ok(Some(format!("{entry:?}")));
             }
@@ -247,16 +303,24 @@ fn generic_free_reference_key(reference: &TypeRef) -> Option<CatalogueEntryKey> 
 fn declaration_key_identity(
     crate_name: &CrateName,
     stored_key: &CatalogueEntryKey,
-    module_path: &ModulePath,
+    module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
 ) -> Result<FullyQualifiedItemPath, DiagnosticMessage> {
-    FullyQualifiedItemPath::from_catalogue_entry_key(crate_name, stored_key, module_path).map_err(
-        |error| {
-            diag(&format!(
-                "invalid catalogue declaration identity '{}': {error}",
-                stored_key.as_str()
-            ))
-        },
-    )
+    let result = match namespace {
+        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+            crate_name,
+            stored_key,
+            module_path,
+        ),
+        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+            crate_name,
+            stored_key,
+            module_path,
+        ),
+    };
+    result.map_err(|error| {
+        diag(&format!("invalid catalogue declaration identity '{}': {error}", stored_key.as_str()))
+    })
 }
 
 fn join_module_and_name(module_path: &ModulePath, name: &str) -> String {

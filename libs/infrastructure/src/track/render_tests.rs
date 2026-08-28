@@ -1676,7 +1676,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         .as_str()
         .to_owned();
     let signal_file = serde_json::json!({
-        "schema_version": 4,
+        "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -1684,6 +1684,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         "signals": [
             {
                 "type_name": "TrackId",
+                "namespace": "type",
                 "kind_tag": "value_object",
                 "signal": "blue",
                 "found_type": true
@@ -1740,7 +1741,7 @@ fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
 
     let write_signal_file = |baseline_hash: String| {
         let signal_file = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-19T00:00:00Z",
             "declaration_hash": declaration_hash.clone(),
             "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -1748,6 +1749,7 @@ fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
             "signals": [
                 {
                     "type_name": "TrackId",
+                    "namespace": "type",
                     "kind_tag": "value_object",
                     "signal": "blue",
                     "found_type": true

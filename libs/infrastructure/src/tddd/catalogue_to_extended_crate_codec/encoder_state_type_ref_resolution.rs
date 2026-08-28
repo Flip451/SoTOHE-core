@@ -9,7 +9,7 @@ use crate::tddd::canonical_type_identity::{
 };
 use crate::tddd::type_ref_parser::{STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID, std_canonical_path};
 use domain::tddd::NewTypeGraphCodecError;
-use domain::tddd::catalogue_v2::identifiers::{Identifier, TypeRef};
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, Identifier, TypeRef};
 use domain::tddd::catalogue_v2::roles::NonEmptyVec;
 use rustdoc_types::{GenericArg, GenericArgs, Id, Path, Type};
 
@@ -17,14 +17,17 @@ use super::encoder::EncoderState;
 use super::invalid_type_ref;
 
 impl EncoderState {
-    pub(super) fn local_id_for_identity(
+    pub(super) fn local_id_for_identity_in_namespace(
         &self,
         identity: &CanonicalTypeIdentity,
+        namespace: CatalogueItemNamespace,
     ) -> Result<Option<Id>, NewTypeGraphCodecError> {
         let Some(entries) = self.local_identity_to_id.get(identity) else {
             return Ok(None);
         };
-        match entries.as_slice() {
+        let namespace_entries =
+            entries.iter().filter(|(path, _)| path.namespace() == namespace).collect::<Vec<_>>();
+        match namespace_entries.as_slice() {
             [] => Ok(None),
             [(_, id)] => Ok(Some(*id)),
             [(first_path, _), rest @ ..] => {
@@ -32,10 +35,10 @@ impl EncoderState {
                     Identifier::new(first_path.name().as_str().to_owned()).map_err(|_| {
                         super::invalid_type_ref(identity.as_str(), "invalid identity name")
                     })?;
-                let candidates = rest.iter().map(|(path, _)| path.clone()).collect::<Vec<_>>();
+                let candidates = rest.iter().map(|(path, _)| (*path).clone()).collect::<Vec<_>>();
                 Err(NewTypeGraphCodecError::AmbiguousIdentifier(
                     identifier,
-                    NonEmptyVec::new(first_path.clone(), candidates),
+                    NonEmptyVec::new((*first_path).clone(), candidates),
                 ))
             }
         }
@@ -49,19 +52,34 @@ impl EncoderState {
     pub(super) fn local_id_for_path(
         &self,
         path: &str,
+        namespace: CatalogueItemNamespace,
     ) -> Result<Option<Id>, NewTypeGraphCodecError> {
         let lookup = path.strip_prefix("::").unwrap_or(path);
         let type_ref = TypeRef::new(lookup.to_owned())
             .map_err(|_| invalid_type_ref(lookup, "empty TypeRef path"))?;
-        match canonicalize_catalogue_type_ref(
-            &type_ref,
-            &self.crate_name,
-            &self.resolution_paths,
-            &[],
-        ) {
-            Ok(identity) => self.local_id_for_identity(&identity),
+        let namespace_paths = self.resolution_paths_for_namespace(namespace);
+        match canonicalize_catalogue_type_ref(&type_ref, &self.crate_name, &namespace_paths, &[]) {
+            Ok(identity) => self.local_id_for_identity_in_namespace(&identity, namespace),
             Err(error) => Err(error),
         }
+    }
+
+    fn local_id_namespace(&self, id: Id) -> Option<CatalogueItemNamespace> {
+        self.local_identity_to_id
+            .values()
+            .flat_map(|entries| entries.iter())
+            .find_map(|(path, candidate)| (*candidate == id).then_some(path.namespace()))
+    }
+
+    pub(super) fn resolve_trait_ref_for_top_level_in_trait_namespace(
+        &mut self,
+        trait_ref: &str,
+        generic_names: &[&str],
+    ) -> Result<Path, NewTypeGraphCodecError> {
+        let previous = self.pending_root_namespace.replace(CatalogueItemNamespace::Trait);
+        let result = self.resolve_trait_ref_for_top_level(trait_ref, generic_names);
+        self.pending_root_namespace = previous;
+        result
     }
 
     pub(super) fn record_resolution_error(&mut self, error: NewTypeGraphCodecError) {
@@ -83,10 +101,21 @@ impl EncoderState {
     /// Phase 1 errors.  Allocating a `paths` entry for them lets the S-construction
     /// algorithm identify them as valid externals without string-pattern heuristics.
     pub(super) fn resolve_external_type_ids(&mut self, ty: Type) -> Type {
+        let namespace = self.pending_root_namespace.take().unwrap_or(CatalogueItemNamespace::Type);
+        self.resolve_external_type_ids_with_root_namespace(ty, namespace)
+    }
+
+    fn resolve_external_type_ids_with_root_namespace(
+        &mut self,
+        ty: Type,
+        root_namespace: CatalogueItemNamespace,
+    ) -> Type {
         match ty {
             // `ResolvedPath` — delegate to the shared path helper which fixes up the id
             // and recurses into generic args so nested externals are also corrected.
-            Type::ResolvedPath(p) => Type::ResolvedPath(self.resolve_external_type_ids_in_path(p)),
+            Type::ResolvedPath(p) => {
+                Type::ResolvedPath(self.resolve_external_type_ids_in_path(p, root_namespace))
+            }
             // Recurse into container types.
             Type::Tuple(elems) => {
                 Type::Tuple(elems.into_iter().map(|t| self.resolve_external_type_ids(t)).collect())
@@ -120,7 +149,10 @@ impl EncoderState {
                     .traits
                     .into_iter()
                     .map(|pt| {
-                        let new_trait_path = self.resolve_external_type_ids_in_path(pt.trait_);
+                        let new_trait_path = self.resolve_external_type_ids_in_path(
+                            pt.trait_,
+                            CatalogueItemNamespace::Trait,
+                        );
                         rustdoc_types::PolyTrait {
                             trait_: new_trait_path,
                             generic_params: pt.generic_params,
@@ -137,7 +169,9 @@ impl EncoderState {
                 args: args
                     .map(|boxed| Box::new(self.resolve_external_type_ids_in_generic_args(*boxed))),
                 self_type: Box::new(self.resolve_external_type_ids(*self_type)),
-                trait_: trait_.map(|path| self.resolve_external_type_ids_in_path(path)),
+                trait_: trait_.map(|path| {
+                    self.resolve_external_type_ids_in_path(path, CatalogueItemNamespace::Trait)
+                }),
             },
             // `fn(A, B) -> C` function pointers — fix up input and output types.
             Type::FunctionPointer(fp) => {
@@ -164,7 +198,11 @@ impl EncoderState {
     }
 
     /// Resolves external type ids inside a `Path` value (used for trait bound paths).
-    pub(super) fn resolve_external_type_ids_in_path(&mut self, path: Path) -> Path {
+    pub(super) fn resolve_external_type_ids_in_path(
+        &mut self,
+        path: Path,
+        namespace: CatalogueItemNamespace,
+    ) -> Path {
         // A preserving-spelling path may retain an absolute `::` prefix for
         // lexical comparison.  Strip that prefix only for external-crate
         // lookup and synthetic path registration; the emitted `Path.path`
@@ -181,16 +219,21 @@ impl EncoderState {
             path.id == Id(std_id) && STD_PRELUDE_TYPES.contains(&lookup_path)
         });
         let new_id = if is_preserved_std_marker {
-            match self.local_id_for_path(lookup_path) {
+            match self.local_id_for_path(lookup_path, namespace) {
                 Ok(Some(id)) => id,
-                Ok(None) => self.ensure_external_type_id(&std_canonical_path(lookup_path), "std"),
+                Ok(None) => {
+                    self.ensure_external_type_id(&std_canonical_path(lookup_path), "std", namespace)
+                }
+                Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) => {
+                    self.ensure_external_type_id(&std_canonical_path(lookup_path), "std", namespace)
+                }
                 Err(error) => {
                     self.record_resolution_error(error);
                     Id(UNRESOLVED_CRATE_ID)
                 }
             }
         } else if path.id == Id(UNRESOLVED_CRATE_ID) {
-            match self.local_id_for_path(lookup_path) {
+            match self.local_id_for_path(lookup_path, namespace) {
                 Ok(Some(id)) => id,
                 Err(error) => {
                     self.record_resolution_error(error);
@@ -200,7 +243,7 @@ impl EncoderState {
                     if let Some(colon_pos) = lookup_path.find("::") {
                         let first_seg = &lookup_path[..colon_pos];
                         if self.ext_name_to_id.contains_key(first_seg) {
-                            self.ensure_external_type_id(lookup_path, first_seg)
+                            self.ensure_external_type_id(lookup_path, first_seg, namespace)
                         } else {
                             Id(UNRESOLVED_CRATE_ID)
                         }
@@ -209,14 +252,34 @@ impl EncoderState {
                         // `Clone`) for lexical comparison.  Their bare spelling still
                         // denotes a known std external, so register the canonical path
                         // and retain the short spelling on the emitted `Path`.
-                        self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
+                        self.ensure_external_type_id(
+                            &std_canonical_path(lookup_path),
+                            "std",
+                            namespace,
+                        )
                     } else {
                         Id(UNRESOLVED_CRATE_ID)
                     }
                 }
             }
         } else {
-            path.id
+            match self.local_id_namespace(path.id) {
+                None => path.id,
+                Some(_) => match self.local_id_for_path(lookup_path, namespace) {
+                    Ok(Some(id)) => id,
+                    Ok(None) => {
+                        self.record_resolution_error(invalid_type_ref(
+                            lookup_path,
+                            "local path has no identity in the requested namespace",
+                        ));
+                        Id(UNRESOLVED_CRATE_ID)
+                    }
+                    Err(error) => {
+                        self.record_resolution_error(error);
+                        Id(UNRESOLVED_CRATE_ID)
+                    }
+                },
+            }
         };
         let new_args =
             path.args.map(|boxed| Box::new(self.resolve_external_type_ids_in_generic_args(*boxed)));
@@ -281,7 +344,12 @@ impl EncoderState {
         use rustdoc_types::GenericBound;
         match bound {
             GenericBound::TraitBound { trait_, generic_params, modifier } => {
-                let new_trait = self.resolve_external_type_ids_in_path(trait_);
+                // A GenericBound::TraitBound is always a trait-position path.
+                // The parser can assign a local id before the surrounding syntax
+                // is available, so the post-processing pass must revalidate it in
+                // the trait namespace rather than preserving a type id.
+                let new_trait =
+                    self.resolve_external_type_ids_in_path(trait_, CatalogueItemNamespace::Trait);
                 GenericBound::TraitBound { trait_: new_trait, generic_params, modifier }
             }
             other => other,

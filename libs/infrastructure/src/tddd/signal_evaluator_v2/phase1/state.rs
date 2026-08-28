@@ -6,6 +6,7 @@ use super::child_items::{
     collect_impl_child_ids, copy_non_impl_children_to_d, move_impl_children_to_d,
     remove_child_items_from_s,
 };
+use domain::tddd::Phase1Error;
 use domain::tddd::catalogue_v2::ItemAction;
 use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
 
@@ -17,6 +18,13 @@ use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
 pub(super) struct Phase1State {
     /// Fresh Id counter (Id(0) = root module reserved).
     pub(super) next_id: u32,
+    /// Whether an allocation was attempted after the Id space was exhausted.
+    ///
+    /// The allocator is used by helpers in sibling modules that cannot return a
+    /// `Phase1Error` without widening their APIs.  Latching this condition keeps
+    /// those helpers panic-free; the Phase 1 entry-point turns it into a typed
+    /// error before publishing S or D.
+    id_allocation_exhausted: bool,
     /// item index for S.
     pub(super) s_index: HashMap<Id, Item>,
     /// paths map for S.
@@ -68,12 +76,11 @@ impl Phase1State {
     /// Creates a new `Phase1State`.
     ///
     /// `first_fresh_id` is the first Id value that is safe to allocate without
-    /// colliding with any Id already present in B's index.  Pass `b.index.keys().map(|id|
-    /// id.0).max().map_or(1, |m| m + 1)` to ensure all fresh Ids are above the
-    /// B-side namespace.
+    /// colliding with any Id already present in B's index or paths map.
     pub(super) fn new(first_fresh_id: u32) -> Self {
         Self {
             next_id: first_fresh_id,
+            id_allocation_exhausted: false,
             s_index: HashMap::new(),
             s_paths: HashMap::new(),
             s_actions: BTreeMap::new(),
@@ -92,8 +99,24 @@ impl Phase1State {
 
     pub(super) fn alloc_id(&mut self) -> Id {
         let id = Id(self.next_id);
-        self.next_id += 1;
+        if let Some(next_id) = self.next_id.checked_add(1) {
+            self.next_id = next_id;
+        } else {
+            self.id_allocation_exhausted = true;
+        }
         id
+    }
+
+    /// Fails closed if any fresh-Id allocation reached the end of the `u32`
+    /// namespace.
+    pub(super) fn check_id_allocation(&self) -> Result<(), Phase1Error> {
+        if self.id_allocation_exhausted {
+            Err(Phase1Error::rustdoc_root_resolution(
+                "Phase 1 item-id space was exhausted while constructing S and D",
+            ))
+        } else {
+            Ok(())
+        }
     }
 
     /// Inserts a type/trait item into S at a *specific* Id (for Modify: keep same Id position).

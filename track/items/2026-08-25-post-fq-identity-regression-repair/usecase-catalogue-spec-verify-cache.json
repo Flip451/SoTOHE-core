@@ -1,0 +1,342 @@
+{
+  "entries": [
+    {
+      "claim_hash": "de367b295486aa5615b09804c938afc81134b39db4c30edc269b6100400e216e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f89b057a7ba7841774cc883bad5aa15d7fa659f729d2aff1ae93bd5e6386169",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::pre_review_gate::CoverageVerifyInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f67de40968a114f1320aac3defa3d9b4646e1da536c4e928c77776de699a88a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::pre_review_gate::PreReviewGateError",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f89b057a7ba7841774cc883bad5aa15d7fa659f729d2aff1ae93bd5e6386169",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::pre_review_gate::PreReviewGateInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4829a827ac2f402721bbef2b320f3d42c36fb7594ed5f3a3ee00af1624a219f8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10899acf4eec72806c9630a01164e26a10e551a0b40ba8e84e6de5fcd1209207",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "66b79499a80b47f977d4954e0eb36d38adb7805cdc4642fe66c70caa54030c50",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10899acf4eec72806c9630a01164e26a10e551a0b40ba8e84e6de5fcd1209207",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d46be988ba4df1d191b3b159d4067db2250363a9b3966e563a152cd9fc0a4b7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10899acf4eec72806c9630a01164e26a10e551a0b40ba8e84e6de5fcd1209207",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "957611ae8bc068f2bedadb93824f292582fdae5690d25ef0116bffcd1cad5c7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6635706b0637a0a35284b3ff1643d6ae9cfc6a9288b16430f18567232bf69790",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8de2e65ff9080be6aa35810b124777007acbbd6d1ac8785bcbf53a8b6cc6083c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "96130dd76d3f078db48a3c61ad8b77de974fa4f8cac466f8779d9c0f8e83baf4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedCatalogueDocumentLoaderPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "259dbd0f48734f0f384b25b1fb09ff93ccd3612c41d348927166b65ac3092832",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a7b6e0b38e8d51bb8b86e296b000921f765c0ef377b4758c78cff02e500f208f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。経路ごとの別名適用は残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d534b5c4f4ce47abd7f9bf0f3eb907e291bcddd6227847ec4c3f5b753edd8ca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogPort",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2e10807a145f0ef89c44562aea4b988fb51acaf9afa48868a70e4878729fc5eb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

@@ -1,292 +1,24 @@
 //! Conversion of three-way evaluator output into persisted type signals.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
-use domain::tddd::NewTypeGraphCodecError;
-use domain::tddd::catalogue_v2::roles::ItemAction;
-use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FullyQualifiedItemPath, ParamName, TypeRef,
-};
 use domain::{ConfidenceSignal, TypeSignal};
-use rustdoc_types::{Id, ItemSummary};
 
-use crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref;
-use crate::tddd::{ThreeWaySignal, ThreeWaySignalKind};
+use crate::tddd::ThreeWaySignal;
 
-/// Intermediate accumulator entry for a single top-level item.
-///
-/// Fields: `(signal, found_type, found_items, missing_items, extra_items)`.
-type AccEntry = (ConfidenceSignal, bool, Vec<String>, Vec<String>, Vec<String>);
+#[path = "signal_builder/accumulator.rs"]
+mod accumulator;
+#[path = "signal_builder/identity_index.rs"]
+mod identity_index;
 
-/// Canonical catalogue-key aliases used while collapsing evaluator output.
-///
-/// The evaluator deliberately keeps short labels for human-readable reports.
-/// The persisted type-signals document is consumed as an entry-key index,
-/// however, so an impl such as `ShortOwner: Trait` must join the catalogue
-/// entry that owns the fully qualified identity.  The aliases in this index
-/// are derived from the catalogue declarations and the T004 canonicalizer;
-/// no renderer-local path spelling is treated as an identity.
-#[derive(Debug, Default)]
-pub(super) struct TypeSignalIdentityIndex {
-    canonical_to_keys: BTreeMap<String, Vec<String>>,
-    declaration_aliases_to_keys: BTreeMap<String, Vec<String>>,
-    impl_aliases_to_keys: BTreeMap<String, Vec<String>>,
-}
-
-impl TypeSignalIdentityIndex {
-    fn add_canonical(&mut self, canonical: &str, key: &str) {
-        add_unique(&mut self.canonical_to_keys, canonical, key);
-    }
-
-    fn add_alias(&mut self, alias: &str, key: &str) {
-        add_unique(&mut self.declaration_aliases_to_keys, alias, key);
-    }
-
-    fn add_impl_alias(&mut self, alias: &str, key: &str) {
-        add_unique(&mut self.impl_aliases_to_keys, alias, key);
-    }
-
-    fn declaration_candidates(&self, raw: &str) -> Option<Vec<String>> {
-        let exact =
-            self.declaration_aliases_to_keys.get(raw).or_else(|| self.canonical_to_keys.get(raw));
-        if exact.is_some() || raw.contains("::") {
-            return exact.cloned();
-        }
-        self.declaration_aliases_to_keys.get(short_name(raw)).cloned()
-    }
-
-    fn owner_candidates(&self, raw: &str) -> Option<Vec<String>> {
-        if let Some(keys) = self.impl_aliases_to_keys.get(raw) {
-            return Some(keys.clone());
-        }
-
-        let mut candidates = Vec::new();
-        add_candidates(&mut candidates, self.declaration_aliases_to_keys.get(raw));
-        if let Some(keys) = self.canonical_to_keys.get(raw) {
-            add_candidates(&mut candidates, Some(keys));
-        }
-        if !raw.contains("::") {
-            let short = short_name(raw);
-            if short != raw {
-                if let Some(keys) = self.impl_aliases_to_keys.get(short) {
-                    return Some(keys.clone());
-                }
-                add_candidates(&mut candidates, self.declaration_aliases_to_keys.get(short));
-            }
-        }
-        (!candidates.is_empty()).then_some(candidates)
-    }
-
-    fn aliases_for_entry_key<'a>(&'a self, key: &str) -> Vec<&'a str> {
-        let mut aliases = Vec::new();
-        for (alias, keys) in
-            self.canonical_to_keys.iter().chain(self.declaration_aliases_to_keys.iter())
-        {
-            if keys.len() == 1
-                && keys.first().is_some_and(|candidate| candidate.as_str() == key)
-                && !aliases.contains(&alias.as_str())
-            {
-                aliases.push(alias.as_str());
-            }
-        }
-        aliases
-    }
-}
-
-/// Builds the identity join used by the type-signal producer.
-///
-/// Catalogue entry keys remain the persisted spelling.  Their canonical
-/// identities are computed through the T004 choke point, and impl owners are
-/// then joined to the matching declared entry (or to their own fully
-/// qualified `for_type` key when the owner is external, such as `Arc<T>`).
-///
-/// # Errors
-///
-/// Returns a diagnostic when a catalogue declaration cannot be reconciled
-/// against the authoritative rustdoc path universe.
-pub(super) fn build_type_signal_identity_index(
-    catalogue: &CatalogueDocument,
-    rustdoc_paths: &HashMap<Id, ItemSummary>,
-) -> Result<TypeSignalIdentityIndex, String> {
-    let mut index = TypeSignalIdentityIndex::default();
-    let catalogue_crate = catalogue.crate_name();
-
-    for (key, entry) in catalogue.types() {
-        add_entry_identity(
-            &mut index,
-            catalogue_crate,
-            key.as_str(),
-            entry.module_path(),
-            entry.action(),
-            rustdoc_paths,
-        )?;
-    }
-    for (key, entry) in catalogue.traits() {
-        add_entry_identity(
-            &mut index,
-            catalogue_crate,
-            key.as_str(),
-            entry.module_path(),
-            entry.action(),
-            rustdoc_paths,
-        )?;
-    }
-
-    for deletion in catalogue.deletions() {
-        let key = match deletion {
-            DeletionRecord::Type { name, .. } | DeletionRecord::Trait { name, .. } => name,
-            DeletionRecord::Function { .. } => continue,
-        };
-        add_deletion_identity(&mut index, catalogue_crate, key.as_str(), rustdoc_paths)?;
-    }
-
-    for trait_impl in catalogue.trait_impls() {
-        let generic_params = trait_impl
-            .impl_generics()
-            .iter()
-            .map(|param| param.name.clone())
-            .collect::<Vec<ParamName>>();
-        let canonical = match canonicalize_catalogue_type_ref(
-            trait_impl.for_type(),
-            catalogue_crate,
-            rustdoc_paths,
-            &generic_params,
-        ) {
-            Ok(canonical) => Some(canonical),
-            Err(NewTypeGraphCodecError::UnresolvedIdentifier(_))
-                if matches!(trait_impl.action(), ItemAction::Add | ItemAction::Delete) =>
-            {
-                None
-            }
-            Err(error) => {
-                return Err(format!(
-                    "cannot canonicalize type-signal impl owner '{}': {error}",
-                    trait_impl.for_type()
-                ));
-            }
-        };
-
-        // A local type entry owns its impl rows.  External/self types that are
-        // not declared in this catalogue retain the fully qualified for_type
-        // spelling as their signal entry key.
-        let owner_key = match canonical.as_ref() {
-            Some(canonical) => declaration_key_for_canonical(&index, canonical.as_str()),
-            None => declaration_key_for_raw_owner(&index, trait_impl.for_type().as_str()),
-        }
-        .unwrap_or_else(|| trait_impl.for_type().as_str().to_owned());
-        if let Some(canonical) = canonical {
-            index.add_impl_alias(canonical.as_str(), &owner_key);
-        }
-        index.add_impl_alias(trait_impl.for_type().as_str(), &owner_key);
-        index.add_impl_alias(strip_generic_suffix(trait_impl.for_type().as_str()), &owner_key);
-        index.add_impl_alias(short_name(trait_impl.for_type().as_str()), &owner_key);
-    }
-
-    Ok(index)
-}
-
-fn add_entry_identity(
-    index: &mut TypeSignalIdentityIndex,
-    catalogue_crate: &CrateName,
-    key: &str,
-    module_path: &domain::tddd::catalogue_v2::ModulePath,
-    action: ItemAction,
-    rustdoc_paths: &HashMap<Id, ItemSummary>,
-) -> Result<(), String> {
-    let entry_key = domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(key.to_owned())
-        .map_err(|error| format!("invalid catalogue entry key '{key}': {error}"))?;
-    let identity =
-        FullyQualifiedItemPath::from_catalogue_entry_key(catalogue_crate, &entry_key, module_path)
-            .map_err(|error| format!("cannot construct catalogue identity for '{key}': {error}"))?;
-    let identity_text = identity.to_string();
-    index.add_alias(key, key);
-    index.add_alias(&identity_text, key);
-    index.add_alias(short_name(key), key);
-    let identity_ref = TypeRef::new(identity.to_string())
-        .map_err(|error| format!("cannot construct TypeRef for '{key}': {error}"))?;
-    match canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, rustdoc_paths, &[]) {
-        Ok(canonical) => index.add_canonical(canonical.as_str(), key),
-        Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) if action == ItemAction::Add => {}
-        Err(error) => {
-            return Err(format!("cannot canonicalize catalogue entry '{key}': {error}"));
-        }
-    }
-    Ok(())
-}
-
-fn add_deletion_identity(
-    index: &mut TypeSignalIdentityIndex,
-    catalogue_crate: &CrateName,
-    key: &str,
-    rustdoc_paths: &HashMap<Id, ItemSummary>,
-) -> Result<(), String> {
-    let _entry_key = domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(key.to_owned())
-        .map_err(|error| format!("invalid catalogue deletion key '{key}': {error}"))?;
-    let identity_ref = TypeRef::new(key.to_owned())
-        .map_err(|error| format!("cannot construct TypeRef for '{key}': {error}"))?;
-    index.add_alias(key, key);
-    index.add_alias(short_name(key), key);
-    match canonicalize_catalogue_type_ref(&identity_ref, catalogue_crate, rustdoc_paths, &[]) {
-        Ok(canonical) => index.add_canonical(canonical.as_str(), key),
-        Err(NewTypeGraphCodecError::UnresolvedIdentifier(_)) => {
-            index.add_canonical(key, key);
-        }
-        Err(error) => {
-            return Err(format!("cannot canonicalize catalogue deletion '{key}': {error}"));
-        }
-    }
-    Ok(())
-}
-
-fn add_unique(map: &mut BTreeMap<String, Vec<String>>, alias: &str, key: &str) {
-    let keys = map.entry(alias.to_owned()).or_default();
-    if !keys.iter().any(|existing| existing == key) {
-        keys.push(key.to_owned());
-    }
-}
-
-fn unique_key(keys: Option<&Vec<String>>) -> Option<&str> {
-    let keys = keys?;
-    match keys.as_slice() {
-        [key] => Some(key.as_str()),
-        _ => None,
-    }
-}
-
-fn declaration_key_for_canonical(
-    index: &TypeSignalIdentityIndex,
-    canonical: &str,
-) -> Option<String> {
-    let owner_identity = strip_generic_suffix(canonical);
-    unique_key(index.canonical_to_keys.get(canonical))
-        .or_else(|| unique_key(index.canonical_to_keys.get(owner_identity)))
-        .map(ToOwned::to_owned)
-}
-
-fn declaration_key_for_raw_owner(index: &TypeSignalIdentityIndex, raw: &str) -> Option<String> {
-    let outer = strip_generic_suffix(raw);
-    [raw, outer].into_iter().find_map(|candidate| {
-        index
-            .declaration_candidates(candidate)
-            .and_then(|keys| (keys.len() == 1).then(|| keys.into_iter().next()).flatten())
-    })
-}
-
-fn add_candidates(candidates: &mut Vec<String>, keys: Option<&Vec<String>>) {
-    for key in keys.into_iter().flatten() {
-        if !candidates.iter().any(|candidate| candidate == key) {
-            candidates.push(key.clone());
-        }
-    }
-}
-
-fn strip_generic_suffix(raw: &str) -> &str {
-    raw.split_once('<').map_or(raw, |(head, _)| head)
-}
-
-fn short_name(raw: &str) -> &str {
-    strip_generic_suffix(raw).rsplit("::").next().unwrap_or(raw)
-}
+pub(super) use accumulator::{
+    AccEntry, AccKey, accumulator_namespaces, impl_owner_namespace, kind_tags_for_accumulator,
+    kind_tags_for_entry, record_plain_signal, signal_identity, signal_kind_to_confidence,
+    stored_entry_key_for_kind_name, worse_signal,
+};
+pub(super) use identity_index::{TypeSignalIdentityIndex, build_type_signal_identity_index};
+#[cfg(test)]
+pub(super) use identity_index::{add_deletion_identity, add_entry_identity};
 
 pub(super) fn build_type_signals_from_report<'a>(
     signals: impl Iterator<Item = &'a ThreeWaySignal>,
@@ -295,8 +27,9 @@ pub(super) fn build_type_signals_from_report<'a>(
 ) -> Vec<TypeSignal> {
     use domain::tddd::signal_evaluator::region::SignalRegion;
 
-    let mut acc: HashMap<String, AccEntry> = HashMap::new();
-    let mut order: Vec<String> = Vec::new();
+    let mut acc: HashMap<AccKey, AccEntry> = HashMap::new();
+    let mut order: Vec<AccKey> = Vec::new();
+    let mut external_owner_keys: HashSet<AccKey> = HashSet::new();
 
     for signal in signals {
         let name = signal.item_name();
@@ -317,8 +50,13 @@ pub(super) fn build_type_signals_from_report<'a>(
             let owners = candidates.map_or_else(|| vec![raw_owner.to_owned()], |keys| keys.clone());
 
             for owner in owners {
-                let entry = acc.entry(owner.clone()).or_insert_with(|| {
-                    order.push(owner.clone());
+                let namespace = impl_owner_namespace(&owner, kind_tag_map, identity_index);
+                let acc_key = (owner, namespace);
+                if namespace.is_none() {
+                    external_owner_keys.insert(acc_key.clone());
+                }
+                let entry = acc.entry(acc_key.clone()).or_insert_with(|| {
+                    order.push(acc_key.clone());
                     (
                         if ambiguous { ConfidenceSignal::Yellow } else { ConfidenceSignal::Blue },
                         true,
@@ -347,72 +85,93 @@ pub(super) fn build_type_signals_from_report<'a>(
                     }
                 }
             }
-        } else {
-            if kind_tag_map.contains_key(name) {
+        } else if let Some(namespace) = signal.identity().namespace() {
+            let candidates = identity_index
+                .declaration_candidates_in_namespace(name, namespace)
+                .or_else(|| {
+                    kind_tag_map
+                        .get(name)
+                        .filter(|kind_tags| {
+                            kind_tags.iter().any(|kind_tag| {
+                                super::signal_tags::kind_tag_namespace(kind_tag) == Some(namespace)
+                            })
+                        })
+                        .map(|_| vec![name.to_owned()])
+                })
+                .unwrap_or_else(|| vec![name.to_owned()]);
+            let ambiguous = candidates.len() > 1;
+            for key in candidates {
+                // A typed report identity always stays in its own namespace.
+                // This also separates it from a same-named function label.
                 record_plain_signal(
                     &mut acc,
                     &mut order,
-                    name.to_owned(),
+                    (key, Some(namespace)),
                     confidence,
                     found_in_c,
-                    false,
+                    ambiguous,
                 );
-            } else {
-                match identity_index.declaration_candidates(name) {
-                    Some(keys) if keys.len() > 1 => {
-                        for key in keys.clone() {
-                            record_plain_signal(
-                                &mut acc, &mut order, key, confidence, found_in_c, true,
-                            );
-                        }
-                    }
-                    Some(keys) if keys.len() == 1 => {
-                        if let Some(key) = keys.first() {
-                            record_plain_signal(
-                                &mut acc,
-                                &mut order,
-                                key.clone(),
-                                confidence,
-                                found_in_c,
-                                false,
-                            );
-                        }
-                    }
-                    _ => record_plain_signal(
-                        &mut acc,
-                        &mut order,
-                        name.to_owned(),
-                        confidence,
-                        found_in_c,
-                        false,
-                    ),
-                }
             }
+        } else {
+            // Namespace-less labels are functions (or other report-only
+            // labels). Their report spelling is their identity; catalogue
+            // declaration aliases do not apply to them.
+            record_plain_signal(
+                &mut acc,
+                &mut order,
+                (name.to_owned(), None),
+                confidence,
+                found_in_c,
+                false,
+            );
         }
     }
 
+    // Fill suppressed Reference rows independently for every namespace. A
+    // function key is deliberately kept raw even when it aliases a type key.
     for name in kind_tag_map.keys() {
-        let entry_name =
-            stored_entry_key_for_kind_name(name, identity_index).unwrap_or_else(|| name.clone());
-        acc.entry(entry_name.clone()).or_insert_with(|| {
-            order.push(entry_name);
-            (ConfidenceSignal::Blue, true, Vec::new(), Vec::new(), Vec::new())
-        });
+        for namespace in accumulator_namespaces(name, kind_tag_map, identity_index) {
+            let entry_name = namespace.map_or_else(
+                || name.clone(),
+                |namespace| stored_entry_key_for_kind_name(name, namespace, identity_index),
+            );
+            // An alias without namespace metadata is a report-label join, not
+            // enough evidence to manufacture a catalogue identity. Direct
+            // catalogue keys and the production index both retain metadata.
+            let namespace = if namespace.is_some()
+                && !identity_index.has_known_namespace(&entry_name)
+                && entry_name != *name
+            {
+                None
+            } else {
+                namespace
+            };
+            let acc_key = (entry_name.clone(), namespace);
+            if acc.contains_key(&acc_key) {
+                continue;
+            }
+            order.push(acc_key.clone());
+            acc.insert(acc_key, (ConfidenceSignal::Blue, true, Vec::new(), Vec::new(), Vec::new()));
+        }
     }
 
     order
         .into_iter()
-        .flat_map(|name| {
+        .flat_map(|(name, namespace)| {
             let Some((sig, found_type, found_items, missing_items, extra_items)) =
-                acc.remove(&name)
+                acc.remove(&(name.clone(), namespace))
             else {
                 return Vec::new();
             };
-            let kind_tags = kind_tags_for_entry(name.as_str(), kind_tag_map, identity_index);
+            let kind_tags = kind_tags_for_accumulator(
+                namespace,
+                &kind_tags_for_entry(&name, kind_tag_map, identity_index),
+                external_owner_keys.contains(&(name.clone(), namespace)),
+            );
             if kind_tags.is_empty() {
                 return vec![TypeSignal::new(
-                    name,
-                    "unknown",
+                    signal_identity(name, namespace),
+                    "unknown".to_owned(),
                     sig,
                     found_type,
                     found_items,
@@ -430,8 +189,8 @@ pub(super) fn build_type_signals_from_report<'a>(
                         sig
                     };
                     TypeSignal::new(
-                        name.clone(),
-                        kind_tag,
+                        signal_identity(name.clone(), namespace),
+                        kind_tag.to_owned(),
                         effective_signal,
                         found_type,
                         found_items.clone(),
@@ -444,72 +203,6 @@ pub(super) fn build_type_signals_from_report<'a>(
         .collect()
 }
 
-fn record_plain_signal(
-    acc: &mut HashMap<String, AccEntry>,
-    order: &mut Vec<String>,
-    name: String,
-    confidence: ConfidenceSignal,
-    found_in_c: bool,
-    ambiguous: bool,
-) {
-    let initial_signal = if ambiguous { ConfidenceSignal::Yellow } else { confidence };
-    let entry = acc.entry(name.clone()).or_insert_with(|| {
-        order.push(name);
-        (initial_signal, found_in_c, Vec::new(), Vec::new(), Vec::new())
-    });
-    entry.0 = worse_signal(entry.0, confidence);
-    entry.1 = entry.1 || found_in_c;
-}
-
-fn kind_tags_for_entry(
-    entry_key: &str,
-    kind_tag_map: &BTreeMap<String, Vec<&'static str>>,
-    identity_index: &TypeSignalIdentityIndex,
-) -> Vec<&'static str> {
-    if let Some(kind_tags) = kind_tag_map.get(entry_key) {
-        return kind_tags.clone();
-    }
-
-    let mut kind_tags = Vec::new();
-    for alias in identity_index.aliases_for_entry_key(entry_key) {
-        if let Some(tags) = kind_tag_map.get(alias) {
-            for &tag in tags {
-                if !kind_tags.contains(&tag) {
-                    kind_tags.push(tag);
-                }
-            }
-        }
-    }
-    kind_tags
-}
-
-fn stored_entry_key_for_kind_name(
-    kind_name: &str,
-    identity_index: &TypeSignalIdentityIndex,
-) -> Option<String> {
-    match identity_index.declaration_candidates(kind_name)?.as_slice() {
-        [entry_key] => Some(entry_key.clone()),
-        _ => None,
-    }
-}
-
-fn signal_kind_to_confidence(kind: ThreeWaySignalKind) -> ConfidenceSignal {
-    match kind {
-        ThreeWaySignalKind::Blue => ConfidenceSignal::Blue,
-        ThreeWaySignalKind::Yellow => ConfidenceSignal::Yellow,
-        ThreeWaySignalKind::Red => ConfidenceSignal::Red,
-        ThreeWaySignalKind::Skip => ConfidenceSignal::Yellow,
-    }
-}
-
-fn worse_signal(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
-    match (a, b) {
-        (ConfidenceSignal::Red, _) | (_, ConfidenceSignal::Red) => ConfidenceSignal::Red,
-        (ConfidenceSignal::Yellow, _) | (_, ConfidenceSignal::Yellow) => ConfidenceSignal::Yellow,
-        _ => ConfidenceSignal::Blue,
-    }
-}
-
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::useless_vec)]
 mod tests {
@@ -519,12 +212,583 @@ mod tests {
         TypeSignalIdentityIndex, add_deletion_identity, add_entry_identity,
         build_type_signal_identity_index, build_type_signals_from_report,
     };
+    use domain::FreeText;
     use domain::tddd::LayerId;
-    use domain::tddd::catalogue_v2::roles::ItemAction;
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath,
+        CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath, TypeRef,
     };
     use domain::tddd::signal_evaluator::region::{SignalRegion, ThreeWaySignal};
+    use rustdoc_types::{Id, ItemKind, ItemSummary};
+
+    #[test]
+    fn test_build_type_signals_keeps_same_key_type_and_trait_rows_independent() {
+        use domain::ConfidenceSignal;
+
+        // A catalogue may declare a type and a trait under one key. The
+        // evaluator emits one namespace-aware signal each; the persisted rows
+        // must keep their own status instead of collapsing into one
+        // accumulator and forcing both to Yellow.
+        let index = TypeSignalIdentityIndex::default();
+        let mut kinds = BTreeMap::new();
+        kinds.insert("Shared".to_owned(), vec!["value_object", "secondary_port"]);
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Trait,
+                SignalRegion::SMinusC_Add,
+            ),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        assert_eq!(built.len(), 2, "{built:?}");
+        let type_row = built.iter().find(|row| row.kind_tag() == "value_object").expect("type row");
+        let trait_row =
+            built.iter().find(|row| row.kind_tag() == "secondary_port").expect("trait row");
+        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_eq!(type_row.type_name(), "Shared");
+        assert_eq!(trait_row.type_name(), "Shared");
+        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);
+        assert!(type_row.found_type());
+        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);
+        assert!(!trait_row.found_type());
+    }
+
+    #[test]
+    fn test_build_type_signals_fills_missing_namespace_row_for_shared_key() {
+        use domain::ConfidenceSignal;
+
+        // Only the trait produced a signal (a matched Reference type is
+        // suppressed by Phase 2); the type row is still filled as Blue and the
+        // trait row keeps its own status.
+        let index = TypeSignalIdentityIndex::default();
+        let mut kinds = BTreeMap::new();
+        kinds.insert("Shared".to_owned(), vec!["value_object", "secondary_port"]);
+        let signals = vec![ThreeWaySignal::catalogue_item(
+            FreeText::new("Shared"),
+            CatalogueItemNamespace::Trait,
+            SignalRegion::SIntersectC_Mismatch_Modify,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        assert_eq!(built.len(), 2, "{built:?}");
+        let type_row = built.iter().find(|row| row.kind_tag() == "value_object").expect("type row");
+        let trait_row =
+            built.iter().find(|row| row.kind_tag() == "secondary_port").expect("trait row");
+        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(trait_row.identity().namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);
+        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_build_type_signals_resolves_catalogue_labels_in_their_namespace() {
+        let crate_name = CrateName::new("domain").expect("valid crate name");
+        let root = ModulePath::root();
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let mut index = TypeSignalIdentityIndex::default();
+        add_entry_identity(
+            &mut index,
+            &crate_name,
+            "domain::Shared",
+            Some(&root),
+            CatalogueItemNamespace::Type,
+            &rustdoc_paths,
+        )
+        .expect("type identity resolves");
+        add_entry_identity(
+            &mut index,
+            &crate_name,
+            "Shared",
+            Some(&root),
+            CatalogueItemNamespace::Trait,
+            &rustdoc_paths,
+        )
+        .expect("trait identity resolves");
+
+        let kinds = BTreeMap::from([
+            ("domain::Shared".to_owned(), vec!["value_object"]),
+            ("Shared".to_owned(), vec!["secondary_port"]),
+        ]);
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Trait,
+                SignalRegion::SMinusC_Add,
+            ),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        let type_row = built
+            .iter()
+            .find(|signal| signal.type_name() == "domain::Shared")
+            .expect("type label resolves to its qualified stored key");
+        assert_eq!(type_row.kind_tag(), "value_object");
+        assert!(type_row.found_type());
+        let trait_row = built
+            .iter()
+            .find(|signal| signal.type_name() == "Shared")
+            .expect("trait label resolves to its stored key");
+        assert_eq!(trait_row.kind_tag(), "secondary_port");
+        assert!(!trait_row.found_type());
+    }
+
+    #[test]
+    fn test_build_type_signals_separates_same_key_deletion_namespaces() {
+        use domain::ConfidenceSignal;
+
+        let crate_name = CrateName::new("domain").expect("valid crate name");
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let mut index = TypeSignalIdentityIndex::default();
+        add_deletion_identity(
+            &mut index,
+            &crate_name,
+            "Shared",
+            CatalogueItemNamespace::Type,
+            &rustdoc_paths,
+        )
+        .expect("type tombstone identity resolves");
+        add_deletion_identity(
+            &mut index,
+            &crate_name,
+            "Shared",
+            CatalogueItemNamespace::Trait,
+            &rustdoc_paths,
+        )
+        .expect("trait tombstone identity resolves");
+
+        assert_eq!(
+            super::accumulator_namespaces("Shared", &BTreeMap::new(), &index),
+            vec![Some(CatalogueItemNamespace::Type), Some(CatalogueItemNamespace::Trait)]
+        );
+
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::DMinusC,
+            ),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Trait,
+                SignalRegion::DIntersectC,
+            ),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &BTreeMap::new(), &index);
+
+        assert_eq!(built.len(), 2, "each tombstone namespace needs its own row: {built:?}");
+        let type_row = built
+            .iter()
+            .find(|row| row.identity().namespace() == Some(CatalogueItemNamespace::Type))
+            .expect("type tombstone row");
+        assert_eq!(type_row.type_name(), "Shared");
+        assert_eq!(type_row.kind_tag(), "unknown");
+        assert_eq!(type_row.signal(), ConfidenceSignal::Blue);
+        let trait_row = built
+            .iter()
+            .find(|row| row.identity().namespace() == Some(CatalogueItemNamespace::Trait))
+            .expect("trait tombstone row");
+        assert_eq!(trait_row.type_name(), "Shared");
+        assert_eq!(trait_row.kind_tag(), "unknown");
+        assert_eq!(trait_row.signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_build_type_signals_keeps_namespace_less_tag_in_its_own_row() {
+        let crate_name = CrateName::new("domain").expect("valid crate name");
+        let root = ModulePath::root();
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let mut index = TypeSignalIdentityIndex::default();
+        for namespace in [CatalogueItemNamespace::Type, CatalogueItemNamespace::Trait] {
+            add_entry_identity(
+                &mut index,
+                &crate_name,
+                "domain::Shared",
+                Some(&root),
+                namespace,
+                &rustdoc_paths,
+            )
+            .expect("shared identity resolves in both namespaces");
+        }
+
+        let kinds = BTreeMap::from([(
+            "domain::Shared".to_owned(),
+            vec!["value_object", "secondary_port", "free_function"],
+        )]);
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Trait,
+                SignalRegion::SMinusC_Add,
+            ),
+            ThreeWaySignal::label(
+                FreeText::new("domain::Shared"),
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        assert_eq!(built.len(), 3, "each kind tag must have one output row: {built:?}");
+        assert!(built.iter().any(|signal| signal.kind_tag() == "value_object"));
+        assert!(built.iter().any(|signal| signal.kind_tag() == "secondary_port"));
+        assert!(built.iter().any(|signal| signal.kind_tag() == "free_function"));
+        for pair in [("value_object", true), ("secondary_port", false), ("free_function", true)] {
+            let row = built
+                .iter()
+                .find(|signal| signal.kind_tag() == pair.0)
+                .expect("expected kind tag row");
+            assert_eq!(row.found_type(), pair.1, "wrong accumulator for {}", pair.0);
+        }
+        assert_eq!(
+            built
+                .iter()
+                .find(|signal| signal.kind_tag() == "value_object")
+                .expect("type row")
+                .signal(),
+            domain::ConfidenceSignal::Blue
+        );
+        assert_eq!(
+            built
+                .iter()
+                .find(|signal| signal.kind_tag() == "secondary_port")
+                .expect("trait row")
+                .signal(),
+            domain::ConfidenceSignal::Yellow
+        );
+        assert_eq!(
+            built
+                .iter()
+                .find(|signal| signal.kind_tag() == "free_function")
+                .expect("function row")
+                .identity()
+                .namespace(),
+            None
+        );
+        assert_eq!(
+            built
+                .iter()
+                .find(|signal| signal.kind_tag() == "free_function")
+                .expect("function row")
+                .signal(),
+            domain::ConfidenceSignal::Blue
+        );
+    }
+
+    #[test]
+    fn test_build_type_signals_preserves_namespace_less_function_label() {
+        let mut index = TypeSignalIdentityIndex::default();
+        index.add_alias("domain::Shared", "Shared");
+        let kinds = BTreeMap::from([("Shared".to_owned(), vec!["value_object"])]);
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::Shared"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        let function_row = built
+            .iter()
+            .find(|signal| signal.type_name() == "domain::Shared")
+            .expect("function label must retain its report spelling");
+        assert_eq!(function_row.identity().namespace(), None);
+        assert_eq!(function_row.kind_tag(), "unknown");
+        assert_eq!(function_row.signal(), domain::ConfidenceSignal::Blue);
+        assert!(built
+            .iter()
+            .any(|signal| signal.type_name() == "Shared" && signal.kind_tag() == "value_object"));
+    }
+
+    #[test]
+    fn test_build_type_signals_preserves_raw_function_label_when_it_matches_catalogue_type() {
+        use domain::ConfidenceSignal;
+
+        let mut index = TypeSignalIdentityIndex::default();
+        index.add_namespace("Shared", CatalogueItemNamespace::Type);
+        let kinds = BTreeMap::from([("Shared".to_owned(), vec!["value_object"])]);
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::label(FreeText::new("Shared"), SignalRegion::SMinusC_Add),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        let function_row = built
+            .iter()
+            .find(|row| row.kind_tag() == "unknown" && row.identity().namespace().is_none())
+            .expect("function label must remain a report-only row");
+        assert_eq!(function_row.type_name(), "Shared");
+        assert!(matches!(
+            function_row.identity(),
+            domain::tddd::signal_evaluator::ThreeWaySignalIdentity::Label { label }
+                if label.as_str() == "Shared"
+        ));
+        assert_eq!(function_row.signal(), ConfidenceSignal::Yellow);
+
+        let type_row =
+            built.iter().find(|row| row.kind_tag() == "value_object").expect("catalogue type row");
+        assert_eq!(type_row.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert!(type_row.found_type());
+    }
+
+    #[test]
+    fn test_build_type_signals_namespace_less_label_does_not_join_declared_type() {
+        use domain::ConfidenceSignal;
+
+        let mut index = TypeSignalIdentityIndex::default();
+        index.add_namespace("Shared", CatalogueItemNamespace::Type);
+        let kinds = BTreeMap::from([("Shared".to_owned(), vec!["value_object"])]);
+        let signals = vec![
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("Shared"),
+                CatalogueItemNamespace::Type,
+                SignalRegion::SIntersectC_Match_Add,
+            ),
+            ThreeWaySignal::label(FreeText::new("Shared"), SignalRegion::SMinusC_Add),
+        ];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        let declared_type = built
+            .iter()
+            .find(|signal| signal.kind_tag() == "value_object")
+            .expect("declared type row remains present");
+        assert_eq!(declared_type.signal(), ConfidenceSignal::Blue);
+        assert!(declared_type.found_type());
+
+        let report_label = built
+            .iter()
+            .find(|signal| signal.kind_tag() == "unknown")
+            .expect("namespace-less report label remains present");
+        assert_eq!(report_label.type_name(), "Shared");
+        assert_eq!(report_label.signal(), ConfidenceSignal::Yellow);
+        assert!(!report_label.found_type());
+    }
+
+    #[test]
+    fn test_build_type_signals_retains_trait_impl_label_on_owner_row() {
+        let mut index = TypeSignalIdentityIndex::default();
+        index.add_namespace("Owner", CatalogueItemNamespace::Type);
+        let kinds = BTreeMap::from([("Owner".to_owned(), vec!["value_object"])]);
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("Owner: Trait"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        assert_eq!(built.len(), 1, "trait impl must join its owner row: {built:?}");
+        assert_eq!(built[0].type_name(), "Owner");
+        assert_eq!(built[0].kind_tag(), "value_object");
+        assert_eq!(built[0].identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(built[0].found_items(), &["Trait"]);
+    }
+
+    #[test]
+    fn test_build_identity_index_assigns_impl_owner_to_type_namespace_key() {
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
+        );
+        let root = ModulePath::root();
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Shared".to_owned()).expect("valid type key"),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(root.clone()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.insert_trait(
+            CatalogueEntryKey::try_new("domain::Shared".to_owned()).expect("valid trait key"),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(root),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("SomeTrait").expect("valid trait ref"),
+            TypeRef::new("Shared").expect("valid type ref"),
+        ));
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("type-signal identities resolve in their namespaces");
+        let kinds = BTreeMap::from([
+            ("Shared".to_owned(), vec!["value_object"]),
+            ("domain::Shared".to_owned(), vec!["secondary_port"]),
+        ]);
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::Shared: SomeTrait"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+
+        let type_row = built
+            .iter()
+            .find(|signal| signal.type_name() == "Shared")
+            .expect("type entry remains the impl owner");
+        assert_eq!(type_row.found_items(), &["SomeTrait"]);
+        let trait_row = built
+            .iter()
+            .find(|signal| signal.type_name() == "domain::Shared")
+            .expect("trait entry remains separate from the type owner");
+        assert!(trait_row.found_items().is_empty());
+    }
+
+    #[test]
+    fn test_build_type_signals_preserves_namespace_less_function_key_in_fill_pass() {
+        let crate_name = CrateName::new("domain").expect("valid crate name");
+        let root = ModulePath::root();
+        let rustdoc_paths = HashMap::from([(
+            Id(1),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["domain".to_owned(), "Shared".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let mut index = TypeSignalIdentityIndex::default();
+        add_entry_identity(
+            &mut index,
+            &crate_name,
+            "Shared",
+            Some(&root),
+            CatalogueItemNamespace::Type,
+            &rustdoc_paths,
+        )
+        .expect("type identity resolves");
+
+        let kinds = BTreeMap::from([
+            ("Shared".to_owned(), vec!["value_object"]),
+            ("domain::Shared".to_owned(), vec!["free_function"]),
+        ]);
+
+        let built = build_type_signals_from_report(std::iter::empty(), &kinds, &index);
+
+        assert_eq!(built.len(), 2, "function fill row must not join the type row: {built:?}");
+        assert!(
+            built.iter().any(|signal| signal.type_name() == "domain::Shared"
+                && signal.kind_tag() == "free_function")
+        );
+        assert!(built
+            .iter()
+            .any(|signal| signal.type_name() == "Shared" && signal.kind_tag() == "value_object"));
+    }
 
     #[test]
     fn test_build_type_signals_joins_short_impl_owner_to_qualified_entry() {
@@ -539,8 +803,8 @@ mod tests {
             "domain::tddd::catalogue_linter::CatalogueLinterError".to_owned(),
             vec!["error_type"],
         );
-        let signals = vec![ThreeWaySignal::new(
-            "CatalogueLinterError: From<TypeRefPathExtractionError>".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("CatalogueLinterError: From<TypeRefPathExtractionError>"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -556,8 +820,8 @@ mod tests {
         let mut index = TypeSignalIdentityIndex::default();
         index.add_impl_alias("Arc", "std::sync::Arc<T>");
 
-        let signals = vec![ThreeWaySignal::new(
-            "Arc: TypeRefPathExtractorPort".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("Arc: TypeRefPathExtractorPort"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -569,6 +833,7 @@ mod tests {
 
         assert_eq!(built.len(), 1);
         assert_eq!(built[0].type_name(), "std::sync::Arc<T>");
+        assert_eq!(built[0].identity().namespace(), None);
     }
 
     #[test]
@@ -596,7 +861,9 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path"),
+                Some(
+                    ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path"),
+                ),
                 None,
                 vec![],
                 vec![],
@@ -621,22 +888,20 @@ mod tests {
                 kind: ItemKind::Struct,
             },
         )]);
-        for rustdoc_paths in [rustdoc_paths, HashMap::new()] {
-            let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
-                .expect("generic impl owner identity indexes successfully");
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("generic impl owner identity indexes successfully");
 
-            let signals = vec![ThreeWaySignal::new(
-                "domain::alpha::Wrapper<T>: domain::ports::Port".to_owned(),
-                SignalRegion::SIntersectC_Match_Add,
-            )];
-            let kinds = BTreeMap::from([("domain::alpha::Wrapper".to_owned(), vec!["struct"])]);
-            let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::alpha::Wrapper<T>: domain::ports::Port"),
+            SignalRegion::SIntersectC_Match_Add,
+        )];
+        let kinds = BTreeMap::from([("domain::alpha::Wrapper".to_owned(), vec!["struct"])]);
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
 
-            assert_eq!(built.len(), 1);
-            assert_eq!(built[0].type_name(), "domain::alpha::Wrapper");
-            assert_eq!(built[0].kind_tag(), "struct");
-            assert_eq!(built[0].found_items(), &["domain::ports::Port"]);
-        }
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), "domain::alpha::Wrapper");
+        assert_eq!(built[0].kind_tag(), "struct");
+        assert_eq!(built[0].found_items(), &["domain::ports::Port"]);
     }
 
     #[test]
@@ -666,7 +931,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
-                    module_path.clone(),
+                    Some(module_path.clone()),
                     None,
                     vec![],
                     vec![],
@@ -683,7 +948,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
-                    module_path,
+                    Some(module_path),
                     None,
                     vec![],
                     vec![],
@@ -739,12 +1004,12 @@ mod tests {
         let identity_index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
             .expect("duplicate module identities must be indexable");
         let signals = [
-            ThreeWaySignal::new(
-                "domain::alpha::Input: domain::alpha::Port<domain::alpha::Input>".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::alpha::Input: domain::alpha::Port<domain::alpha::Input>"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new(
-                "domain::beta::Input: domain::beta::Port<domain::beta::Input>".to_owned(),
+            ThreeWaySignal::label(
+                FreeText::new("domain::beta::Input: domain::beta::Port<domain::beta::Input>"),
                 SignalRegion::SIntersectC_Match_Add,
             ),
         ];
@@ -780,11 +1045,15 @@ mod tests {
     fn test_build_type_signals_plain_declaration_ignores_external_impl_alias() {
         let mut index = TypeSignalIdentityIndex::default();
         index.add_alias("Shared", "domain::alpha::Shared");
+        index.add_namespace("domain::alpha::Shared", CatalogueItemNamespace::Type);
         index.add_impl_alias("Shared", "external::Shared");
         let mut kinds = std::collections::BTreeMap::new();
         kinds.insert("domain::alpha::Shared".to_owned(), vec!["struct"]);
-        let signals =
-            vec![ThreeWaySignal::new("Shared".to_owned(), SignalRegion::SIntersectC_Match_Add)];
+        let signals = vec![ThreeWaySignal::catalogue_item(
+            FreeText::new("Shared"),
+            CatalogueItemNamespace::Type,
+            SignalRegion::SIntersectC_Match_Add,
+        )];
 
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
 
@@ -801,8 +1070,8 @@ mod tests {
 
         let mut kinds = std::collections::BTreeMap::new();
         kinds.insert("domain::other::Thing".to_owned(), vec!["struct"]);
-        let signals = vec![ThreeWaySignal::new(
-            "other::Thing: LocalTrait".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("other::Thing: LocalTrait"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
@@ -825,20 +1094,27 @@ mod tests {
         let mut index = TypeSignalIdentityIndex::default();
         index.add_alias("Shared", "domain::alpha::Shared");
         index.add_alias("Shared", "domain::beta::Shared");
+        index.add_namespace("domain::alpha::Shared", CatalogueItemNamespace::Type);
+        index.add_namespace("domain::beta::Shared", CatalogueItemNamespace::Type);
 
         let mut kinds = std::collections::BTreeMap::new();
         kinds.insert("domain::alpha::Shared".to_owned(), vec!["struct"]);
         kinds.insert("domain::beta::Shared".to_owned(), vec!["struct"]);
         let signals = vec![
-            ThreeWaySignal::new(
-                "domain::alpha::Shared".to_owned(),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("domain::alpha::Shared"),
+                CatalogueItemNamespace::Type,
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new(
-                "domain::beta::Shared".to_owned(),
+            ThreeWaySignal::catalogue_item(
+                FreeText::new("domain::beta::Shared"),
+                CatalogueItemNamespace::Type,
                 SignalRegion::SIntersectC_Match_Add,
             ),
-            ThreeWaySignal::new("Shared: Clone".to_owned(), SignalRegion::SIntersectC_Match_Add),
+            ThreeWaySignal::label(
+                FreeText::new("Shared: Clone"),
+                SignalRegion::SIntersectC_Match_Add,
+            ),
         ];
 
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
@@ -854,8 +1130,8 @@ mod tests {
         index.add_alias("Shared", "domain::alpha::Shared");
         index.add_alias("Shared", "domain::beta::Shared");
 
-        let signals = vec![ThreeWaySignal::new(
-            "domain::gamma::Shared: Clone".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("domain::gamma::Shared: Clone"),
             SignalRegion::SIntersectC_Match_Add,
         )];
         let mut kinds = std::collections::BTreeMap::new();
@@ -887,14 +1163,14 @@ mod tests {
             "usecase::chain::traits::SoTChain".to_owned(),
             vec!["secondary_port"],
         )]);
-        let signals = vec![ThreeWaySignal::new(
-            "usecase::chain::traits::SoTChain: ChainIdentity".to_owned(),
+        let signals = vec![ThreeWaySignal::label(
+            FreeText::new("usecase::chain::traits::SoTChain: ChainIdentity"),
             SignalRegion::SIntersectC_Match_Add,
         )];
 
         let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
 
-        assert_eq!(built.len(), 1);
+        assert_eq!(built.len(), 1, "{built:?}");
         assert_eq!(built[0].type_name(), "SoTChain");
         assert_eq!(built[0].kind_tag(), "secondary_port");
         assert_eq!(built[0].signal(), domain::ConfidenceSignal::Blue);
@@ -902,28 +1178,88 @@ mod tests {
     }
 
     #[test]
-    fn test_build_identity_index_preserves_unresolved_add_entry_alias() {
+    fn test_build_identity_index_rejects_add_entry_absent_from_resolution_set() {
         let mut index = TypeSignalIdentityIndex::default();
         let crate_name = CrateName::new("domain").expect("valid crate name");
 
-        add_entry_identity(
+        let error = add_entry_identity(
             &mut index,
             &crate_name,
             "domain::new::Added",
-            &ModulePath::root(),
-            ItemAction::Add,
+            None,
+            CatalogueItemNamespace::Type,
             &HashMap::new(),
         )
-        .expect("unimplemented add entry remains indexable");
+        .expect_err("an add absent from the shared resolution set must fail closed");
 
-        assert_eq!(
-            index.declaration_candidates("domain::new::Added"),
-            Some(vec!["domain::new::Added".to_owned()])
+        assert!(error.contains("cannot canonicalize catalogue entry"));
+    }
+
+    #[test]
+    fn test_build_identity_index_resolves_impl_owner_in_type_namespace() {
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").expect("valid crate name"),
+            LayerId::try_new("domain").expect("valid layer"),
         );
-        assert_eq!(
-            index.declaration_candidates("Added"),
-            Some(vec!["domain::new::Added".to_owned()])
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Shared".to_owned()).expect("valid type key"),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
         );
+        catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Shared".to_owned()).expect("valid trait key"),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("SomeTrait").expect("valid trait reference"),
+            TypeRef::new("Shared").expect("valid type reference"),
+        ));
+
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "Shared".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+
+        build_type_signal_identity_index(&catalogue, &rustdoc_paths)
+            .expect("for_type must resolve in the type namespace only");
     }
 
     #[test]
@@ -945,7 +1281,25 @@ mod tests {
             informal_grounds: vec![],
         });
 
-        let index = build_type_signal_identity_index(&catalogue, &HashMap::new())
+        let rustdoc_paths = HashMap::from([
+            (
+                Id(1),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "RemovedType".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(2),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "old".to_owned(), "RemovedTrait".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            ),
+        ]);
+        let index = build_type_signal_identity_index(&catalogue, &rustdoc_paths)
             .expect("deletion identities remain indexable");
 
         assert_eq!(
@@ -959,17 +1313,29 @@ mod tests {
     }
 
     #[test]
-    fn test_add_deletion_identity_preserves_bare_catalogue_key() {
+    fn test_add_deletion_identity_uses_authoritative_catalogue_key() {
         let mut index = TypeSignalIdentityIndex::default();
         let crate_name = CrateName::new("infrastructure").expect("valid crate name");
 
+        let rustdoc_paths = HashMap::from([(
+            Id(1),
+            ItemSummary {
+                crate_id: 0,
+                path: vec![
+                    "infrastructure".to_owned(),
+                    "CatalogueToExtendedCrateCodecError".to_owned(),
+                ],
+                kind: ItemKind::Struct,
+            },
+        )]);
         add_deletion_identity(
             &mut index,
             &crate_name,
             "CatalogueToExtendedCrateCodecError",
-            &HashMap::new(),
+            CatalogueItemNamespace::Type,
+            &rustdoc_paths,
         )
-        .expect("legacy bare deletion key remains indexable");
+        .expect("deletion key resolves through the shared resolution set");
 
         assert_eq!(
             index.declaration_candidates("CatalogueToExtendedCrateCodecError"),
