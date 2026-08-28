@@ -14,7 +14,7 @@
   "types": {
     "cli_composition::task_contract::TaskContractCompositionRoot": {
       "action": "modify",
-      "docs": "Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor, accepts the caller-supplied workspace_root used to resolve the layer bindings and catalogue file, and drops Default; composition entry point of the IN-05 pre-review gates.",
+      "docs": "Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor from one items-directory repository context, and drops Default; composition entry point of the IN-05 pre-review gates.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -27,17 +27,17 @@
       "methods": [
         {
           "action": "modify",
-          "docs": "Builds PreReviewGateInteractor and CoverageVerifyInteractor with FsCatalogueDocumentLoader, FsTdddLayerBindingsAdapter, and the caller-supplied workspace_root used to resolve the layer bindings and catalogue file; constructor for the IN-05 pre-review gates.",
+          "docs": "Discovers and canonicalizes the repository root from items_dir with SystemGitRepo::discover_from, then wires the IN-05 pre-review gates; discovery failures produce CompositionError::Infrastructure.",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
           "params": [
             {
-              "name": "workspace_root",
+              "name": "items_dir",
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Self",
+          "returns": "Result<Self, CompositionError>",
           "spec_refs": [
             {
               "anchor": "IN-05",
@@ -46,19 +46,20 @@
           ]
         },
         {
-          "action": "reference",
-          "docs": "Constructs the task-contract driver for the supplied items directory.",
+          "action": "modify",
+          "docs": "Constructs the task-contract driver from the repository context captured by new; driver surface for the IN-05 pre-review gates.",
           "has_default_impl": false,
           "is_async": false,
           "name": "task_contract_driver",
-          "params": [
-            {
-              "name": "items_dir",
-              "ty": "std::path::PathBuf"
-            }
-          ],
+          "params": [],
           "receiver": "&self",
-          "returns": "cli_driver::task_contract::TaskContractDriver"
+          "returns": "cli_driver::task_contract::TaskContractDriver",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "task_contract",

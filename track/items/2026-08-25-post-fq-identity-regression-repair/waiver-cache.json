@@ -394,8 +394,8 @@
       },
       "key": {
         "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
-        "declaration_hash": "550f5964f5082eab6f7d52dcae8633b223bd038b1aa67841367ace13d6880511",
-        "waived_reason_hash": "ead55d606c0945abb095f4307c7f2bc61daee5bd7ef70acb346232a5daf20b1d"
+        "declaration_hash": "bb21f3d713d771fc1906f8fef984f7ef6382d85558c6910262915380766b4022",
+        "waived_reason_hash": "b23d93c36fc0d4d7a99050c3f6002155b8e1960ed61762b7717391ab1ef5f6a6"
       },
       "obligation_id": {
         "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot",
@@ -403,7 +403,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor\"",
+        "citation": "Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor from one items-directory repository context",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

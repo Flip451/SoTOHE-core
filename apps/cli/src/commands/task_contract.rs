@@ -21,7 +21,7 @@ use clap::{Args, Subcommand};
 use cli_composition::{TaskContractCompositionRoot, TrackCompositionRoot};
 use cli_driver::task_contract::TaskContractInput;
 use cli_driver::track_resolution::{
-    TrackItemsDirectoryInput, TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
+    TrackResolutionInput, TrackResolutionOutcome, TrackWorkspaceRootInput,
 };
 
 use crate::commands::driver_outcome_to_exit;
@@ -165,15 +165,14 @@ fn task_contract_check_core(
             return ExitCode::FAILURE;
         }
     };
-    let workspace_root = match TrackItemsDirectoryInput::try_new(items_dir.clone()) {
-        Ok(input) => input.workspace_root().into_path(),
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
         Err(error) => {
-            eprintln!("[BLOCKED] cannot determine task-contract workspace root: {error}");
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
             return ExitCode::FAILURE;
         }
     };
-    let composition_root = TaskContractCompositionRoot::new(workspace_root);
-    let driver = composition_root.task_contract_driver(items_dir);
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Check { layer, track_id: resolved_track_id }),
     )
@@ -208,15 +207,14 @@ fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf)
             return ExitCode::FAILURE;
         }
     };
-    let workspace_root = match TrackItemsDirectoryInput::try_new(items_dir.clone()) {
-        Ok(input) => input.workspace_root().into_path(),
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
         Err(error) => {
-            eprintln!("[BLOCKED] cannot determine task-contract workspace root: {error}");
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
             return ExitCode::FAILURE;
         }
     };
-    let composition_root = TaskContractCompositionRoot::new(workspace_root);
-    let driver = composition_root.task_contract_driver(items_dir);
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Coverage { track_id: resolved_track_id }),
     )
