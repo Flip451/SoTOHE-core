@@ -1028,6 +1028,83 @@ fn test_encode_type_and_trait_deletions_keep_namespace_specific_identities() {
 }
 
 #[test]
+fn test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous() {
+    use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+
+    let explicit_root_json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {
+    "GoneTrait": { "action": "delete", "module_path": "." }
+  },
+  "functions": {}
+}"#;
+    let explicit_root_doc = CatalogueDocumentCodec::decode(explicit_root_json, "domain")
+        .expect("explicit root decodes");
+    let baseline = rustdoc_crate_with_paths([
+        (1, vec!["domain", "GoneType"], ItemKind::Struct),
+        (2, vec!["domain", "nested", "GoneType"], ItemKind::Struct),
+        (3, vec!["domain", "GoneTrait"], ItemKind::Trait),
+        (4, vec!["domain", "nested", "GoneTrait"], ItemKind::Trait),
+    ]);
+
+    let encoded = CatalogueToExtendedCrateCodec::new()
+        .encode(explicit_root_doc, &baseline, &baseline)
+        .expect("explicit root tombstones resolve to the root identities");
+    let root_type_id = item_id_for_path(&encoded, &["domain", "GoneType"]);
+    let root_trait_id = item_id_for_path(&encoded, &["domain", "GoneTrait"]);
+    assert_eq!(encoded.action_for(&root_type_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&root_trait_id), Some(ItemAction::Delete));
+    assert!(
+        encoded
+            .krate()
+            .paths
+            .values()
+            .all(|summary| summary.path != ["domain", "nested", "GoneType"])
+    );
+    assert!(
+        encoded
+            .krate()
+            .paths
+            .values()
+            .all(|summary| summary.path != ["domain", "nested", "GoneTrait"])
+    );
+
+    for section in ["types", "traits"] {
+        let omitted_json = format!(
+            r#"{{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {types},
+  "traits": {traits},
+  "functions": {{}}
+}}"#,
+            types =
+                if section == "types" { r#"{ "GoneType": { "action": "delete" } }"# } else { "{}" },
+            traits = if section == "traits" {
+                r#"{ "GoneTrait": { "action": "delete" } }"#
+            } else {
+                "{}"
+            },
+        );
+        let omitted_doc = CatalogueDocumentCodec::decode(&omitted_json, "domain")
+            .expect("omitted placement decodes");
+        let error = CatalogueToExtendedCrateCodec::new()
+            .encode(omitted_doc, &baseline, &baseline)
+            .expect_err("omitted placement must remain fail-closed when the baseline is ambiguous");
+        assert!(
+            matches!(error, NewTypeGraphCodecError::AmbiguousIdentifier(..)),
+            "omitted {section} tombstone must be ambiguous, got {error:?}"
+        );
+    }
+}
+
+#[test]
 fn test_encode_function_deletion_record_emits_delete_action() {
     let mut doc = make_doc("domain");
     let path = FunctionPath::at_root(

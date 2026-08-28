@@ -934,6 +934,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths"
         },
         {
@@ -1085,6 +1090,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_function_deletion_record_emits_delete_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ]
     },
@@ -1127,6 +1137,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ]
     },
@@ -1164,6 +1189,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ]
     },

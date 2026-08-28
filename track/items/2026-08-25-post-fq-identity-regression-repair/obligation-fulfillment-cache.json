@@ -2438,6 +2438,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths"
         },
         {
@@ -2500,7 +2505,7 @@
       },
       "key": {
         "anchor_text_hash": "c5fb35f88b77ccd4fcf3b3a0299565f08da5138d0a5c34172327c6c83b1543e2",
-        "bound_tests_set_hash": "a2d24243a288039f27898331cbd471927345e26ae23f9c194cd9c00f2a7f856e",
+        "bound_tests_set_hash": "6c1b4c8879c83f9d8122a4052421ace28cbe9f9c6cec6bbf59602c204b3d91e7",
         "declaration_hash": "672f6b7da5a756a2ea3cc1148a54700aa7d2afa5303edfe8eb1c604acd85063c"
       },
       "obligation_id": {
@@ -2509,7 +2514,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().paths[&id].path, [\"domain\", \"FutureType\"]);\nassert_eq!(encoded.krate().paths[&id].crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID);\nassert!(matches!(encoded.krate().index[&id].inner, ItemEnum::Struct(_)));",
+        "citation": "expect(\"catalogue add declarations must seed the production resolution set\");\n\n    assert!(\n        encoded.krate().paths.values().any(|summary| { summary.path == vec![\"domain\", \"First\"] })\n    );\n    assert!(\n        encoded.krate().paths.values().any(|summary| { summary.path == vec![\"domain\", \"Second\"] })\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2525,6 +2530,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_type_and_trait_deletions_keep_namespace_specific_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         },
         {
           "layer": "infrastructure",
@@ -2591,7 +2601,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "a2d24243a288039f27898331cbd471927345e26ae23f9c194cd9c00f2a7f856e",
+        "bound_tests_set_hash": "6c1b4c8879c83f9d8122a4052421ace28cbe9f9c6cec6bbf59602c204b3d91e7",
         "declaration_hash": "672f6b7da5a756a2ea3cc1148a54700aa7d2afa5303edfe8eb1c604acd85063c"
       },
       "obligation_id": {
@@ -2600,7 +2610,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id\n    ));\n    assert_eq!(encoded.krate().paths[&added_id].path, [\"cli\", \"generated\", \"AddedType\"]); ... assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);\n    assert_eq!(encoded.action_for(&id), Some(ItemAction::Add));",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id\n    ));\n    assert_eq!(encoded.krate().paths[&added_id].path, [\"domain\", \"generated\", \"AddedType\"]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2697,6 +2707,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_function_deletion_record_emits_delete_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ],
       "edge_id": {
@@ -2708,7 +2723,7 @@
       },
       "key": {
         "anchor_text_hash": "4dcfe030829a00aad8626bdef8712c9d938b395528f99cd133f42757e7e75d4a",
-        "bound_tests_set_hash": "975089ce10122101164dfc2691b79b64a636e3d9b359780867cdbc5c6d58be4d",
+        "bound_tests_set_hash": "e3f68385c60fb30a0dc7d17ab1b87a49eb020b41437dd0f55ad9ee26e1915f9a",
         "declaration_hash": "8336bcb0648825977c60044f8477ef23539ba43b78b40213465ce74f3d30b375"
       },
       "obligation_id": {
@@ -2717,7 +2732,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"for (action, key, module) in [\\n        (ItemAction::Modify, \\\"Modified\\\", \\\"before\\\"),\\n        (ItemAction::Reference, \\\"Referenced\\\", \\\"already\\\"),\\n    ]\" ... \"assert_eq!(encoded.action_for(&id), Some(action));\" ... \"assert_eq!(encoded.action_for(&id), Some(ItemAction::Delete));\" ... \"multiple current placements must fail closed\" ... \"identifier.as_str() == \\\"FutureType\\\" && candidates.as_slice().len() == 2\"",
+        "citation": "for (action, key, module) in [\n        (ItemAction::Modify, \"Modified\", \"before\"),\n        (ItemAction::Reference, \"Referenced\", \"already\"),\n    ] {\n        let encoded = encode_entry(action, key, module)\n            .expect(\"modify/reference must resolve one baseline identity\");\n        let id = item_id_for_path(&encoded, &[\"domain\", module, key]);\n        assert_eq!(encoded.action_for(&id), Some(action));\n    }\n\n    let mut deletion_doc = make_doc(\"domain\");\n    deletion_doc.push_deletion(DeletionRecord::Type {\n        name: CatalogueEntryKey::try_new(\"Removed\".to_owned()).unwrap(),\n        spec_refs: vec![],\n        informal_grounds: vec![],\n    });\n    let baseline =\n        rustdoc_crate_with_paths([(1, vec![\"domain\", \"gone\", \"Removed\"], ItemKind::Struct)]);\n    let encoded = CatalogueToExtendedCrateCodec::new()\n        .encode(deletion_doc, &baseline, &baseline)\n        .expect(\"delete must resolve one baseline identity\");\n    let id = item_id_for_path(&encoded, &[\"domain\", \"gone\", \"Removed\"]);\n    assert_eq!(encoded.action_for(&id), Some(ItemAction::Delete));\n\nlet error = CatalogueToExtendedCrateCodec::new()\n        .encode(doc, &baseline, &current)\n        .expect_err(\"multiple current placements must fail closed\");\n    assert!(matches!(\n        error,\n        NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates)\n            if identifier.as_str() == \"FutureType\" && candidates.as_slice().len() == 2\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2753,6 +2768,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ],
       "edge_id": {
@@ -2764,7 +2794,7 @@
       },
       "key": {
         "anchor_text_hash": "59470573f2f5f38eda2d405e9271e57bfac395f2c6e85720e5d60ca4505c35fb",
-        "bound_tests_set_hash": "18db40d20af4662d767db2febb3ed984fb86f492f69479cd6a03f29201ea0453",
+        "bound_tests_set_hash": "52676757f3c4a09e0d886d5588e77a75119416502dac49dfaa0cb1e74a41cbaa",
         "declaration_hash": "29639c83b06c392a353dd6f387047e3463e5a48b5c9b9ae77c8a242abafad210"
       },
       "obligation_id": {
@@ -2773,7 +2803,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(summary_identity(omitted), Some(FullyQualifiedItemPath::UnplacedType { .. }))); assert!(matches!(summary_identity(explicit), Some(FullyQualifiedItemPath::PlacedType { .. }))); assert_eq!(explicit.crate_id, 0); assert_eq!(omitted.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID); ... assert_eq!(identities.get_by_path(\"domain::alpha::SharedName\"), Some(&type_id)); assert_eq!(identities.get_by_path(\"domain::beta::SharedName\"), Some(&trait_id)); ... let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else { panic!(\"expected AmbiguousIdentifier, got {error:?}\"); };",
+        "citation": "assert!(matches!(summary_identity(omitted), Some(FullyQualifiedItemPath::UnplacedType { .. }))); ... assert_eq!(omitted.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID); ... assert_eq!(identities.get_by_path(\"domain::alpha::SharedName\"), Some(&type_id)); ... assert_eq!(identities.get_by_path(\"domain::beta::SharedName\"), Some(&trait_id)); ... assert!(matches!(error, NewTypeGraphCodecError::AmbiguousIdentifier(..)), \"omitted {section} tombstone must be ambiguous, got {error:?}\")",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2804,6 +2834,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous"
         }
       ],
       "edge_id": {
@@ -2815,7 +2860,7 @@
       },
       "key": {
         "anchor_text_hash": "3efe6fe78a0e392077abe118f5af1ebd5dbed6ecc5de7dd1d87668636d4a780a",
-        "bound_tests_set_hash": "1e17447325be31f75b7362312a777bb9141bcc84fc65ce174aef6dd588bd0f9e",
+        "bound_tests_set_hash": "3c4717fd568e0d0ac34186e1611382c9d4753a3d6f01f94bc17ab020fef377ab",
         "declaration_hash": "0bfc871cf55a3950610a7517fc41477fa7f9db57d73be5119885ac8d2bea8261"
       },
       "obligation_id": {
@@ -2824,7 +2869,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"expect(\\\"one current candidate supplies omitted placement\\\")\"; ... \"summary.path == vec![\\\"domain\\\", \\\"generated\\\", \\\"FutureType\\\"]\" ... \"expect_err(\\\"an omitted add cannot replace a baseline declaration\\\")\" ... \"expect_err(\\\"multiple current placements must fail closed\\\")\" ... \"SYNTHETIC_UNPLACED_CRATE_ID\" ... \"modify/reference must resolve one baseline identity\" ... \"delete must resolve one baseline identity\"",
+        "citation": "let error = CatalogueToExtendedCrateCodec::new()\n        .encode(doc, &baseline, &baseline)\n        .expect_err(\"an omitted add cannot replace a baseline declaration\");\n    assert!(matches!(error, NewTypeGraphCodecError::AmbiguousIdentifier(..)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

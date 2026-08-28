@@ -153,10 +153,10 @@ fn tombstone_grounding(
 
 /// Keeps the module context of a type/trait tombstone in its identity-only
 /// domain record. Type and trait deletion records have no separate
-/// `module_path` field, so a bare legacy key must be promoted to the local
-/// module-qualified notation before the DTO context is discarded. A key that
-/// already contains a path is retained as written, matching live-entry key
-/// handling and preserving explicitly qualified spellings.
+/// `module_path` field, so a bare key with an explicit module path must be
+/// promoted to the corresponding qualified notation before the DTO context is
+/// discarded. An omitted module path remains an unplaced/bare key, preserving
+/// the fail-closed resolution rule for placement-unspecified deletions.
 fn tombstone_entry_key(
     crate_name: &CrateName,
     entry_key: &CatalogueEntryKey,
@@ -165,21 +165,30 @@ fn tombstone_entry_key(
     let entry_name = entry_key.as_str();
     // Route the tombstone through the same marker-aware decoder as live
     // entries: the explicit root marker written by `encode_module_path` must
-    // decode as the crate root, and a legacy empty value keeps its root
-    // meaning for tombstones (they carry no separate placement state).
-    let module_path = decode_module_path(&tombstone.module_path)
-        .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+    // decode as the crate root. An empty value is deliberately retained as
+    // `None` so omitted placement does not become an implicit root identity.
+    let module_path = decode_module_path(&tombstone.module_path).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
             entry_name: entry_name.to_owned(),
             reason: format!("invalid module_path '{}': {error}", tombstone.module_path),
-        })?
-        .unwrap_or_else(ModulePath::root);
-    let identity =
-        FullyQualifiedItemPath::from_catalogue_entry_key(crate_name, entry_key, &module_path)
-            .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
-                entry_name: entry_name.to_owned(),
-                reason: format!("invalid catalogue entry identity: {error}"),
-            })?;
-    if !tombstone.module_path.is_empty() && identity.module_path() != Some(&module_path) {
+        }
+    })?;
+    // Validate the key even when its placement is omitted. The root fallback
+    // is only a parsing context here; the returned key below remains bare.
+    let identity_module_path = module_path.clone().unwrap_or_else(ModulePath::root);
+    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+        crate_name,
+        entry_key,
+        &identity_module_path,
+    )
+    .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason: format!("invalid catalogue entry identity: {error}"),
+    })?;
+    let Some(module_path) = module_path else {
+        return Ok(entry_key.clone());
+    };
+    if identity.module_path() != Some(&module_path) {
         return Err(CatalogueDocumentCodecError::InvalidEntry {
             entry_name: entry_name.to_owned(),
             reason: format!(
@@ -190,7 +199,9 @@ fn tombstone_entry_key(
             ),
         });
     }
-    let effective_name = if module_path.is_root() || entry_name.contains("::") {
+    let effective_name = if module_path.is_root() && !entry_name.contains("::") {
+        format!("{crate_name}::{entry_name}")
+    } else if entry_name.contains("::") {
         entry_name.to_owned()
     } else {
         format!("{module_path}::{entry_name}")

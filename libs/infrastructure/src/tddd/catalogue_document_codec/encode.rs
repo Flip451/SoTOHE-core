@@ -10,8 +10,8 @@ use domain::tddd::catalogue_v2::entries::{
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, DeletionRecord, InvariantDecl, MethodDeclaration, MethodGenericParam,
-    ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueEntryKey, DeletionRecord, FullyQualifiedItemPath, InvariantDecl,
+    MethodDeclaration, MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
@@ -74,7 +74,7 @@ pub(super) fn domain_to_dto(
                     &mut types,
                     "type",
                     name.as_str().to_owned(),
-                    tombstone_dto(spec_refs, informal_grounds),
+                    tombstone_dto(doc.crate_name(), name, spec_refs, informal_grounds),
                 )?;
             }
             DeletionRecord::Trait { name, spec_refs, informal_grounds } => {
@@ -82,7 +82,7 @@ pub(super) fn domain_to_dto(
                     &mut traits,
                     "trait",
                     name.as_str().to_owned(),
-                    tombstone_dto(spec_refs, informal_grounds),
+                    tombstone_dto(doc.crate_name(), name, spec_refs, informal_grounds),
                 )?;
             }
             DeletionRecord::Function { path, spec_refs, informal_grounds } => {
@@ -90,7 +90,7 @@ pub(super) fn domain_to_dto(
                     &mut functions,
                     "function",
                     path.to_string(),
-                    tombstone_dto(spec_refs, informal_grounds),
+                    function_tombstone_dto(spec_refs, informal_grounds),
                 )?;
             }
         }
@@ -117,6 +117,20 @@ pub(super) fn domain_to_dto(
 // ---------------------------------------------------------------------------
 
 fn tombstone_dto(
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
+    spec_refs: &[domain::SpecRef],
+    informal_grounds: &[domain::InformalGroundRef],
+) -> TombstoneDto {
+    TombstoneDto {
+        action: "delete".to_owned(),
+        module_path: encode_tombstone_module_path(crate_name, key),
+        spec_refs: spec_refs_to_dtos(spec_refs),
+        informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
+}
+
+fn function_tombstone_dto(
     spec_refs: &[domain::SpecRef],
     informal_grounds: &[domain::InformalGroundRef],
 ) -> TombstoneDto {
@@ -125,6 +139,22 @@ fn tombstone_dto(
         module_path: String::new(),
         spec_refs: spec_refs_to_dtos(spec_refs),
         informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
+}
+
+fn encode_tombstone_module_path(
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
+) -> String {
+    let Ok(identity) = FullyQualifiedItemPath::from_type_fully_qualified_key(key) else {
+        return String::new();
+    };
+    if identity.crate_name() == crate_name
+        && identity.module_path().is_some_and(|module_path| module_path.is_root())
+    {
+        EXPLICIT_ROOT_MODULE_PATH.to_owned()
+    } else {
+        String::new()
     }
 }
 

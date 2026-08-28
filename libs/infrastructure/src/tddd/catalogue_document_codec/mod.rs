@@ -2157,10 +2157,10 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_type_delete_tombstone_accepts_explicit_root_marker() {
+    fn test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker() {
         // Turning an explicitly root-placed live entry into a tombstone keeps
-        // `module_path: "."`; the tombstone must decode through the same
-        // marker-aware helper as live entries instead of rejecting the marker.
+        // `module_path: "."`; the tombstone must retain that placement in its
+        // identity and on a subsequent encode.
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -2175,11 +2175,17 @@ mod tests {
         let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
             panic!("expected Type deletion");
         };
-        assert_eq!(name.as_str(), "GoneType");
+        assert_eq!(name.as_str(), "domain::GoneType");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["domain::GoneType"]["module_path"], ".");
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
     }
 
     #[test]
-    fn test_decode_trait_delete_tombstone_accepts_explicit_root_marker() {
+    fn test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker() {
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -2192,7 +2198,13 @@ mod tests {
         let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
             panic!("expected Trait deletion");
         };
-        assert_eq!(name.as_str(), "OldPort");
+        assert_eq!(name.as_str(), "domain::OldPort");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["traits"]["domain::OldPort"]["module_path"], ".");
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
     }
 
     #[test]
@@ -2234,6 +2246,11 @@ mod tests {
             }
             other => panic!("expected Trait deletion, got {other:?}"),
         }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert!(value["traits"]["OldPort"]["module_path"].is_null());
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
     }
 
     #[test]
