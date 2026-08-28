@@ -2231,6 +2231,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
           "test_name": "test_catalog_import_unrelated_root_fails_with_shared_canonicalization_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_compare_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_reject_same_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_entry_resolution_fails_closed_when_unresolved_or_ambiguous"
         }
       ],
       "edge_id": {
@@ -2242,7 +2257,7 @@
       },
       "key": {
         "anchor_text_hash": "e975b3d7a10a9e4d88d59937a046e01a4a00043784750474062dbd6312d33ef4",
-        "bound_tests_set_hash": "446b04227974b971a5b2a5c72b763cb1b052f6414c858f02211139f62c5bbf77",
+        "bound_tests_set_hash": "0b205d7c4323e2c7034c5c108ffbe5551ddd0a5803b0a1bf7b58226209ce2f7d",
         "declaration_hash": "84f5b188de5ad00348abc2106ad462438dad6f33e54303f9387e6f56a233bbec"
       },
       "obligation_id": {
@@ -2251,7 +2266,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let canonical_key = crate::tddd::canonical_type_identity::canonicalize_rustdoc_root_path(\n        &rustdoc_path,\n        &package,\n        Some(resolution.rustdoc_root_name()),\n    )\n    .join(\"::\");\n    let report = CatalogPort::import(\n        &adapter,\n        &track_id,\n        &items_dir,\n        CatalogImportCommand {\n            layer: LayerId::try_new(\"cli\").unwrap(),\n            type_path: \"cli::commands::VerifyCommand\".to_owned(),\n            action: CatalogImportAction::Modify,\n            anchors: vec![\"AC-02\".to_owned()],\n        },\n    )\n    .unwrap();\n\n    assert_eq!(report.entry_key.as_bytes(), canonical_key.as_bytes());",
+        "citation": "assert_eq!(report.entry_key.as_bytes(), canonical_key.as_bytes());\n...\nassert_eq!(library_report.entry_key, expected_library_key);\nassert_eq!(library_report.entry_key, \"cli::commands::LibraryCommand\");\n...\nassert_eq!(report.entry_key, \"domain::beta::Thing\");\n...\nassert!(matches!(error, CatalogError::DuplicateEntry { .. }));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2292,6 +2307,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
           "test_name": "test_catalog_import_unrelated_root_fails_with_shared_canonicalization_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_compare_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_reject_same_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_entry_resolution_fails_closed_when_unresolved_or_ambiguous"
         }
       ],
       "edge_id": {
@@ -2303,7 +2333,7 @@
       },
       "key": {
         "anchor_text_hash": "da4e14f28fcf6a1dc2f1294ebbd30486be30de9f9ec49633f9e737349d2630ae",
-        "bound_tests_set_hash": "446b04227974b971a5b2a5c72b763cb1b052f6414c858f02211139f62c5bbf77",
+        "bound_tests_set_hash": "0b205d7c4323e2c7034c5c108ffbe5551ddd0a5803b0a1bf7b58226209ce2f7d",
         "declaration_hash": "84f5b188de5ad00348abc2106ad462438dad6f33e54303f9387e6f56a233bbec"
       },
       "obligation_id": {
@@ -2312,7 +2342,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let canonical_key = crate::tddd::canonical_type_identity::canonicalize_rustdoc_root_path(\n        &rustdoc_path,\n        &package,\n        Some(resolution.rustdoc_root_name()),\n    )\n    .join(\"::\");\n    let report = CatalogPort::import(\n        &adapter,\n        &track_id,\n        &items_dir,\n        CatalogImportCommand {\n            layer: LayerId::try_new(\"cli\").unwrap(),\n            type_path: \"cli::commands::VerifyCommand\".to_owned(),\n            action: CatalogImportAction::Modify,\n            anchors: vec![\"AC-02\".to_owned()],\n        },\n    )\n    .unwrap();\n\n    assert_eq!(report.entry_key.as_bytes(), canonical_key.as_bytes());",
+        "citation": "assert_eq!(report.entry_key.as_bytes(), canonical_key.as_bytes()); ... assert!(!bin_report.entry_key.contains(\"cli::cli::\")); ... assert!(!bin_report.entry_key.starts_with(\"sotp::\")); ... assert_eq!(catalogue[\"functions\"][\"cli::commands::run\"][\"action\"], \"add\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2353,6 +2383,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
           "test_name": "test_catalog_import_unrelated_root_fails_with_shared_canonicalization_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_compare_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_reject_same_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_entry_resolution_fails_closed_when_unresolved_or_ambiguous"
         }
       ],
       "edge_id": {
@@ -2364,7 +2409,7 @@
       },
       "key": {
         "anchor_text_hash": "e0df45dfceffc3f0a70e284ab8c2f8786e38eb35ad517ac2da93ec6db018ada2",
-        "bound_tests_set_hash": "446b04227974b971a5b2a5c72b763cb1b052f6414c858f02211139f62c5bbf77",
+        "bound_tests_set_hash": "0b205d7c4323e2c7034c5c108ffbe5551ddd0a5803b0a1bf7b58226209ce2f7d",
         "declaration_hash": "84f5b188de5ad00348abc2106ad462438dad6f33e54303f9387e6f56a233bbec"
       },
       "obligation_id": {
@@ -2373,7 +2418,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let added_function = CatalogPort::add(\n        &adapter,\n        &track_id,\n        &items_dir,\n        CatalogAddCommand {\n            layer: LayerId::try_new(\"cli\").unwrap(),\n            kind: CatalogEntryKind::Function,\n            name: \"cli::commands::run\".to_owned(),",
+        "citation": "assert_eq!(catalogue[\"types\"][\"cli::commands::AddedCommand\"][\"action\"], \"add\");\n    for (entry_key, action) in [\n        (\"cli::commands::VerifyCommand\", \"modify\"),\n        (\"cli::commands::ReferenceCommand\", \"reference\"),\n    ] {\n        let entry = &catalogue[\"types\"][entry_key];\n        assert_eq!(entry[\"action\"], action);\n        assert_eq!(entry[\"module_path\"], \"commands\");\n    }\n    assert_eq!(catalogue[\"functions\"][\"cli::commands::run\"][\"action\"], \"add\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

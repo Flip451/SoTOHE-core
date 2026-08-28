@@ -2501,6 +2501,71 @@
           "hash": "rvw1:sha256:b52328bc497aaf46711a2bbffb2fc053ed32f620f18e929e98e89c5ed5daf07e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T01:12:47Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 201,
+              "message": "The action-aware relaxation is applied to bare `Add` entries as well as `Reference`/`Modify`. `run_with_resolver` builds `current` from a possibly missing or stale cached rustdoc file before `resolve` generates fresh rustdoc; lookup failures are also discarded with `.ok()`. Consequently, an existing bare Add can resolve as unplaced, appear distinct from the qualified import, and then collide with that import once fresh current rustdoc exists. Keep the same-name Add case fail-closed, or resolve it from the fresh current artifact rather than this cache.",
+              "severity": "P1"
+            },
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 234,
+              "message": "A present but non-string `action` is silently treated as a missing action and defaulted to `Add` because `as_str()` and absence are collapsed by `unwrap_or(\"add\")`. A malformed external catalogue can therefore be compared under the wrong identity rules instead of returning `SchemaInvalid`. Distinguish a missing field from an invalid field type or use typed deserialization.",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 291,
+              "message": "The new snapshot loader calls `BaselineRustdocCodec::load`, which performs an unbounded `read_to_string`; the import route may load both baseline and current rustdoc crates before continuing. A large or corrupted artifact can therefore cause unbounded allocation/OOM instead of a typed size-limit error. Resource limits remain undeclared in the environment-assumptions convention, so this is `未宣言の前提への依存`; use the established bounded rustdoc-read pattern and fail closed on overflow.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 745,
+              "message": "The new regression tests inject hand-built `IdentityResolutionSets` directly into `import_entry_to_file_with_identity_sets`, bypassing `load_identity_resolution_sets`, which is the production construction added by this diff. They therefore cannot detect cached-current lookup failures, stale/missing snapshots, alias normalization errors, or filesystem-boundary failures. Add coverage that exercises the production construction rather than a substitute universe.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3958aea2b3e435546eb756ee9739775d6d4df834fe6abde5bb2d562bc5141ed2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T01:35:19Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 305,
+              "message": "`requires_current_identity_set` examines every bare type before `reject_duplicate_identity` applies its requested-name filter. An unrelated draft such as `Other: { module_path: { \"$todo\": ... } }` therefore fails at `existing_module_path` and blocks production `run_with_resolver`, even though this file explicitly intends unrelated drafts to be skipped. The existing regression test bypasses this preflight via the test-only `import_entry_to_file` seam. Restrict inspection to the requested identity or avoid globally decoding unrelated entries, and exercise this case through the production construction.",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_import.rs",
+              "line": 270,
+              "message": "The current-snapshot preflight is semantically unused: `requires_current_identity_set` selects only existing `Reference`/`Modify` entries, while `resolve_catalogue_identity_for_action_in_namespace` consults `current` only for `Add` and uses baseline alone for every non-Add action. Nevertheless, this branch launches Cargo metadata and parses a cached target rustdoc file, so a stale, malformed, oversized, or otherwise inaccessible cache can block an otherwise resolvable import—and even an unrelated Delete—before the fresh resolver runs. This is `未宣言の前提への依存` on an unnecessary process/artifact boundary; omit the cached-current load for this branch or use fresh current evidence if a real cross-check is required.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9f9e985e8ba91f8cfdd1dcda77fe3bb7927b4d2aaddb7342fe8acee46a8805b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T01:45:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d295ae6b30e60ae985b63b233e01ecde3127dd4d17d3e392f1e553bae68b976a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2867,6 +2932,13 @@
           "at": "2026-08-27T23:47:06Z",
           "findings": [],
           "hash": "rvw1:sha256:7f378b89b80ef0ab260e4d2cb8263c162ef29029e3a23a5aaf126fa6e880d332",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T01:06:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98787ff105b849b6939d1484fda287eff3701eccbd123ab4630194daa6323a34",
           "type": "final",
           "verdict": "zero_findings"
         }

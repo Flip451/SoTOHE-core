@@ -2,24 +2,38 @@
 //! shape from rustdoc extraction into a layer's catalogue.
 
 use std::collections::BTreeSet;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
 use domain::plan_ref::SpecElementId;
 use domain::tddd::catalog_gen::{CatalogEntryName, CatalogImportAction};
-use domain::tddd::catalogue_v2::{CrateName, FullyQualifiedItemPath, Identifier, ModulePath};
+use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace;
+use domain::tddd::catalogue_v2::{
+    CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, Identifier, ItemAction, ModulePath,
+    TypeRef,
+};
 use domain::tddd::semantic_verify::CatalogueEntryKey;
 use usecase::catalog_gen::{CatalogError, CatalogImportCommand, CatalogWriteReport};
 
 use super::fs_access::{
-    catalogue_path, insert_entry, load_bindings, read_catalogue, scan_entry_holes, schema_error,
-    spec_ref_file, track_dir, workspace_root, write_catalogue,
+    catalogue_path, insert_entry, load_bindings, port_error, read_catalogue, scan_entry_holes,
+    schema_error, spec_ref_file, track_dir, workspace_root, write_catalogue,
 };
 use super::import_shape::{
     ImportedShape, build_delete_entry, build_import_entry, parse_type_path, resolve_shape,
 };
 use super::validate::load_spec_anchors;
+use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 use crate::tddd::catalogue_document_codec::EXPLICIT_ROOT_MODULE_PATH;
+use crate::tddd::catalogue_to_extended_crate_codec::{normalized_paths_for_doc, paths_from_map};
+
+const MAX_RUSTDOC_JSON_BYTES: u64 = 64 * 1024 * 1024;
+
+#[derive(Debug, Default)]
+struct IdentityResolutionSets {
+    baseline: BTreeSet<FullyQualifiedItemPath>,
+    current: BTreeSet<FullyQualifiedItemPath>,
+}
 
 /// Import an existing type into the layer's catalogue.
 ///
@@ -49,9 +63,16 @@ pub(super) fn run_with_resolver(
     let spec_file = spec_ref_file(track_id);
     let spec_anchors = load_spec_anchors(&dir, items_dir)?;
     let root = workspace_root(items_dir);
-    import_entry_to_file(&path, items_dir, &command, &spec_file, &spec_anchors, || {
-        resolve(&root, &command.type_path)
-    })
+    let identity_sets = load_identity_resolution_sets(&path, items_dir)?;
+    import_entry_to_file_with_identity_sets(
+        &path,
+        items_dir,
+        &command,
+        &spec_file,
+        &spec_anchors,
+        &identity_sets,
+        || resolve(&root, &command.type_path),
+    )
 }
 
 /// Insert the resolved import entry into an existing catalogue file.
@@ -61,6 +82,7 @@ pub(super) fn run_with_resolver(
 /// before the expensive nightly-rustdoc resolution is attempted. `resolve` is a
 /// seam so the pure read → insert → write path stays unit-testable without the
 /// nightly toolchain.
+#[cfg(test)]
 fn import_entry_to_file(
     path: &Path,
     trusted_root: &Path,
@@ -69,12 +91,39 @@ fn import_entry_to_file(
     spec_anchors: &BTreeSet<SpecElementId>,
     resolve: impl FnOnce() -> Result<ImportedShape, CatalogError>,
 ) -> Result<CatalogWriteReport, CatalogError> {
+    import_entry_to_file_with_identity_sets(
+        path,
+        trusted_root,
+        command,
+        spec_file,
+        spec_anchors,
+        &IdentityResolutionSets::default(),
+        resolve,
+    )
+}
+
+fn import_entry_to_file_with_identity_sets(
+    path: &Path,
+    trusted_root: &Path,
+    command: &CatalogImportCommand,
+    spec_file: &str,
+    spec_anchors: &BTreeSet<SpecElementId>,
+    identity_sets: &IdentityResolutionSets,
+    resolve: impl FnOnce() -> Result<ImportedShape, CatalogError>,
+) -> Result<CatalogWriteReport, CatalogError> {
     let mut document = read_catalogue(path, trusted_root)?;
     let entry_key = fully_qualified_entry_key(&document, &command.type_path)?;
     let name = CatalogEntryName::try_new(entry_key.as_str().to_owned()).map_err(|err| {
         schema_error(format!("invalid entry name `{}`: {err}", entry_key.as_str()))
     })?;
-    reject_duplicate_identity(&document, "types", &entry_key, &name)?;
+    reject_duplicate_identity(
+        &document,
+        "types",
+        &entry_key,
+        &name,
+        &identity_sets.baseline,
+        &identity_sets.current,
+    )?;
     let entry = match command.action {
         // A delete import records the removed type's identity plus grounding
         // without resolving the (expensive, nightly) rustdoc shape or emitting
@@ -104,6 +153,8 @@ fn reject_duplicate_identity(
     section: &str,
     new_key: &CatalogueEntryKey,
     new_name: &CatalogEntryName,
+    baseline: &BTreeSet<FullyQualifiedItemPath>,
+    current: &BTreeSet<FullyQualifiedItemPath>,
 ) -> Result<(), CatalogError> {
     let crate_name_text = document
         .get("crate_name")
@@ -131,6 +182,7 @@ fn reject_duplicate_identity(
         if terminal_entry_name(raw_key) != requested_name {
             continue;
         }
+        let action = existing_item_action(raw_key, entry)?;
         let existing_key = CatalogueEntryKey::try_new(raw_key.to_owned()).map_err(|error| {
             schema_error(format!("invalid existing catalogue entry key `{raw_key}`: {error}"))
         })?;
@@ -139,13 +191,35 @@ fn reject_duplicate_identity(
         } else {
             existing_module_path(raw_key, entry)?
         };
-        // D3: an omitted placement is unresolved, not the crate root. Such a
-        // declaration resolves to the unique same-named current item, which is
-        // exactly what this import would place (an ambiguous current set fails
-        // closed elsewhere), so a second declaration is a duplicate. Reject it
-        // before resolution.
+        // D3: an omitted placement is unresolved, not the crate root. Resolve
+        // the existing declaration with its own action against the shared
+        // baseline/current identity sets before deciding whether it collides
+        // with this qualified import.
         let Some(module_path) = module_path else {
-            return Err(CatalogError::DuplicateEntry { entry_key: new_name.clone() });
+            // An existing bare Add is declaration-first and has no established
+            // identity to compare. Keep the duplicate guard conservative rather
+            // than allowing a stale or absent current snapshot to manufacture a
+            // distinct identity that a later fresh rustdoc run could collide
+            // with.
+            if action == ItemAction::Add {
+                return Err(CatalogError::DuplicateEntry { entry_key: new_name.clone() });
+            }
+            let reference = TypeRef::new(raw_key.to_owned()).map_err(|error| {
+                schema_error(format!("invalid existing entry reference `{raw_key}`: {error}"))
+            })?;
+            let existing_identity = resolve_catalogue_identity_for_action_in_namespace(
+                &reference,
+                &crate_name,
+                action,
+                baseline,
+                current,
+                CatalogueItemNamespace::Type,
+            )
+            .map_err(|_| CatalogError::DuplicateEntry { entry_key: new_name.clone() })?;
+            if existing_identity == new_identity {
+                return Err(CatalogError::DuplicateEntry { entry_key: new_name.clone() });
+            }
+            continue;
         };
         let existing_identity = FullyQualifiedItemPath::from_catalogue_entry_key(
             &crate_name,
@@ -160,6 +234,88 @@ fn reject_duplicate_identity(
         }
     }
     Ok(())
+}
+
+fn existing_item_action(
+    raw_key: &str,
+    entry: &serde_json::Value,
+) -> Result<ItemAction, CatalogError> {
+    let action = match entry.get("action") {
+        None => "add",
+        Some(value) => value.as_str().ok_or_else(|| {
+            schema_error(format!("existing entry `{raw_key}` has a non-string `action`"))
+        })?,
+    };
+    ItemAction::from_str(action).map_err(|error| {
+        schema_error(format!("existing entry `{raw_key}` has invalid action `{action}`: {error}"))
+    })
+}
+
+fn load_identity_resolution_sets(
+    catalogue_path: &Path,
+    trusted_items_root: &Path,
+) -> Result<IdentityResolutionSets, CatalogError> {
+    let document = read_catalogue(catalogue_path, trusted_items_root)?;
+    let crate_name_text = document
+        .get("crate_name")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| schema_error("catalogue is missing a string `crate_name`"))?;
+    let crate_name = CrateName::new(crate_name_text.to_owned())
+        .map_err(|error| schema_error(format!("invalid catalogue crate_name: {error}")))?;
+
+    let baseline_path = baseline_path(catalogue_path)?;
+    let baseline = load_optional_rustdoc(&baseline_path, trusted_items_root)?;
+    // Bare Add entries are rejected conservatively, while the action-aware
+    // resolver uses only the baseline for the remaining existing-item actions.
+    // There is therefore no reason for this duplicate check to inspect the
+    // shared, mutable current rustdoc cache.
+
+    Ok(IdentityResolutionSets {
+        baseline: baseline
+            .as_ref()
+            .map(|krate| rustdoc_identities(krate, &crate_name))
+            .unwrap_or_default(),
+        current: BTreeSet::new(),
+    })
+}
+
+fn baseline_path(catalogue_path: &Path) -> Result<PathBuf, CatalogError> {
+    let stem = catalogue_path
+        .file_stem()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| schema_error("catalogue path has no valid file stem"))?;
+    Ok(catalogue_path.with_file_name(format!("{stem}-baseline.json")))
+}
+
+fn load_optional_rustdoc(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<Option<rustdoc_types::Crate>, CatalogError> {
+    let Some(content) =
+        crate::trusted_file::read_bounded_regular_file(path, trusted_root, MAX_RUSTDOC_JSON_BYTES)
+            .map_err(|error| {
+                port_error(format!(
+                    "failed to read rustdoc identity snapshot {}: {error}",
+                    path.display()
+                ))
+            })?
+    else {
+        return Ok(None);
+    };
+    BaselineRustdocCodec::from_json(&content).map(Some).map_err(|error| {
+        port_error(format!(
+            "failed to decode rustdoc identity snapshot {}: {error}",
+            path.display()
+        ))
+    })
+}
+
+fn rustdoc_identities(
+    krate: &rustdoc_types::Crate,
+    crate_name: &CrateName,
+) -> BTreeSet<FullyQualifiedItemPath> {
+    let normalized = normalized_paths_for_doc(krate, crate_name);
+    paths_from_map(&normalized)
 }
 
 fn terminal_entry_name(key: &str) -> &str {
@@ -268,10 +424,10 @@ mod tests {
         path
     }
 
-    fn sample_shape() -> ImportedShape {
+    fn sample_shape_at(module_path: &str, name: &str) -> ImportedShape {
         ImportedShape {
-            module_path: "tddd".to_owned(),
-            name: "LayerId".to_owned(),
+            module_path: module_path.to_owned(),
+            name: name.to_owned(),
             kind: json!({
                 "kind": "struct",
                 "shape": { "kind": "plain", "fields": [{ "name": "value", "ty": "String" }], "has_stripped_fields": false }
@@ -280,13 +436,129 @@ mod tests {
         }
     }
 
+    fn sample_shape() -> ImportedShape {
+        sample_shape_at("tddd", "LayerId")
+    }
+
     fn import_command(action: CatalogImportAction) -> CatalogImportCommand {
+        import_command_for(action, "domain::tddd::LayerId")
+    }
+
+    fn import_command_for(action: CatalogImportAction, type_path: &str) -> CatalogImportCommand {
         CatalogImportCommand {
             layer: LayerId::try_new("domain").unwrap(),
-            type_path: "domain::tddd::LayerId".to_owned(),
+            type_path: type_path.to_owned(),
             action,
             anchors: vec![],
         }
+    }
+
+    fn write_existing_bare_type(path: &Path, action: &str) {
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        document["types"] = json!({ "Thing": { "action": action } });
+        std::fs::write(path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+    }
+
+    fn rustdoc_snapshot(entries: &[(&str, &str)]) -> String {
+        let paths = entries
+            .iter()
+            .enumerate()
+            .map(|(index, (module_path, name))| {
+                let mut path = vec!["domain".to_owned()];
+                path.extend(
+                    module_path
+                        .split("::")
+                        .filter(|segment| !segment.is_empty())
+                        .map(str::to_owned),
+                );
+                path.push((*name).to_owned());
+                (
+                    rustdoc_types::Id((index + 1) as u32),
+                    rustdoc_types::ItemSummary {
+                        crate_id: 0,
+                        path,
+                        kind: rustdoc_types::ItemKind::Struct,
+                    },
+                )
+            })
+            .collect();
+        let krate = rustdoc_types::Crate {
+            root: rustdoc_types::Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: std::collections::HashMap::new(),
+            paths,
+            external_crates: std::collections::HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+        };
+        serde_json::to_string(&krate).unwrap()
+    }
+
+    fn production_import_resolver(
+        _workspace_root: &Path,
+        type_path: &str,
+    ) -> Result<ImportedShape, CatalogError> {
+        let (_, module, name) = parse_type_path(type_path)
+            .map_err(|error| port_error(format!("test type path parsing failed: {error}")))?;
+        Ok(sample_shape_at(&module, &name))
+    }
+
+    fn resolver_must_not_run(
+        _workspace_root: &Path,
+        _type_path: &str,
+    ) -> Result<ImportedShape, CatalogError> {
+        Err(port_error("the rustdoc shape resolver must not run"))
+    }
+
+    fn setup_production_identity_import_fixture(
+        existing_action: &str,
+        baseline_entries: &[(&str, &str)],
+    ) -> (tempfile::TempDir, std::path::PathBuf, String, std::path::PathBuf) {
+        let workspace = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(workspace.path().join("src")).unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            r#"[package]
+name = "domain"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "src/lib.rs"
+"#,
+        )
+        .unwrap();
+        std::fs::write(workspace.path().join("src/lib.rs"), "pub struct Thing;\n").unwrap();
+        std::fs::write(
+            workspace.path().join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap();
+
+        let items_dir = workspace.path().join("track/items");
+        let track_id = "production-import-track".to_owned();
+        let track_dir = items_dir.join(&track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("spec.json"),
+            r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Production identity import test",
+  "scope": {
+    "in_scope": [{ "id": "AC-02", "text": "identity import" }],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#,
+        )
+        .unwrap();
+        let path = seed_catalogue(&track_dir);
+        write_existing_bare_type(&path, existing_action);
+        std::fs::write(baseline_path(&path).unwrap(), rustdoc_snapshot(baseline_entries)).unwrap();
+        (workspace, items_dir, track_id, path)
     }
 
     fn spec_anchors(ids: &[&str]) -> BTreeSet<domain::plan_ref::SpecElementId> {
@@ -550,42 +822,116 @@ mod tests {
     }
 
     #[test]
-    fn test_import_duplicate_rejected_for_unplaced_same_name_entry() {
-        // D3: an omitted (or empty-string) `module_path` is an unresolved
-        // placement. The bare declaration resolves to the unique same-named
-        // current item, which is what this import would place, so it is a
-        // duplicate and must be rejected before resolution.
-        for module_path in [json!({}), json!({"module_path": ""})] {
-            let temp = tempfile::tempdir().unwrap();
-            let path = seed_catalogue(temp.path());
-            let mut document: Value =
-                serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
-            document["types"] = json!({ "LayerId": module_path });
-            std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
-            let resolver_called = std::cell::Cell::new(false);
-
-            let error = import_entry_to_file(
-                &path,
-                temp.path(),
-                &import_command(CatalogImportAction::Reference),
-                "spec.json",
-                &BTreeSet::new(),
-                || {
-                    resolver_called.set(true);
-                    Ok(sample_shape())
-                },
+    fn test_import_unplaced_reference_and_modify_compare_resolved_identity() {
+        // A bare existing entry must be compared by the identity selected from
+        // its own action. A baseline `alpha::Thing` does not block an import of
+        // the distinct qualified `beta::Thing`. The fixture goes through
+        // `run_with_resolver`, so the identity sets come from the production
+        // snapshot construction rather than a hand-built test universe.
+        for (existing_action, import_action) in
+            [("reference", CatalogImportAction::Reference), ("modify", CatalogImportAction::Modify)]
+        {
+            let (_workspace, items_dir, track_id, _path) =
+                setup_production_identity_import_fixture(existing_action, &[("alpha", "Thing")]);
+            let report = run_with_resolver(
+                &track_id,
+                &items_dir,
+                import_command_for(import_action, "domain::beta::Thing"),
+                production_import_resolver,
             )
-            .unwrap_err();
+            .expect("a distinct resolved identity must not be rejected");
 
-            assert!(matches!(error, CatalogError::DuplicateEntry { .. }), "{error:?}");
-            assert!(!resolver_called.get(), "unplaced duplicate must fail before resolution");
+            assert_eq!(report.entry_key, "domain::beta::Thing");
         }
     }
 
     #[test]
-    fn test_import_skips_unrelated_draft_entry_without_module_identity() {
+    fn test_import_unplaced_reference_and_modify_reject_same_resolved_identity() {
+        for existing_action in ["reference", "modify"] {
+            let (_workspace, items_dir, track_id, _path) =
+                setup_production_identity_import_fixture(existing_action, &[("alpha", "Thing")]);
+            let error = run_with_resolver(
+                &track_id,
+                &items_dir,
+                import_command_for(CatalogImportAction::Reference, "domain::alpha::Thing"),
+                production_import_resolver,
+            )
+            .expect_err("the resolved same identity must be rejected");
+
+            assert!(matches!(error, CatalogError::DuplicateEntry { .. }), "{error:?}");
+        }
+    }
+
+    #[test]
+    fn test_import_unplaced_entry_resolution_fails_closed_when_unresolved_or_ambiguous() {
+        for baseline in [&[][..], &[("alpha", "Thing"), ("beta", "Thing")][..]] {
+            let (_workspace, items_dir, track_id, _path) =
+                setup_production_identity_import_fixture("reference", baseline);
+            let error = run_with_resolver(
+                &track_id,
+                &items_dir,
+                import_command_for(CatalogImportAction::Reference, "domain::gamma::Thing"),
+                production_import_resolver,
+            )
+            .expect_err("unresolved and ambiguous existing identities must fail closed");
+
+            assert!(matches!(error, CatalogError::DuplicateEntry { .. }), "{error:?}");
+        }
+    }
+
+    #[test]
+    fn test_import_existing_bare_add_fails_closed_without_current_snapshot_lookup() {
+        let (_workspace, items_dir, track_id, _path) =
+            setup_production_identity_import_fixture("add", &[]);
+
+        let error = run_with_resolver(
+            &track_id,
+            &items_dir,
+            import_command_for(CatalogImportAction::Reference, "domain::beta::Thing"),
+            resolver_must_not_run,
+        )
+        .expect_err("an existing bare add must be rejected conservatively");
+
+        assert!(matches!(error, CatalogError::DuplicateEntry { .. }), "{error:?}");
+    }
+
+    #[test]
+    fn test_import_rejects_non_string_existing_action_through_production_path() {
+        let (_workspace, items_dir, track_id, path) =
+            setup_production_identity_import_fixture("add", &[]);
+        let mut document: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        document["types"]["Thing"]["action"] = json!(7);
+        std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
+
+        let error = run_with_resolver(
+            &track_id,
+            &items_dir,
+            import_command_for(CatalogImportAction::Reference, "domain::beta::Thing"),
+            resolver_must_not_run,
+        )
+        .expect_err("a non-string action must be schema-invalid");
+
+        assert!(matches!(error, CatalogError::SchemaInvalid { .. }), "{error:?}");
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn test_load_optional_rustdoc_rejects_oversized_snapshot_before_decode() {
         let temp = tempfile::tempdir().unwrap();
-        let path = seed_catalogue(temp.path());
+        let path = temp.path().join("snapshot.json");
+        std::fs::File::create(&path).unwrap().set_len(MAX_RUSTDOC_JSON_BYTES + 1).unwrap();
+
+        let error = load_optional_rustdoc(&path, temp.path())
+            .expect_err("an oversized rustdoc snapshot must fail closed");
+
+        assert!(matches!(error, CatalogError::Port { .. }), "{error:?}");
+    }
+
+    #[test]
+    fn test_import_skips_unrelated_draft_entry_without_module_identity() {
+        let (_workspace, items_dir, track_id, path) =
+            setup_production_identity_import_fixture("add", &[]);
         let mut document: Value =
             serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
         document["types"] = json!({
@@ -593,13 +939,11 @@ mod tests {
         });
         std::fs::write(&path, serde_json::to_string_pretty(&document).unwrap()).unwrap();
 
-        let report = import_entry_to_file(
-            &path,
-            temp.path(),
-            &import_command(CatalogImportAction::Reference),
-            "spec.json",
-            &BTreeSet::new(),
-            || Ok(sample_shape()),
+        let report = run_with_resolver(
+            &track_id,
+            &items_dir,
+            import_command(CatalogImportAction::Reference),
+            production_import_resolver,
         )
         .unwrap();
 

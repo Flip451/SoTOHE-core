@@ -895,6 +895,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalog_gen::adapter_tests",
           "test_name": "test_catalog_import_unrelated_root_fails_with_shared_canonicalization_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_compare_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_reference_and_modify_reject_same_resolved_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalog_gen::verb_import::tests",
+          "test_name": "test_import_unplaced_entry_resolution_fails_closed_when_unresolved_or_ambiguous"
         }
       ]
     },

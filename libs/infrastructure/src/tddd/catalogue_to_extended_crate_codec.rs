@@ -308,7 +308,7 @@ fn identity_path(identity: &FullyQualifiedItemPath) -> Vec<String> {
     path
 }
 
-fn paths_from_map(paths: &HashMap<Id, ItemSummary>) -> BTreeSet<FullyQualifiedItemPath> {
+pub(super) fn paths_from_map(paths: &HashMap<Id, ItemSummary>) -> BTreeSet<FullyQualifiedItemPath> {
     paths.values().filter_map(summary_identity).collect()
 }
 
