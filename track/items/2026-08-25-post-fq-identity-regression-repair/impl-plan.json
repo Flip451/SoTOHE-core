@@ -206,12 +206,13 @@
       "status": "done"
     },
     {
+      "commit_hash": "d4489fcc29bab7a58413793feb177ffdde8f1def",
       "depends_on": [
         "T014"
       ],
       "description": "Modify libs/infrastructure/src/lib.rs (infrastructure::repository_root_for_items_dir) and apps/cli-composition/src/task_contract.rs with nested-items-directory, non-repository, and repository-selection-isolation regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T016",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }

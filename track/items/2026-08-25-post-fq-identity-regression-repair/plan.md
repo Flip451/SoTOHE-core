@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T011, T012, T010, T014, T013, T015, T016. Implement the domain, infrastructure, and usecase changes in dependency order and cover the listed anchors.
 
-## Tasks (15/16 resolved)
+## Tasks (16/16 resolved)
 
 ### S1 — Action-aware catalogue identity
 
@@ -52,4 +52,4 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T011, T012, T010
 - [x] **T014**: Modify libs/domain/src/tddd/catalogue_v2/identity_resolution.rs (resolve_contract_entry_namespace) and libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs (AttestedCatalogueDocument::attest and the domain loader port); relocate the loader port in libs/usecase/src/catalogue_document_loader.rs; propagate its constructor type through libs/usecase/src/catalogue_impl_signals/interactor.rs and libs/usecase/src/test_obligation/{check,evaluate,results}.rs; modify libs/usecase/src/pre_review_gate.rs and libs/usecase/src/pre_review_gate/helpers.rs (PreReviewGateError); modify libs/infrastructure/src/tddd/tddd_catalogue_document_loader.rs; wire the loader in apps/cli-composition/src/task_contract.rs; add regression tests for each affected module. Anchors: IN-03, IN-05, CO-03, CO-05, AC-03, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md. (`21864697bb6ae2d39dc684f1fce90a7df2c3a46f`)
 - [x] **T013**: Modify libs/infrastructure/src/tddd/type_signals_codec.rs with its round-trip regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md. (`ba33fcc55349dcadbff5347e5d398f65f727052d`)
 - [x] **T015**: Modify libs/infrastructure/src/signal_report/mod.rs with its coverage-comparison regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md. (`ba33fcc55349dcadbff5347e5d398f65f727052d`)
-- [~] **T016**: Modify libs/infrastructure/src/lib.rs (infrastructure::repository_root_for_items_dir) and apps/cli-composition/src/task_contract.rs with nested-items-directory, non-repository, and repository-selection-isolation regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.
+- [x] **T016**: Modify libs/infrastructure/src/lib.rs (infrastructure::repository_root_for_items_dir) and apps/cli-composition/src/task_contract.rs with nested-items-directory, non-repository, and repository-selection-isolation regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md. (`d4489fcc29bab7a58413793feb177ffdde8f1def`)
