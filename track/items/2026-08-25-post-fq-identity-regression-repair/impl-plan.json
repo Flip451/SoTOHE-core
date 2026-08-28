@@ -162,20 +162,22 @@
       "status": "done"
     },
     {
+      "commit_hash": "ba33fcc55349dcadbff5347e5d398f65f727052d",
       "depends_on": [
         "T012"
       ],
       "description": "Modify libs/infrastructure/src/tddd/type_signals_codec.rs with its round-trip regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T013",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "ba33fcc55349dcadbff5347e5d398f65f727052d",
       "depends_on": [
         "T012"
       ],
       "description": "Modify libs/infrastructure/src/signal_report/mod.rs with its coverage-comparison regression tests. Anchors: IN-05, CO-05, AC-05. Planning policy: .harness/policies/no-upstream-restatement.md.",
       "id": "T015",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "commit_hash": "21864697bb6ae2d39dc684f1fce90a7df2c3a46f",
