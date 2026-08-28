@@ -696,8 +696,15 @@ mod tests {
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
-        let signals_array =
+        let mut signals_array =
             value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        for signal in &mut signals_array {
+            if let Some(signal) = signal.as_object_mut() {
+                // Legacy declaration fixtures describe type rows; the v5
+                // persisted document must make that namespace explicit.
+                signal.insert("namespace".to_owned(), serde_json::Value::String("type".to_owned()));
+            }
+        }
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
             .as_digest()
             .as_str()
@@ -713,7 +720,7 @@ mod tests {
             .as_str()
             .to_owned();
         let signal_file = serde_json::json!({
-            "schema_version": 4,
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
             "head_commit": "a".repeat(40),
@@ -1548,13 +1555,13 @@ mod tests {
     }
 
     const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "head_commit": "0000000000000000000000000000000000000000",
   "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
-    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
+    { "type_name": "TrackId", "namespace": "type", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
 }"#;
 
@@ -1773,7 +1780,7 @@ mod tests {
             .to_owned();
         let blue_signal_file = format!(
             r#"{{
-              "schema_version": 4,
+              "schema_version": {schema_version},
               "generated_at": "2026-04-18T12:00:00Z",
               "declaration_hash": "{digest}",
               "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -1781,12 +1788,14 @@ mod tests {
               "signals": [
                 {{
                   "type_name": "TrackId",
+                  "namespace": "type",
                   "kind_tag": "value_object",
                   "signal": "blue",
                   "found_type": true
                 }}
               ]
             }}"#,
+            schema_version = domain::TYPE_SIGNALS_SCHEMA_VERSION,
         );
         std::fs::write(dir.path().join("domain-type-signals.json"), blue_signal_file).unwrap();
 
@@ -1904,7 +1913,8 @@ mod tests {
         // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
         // (deny_unknown_fields; missing fields fail decoding).
         format!(
-            r#"{{"schema_version":4,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{declaration_hash}","head_commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","baseline_hash":"{baseline_hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+            r#"{{"schema_version":{},"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{declaration_hash}","head_commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","baseline_hash":"{baseline_hash}","signals":[{{"type_name":"Foo","namespace":"type","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+            domain::TYPE_SIGNALS_SCHEMA_VERSION,
         )
     }
 

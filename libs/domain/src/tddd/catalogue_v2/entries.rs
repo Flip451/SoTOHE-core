@@ -101,8 +101,9 @@ pub struct AssocConstDecl {
 /// The `role: DataRole` field ensures that only `DataRole` values can be attached to a
 /// type entry — assigning a `ContractRole` is a compile-time error (ADR 1 D2).
 ///
-/// `module_path` defaults to empty (crate root) when not specified in JSON (ADR 1 D7).
-/// The infrastructure codec (T003) handles the `serde default` for this field.
+/// `module_path` is optional. `None` means that the catalogue did not specify a
+/// placement; it must not be interpreted as an assertion that the item lives at
+/// the crate root (ADR `2026-08-25-0804` D3).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeEntry {
     /// The action for this entry (Add / Modify / Reference / Delete). Default: `Add`.
@@ -123,8 +124,8 @@ pub struct TypeEntry {
     ///
     /// Default empty Vec. Reuses `WherePredicateDecl` (ADR `2026-07-02-1345` D6 / IN-13).
     where_predicates: Vec<WherePredicateDecl>,
-    /// Module path within the crate (empty = crate root). Serde default = empty.
-    module_path: ModulePath,
+    /// Explicit module path within the crate. `None` means placement is omitted.
+    module_path: Option<ModulePath>,
     /// Optional documentation string.
     docs: Option<DocString>,
     /// SoT Chain ② references to spec.json elements.
@@ -146,7 +147,7 @@ impl TypeEntry {
         methods: Vec<MethodDeclaration>,
         generics: Vec<MethodGenericParam>,
         where_predicates: Vec<WherePredicateDecl>,
-        module_path: ModulePath,
+        module_path: Option<ModulePath>,
         docs: Option<DocString>,
         spec_refs: Vec<SpecRef>,
         informal_grounds: Vec<InformalGroundRef>,
@@ -201,10 +202,10 @@ impl TypeEntry {
         &self.where_predicates
     }
 
-    /// Module path within the crate (empty = crate root).
+    /// Returns the explicit module path within the crate, if one was declared.
     #[must_use]
-    pub fn module_path(&self) -> &ModulePath {
-        &self.module_path
+    pub fn module_path(&self) -> Option<&ModulePath> {
+        self.module_path.as_ref()
     }
 
     /// Optional documentation string.
@@ -236,7 +237,9 @@ impl TypeEntry {
 /// field ensures that only `ContractRole` values can be attached to a trait entry —
 /// assigning a `DataRole` is a compile-time error (ADR 1 D2).
 ///
-/// `module_path` defaults to empty (crate root) when not specified in JSON (ADR 1 D7).
+/// `module_path` is optional. `None` means that the catalogue did not specify a
+/// placement; it must not be interpreted as an assertion that the item lives at
+/// the crate root (ADR `2026-08-25-0804` D3).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TraitEntry {
     /// The action for this entry (Add / Modify / Reference / Delete). Default: `Add`.
@@ -279,8 +282,8 @@ pub struct TraitEntry {
     /// Default empty Vec for backward compatibility.
     /// Reuses `WherePredicateDecl` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
     where_predicates: Vec<WherePredicateDecl>,
-    /// Module path within the crate (empty = crate root). Serde default = empty.
-    module_path: ModulePath,
+    /// Explicit module path within the crate. `None` means placement is omitted.
+    module_path: Option<ModulePath>,
     /// Optional documentation string.
     docs: Option<DocString>,
     /// SoT Chain ② references to spec.json elements.
@@ -304,7 +307,7 @@ impl TraitEntry {
         supertrait_bounds: Vec<TypeRef>,
         generics: Vec<MethodGenericParam>,
         where_predicates: Vec<WherePredicateDecl>,
-        module_path: ModulePath,
+        module_path: Option<ModulePath>,
         docs: Option<DocString>,
         spec_refs: Vec<SpecRef>,
         informal_grounds: Vec<InformalGroundRef>,
@@ -373,10 +376,10 @@ impl TraitEntry {
         &self.where_predicates
     }
 
-    /// Module path within the crate (empty = crate root).
+    /// Returns the explicit module path within the crate, if one was declared.
     #[must_use]
-    pub fn module_path(&self) -> &ModulePath {
-        &self.module_path
+    pub fn module_path(&self) -> Option<&ModulePath> {
+        self.module_path.as_ref()
     }
 
     /// Optional documentation string.
@@ -629,12 +632,15 @@ impl InherentImplDeclV2 {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
+    use std::collections::BTreeSet;
+
     use super::*;
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, DocString, FieldName, MethodName, ModulePath, ParamName, RustExpression,
-        TypeName, TypeRef,
+        CatalogueItemNamespace, CrateName, DocString, FieldName, FullyQualifiedItemPath,
+        Identifier, MethodName, ModulePath, ParamName, RustExpression, TypeName, TypeRef,
     };
+    use crate::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace;
     use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
     use crate::tddd::catalogue_v2::variants::FieldDecl;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
@@ -656,7 +662,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -680,7 +686,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             Some(DocString::new("A domain entity.".to_string())),
             vec![],
             vec![],
@@ -725,7 +731,7 @@ mod tests {
             vec![method.clone()],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -748,13 +754,221 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            module_path.clone(),
+            Some(module_path.clone()),
             None,
             vec![],
             vec![],
         );
-        assert_eq!(entry.module_path(), &module_path);
+        assert_eq!(entry.module_path(), Some(&module_path));
         assert_eq!(entry.action(), ItemAction::Modify);
+    }
+
+    #[test]
+    fn test_type_entry_omitted_module_path_remains_unplaced() {
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+
+        assert_eq!(entry.module_path(), None);
+    }
+
+    #[test]
+    fn test_type_entry_omitted_module_path_resolves_against_current_candidates() {
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        let crate_name = CrateName::new("domain").unwrap();
+        let key = CatalogueEntryKey::try_new("Shared".to_owned()).unwrap();
+        let current = BTreeSet::from([FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["generated".to_owned()]).unwrap(),
+            Identifier::new("Shared").unwrap(),
+        )]);
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new(key.as_str().to_owned()).unwrap(),
+            &crate_name,
+            entry.action(),
+            &BTreeSet::new(),
+            &current,
+            CatalogueItemNamespace::Type,
+        )
+        .unwrap();
+        assert_eq!(resolved.module_path().unwrap().to_string(), "generated");
+
+        let unplaced = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("Future".to_owned()).unwrap(),
+            &crate_name,
+            entry.action(),
+            &BTreeSet::new(),
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .unwrap();
+        assert!(matches!(unplaced, FullyQualifiedItemPath::UnplacedType { .. }));
+
+        let baseline_collision = BTreeSet::from([FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["old".to_owned()]).unwrap(),
+            Identifier::new("Shared").unwrap(),
+        )]);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("Shared".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &baseline_collision,
+                &current,
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
+        let multiple_current = BTreeSet::from([
+            FullyQualifiedItemPath::new_type(
+                crate_name.clone(),
+                ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+                Identifier::new("NewShared").unwrap(),
+            ),
+            FullyQualifiedItemPath::new_type(
+                crate_name.clone(),
+                ModulePath::from_segments(vec!["beta".to_owned()]).unwrap(),
+                Identifier::new("NewShared").unwrap(),
+            ),
+        ]);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("NewShared".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &BTreeSet::new(),
+                &multiple_current,
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_type_entry_modify_omitted_module_path_requires_one_baseline_candidate() {
+        let entry = TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        let crate_name = CrateName::new("domain").unwrap();
+        let identity = FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["existing".to_owned()]).unwrap(),
+            Identifier::new("Existing").unwrap(),
+        );
+        let same_named_trait = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["ports".to_owned()]).unwrap(),
+            Identifier::new("Existing").unwrap(),
+        );
+        let reference = TypeRef::new("Existing".to_owned()).unwrap();
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &reference,
+            &crate_name,
+            entry.action(),
+            &BTreeSet::from([identity.clone(), same_named_trait]),
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .unwrap();
+        assert_eq!(resolved, identity);
+
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &reference,
+                &crate_name,
+                entry.action(),
+                &BTreeSet::new(),
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_type_entry_explicit_module_path_matches_exact_type_namespace_only() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let module_path = ModulePath::from_segments(vec!["generated".to_owned()]).unwrap();
+        let entry = TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(module_path.clone()),
+            None,
+            vec![],
+            vec![],
+        );
+        let key = CatalogueEntryKey::try_new("domain::generated::Shared".to_owned()).unwrap();
+        let type_identity = FullyQualifiedItemPath::from_type_catalogue_entry_key(
+            &crate_name,
+            &key,
+            entry.module_path(),
+        )
+        .unwrap();
+        assert_eq!(type_identity.module_path(), Some(&module_path));
+        let trait_identity = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["ports".to_owned()]).unwrap(),
+            Identifier::new("Shared").unwrap(),
+        );
+        let baseline = BTreeSet::from([type_identity.clone(), trait_identity]);
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("domain::generated::Shared".to_owned()).unwrap(),
+            &crate_name,
+            entry.action(),
+            &baseline,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .unwrap();
+        assert_eq!(resolved, type_identity);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("domain::other::Shared".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Type,
+            )
+            .is_err()
+        );
     }
 
     #[test]
@@ -790,7 +1004,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -813,7 +1027,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -825,6 +1039,345 @@ mod tests {
         // TraitEntry.role: ContractRole — assigning DataRole is a compile-time error.
         let entry = trait_entry_fixture();
         assert_eq!(entry.role(), &ContractRole::SecondaryPort);
+    }
+
+    #[test]
+    fn test_trait_entry_omitted_module_path_remains_unplaced() {
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+
+        assert_eq!(entry.module_path(), None);
+    }
+
+    #[test]
+    fn test_trait_entry_omitted_module_path_resolves_in_trait_namespace() {
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        let crate_name = CrateName::new("domain").unwrap();
+        let trait_identity = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["ports".to_owned()]).unwrap(),
+            Identifier::new("Shared").unwrap(),
+        );
+        let same_named_type = FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["types".to_owned()]).unwrap(),
+            Identifier::new("Shared").unwrap(),
+        );
+        let current = BTreeSet::from([trait_identity.clone()]);
+        let baseline = BTreeSet::from([same_named_type]);
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("Shared".to_owned()).unwrap(),
+            &crate_name,
+            entry.action(),
+            &baseline,
+            &current,
+            CatalogueItemNamespace::Trait,
+        )
+        .unwrap();
+        assert_eq!(resolved, trait_identity);
+
+        let unplaced = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("FuturePort".to_owned()).unwrap(),
+            &crate_name,
+            entry.action(),
+            &BTreeSet::new(),
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Trait,
+        )
+        .unwrap();
+        assert!(matches!(unplaced, FullyQualifiedItemPath::UnplacedTrait { .. }));
+    }
+
+    #[test]
+    fn test_trait_entry_modify_omitted_module_path_requires_one_baseline_candidate() {
+        let entry = TraitEntry::new(
+            ItemAction::Modify,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        let crate_name = CrateName::new("domain").unwrap();
+        let identity = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["ports".to_owned()]).unwrap(),
+            Identifier::new("ExistingPort").unwrap(),
+        );
+        let reference = TypeRef::new("ExistingPort".to_owned()).unwrap();
+
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &reference,
+            &crate_name,
+            entry.action(),
+            &BTreeSet::from([identity.clone()]),
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Trait,
+        )
+        .unwrap();
+        assert_eq!(resolved, identity);
+
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &reference,
+                &crate_name,
+                entry.action(),
+                &BTreeSet::new(),
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_trait_entry_delete_and_reference_resolve_against_baseline() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let identity = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["ports".to_owned()]).unwrap(),
+            Identifier::new("ExistingPort").unwrap(),
+        );
+        let baseline = BTreeSet::from([identity.clone()]);
+        for action in [ItemAction::Delete, ItemAction::Reference] {
+            let entry = TraitEntry::new(
+                action,
+                ContractRole::SecondaryPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            );
+            let resolved = resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("domain::ports::ExistingPort".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .unwrap();
+            assert_eq!(resolved, identity);
+        }
+    }
+
+    #[test]
+    fn test_trait_entry_explicit_path_and_actions_fail_closed_on_collisions() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let module_path = ModulePath::from_segments(vec!["ports".to_owned()]).unwrap();
+        let explicit_entry = TraitEntry::new(
+            ItemAction::Modify,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(module_path.clone()),
+            None,
+            vec![],
+            vec![],
+        );
+        let key = CatalogueEntryKey::try_new("domain::ports::SharedPort".to_owned()).unwrap();
+        let trait_identity = FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+            &crate_name,
+            &key,
+            explicit_entry.module_path(),
+        )
+        .unwrap();
+        assert_eq!(trait_identity.module_path(), Some(&module_path));
+        let same_named_type = FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["types".to_owned()]).unwrap(),
+            Identifier::new("SharedPort").unwrap(),
+        );
+        let baseline = BTreeSet::from([trait_identity.clone(), same_named_type]);
+        assert_eq!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("domain::ports::SharedPort".to_owned()).unwrap(),
+                &crate_name,
+                explicit_entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .unwrap(),
+            trait_identity
+        );
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("domain::other::SharedPort".to_owned()).unwrap(),
+                &crate_name,
+                explicit_entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .is_err()
+        );
+
+        let add_entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("SharedPort".to_owned()).unwrap(),
+                &crate_name,
+                add_entry.action(),
+                &BTreeSet::from([trait_identity.clone()]),
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .is_err()
+        );
+        let multiple_current = BTreeSet::from([
+            FullyQualifiedItemPath::new_trait(
+                crate_name.clone(),
+                ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+                Identifier::new("NewPort").unwrap(),
+            ),
+            FullyQualifiedItemPath::new_trait(
+                crate_name.clone(),
+                ModulePath::from_segments(vec!["beta".to_owned()]).unwrap(),
+                Identifier::new("NewPort").unwrap(),
+            ),
+        ]);
+        assert!(
+            resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("NewPort".to_owned()).unwrap(),
+                &crate_name,
+                add_entry.action(),
+                &BTreeSet::new(),
+                &multiple_current,
+                CatalogueItemNamespace::Trait,
+            )
+            .is_err()
+        );
+
+        for action in [ItemAction::Delete, ItemAction::Reference] {
+            let entry = TraitEntry::new(
+                action,
+                ContractRole::SecondaryPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            );
+            assert!(
+                resolve_catalogue_identity_for_action_in_namespace(
+                    &TypeRef::new("MissingPort".to_owned()).unwrap(),
+                    &crate_name,
+                    entry.action(),
+                    &BTreeSet::new(),
+                    &BTreeSet::new(),
+                    CatalogueItemNamespace::Trait,
+                )
+                .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn test_trait_entry_modify_delete_reference_fail_on_multiple_baseline_candidates() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let first = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            Identifier::new("ExistingPort").unwrap(),
+        );
+        let second = FullyQualifiedItemPath::new_trait(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["beta".to_owned()]).unwrap(),
+            Identifier::new("ExistingPort").unwrap(),
+        );
+        let baseline = BTreeSet::from([first.clone(), second.clone()]);
+        for action in [ItemAction::Modify, ItemAction::Delete, ItemAction::Reference] {
+            let entry = TraitEntry::new(
+                action,
+                ContractRole::SecondaryPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            );
+            let error = resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("ExistingPort".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Trait,
+            )
+            .expect_err("non-add actions must reject multiple same-named baseline traits");
+            assert!(matches!(
+                error,
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(_, candidates)
+                    if candidates.as_slice().contains(&first)
+                        && candidates.as_slice().contains(&second)
+            ));
+        }
     }
 
     #[test]
@@ -854,7 +1407,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             Some(DocString::new("User repository port.".to_string())),
             vec![],
             vec![],
@@ -877,7 +1430,7 @@ mod tests {
             vec![send.clone(), sync.clone()],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -885,6 +1438,41 @@ mod tests {
         assert_eq!(entry.supertrait_bounds().len(), 2);
         assert_eq!(entry.supertrait_bounds()[0].as_str(), "Send");
         assert_eq!(entry.supertrait_bounds()[1].as_str(), "Sync");
+    }
+
+    #[test]
+    fn test_type_entry_delete_and_reference_resolve_against_baseline() {
+        let crate_name = CrateName::new("domain").unwrap();
+        let identity = FullyQualifiedItemPath::new_type(
+            crate_name.clone(),
+            ModulePath::from_segments(vec!["existing".to_owned()]).unwrap(),
+            Identifier::new("Existing").unwrap(),
+        );
+        let baseline = BTreeSet::from([identity.clone()]);
+        for action in [ItemAction::Delete, ItemAction::Reference] {
+            let entry = TypeEntry::new(
+                action,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            );
+            let resolved = resolve_catalogue_identity_for_action_in_namespace(
+                &TypeRef::new("domain::existing::Existing".to_owned()).unwrap(),
+                &crate_name,
+                entry.action(),
+                &baseline,
+                &BTreeSet::new(),
+                CatalogueItemNamespace::Type,
+            )
+            .unwrap();
+            assert_eq!(resolved, identity);
+        }
     }
 
     #[test]
@@ -905,7 +1493,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -952,7 +1540,7 @@ mod tests {
                 rhs: vec![TypeRef::new("Clone").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -977,7 +1565,7 @@ mod tests {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -1003,7 +1591,7 @@ mod tests {
                 rhs: vec![TypeRef::new("Clone").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -1028,7 +1616,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -1048,7 +1636,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -1276,7 +1864,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref.clone()],
             vec![],
@@ -1302,7 +1890,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![ground.clone()],

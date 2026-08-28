@@ -111,7 +111,7 @@ fn type_entry_for_inherent_methods(
         methods,
         type_entry.generics().to_vec(),
         type_entry.where_predicates().to_vec(),
-        type_entry.module_path().clone(),
+        type_entry.module_path().cloned(),
         type_entry.docs().cloned(),
         type_entry.spec_refs().to_vec(),
         type_entry.informal_grounds().to_vec(),
@@ -196,7 +196,7 @@ mod tests {
             methods,
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![spec_ref("IN-13")],
             vec![],
@@ -301,7 +301,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["a".to_owned()]).unwrap(),
+                Some(ModulePath::from_segments(vec!["a".to_owned()]).unwrap()),
                 None,
                 vec![spec_ref("IN-13")],
                 vec![],
@@ -354,5 +354,39 @@ mod tests {
             vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
         ));
         assert!(derive(&catalogue).unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_ambiguous_inherent_impl_owner_fails_closed() {
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        for module in ["alpha", "beta"] {
+            catalogue.insert_type(
+                CatalogueEntryKey::try_new(format!("{}::Compute", module)).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Reference,
+                    DataRole::domain_service(),
+                    TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                    vec![],
+                    vec![],
+                    vec![],
+                    Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                    None,
+                    vec![spec_ref("IN-13")],
+                    vec![],
+                ),
+            );
+        }
+        catalogue.push_inherent_impl(InherentImplDeclV2::new(
+            CatalogueEntryKey::try_new("Compute".to_owned()).unwrap(),
+            vec![],
+            vec![],
+            vec![method("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
+        ));
+
+        assert!(derive(&catalogue).is_err());
     }
 }

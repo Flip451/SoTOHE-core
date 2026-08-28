@@ -1,0 +1,281 @@
+{
+  "entries": [
+    {
+      "claim_hash": "eaf19fe851ccac4e448a56ed73b3164ad1c5124a84742a1d98bb65352325557a",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "sotp が静的な秘匿パターンを利用する際、パターン不正によって秘匿機能全体が無音で無効化され、機密値が出力へ流出する状態を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "不正な静的パターンはプログラミングエラーであり、秘匿の無音停止より fail-stop が正しい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3e093b04a777cd2fc1e804a68aa8991f8bad54a941f8ea36c5d4220ddeb24b92",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "秘匿境界で使用する全ての静的正規表現リテラルについて、構築失敗が秘匿のスキップ又は代替なしの継続につながらず、処理を停止させること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "不正な静的パターンはプログラミングエラーであり、秘匿の無音停止より fail-stop が正しい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d50879b29e0f15428377734b5431cdae6774e11806e5141b658dbd7d52674f92",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "静的秘匿パターンごとに構築を検証し、production で初めて不正パターンが検出される経路を残さないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "これらの静的リテラルには構築検証を併設し、production で `expect` が初出検出になる経路を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "60f4ab19a4da2aaac20215561e0a917f88e794cfe911546d1e4b3b78382c7f90",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "秘匿・検証・権限判定のセキュリティ境界では無音の機能縮退を禁止し、構築又は初期化の失敗を停止として扱う規約を記録すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "security.md に「セキュリティ境界(秘匿・検証・権限判定)では機能の無音縮退を禁止し、構築・初期化の失敗は停止させる」を追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b8286900b718fbf55aea22dfb8c69ab16b189867b5a4bb657aaf9a1fca864d6b",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "operator 設定その他の外部入力で動的に供給される秘匿パターンの設計又は失敗時の扱いは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象集合は秘匿境界の静的リテラル正規表現に限り",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ba2f34f37d0c312f25e68d3637e199ee3a23eea5d9b2991b5877801954c92ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "起動時に静的パターンを一括検証するための新しいコマンド又は実行面は追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "これらの静的リテラルには構築検証を併設し、production で `expect` が初出検出になる経路を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "352e429d93caa415b954d41bd87f4c7073ac4640124c2e7b5e3228eae17177b0",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "静的秘匿パターンの構築不能はプログラミングエラーとして fail-stop とし、警告のみの通知、無効値への縮退、又は秘匿なしでの出力継続を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "不正な静的パターンはプログラミングエラーであり、秘匿の無音停止より fail-stop が正しい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3e03cdfc46876a75a1957f10c66d99efcaeead1d36ac30327f578204888b3c90",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "この変更は静的な秘匿境界パターンに限定し、追加される同種の静的リテラルにも同一の fail-closed 構築保証を適用する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "対象集合は秘匿境界の静的リテラル正規表現に限り、完備は `Regex` 型（`Option<Regex>` ではない）への委譲と、追加リテラルも同一の構築に従うことで取る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "88908f126510a9c9afc2685406e2c9dff4ce042cc452214963886486ff6f4aa5",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "不正な静的秘匿パターンは構築検証で検出され、秘匿を無音で無効化したまま出力処理を続行しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "不正な静的パターンはプログラミングエラーであり、秘匿の無音停止より fail-stop が正しい。これらの静的リテラルには構築検証を併設し、production で `expect` が初出検出になる経路を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "08ce8de51fe409f2e44c87db898f4a3ab7435809cdc2b96ebc2135a0afbbc49f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "有効な静的秘匿パターンを用いる出力経路では、対象となる機密値が従来どおり秘匿される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "秘匿の無音停止より fail-stop が正しい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3df78b02dc0118b916cf9871d6cc6d660e185984a5b24ebf5ac601ca4deffba0",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "security 規約は、秘匿・検証・権限判定の各セキュリティ境界で無音の機能縮退を禁止し、構築又は初期化の失敗を停止させる方針を明記する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "セキュリティ境界(秘匿・検証・権限判定)では機能の無音縮退を禁止し、構築・初期化の失敗は停止させる",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "80971c9c3b1fc5e3c6c4c4e48f9d07f4942e4a9984753c665d99039d13433c13",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "静的秘匿パターンのためだけに、新しい起動時一括検証コマンド又は実行面を追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "dd72ce9dce7e3a41cf9b784a9bd5a395ee86b136fd1376d76f749abb0ce5714d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "これらの静的リテラルには構築検証を併設し、production で `expect` が初出検出になる経路を残さない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

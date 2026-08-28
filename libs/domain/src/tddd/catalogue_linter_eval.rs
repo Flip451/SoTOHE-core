@@ -24,7 +24,7 @@ use super::{
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::identifiers::{
-    CrateName, FullyQualifiedItemPath, ParamName, TypeRef,
+    CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, ParamName, TypeRef,
 };
 use crate::tddd::catalogue_v2::roles::{InvariantPredicate, ItemAction, SelfReceiver};
 use crate::tddd::layer_id::LayerId;
@@ -86,12 +86,14 @@ pub(super) fn inspect_type_ref<E: TypeRefPathExtractorPort>(
     type_parameters: &[ParamName],
     lifetime_parameters: &[ParamName],
     const_parameters: &[ParamName],
+    namespace: CatalogueItemNamespace,
     extractor: &E,
 ) -> Result<(), CatalogueLinterError> {
     let identity_context = CatalogueIdentityContext {
         catalogue_crate: &context.catalogue_crate,
         universe: &context.universe,
         entries: &[],
+        namespace,
     };
     let inspection =
         TypeRefInspectionContext { type_parameters, lifetime_parameters, const_parameters };
@@ -247,6 +249,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
                     entries: &declared_identities,
+                    namespace: CatalogueItemNamespace::Type,
                 };
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
                     let type_parameters = generic_parameter_names(entry.generics());
@@ -524,6 +527,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner, E: TypeRefPathExtr
                     catalogue_crate: catalogue.crate_name(),
                     universe: &identity_universe,
                     entries: &declared_identities,
+                    namespace: CatalogueItemNamespace::Type,
                 };
                 let mut seen: BTreeMap<FullyQualifiedItemPath, String> = BTreeMap::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {

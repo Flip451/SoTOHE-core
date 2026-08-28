@@ -11,6 +11,7 @@ focuses on what the AST scanner cannot catch.
 
 Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
+- **external-boundary assumptions**: What external boundaries does the diff touch (OS, process, encoding, concurrency, resource limits, time, and other versions of its own artifacts)? Enumerate operations directly reached from the changed behavior. If a depended-on assumption is in neither the spec nor the environment-assumption declaration the project owns (the convention listed under `Current Files` in `knowledge/conventions/README.md` whose purpose is declaring environment assumptions; resolve it through that index, not a fixed filename), report it as `未宣言の前提への依存`; treat unresolvable indirect boundaries the same way rather than searching exhaustively.
 - **purity violation by trait or generic**: a `T: Reader` bound that effectively
   forces an `std::io::Read` dependency the syn scanner cannot see (e.g., via
   a re-export), or a generic constraint that lets infrastructure leak into

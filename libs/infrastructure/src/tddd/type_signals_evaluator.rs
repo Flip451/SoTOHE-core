@@ -1,6 +1,6 @@
 //! Per-layer type-signal evaluation with conservative rustdoc reuse.
 
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -42,7 +42,9 @@ pub(crate) fn with_process_environment_lock<T>(action: impl FnOnce() -> T) -> T 
 use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
-use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+use crate::tddd::catalogue_to_extended_crate_codec::{
+    CatalogueToExtendedCrateCodec, normalized_paths_for_doc, resolution_paths_for_catalogue,
+};
 use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
 use crate::tddd::type_signals_codec;
 use crate::tddd::{CatalogueToExtendedCratePort, SignalEvaluatorPort};
@@ -307,17 +309,21 @@ fn evaluate_and_write(
     let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
         EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
     })?;
-    let identity_paths =
-        merge_rustdoc_paths(&baseline, &current).map_err(EvaluateSignalsError::evaluation)?;
+    let identity_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
+        .map_err(|error| EvaluateSignalsError::evaluation(error.to_string()))?;
     let identity_index = build_type_signal_identity_index(&catalogue, &identity_paths)
         .map_err(EvaluateSignalsError::evaluation)?;
+    let canonical_baseline_paths = normalized_paths_for_doc(&baseline, catalogue.crate_name());
+    let canonical_current_paths = normalized_paths_for_doc(&current, catalogue.crate_name());
+    let canonical_baseline = crate_with_canonical_paths(&baseline, canonical_baseline_paths);
+    let canonical_current = crate_with_canonical_paths(&current, canonical_current_paths);
     let extended = CatalogueToExtendedCrateCodec::new()
         .encode(catalogue, &baseline, &current)
         .map_err(|error| {
             EvaluateSignalsError::authoritative_input(format!("cannot convert catalogue: {error}"))
         })?;
     let report = SignalEvaluatorV2::with_workspace_root(workspace_root.to_path_buf())
-        .evaluate(extended, baseline, current)
+        .evaluate(extended, canonical_baseline, canonical_current)
         .map_err(|error| {
             EvaluateSignalsError::evaluation(format!("signal evaluation failed: {error:?}"))
         })?;
@@ -352,40 +358,23 @@ fn evaluate_and_write(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Combines the frozen baseline and current rustdoc path tables for the
-/// producer-side identity join. Baseline-only delete entries must remain
-/// canonicalizable, while independently assigned rustdoc ids must not make a
-/// same-path item ambiguous.
-fn merge_rustdoc_paths(
-    baseline: &rustdoc_types::Crate,
-    current: &rustdoc_types::Crate,
-) -> Result<HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>, String> {
-    let mut paths = baseline.paths.clone();
-    let mut used_ids =
-        baseline.paths.keys().chain(current.paths.keys()).map(|id| id.0).collect::<BTreeSet<_>>();
-    let mut next_id = used_ids.iter().copied().max().unwrap_or(0).saturating_add(1);
-
-    for (id, summary) in &current.paths {
-        if paths
+fn crate_with_canonical_paths(
+    krate: &rustdoc_types::Crate,
+    paths: std::collections::HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>,
+) -> rustdoc_types::Crate {
+    let mut canonical = krate.clone();
+    canonical.paths = paths;
+    if let Some(root) = canonical.index.get_mut(&canonical.root) {
+        if let Some(root_name) = canonical
+            .paths
             .values()
-            .any(|existing| existing.path == summary.path && existing.kind == summary.kind)
+            .find(|summary| summary.crate_id == 0)
+            .and_then(|summary| summary.path.first())
         {
-            continue;
-        }
-        if paths.contains_key(id) {
-            let Some(remap_id) =
-                (next_id..=u32::MAX).find(|candidate| !used_ids.contains(candidate))
-            else {
-                return Err("cannot merge rustdoc paths: no unused item id remains".to_owned());
-            };
-            paths.insert(rustdoc_types::Id(remap_id), summary.clone());
-            used_ids.insert(remap_id);
-            next_id = remap_id.saturating_add(1);
-        } else {
-            paths.insert(*id, summary.clone());
+            root.name = Some(root_name.clone());
         }
     }
-    Ok(paths)
+    canonical
 }
 
 fn reject_type_signals_path(
@@ -427,10 +416,14 @@ fn read_actual_baseline(path: &Path) -> Result<(String, BaselineHash), EvaluateS
 
 #[cfg(test)]
 #[cfg(feature = "test-helpers")]
-#[allow(clippy::unwrap_used, clippy::panic)]
+#[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::unwrap_used)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
+    use crate::tddd::ThreeWaySignal;
     use crate::verify::tddd_layers::parse_tddd_layers;
+    use domain::FreeText;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
     fn rustdoc_json() -> String {
@@ -455,29 +448,751 @@ mod tests {
         }
     }
 
-    fn struct_summary(path: &[&str]) -> rustdoc_types::ItemSummary {
-        rustdoc_types::ItemSummary {
-            crate_id: 0,
-            path: path.iter().map(|segment| (*segment).to_owned()).collect(),
-            kind: rustdoc_types::ItemKind::Struct,
-        }
+    #[test]
+    fn test_type_signal_identity_index_uses_catalogue_adds_from_shared_resolution_set() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey};
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("AddedOnlyInCatalogue".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let baseline = rustdoc_crate_with_paths(HashMap::new());
+        let current = baseline.clone();
+        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
+            .expect("the shared resolution set must include catalogue add declarations");
+        let index = build_type_signal_identity_index(&catalogue, &resolution_paths)
+            .expect("type-signal identity indexing must consume catalogue additions");
+
+        let kinds = BTreeMap::from([("AddedOnlyInCatalogue".to_owned(), vec!["struct"])]);
+        let signals = [ThreeWaySignal::catalogue_item(
+            FreeText::new("domain::AddedOnlyInCatalogue"),
+            CatalogueItemNamespace::Type,
+            domain::tddd::signal_evaluator::region::SignalRegion::SIntersectC_Match_Add,
+        )];
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), "AddedOnlyInCatalogue");
     }
 
     #[test]
-    fn test_merge_rustdoc_paths_allocates_id_unused_by_baseline_and_current() {
-        let baseline = rustdoc_crate_with_paths(HashMap::from([
-            (rustdoc_types::Id(5), struct_summary(&["domain", "Baseline"])),
-            (rustdoc_types::Id(10), struct_summary(&["domain", "MaxBaseline"])),
-        ]));
-        let current = rustdoc_crate_with_paths(HashMap::from([
-            (rustdoc_types::Id(11), struct_summary(&["domain", "Current"])),
-            (rustdoc_types::Id(5), struct_summary(&["domain", "Collision"])),
-        ]));
+    fn test_type_signal_identity_index_resolves_add_impl_owner_from_shared_resolution_set() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::CatalogueDocument;
+        use domain::tddd::catalogue_v2::CatalogueEntryKey;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+        use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+        use domain::tddd::catalogue_v2::{CrateName, TypeRef};
 
-        let merged = merge_rustdoc_paths(&baseline, &current).unwrap();
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.insert_trait(
+            CatalogueEntryKey::try_new("NewTrait".to_owned()).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            ItemAction::Add,
+            TypeRef::new("NewTrait".to_owned()).unwrap(),
+            TypeRef::new("Owner".to_owned()).unwrap(),
+            vec![],
+            vec![],
+        ));
 
-        assert_eq!(merged.get(&rustdoc_types::Id(11)).unwrap().path, ["domain", "Current"]);
-        assert_eq!(merged.get(&rustdoc_types::Id(12)).unwrap().path, ["domain", "Collision"]);
+        let baseline = rustdoc_crate_with_paths(HashMap::new());
+        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &baseline)
+            .expect("the shared resolution set must include both add declarations");
+        let index = build_type_signal_identity_index(&catalogue, &resolution_paths)
+            .expect("an add impl owner must resolve through the shared set");
+        let kinds = BTreeMap::from([("Owner".to_owned(), vec!["struct"])]);
+        let signals = [ThreeWaySignal::label(
+            FreeText::new("Owner: NewTrait"),
+            domain::tddd::signal_evaluator::region::SignalRegion::SIntersectC_Match_Add,
+        )];
+
+        let built = build_type_signals_from_report(signals.iter(), &kinds, &index);
+        assert_eq!(built.len(), 1);
+        assert_eq!(built[0].type_name(), "Owner");
+        assert_eq!(built[0].found_items(), &["NewTrait"]);
+    }
+
+    #[test]
+    fn test_type_signal_identity_index_rejects_impl_owner_absent_from_shared_resolution_set() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::CatalogueDocument;
+        use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+        use domain::tddd::catalogue_v2::{CrateName, TypeRef};
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            TypeRef::new("MissingTrait").unwrap(),
+            TypeRef::new("MissingOwner").unwrap(),
+            vec![],
+            vec![],
+        ));
+
+        let empty = rustdoc_crate_with_paths(HashMap::new());
+        let error = build_type_signal_identity_index(&catalogue, &empty.paths)
+            .expect_err("an impl owner absent from both authorities must fail closed");
+        assert!(error.contains("MissingOwner"));
+    }
+
+    #[test]
+    fn test_execute_type_signals_evaluates_shared_catalogue_identity_and_function_path() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+        use domain::tddd::catalogue_v2::{
+            CatalogueDocument, CatalogueEntryKey, CrateName, FunctionName, FunctionPath, ModulePath,
+        };
+
+        let make_rustdoc = |root_name: &str, include_items: bool, include_removed: bool| {
+            let root_id = rustdoc_types::Id(0);
+            let type_id = rustdoc_types::Id(1);
+            let function_id = rustdoc_types::Id(2);
+            let removed_id = rustdoc_types::Id(3);
+            let mut index = HashMap::new();
+            let mut paths = HashMap::new();
+            let mut root_items = Vec::new();
+
+            if include_items {
+                index.insert(
+                    type_id,
+                    rustdoc_types::Item {
+                        id: type_id,
+                        crate_id: 0,
+                        name: Some("Added".to_owned()),
+                        span: None,
+                        visibility: rustdoc_types::Visibility::Public,
+                        docs: None,
+                        links: HashMap::new(),
+                        attrs: vec![],
+                        deprecation: None,
+                        inner: rustdoc_types::ItemEnum::Struct(rustdoc_types::Struct {
+                            kind: rustdoc_types::StructKind::Unit,
+                            generics: rustdoc_types::Generics {
+                                params: vec![],
+                                where_predicates: vec![],
+                            },
+                            impls: vec![],
+                        }),
+                    },
+                );
+                paths.insert(
+                    type_id,
+                    rustdoc_types::ItemSummary {
+                        crate_id: 0,
+                        path: vec![
+                            root_name.to_owned(),
+                            "generated".to_owned(),
+                            "Added".to_owned(),
+                        ],
+                        kind: rustdoc_types::ItemKind::Struct,
+                    },
+                );
+                index.insert(
+                    function_id,
+                    rustdoc_types::Item {
+                        id: function_id,
+                        crate_id: 0,
+                        name: Some("run".to_owned()),
+                        span: None,
+                        visibility: rustdoc_types::Visibility::Public,
+                        docs: None,
+                        links: HashMap::new(),
+                        attrs: vec![],
+                        deprecation: None,
+                        inner: rustdoc_types::ItemEnum::Function(rustdoc_types::Function {
+                            sig: rustdoc_types::FunctionSignature {
+                                inputs: vec![],
+                                output: None,
+                                is_c_variadic: false,
+                            },
+                            generics: rustdoc_types::Generics {
+                                params: vec![],
+                                where_predicates: vec![],
+                            },
+                            has_body: true,
+                            header: rustdoc_types::FunctionHeader {
+                                is_async: false,
+                                is_const: false,
+                                is_unsafe: false,
+                                abi: rustdoc_types::Abi::Rust,
+                            },
+                        }),
+                    },
+                );
+                paths.insert(
+                    function_id,
+                    rustdoc_types::ItemSummary {
+                        crate_id: 0,
+                        path: vec![root_name.to_owned(), "commands".to_owned(), "run".to_owned()],
+                        kind: rustdoc_types::ItemKind::Function,
+                    },
+                );
+                root_items.extend([type_id, function_id]);
+            }
+
+            if include_removed {
+                index.insert(
+                    removed_id,
+                    rustdoc_types::Item {
+                        id: removed_id,
+                        crate_id: 0,
+                        name: Some("Removed".to_owned()),
+                        span: None,
+                        visibility: rustdoc_types::Visibility::Public,
+                        docs: None,
+                        links: HashMap::new(),
+                        attrs: vec![],
+                        deprecation: None,
+                        inner: rustdoc_types::ItemEnum::Struct(rustdoc_types::Struct {
+                            kind: rustdoc_types::StructKind::Unit,
+                            generics: rustdoc_types::Generics {
+                                params: vec![],
+                                where_predicates: vec![],
+                            },
+                            impls: vec![],
+                        }),
+                    },
+                );
+                paths.insert(
+                    removed_id,
+                    rustdoc_types::ItemSummary {
+                        crate_id: 0,
+                        path: vec![root_name.to_owned(), "Removed".to_owned()],
+                        kind: rustdoc_types::ItemKind::Struct,
+                    },
+                );
+                root_items.push(removed_id);
+            }
+
+            index.insert(
+                root_id,
+                rustdoc_types::Item {
+                    id: root_id,
+                    crate_id: 0,
+                    name: Some(root_name.to_owned()),
+                    span: None,
+                    visibility: rustdoc_types::Visibility::Public,
+                    docs: None,
+                    links: HashMap::new(),
+                    attrs: vec![],
+                    deprecation: None,
+                    inner: rustdoc_types::ItemEnum::Module(rustdoc_types::Module {
+                        is_crate: true,
+                        items: root_items,
+                        is_stripped: false,
+                    }),
+                },
+            );
+
+            rustdoc_types::Crate {
+                root: root_id,
+                crate_version: None,
+                includes_private: false,
+                index,
+                paths,
+                external_crates: HashMap::new(),
+                target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+                format_version: rustdoc_types::FORMAT_VERSION,
+            }
+        };
+
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        crate::verify::test_support::git_init(root);
+        let track_id = TrackId::try_new("shared-identity-track").unwrap();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/infrastructure\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::create_dir_all(root.join("libs/infrastructure/src")).unwrap();
+        std::fs::write(
+            root.join("libs/infrastructure/Cargo.toml"),
+            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("libs/infrastructure/src/lib.rs"), "pub struct Fixture;\n")
+            .unwrap();
+        let rules = r#"{
+            "version": 2,
+            "layers": [{
+                "crate": "infrastructure",
+                "path": "libs/infrastructure",
+                "may_depend_on": [],
+                "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "infrastructure-types.json",
+                    "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                }
+            }]
+        }"#;
+        std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
+        let binding = parse_tddd_layers(rules).unwrap().pop().unwrap();
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").unwrap(),
+            LayerId::try_new("infrastructure").unwrap(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Added".to_owned()).unwrap(),
+            domain::tddd::catalogue_v2::entries::TypeEntry::new(
+                domain::tddd::catalogue_v2::ItemAction::Add,
+                domain::tddd::catalogue_v2::roles::DataRole::value_object(),
+                domain::tddd::catalogue_v2::composite::TypeKindV2::Struct(
+                    domain::tddd::catalogue_v2::composite::StructKind::new(
+                        domain::tddd::catalogue_v2::composite::StructShape::Unit,
+                        None,
+                    ),
+                ),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        catalogue.push_deletion(domain::tddd::catalogue_v2::DeletionRecord::Type {
+            name: CatalogueEntryKey::try_new("Removed".to_owned()).unwrap(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
+        catalogue.insert_function(
+            FunctionPath::new(
+                CrateName::new("infrastructure").unwrap(),
+                ModulePath::from_segments(vec!["commands".to_owned()]).unwrap(),
+                FunctionName::new("run").unwrap(),
+            ),
+            FunctionEntry::new(
+                domain::tddd::catalogue_v2::ItemAction::Add,
+                FunctionRole::FreeFunction,
+                vec![],
+                domain::tddd::catalogue_v2::TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogue_json = CatalogueDocumentCodec::encode(&catalogue).unwrap();
+        let baseline = make_rustdoc("sotp", false, true);
+        let current = make_rustdoc("sotp", true, false);
+        let baseline_json = serde_json::to_string(&baseline).unwrap();
+        let current_json = serde_json::to_string(&current).unwrap();
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let baseline_path = track_dir.join(binding.baseline_file());
+        std::fs::write(&catalogue_path, &catalogue_json).unwrap();
+        std::fs::write(&baseline_path, &baseline_json).unwrap();
+
+        let result = evaluate_and_write(
+            catalogue_json.as_bytes(),
+            &catalogue_path,
+            &track_dir,
+            root,
+            &items_dir.canonicalize().unwrap(),
+            "infrastructure",
+            &binding,
+            current_json,
+            type_signals_codec::declaration_hash(catalogue_json.as_bytes()),
+            read_head_commit(root).unwrap(),
+            &baseline_path,
+            &baseline_json,
+            type_signals_codec::baseline_hash(baseline_json.as_bytes()),
+        )
+        .unwrap();
+        assert_eq!(result, ExitCode::SUCCESS);
+
+        let persisted = type_signals_codec::decode(
+            &std::fs::read_to_string(track_dir.join(binding.signal_file())).unwrap(),
+        )
+        .unwrap();
+        assert!(
+            persisted.signals().iter().any(|signal| signal.type_name() == "Added"),
+            "catalogue additions must reach the production type-signal pipeline"
+        );
+        assert!(
+            persisted
+                .signals()
+                .iter()
+                .any(|signal| signal.type_name() == "infrastructure::commands::run"),
+            "function identity must retain the canonical package path"
+        );
+        assert!(
+            persisted.signals().iter().any(|signal| signal.type_name() == "Removed"),
+            "deletion handling must retain the baseline identity through Phase 1"
+        );
+    }
+
+    #[test]
+    fn test_execute_type_signals_resolves_mutual_add_and_modify_references_in_declaration_order() {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::CatalogueDocument;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::{
+            CatalogueEntryKey, CrateName, FieldDecl, FieldName, ModulePath, TypeRef,
+        };
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").unwrap(),
+            LayerId::try_new("infrastructure").unwrap(),
+        );
+        // Insert the modify declaration before the add declarations. The production
+        // pre-pass must still resolve every reference independently of declaration order.
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Modify,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("first").unwrap(),
+                            TypeRef::new("First").unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let first = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("second").unwrap(),
+                        TypeRef::new("Second").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        catalogue.insert_type(CatalogueEntryKey::try_new("First".to_owned()).unwrap(), first);
+        let second = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("first").unwrap(),
+                        TypeRef::new("First").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        );
+        catalogue.insert_type(CatalogueEntryKey::try_new("Second".to_owned()).unwrap(), second);
+
+        let baseline = rustdoc_crate_with_paths(HashMap::from([(
+            rustdoc_types::Id(1),
+            rustdoc_types::ItemSummary {
+                crate_id: 0,
+                path: vec!["infrastructure".to_owned(), "Holder".to_owned()],
+                kind: rustdoc_types::ItemKind::Struct,
+            },
+        )]));
+        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &baseline)
+            .expect("the shared set must include both add declarations and the modify baseline");
+        let identity_index = build_type_signal_identity_index(&catalogue, &resolution_paths)
+            .expect("all declared identities must resolve through the shared set");
+        let _ = identity_index;
+        let encoded = CatalogueToExtendedCrateCodec::new()
+            .encode(catalogue, &baseline, &baseline)
+            .expect("mutual add and modify-to-add references must encode");
+
+        let id_for = |path: &[&str]| {
+            let expected = path.iter().map(|segment| (*segment).to_owned()).collect::<Vec<_>>();
+            encoded
+                .krate()
+                .paths
+                .iter()
+                .find(|(_, summary)| summary.path == expected)
+                .map(|(id, _)| *id)
+                .expect("encoded identity must have an authoritative path")
+        };
+        let first_id = id_for(&["infrastructure", "First"]);
+        let second_id = id_for(&["infrastructure", "Second"]);
+        let holder_id = id_for(&["infrastructure", "Holder"]);
+        let field_target = |owner_id| {
+            let rustdoc_types::ItemEnum::Struct(owner) = &encoded.krate().index[&owner_id].inner
+            else {
+                panic!("expected a struct owner")
+            };
+            let rustdoc_types::StructKind::Plain { fields, .. } = &owner.kind else {
+                panic!("expected a plain struct owner")
+            };
+            let field_id = fields.first().expect("expected one reference-bearing field");
+            let rustdoc_types::ItemEnum::StructField(rustdoc_types::Type::ResolvedPath(path)) =
+                &encoded.krate().index[field_id].inner
+            else {
+                panic!("expected a resolved field reference")
+            };
+            path.id
+        };
+
+        assert_eq!(field_target(first_id), second_id);
+        assert_eq!(field_target(second_id), first_id);
+        assert_eq!(field_target(holder_id), first_id);
+    }
+
+    #[test]
+    fn test_execute_type_signals_resolves_all_type_actions_and_modify_function_under_bin_root_alias()
+     {
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::CatalogueDocument;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
+        use domain::tddd::catalogue_v2::roles::{DataRole, FunctionRole, ItemAction};
+        use domain::tddd::catalogue_v2::{
+            CatalogueEntryKey, CrateName, FunctionName, FunctionPath, ModulePath, TypeRef,
+        };
+
+        let rooted_crate = |paths: Vec<(u32, Vec<&str>, rustdoc_types::ItemKind)>| {
+            let path_map = paths
+                .into_iter()
+                .map(|(id, path, kind)| {
+                    (
+                        rustdoc_types::Id(id),
+                        rustdoc_types::ItemSummary {
+                            crate_id: 0,
+                            path: path.into_iter().map(str::to_owned).collect(),
+                            kind,
+                        },
+                    )
+                })
+                .collect::<HashMap<_, _>>();
+            let mut krate = rustdoc_crate_with_paths(path_map);
+            krate.index.insert(
+                rustdoc_types::Id(0),
+                rustdoc_types::Item {
+                    id: rustdoc_types::Id(0),
+                    crate_id: 0,
+                    name: Some("sotp".to_owned()),
+                    span: None,
+                    visibility: rustdoc_types::Visibility::Public,
+                    docs: None,
+                    links: HashMap::new(),
+                    attrs: vec![],
+                    deprecation: None,
+                    inner: rustdoc_types::ItemEnum::Module(rustdoc_types::Module {
+                        is_crate: true,
+                        items: vec![],
+                        is_stripped: false,
+                    }),
+                },
+            );
+            krate
+        };
+        let type_entry = |action| {
+            TypeEntry::new(
+                action,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            )
+        };
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("cli").unwrap(),
+            LayerId::try_new("cli").unwrap(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Added".to_owned()).unwrap(),
+            type_entry(ItemAction::Add),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Modified".to_owned()).unwrap(),
+            type_entry(ItemAction::Modify),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Referenced".to_owned()).unwrap(),
+            type_entry(ItemAction::Reference),
+        );
+        catalogue.insert_function(
+            FunctionPath::new(
+                CrateName::new("cli").unwrap(),
+                ModulePath::from_segments(vec!["commands".to_owned()]).unwrap(),
+                FunctionName::new("run").unwrap(),
+            ),
+            FunctionEntry::new(
+                ItemAction::Modify,
+                FunctionRole::FreeFunction,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let baseline = rooted_crate(vec![
+            (1, vec!["sotp", "commands", "Modified"], rustdoc_types::ItemKind::Struct),
+            (2, vec!["sotp", "commands", "Referenced"], rustdoc_types::ItemKind::Struct),
+            (3, vec!["sotp", "commands", "run"], rustdoc_types::ItemKind::Function),
+        ]);
+        let current = rooted_crate(vec![
+            (1, vec!["sotp", "commands", "Modified"], rustdoc_types::ItemKind::Struct),
+            (2, vec!["sotp", "commands", "Referenced"], rustdoc_types::ItemKind::Struct),
+            (3, vec!["sotp", "commands", "run"], rustdoc_types::ItemKind::Function),
+            (4, vec!["sotp", "generated", "Added"], rustdoc_types::ItemKind::Struct),
+        ]);
+        let package = CrateName::new("cli").unwrap();
+        let normalized_current = normalized_paths_for_doc(&current, &package);
+        for expected in [
+            vec!["cli", "commands", "Modified"],
+            vec!["cli", "commands", "Referenced"],
+            vec!["cli", "commands", "run"],
+            vec!["cli", "generated", "Added"],
+        ] {
+            assert!(
+                normalized_current.values().any(|summary| summary.path == expected),
+                "root alias must be normalized once for {expected:?}"
+            );
+        }
+
+        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
+            .expect("all type actions must share one normalized resolution set");
+        build_type_signal_identity_index(&catalogue, &resolution_paths)
+            .expect("type-signal indexing must use the same normalized identities");
+        let encoded = CatalogueToExtendedCrateCodec::new()
+            .encode(catalogue, &baseline, &current)
+            .expect("add, modify, reference, and function identities must encode under alias");
+
+        let id_for = |path: &[&str]| {
+            let expected = path.iter().map(|segment| (*segment).to_owned()).collect::<Vec<_>>();
+            encoded
+                .krate()
+                .paths
+                .iter()
+                .find(|(_, summary)| summary.path == expected)
+                .map(|(id, _)| *id)
+                .expect("encoded path must be present")
+        };
+        assert_eq!(
+            encoded.action_for(&id_for(&["cli", "generated", "Added"])),
+            Some(ItemAction::Add)
+        );
+        assert_eq!(
+            encoded.action_for(&id_for(&["cli", "commands", "Modified"])),
+            Some(ItemAction::Modify)
+        );
+        assert_eq!(
+            encoded.action_for(&id_for(&["cli", "commands", "Referenced"])),
+            Some(ItemAction::Reference)
+        );
+        assert_eq!(
+            encoded.action_for(&id_for(&["cli", "commands", "run"])),
+            Some(ItemAction::Modify)
+        );
     }
 
     fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {

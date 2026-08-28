@@ -1,5 +1,7 @@
 # Language Rules
 
+Reference this rule when editing source or documentation; it is not a PR-review briefing.
+
 ## Thinking and Reasoning
 
 - **Always think and reason in English**

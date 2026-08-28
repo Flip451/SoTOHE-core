@@ -29,11 +29,12 @@
 //! ADR: `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`.
 
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::ConfidenceSignal;
 use domain::TypeSignalsDocument;
 use domain::tddd::catalogue_linter::FreeText;
+use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
 // Re-export domain task_contract types accessible to the cli_driver primary adapter
 // via usecase module path (architecture-rules.json: cli_driver may_depend_on [usecase] only).
 pub use domain::task_contract::{
@@ -41,15 +42,17 @@ pub use domain::task_contract::{
 };
 use thiserror::Error;
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
+
 // Pure-helper free functions extracted to a sibling module to keep this file
 // under the workspace `verify-module-size` cap (700 non-test lines, see ADR
 // `2026-06-06-1609-enforce-module-size-limit-splitting`). The glob import
 // keeps call sites unchanged.
 mod helpers;
 use helpers::{
-    blocked_coverage_outcome, blocked_outcome, build_scope_entries,
+    blocked_coverage_outcome, blocked_outcome, build_scope_entries, check_signal_document,
     collect_non_canonical_layer_violations, collect_per_layer_violations,
-    collect_task_key_ri_violations, entry_key_to_contracted_ref,
+    collect_task_key_ri_violations, load_catalogue,
 };
 
 // ---------------------------------------------------------------------------
@@ -92,6 +95,10 @@ pub struct PreReviewGateCommand {
 ///   (e.g. enforcing the gate when `impl-plan.json` exists).
 /// - `TaskContractReadFailed`: I/O or decode error reading the contract;
 ///   `message` is opaque diagnostic [`FreeText`] (R9: opaque infrastructure error message).
+/// - `CatalogueReadFailed`: I/O or decode error reading a layer catalogue;
+///   `layer` identifies the affected TDDD layer.
+/// - `CatalogueFreshnessMismatch`: the loaded catalogue's declaration hash
+///   differs from the validated type-signals document's attested hash.
 /// - `SignalReadFailed`: I/O or decode error reading the per-layer type-signals
 ///   document; `layer` is typed as `domain::tddd::LayerId` (the port takes
 ///   `&LayerId` so the error always originates from a valid `LayerId`), `message`
@@ -112,6 +119,25 @@ pub enum PreReviewGateError {
     #[error("failed to read task-contract.json: {message}")]
     TaskContractReadFailed {
         /// Opaque diagnostic message from the infrastructure adapter.
+        message: FreeText,
+    },
+
+    /// I/O or decode error reading the catalogue for a TDDD layer.
+    #[error("failed to read catalogue for layer '{layer}': {message}")]
+    CatalogueReadFailed {
+        /// The TDDD layer whose catalogue could not be read.
+        layer: domain::tddd::LayerId,
+        /// Opaque diagnostic message from the infrastructure adapter.
+        message: FreeText,
+    },
+
+    /// The loaded catalogue does not match the declaration hash attested by
+    /// the already-validated type-signals document.
+    #[error("catalogue freshness mismatch for layer '{layer}': {message}")]
+    CatalogueFreshnessMismatch {
+        /// The TDDD layer whose catalogue is stale relative to its signals.
+        layer: domain::tddd::LayerId,
+        /// Diagnostic describing the failed freshness comparison.
         message: FreeText,
     },
 
@@ -296,29 +322,47 @@ pub trait CoverageVerifyService: Send + Sync {
 
 /// Interactor implementing [`CoverageVerifyService`] (attribution-completeness check).
 ///
-/// Holds two injected secondary ports: `task_contract_reader` reads
-/// `task-contract.json`; `signal_reader` reads per-layer type-signals documents
-/// to enumerate all catalogue entry keys.  Checks that every signaled entry is
-/// attributed to at least one task (orphan detection) and every attributed
-/// entry has a signal (referential integrity). Shares `TaskContractReaderPort`
-/// and `ImplCatalogSignalReaderPort` with `PreReviewGateInteractor` (reuse per
-/// spec `IN-07`).
+/// Holds the task-contract, signal, implementation-plan, and catalogue loader
+/// dependencies. It also receives the repository workspace root explicitly so
+/// layer bindings never depend on the shape of `items_dir`. It checks that every
+/// signaled entry is attributed to at least one task (orphan detection) and
+/// every attributed entry has a signal (referential integrity). Shares the
+/// task-contract, signal, and plan ports with `PreReviewGateInteractor` (reuse
+/// per spec `IN-07`).
 pub struct CoverageVerifyInteractor {
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
     impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
+    catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
+    layer_bindings: Arc<dyn TdddLayerBindingsPort>,
+    workspace_root: PathBuf,
+    items_dir: PathBuf,
 }
 
 impl CoverageVerifyInteractor {
-    /// Construct by injecting three secondary ports; `impl_plan_reader` enables
-    /// the D9 task-key referential integrity check.
+    /// Construct by injecting the task-contract, signal, plan, and catalogue
+    /// dependencies; `impl_plan_reader` enables the D9 task-key referential
+    /// integrity check, `workspace_root` anchors layer-binding resolution, and
+    /// `items_dir` anchors per-layer catalogue loading.
     #[must_use]
     pub fn new(
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
         impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
+        catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
+        layer_bindings: Arc<dyn TdddLayerBindingsPort>,
+        workspace_root: PathBuf,
+        items_dir: PathBuf,
     ) -> Self {
-        Self { task_contract_reader, signal_reader, impl_plan_reader }
+        Self {
+            task_contract_reader,
+            signal_reader,
+            impl_plan_reader,
+            catalogue_loader,
+            layer_bindings,
+            workspace_root,
+            items_dir,
+        }
     }
 }
 
@@ -355,10 +399,21 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
                 );
                 continue;
             };
+            let attested = load_catalogue(
+                self.catalogue_loader.as_ref(),
+                self.layer_bindings.as_ref(),
+                &self.workspace_root,
+                &self.items_dir,
+                &cmd.track_id,
+                &layer,
+                &signal_doc,
+            )?;
+            let catalogue = attested.document();
             let scope_entries = build_scope_entries(&signal_doc, &layer)?;
             all_violations.extend(collect_per_layer_violations(
                 &contract_doc,
                 &layer,
+                catalogue,
                 &scope_entries,
             ));
         }
@@ -403,10 +458,14 @@ pub trait PreReviewGateService: Send + Sync {
 
 /// Interactor implementing [`PreReviewGateService`] (liveness check).
 ///
-/// Holds three injected secondary ports:
+/// Holds seven injected dependencies:
 /// - `task_contract_reader` reads `task-contract.json` for the active track.
 /// - `signal_reader` reads per-layer `impl_catalog` type-signal documents.
 /// - `impl_plan_reader` reads `impl-plan.json` for task-status filtering (D7).
+/// - `catalogue_loader` reads the layer catalogue used to resolve each contract
+///   entry's type/trait/function namespace.
+/// - `workspace_root` anchors `architecture-rules.json` resolution.
+/// - `items_dir` anchors the catalogue paths for the active track.
 ///
 /// The interactor checks that all attributed entries for current/done tasks
 /// have Blue `impl_catalog` signals.
@@ -414,19 +473,35 @@ pub struct PreReviewGateInteractor {
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
     impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
+    catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
+    layer_bindings: Arc<dyn TdddLayerBindingsPort>,
+    workspace_root: PathBuf,
+    items_dir: PathBuf,
 }
 
 impl PreReviewGateInteractor {
-    /// Construct a `PreReviewGateInteractor` by injecting three secondary ports:
-    /// task-contract reader, signal reader, and impl-plan reader (D7 addition
-    /// for task status filtering).
+    /// Construct a `PreReviewGateInteractor` by injecting its readers, the
+    /// workspace root used for layer-binding resolution, and the catalogue
+    /// path root used for namespace resolution.
     #[must_use]
     pub fn new(
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
         impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
+        catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
+        layer_bindings: Arc<dyn TdddLayerBindingsPort>,
+        workspace_root: PathBuf,
+        items_dir: PathBuf,
     ) -> Self {
-        Self { task_contract_reader, signal_reader, impl_plan_reader }
+        Self {
+            task_contract_reader,
+            signal_reader,
+            impl_plan_reader,
+            catalogue_loader,
+            layer_bindings,
+            workspace_root,
+            items_dir,
+        }
     }
 }
 
@@ -435,105 +510,6 @@ const CANONICAL_LAYERS: &[&str] =
     &["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"];
 
 impl PreReviewGateInteractor {
-    /// Evaluate one already-loaded signal document against the task contract.
-    ///
-    /// Performs liveness check only (Phase 3, D7 variant): verifies that every
-    /// contracted entry that exists in the signal document has a Blue
-    /// `impl_catalog` signal, with the following task-status filtering rules
-    /// (D7):
-    ///
-    /// - Entries whose owning tasks include no `done` or `in_progress` task in
-    ///   `impl-plan.json` are **skipped** from the Blue requirement (Yellow
-    ///   tolerated).
-    /// - If ANY owning task is `done` or `in_progress`, the entry **requires**
-    ///   Blue.
-    /// - Red signal is a blocker **regardless** of task status.
-    /// - Entries absent from `impl-plan.json` are treated conservatively
-    ///   (required to be Blue).
-    ///
-    /// Attribution checks (orphan detection, referential integrity) are
-    /// handled by [`CoverageVerifyInteractor`].
-    ///
-    /// Returns the list of violations found for this layer (empty = passed).
-    /// The caller is responsible for combining per-layer results into a final
-    /// [`PreReviewGateOutcome`].
-    fn check_signal_document(
-        &self,
-        layer: &domain::tddd::LayerId,
-        contract_doc: &domain::task_contract::TaskContractDocument,
-        signal_doc: &TypeSignalsDocument,
-        task_statuses: &HashMap<domain::TaskId, domain::TaskStatusKind>,
-    ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
-        // ── Build signal lookup ───────────────────────────────────────────────
-        //
-        // scope_signals: type_name -> ConfidenceSignal for entries in the signal doc.
-        // Validate entry-key shape up front so malformed signal documents fail closed.
-        let mut scope_signals: HashMap<String, ConfidenceSignal> = HashMap::new();
-        for signal in signal_doc.signals() {
-            let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
-                signal.type_name().to_owned(),
-            )
-            .map_err(|_| PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: FreeText::new(format!(
-                    "invalid entry key '{}' in {}-type-signals.json",
-                    signal.type_name(),
-                    layer.as_ref()
-                )),
-            })?;
-            scope_signals.insert(entry_key.as_str().to_owned(), signal.signal());
-        }
-
-        // Build a map: entry_key → set of task statuses that attribute it for this layer.
-        // We need this to determine if any owning task requires Blue.
-        let entries = contract_doc.entries();
-        let mut entry_task_statuses: HashMap<&str, Vec<domain::TaskStatusKind>> = HashMap::new();
-        for (task_id, refs) in entries {
-            let status =
-                task_statuses.get(task_id).copied().unwrap_or(domain::TaskStatusKind::Done); // conservative default
-            for entry_ref in refs {
-                if entry_ref.layer() == layer {
-                    entry_task_statuses
-                        .entry(entry_ref.entry_key().as_str())
-                        .or_default()
-                        .push(status);
-                }
-            }
-        }
-
-        // ── Phase 3 (D7): Signal check with task-status filtering ─────────────
-        //
-        // For each attributed entry present in the signal document:
-        // - If the signal is Red → always block (status-independent).
-        // - If any owning task is done or in_progress → require Blue.
-        // - Otherwise, skip Blue check (Yellow tolerated).
-        // Entries not present in the signal document are skipped (coverage concern).
-        let mut violations: Vec<PreReviewGateViolation> = Vec::new();
-        for (key, statuses) in &entry_task_statuses {
-            let Some(&signal) = scope_signals.get(*key) else {
-                continue; // Not in signal doc → coverage concern, skip here.
-            };
-
-            let is_red = signal == ConfidenceSignal::Red;
-            let requires_blue = statuses.iter().any(|&status| {
-                matches!(status, domain::TaskStatusKind::InProgress | domain::TaskStatusKind::Done)
-            });
-
-            if is_red {
-                // Red is always a blocker regardless of task status.
-                let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
-                violations.push(PreReviewGateViolation::NonBlueSignal(entry_ref, signal));
-            } else if requires_blue && signal != ConfidenceSignal::Blue {
-                // Done/in_progress task with non-blue, non-red signal → block.
-                let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
-                violations.push(PreReviewGateViolation::NonBlueSignal(entry_ref, signal));
-            }
-            // No done/in_progress owner + Yellow → skip (no violation)
-        }
-
-        Ok(violations)
-    }
-
     /// Run the liveness gate for a single TDDD layer.
     ///
     /// Returns the list of violations found for this layer (empty = passed).
@@ -549,7 +525,16 @@ impl PreReviewGateInteractor {
         // ── Step 1: read type-signals for layer ───────────────────────────────
         let signal_doc =
             self.signal_reader.read_signals(track_id, layer).map_err(PreReviewGateError::from)?;
-        self.check_signal_document(layer, contract_doc, &signal_doc, task_statuses)
+        let attested = load_catalogue(
+            self.catalogue_loader.as_ref(),
+            self.layer_bindings.as_ref(),
+            &self.workspace_root,
+            &self.items_dir,
+            track_id,
+            layer,
+            &signal_doc,
+        )?;
+        check_signal_document(layer, contract_doc, attested.document(), &signal_doc, task_statuses)
     }
 }
 
@@ -610,9 +595,19 @@ impl PreReviewGateService for PreReviewGateInteractor {
                         .map_err(PreReviewGateError::from)?
                     {
                         Some(signal_doc) => {
-                            let violations = self.check_signal_document(
+                            let attested = load_catalogue(
+                                self.catalogue_loader.as_ref(),
+                                self.layer_bindings.as_ref(),
+                                &self.workspace_root,
+                                &self.items_dir,
+                                &cmd.track_id,
+                                &layer,
+                                &signal_doc,
+                            )?;
+                            let violations = check_signal_document(
                                 &layer,
                                 &contract_doc,
+                                attested.document(),
                                 &signal_doc,
                                 &task_statuses,
                             )?;
@@ -648,16 +643,26 @@ impl PreReviewGateService for PreReviewGateInteractor {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::collections::BTreeMap;
-    use std::sync::Arc;
+    use std::path::{Path, PathBuf};
+    use std::sync::{Arc, Mutex};
 
     use domain::TaskStatusKind;
     use domain::task_contract::{
         ContractedEntryRef, CoverageVerifyOutcome, CoverageViolation, PreReviewGateOutcome,
         PreReviewGateViolation, TaskContractDocument,
     };
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, CrateName, ModulePath};
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{
+        AttestedCatalogueDocument, CatalogueDocument, CatalogueDocumentLoaderError,
+        TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
+    };
     use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use domain::tddd::{LayerId, type_signals_doc::TypeSignalsDocument};
-    use domain::{ConfidenceSignal, TaskId, Timestamp, TrackId, TypeSignal};
+    use domain::{ConfidenceSignal, FreeText, TaskId, Timestamp, TrackId, TypeSignal};
 
     use super::{
         CoverageVerifyCommand, CoverageVerifyInteractor, CoverageVerifyService,
@@ -665,6 +670,7 @@ mod tests {
         ImplPlanReaderPort, PreReviewGateCommand, PreReviewGateError, PreReviewGateInteractor,
         PreReviewGateService, TaskContractReadError, TaskContractReaderPort,
     };
+    use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 
     // ── Mock helpers ──────────────────────────────────────────────────────────
 
@@ -689,15 +695,65 @@ mod tests {
     }
 
     fn blue_signal(name: &str) -> TypeSignal {
-        TypeSignal::new(name, "struct", ConfidenceSignal::Blue, true, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new(name),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "struct".to_owned(),
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     fn yellow_signal(name: &str) -> TypeSignal {
-        TypeSignal::new(name, "struct", ConfidenceSignal::Yellow, false, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new(name),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "struct".to_owned(),
+            ConfidenceSignal::Yellow,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        )
+    }
+
+    fn catalogue_signal(
+        name: &str,
+        namespace: CatalogueItemNamespace,
+        signal: ConfidenceSignal,
+    ) -> TypeSignal {
+        let kind_tag = match namespace {
+            CatalogueItemNamespace::Type => "struct",
+            CatalogueItemNamespace::Trait => "secondary_port",
+        };
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem { item_name: FreeText::new(name), namespace },
+            kind_tag.to_owned(),
+            signal,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     fn unknown_signal(name: &str) -> TypeSignal {
-        TypeSignal::new(name, "unknown", ConfidenceSignal::Yellow, true, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new(name) },
+            "unknown".to_owned(),
+            ConfidenceSignal::Yellow,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     fn make_contract(
@@ -711,14 +767,157 @@ mod tests {
         TaskContractDocument::new(track_id(track), map).unwrap()
     }
 
+    fn test_type_entry() -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn test_trait_entry() -> TraitEntry {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn type_only_catalogue() -> CatalogueDocument {
+        let mut document =
+            CatalogueDocument::new(5, CrateName::new("domain").unwrap(), layer("domain"));
+        for name in [
+            "Foo",
+            "Bar",
+            "UseFoo",
+            "UseBar",
+            "Missing",
+            "domain::alpha::Shared",
+            "domain::beta::Shared",
+        ] {
+            document.insert_type(entry_key(name), test_type_entry());
+        }
+        document.insert_type(entry_key("Shared"), test_type_entry());
+        document
+    }
+
+    fn ambiguous_catalogue() -> CatalogueDocument {
+        let mut document = type_only_catalogue();
+        document.insert_trait(entry_key("Shared"), test_trait_entry());
+        document
+    }
+
+    struct ConstCatalogueReader(AttestedCatalogueDocument);
+
+    impl AttestedCatalogueDocumentLoaderPort for ConstCatalogueReader {
+        fn load(
+            &self,
+            _path: &Path,
+        ) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    struct RecordingCatalogueReader {
+        document: AttestedCatalogueDocument,
+        paths: Arc<Mutex<Vec<PathBuf>>>,
+    }
+
+    impl AttestedCatalogueDocumentLoaderPort for RecordingCatalogueReader {
+        fn load(
+            &self,
+            path: &Path,
+        ) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+            self.paths.lock().unwrap().push(path.to_path_buf());
+            Ok(self.document.clone())
+        }
+    }
+
+    fn catalogue_reader() -> Arc<dyn AttestedCatalogueDocumentLoaderPort> {
+        Arc::new(ConstCatalogueReader(test_catalogue_with_hash('a')))
+    }
+
+    fn ambiguous_catalogue_reader() -> Arc<dyn AttestedCatalogueDocumentLoaderPort> {
+        Arc::new(ConstCatalogueReader(ambiguous_catalogue_with_hash('a')))
+    }
+
+    struct FailingCatalogueReader;
+
+    impl AttestedCatalogueDocumentLoaderPort for FailingCatalogueReader {
+        fn load(
+            &self,
+            path: &Path,
+        ) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+            Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
+        }
+    }
+
+    fn failing_catalogue_reader() -> Arc<dyn AttestedCatalogueDocumentLoaderPort> {
+        Arc::new(FailingCatalogueReader)
+    }
+
+    fn attest_catalogue(
+        document: CatalogueDocument,
+        source_tag: char,
+    ) -> AttestedCatalogueDocument {
+        let source = format!("T014 catalogue source {source_tag}").into_bytes();
+        AttestedCatalogueDocument::attest(&source, |_| Ok::<_, std::convert::Infallible>(document))
+            .unwrap()
+    }
+
+    fn test_catalogue_with_hash(hash_byte: char) -> AttestedCatalogueDocument {
+        attest_catalogue(type_only_catalogue(), hash_byte)
+    }
+
+    fn ambiguous_catalogue_with_hash(hash_byte: char) -> AttestedCatalogueDocument {
+        attest_catalogue(ambiguous_catalogue(), hash_byte)
+    }
+
+    fn items_dir() -> PathBuf {
+        PathBuf::from("track/items")
+    }
+
+    fn custom_items_dir() -> PathBuf {
+        PathBuf::from("custom/track/items")
+    }
+
+    fn workspace_root() -> PathBuf {
+        PathBuf::from("workspace")
+    }
+
     fn make_signals(signals: Vec<TypeSignal>) -> TypeSignalsDocument {
-        let digest = domain::Sha256Digest::try_new("a".repeat(64)).unwrap();
+        make_signals_with_hash(signals, 'a')
+    }
+
+    fn make_signals_with_hash(signals: Vec<TypeSignal>, hash_byte: char) -> TypeSignalsDocument {
+        let declaration_hash = test_catalogue_with_hash(hash_byte).declaration_hash().clone();
+        let baseline_digest =
+            domain::Sha256Digest::try_new(hash_byte.to_string().repeat(64)).unwrap();
         TypeSignalsDocument::new(
             ts("2026-06-27T00:00:00Z"),
             domain::TypeSignalsCacheKey::new(
-                domain::CatalogueDeclarationHash::new(digest.clone()),
+                declaration_hash,
                 domain::CommitHash::try_new("a".repeat(40)).unwrap(),
-                domain::BaselineHash::new(digest),
+                domain::BaselineHash::new(baseline_digest),
             ),
             signals,
         )
@@ -848,6 +1047,54 @@ mod tests {
         }
     }
 
+    struct ConstLayerBindings {
+        catalogue_file: String,
+    }
+
+    impl TdddLayerBindingsPort for ConstLayerBindings {
+        fn load(
+            &self,
+            _workspace_root: &Path,
+            layer_filter: Option<&str>,
+        ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
+            Ok(vec![TdddLayerBinding {
+                layer_id: layer_filter.unwrap_or("domain").to_owned(),
+                catalogue_file: self.catalogue_file.clone(),
+                baseline_file: "domain-types-baseline.json".to_owned(),
+                targets: vec!["domain".to_owned()],
+            }])
+        }
+    }
+
+    struct RecordingLayerBindings {
+        catalogue_file: String,
+        roots: Arc<Mutex<Vec<PathBuf>>>,
+    }
+
+    impl TdddLayerBindingsPort for RecordingLayerBindings {
+        fn load(
+            &self,
+            workspace_root: &Path,
+            layer_filter: Option<&str>,
+        ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
+            self.roots.lock().unwrap().push(workspace_root.to_path_buf());
+            Ok(vec![TdddLayerBinding {
+                layer_id: layer_filter.unwrap_or("domain").to_owned(),
+                catalogue_file: self.catalogue_file.clone(),
+                baseline_file: "domain-types-baseline.json".to_owned(),
+                targets: vec!["domain".to_owned()],
+            }])
+        }
+    }
+
+    fn layer_bindings() -> Arc<dyn TdddLayerBindingsPort> {
+        layer_bindings_with_catalogue_file("domain-types.json")
+    }
+
+    fn layer_bindings_with_catalogue_file(file: &str) -> Arc<dyn TdddLayerBindingsPort> {
+        Arc::new(ConstLayerBindings { catalogue_file: file.to_owned() })
+    }
+
     /// Const impl-plan reader that always returns an empty task-status map.
     struct EmptyImplPlanReader;
 
@@ -868,6 +1115,10 @@ mod tests {
             Arc::new(ConstContractReader(contract)),
             Arc::new(ConstSignalReader(signals)),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         )
     }
 
@@ -915,6 +1166,10 @@ mod tests {
                 make_signals(vec![blue_signal("Foo")]),
             )]))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         assert!(
@@ -928,6 +1183,231 @@ mod tests {
 
     fn cmd(track: &str, group: &str) -> PreReviewGateCommand {
         PreReviewGateCommand { track_id: track_id(track), layer: Some(layer(group)) }
+    }
+
+    #[test]
+    fn catalogue_hash_mismatch_fails_closed_before_namespace_resolution() {
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals_with_hash(vec![blue_signal("Foo")], 'a')))),
+            Arc::new(EmptyImplPlanReader),
+            Arc::new(ConstCatalogueReader(test_catalogue_with_hash('b'))),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+
+        let error = service.check(cmd("my-track", "domain")).unwrap_err();
+
+        assert!(matches!(
+            error,
+            PreReviewGateError::CatalogueFreshnessMismatch { layer, message }
+                if layer.as_ref() == "domain"
+                    && message.as_str()
+                        == "catalogue changed between signal validation and namespace resolution"
+        ));
+    }
+
+    #[test]
+    fn catalogue_read_failure_is_reported_as_catalogue_error() {
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
+            Arc::new(EmptyImplPlanReader),
+            failing_catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+
+        let error = service.check(cmd("my-track", "domain")).unwrap_err();
+        assert!(matches!(
+            error,
+            PreReviewGateError::CatalogueReadFailed { layer, message }
+                if layer.as_ref() == "domain" && message.as_str().contains("catalogue file not found")
+        ));
+    }
+
+    #[test]
+    fn configured_catalogue_filename_is_used_for_namespace_resolution() {
+        let paths = Arc::new(Mutex::new(Vec::new()));
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
+            Arc::new(EmptyImplPlanReader),
+            Arc::new(RecordingCatalogueReader {
+                document: test_catalogue_with_hash('a'),
+                paths: Arc::clone(&paths),
+            }),
+            layer_bindings_with_catalogue_file("custom-domain-types.json"),
+            workspace_root(),
+            items_dir(),
+        );
+
+        assert!(matches!(
+            service.check(cmd("my-track", "domain")),
+            Ok(PreReviewGateOutcome::Passed)
+        ));
+        assert_eq!(
+            paths.lock().unwrap().as_slice(),
+            [PathBuf::from("track/items/my-track/custom-domain-types.json")].as_slice()
+        );
+    }
+
+    #[test]
+    fn custom_items_dir_uses_explicit_workspace_root_for_liveness_and_coverage() {
+        let contract_document = make_contract(
+            "my-track",
+            vec![(
+                task_id("T001"),
+                vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+            )],
+        );
+        let liveness_contract = Ok(contract_document.clone());
+        let coverage_contract = Ok(contract_document);
+        let liveness_roots = Arc::new(Mutex::new(Vec::new()));
+        let liveness = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(liveness_contract)),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
+            Arc::new(EmptyImplPlanReader),
+            Arc::new(RecordingCatalogueReader {
+                document: test_catalogue_with_hash('a'),
+                paths: Arc::new(Mutex::new(Vec::new())),
+            }),
+            Arc::new(RecordingLayerBindings {
+                catalogue_file: "domain-types.json".to_owned(),
+                roots: Arc::clone(&liveness_roots),
+            }),
+            workspace_root(),
+            custom_items_dir(),
+        );
+        assert!(matches!(
+            liveness.check(cmd("my-track", "domain")),
+            Ok(PreReviewGateOutcome::Passed)
+        ));
+        assert_eq!(liveness_roots.lock().unwrap().as_slice(), [workspace_root()].as_slice());
+
+        let coverage_roots = Arc::new(Mutex::new(Vec::new()));
+        let coverage = CoverageVerifyInteractor::new(
+            Arc::new(ConstContractReader(coverage_contract)),
+            Arc::new(LayerAwareSignalReader(std::collections::HashMap::from([(
+                "domain".to_owned(),
+                make_signals(vec![blue_signal("Foo")]),
+            )]))),
+            plan_reader_matching_contract(&Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            ))),
+            Arc::new(RecordingCatalogueReader {
+                document: test_catalogue_with_hash('a'),
+                paths: Arc::new(Mutex::new(Vec::new())),
+            }),
+            Arc::new(RecordingLayerBindings {
+                catalogue_file: "domain-types.json".to_owned(),
+                roots: Arc::clone(&coverage_roots),
+            }),
+            workspace_root(),
+            custom_items_dir(),
+        );
+        let coverage_outcome = coverage.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert!(matches!(coverage_outcome, CoverageVerifyOutcome::Blocked(_)));
+        assert_eq!(coverage_roots.lock().unwrap().as_slice(), [workspace_root()].as_slice());
+    }
+
+    #[test]
+    fn items_dir_outside_workspace_root_fails_closed_before_binding_resolution() {
+        let roots = Arc::new(Mutex::new(Vec::new()));
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
+            Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            Arc::new(RecordingLayerBindings {
+                catalogue_file: "domain-types.json".to_owned(),
+                roots: Arc::clone(&roots),
+            }),
+            PathBuf::from("/repository-a"),
+            PathBuf::from("/repository-b/custom/track/items"),
+        );
+
+        let error = service.check(cmd("my-track", "domain")).unwrap_err();
+
+        assert!(matches!(
+            error,
+            PreReviewGateError::CatalogueReadFailed { layer, message }
+                if layer.as_ref() == "domain"
+                    && message.as_str().contains("outside workspace root")
+        ));
+        assert!(
+            roots.lock().unwrap().is_empty(),
+            "layer bindings must not be resolved after repository context validation fails"
+        );
+    }
+
+    #[test]
+    fn catalogue_hash_validation_is_request_scoped_for_same_path() {
+        let contract = make_contract(
+            "my-track",
+            vec![(
+                task_id("T001"),
+                vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+            )],
+        );
+        let first_request = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(contract.clone()))),
+            Arc::new(ConstSignalReader(Ok(make_signals_with_hash(vec![blue_signal("Foo")], 'a')))),
+            Arc::new(EmptyImplPlanReader),
+            Arc::new(ConstCatalogueReader(test_catalogue_with_hash('a'))),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+        let second_request = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(contract))),
+            Arc::new(ConstSignalReader(Ok(make_signals_with_hash(vec![blue_signal("Foo")], 'b')))),
+            Arc::new(EmptyImplPlanReader),
+            Arc::new(ConstCatalogueReader(test_catalogue_with_hash('b'))),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+
+        // Each call carries its own decoded signal hash and loaded catalogue
+        // attestation. There is no process-global path cache for concurrent
+        // calls to cross-consume.
+        std::thread::scope(|scope| {
+            let first = scope.spawn(|| first_request.check(cmd("my-track", "domain")));
+            let second = scope.spawn(|| second_request.check(cmd("my-track", "domain")));
+            assert!(matches!(first.join().unwrap(), Ok(PreReviewGateOutcome::Passed)));
+            assert!(matches!(second.join().unwrap(), Ok(PreReviewGateOutcome::Passed)));
+        });
     }
 
     // ── D9 tolerance (knowledge/adr/2026-06-26-0503-...): TaskContractNotFound → Passed ──
@@ -951,8 +1431,15 @@ mod tests {
 
     #[test]
     fn test_check_invalid_signal_entry_key_returns_signal_read_failed() {
-        let invalid_signal =
-            TypeSignal::new("   ", "struct", ConfidenceSignal::Blue, true, vec![], vec![], vec![]);
+        let invalid_signal = TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new("   ") },
+            "free_function".to_owned(),
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        );
         let svc = interactor(
             Ok(make_contract(
                 "my-track",
@@ -973,6 +1460,37 @@ mod tests {
                 );
             }
             other => panic!("expected SignalReadFailed, got {other}"),
+        }
+    }
+
+    #[test]
+    fn test_check_duplicate_signal_identity_returns_signal_read_failed() {
+        for (first, second) in [
+            (ConfidenceSignal::Blue, ConfidenceSignal::Yellow),
+            (ConfidenceSignal::Yellow, ConfidenceSignal::Blue),
+        ] {
+            let svc = interactor(
+                Ok(make_contract(
+                    "my-track",
+                    vec![(
+                        task_id("T001"),
+                        vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                    )],
+                )),
+                Ok(make_signals(vec![
+                    catalogue_signal("Foo", CatalogueItemNamespace::Type, first),
+                    catalogue_signal("Foo", CatalogueItemNamespace::Type, second),
+                ])),
+            );
+
+            let err = svc.check(cmd("my-track", "domain")).unwrap_err();
+            match err {
+                PreReviewGateError::SignalReadFailed { layer, message } => {
+                    assert_eq!(layer.as_ref(), "domain");
+                    assert!(message.as_str().contains("duplicate signal identity"));
+                }
+                other => panic!("expected duplicate identity to fail closed, got {other}"),
+            }
         }
     }
 
@@ -1000,6 +1518,7 @@ mod tests {
         );
     }
 
+    /// Uses the type-only fixture; see `same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage` and `coverage_ambiguous_contract_key_fails_closed_for_same_named_rows`.
     #[test]
     fn test_pre_review_gate_attributes_duplicate_qualified_entry_keys_independently() {
         let alpha = entry_key("domain::alpha::Shared");
@@ -1022,6 +1541,10 @@ mod tests {
                 blue_signal(beta.as_str()),
             ])))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = service.check(cmd("my-track", "domain")).unwrap();
@@ -1031,6 +1554,80 @@ mod tests {
                 ContractedEntryRef::new(layer("domain"), alpha),
                 ConfidenceSignal::Yellow,
             )],
+        );
+    }
+
+    #[test]
+    fn same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage() {
+        let shared = entry_key("Shared");
+        let catalogue = ambiguous_catalogue();
+        assert!(
+            catalogue.types().contains_key(&shared),
+            "the ambiguity fixture must register Shared as a Type"
+        );
+        assert!(
+            catalogue.traits().contains_key(&shared),
+            "the ambiguity fixture must register Shared as a Trait"
+        );
+        let contract = make_contract(
+            "my-track",
+            vec![(task_id("T001"), vec![ContractedEntryRef::new(layer("domain"), shared.clone())])],
+        );
+        let signal_doc = make_signals(vec![
+            catalogue_signal("Shared", CatalogueItemNamespace::Type, ConfidenceSignal::Yellow),
+            catalogue_signal("Shared", CatalogueItemNamespace::Trait, ConfidenceSignal::Blue),
+        ]);
+
+        let statuses =
+            std::collections::HashMap::from([(task_id("T001"), TaskStatusKind::InProgress)]);
+        let liveness = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(contract.clone()))),
+            Arc::new(ConstSignalReader(Ok(signal_doc.clone()))),
+            Arc::new(FixedImplPlanReader(statuses)),
+            ambiguous_catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
+        );
+        let liveness_error = liveness.check(cmd("my-track", "domain")).unwrap_err();
+        match liveness_error {
+            PreReviewGateError::TaskContractReadFailed { message } => {
+                assert!(message.as_str().contains("entry_key 'Shared'"));
+                assert!(message.as_str().contains("no unique catalogue namespace"));
+            }
+            other => panic!("expected liveness ambiguity to fail closed, got {other}"),
+        }
+
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("domain".to_owned(), signal_doc);
+        for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"] {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
+        let coverage = coverage_interactor_with_catalogue(
+            Ok(contract),
+            signal_docs,
+            ambiguous_catalogue_reader(),
+        );
+        let coverage_outcome = coverage.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert_coverage_violations(
+            coverage_outcome,
+            vec![
+                CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+                    layer("domain"),
+                    shared.clone(),
+                )),
+                CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+                    layer("domain"),
+                    shared.clone(),
+                )),
+                CoverageViolation::InvalidEntryRef(
+                    ContractedEntryRef::new(layer("domain"), shared),
+                    domain::FreeText::new(
+                        "entry_key 'Shared' has no unique catalogue namespace in domain: \
+                         could not classify TypeRef path at `Shared`",
+                    ),
+                ),
+            ],
         );
     }
 
@@ -1109,6 +1706,10 @@ mod tests {
             )))),
             Arc::new(LayerAwareSignalReader(signal_docs)),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc
@@ -1153,6 +1754,10 @@ mod tests {
             )))),
             Arc::new(LayerAwareSignalReader(signal_docs)),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc
@@ -1167,8 +1772,15 @@ mod tests {
 
     #[test]
     fn test_all_layer_iterate_malformed_signal_document_returns_signal_read_failed() {
-        let invalid_signal =
-            TypeSignal::new("   ", "struct", ConfidenceSignal::Blue, true, vec![], vec![], vec![]);
+        let invalid_signal = TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new("   ") },
+            "free_function".to_owned(),
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        );
         let mut signal_docs = std::collections::HashMap::new();
         signal_docs.insert("domain".to_owned(), make_signals(vec![invalid_signal]));
 
@@ -1182,6 +1794,10 @@ mod tests {
             )))),
             Arc::new(LayerAwareSignalReader(signal_docs)),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let err = svc
@@ -1214,6 +1830,10 @@ mod tests {
                 message: "codec error reading domain-type-signals.json",
             }),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let err = svc
@@ -1246,6 +1866,10 @@ mod tests {
                 message: "signal file not found: codec emitted misleading diagnostic",
             }),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let err = svc
@@ -1285,11 +1909,23 @@ mod tests {
         contract: Result<TaskContractDocument, PreReviewGateError>,
         signal_docs: std::collections::HashMap<String, TypeSignalsDocument>,
     ) -> CoverageVerifyInteractor {
+        coverage_interactor_with_catalogue(contract, signal_docs, catalogue_reader())
+    }
+
+    fn coverage_interactor_with_catalogue(
+        contract: Result<TaskContractDocument, PreReviewGateError>,
+        signal_docs: std::collections::HashMap<String, TypeSignalsDocument>,
+        catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
+    ) -> CoverageVerifyInteractor {
         let plan_reader = plan_reader_matching_contract(&contract);
         CoverageVerifyInteractor::new(
             Arc::new(ConstContractReader(contract)),
             Arc::new(LayerAwareSignalReader(signal_docs)),
             plan_reader,
+            catalogue_loader,
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         )
     }
 
@@ -1302,6 +1938,10 @@ mod tests {
             Arc::new(ConstContractReader(contract)),
             Arc::new(LayerAwareSignalReader(signal_docs)),
             plan_reader,
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         )
     }
 
@@ -1320,6 +1960,10 @@ mod tests {
             Arc::new(ConstContractReader(Err(PreReviewGateError::TaskContractNotFound))),
             Arc::new(LayerAwareSignalReader(std::collections::HashMap::new())),
             Arc::new(EmptyImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
         assert!(
@@ -1601,6 +2245,96 @@ mod tests {
         );
     }
 
+    #[test]
+    fn coverage_ambiguous_contract_key_fails_closed_for_same_named_rows() {
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "domain".to_owned(),
+            make_signals(vec![
+                catalogue_signal("Shared", CatalogueItemNamespace::Type, ConfidenceSignal::Blue),
+                catalogue_signal("Shared", CatalogueItemNamespace::Trait, ConfidenceSignal::Blue),
+            ]),
+        );
+        for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"] {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
+
+        let svc = coverage_interactor_with_catalogue(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Shared"))],
+                )],
+            )),
+            signal_docs,
+            ambiguous_catalogue_reader(),
+        );
+
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert_coverage_violations(
+            outcome,
+            vec![
+                CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+                    layer("domain"),
+                    entry_key("Shared"),
+                )),
+                CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+                    layer("domain"),
+                    entry_key("Shared"),
+                )),
+                CoverageViolation::InvalidEntryRef(
+                    ContractedEntryRef::new(layer("domain"), entry_key("Shared")),
+                    domain::FreeText::new(
+                        "entry_key 'Shared' has no unique catalogue namespace in domain: \
+                         could not classify TypeRef path at `Shared`",
+                    ),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn coverage_duplicate_signal_identity_fails_closed() {
+        for (first, second) in [
+            (ConfidenceSignal::Blue, ConfidenceSignal::Yellow),
+            (ConfidenceSignal::Yellow, ConfidenceSignal::Blue),
+        ] {
+            let mut signal_docs = std::collections::HashMap::new();
+            signal_docs.insert(
+                "domain".to_owned(),
+                make_signals(vec![
+                    catalogue_signal("Foo", CatalogueItemNamespace::Type, first),
+                    catalogue_signal("Foo", CatalogueItemNamespace::Type, second),
+                ]),
+            );
+            for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"]
+            {
+                signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+            }
+
+            let svc = coverage_interactor(
+                Ok(make_contract(
+                    "my-track",
+                    vec![(
+                        task_id("T001"),
+                        vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                    )],
+                )),
+                signal_docs,
+            );
+
+            let err = svc.verify_coverage(coverage_cmd("my-track")).unwrap_err();
+            match err {
+                PreReviewGateError::SignalReadFailed { layer, message } => {
+                    assert_eq!(layer.as_ref(), "domain");
+                    assert!(message.as_str().contains("duplicate signal identity"));
+                }
+                other => panic!("expected duplicate identity to fail closed, got {other}"),
+            }
+        }
+    }
+
     // ── D9 task-key referential integrity tests ───────────────────────────────
 
     /// Build a signal-docs map populated with empty docs for every canonical
@@ -1736,7 +2470,18 @@ mod tests {
     }
 
     fn red_signal(name: &str) -> TypeSignal {
-        TypeSignal::new(name, "struct", ConfidenceSignal::Red, false, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new(name),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "struct".to_owned(),
+            ConfidenceSignal::Red,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     // ── D7 case (d): Red signal on todo task → always blocked ────────────────────
@@ -1757,6 +2502,10 @@ mod tests {
             )))),
             Arc::new(ConstSignalReader(Ok(make_signals(vec![red_signal("Foo")])))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
@@ -1796,6 +2545,10 @@ mod tests {
                 blue_signal("Bar"),
             ])))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
@@ -1823,6 +2576,10 @@ mod tests {
             )))),
             Arc::new(ConstSignalReader(Ok(make_signals(vec![yellow_signal("Foo")])))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
@@ -1847,6 +2604,10 @@ mod tests {
             )))),
             Arc::new(ConstSignalReader(Ok(make_signals(vec![yellow_signal("Foo")])))),
             Arc::new(FixedImplPlanReader(statuses)),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
@@ -1870,6 +2631,10 @@ mod tests {
             )))),
             Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
             Arc::new(FailingImplPlanReader),
+            catalogue_reader(),
+            layer_bindings(),
+            workspace_root(),
+            items_dir(),
         );
 
         let err = svc.check(cmd("my-track", "domain")).unwrap_err();
@@ -1898,6 +2663,24 @@ mod tests {
             PreReviewGateError::TaskContractReadFailed { message }
                 if message.as_str() == "contract read failure"
         ));
+
+        let catalogue_error = PreReviewGateError::CatalogueReadFailed {
+            layer: LayerId::try_new("domain".to_owned()).expect("valid test layer"),
+            message: domain::FreeText::new("catalogue read failure"),
+        };
+        assert_eq!(
+            catalogue_error.to_string(),
+            "failed to read catalogue for layer 'domain': catalogue read failure"
+        );
+
+        let freshness_error = PreReviewGateError::CatalogueFreshnessMismatch {
+            layer: LayerId::try_new("domain".to_owned()).expect("valid test layer"),
+            message: domain::FreeText::new("catalogue freshness failure"),
+        };
+        assert_eq!(
+            freshness_error.to_string(),
+            "catalogue freshness mismatch for layer 'domain': catalogue freshness failure"
+        );
 
         let signal_error = PreReviewGateError::from(ImplCatalogSignalReadError::ReadFailed {
             layer: LayerId::try_new("domain".to_owned()).expect("valid test layer"),

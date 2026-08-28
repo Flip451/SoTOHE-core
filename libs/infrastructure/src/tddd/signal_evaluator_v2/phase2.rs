@@ -12,18 +12,36 @@ use rustdoc_types::{Crate, Id};
 use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
 
 use super::impl_identity::try_build_impl_identity_map_with_authority;
+use super::phase1::rustdoc_authority::canonicalize_rustdoc_paths_in_place;
 use super::structural_eq::items_structurally_equal_with_authority;
-use super::{RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map};
+use super::{
+    RustdocTargetResolution, TypeTraitIdentityKey, TypeTraitIdentityMap,
+    build_function_identity_map, build_type_trait_identity_map,
+};
 use domain::tddd::ExtendedCrate;
 
 /// Runs Phase 2: evaluates S / D / C and produces a `ThreeWayEvaluationReport`.
 pub(super) fn phase2_evaluate(
     s: &ExtendedCrate,
     d: &Crate,
-    c: &Crate,
+    mut c: Crate,
     rustdoc_root: Option<&RustdocTargetResolution>,
 ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
     let s_krate = s.krate();
+
+    // D2: the bin-root alias is applied once, through the same canonicalization
+    // the baseline crossed in Phase 1. C's type/trait identities and definition
+    // paths must speak the catalogue package root before they are compared
+    // against S and D; otherwise a bin target whose rustdoc root differs from
+    // its package name splits every matching item into `SMinusC` plus
+    // `CMinusSUnionD`. The crate is owned here and only its `paths` summaries
+    // are rewritten, so an externally sized rustdoc artifact is never cloned.
+    canonicalize_rustdoc_paths_in_place(
+        &mut c,
+        rustdoc_root.map(|resolution| resolution.package_name()),
+        rustdoc_root.map(|resolution| resolution.rustdoc_root_name()),
+    );
+    let c = &c;
 
     // Derive the crate name from C's root item so that rustdoc local-trait paths
     // (`my_crate::MyTrait`) can be normalized to match codec paths (`crate::MyTrait`).
@@ -91,7 +109,7 @@ pub(super) fn phase2_evaluate(
         let action = s.action_for(s_id).unwrap_or(ItemAction::Reference);
         let s_item = s_krate.index.get(s_id);
 
-        if let Some(c_id) = c_types.get(name.as_str()) {
+        if let Some(c_id) = c_types.get(name) {
             // Item in S ∩ C.
             let c_item = c.index.get(c_id);
             let structurally_equal = match (s_item, c_item) {
@@ -108,15 +126,17 @@ pub(super) fn phase2_evaluate(
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 region,
             ));
         } else {
             // Item in S \ C.
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 region,
             ));
         }
@@ -143,10 +163,10 @@ pub(super) fn phase2_evaluate(
                 _ => false,
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(fn_path.clone(), region));
+            signals.push(ThreeWaySignal::label(domain::FreeText::new(fn_path.clone()), region));
         } else {
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(fn_path.clone(), region));
+            signals.push(ThreeWaySignal::label(domain::FreeText::new(fn_path.clone()), region));
         }
     }
 
@@ -201,14 +221,22 @@ pub(super) fn phase2_evaluate(
                 }
             };
             let region = s_intersect_c_region(action, structurally_equal);
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 region,
             ));
         } else {
             let region = s_minus_c_region(action);
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 region,
             ));
         }
@@ -216,16 +244,18 @@ pub(super) fn phase2_evaluate(
 
     // --- Evaluate D types/traits vs C ---
     for name in d_types.keys() {
-        if c_types.contains_key(name.as_str()) {
+        if c_types.contains_key(name) {
             // D ∩ C: delete in progress.
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::DIntersectC,
             ));
         } else {
             // D \ C: delete achieved.
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::DMinusC,
             ));
         }
@@ -234,9 +264,15 @@ pub(super) fn phase2_evaluate(
     // --- Evaluate D functions vs C ---
     for fn_path in d_fns.keys() {
         if c_fns.contains_key(fn_path.as_str()) {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::DIntersectC));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::DIntersectC,
+            ));
         } else {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::DMinusC));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::DMinusC,
+            ));
         }
     }
 
@@ -256,8 +292,12 @@ pub(super) fn phase2_evaluate(
     for key in d_impls.keys() {
         if c_impls.contains_key(key.as_str()) {
             // Exact match: D key found verbatim in C.
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DIntersectC,
             ));
         } else if let Some(&stripped_c_id) = c_impls_stripped.get(key.as_str()) {
@@ -266,13 +306,21 @@ pub(super) fn phase2_evaluate(
             if let Some(c_key) = c_impl_id_to_key.get(&stripped_c_id) {
                 c_matched_via_stripped.insert(c_key);
             }
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DIntersectC,
             ));
         } else {
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::DMinusC,
             ));
         }
@@ -280,12 +328,13 @@ pub(super) fn phase2_evaluate(
 
     // --- Evaluate C \ (S ∪ D): undeclared implementations ---
     // For each C type/trait not in S or D.
-    let s_union_d_types: HashSet<&str> =
-        s_types.keys().chain(d_types.keys()).map(String::as_str).collect();
+    let s_union_d_types: HashSet<&TypeTraitIdentityKey> =
+        s_types.keys().chain(d_types.keys()).collect();
     for name in c_types.keys() {
-        if !s_union_d_types.contains(name.as_str()) {
-            signals.push(ThreeWaySignal::new(
-                type_signal_name(name, &[&s_types, &d_types, &c_types]),
+        if !s_union_d_types.contains(name) {
+            signals.push(ThreeWaySignal::catalogue_item(
+                domain::FreeText::new(type_signal_name(name, &[&s_types, &d_types, &c_types])),
+                name.namespace,
                 SignalRegion::CMinusSUnionD,
             ));
         }
@@ -296,7 +345,10 @@ pub(super) fn phase2_evaluate(
         s_fns.keys().chain(d_fns.keys()).map(String::as_str).collect();
     for fn_path in c_fns.keys() {
         if !s_union_d_fns.contains(fn_path.as_str()) {
-            signals.push(ThreeWaySignal::new(fn_path.clone(), SignalRegion::CMinusSUnionD));
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(fn_path.clone()),
+                SignalRegion::CMinusSUnionD,
+            ));
         }
     }
 
@@ -324,8 +376,12 @@ pub(super) fn phase2_evaluate(
                 // C impl was already covered by an S/D-vs-C stripped-key match.
                 continue;
             }
-            signals.push(ThreeWaySignal::new(
-                impl_signal_name(key, &[&s_impls, &d_impls, &c_impls], crate_name),
+            signals.push(ThreeWaySignal::label(
+                domain::FreeText::new(impl_signal_name(
+                    key,
+                    &[&s_impls, &d_impls, &c_impls],
+                    crate_name,
+                )),
                 SignalRegion::CMinusSUnionD,
             ));
         }
@@ -340,15 +396,18 @@ pub(super) fn phase2_evaluate(
 /// fully-qualified identities share that short name, the full identity remains
 /// in the report so the output cannot merge the two targets after the evaluator
 /// has kept them separate internally.
-fn type_signal_name(identity_key: &str, identity_maps: &[&BTreeMap<String, Id>]) -> String {
-    let short_name = identity_key.rsplit("::").next().unwrap_or(identity_key);
+fn type_signal_name(
+    identity_key: &TypeTraitIdentityKey,
+    identity_maps: &[&TypeTraitIdentityMap],
+) -> String {
+    let short_name = identity_key.short_name();
     let matching_identities: HashSet<&str> = identity_maps
         .iter()
-        .flat_map(|map| map.keys().map(String::as_str))
+        .flat_map(|map| map.keys().map(|candidate| candidate.path.as_str()))
         .filter(|candidate| candidate.rsplit("::").next().unwrap_or(candidate) == short_name)
         .collect();
 
-    if matching_identities.len() > 1 { identity_key.to_owned() } else { short_name.to_owned() }
+    if matching_identities.len() > 1 { identity_key.path.clone() } else { short_name.to_owned() }
 }
 
 /// Keeps the established short display for an unambiguous impl while retaining

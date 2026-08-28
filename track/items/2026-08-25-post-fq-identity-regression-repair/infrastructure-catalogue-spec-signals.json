@@ -1,0 +1,51 @@
+{
+  "catalogue_declaration_hash": "ba3ed7305fab23b46acd43d5c37cc1e4e603ce1c3e686f66343113687ed41b43",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "49d3f4c2af414b1cb2ecc7ba86cd0b7074e26040709b7c9bd5dc1c1a44cb6272",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+    },
+    {
+      "entry_hash": "36198f69edc4ccf67bd5327e4c7f5d3406fe150213080c9cdf3180d1ec5b1af6",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::catalog_gen::FsCatalogAdapter"
+    },
+    {
+      "entry_hash": "78c3bd6e4ea9afbeb8ff70abaf1efb31c1bd1ecaaef58ce941d019f65ffe3c72",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+    },
+    {
+      "entry_hash": "26b438bc6f4f41042753cefaa0dc814cdc646a526b6dc4473f29120e16258f4e",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2"
+    },
+    {
+      "entry_hash": "5ca0028faaa227625d19421f75335b6d4f7379aa87a24cd215ee5245a5fbb88d",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader"
+    },
+    {
+      "entry_hash": "e35f04f8a7073121ae86c58bc05aacff581c7cbc475057b1a1e73a2d0901a343",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+    },
+    {
+      "entry_hash": "1dfb80e3990439a9ac8468a1fcb1406b6ec4acd2b391bb6b0a854f4d7c7991b7",
+      "signal": "blue",
+      "type_name": "infrastructure::repository_root_for_items_dir"
+    },
+    {
+      "entry_hash": "39ef208c54c554bbf45dc13f78cf21d325da0c2d3bdb101cfcf11440f6929998",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+    },
+    {
+      "entry_hash": "2eea6e74e576f8067f3c73f76b7336bff3d6a962fbeee020aae29d33a77a2a7b",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+    }
+  ]
+}

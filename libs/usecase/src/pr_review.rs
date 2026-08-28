@@ -21,30 +21,45 @@ use thiserror::Error;
 // ---------------------------------------------------------------------------
 
 // These regex patterns are constant literals — compilation can only fail if the source
-// pattern is wrong, which is a programmer bug caught by tests.  Using `.ok()` to
-// eliminate panic paths in library code; if a pattern fails to compile, the
-// corresponding sanitization step is skipped (fail-safe).
-static ABS_PATH_RE: LazyLock<Option<Regex>> = LazyLock::new(|| {
-    Regex::new(r"(/(?:home|Users|tmp|var|etc|opt|srv|workspace|root|usr/local)/[^\s]+)").ok()
+// pattern is wrong, which is a programmer error. Invalid patterns must fail during static
+// initialization instead of silently disabling the corresponding sanitization step.
+static ABS_PATH_RE: LazyLock<Regex> = LazyLock::new(|| {
+    // Static literal: an invalid redaction pattern must fail-stop during initialization.
+    #[allow(clippy::expect_used)]
+    let regex =
+        Regex::new(r"(/(?:home|Users|tmp|var|etc|opt|srv|workspace|root|usr/local)/[^\s]+)")
+            .expect("absolute path redaction regex must compile");
+    regex
 });
 
-static ENV_INFO_RE: LazyLock<Option<Regex>> = LazyLock::new(|| {
-    Regex::new(r"(?:https?://)?(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d+)?(?:/[^\s]*)?").ok()
+static ENV_INFO_RE: LazyLock<Regex> = LazyLock::new(|| {
+    // Static literal: an invalid redaction pattern must fail-stop during initialization.
+    #[allow(clippy::expect_used)]
+    let regex =
+        Regex::new(r"(?:https?://)?(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d+)?(?:/[^\s]*)?")
+            .expect("environment information redaction regex must compile");
+    regex
 });
 
-static SECRET_PATTERN_RE: LazyLock<Option<Regex>> = LazyLock::new(|| {
-    Regex::new(
+static SECRET_PATTERN_RE: LazyLock<Regex> = LazyLock::new(|| {
+    // Static literal: an invalid redaction pattern must fail-stop during initialization.
+    #[allow(clippy::expect_used)]
+    let regex = Regex::new(
         r"(?:sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36,}|github_pat_[a-zA-Z0-9_]{20,}|glpat-[a-zA-Z0-9\-]{20,}|AKIA[A-Z0-9]{16}|xox[bprs]-[a-zA-Z0-9\-]+)",
     )
-    .ok()
+    .expect("secret redaction regex must compile");
+    regex
 });
 
-static RFC1918_RE: LazyLock<Option<Regex>> = LazyLock::new(|| {
+static RFC1918_RE: LazyLock<Regex> = LazyLock::new(|| {
     // Rust regex does not support look-around; boundary checks are done in sanitize_rfc1918().
-    Regex::new(
+    // Static literal: an invalid redaction pattern must fail-stop during initialization.
+    #[allow(clippy::expect_used)]
+    let regex = Regex::new(
         r"(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(?::\d+)?",
     )
-    .ok()
+    .expect("RFC 1918 redaction regex must compile");
+    regex
 });
 
 /// Allowed reviewer providers that support structured output.
@@ -132,18 +147,9 @@ pub struct PrReviewResult {
 /// ```
 #[must_use]
 pub fn sanitize_text(text: &str) -> String {
-    let text = match SECRET_PATTERN_RE.as_ref() {
-        Some(re) => re.replace_all(text, "[REDACTED]").into_owned(),
-        None => text.to_owned(),
-    };
-    let text = match ABS_PATH_RE.as_ref() {
-        Some(re) => re.replace_all(&text, "[PATH]").into_owned(),
-        None => text,
-    };
-    let text = match ENV_INFO_RE.as_ref() {
-        Some(re) => re.replace_all(&text, "[INTERNAL]").into_owned(),
-        None => text,
-    };
+    let text = SECRET_PATTERN_RE.replace_all(text, "[REDACTED]").into_owned();
+    let text = ABS_PATH_RE.replace_all(&text, "[PATH]").into_owned();
+    let text = ENV_INFO_RE.replace_all(&text, "[INTERNAL]").into_owned();
     sanitize_rfc1918(&text)
 }
 
@@ -152,14 +158,11 @@ pub fn sanitize_text(text: &str) -> String {
 /// The Rust `regex` crate does not support look-behind/look-ahead, so we manually
 /// check whether the character immediately before/after the match is a digit.
 fn sanitize_rfc1918(text: &str) -> String {
-    let Some(re) = RFC1918_RE.as_ref() else {
-        return text.to_owned();
-    };
     let bytes = text.as_bytes();
     let mut result = String::with_capacity(text.len());
     let mut last_end = 0;
 
-    for m in re.find_iter(text) {
+    for m in RFC1918_RE.find_iter(text) {
         let start = m.start();
         let end = m.end();
         // Emulate (?<!\d): reject if preceded by a digit
@@ -254,7 +257,20 @@ pub fn validate_reviewer_provider(provider: &str) -> Result<(), PrReviewError> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
-    use super::{parse_paginated_json, sanitize_text, validate_reviewer_provider};
+    use super::{
+        ABS_PATH_RE, ENV_INFO_RE, RFC1918_RE, SECRET_PATTERN_RE, parse_paginated_json,
+        sanitize_text, validate_reviewer_provider,
+    };
+
+    #[test]
+    fn test_static_redaction_patterns_compile_before_production_use() {
+        // Force every static literal so malformed patterns fail in the test suite rather than
+        // being discovered for the first time while processing production output.
+        let _ = &*ABS_PATH_RE;
+        let _ = &*ENV_INFO_RE;
+        let _ = &*SECRET_PATTERN_RE;
+        let _ = &*RFC1918_RE;
+    }
 
     // -----------------------------------------------------------------------
     // sanitize_text — 16 tests

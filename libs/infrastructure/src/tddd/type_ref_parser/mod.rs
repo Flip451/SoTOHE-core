@@ -21,7 +21,7 @@
 use domain::tddd::catalogue_linter::{
     ExtractedTypeRefPath, TypeRefPathExtractionError, TypeRefPathExtractorPort,
 };
-use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, ParamName, TypeRef};
 use quote::ToTokens;
 use syn::visit::{self, Visit};
 
@@ -159,7 +159,7 @@ impl TypeRefPathVisitor<'_> {
         self.push(occurrence);
     }
 
-    fn record_path(&mut self, path: &syn::Path) {
+    fn record_path(&mut self, path: &syn::Path, namespace: CatalogueItemNamespace) {
         let first = path.segments.first().map(|segment| ident_text(&segment.ident));
         let rooted_in_type_parameter = first.as_deref().is_some_and(|name| {
             name == "Self" || self.type_parameters.iter().any(|param| param.as_str() == name)
@@ -184,7 +184,7 @@ impl TypeRefPathVisitor<'_> {
 
         let path_text = path_head(path);
         match TypeRef::new(path_text) {
-            Ok(type_ref) => self.push(ExtractedTypeRefPath::Path(type_ref)),
+            Ok(type_ref) => self.push(ExtractedTypeRefPath::Path { type_ref, namespace }),
             Err(_) => self.unsupported(),
         }
     }
@@ -290,13 +290,13 @@ impl<'ast, 'ctx> Visit<'ast> for TypeRefPathVisitor<'ctx> {
                 self.record_associated_label(&segment.ident);
             }
         } else {
-            self.record_path(&node.path);
+            self.record_path(&node.path, CatalogueItemNamespace::Type);
             visit::visit_type_path(self, node);
         }
     }
 
     fn visit_trait_bound(&mut self, node: &'ast syn::TraitBound) {
-        self.record_path(&node.path);
+        self.record_path(&node.path, CatalogueItemNamespace::Trait);
         visit::visit_trait_bound(self, node);
     }
 
@@ -444,7 +444,7 @@ impl TypeRefPathVisitor<'_> {
             rendered.push_str(&ident_text(&segment.ident));
         }
         match TypeRef::new(rendered) {
-            Ok(type_ref) => self.push(ExtractedTypeRefPath::Path(type_ref)),
+            Ok(type_ref) => self.push(ExtractedTypeRefPath::trait_path(type_ref)),
             Err(_) => self.unsupported(),
         }
     }
@@ -517,7 +517,7 @@ mod path_extractor_tests {
     fn test_syn_type_ref_path_extractor_skips_reference_syntax_tokens() {
         for source in ["&mut OrderPlaced", "*const OrderPlaced", "&'static OrderPlaced"] {
             let paths = extract(source, &[], &[], &[]).expect("syn extraction succeeds");
-            assert_eq!(paths, vec![ExtractedTypeRefPath::Path(type_ref("OrderPlaced"))]);
+            assert_eq!(paths, vec![ExtractedTypeRefPath::type_path(type_ref("OrderPlaced"))]);
         }
     }
 
@@ -525,7 +525,7 @@ mod path_extractor_tests {
     fn test_syn_type_ref_path_extractor_accepts_standalone_maybe_sized_bound() {
         let paths = extract("?Sized", &[], &[], &[]).expect("bound extraction succeeds");
 
-        assert_eq!(paths, vec![ExtractedTypeRefPath::Path(type_ref("Sized"))]);
+        assert_eq!(paths, vec![ExtractedTypeRefPath::trait_path(type_ref("Sized"))]);
     }
 
     #[test]
@@ -536,8 +536,8 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("std::cell::Cell")),
-                ExtractedTypeRefPath::Path(type_ref("OrderPlaced")),
+                ExtractedTypeRefPath::type_path(type_ref("std::cell::Cell")),
+                ExtractedTypeRefPath::type_path(type_ref("OrderPlaced")),
             ]
         );
     }
@@ -555,9 +555,9 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("std::result::Result")),
-                ExtractedTypeRefPath::Path(type_ref("domain::alpha::Event")),
-                ExtractedTypeRefPath::Path(type_ref("domain::beta::Event")),
+                ExtractedTypeRefPath::type_path(type_ref("std::result::Result")),
+                ExtractedTypeRefPath::type_path(type_ref("domain::alpha::Event")),
+                ExtractedTypeRefPath::type_path(type_ref("domain::beta::Event")),
             ]
         );
     }
@@ -569,7 +569,7 @@ mod path_extractor_tests {
 
             assert_eq!(
                 paths,
-                vec![ExtractedTypeRefPath::Path(type_ref("domain::ports::Port"))],
+                vec![ExtractedTypeRefPath::trait_path(type_ref("domain::ports::Port"))],
                 "trait-bound path was not extracted from `{source}`"
             );
         }
@@ -584,8 +584,8 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("domain::alpha::Wrapper")),
-                ExtractedTypeRefPath::Path(type_ref("domain::ports::Port")),
+                ExtractedTypeRefPath::type_path(type_ref("domain::alpha::Wrapper")),
+                ExtractedTypeRefPath::trait_path(type_ref("domain::ports::Port")),
                 ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("Output").unwrap()),
             ]
         );
@@ -596,7 +596,7 @@ mod path_extractor_tests {
         let paths = extract("std::vec::Vec<&'a T, [u8; N]>", &["T"], &["a"], &["N"])
             .expect("parameterized type extracts");
 
-        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref("std::vec::Vec"))));
+        assert!(paths.contains(&ExtractedTypeRefPath::type_path(type_ref("std::vec::Vec"))));
         assert!(paths.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap())));
         assert!(
             paths.contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap()))
@@ -604,9 +604,9 @@ mod path_extractor_tests {
         assert!(
             paths.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap()))
         );
-        assert!(paths.contains(&ExtractedTypeRefPath::Path(type_ref("u8"))));
+        assert!(paths.contains(&ExtractedTypeRefPath::type_path(type_ref("u8"))));
         assert!(!paths.iter().any(|path| {
-            matches!(path, ExtractedTypeRefPath::Path(path) if matches!(path.as_str(), "T" | "a" | "N"))
+            matches!(path, ExtractedTypeRefPath::Path { type_ref: path, .. } if matches!(path.as_str(), "T" | "a" | "N"))
         }));
     }
 
@@ -618,7 +618,7 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("Buffer")),
+                ExtractedTypeRefPath::type_path(type_ref("Buffer")),
                 ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap()),
             ]
         );
@@ -628,14 +628,14 @@ mod path_extractor_tests {
     fn test_syn_type_ref_path_extractor_skips_non_parameter_const_value_paths() {
         let array_paths =
             extract("[u8; CAPACITY]", &[], &[], &[]).expect("array const expression extracts");
-        assert_eq!(array_paths, vec![ExtractedTypeRefPath::Path(type_ref("u8"))]);
+        assert_eq!(array_paths, vec![ExtractedTypeRefPath::type_path(type_ref("u8"))]);
 
         let call_paths = extract("Wrapper<{ size_of::<T>() }>", &["T"], &[], &[])
             .expect("const block with nested type argument extracts");
         assert_eq!(
             call_paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("Wrapper")),
+                ExtractedTypeRefPath::type_path(type_ref("Wrapper")),
                 ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap()),
             ]
         );
@@ -649,9 +649,9 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("u8")),
-                ExtractedTypeRefPath::Path(type_ref("domain::Ty")),
-                ExtractedTypeRefPath::Path(type_ref("external::Trait")),
+                ExtractedTypeRefPath::type_path(type_ref("u8")),
+                ExtractedTypeRefPath::type_path(type_ref("domain::Ty")),
+                ExtractedTypeRefPath::trait_path(type_ref("external::Trait")),
                 ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("N").unwrap()),
             ]
         );
@@ -661,8 +661,8 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("u8")),
-                ExtractedTypeRefPath::Path(type_ref("domain::Ty")),
+                ExtractedTypeRefPath::type_path(type_ref("u8")),
+                ExtractedTypeRefPath::type_path(type_ref("domain::Ty")),
                 ExtractedTypeRefPath::AssociatedItemLabel(ParamName::new("N").unwrap()),
             ]
         );
@@ -676,7 +676,7 @@ mod path_extractor_tests {
         assert_eq!(
             paths,
             vec![
-                ExtractedTypeRefPath::Path(type_ref("Trait")),
+                ExtractedTypeRefPath::trait_path(type_ref("Trait")),
                 ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap()),
                 ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap()),
                 ExtractedTypeRefPath::ConstParameter(ParamName::new("K").unwrap()),
@@ -751,7 +751,7 @@ mod path_extractor_tests {
                 vec![],
                 vec![],
                 vec![],
-                module.clone(),
+                Some(module.clone()),
                 None,
                 vec![],
                 vec![],
@@ -773,7 +773,7 @@ mod path_extractor_tests {
                 vec![],
                 vec![],
                 vec![],
-                module,
+                Some(module),
                 None,
                 vec![],
                 vec![],
@@ -843,7 +843,7 @@ mod path_extractor_tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -969,7 +969,7 @@ mod path_extractor_tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -1070,7 +1070,7 @@ mod path_extractor_tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],

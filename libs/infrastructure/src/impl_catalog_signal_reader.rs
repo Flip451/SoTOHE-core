@@ -500,7 +500,7 @@ mod tests {
             type_signals_codec::declaration_hash(SAMPLE_CATALOGUE_JSON.as_bytes());
         format!(
             r#"{{
-  "schema_version": 4,
+  "schema_version": {},
   "generated_at": "2026-06-27T00:00:00Z",
   "declaration_hash": "{}",
   "head_commit": "{}",
@@ -508,12 +508,14 @@ mod tests {
   "signals": [
     {{
       "type_name": "MyType",
+      "namespace": "type",
       "kind_tag": "struct",
       "signal": "blue",
       "found_type": true
     }}
   ]
 }}"#,
+            domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
             declaration_hash.as_digest().as_str(),
             head_commit,
         )
@@ -540,7 +542,7 @@ mod tests {
     }
 
     const SAMPLE_SIGNALS_JSON: &str = r#"{
-  "schema_version": 4,
+  "schema_version": 5,
   "generated_at": "2026-06-27T00:00:00Z",
   "declaration_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -548,6 +550,7 @@ mod tests {
   "signals": [
     {
       "type_name": "MyType",
+      "namespace": "type",
       "kind_tag": "struct",
       "signal": "blue",
       "found_type": true

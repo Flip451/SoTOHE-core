@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-25-orchestrator-context-discipline",
+  "title": "オーケストレーターの文脈摂取を規律化する",
+  "branch": "track/2026-08-25-orchestrator-context-discipline",
+  "created_at": "2026-08-25T04:19:47Z",
+  "updated_at": "2026-08-25T04:19:47Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

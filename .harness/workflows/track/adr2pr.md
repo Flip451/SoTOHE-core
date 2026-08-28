@@ -63,7 +63,8 @@ Sub-workflows used (in execution order):
   interaction is invocation-time input acquisition, not a workflow-step
   pause; from Step 1 onward the sequence remains autonomous per Constraint 2.
 - **Track initialization state** — Step 1 is conditional: if a `track/<id>` branch already
-  exists with `metadata.json`, skip `init` and start at Step 2.
+  exists with `metadata.json`, use the persisted-state resume contract below to derive the first
+  incomplete lifecycle boundary instead of assuming that execution starts at Step 2.
 - **Autonomy level** — this workflow is fully autonomous subject to the Phase 0 interaction
   boundaries governed by
   `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` and the user
@@ -83,8 +84,10 @@ is complete.
 
 **Step 1: init workflow (conditional)**
 
-If the track is already initialized (on a `track/<id>` branch with `metadata.json`), skip
-this step and start at Step 2. Otherwise, invoke the `init` workflow
+If the track is already initialized (on a `track/<id>` branch with `metadata.json`), do not
+assume that execution starts at Step 2: derive the resume step from persisted state using the
+`Parent-session refresh points and resume` contract below, then continue at the first incomplete
+lifecycle boundary. Otherwise, invoke the `init` workflow
 (`.harness/workflows/track/init.md`) to create the track directory, write `metadata.json`, and
 materialize the branch. Pass both the resolved, user-confirmed feature-name input and the
 resolved, user-confirmed direct primary-ADR-source filename input explicitly: `init` derives
@@ -152,11 +155,59 @@ Run `bin/sotp git add-all` after the final review round.
 Invoke the `commit` workflow. Generate the commit message per Constraint 2. This is the second
 commit on the track branch.
 
+**Parent-session refresh points and resume.** These are the fixed boundaries at which the parent
+session may be refreshed and from which any invocation can resume from durable state:
+
+- After the plan-artifacts commit in Step 8 succeeds, before starting Step 9.
+- After the first implementation batch in Step 9 completes, before continuing with any
+  remaining full-cycle batches or the lifecycle tail.
+- At the start of the PR lane in Step 10, before invoking `pr-review`.
+
+A boundary is not a stop. On a host with automatic context management, the invocation continues
+into the next step. On a host without automatic context management, the orchestrator may request
+a refresh and, if it does, stops at that boundary; the re-invocation resumes at that boundary.
+The resume derivation from persisted git and track state is the evidence that the refresh occurred;
+no additional durable refresh state is introduced. Thus a resume that lands at Step 9 after the
+plan-artifacts commit starts Step 9, a resume that lands at Step 9 after the first implementation
+batch invokes the normal continuation, and a resume that lands at Step 10 after all batches and
+the lifecycle tail are complete invokes `pr-review`.
+
+Step 9 uses the caller-requested `--single-batch` mode for the first unfinished declared batch
+after Step 8. That mode drains the declared batch, including any runtime admission-split
+execution units, and returns before the lifecycle tail. After that invocation returns, continue
+with the normal Step 9 invocation; a refreshed or re-invoked session reconstructs the first
+unfinished lifecycle boundary from durable state.
+
+At each boundary, git and the track artifacts are the machine state, so the parent context may
+be discarded and reconstructed from them. On every invocation for an existing track, reconstruct
+the lifecycle position from that durable state before executing a step; do not restart at Step 2
+merely because the workflow entry point was invoked again. Use the track and review summaries,
+the declared batch/task state, and read-only git state to identify the first incomplete boundary:
+
+- without the successful ADR + metadata commit, resume the Phase 0 review/commit path (Step 2,
+  or its first incomplete sub-step);
+- with that commit but without the successful plan-artifacts commit, resume the planning/review/
+  commit path (Steps 5–8, or its first incomplete sub-step);
+- with the plan-artifacts commit and an unfinished declared batch, resume Step 9; `full-cycle`
+  selects the first batch member not yet `done` with a commit hash;
+- after all batches and the lifecycle tail commit are complete, resume Step 10 until the PR lane
+  reaches its terminal state, then resume Step 11 if the terminal audit comment remains to be
+  posted.
+
+A partially completed step resumes at its first incomplete sub-step. If the durable evidence is
+ambiguous or conflicting, stop and report instead of rerunning a completed step or skipping an
+incomplete one. These are orchestrator session boundaries only; do not add host-specific
+backgrounding thresholds, notification formats, or compaction timing.
+
 **Step 9: full-cycle workflow**
 
-Invoke the `full-cycle` workflow (`.harness/workflows/track/full-cycle.md`) for
-feature-batch implement → DRY check → review → commit. See that workflow's SSoT for the
-full internal state machine.
+For the first unfinished declared batch after Step 8, invoke the `full-cycle` workflow
+(`.harness/workflows/track/full-cycle.md`) once with `--single-batch`. It drains that declared
+batch, including any runtime admission-split execution units, and returns before the lifecycle
+tail. After it returns successfully, the same or a resumed invocation continues with `full-cycle`
+in normal mode; it resumes at the first unfinished lifecycle boundary and consumes the remaining
+batches or runs the lifecycle tail. On any later Step 9 entry, invoke `full-cycle` without the
+option (the default `normal` mode). See that workflow's SSoT for the full internal state machine.
 
 **Step 10: pr-review workflow**
 
@@ -231,7 +282,7 @@ or retry by using the review-request path.
 | 5 | Phase 1-3 gates (per `plan` SSoT loop rules) | proceed / escalate / stop |
 | 6 | `review` check-approved exit 0 (plan artifacts) | proceed / blocked |
 | 8 | `commit` CI + git commit OK | proceed / ERROR |
-| 9 | `full-cycle` completes (all batches committed) | proceed / stop |
+| 9 | `full-cycle` reaches the requested return and all batches are committed | proceed / stop |
 | 10 | `pr-review` reaches a terminal state: machine PASS (explicit zero findings) or user-approved Accepted Deviations | terminal / loop |
 | 11 | One independently posted all-protected-source terminal-audit comment, or a reported non-fatal posting/preparation failure | complete / reported |
 
@@ -246,9 +297,13 @@ All gates are binary; no step begins until the previous step's gate passes.
   with warnings, abort, or manual edit). The user decides.
 - **DFP `blocked`** (in `full-cycle`): surface violation pairs and halt. Do not proceed to
   review or commit.
-- **PR review loop actionable findings**: fix locally, commit, re-run `pr-review`. Repeat
-  until machine PASS (explicit zero findings) or user-approved Accepted Deviations. The loop
-  MUST continue until the terminal condition is met.
+- **PR review loop actionable findings**: use the `pr-review` workflow's briefing → owning
+  capability → local review convergence → `commit` route. A finding requiring an edit to
+  `knowledge/adr/*.md` follows the review workflow SSoT's `ADR-scope repair lane` and is never
+  fixed by the parent or `review-fix-lead`. If delegation fails for a non-ADR finding, parent
+  editing is recovery only; the parent must still converge local review and use the `commit`
+  workflow before re-running `pr-review`. Repeat until machine PASS (explicit zero findings) or
+  user-approved Accepted Deviations. The loop MUST continue until the terminal condition is met.
 - **Terminal diff-comment preparation or posting failure**: report the failure, including any
   available diff/provenance fallback, but do not invalidate Step 10, request user confirmation,
   or route through `pr review-cycle`.

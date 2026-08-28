@@ -6,6 +6,8 @@ All shell command parsing in the workspace MUST use the `ShellParser` port
 (`domain::guard::ShellParser`) with the `ConchShellParser` adapter
 (`infrastructure::shell::ConchShellParser`).
 
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
+
 **Do not** implement custom shell tokenization, separator normalization, or redirect handling
 in any crate. The following patterns are prohibited outside `domain::guard::text` and
 `infrastructure::shell`:
@@ -14,6 +16,8 @@ in any crate. The following patterns are prohibited outside `domain::guard::text
 - Hand-rolled redirect operator detection (`>`, `>>`, `>&`, etc.)
 - Custom `normalize_separators()` functions
 - Manual quote stripping for shell tokens
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
 
 ## Available API
 
@@ -25,6 +29,8 @@ in any crate. The following patterns are prohibited outside `domain::guard::text
 | `extract_command_substitutions(input)` | `domain::guard` | Extract `$(...)` and backtick contents |
 
 `SimpleCommand::argv` returns **quote-stripped** tokens. No post-processing needed.
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
 
 ## Fail-Closed on Parse Error
 
@@ -44,6 +50,8 @@ let commands = match parser.split_shell(command) {
 };
 let verdict = policy::check_commands(&commands);
 ```
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition scope
 
 ## Rationale
 
@@ -65,3 +73,5 @@ It does NOT apply to:
 
 - String matching on non-shell input (e.g., markdown parsing, YAML frontmatter)
 - Test helpers that construct shell command strings
+
+> **強制先**: 強制なし (明記) — 非 shell 入力とテスト用文字列は対象外

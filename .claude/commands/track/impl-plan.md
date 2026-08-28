@@ -10,6 +10,12 @@ User invokes this command as `/track:impl-plan`. No arguments.
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the impl-plan workflow SSoT's `Summary-first context intake`.
+  Use CLI summaries as the primary context; do not bulk-read `*-types.json`, plan artifacts,
+  review or binding JSON, full sub-workflow texts, or a `Related Conventions` list. Open only a
+  targeted diff or the body named by a blocker; the dispatcher supplies exact spec, catalogue,
+  ADR, and convention paths to the delegated capability.
+
 Write a briefing containing the track id, paths to `spec.json` and each `<layer>-types.json`,
 and paths to the related ADR(s). Do not put convention paths in the briefing: the capability
 dispatcher resolves the `impl-planner` convention set and delivers it with the dispatch, and

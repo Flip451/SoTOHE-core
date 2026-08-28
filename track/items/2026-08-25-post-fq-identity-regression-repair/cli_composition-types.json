@@ -1,0 +1,77 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "delete",
+      "for_type": "TaskContractCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "cli_composition::task_contract::TaskContractCompositionRoot": {
+      "action": "modify",
+      "docs": "Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor from one items-directory repository context, and drops Default; composition entry point of the IN-05 pre-review gates.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Obtains the repository root through infrastructure::repository_root_for_items_dir and wires the IN-05 pre-review gates; failures produce CompositionError::Infrastructure.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, CompositionError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "modify",
+          "docs": "Constructs the task-contract driver from the repository context captured by new; driver surface for the IN-05 pre-review gates.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_contract_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::task_contract::TaskContractDriver",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
+}

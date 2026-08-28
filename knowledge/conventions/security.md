@@ -5,11 +5,15 @@
 This project defines two project-specific sensitive directories. Files in these directories must
 not be committed to version control and must not be read by Claude Code.
 
+> **強制先**: review 観点 — harness-policy scope
+
 > **Scope of enforcement**: The `Read` / `Grep` deny rules in `.claude/settings.json` apply only
 > to Claude Code's own tool calls. They do **not** apply inside a Codex subprocess
 > (`workspace-write` sandbox) or when Gemini CLI accesses the filesystem directly — see
 > `.claude/rules/guardrails.md` §Sandbox and Hook Coverage Warning for details. When using Codex with `workspace-write`,
 > instruct it explicitly not to read files under `private/` or `config/secrets/`.
+
+> **強制先**: review 観点 — harness-policy scope
 >
 > **Optional container-level enforcement**: A project that selects the Docker environment can
 > additionally use Docker Compose services to enforce these rules at OS level:
@@ -18,9 +22,13 @@ not be committed to version control and must not be read by Claude Code.
 >   or hook-based blocking should be used if push prevention is required.
 > - `private/` and `config/secrets/` are masked by empty tmpfs overlays, making them appear empty
 >   inside containers regardless of host contents
+
+> **強制先**: 強制なし (明記) — Docker 環境の選択は consumer 所有
 >
 > This container isolation does not cover host-runner commands or Codex `workspace-write`
 > subprocesses. Those paths must follow the permission and guarded-workflow rules above.
+
+> **強制先**: review 観点 — harness-policy scope
 
 ### `private/`
 
@@ -28,8 +36,10 @@ Purpose: Local certificates, TLS credentials, SSH keys, and other host-specific 
 leave the developer's machine.
 
 - **Git**: Must not be committed. Add `private/` to `.gitignore`.
+  > **強制先**: review 観点 — harness-policy scope
 - **AI read**: Prohibited. `Read(./private/**)` and `Grep(./private/**)` are in
   `.claude/settings.json` deny.
+  > **強制先**: review 観点 — harness-policy scope
 - **Typical contents**: `dev-cert.crt`, `dev-key.pem`, host-specific config with embedded credentials.
 
 ### `config/secrets/`
@@ -38,37 +48,58 @@ Purpose: Application-level secrets for local development (OAuth client IDs, API 
 passwords, and other credential files).
 
 - **Git**: Must not be committed. Add `config/secrets/` to `.gitignore`.
+  > **強制先**: review 観点 — harness-policy scope
 - **AI read**: Prohibited. `Read(./config/secrets/**)` and `Grep(./config/secrets/**)` are in
   `.claude/settings.json` deny.
+  > **強制先**: review 観点 — harness-policy scope
 - **Typical contents**: `local.toml`, `oauth/client.json`, environment-specific credential files.
 
 ## Symlink Rejection in Infrastructure Adapters
 
-Infrastructure 層のファイル I/O アダプターは、対象ファイルとその親ディレクトリの symlink を事前に拒絶する。
+Infrastructure 層のファイル I/O アダプターは、composition root から別途信頼して受け取る root を起点に、対象までの **すべての既存パス要素**（中間ディレクトリと leaf を含む）の symlink を事前に拒絶し、対象への相対パスを root より下に閉じる。leaf と直上の親だけを検査する実装は不十分である。
 
 ### ルール
 
 | 対象 | チェック |
 |---|---|
-| 読み書き対象ファイル（leaf） | `symlink_metadata()` で symlink なら fail-closed エラー |
-| 親ディレクトリ（track dir 等） | `symlink_metadata()` で symlink なら fail-closed エラー |
-| root ディレクトリ | CLI composition root から渡されるため信頼する |
+| trusted root | composition root から別途渡され、信頼境界として扱う。対象パスはこの root より下に閉じ、`..` などで root の外へ出る対象は fail-closed エラー |
+| root より下の各既存要素（中間ディレクトリと leaf を含む） | root から leaf に向かって順に `symlink_metadata()` で検査し、symlink なら fail-closed エラー |
+| 新規作成する leaf | 作成前に既存の全 ancestor を上記のとおり検査する |
+
+> **強制先**: review 観点 — infrastructure / cli_composition scope
 
 ### 理由
 
-- symlink 経由のファイル差し替えにより、review state や metadata が外部パスに redirect される可能性がある
-- `std::fs::read_to_string` / `atomic_write_file` は symlink を透過的に follow する
-- tamper-proof 対策として、ファイルアクセス前に symlink を検出して拒絶する
-
-### 適用例
-
-- `FsReviewStore` (review_v2): `reject_symlinks_below()` + `WriteGuard` で read/write の前に symlink / 外部書き込みを拒絶
+- symlink 経由のファイル差し替えにより、永続化した状態や metadata が外部パスへ redirect される可能性がある
+- `std::fs::read_to_string` や一般的な atomic write の実装は symlink を透過的に follow する
+- 中間ディレクトリの symlink も透過的に follow されるため、leaf と直近の親だけの検査では trusted root の外へ escape しうる
+- symlink を含まない `../` 経路でも root の外へ出られるため、symlink 検査だけでは containment にならない
 
 ### 新規アダプター追加時
 
-1. ファイル I/O の前に `symlink_metadata()` で symlink チェックを追加する
-2. symlink の場合は fail-closed でエラーを返す（silent skip 禁止）
-3. テストで symlink 拒絶を検証する（プラットフォーム対応に注意）
+1. composition root から trusted root を別途受け取り、対象への相対パスを root より下に閉じる（root の外を指す対象は fail-closed エラー）
+2. ファイル I/O の前に、root より下の既存の各 path component を root 側から順に `symlink_metadata()` で検査する
+3. symlink の場合は fail-closed でエラーを返す（silent skip 禁止）
+4. leaf と直近の親だけでなく、中間ディレクトリに置いた nested symlink と root 外への `../` 経路の拒絶もテストする（プラットフォーム対応に注意）
+
+> **強制先**: review 観点 — infrastructure scope
+
+### 適用例
+
+- `FsReviewStore` (review_v2): `reject_symlinks_below()` を read/write の前に呼び出し、対象 path の symlink component を拒絶する
+
+## Security Boundary Failure Handling
+
+秘匿・入力検証・権限判定のセキュリティ境界では、エラー時の無音の機能縮退を許さない。
+構築または初期化に失敗した場合は、警告のみの通知、無効値への縮退、保護なしでの処理継続ではなく、
+処理を停止してエラーを返すか fail-stop とする。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
+
+静的な秘匿パターンなど、構築がプログラミングエラーを示す場合も、同じ構築保証を適用する。
+外部入力を使う動的な値は、検証に失敗した時点でエラーとして伝播させる。
+
+> **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 
 ## Enforcement
 
@@ -78,11 +109,15 @@ When adding a new sensitive directory to this project:
 2. Add `Read(./new-dir/**)` and `Grep(./new-dir/**)` deny rules to `.claude/settings.json`.
 3. Document the directory purpose in this file.
 
+> **強制先**: review 観点 — harness-policy scope
+
 > **Consumer's responsibility**: CI enforcement of sensitive-directory deny rules (verifying that
 > `.claude/settings.json` contains the expected `Read`/`Grep` deny entries) is the **consumer's
 > responsibility**, not SoTOHE's. SoTOHE ships recommended deny entries as defaults and documents
 > the intent here, but does not hard-fail CI against them. See
 > `.harness/policies/consumer-ownership.md` for the provide-not-enforce principle.
+
+> **強制先**: 強制なし (明記) — sensitive-directory CI は consumer 所有
 
 ## Secrets Management
 
@@ -100,9 +135,13 @@ fn init_config() -> Result<Config, ConfigError> {
 
 `.env` はコミットしない。`.env.example` のみコミットする。
 
+> **強制先**: review 観点 — harness-policy scope
+
 ## Input Validation
 
 ドメイン型のコンストラクタで検証する：
+
+> **強制先**: review 観点 — domain scope
 
 ```rust
 pub struct Email(String);
@@ -117,6 +156,8 @@ impl Email {
 ## SQL Injection Prevention
 
 SQLx のパラメータバインドを必ず使う：
+
+> **強制先**: review 観点 — infrastructure scope
 
 ```rust
 // Bad
@@ -133,6 +174,8 @@ let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = $1")
 
 内部詳細をユーザーに漏らさない：
 
+> **強制先**: review 観点 — infrastructure scope
+
 ```rust
 // Bad: leaks internal info
 Err(AppError::Database(format!("Connection to {}:{} failed", host, port)))
@@ -148,12 +191,23 @@ Err(AppError::Internal("Service unavailable".to_string()))
 cargo make deny      # 脆弱性・ライセンス・禁止クレートチェック
 ```
 
+> **強制先**: 機械 lint — cargo make deny
+
 ## Code Review Checklist
 
 - [ ] シークレットのハードコードなし
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] 外部入力はドメイン型で検証済み
+  > **強制先**: review 観点 — domain scope
 - [ ] SQL クエリはパラメータバインド使用
+  > **強制先**: review 観点 — infrastructure scope
 - [ ] エラーメッセージは内部情報を漏らさない
+  > **強制先**: review 観点 — infrastructure scope
 - [ ] ログに機密情報が含まれていない
+  > **強制先**: review 観点 — infrastructure scope
+- [ ] セキュリティ境界（秘匿・検証・権限判定）で無音の機能縮退がなく、構築・初期化の失敗が停止として扱われている
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] `unsafe` コードは最小限かつコメント付き
+  > **強制先**: review 観点 — domain / usecase / infrastructure / cli / cli_driver / cli_composition / harness-policy scope
 - [ ] `cargo make deny` が通っている
+  > **強制先**: 機械 lint — cargo make deny

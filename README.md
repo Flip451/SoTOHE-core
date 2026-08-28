@@ -65,14 +65,21 @@ track 作業には `/adr:add <slug>` で ADR を作り
 - **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
   - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
   - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
-- **Claude Code** — 主操作面。`/track:*` コマンドの入口
-- **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`) とリサーチ担当 (`researcher`)
+- **Claude Code / Codex CLI** — ルート入口はそれぞれ `CLAUDE.md` / `AGENTS.md`、常時適用する orchestrator rules は `.claude/rules/orchestrator.md` / `.codex/instructions.md` に置く。Claude Code は `/track:*` コマンドの入口、Codex CLI は profile に従う orchestrator / capability の実行面として使う
 
 補足:
 
 - capability の担当者は `.harness/config/agent-profiles.json` で切り替えられる
 - 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
 - プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
+
+## エージェントのルールと利用者所有設定
+
+ルートの `CLAUDE.md` と `AGENTS.md` は入口ポインタであり、Claude Code の常時適用 orchestrator rules は `.claude/rules/orchestrator.md`、Codex の orchestrator rules は `.codex/instructions.md`、Codex のコマンドポリシーは `.codex/rules/default.rules` にある。PR reviewer 向けの指針は `.harness/custom/review-prompts/pr-review.md` に分離され、ルート orchestrator の常時適用文書には含まれない。
+
+Claude Code / Codex の設定でこれらの rules を常時適用するための provider-side compatibility / loader 設定は、`.claude/settings.json` の `permissions.allow` と同じく consumer-owned configuration である。SoTOHE は推奨する配置と設定方法を文書化するが、provider 設定の値、rules ファイルの存在、常時適用状態、または散文の正確な文言を CI で強制しない。採用する provider とその運用上の責任は利用者が判断する。
+
+workflow、policy、capability、provider rules などの runtime-instruction documents は自己完結し、ADR の日付 ID に依存せずに動作と境界を記述する。この enforcement boundary は文書化と review の対象であり、consumer 側の provider 設定と同様に CI の hard-fail 条件ではない。詳しい分界は [Consumer Ownership policy](.harness/policies/consumer-ownership.md) を参照する。
 
 ## 外部プロバイダーを capability 単位で設定する
 

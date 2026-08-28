@@ -190,6 +190,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 | [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
 | [子プロセスの診断出力は末尾リングで保持し、出力量で kill しない](2026-08-14-1048-child-output-ring-capture.md) | Proposed | 2026-08-14 |
+| [シークレット秘匿の正規表現を fail-closed にする](2026-08-20-1053-sensitive-redaction-fail-closed.md) | Proposed | 2026-08-20 |
 
 ### ADR 運用
 
@@ -214,6 +215,11 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
 | [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
 | [consumer 規約の所有権分離と harness 固定依存の撤去](2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md) | Proposed | 2026-07-24 |
+| [規約を機構と突き合わせて改訂する](2026-08-20-1043-conventions-mechanism-alignment.md) | Proposed | 2026-08-20 |
+| [usecase 入力境界を Command と Query の検証済み型に統一する](2026-08-25-1021-validated-usecase-input-boundaries.md) | Proposed | 2026-08-25 |
+| [必須ポートを必要性テストの対象外にする](2026-08-25-2239-required-ports-exempt-from-necessity-test.md) | Proposed | 2026-08-25 |
+| [consumer 所有の初期規約にも改訂済みの規範を出荷する](2026-08-26-0000-consumer-shipped-convention-initial-values.md) | Proposed | 2026-08-26 |
+| [終了保証の検証は有界待ちで観測する](2026-08-26-0211-bounded-wait-termination-assertions.md) | Proposed | 2026-08-26 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
@@ -269,6 +275,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 | [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
 | [欠ける typed-pipeline 専用経路に grok を割り当て可能にする](2026-08-18-1534-grok-configurable-for-all-capabilities.md) | Proposed | 2026-08-18 |
+| [オーケストレーターの文脈摂取を規律化する](2026-08-22-0145-orchestrator-context-discipline.md) | Proposed | 2026-08-22 |
 
 ### テスト・CI ツーリング
 

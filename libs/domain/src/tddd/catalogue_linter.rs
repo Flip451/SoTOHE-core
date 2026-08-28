@@ -4,6 +4,7 @@
 //! the injected extractor performs syntax inspection only.
 
 use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use crate::tddd::catalogue_v2::identifiers::{ParamName, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError;
 use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
@@ -33,7 +34,12 @@ pub use role::RoleKind;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ExtractedTypeRefPath {
     /// A syntactic path whose catalogue-vs-external meaning is decided by the domain.
-    Path(TypeRef),
+    ///
+    /// `namespace` is the syntactic position of the occurrence: `Trait` when the
+    /// path is a trait bound (`dyn` / `impl` / `T: Bound` / a qualified-self
+    /// trait prefix), `Type` otherwise. Slot-level authority for the root path
+    /// is applied by the domain classifier.
+    Path { type_ref: TypeRef, namespace: CatalogueItemNamespace },
     /// A declared type parameter occurrence.
     TypeParameter(ParamName),
     /// A lifetime parameter occurrence.
@@ -42,6 +48,20 @@ pub enum ExtractedTypeRefPath {
     ConstParameter(ParamName),
     /// An associated type/constant label, not a catalogue identity.
     AssociatedItemLabel(ParamName),
+}
+
+impl ExtractedTypeRefPath {
+    /// A path occurrence in type position.
+    #[must_use]
+    pub fn type_path(type_ref: TypeRef) -> Self {
+        Self::Path { type_ref, namespace: CatalogueItemNamespace::Type }
+    }
+
+    /// A path occurrence in trait (bound) position.
+    #[must_use]
+    pub fn trait_path(type_ref: TypeRef) -> Self {
+        Self::Path { type_ref, namespace: CatalogueItemNamespace::Trait }
+    }
 }
 
 /// Failure returned by the parser-authoritative TypeRef path extractor.
@@ -98,33 +118,8 @@ pub struct RuleTarget {
     target_roles: Vec<RoleKind>,
 }
 
-impl RuleTarget {
-    /// Creates a new `RuleTarget` from the given role list.
-    ///
-    /// An empty `target_roles` means "apply to all roles".
-    #[must_use]
-    pub fn new(target_roles: Vec<RoleKind>) -> Self {
-        Self { target_roles }
-    }
-
-    /// Creates a `RuleTarget` that matches all roles.
-    #[must_use]
-    pub fn all_roles() -> Self {
-        Self::new(vec![])
-    }
-
-    /// Returns the target roles. An empty slice means "all roles".
-    #[must_use]
-    pub fn target_roles(&self) -> &[RoleKind] {
-        &self.target_roles
-    }
-
-    /// Returns `true` if the given `RoleKind` is in scope for this target.
-    #[must_use]
-    pub fn matches(&self, role: RoleKind) -> bool {
-        self.target_roles.is_empty() || self.target_roles.contains(&role)
-    }
-}
+#[path = "catalogue_linter_rule_target.rs"]
+mod rule_target_impl;
 
 // ---------------------------------------------------------------------------
 // RolePayloadField — 8-variant closed field-name enum
@@ -764,7 +759,7 @@ mod tests {
                 "core::convert::TryFrom<PathBuf>" => Some("core::convert::TryFrom"),
                 _ => None,
             } {
-                return Ok(vec![ExtractedTypeRefPath::Path(
+                return Ok(vec![ExtractedTypeRefPath::type_path(
                     TypeRef::new(root.to_owned()).unwrap(),
                 )]);
             }
@@ -772,21 +767,35 @@ mod tests {
                 type_ref.as_str(),
                 "r#GreetingCompositionRoot<T>" | "GreetingCompositionRoot /* owner */ < T >"
             ) {
-                return Ok(vec![ExtractedTypeRefPath::Path(
+                return Ok(vec![ExtractedTypeRefPath::type_path(
                     TypeRef::new("GreetingCompositionRoot").unwrap(),
                 )]);
             }
+            if type_ref.as_str() == "mixed_nested_trait_in_type_slot" {
+                // Represents `Box<dyn Port>` in a type slot: root type, nested trait.
+                return Ok(vec![
+                    ExtractedTypeRefPath::type_path(TypeRef::new("Box".to_owned()).unwrap()),
+                    ExtractedTypeRefPath::trait_path(TypeRef::new("Port".to_owned()).unwrap()),
+                ]);
+            }
+            if type_ref.as_str() == "mixed_nested_type_in_trait_slot" {
+                // Represents `Into<Result<Event, ()>>` in a bound slot: root trait, nested type.
+                return Ok(vec![
+                    ExtractedTypeRefPath::trait_path(TypeRef::new("Into".to_owned()).unwrap()),
+                    ExtractedTypeRefPath::type_path(TypeRef::new("Event".to_owned()).unwrap()),
+                ]);
+            }
             if type_ref.as_str() == "same_named_paths" {
                 return Ok(vec![
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("domain::alpha::Event".to_owned()).unwrap(),
                     ),
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("domain::beta::Event".to_owned()).unwrap(),
                     ),
                 ]);
             }
-            Ok(vec![ExtractedTypeRefPath::Path(type_ref.clone())])
+            Ok(vec![ExtractedTypeRefPath::type_path(type_ref.clone())])
         }
     }
 
@@ -804,11 +813,12 @@ mod tests {
             _lifetime_parameters: &[ParamName],
             _const_parameters: &[ParamName],
         ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
-            let reference =
-                |value: &str| ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap());
+            let reference = |value: &str| {
+                ExtractedTypeRefPath::type_path(TypeRef::new(value.to_owned()).unwrap())
+            };
             let wrapped = |value: &str| {
                 vec![
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("std::made_up::NotARealWrapper".to_owned()).unwrap(),
                     ),
                     reference(value),
@@ -850,7 +860,7 @@ mod tests {
         let wrapped_paths = wrapped.extract(&type_ref, &[], &[], &[]).unwrap();
 
         assert_eq!(wrapped_paths, direct_paths);
-        assert_eq!(wrapped_paths, vec![ExtractedTypeRefPath::Path(type_ref)]);
+        assert_eq!(wrapped_paths, vec![ExtractedTypeRefPath::type_path(type_ref)]);
 
         let invalid_type_ref = TypeRef::new("(".to_owned()).unwrap();
         let direct_error = direct.extract(&invalid_type_ref, &[], &[], &[]);
@@ -869,10 +879,12 @@ mod tests {
         assert_eq!(
             qualified_wrapped,
             vec![
-                ExtractedTypeRefPath::Path(
+                ExtractedTypeRefPath::type_path(
                     TypeRef::new("domain::alpha::Event".to_owned()).unwrap(),
                 ),
-                ExtractedTypeRefPath::Path(TypeRef::new("domain::beta::Event".to_owned()).unwrap(),),
+                ExtractedTypeRefPath::type_path(
+                    TypeRef::new("domain::beta::Event".to_owned()).unwrap(),
+                ),
             ]
         );
     }
@@ -1790,7 +1802,7 @@ mod tests {
                     bounds: vec![TypeRef::new("usecase::ApplicationService").unwrap()],
                 }],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1850,7 +1862,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -2220,7 +2232,7 @@ mod tests {
                     MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
                 ],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -2256,7 +2268,7 @@ mod tests {
                     MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
                 ],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -2295,11 +2307,11 @@ mod tests {
                 _const_parameters: &[ParamName],
             ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
                 let reference = |value: &str| {
-                    ExtractedTypeRefPath::Path(TypeRef::new(value.to_owned()).unwrap())
+                    ExtractedTypeRefPath::type_path(TypeRef::new(value.to_owned()).unwrap())
                 };
                 let wrapped = |value: &str| {
                     vec![
-                        ExtractedTypeRefPath::Path(
+                        ExtractedTypeRefPath::type_path(
                             TypeRef::new("std::ghost::UnknownWrapper".to_owned()).unwrap(),
                         ),
                         reference(value),
@@ -2339,7 +2351,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -2359,7 +2371,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                module(module_path),
+                Some(module(module_path)),
                 None,
                 vec![],
                 vec![],
@@ -2454,7 +2466,7 @@ mod tests {
                 )],
                 vec![],
                 vec![],
-                module("alpha"),
+                Some(module("alpha")),
                 None,
                 vec![],
                 vec![],
@@ -2575,6 +2587,212 @@ mod tests {
             invalid_result,
             Err(CatalogueLinterError::InvalidRuleConfig(message))
                 if message.as_str().contains("invariants")
+        ));
+    }
+
+    #[test]
+    fn test_catalogue_lint_type_reference_ignores_same_named_trait_identity() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Event".to_owned()).unwrap(),
+            make_type_entry(DataRole::DomainEvent),
+        );
+        catalogue.insert_trait(
+            CatalogueEntryKey::try_new("Event".to_owned()).unwrap(),
+            make_trait_entry(ContractRole::SecondaryPort),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("HandlesEvent".to_owned()).unwrap(),
+            make_type_entry(DataRole::UseCase {
+                handles: vec![TypeRef::new("Event".to_owned()).unwrap()],
+            }),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCase]),
+            CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                target_field: RolePayloadField::Handles,
+                expected_role: RoleKind::DomainEvent,
+            },
+        )
+        .unwrap();
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let violations = evaluate_catalogue_lint_with_preflight(
+            &[rule],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "same-named trait must not shadow a type reference");
+    }
+
+    #[test]
+    #[allow(clippy::expect_used)]
+    fn test_catalogue_lint_preflight_classifies_nested_trait_inside_type_slot_by_occurrence() {
+        // Two same-named traits; a field type `Box<dyn Port>` (type slot) must
+        // classify the nested `Port` occurrence as a trait and fail closed.
+        let mut catalogue = make_doc("domain");
+        for module in ["alpha", "beta"] {
+            catalogue.insert_trait(
+                CatalogueEntryKey::try_new(format!("domain::{module}::Port")).unwrap(),
+                make_trait_entry(ContractRole::SecondaryPort),
+            );
+        }
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                plain_struct_kind(vec![field_decl("port", "mixed_nested_trait_in_type_slot")]),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let error = evaluate_catalogue_lint_with_preflight(
+            &[],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        )
+        .expect_err("a nested ambiguous trait occurrence must fail closed in a type slot");
+
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                    identifier,
+                    candidates,
+                ),
+            ) if identifier.as_str() == "Port" && candidates.as_slice().len() == 2
+        ));
+    }
+
+    #[test]
+    #[allow(clippy::expect_used)]
+    fn test_catalogue_lint_preflight_classifies_nested_type_inside_trait_slot_by_occurrence() {
+        // Two same-named types; a generic bound `Into<Result<Event, ()>>` (trait
+        // slot) must classify the nested `Event` occurrence as a type and fail closed.
+        let mut catalogue = make_doc("domain");
+        for module in ["alpha", "beta"] {
+            catalogue.insert_type(
+                CatalogueEntryKey::try_new(format!("domain::{module}::Event")).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    unit_struct_kind(),
+                    vec![],
+                    vec![],
+                    vec![],
+                    Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit_struct_kind(),
+                vec![],
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![
+                        TypeRef::new("mixed_nested_type_in_trait_slot".to_owned()).unwrap(),
+                    ],
+                }],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let error = evaluate_catalogue_lint_with_preflight(
+            &[],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        )
+        .expect_err("a nested ambiguous type occurrence must fail closed in a trait slot");
+
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                    identifier,
+                    candidates,
+                ),
+            ) if identifier.as_str() == "Event" && candidates.as_slice().len() == 2
+        ));
+    }
+
+    #[test]
+    #[allow(clippy::expect_used)]
+    fn test_catalogue_lint_preflight_rejects_ambiguous_trait_bound_namespace() {
+        let mut catalogue = make_doc("domain");
+        for module in ["alpha", "beta"] {
+            catalogue.insert_trait(
+                CatalogueEntryKey::try_new(format!("domain::{module}::Event")).unwrap(),
+                make_trait_entry(ContractRole::SecondaryPort),
+            );
+        }
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Owner".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit_struct_kind(),
+                vec![],
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Event".to_owned()).unwrap()],
+                }],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let error = evaluate_catalogue_lint_with_preflight(
+            &[],
+            &all_catalogues,
+            catalogue.layer(),
+            &StubPrimitiveScanner,
+            &StubTypeRefPathExtractor,
+        )
+        .expect_err("ambiguous trait bounds must fail closed during preflight");
+
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                crate::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError::AmbiguousIdentifier(
+                    identifier,
+                    candidates,
+                ),
+            ) if identifier.as_str() == "Event"
+                && candidates.as_slice().len() == 2
+                && format!("{candidates:?}").contains("alpha")
+                && format!("{candidates:?}").contains("beta")
         ));
     }
 
@@ -2853,10 +3071,10 @@ mod tests {
                     "partially_inspected" => Err(TypeRefPathExtractionError::UnsupportedSyntax {
                         location: type_ref.clone(),
                     }),
-                    "unclassifiable" => Ok(vec![ExtractedTypeRefPath::Path(
+                    "unclassifiable" => Ok(vec![ExtractedTypeRefPath::type_path(
                         TypeRef::new("UnknownBarePath").unwrap(),
                     )]),
-                    _ => Ok(vec![ExtractedTypeRefPath::Path(type_ref.clone())]),
+                    _ => Ok(vec![ExtractedTypeRefPath::type_path(type_ref.clone())]),
                 }
             }
         }
@@ -2961,7 +3179,7 @@ mod tests {
                         vec![ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap())]
                     }
                     "<domain::alpha::AssociatedCarrier as domain::alpha::Port>::Output" => vec![
-                        ExtractedTypeRefPath::Path(
+                        ExtractedTypeRefPath::type_path(
                             TypeRef::new("domain::alpha::AssociatedCarrier").unwrap(),
                         ),
                         ExtractedTypeRefPath::AssociatedItemLabel(
@@ -2978,7 +3196,7 @@ mod tests {
                             location: type_ref.clone(),
                         });
                     }
-                    _ => vec![ExtractedTypeRefPath::Path(type_ref.clone())],
+                    _ => vec![ExtractedTypeRefPath::type_path(type_ref.clone())],
                 };
 
                 self.observations
@@ -3016,7 +3234,7 @@ mod tests {
                 vec![],
                 vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
                 vec![],
-                duplicate_fixture_module("alpha"),
+                Some(duplicate_fixture_module("alpha")),
                 None,
                 vec![],
                 vec![],
@@ -3066,7 +3284,7 @@ mod tests {
                 && paths.iter().any(|path| {
                     matches!(
                         path,
-                        ExtractedTypeRefPath::Path(path)
+                        ExtractedTypeRefPath::Path { type_ref: path, .. }
                             if path.as_str() == "domain::alpha::AssociatedCarrier"
                     )
                 })
@@ -3618,7 +3836,7 @@ mod tests {
                 vec![],
                 vec![MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] }],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -3837,7 +4055,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -4413,7 +4631,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -4428,7 +4646,7 @@ mod tests {
             methods,
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -4451,7 +4669,7 @@ mod tests {
             methods,
             vec![],
             vec![],
-            duplicate_fixture_module(module),
+            Some(duplicate_fixture_module(module)),
             None,
             vec![],
             vec![],
@@ -4496,7 +4714,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -4521,7 +4739,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5032,6 +5250,43 @@ mod tests {
     }
 
     #[test]
+    fn test_trait_impl_required_preserves_omitted_type_placement() {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            CatalogueEntryKey::try_new("MyValue".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit_struct_kind(),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("PartialEq").unwrap(),
+            TypeRef::new("MyValue").unwrap(),
+        ));
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]),
+            },
+        );
+
+        assert!(
+            violations.is_empty(),
+            "an omitted module path must not be coerced to crate root: {violations:?}"
+        );
+    }
+
+    #[test]
     fn test_trait_impl_required_violation_when_trait_missing() {
         // ValueObject with only PartialEq (missing Eq) → 1 violation
         let mut doc = make_doc("domain");
@@ -5228,7 +5483,7 @@ mod tests {
             vec![method_shared_ref_no_params("is_valid", "bool")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5258,7 +5513,7 @@ mod tests {
             vec![], // method missing
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5291,7 +5546,7 @@ mod tests {
             vec![method_exclusive_ref_no_params("is_valid", "bool")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5332,7 +5587,7 @@ mod tests {
             )],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5365,7 +5620,7 @@ mod tests {
             vec![method_shared_ref_no_params("id", "OrderId")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5392,7 +5647,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -5422,7 +5677,7 @@ mod tests {
             vec![method_shared_ref_no_params("id", "()")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -6124,7 +6379,7 @@ mod tests {
                 methods,
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 Some(crate::tddd::catalogue_v2::identifiers::DocString::new(
                     "Modified MethodDeclaration surface.".to_owned(),
                 )),
@@ -6196,7 +6451,7 @@ mod tests {
                     bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
                 }],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -7379,7 +7634,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -7446,7 +7701,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -7522,7 +7777,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -7632,7 +7887,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -7669,7 +7924,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -7710,7 +7965,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -8069,7 +8324,7 @@ mod tests {
             vec![method_shared_ref_no_params("get_line", "OrderLine")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -8334,7 +8589,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -8874,7 +9129,7 @@ mod tests {
             vec![TypeRef::new("?Sized").unwrap()],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -8975,7 +9230,7 @@ mod tests {
                     bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
                 }],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -9022,7 +9277,7 @@ mod tests {
                     rhs: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
                     operator: BoundOp::Bound,
                 }],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],

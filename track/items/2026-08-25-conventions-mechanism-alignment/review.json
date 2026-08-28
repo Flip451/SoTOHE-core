@@ -1,0 +1,2517 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-25T03:54:08Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 46,
+              "message": "D1 は「全規約規則」「各規則」を例外なく注記するという完全追跡の義務を決定しているが、既存 authority への委譲、保守的 over-approximation、または実装深度見積りのいずれで解決するかを Decision/Consequences に記録していない。対象集合の増加に対して非収束な実装・レビュー範囲を残している。",
+              "severity": "P1"
+            },
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 74,
+              "message": "D8 はコード scope ごとに diff が接する外部境界を「列挙」することを要求しているが、列挙の完全性を既存 authority に委譲するのか、保守的 over-approximation とするのか、厳密実装の深度をどう見積もるのかを Decision/Consequences に記録していない。外部境界の open set に対する未解決の完全追跡義務になっている。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:316b32d46bc11d5dfc000953d9fdb2d26ae6a8222155b1ded1fadfed139bb3a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:01:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0aac233b4a2bfb0f260152b097d315f6a07b1438735476484f678bf6a143a7c3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:07:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0aac233b4a2bfb0f260152b097d315f6a07b1438735476484f678bf6a143a7c3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ecc0a0d601087dd693376fbd89d2be286f1d7af766ba3b041f9e8c4f55691893",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:24:49Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 68,
+              "message": "D6 は「カバレッジ目標 80% は廃止する」と決定していますが、既存の accepted decision `2026-07-08-1405-grandfathered-tech-and-product-baseline.md` D16 は新規コードの line coverage 80% 目標を維持しています。本 ADR はその supersede/refine 関係を記録していないため、両方が有効な相反する決定として残ります。D6 が D16 のカバレッジ行を置き換えることと、D16 の残余を維持することを Existing decision relationship に明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ecc0a0d601087dd693376fbd89d2be286f1d7af766ba3b041f9e8c4f55691893",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:31:01Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-20-1043-conventions-mechanism-alignment.md",
+              "line": 61,
+              "message": "D4 internally conflicts on the boundary contract: it says the boundary receives an already validated Command, but also requires parsing strings at that same usecase boundary. Clarify whether raw strings or validated Command values cross the boundary; otherwise implementations can satisfy one clause only by violating the other.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e79118086600cb88d727e5601c95c10b12d831e0c1fba2e70e047b81468ebc29",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T04:37:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:167f7168f3edaba15041e1328e94c0600a5f3e1157bdd98cf0b3fd85c562d045",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T04:41:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:167f7168f3edaba15041e1328e94c0600a5f3e1157bdd98cf0b3fd85c562d045",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:10:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d714f8aca3bee8dd474143492d6f7fa8d99cc1cf1f2b84687bc3a7462d18c511",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:14:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d714f8aca3bee8dd474143492d6f7fa8d99cc1cf1f2b84687bc3a7462d18c511",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:29:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d206ee154dbe6cc0319c6af157b7bb83054500122fda33e1b1b541f5a55931a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:35:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d206ee154dbe6cc0319c6af157b7bb83054500122fda33e1b1b541f5a55931a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:53:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ecbd75e8ec2cb81d7898223739b0213c0649426bc90205a46f85bccf5fbf998",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:55:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ecbd75e8ec2cb81d7898223739b0213c0649426bc90205a46f85bccf5fbf998",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:46:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7320f2275dffad09be75549825e6b14ee6c6d802245a35ce4f878afe876fa8f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:51:04Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-25-2239-required-ports-exempt-from-necessity-test.md",
+              "line": 20,
+              "message": "D1 は `ApplicationService` + `Interactor` の組を必要性テストの対象とする一方、直後ですべての inbound port trait を対象外としており、分類が重複している。R1 では `ApplicationService` は application interface、その実装は `Interactor` と定義され、port-granularity D1 の「1 usecase = 1 input trait」もこの application-side interface に該当するため、必須の per-usecase `ApplicationService` port がテスト対象か免除対象か決定できない。必要性テスト対象と structure-required inbound port を重ならない分類で記録しない限り、refine 対象 D2 と D3 の矛盾が残る。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e7320f2275dffad09be75549825e6b14ee6c6d802245a35ce4f878afe876fa8f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:57:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6892d5f3c53e5281623b87da882054023281a88605d265629c275f76703e470",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:00:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6892d5f3c53e5281623b87da882054023281a88605d265629c275f76703e470",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:18:45Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-26-0000-consumer-shipped-convention-initial-values.md",
+              "line": 25,
+              "message": "D1 commits to preserving every normative requirement and enforcement correspondence across the workspace and overlay conventions, but neither the decision nor Consequences delegates completeness to an existing authority, chooses conservative over-approximation, or acknowledges an implementation depth estimate. This is an unresolved open-set commitment under the ADR review policy.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8f95f98e7d233b4a189aaf164179939980f8b78f12b67ebec8587c09a98878da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:25:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42ee3120fedc9cc941cab5ac0a95c46e6d1b1c7a28ae5fbdc2ac440119f33c39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:29:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42ee3120fedc9cc941cab5ac0a95c46e6d1b1c7a28ae5fbdc2ac440119f33c39",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T01:02:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08c41a50ccea0d5420f7a1c51d1d60ba24f1d682b49f942dfc87069300532ab7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T01:07:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08c41a50ccea0d5420f7a1c51d1d60ba24f1d682b49f942dfc87069300532ab7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:14:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c185122903b2653c5e0736beef3a7587f4d4e8100ffc4bd3acd1720e2691656",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:18:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c185122903b2653c5e0736beef3a7587f4d4e8100ffc4bd3acd1720e2691656",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-25T07:35:49Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 36,
+              "message": "`type-designer-kind-selection.md` remains substantially non-conformant with the new D1 completeness requirement: normative rules and review obligations are unannotated, including R1/R2/R5/R8–R10 and the review checklist/enforcement requirements (for example lines 36, 75, 79, 83, 89, 93, 150, 206, 221, 225, 245, 260, 265, 272, 280, and 321–340). Each normative requirement in a touched convention file needs an immediate `強制先` annotation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:80a30356e93d471c95afdbe753ac9694a01077ad82a87843fc022f4c56ed5f06",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:44:56Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 440,
+              "message": "The enforcement annotation for the fourth line claims `bin/sotp signal calc-impl-catalog` as a declaration/verification mechanism, but that command only evaluates catalogue→spec trace integrity; the surrounding text explicitly says role violations are rejected by `catalogue-lint` before signal evaluation. It therefore does not enforce the stated R1–R10 convention checks and fails the briefing requirement that annotations name mechanisms that enforce the rule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e675cb0f9eec09634d038aae1ca3c4746fab4674f766fc01e0b8e3cb96d632d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:47:19Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": "knowledge/conventions/source-attribution.md",
+              "line": 90,
+              "message": "The annotation for the multi-source signal policy names only `spec-frontmatter` and `spec-attribution`, but those commands validate front matter and source-tag presence respectively; neither enforces that the item's signal is the highest confidence among its sources. `bin/sotp verify spec-signals` is the mechanism that checks signal semantics and must be included.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f2f31d378c5ae624e3ccfba7a09201e76fd672578237e2efebf284c89cfcf415",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:50:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7dc5bfc9b9e6c9ba47834404f9b950dd5ca3dab1062109e78f1c9b5d581217a8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:04:32Z",
+          "findings": [
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/README.md",
+              "line": 17,
+              "message": "D1 は許容条件・禁止も注記対象としているが、`Scope` の「ここに置くもの／置かないもの」は未注記のまま。触れた文書内の規範的要求が網羅されていない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 10,
+              "message": "`Scope` の適用対象・適用外は D1 が対象とする適用条件だが、強制先注記がない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 7,
+              "message": "`Scope` の nightly 適用範囲と stable-only 除外条件に強制先注記がなく、D1 の完全性要件を満たさない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 9,
+              "message": "`Scope` にある純粋なバグ修正と semver 互換変更の適用除外は許容条件だが、強制先注記がない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/source-attribution.md",
+              "line": 54,
+              "message": "`Placement` の「source tag は requirement 文末に置く」という規範的な配置要求に強制先注記がない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+              "line": 7,
+              "message": "`Scope` の適用対象・セキュリティ境界などの適用除外が未注記で、D1 の有限集合完全性を満たさない。",
+              "severity": "P1"
+            },
+            {
+              "category": "command-wiring",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 98,
+              "message": "記載された `cargo make track-local-review -- --group harness-policy` は、必須の `--round-type` と `--briefing-file` または `--prompt` がなく、そのままでは CLI が失敗する。実行不能な invocation を enforcement mechanism として参照している。",
+              "severity": "P1"
+            },
+            {
+              "category": "template-distribution",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 119,
+              "message": "チェックリストが記録先として具体的な `TODO.md` を参照するが、このファイルは配布ツリーに存在せず runtime 生成物でもない。distribution target から consumer checkout に存在しないパスを参照しており、`.harness/policies/consumer-ownership.md` の配布境界に反する。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-mismatch",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 49,
+              "message": "DFP→RFP 規則の注記が実際にはその規則を強制しない。`dry check-approved` は DRY 状態を判定するだけで Review 起動を阻止せず、`track-local-review` は単一 reviewer round の委譲で back-edge・全コードベース DFP scope・`dry-check.json` sole-writer を強制しない。fixpoint と back-edge は `full-cycle`、commit block は `track-commit-message` が所有するため、49–56行および80–81行の強制先が不正確。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-mismatch",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 14,
+              "message": "`cargo make test` は Dockerfile の既定 Rust 1.94.0 でテストを実行するため、MSRV 1.91 でのコンパイル・テストを機械的に検証しない。1.91 非互換コードでもこの注記の gate は通過できる。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 42,
+              "message": "`#![feature]`、nightly 不在時の Rust 実装、`rustdoc-types` 互換性などを `harness-policy scope` に割り当てているが、その scope は `apps/**`、`libs/**`、Cargo.toml、Dockerfile、rust-toolchain ファイルを対象にしない。該当コードだけの変更ではこの review が起動せず、注記された mechanism は規則を強制できない。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-mismatch",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 22,
+              "message": "`cargo make ci-track` は active track の gate だけを実行し、`catalogue-lint check-active-track` も active catalogue の read-only lint である。どちらも merged/archive/non-active track への write 経路を拒否しないため、non-active write protection の機械強制先として不正確。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 19,
+              "message": "schema/behavior の非遡及適用、grace period、compatibility layer は CLI・codec・source の変更でも破れるが、注記は `harness-policy scope` のみであり `apps/**` と `libs/**` を対象にしない。コードだけの違反変更が該当 review を通らない。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-mismatch",
+              "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+              "line": 24,
+              "message": "`cargo make ci` は既存 gate を実行するだけで、phase 状態が file existence で表現されているか、optional status field が追加されたかを判定する lint を持たない。この規則を `機械 lint — cargo make ci` とする注記は偽の機械強制を示す。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/language-policy.md",
+              "line": 5,
+              "message": "Rust-first と fail-closed の要求を `harness-policy scope` に割り当てているが、その scope は `apps/**`、`libs/**`、`scripts/**` を対象にしない。新規 Python ロジックや fail-open な Rust 実装だけの変更ではこの review が起動しない。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/security.md",
+              "line": 183,
+              "message": "「ハードコードされた secret なし」と `unsafe` の確認を `harness-policy scope` に割り当てているが、その scope は Rust production source を対象にしない。コードだけの security violation をこの mechanism は検査できない。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/shell-parsing.md",
+              "line": 5,
+              "message": "規則は workspace の全 guard/hook/policy code に適用され、本文自身も `usecase::hook.rs` を例示しているのに、強制先は domain/infrastructure scope だけで usecase を除外している。usecase 内の独自 tokenization や fail-open caller は指定 scope のどちらも起動せず通過できる。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 27,
+              "message": "既存抽象ペアを遡及解体しないという source-level 制約を `harness-policy scope` のみに割り当てている。その scope は `apps/**`・`libs/**` を対象にしないため、既存 trait/implementation を削除するコード変更を検査できない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 376,
+              "message": "新しい D2/R2 は Interactor + ApplicationService を複数実装または必要な test seam がある場合だけ許すが、Bad example の「正しい修正」はその根拠を確認せず常に同ペアを作るよう要求している。この例に従うと必要駆動規則を直接破る。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7dc5bfc9b9e6c9ba47834404f9b950dd5ca3dab1062109e78f1c9b5d581217a8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:20:18Z",
+          "findings": [
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/README.md",
+              "line": 11,
+              "message": "D1 の対象には義務・確認項目も含まれるが、`Read Order` の読み順と「必要なものだけ追加すること」という追加条件には強制先注記がない。現在の touched file 内で注記完全性が残っていない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "knowledge/conventions/source-attribution.md",
+              "line": 14,
+              "message": "有効な source tag の種類と Blue/Yellow の分類は signal semantics を決める規範的な許容条件だが、`Source Tag Types` 表と直後の分類規則に強制先注記がない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 42,
+              "message": "D1 の記法規則は強制先を既存の `cargo make` task、`bin/sotp verify ...`、または review scope に限定しているが、現在の注記は `bin/sotp dry ...`、`bin/sotp catalogue-lint ...`、`sotp pr wait-and-merge`、`full-cycle workflow` も使用している。メタ規則と実際の注記集合が内部矛盾しているため、許容する既存 mechanism の定義を一致させる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 49,
+              "message": "規則1は `dry check-approved` が exit 0 になるまで RFP に入れないとしているが、canonical dry-check workflow は config が missing/disabled の場合に同コマンドを実行せず `skipped` として Review へ進む。正規の opt-out 経路がこの convention を必ず破り、コマンド自体も Review 起動を機械的に阻止しない。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 51,
+              "message": "規則2は rfl が RFP 中に DRY 違反を検出して直ちに DFP へ戻す責務を持つとしているが、`full-cycle` SSoT では Review が `zero_findings` に達した後に orchestrator が DFP を再実行する。rfl は DRY 判定・back-edge を所有しておらず、責任境界が canonical workflow と食い違う。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/no-backward-compat.md",
+              "line": 72,
+              "message": "Rules では非遡及適用・grace period・compatibility layer をコード層および SoT scopes に割り当てた一方、同じ確認を行う checklist は `harness-policy scope` のみに戻っている。`apps/**`、`libs/**`、spec/types/impl-plan だけの変更では checklist の指定 mechanism が起動せず、security bypass の実装確認も同様に漏れる。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 152,
+              "message": "R3 は port を呼ぶ依存があるだけで usecase 型を `Interactor` に振り分けるが、R1 は `Interactor` を `ApplicationService` trait の実装と定義している。複数実装または service 自体を差し替える test seam の証拠がなくても trait+implementation ペアを要求するため、新しい D2 の必要駆動規則と矛盾する。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1951ada21cb321758b820009d31e7c086f495ee57de02abec4038aa63d1a2d56",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:30:10Z",
+          "findings": [
+            {
+              "category": "enforcement-mismatch",
+              "file": "knowledge/conventions/README.md",
+              "line": 89,
+              "message": "生成済み index の完全性に対する注記が `bin/sotp conventions update-index` を「機械 lint」としているが、この subcommand は一覧を書き換える generator であり、stale/missing entry を判定して失敗しない。同じ CLI に判定専用の `bin/sotp conventions verify-index` が存在するため、現在の注記は実際の enforcement mechanism を指していない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 164,
+              "message": "規則1では DRY disabled/missing 時の `skipped` を正規の Review 進行経路として認めた一方、この節は RFP 前に `dry check-approved` の exit 0 を「必ず」確認すると無条件に要求している。canonical dry-check workflow は skipped 経路で同コマンドを実行しないため、文書内で完了条件が矛盾している。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 22,
+              "message": "`rustdoc-types` の互換性確認を infrastructure/cli/cli_driver/cli_composition scopes に割り当てているが、依存 version は `libs/domain/Cargo.toml` と `libs/usecase/Cargo.toml` にも宣言されている。これらだけを変更した場合は domain/usecase scope しか起動せず、注記された review mechanism が version drift を検査できない。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/shell-parsing.md",
+              "line": 5,
+              "message": "規則は明示的に workspace の全 shell parsing と「any crate」の custom parser を禁止しているが、強制先は domain/usecase/infrastructure scopes のみで、cli・cli_driver・cli_composition を含まない。`apps/**` だけに custom tokenization または fail-open caller を追加する変更は指定された review scopesを通らない。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 192,
+              "message": "R3 本文は必要駆動条件を反映したが、R5 の補足は依存があるだけで `Interactor` を候補とし、R6 の `RegisterUserInteractor` 例も「依存あり」を唯一の根拠に `Interactor` を選んでいる。R1 では Interactor は ApplicationService trait の実装なので、複数実装または service 自体の test seam を確認せず抽象ペアを導入でき、D2 とまだ矛盾する。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:168dce563c36cc9412d72e8f98d05b78793e798371b1fc595eb90cff7116ce86",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:34:38Z",
+          "findings": [
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 216,
+              "message": "D2 の具体型既定を適用する対象を取り違えている。`RegisterUserUseCase { repo: Arc<UserRepositoryImpl> }` は usecase から infrastructure の具体 adapter へ直接依存し、`coding-principles.md` の「外部機能は domain/usecase port 経由」に反する。一方、次の Interactor 例は `UserRepository` の複数実装/test seam を ApplicationService+Interactor 導入の根拠にしているが、それは repository port の抽象化を正当化するだけで service 自体の trait seam を正当化しない。具体 service は `Arc<RegisterUserUseCase>` としつつ repository 依存は port のまま保ち、ApplicationService の複数実装または service test substitution が必要な場合だけ Interactor ペアを導入する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca7de7816bfc5d1cc7f4cd567ad5f51871cf99680b4c67dc6338a0c58f86aabd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T08:38:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e8e3a0e150c94360390aeb3d6061b93d49c1af9e836bde6af901f48bb968480",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:58:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4eb85302c7f8ff0df11d2b98a7c36e2cf0628fd084239699272eef5f0242e296",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:10:26Z",
+          "findings": [
+            {
+              "category": "enforcement annotation",
+              "file": "knowledge/conventions/testing.md",
+              "line": 10,
+              "message": "Scope の適用・除外条件は D1 が注記対象とする規範的な許容条件だが、強制先注記がない。区切り線の前に実在する review scope または強制なしを明記する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "mechanism mismatch",
+              "file": "knowledge/conventions/testing.md",
+              "line": 26,
+              "message": "`test-obligation check/evaluate` は binding と verdict を検証するだけで、数値 coverage 目標の追加や coverage 値だけによる判定を検出しない。この禁止規則を completion-gate 規則から分離し、review 観点または強制なしへ割り当てる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "review wiring inconsistency",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 59,
+              "message": "公開 API documentation を domain review に割り当てているが、domain review policy は doc string presence を機械検査として reviewer 対象外にしている。しかも現在の clippy 設定には missing-docs / missing-errors-doc lint がなく、検出責任が空白になる。機械 gate を実装するか review policy と割り当てを一致させる必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 30,
+              "message": "すべてのエラー伝搬に `?` を要求する規則は、cli policy が context 付与のための明示的 `match` を報告対象外としていることと矛盾する。`?` を原則としつつ、型付き変換や context 付与を行う明示的処理を許容する形に揃える必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "incorrect convention example",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 162,
+              "message": "panic-free の Good 例は `b == 0` しか検査せず、`i32::MIN / -1` で除算オーバーフローにより panic する。`checked_div` と overflow 用の型付きエラーを使う例にする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 22,
+              "message": "複数 usecase の orchestration を composition の責務にも分類しているが、cli_composition policy は composition root による usecase invocation を明示的に禁止しており、同じファイルの後続規則も usecase application service を所有者としている。`composition/` を削除して責任境界を一意にする必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb85302c7f8ff0df11d2b98a7c36e2cf0628fd084239699272eef5f0242e296",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:17:42Z",
+          "findings": [
+            {
+              "category": "review wiring inconsistency",
+              "file": ".harness/custom/review-prompts/domain.md",
+              "line": 7,
+              "message": "同じ段落で doc string presence を機械検査の責務とした直後に reviewer の責務としており、所有者が二重化している。実際の workspace lint に missing-docs 系設定もないため、`doc string presence` を機械検査一覧から外し、新設した review category を唯一の強制先にする必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement annotation mismatch",
+              "file": "knowledge/conventions/testing.md",
+              "line": 13,
+              "message": "Scope の `Applies to` と `Does not apply` をまとめて「強制なし」としているが、理由は非 Rust 文書の除外しか説明せず、`libs/`・`apps/` に規約を適用する条件を誤って未強制扱いにしている。coding-principles の Scope と同様に code review scopes を割り当てるか、適用条件と除外条件を分けて注記する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a792e1b2246df32b87a974b5062d05483fcb77b347e06dc1a962164e574f151d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:22:18Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 5,
+              "message": "TDD 規則を削除したため、`knowledge/conventions/source-attribution.md` の出荷例が引き続き「TDD workflow is mandatory」を本ファイル由来としているのは虚偽の source attribution になっている。例を現存する testing 規則へ更新するか、TDD の根拠を別の有効な SSoT に向ける必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "review-policy contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 84,
+              "message": "fake-first・interaction-only mock という厳密な区別は、現在の `AGENTS.md` review contract にある「External dependencies (DB, API) must be mocked」と矛盾する。このままでは同じテストを convention reviewer は fake 必須、PR reviewer は mock 必須と判定できるため、AGENTS.md 側も同じ test-double policy に同期する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a93aba76ab616532699f916c6fa7200a9ae80ceca3262a99806173a9e7fe6ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:25:53Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 7,
+              "message": "The D3 update allows a driver to receive multiple single-purpose ports and explicitly removes the one-interactor injection constraint, but this prompt still states “one interactor per request” and requires multi-interactor calls to be extracted. That makes compliant multi-port drivers reportable as violations; update the role statement and the affected categories together.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c270558bfe39092cede69857698bfda29b00d82d4f15f8083904e8e3a6184da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:29:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc432d31d791bcf9f434ba9691b1f6d3450c1a85c0ee792153e1591ae002088a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:35:19Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary contradiction",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 23,
+              "message": "D3 removes the single-interactor injection constraint, but it does not remove the one-subcommand/one-use-case execution boundary. Allowing one request to invoke multiple use-case ports moves multi-use-case orchestration back into the primary adapter. A Driver may hold several single-purpose ports for different requests, but each request should invoke one use-case port; multi-step behavior must be represented behind one application-service port.",
+              "severity": "P1"
+            },
+            {
+              "category": "review-policy contradiction",
+              "file": "AGENTS.md",
+              "line": 23,
+              "message": "This absolute `?` requirement still contradicts `coding-principles.md`, which now permits an explicit exhaustive `match` for typed conversion or context attachment, and `cli.md`, which explicitly excludes such matches from findings. Align the PR-review rule with those permitted error-propagation forms so reviewers do not reject valid boundary handling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc432d31d791bcf9f434ba9691b1f6d3450c1a85c0ee792153e1591ae002088a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T09:40:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:36d54cb135dcdc6498585d686c2df26bd97217306eb796a1c4a0ddfbe27c4bdd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:54:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:931a7301281fa7cb893bfe21d2d2140846d407f5f7b0d118d5937f151c10ac11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:02:38Z",
+          "findings": [
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "The new “Command only” rule contradicts this file’s R1 `Query` role and CQRS guidance: a validated `Query` would now be forbidden at a read-usecase input port. Scope this rule to command use cases or explicitly permit the corresponding validated `Query` type.",
+              "severity": "P1"
+            },
+            {
+              "category": "responsibility-boundary",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 124,
+              "message": "`cli` is the thin-bin crate and may not depend on `usecase`; it therefore cannot call a usecase-owned parser or pass `Command` directly. The one-time Input/String→Command conversion and port invocation belong to the primary adapter (`cli_driver`). The current wording conflicts with `architecture-rules.json` and the CLI responsibility boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "requirement-coverage",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 5,
+              "message": "T007 assigns `typed-deserialization.md` a Command-boundary revision, but this file received only enforcement annotations and still contains no CLI/usecase/Command conversion rule. Consequently the related convention does not require the one-time conversion into a validated usecase-owned Command. Add the D4 boundary rule and its actual review scopes.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-correctness",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 5,
+              "message": "The rule covers JSON, YAML, and TOML but mandates `serde_json::from_str::<T>()` for all three. That decoder rejects valid YAML/TOML. Require the format-appropriate typed decoder (`serde_json`, `serde_yaml`, or `toml`) instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 46,
+              "message": "Assigning production `libs/domain/src/guard/` to this rule requires `#[derive(Deserialize)]` in the domain layer, contradicting the repository’s serde-free domain boundary and the DTO placement rules in `type-designer-kind-selection.md`. The domain crate has no production serde dependency. External config parsing/DTO ownership must remain in infrastructure, with validated types passed inward.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:931a7301281fa7cb893bfe21d2d2140846d407f5f7b0d118d5937f151c10ac11",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:11:16Z",
+          "findings": [
+            {
+              "category": "adr-conformance",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Both touched conventions broaden D4 from validated `Command` to `Command` / `Query` (also `typed-deserialization.md` lines 11–13), but the frozen ADR and spec IN-07/AC-07 explicitly require `Command` only. This is a semantic expansion, not a convention clarification; remove the Query extension or route the decision back through ADR adjudication.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 7,
+              "message": "The typed-decoder rule is still assigned to `domain scope`, and the `Value` exception likewise names domain, while line 54 declares the domain serde-free. Applying the rule in domain would require `Deserialize`/serde or `serde_json::Value`, directly contradicting that boundary. Restrict external-format decoding and its exceptions to infrastructure; keep only the serde-free prohibition under domain review.",
+              "severity": "P1"
+            },
+            {
+              "category": "review-scope-mismatch",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 50,
+              "message": "After adding `Usecase Boundary Handoff`, the document-level Scope, “new code only” condition, and test exception remain wired only to domain/infrastructure. They neither list nor assign the types/usecase/cli/cli_driver surfaces governed by the new section, so the scope and enforcement annotations disagree. Split these into section-specific scopes/exceptions or include the actual D4 review scopes.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-correctness",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 23,
+              "message": "Serde does not detect misspelled incoming field names or input type mismatches at compile time; those failures occur while decoding at runtime. This false guarantee can cause callers to omit required parse-error handling and tests. State the runtime failure boundary accurately.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:64273866ec7f4c46f0edcd728b7b540b8f6674e522609c6b9c2bc6866f054a0a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:17:15Z",
+          "findings": [
+            {
+              "category": "adr-conformance",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Both touched conventions now narrow D4 to “command usecases” and explicitly exempt query usecases (mirrored in `typed-deserialization.md` line 11). The frozen D4 and spec IN-07/AC-07 apply the validated-`Command` boundary to the cli→usecase input boundary, and the promoted predecessor rule includes read-only usecases. This carve-out is therefore an unadjudicated semantic narrowing introduced to reconcile R1’s `Query` role. Route that conflict through ADR adjudication rather than resolving it inside the convention text.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c9a44e710a2325fab1fe63d748a549ca70028a437a763dc10ee78b4059727e44",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T10:20:25Z",
+          "findings": [
+            {
+              "category": "convention-contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "The exact D4 transcription now makes every new usecase input boundary `Command`-only, while R1 line 66 defines `Query` as a usecase input and the CQRS section supports query usecases; `typed-deserialization.md` line 11 duplicates the same conflict. A new query usecase therefore must both accept `Query` and accept only `Command`. Because this contradiction originates in the frozen ADR/predecessor decision, route it through ADR adjudication rather than adding another convention-level exception.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf54a36aad04fc11f34fe9eef0cf3d35945c6dbb2d9bfbe823543e186b9c216",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:02:46Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 121,
+              "message": "Phase 1+ delta の admitted D1 は command usecase には Command、query usecase には Query を要求していますが、この規約は全 usecase input boundary を Command のみに限定しており、Query usecase を誤って拒否します。Command / Query を usecase role に応じて明記してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/typed-deserialization.md",
+              "line": 11,
+              "message": "Usecase Boundary Handoff も外部入力を全て検証済み Command に限定しており、admitted D1 の query usecase → validated Query という契約と不整合です。handoff、parse、domain-agnostic CLI の規則を Command / Query 両対応に修正してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf54a36aad04fc11f34fe9eef0cf3d35945c6dbb2d9bfbe823543e186b9c216",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:05:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23995af979717d83d6de4114c687c8ecc72f902a87b2f416343f8f99fbc92574",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23995af979717d83d6de4114c687c8ecc72f902a87b2f416343f8f99fbc92574",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:46:55Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 99,
+              "message": "R1 now claims that `KindLayerConstraint.permitted_layers` is resolved from each adopter's `architecture-rules.json` and therefore preserves the role × layer rules after layers are renamed or split, but the shipped lint configuration still hard-codes `domain`, `usecase`, `infrastructure`, `cli_driver`, and `cli_composition` (for example `.harness/catalogue-lint/config.json`). `architecture-rules.json` also has no layer-nature field or resolver mapping—only crate/path/dependency metadata—so the convention's advertised adopter-independent enforcement is not implemented and can silently enforce the wrong mapping in consumers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:98c7c0c195576a3f4423c247fb9eeb9b4f163fd4e3715658b2f52515aa57b933",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T11:50:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7fdf858641e5f9f7d0e201effd135e9c893be0f781b796ac13acbe876886be0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:59:59Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 95,
+              "message": "薄い process entrypoint を driving adapter または composition root のどちらか一つに分類する規則では、出荷済み `cli` layer を表現できません。現行 `KindLayerConstraint` は `cli` で `Dto`・`FreeFunction`・`ErrorType` を許可しますが、R1 の driving 列は `ErrorType` を禁止し、composition-root 列は `Dto` と `FreeFunction` を禁止します。さらに `architecture-rules.json` の `cli` には責務宣言がありません。このため line 99 が要求する表と literal lint config の突合が現行テンプレートですでに成立せず、adopter-independent な配置規則になっていません。entrypoint の性質を明示的に表現するか、表・architecture declaration・lint config を整合させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d7fdf858641e5f9f7d0e201effd135e9c893be0f781b796ac13acbe876886be0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0debfd2992dea031df41a9601e25ea523d1e425e7cc684f0f12e8bbcf2f8cfc6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:53:23Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 91,
+              "message": "The new normative “Security Boundary Failure Handling” requirements are unannotated; add a taxonomy annotation naming the responsible mechanism/review scope (or explicit 強制なし) so this convention is routed and enforced consistently.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 202,
+              "message": "The new security-boundary checklist requirement lacks the required taxonomy annotation, unlike the surrounding checklist items. Add the appropriate mechanism/review-scope annotation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39358b0b6e4a059b8118c1d2c690620a3e1af89ee95439ad1ed77eada36e7356",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T12:57:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:01:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 93,
+              "message": "`fail-stop` を入力検証・権限判定を含む全レイヤーで一般に許容しており、`coding-principles.md` の「本番ライブラリコードは panic/expect 禁止、失敗は Result で返す」という規約と矛盾します。静的な秘匿パターンに例外が必要ならそのケースへ明確に限定し、それ以外のライブラリ層では Result 伝播を要求するよう規約間を整合させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:05:00Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 98,
+              "message": "静的な秘匿パターンにもライブラリ層で `Result` 伝播を必須化していますが、同時に取り込まれている sensitive-redaction ADR の D1 と実装は、静的リテラルを `LazyLock<Regex>` と限定的な `expect` で fail-stop させることを明示的に要求しています。この文面では規約が正規実装を禁止するため、ADR の限定例外を反映して no-panic 規約側にも整合的に伝播するか、ADR 変更を orchestrator にルーティングしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d5d3d0de22395ae2fd4e2e0d2e9a6b2c2f31d062502d1d643d7e56d75f5ddce0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:09:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:12:40Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 93,
+              "message": "復元された規約は静的秘匿パターンの限定的な library-level fail-stop を許容しますが、`coding-principles.md` と `AGENTS.md` は本番ライブラリの `expect` を例外なく禁止したままです。この文面は develop 側の確定内容なので変更せず、ADR が認めた「静的リテラル・行単位 allow・事前構築テスト」という限定例外を no-panic 規約と reviewer policy に伝播させてください。現状では同じ実装が security 規約では必須、review policy では P0 になります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b60ac953c13a1f600d3c837d58af26eaf28e47674f31327ad8302a3551638328",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:16:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c519e1fe66969b168b8b322ed0300db9d0b9ae86d39272524471c024149719",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:19:11Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 203,
+              "message": "Review Checklist は依然として本番コードの `expect` を無条件に禁止しており、直前に追加された静的秘匿 regex の限定例外および更新済み `AGENTS.md` と矛盾します。許可された実装もこのチェックでは違反になるため、限定例外を明記し、その例外条件の確認を review 観点へ対応付けてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a2c519e1fe66969b168b8b322ed0300db9d0b9ae86d39272524471c024149719",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T13:21:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34f69e8f950fe873c52cd0dc533cacf3909a447a8e68b20322c7086de723d7e4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:20:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:22:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:31:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 175,
+              "message": "この段落はユースケース自身の `ApplicationService` inbound port を必要性テストの対象外とする一方、同じ文書の R2/R3/R5/R6（163、199、239、245、253、264 行目）は `Interactor` + `ApplicationService` を複数実装または service 自体の test seam がある場合だけ許可している。R1 では `Interactor` を `ApplicationService` の実装と定義しているため、必須 inbound port が同時に「無条件で対象外」と「D2 条件付き」になり、type-designer が構造必須 port を省略し得る。structure-required な組と任意に重ねる第二の抽象を、判断木と例を含め一貫して区別する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:45316094ad9b725a711f157e3b9f273259540d3e5f3af800ccab30f0bc9bc58f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:40:43Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 175,
+              "message": "structure-required exemption is limited to the literal `SecondaryPort` role here and in `prefer-type-safe-abstractions.md:19`, but R1 models aggregate persistence ports separately as `Repository`. The governing required-port decision exempts all output-side/layer-crossing ports and explicitly rejects replacing them with concrete infrastructure adapters. As written, a single-implementation `Repository` can still be subjected to D2 and omitted. Explicitly include `Repository` in both exemption rules.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 268,
+              "message": "This example injects `Arc<具象Repository>` into an application `UseCase`, contradicting the same file’s R1 port placement, `coding-principles.md` usecase-purity rule, and `architecture-rules.json` (infrastructure implements domain/usecase ports; usecase cannot depend on infrastructure). Keep the service concrete for shared ownership, but retain the repository dependency behind `UserRepository`—for example `RegisterUserUseCase { repo: Arc<dyn UserRepository> }` shared as `Arc<RegisterUserUseCase>`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f8d41000c1300ee7d0c13628d721b5bb9d34c4aea2ad3edc4368931edfc17e5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T14:45:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccaa452356a8c6e53ee62bd8a258fbde86bdfd376fcb73820503cdfbd86c2b51",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:09:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f00060964b6c46e16c69bfb09baada6f88c1ac2fdc04fad81ca0da759df90c9d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:15:35Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/testing.md",
+              "line": 111,
+              "message": "`parser` の property-based test の強制先が `infrastructure / cli / cli_driver` に限定されていますが、`type-designer-kind-selection.md` §Validated Command / Query boundary は String→Command/Query のパースと検証を usecase 所有型の責務としています。さらに本ファイルの Review Checklist は同じ検査に `usecase` scope を含めており、規約内でも不一致です。このままでは usecase 内の新規 boundary parser がレビュー対象から漏れるため、強制先に `usecase` を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f00060964b6c46e16c69bfb09baada6f88c1ac2fdc04fad81ca0da759df90c9d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:19:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b195b4d61a0417b0a411e1bd1f2b9b0a7b5d7da2f1c7131c23c78f178ad64fed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:27:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f73bb60db1198350f467caba74e7b367e7380e6e0bda490bfffeba218b28bf5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:32:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f73bb60db1198350f467caba74e7b367e7380e6e0bda490bfffeba218b28bf5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:07:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:697c7986e623f6ca475bfa9361dc0de3f4b2e3d10f6f56059ecd394e5b6c5c2b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:11:36Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 10,
+              "message": "この規約と `.harness/custom/review-prompts/*.md` はどちらも consumer 所有であり、既存 ADR D9 は review prompt から consumer 所有規約への固定 path 参照を残すことを明示的に禁じています。この一文は prompt を harness 所有と再分類し、固定参照による結合を「唯一の改名不可例外」として規約側だけで正当化しているため、所有境界と ADR に矛盾します。固定参照を解消するか、この例外を ADR レベルで裁定する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:697c7986e623f6ca475bfa9361dc0de3f4b2e3d10f6f56059ecd394e5b6c5c2b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:15:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f96bb809aae17cd06cb7ac0e3e9a7512a1fc632b2c5ad535d1b710f4194760",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:21:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f96bb809aae17cd06cb7ac0e3e9a7512a1fc632b2c5ad535d1b710f4194760",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:17:18Z",
+          "findings": [
+            {
+              "category": "harness-policy",
+              "file": "AGENTS.md",
+              "line": 1,
+              "message": "AGENTS.md is still marked unmerged (`UU`) in the index, so this scope cannot be committed cleanly even though the worktree text appears resolved. Resolve and stage the file before delivery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:20:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:31:35Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 21,
+              "message": "PR reviewer 用に移した規則が、秘匿境界の静的リテラル正規表現に認められた限定的な `expect` 例外を落としています。これでは正しい fail-stop 実装を automated PR reviewer が違反として扱います。`coding-principles.md` と移動前の `AGENTS.md` にある限定例外を同期してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 23,
+              "message": "エラー伝搬を `?` に限定していますが、`coding-principles.md` は、全分岐が `Result` を返してエラーを捨てない型付き変換・コンテキスト付与の exhaustive `match` を許可しています。このままでは正当な実装に誤った PR finding が出ます。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 32,
+              "message": "「外部依存は mock 必須」は `testing.md` の fake-first 規則と逆です。同規則は deterministic fake を既定とし、mock は呼出回数・順序・retry 等の interaction 自体が仕様の場合だけ許可しています。PR reviewer の規則もその境界に合わせてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/review.md",
+              "line": 47,
+              "message": "ローカル review から project convention の入力経路が消えています。ここでは `Related Conventions` を読まない一方、dispatcher が resolved paths を briefing に入れる前提ですが、`reviewer` / `review-fix-lead` は `review local` / `fix-local` の typed-pipeline であり、convention resolver を持つ generic `capability exec` を通りません。そのため briefing に規約 path を入れる主体がなく、fake-first や限定 `expect` などの規約を reviewer/fixer が読まないまま `zero_findings` にできます。review wrapper に resolver を配線するか、workflow 側で規約 path を解決して briefing に記載してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f26dc871472c4cf4832d87a1ab8107acc7bcd746afbbe9def5697d8e2992adc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:45:52Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".claude/rules/orchestration.md",
+              "line": 54,
+              "message": "typed-pipeline の local review では workflow 自身が convention path を解決するよう修正されましたが、この詳細 orchestration rule は依然として「dispatcher が全 capability briefing に供給し、orchestrator は列挙しない」と指示しています。`/track:review` 実行時にも読み込まれる規則なので、Claude root が workflow-owned resolution を省略し得ます。local reviewer / review-fix-lead の例外をここにも同期してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".codex/instructions.md",
+              "line": 24,
+              "message": "review SSoT は local typed-pipeline briefing の作成時に track の convention refs と `knowledge/conventions/README.md` の index を読むよう要求しますが、この Codex root rule は convention list を diff/blocker 調査時以外は開かないよう制限しています。Codex 側には Claude adapter に追加された typed-review 例外がないため、規約 path が briefing から再び欠落し得ます。該当する限定例外を Command/Context rule に追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring breakage",
+              "file": ".codex/agents/orchestrator.toml",
+              "line": 13,
+              "message": "Codex orchestrator agent の責務も artifact body を diff/blocker 時だけ開くと限定したままで、review SSoT が新たに所有する convention-index/path resolution を許可していません。`.codex/instructions.md` だけを直してもこの agent 定義が同じ処理を抑止するため、typed-pipeline local review の限定例外をこちらにも同期してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f2a317bf0ea4269228b0228de332f043602d8ac8f0915322e74e6706a13b558d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T03:52:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342c3c43ffe85cb1faa089bada1fed025a93375265d63d9bd8747f001e3b0c3e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T03:55:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342c3c43ffe85cb1faa089bada1fed025a93375265d63d9bd8747f001e3b0c3e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:18:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3764167644ce7a8d60fc5ffd2f1e0e17ad87e1c54b5724ea75360f6821ad976",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:23:49Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/security.md",
+              "line": 89,
+              "message": "強化された trusted-root containment ルールの適用例が実装と一致していません。`reject_symlinks_below()` は対象が `trusted_root` 配下か、または `..` を含むかを検証せず、`WriteGuard::acquire()` にも containment 検査がありません。そのため `FsReviewStore::new(root.join(\"../outside/review.json\"), root)` の書き込みは外部パスを拒絶できず、「symlink / 外部書き込みを拒絶」という記述は誤りです。実際に containment を行う処理を例に含めるか、この例を symlink 拒絶だけに限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3764167644ce7a8d60fc5ffd2f1e0e17ad87e1c54b5724ea75360f6821ad976",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T04:27:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a20506a4c6e392fb19d7a1fb384b544691887c03c8e7f5cd2eb408dac33af006",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:45:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b1b219c85b3051f5893884ae66da3a346f3d64a5821d608f8bd936bd136f138",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:48:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b1b219c85b3051f5893884ae66da3a346f3d64a5821d608f8bd936bd136f138",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:15:38Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 164,
+              "message": "追加された UseCaseFunction 例外が、このファイルの R2 と矛盾しています。R2 は「top-level の pub fn」を stateless 条件に該当する場合は常に role: FreeFunction と規定しているため、同じ条件の user-facing top-level pub fn を role: UseCaseFunction とする規則は同時に成立しません。R2 に明示的な例外または分類条件を追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/coding-principles.md",
+              "line": 120,
+              "message": "coding-principles.md の UseCaseFunction 例外は、対応する type-designer-kind-selection.md の R2 が top-level pub fn を FreeFunction と一律指定しているため、同ファイル内の規約体系と整合しません。UseCaseFunction の条件を R2 の FreeFunction 判定から除外する旨を明記する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:96d2dd40e243f3f2dd8f0ea82bf23619d73db532cdc232e1cd60d89d65f371cf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:19:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5603c1c8ce74112c8d1edc596315fa0a26774293175c174029d801e3e53d3cda",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:25:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5603c1c8ce74112c8d1edc596315fa0a26774293175c174029d801e3e53d3cda",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:39:13Z",
+          "findings": [
+            {
+              "category": "review-policy correctness",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 38,
+              "message": "The added UseCaseFunction exception was inserted before the existing sentence was completed, leaving `decisions that belong in the usecase A direct call...` and moving `layer.` to the next line. This breaks the bypassing-use-case-ports review instruction; restore `usecase layer.` before starting the exception sentence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08c126ec4717f25d676f818aafbae5a6c632ad8897bbb3325db255a2179e6b1f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:41:55Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": ".harness/custom/review-prompts/cli_driver.md",
+              "line": 6,
+              "message": "The new role preamble introduces a fixed reference to `knowledge/conventions/type-designer-kind-selection.md`. The briefing states prompts must resolve consumer-owned conventions through the `knowledge/conventions/README.md` index, because consumers may rename or remove convention files. Resolve this convention through the index instead of hard-coding its path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bd498de8571ba13359d07b1469da6ae4686e95745540b8f089b365c226d39a7c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:44:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f0e980bdaea12344b442e995a76dc34e9cf8e273083b01caddb73c8937c4a763",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:49:24Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": ".harness/custom/review-prompts/pr-review.md",
+              "line": 30,
+              "message": "The new waiver rule reintroduces a fixed reference to the consumer-owned `knowledge/conventions/testing.md`. Consumers may rename or delete overlay conventions, and the consumer-ownership contract explicitly requires live `.harness/custom/review-prompts/` references to avoid fixed convention paths. After such a rename, this PR-review instruction points to a nonexistent SSoT. Make the rule self-contained or resolve the applicable convention through the `Current Files` index, as the other updated prompts do.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e980bdaea12344b442e995a76dc34e9cf8e273083b01caddb73c8937c4a763",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:53:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1340716f85263abcad6253ee13a7c1603ae4160f6e7df61e5f3a63c43eb64d79",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:19:57Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 16,
+              "message": "Section S2 restates upstream behavior contracts (necessity-driven abstractions, single-purpose ports, validated Command boundary, and layer-property rules) instead of limiting the section description to target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 26,
+              "message": "Section S3 restates the testing behavior contract (replacing line coverage with obligation-driven guidance) rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 36,
+              "message": "Section S4 restates the consumer-owned environment-assumption contract and prohibition on project-specific defaults rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 46,
+              "message": "Section S5 restates D8's boundary-question behavior and target semantics rather than using only target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 72,
+              "message": "Task T002 restates the D2–D5 behavior contracts (necessity-driven traits, direct single-purpose ports, one-time Command parsing, and layer-property placement) in prose. Keep only the file targets, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 81,
+              "message": "Task T003 restates the D6 testing contract by enumerating testing-pyramid, fake/mock, property-based testing, substring-assertion, and line-coverage behavior. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 90,
+              "message": "Task T004 restates the D7 environment-assumption contract by specifying declaration slots, authoring guidance, and the default prohibition. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 96,
+              "message": "Task T005 restates D8's required question categories and exclusions in prose. Keep only the target, operation, and anchor cites. Cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 96,
+              "message": "Task T005's target `spec.md` is ambiguous: the repository contains both `.harness/custom/review-prompts/spec.md` and track-rendered `track/items/<track-id>/spec.md`. The executor would have to invent which file to update; use the full `.harness/custom/review-prompts/spec.md` path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce4c8c0cf8b02cf9d311f5effe3d3be2843e39112f398a62d47590eedd85bc2c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:23:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d2eb33219bedc8e05ea7104cce44be63aa7cf67579ae35d35580347615d9378b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:31:46Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/task-coverage.json",
+              "line": 4,
+              "message": "IN-01/AC-01 coverage is incomplete: T001's explicit convention inventory omits `knowledge/conventions/README.md`, while T004's generic README update is anchored only to IN-04/CN-02/OUT-03/AC-04. The README contains existing normative Maintenance Rules covered by IN-01. Add an explicit README annotation operation anchored to IN-01/AC-01.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 63,
+              "message": "T001 restates upstream constraints in “rely on harness-policy review for finite-set completeness and do not add rule-extraction or lint implementation.” Retain only the target, validation operation, and CN-01/OUT-02 anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 72,
+              "message": "T002 is still `todo` but bundles four independently verifiable behavior units. Split it into ordered tasks for necessity-driven abstraction (IN-02/AC-02), port injection/facade policy (IN-06/AC-06), the Command boundary (IN-07/AC-07), and the layer-property matrix (IN-08/AC-08); explicitly allocate its IN-01/AC-01 annotation work among those tasks or a separate annotation pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d2eb33219bedc8e05ea7104cce44be63aa7cf67579ae35d35580347615d9378b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T06:48:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e5a946c6b556ba6209fcb80e4f3ee42acf6563a4e7d6de6f76a573610bb71f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:53:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e5a946c6b556ba6209fcb80e4f3ee42acf6563a4e7d6de6f76a573610bb71f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:35:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a312e4fd9dcb79c0117f7d92c9f2546b6e792e9c6ce7b01fb56787fc7e873982",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:39:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a312e4fd9dcb79c0117f7d92c9f2546b6e792e9c6ce7b01fb56787fc7e873982",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T08:57:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:511e671e6dd91605bc0b91354a55bc9b67ce2b4c80979c22da9dc97a4ee833a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:00:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:511e671e6dd91605bc0b91354a55bc9b67ce2b4c80979c22da9dc97a4ee833a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:54:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a009bbc2a67c8f60887dbbf2b6225aeeca40ae0a6f0ebbd5ae40a328eb0e1bd9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T09:58:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a009bbc2a67c8f60887dbbf2b6225aeeca40ae0a6f0ebbd5ae40a328eb0e1bd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:46:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd4dccfd46f04c01ff010b468d5044bd6493b0c1c32a85d98cf001035fb32e57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T11:49:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd4dccfd46f04c01ff010b468d5044bd6493b0c1c32a85d98cf001035fb32e57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:14:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af60ba45dfc4f563fb81bc5eb1a19bf70d47d9a9b95c3f24544f3a00c3eb24ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T12:18:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af60ba45dfc4f563fb81bc5eb1a19bf70d47d9a9b95c3f24544f3a00c3eb24ae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:48:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b01e041dcb96a9816e0b5796ba1824a86c80ef8df6bf4074ab66f53d3d6c0429",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:55:15Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/task-coverage.json",
+              "line": 42,
+              "message": "AC-09–AC-13 and AC-18–AC-20 require behavior in a fresh template export, but they are mapped only to source-sync tasks T009–T011. T012 is the sole task that creates and validates that export and compares all eight shipped files, yet it is absent from these mappings. Add T012 to those criteria (and cite them in T012), or add equivalent fresh-export validation to the currently mapped tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 149,
+              "message": "T009 is still todo but bundles two independently verifiable units: enforce-by-mechanism shipping (IN-09/AC-09) and README/security synchronization (IN-16/AC-18). Split these units before implementation and assign the holistic AC-17 export comparison to the dependent validation task.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 158,
+              "message": "T010 is still todo but bundles four independently verifiable updates in one file: necessity-driven abstraction (IN-10/AC-10), port/facade policy (IN-11/AC-11), the validated Command/Query boundary (IN-12/AC-12), and the role × layer rule (IN-13/AC-13). Split them into ordered tasks and assign AC-17 comparison ownership explicitly.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 167,
+              "message": "T011 is still todo but combines two independently verifiable document units: coding-principles synchronization (IN-16/IN-17, AC-18/AC-19) and prefer-type-safe-abstractions synchronization (IN-18/AC-20). Split them before implementation; AC-17 can converge in the later export-validation task.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/impl-plan.json",
+              "line": 180,
+              "message": "T012 is still todo but bundles three independently verifiable units: testing.md synchronization (IN-14/AC-14), environment-assumptions.md creation (IN-15/AC-15), and fresh-export plus shipping/content validation (AC-16/AC-17). Split the two source-document units from a dependent export-validation task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b01e041dcb96a9816e0b5796ba1824a86c80ef8df6bf4074ab66f53d3d6c0429",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:07:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b3453bbfa584f4dc8487e2c3194ab112d4c6cb2770b7c352024054c2906940",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:12:59Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 145,
+              "message": "Batch B6 groups T011, T012, T013, and T014 even though all four write `overlay/knowledge/conventions/type-designer-kind-selection.md`. Their dependency chain orders the edits but does not provide isolated write ownership within the implementation batch, so separate task owners cannot work safely without overlapping changes. Have the impl-planner place these same-file tasks in separate ordered batches and repack non-overlapping tasks as ceilings permit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9b3453bbfa584f4dc8487e2c3194ab112d4c6cb2770b7c352024054c2906940",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:19:57Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 146,
+              "message": "B8 unnecessarily serializes T014 and T019 after B7. T014 depends only on T013, and T019 becomes ready after T014 plus the other B7 predecessors; placing T014 and then T019 in B7 is dependency-respecting, has no conflicting write ownership beyond that declared sequence, and totals 210 + 90 + 80 = 380 `other` lines, below the 500-line ceiling. The B8 boundary is therefore removable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53678bb189860dc11187c5050837f94dff9973cc480e51f5637002e805cd13c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:28:27Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/batch-plan.json",
+              "line": 146,
+              "message": "B7 still groups T013 and T014, which both write `overlay/knowledge/conventions/type-designer-kind-selection.md`. Their dependency orders the edits but does not provide isolated write ownership within one implementation batch. Place T014 in a later batch; T019 can follow it there after all source tasks complete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53678bb189860dc11187c5050837f94dff9973cc480e51f5637002e805cd13c6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T18:33:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:36:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b9e3a3fed7fbb1ff23900ea89e19cdb5a2e7bc91e52cc49ffd3d68adb47046b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:56:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d40066ba4e66c9c0f2a0c061cbadb9367e62c27be1f6f2b3d73fa3313e2a732d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:58:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d40066ba4e66c9c0f2a0c061cbadb9367e62c27be1f6f2b3d73fa3313e2a732d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:59:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648261a21b343f87ebfbc766540c3b5279a04375a50529214fda37fddd38993f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:02:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648261a21b343f87ebfbc766540c3b5279a04375a50529214fda37fddd38993f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:28:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:004102523a47ba9354517c2a3da14c19ab64cd14fb5f57cb8c4baff29cf075ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:32:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:004102523a47ba9354517c2a3da14c19ab64cd14fb5f57cb8c4baff29cf075ac",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:27:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a38c87e9faf6a9fd73aceb3677280a504fc2dfdf71f551697ede574fa0f86f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:30:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a38c87e9faf6a9fd73aceb3677280a504fc2dfdf71f551697ede574fa0f86f6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:49:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4bba7b99cbde828df05bd8373340f4b464524e9f50628410b85a6c2e6fec684f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:54:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4bba7b99cbde828df05bd8373340f4b464524e9f50628410b85a6c2e6fec684f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:18:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:298827db5fc1f5dd6b46c312baf4b27dbbbd5a59e04864a03c6dccb2ded38c66",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:21:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:298827db5fc1f5dd6b46c312baf4b27dbbbd5a59e04864a03c6dccb2ded38c66",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T18:56:55Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/enforce-by-mechanism.md",
+              "line": 143,
+              "message": "The exported `enforce-by-mechanism.md` references `no-backward-compat.md` (lines 84 and 145) and `workflow-ceremony-minimization.md` (line 143), but neither file exists under `overlay/knowledge/conventions/`. A fresh template export therefore contains dangling convention references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6551b203bf5ef55d96f4c9b20558737b75850ff80a6e59cb9a6bf51808e0ab9b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:00:28Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/enforce-by-mechanism.md",
+              "line": 143,
+              "message": "The exported `enforce-by-mechanism.md` references `no-backward-compat.md` (lines 84 and 145) and `workflow-ceremony-minimization.md` (line 143), but neither file exists under `overlay/knowledge/conventions/`. A fresh template export therefore contains dangling convention references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:04:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:12:08Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 50,
+              "message": "AC-18 requires the overlay README to differ from its workspace counterpart only in consumer framing, but this Maintenance Rules block adds a new `required_for` obligation and replaces the workspace sensitive-directory procedure with a different `.gitignore`/`security.md` contract. These are normative changes, so fresh exports receive different maintenance requirements. Keep the operational rules aligned and isolate ownership framing separately.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The overlay symlink policy requires checking every existing path component and adds a nested-symlink review requirement, while the workspace counterpart requires only leaf and parent checks. This is a materially different security contract rather than consumer framing, violating AC-18's normative parity requirement.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 187,
+              "message": "The required-port exemption is not faithfully synchronized: this decision guidance drops the workspace qualifier that `UseCase` is for an optional service, and the bad-example correction at line 335 applies the multiple-implementation/test-seam necessity test to a repository adapter. Repository and SecondaryPort boundaries are structure-required regardless of that test, so this wording can cause mandatory inbound or secondary ports to be omitted.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope-leak",
+              "file": "overlay/track/items/2026-08-25-conventions-mechanism-alignment/logs/telemetry.jsonl",
+              "line": 1,
+              "message": "This runtime telemetry record embeds the active maintainer track ID and timestamp under the export overlay. It violates the briefing's no-track-specific-content constraint and, unlike root `track/items/**/logs/`, this nested path is not ignored, so it can be committed as an overlay artifact. Remove it and emit verification telemetry to the workspace's ignored track log location.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dbb6fc8b3ff3ab29e99cc631aac8c34602ca86a2ea2d3826f0c89624287fe6a7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:19:58Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The revised policy checks only the leaf and its immediate parent. An intermediate symlink is followed while resolving both paths, allowing I/O to escape the trusted root even though both checks pass. This also contradicts `reject_symlinks_below`, which checks every ancestor. Require inspection of every component below the trusted root, including nested-symlink tests.",
+              "severity": "P0"
+            },
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 73,
+              "message": "This consumer overlay references maintainer-only `FsReviewStore`, `review_v2`, and `WriteGuard`; none exist in the exported overlay source. Fresh templates therefore receive a dead project-specific example, violating the no-distribution-leak requirement. Replace it with a generic consumer-facing example or remove it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:58e4b36e748ae84c742abe275e6fd2cdf2f94228b7701a2d4b81c74a55aa762e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:27:04Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "overlay/knowledge/conventions/security.md",
+              "line": 53,
+              "message": "The overlay security convention still permits checking only the leaf and immediate parent. It omits the workspace requirement to inspect every directory component below the trusted root, root-to-leaf, including intermediate symlinks and parents when the leaf is absent; this allows path escape through a nested symlink.",
+              "severity": "P0"
+            },
+            {
+              "category": "conformance",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 48,
+              "message": "The overlay README omits the workspace maintenance rule requiring `required_for` frontmatter and capability IDs for conventions intended to be automatically delivered to capabilities. This changes the normative convention behavior rather than merely changing consumer framing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9c6fa77d3c6fc519d266f96808ad35564c9e09fecdb881e6a68ef69c19cd97d5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:31:15Z",
+          "findings": [
+            {
+              "category": "conformance",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 50,
+              "message": "The overlay README adds a normative `required_for` frontmatter maintenance rule at line 50, but the current workspace counterpart does not contain this rule. This is an overlay-only behavioral requirement, not merely consumer ownership framing, so the overlay no longer matches the workspace convention.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:521095490e3bc4f808f1b33339a826f50f183fe52127241c8146e76fec5ffc8a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T19:34:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b6ce3d886dafc911e0fc2df9aab635bf424009243333662a507b99a1212cf90",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T19:37:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b6ce3d886dafc911e0fc2df9aab635bf424009243333662a507b99a1212cf90",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48207a713d4d1f8422ba28fd4d6ca787b0f9c3e46c75f3446cfb0fe7779eef7f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:04:34Z",
+          "findings": [
+            {
+              "category": "spec_conformance",
+              "file": "overlay/knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 200,
+              "message": "The enum/typestate decision table is a normative pattern-selection rule, but its workspace counterpart's `types / domain / infrastructure` review annotation is missing. The annotation at line 215 applies to the separate escape-hatch rule and has a different scope, so restore the table's corresponding enforcement annotation as required by D1/AC-17.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_conformance",
+              "file": "overlay/knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 217,
+              "message": "The persistence-conversion requirement (domain typestate plus infrastructure DTO conversion) lost its `types / domain / infrastructure` review annotation. The annotation at line 224 has only `domain / infrastructure` scope and corresponds to the separate rule against compromising domain type safety, leaving type-catalogue review without this requirement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48207a713d4d1f8422ba28fd4d6ca787b0f9c3e46c75f3446cfb0fe7779eef7f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:08:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42eebbd51bbdd9f0eb29fb640dff2d8f050b89045d9949e27fde31f37d542207",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:28:58Z",
+          "findings": [
+            {
+              "category": "missing enforcement coverage",
+              "file": "overlay/knowledge/conventions/testing.md",
+              "line": 188,
+              "message": "The checklist narrows enforcement for the property-based-testing requirement to `infrastructure / cli / cli_driver`, but the normative parser rule covers `usecase` and the evaluator rule covers `domain / usecase`. Changes in those layers can therefore escape the declared review enforcement scope. Keep this annotation aligned with the workspace counterpart and the preceding requirements.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35733ba263e3daa0cb5c9e3abd36e97705efd1901b96e632597ddb6cf8bcc1b0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:31:29Z",
+          "findings": [
+            {
+              "category": "enforcement annotation mismatch",
+              "file": "overlay/knowledge/conventions/testing.md",
+              "line": 189,
+              "message": "The checklist’s property-based-testing annotation includes `cli_composition`, while the workspace counterpart and the normative codec/parser/evaluator requirements scope this review to `domain / usecase / infrastructure / cli / cli_driver`. This altered enforcement annotation violates the required overlay/workspace alignment and assigns the obligation to an unrelated scope. Match the workspace annotation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9715fb7e9a652d9f840e90e53fb02fd56c5f803da277e995baabd7e48d303c5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T20:33:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c0bfab85626eaf74176230d3c3598801da435e5305e65ac518533272bf6a07a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T20:38:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c0bfab85626eaf74176230d3c3598801da435e5305e65ac518533272bf6a07a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:28:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66d458ddc0ef296d90655daa0670a6ca5ff910771b6854ed96ba19b9fd491c8e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T21:33:39Z",
+          "findings": [
+            {
+              "category": "dead-reference",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 13,
+              "message": "The R1 rewrite removed the `層名を変更する場合` heading, but this ownership guidance still directs consumers to that section. The resulting dead reference obscures the required `permitted_layers` synchronization procedure; point it to the replacement section or restore the heading.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract-conformance",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 218,
+              "message": "R4 is normatively weaker than the workspace counterpart: the workspace requires reconnaissance alongside the named preparation steps, while the overlay makes that sequencing optional and additionally permits reconnaissance to be omitted when no completed track exists. The governing D1/AC-17 contract permits consumer-facing wording differences but not changed requirements, so exported consumers receive a different rule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:66d458ddc0ef296d90655daa0670a6ca5ff910771b6854ed96ba19b9fd491c8e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:37:11Z",
+          "findings": [
+            {
+              "category": "contract-conformance",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 464,
+              "message": "The R4 body now matches the workspace requirement, but this checklist item still adds a consumer-only fallback where confirming that no reference track exists satisfies reconnaissance. The workspace checklist has no such allowance, and R4 requires sampling 1–3 completed tracks, so the document remains internally inconsistent and violates the D1/AC-17 synchronization contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2273d6a92df7c98ecf1255e89e22036343ec86b3b26e68febaa8174d9b360a54",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T21:39:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a0fb161b328e37537bf8ef97a1c5a2e41e8ac17f879710e527a6a8ef3d5a5ce",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:07:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dabec28144f3c0d6903524851aad5dc461f443b0979ecf4ec39e3158898caf38",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:10:44Z",
+          "findings": [
+            {
+              "category": "convention-annotation-completeness",
+              "file": "overlay/knowledge/conventions/README.md",
+              "line": 9,
+              "message": "The new fixed-filename exception is a normative requirement, but it has no immediate `強制先` annotation. Once exported under `knowledge/conventions/`, this violates the D1 annotation-completeness rule; add the corresponding `review 観点 — harness-policy scope` annotation.",
+              "severity": "P1"
+            },
+            {
+              "category": "convention-annotation-completeness",
+              "file": "overlay/knowledge/conventions/environment-assumptions.md",
+              "line": 5,
+              "message": "The fixed-path and deletion conditions mirror a workspace requirement that is followed by `review 観点 — harness-policy scope`, but the overlay omits that enforcement annotation. This breaks the required workspace/overlay annotation parity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dabec28144f3c0d6903524851aad5dc461f443b0979ecf4ec39e3158898caf38",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T22:13:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:456395bd70ea101e9ee622809280807641a0cd672e053b9deb898e5de12ee578",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:16:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:18:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4b22da3c185ffbba8595facd7ddf987b942a2581ce8caeb885082908cd3f367",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:19:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0beff702b2c5f788afb839097893843bcfab91f54b82fbe8169790fdad94aae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:21:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0beff702b2c5f788afb839097893843bcfab91f54b82fbe8169790fdad94aae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:45:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0bccc52c9b8546a61c278f50b9c44da123edb0906f672f429e9346423be2304",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T04:47:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0bccc52c9b8546a61c278f50b9c44da123edb0906f672f429e9346423be2304",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:15:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f87560f557308c2dfa1d91fb66530172c9572b9d27d4984117b5b97d4a3530",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-26T05:20:10Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/coding-principles.md",
+              "line": 128,
+              "message": "The shipped rule weakens the workspace requirement into a conditional: “when modeled as UseCaseFunction.” It omits the mandatory R1 classification and exclusion from FreeFunction selection, so a fresh export can classify an application-only, stateless user-facing entrypoint as FreeFunction. Mirror the workspace wording so the normative requirement is preserved.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "overlay/knowledge/conventions/type-designer-kind-selection.md",
+              "line": 143,
+              "message": "The new exemption conflicts with R2 below, which still requires every stateless, dependency-free top-level pub fn to be a FreeFunction. The workspace counterpart resolves this by explicitly excluding R1-classified application-only user-facing entrypoints from R2; the overlay omits that paragraph. Add the same R2 exception and enforcement annotation so fresh exports receive consistent UseCaseFunction guidance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d6f87560f557308c2dfa1d91fb66530172c9572b9d27d4984117b5b97d4a3530",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-26T05:23:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:863f17e16a26dae191b3c6e66835535bd4a569b0455fe2f1d60932b56986ecef",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-25T05:34:43Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 129,
+              "message": "GO-01 cites only D1 and D8, but its intent also claims alignment with necessity-driven abstraction, typed boundaries, and declared environment assumptions—decisions D2–D7. Those expansions are not anchored by the goal's ADR references, so the goal is not a faithful decision-grounded contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55f2b4f2c598faf2f7d6febb110167af435deb47e42183f8299a3dfebd2a8911",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:37:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f42a8443316cf57b3005721d2b5c9ebb43beacc66bdfc82b01ce98147cf19c4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T05:45:04Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 21,
+              "message": "AC-02 only prohibits introducing a trait solely for shared ownership. GO-01 and IN-02 require the stronger necessity-driven rule that abstractions are introduced only for multiple implementations or a required test seam. Documentation could permit speculative or symmetry-driven traits and still pass AC-02, so completion would not prove the stated goal.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 31,
+              "message": "AC-06 checks only that a facade does not mix commands and queries, while IN-06 requires drivers to receive the consumed single-purpose ports directly. A query-only multi-usecase facade would satisfy AC-06 while recreating the facade aggregation that GO-01 is intended to prevent.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 113,
+              "message": "CN-03 limits review-question injection to code scopes and their briefing files, but IN-05 and AC-05 also require the corresponding question in the spec review prompt. Because `spec` is not a code scope, downstream work cannot satisfy both the constraint and the declared scope/acceptance criterion.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6f42a8443316cf57b3005721d2b5c9ebb43beacc66bdfc82b01ce98147cf19c4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T05:49:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a162b1f50c0f8b105145239d2c39758bfd540ef989a434517c2113bd8bedb1a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:41:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe0aa57de1bc184f81debb0a7d3f1548506677d7ff3b0fd5a4f32227a63b3959",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:45:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe0aa57de1bc184f81debb0a7d3f1548506677d7ff3b0fd5a4f32227a63b3959",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:50:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84444ff7b6679915018598a32e65594cb179c2dc488352c26dc36f5215971276",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T10:53:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84444ff7b6679915018598a32e65594cb179c2dc488352c26dc36f5215971276",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:04:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45fc4c63ffa7258e4118d3d6d694cc49f69324f150fa1c388c1bfe360c5679da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T14:09:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45fc4c63ffa7258e4118d3d6d694cc49f69324f150fa1c388c1bfe360c5679da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:41:04Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 362,
+              "message": "Round 3 requires every Command-boundary element to cite the admitted validated-usecase-input-boundaries ADR (#D1). IN-12 and AC-12 remain anchored only to the primary ADR’s D4, so the overlay contract can be derived from the superseded Command-only wording and omit the required Command/Query distinction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:96a2dfd30281c7b4c1baf28259326c0f317f4c6135b64e514b7977d17e42738f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T15:45:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1dcd12af2c4ba616464c31c429129ba73471c70c1e2160bf3c5086adfa43065a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T15:53:16Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 91,
+              "message": "GO-01 の consumer 出荷側の規約整合を証明する AC が不足しています。AC-09〜AC-15 は `enforce-by-mechanism.md`、`type-designer-kind-selection.md`、`testing.md`、`environment-assumptions.md` に限定されていますが、IN-01/AC-01 は全規範要求を、IN-02/AC-02 と IN-06/AC-06 は関連規約も改訂対象にしています。そのため consumer 所有の `coding-principles.md`、`prefer-type-safe-abstractions.md`、`security.md` が旧内容のままでも全 AC を満たせます。AC-16 の既存コマンドも一方向の文書一覧比較であり内容同期を検証しないため、この欠落を補えません。結果として fresh export が通っても、GO-01 の「consumer 側で同じ逸脱を再生産しない」は証明されません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1dcd12af2c4ba616464c31c429129ba73471c70c1e2160bf3c5086adfa43065a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:05:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7f94fafe6cc23f1357fd5ad84e38f63d019ee08864ed422accfb065fb0d68eaa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:34:13Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 84,
+              "message": "Round 8 requires every overlay element IN-09..IN-18 and AC-09..AC-20 to cite the admitted consumer-shipping ADR D1 alongside its content anchor. The current elements cite only the new ADR, so D2/D3/D5/D6/D7-specific overlay claims are no longer formally grounded in their corresponding workspace decisions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1df41e6ed3714006755de21d2ca1f9162323d8bfa6ea3a3a1e5e7bc757072892",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:42:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f829af243654736ff7cc90672da9a79a60031649f659427c6894ed881869f4a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T16:48:05Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 231,
+              "message": "GO-01 の consumer 出荷側の強制機構整合について、`README.md` の AC coverage が残っています。AC-17 は同期対象を7文書に限定していますが、この track は workspace の `knowledge/conventions/README.md` にある規範的な Maintenance Rules にも強制機構注記を追加しており、consumer 所有の overlay 側にも対応する `README.md` が出荷されます。AC-16 は文書一覧の被覆しか検査せず、AC-18〜20 も別文書だけを対象とするため、overlay の `README.md` が注記のない旧内容でも全 AC を満たせます。これは GO-01 の consumer 側における強制機構整合を決定的に証明できない coverage gap です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f829af243654736ff7cc90672da9a79a60031649f659427c6894ed881869f4a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T16:58:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8b76a85df3a5d8a6ca16e0135b4adb28e93561e2e9ef4d5e6c1c7f15d6c93f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:01:52Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 198,
+              "message": "Round 8 requires every overlay element AC-09..AC-20 to cite the admitted consumer-shipping ADR D1 alongside its content anchors. AC-17 now cites only the shipping ADR, despite asserting synchronization of D1/D2/D3/D5/D6/D7-derived workspace documents and the environment-assumption contract; its corresponding content anchors were removed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:07:07Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 232,
+              "message": "Round 8 requires each overlay acceptance element to cite the admitted consumer-shipping D1 alongside its content anchor. AC-18 cites only the shipping ADR, although it asserts preservation of the D1-derived normative requirements and enforcement annotations in coding-principles.md, security.md, and README.md; the primary ADR D1 anchor is missing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:341f8d92b3a3c60f3f066f902c33cfb4f5545c838aeabb5b112f3b442cbbd484",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:09:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491bbaaf46cfe6de557f7f8ce084eedfe74b54857302f9b9361802a3ee3c40",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:12:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4491bbaaf46cfe6de557f7f8ce084eedfe74b54857302f9b9361802a3ee3c40",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:19:08Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 198,
+              "message": "AC-17 is the composite export-shipping claim. The Round 8 pairing rule explicitly says it must cite only the consumer-shipping ADR D1; its added primary D1, D2-refinement D1, D3, D5, D6, and D7 anchors create failing per-anchor semantic pairs. Per-document traceability belongs in AC-09..15 and AC-18..20.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-conventions-mechanism-alignment/spec.json",
+              "line": 232,
+              "message": "AC-18 is a per-document overlay claim and must cite its content anchor alongside the consumer-shipping ADR D1. It currently cites only the shipping draft, leaving its coding-principles/security/README normative-content claim without the required content anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T17:27:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T17:29:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92619a5cc9a4e2bf4923c305d6ef7637cad1d500d462e2ff667cbd32b7ae4543",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:10:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aecfacef5c3705bc01031f8ab2d885c29457f95672fbe5ead4c68bed01b3c13a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T22:14:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aecfacef5c3705bc01031f8ab2d885c29457f95672fbe5ead4c68bed01b3c13a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-25T06:03:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:05:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T06:08:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55afed1f1698b0bfcf633d83b9044bb9591ba44c735c84c7005d6058623ab724",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-25T12:58:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T13:13:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23ede8db7ddcb5e0b3b4729618b7b26a0176a801d37a70306e24de7202a1f6e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

@@ -2,35 +2,44 @@
 
 The reviewer's role is **primary-adapter correctness review** of `apps/cli-driver/`.
 `cli_driver` is the primary (driving) adapter layer: it holds injected use-case
-interactors, translates typed `Input` enums into use-case commands, invokes exactly
-one interactor per request, and renders the result into a `CommandOutcome`. DI belongs
-in `cli_composition`, not here. Both invoke and render live in the same layer.
+ports, with one trait and one execute method per use case; it translates typed `Input`
+enums into validated use-case `Command` / `Query` values (one parse, usecase-owned boundary types), invokes exactly one single-purpose port per request (or, for a stateless operation modeled as a `UseCaseFunction` entrypoint under the consumer-owned role/layer convention resolved through the `Current Files` index in `knowledge/conventions/README.md`, calls that use-case function directly — such an entrypoint has no port trait or Interactor),
+and renders the result into a `CommandOutcome`. A Driver may hold several
+single-purpose ports for different requests; multi-step behavior belongs behind one
+use-case/application-service port. DI belongs in `cli_composition`, not here. Both
+invoke and render live in the same layer.
 
 ## Priority categories
 
 Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
+- **external-boundary assumptions**: What external boundaries does the diff touch (OS, process, encoding, concurrency, resource limits, time, and other versions of its own artifacts)? Enumerate operations directly reached from the changed behavior. If a depended-on assumption is in neither the spec nor the environment-assumption declaration the project owns (the convention listed under `Current Files` in `knowledge/conventions/README.md` whose purpose is declaring environment assumptions; resolve it through that index, not a fixed filename), report it as `未宣言の前提への依存`; treat unresolvable indirect boundaries the same way rather than searching exhaustively.
 - **adapter performs DI**: a Driver constructor that calls `Arc::new(...)` /
   instantiates adapters / constructs use-case interactors itself, rather than
   receiving them via constructor injection. `cli_driver` is the _injected_ side;
   object-graph construction belongs in `cli_composition`. Name the collaborator the
   constructor builds instead of receiving.
 - **business logic in adapter**: a `handle` method (or helper it calls) that
-  contains validation rules, domain decisions, multi-step orchestration beyond
-  `input → invoke → render`, or any calculation that belongs in `usecase` or
-  `domain`. Orchestrating multiple use cases is a composition/usecase concern;
-  a Driver calls exactly one interactor per request. Name the rule or decision the
-  method carries and the layer that owns it.
+  contains validation rules, domain decisions, multi-step business orchestration
+  beyond `input → invoke one required port → render`, or any calculation that
+  belongs in `usecase` or `domain`. A Driver may hold several injected
+  single-purpose ports for different requests, but each request invokes exactly one
+  port; multi-step behavior belongs behind one use-case/application-service port.
+  Report the business rule or decision that the adapter owns and the layer that
+  should own it.
 - **non-CommandOutcome return**: a public `handle` or equivalent method whose
   return type is anything other than `CommandOutcome`. Errors are part of the
   rendered output — map them to `CommandOutcome.stderr` with an appropriate
   exit-code signal rather than propagating `Result<_, _>` to the caller.
-- **handle not delegating to single use case**: a `handle` method that invokes
-  two or more separate interactor calls in sequence or branches between interactors
-  depending on runtime state. Multi-interactor orchestration must be extracted into
-  a usecase application service, not inlined in the Driver. A Driver may call
-  render-only helpers (formatters, table builders) freely — those are not
-  interactor calls.
+- **handle bypassing use-case ports**: a `handle` method that implements use-case or
+  domain behavior itself, or reaches infrastructure directly, instead of delegating
+  through its injected use-case port(s). A Driver may invoke multiple injected
+  single-purpose ports for different requests, but each request invokes exactly one
+  port; report multi-step orchestration or decisions that belong in the usecase
+  layer. A direct call to a `UseCaseFunction` entrypoint is not a bypass: it is
+  that operation's sanctioned dispatch path until a port trait is introduced
+  for it. A Driver may call render-only helpers (formatters, table builders)
+  freely.
 - **boundary exposure violation**: a Driver may use usecase `Command`, `Query`,
   boundary DTO, and usecase `ValueObject` types in its public signatures for
   transport translation. Report direct domain `ValueObject` / `Entity` /

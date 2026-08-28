@@ -69,6 +69,14 @@ use validate::validate_schema_version;
 /// Schema-version 3 and below are rejected with `UnsupportedSchemaVersion` (no migration path).
 pub const SCHEMA_VERSION: u32 = 5;
 
+/// Wire marker for an explicitly declared crate-root placement.
+///
+/// The DTO keeps `module_path` as a string for schema compatibility, so an
+/// omitted placement and an explicit empty [`ModulePath`] need distinct values
+/// on the wire. The empty string remains the legacy omitted-placement value;
+/// this marker is emitted only for `Some(ModulePath::root())`.
+pub(crate) const EXPLICIT_ROOT_MODULE_PATH: &str = ".";
+
 // ---------------------------------------------------------------------------
 // StrictMap — duplicate-key-rejecting BTreeMap deserializer
 // ---------------------------------------------------------------------------
@@ -328,8 +336,8 @@ mod tests {
     use super::*;
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::ItemAction;
-    use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
-    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
         CrateName, FunctionName, FunctionPath, ModulePath, ParamName,
     };
@@ -619,7 +627,10 @@ mod tests {
 
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
-        assert_eq!(doc.types().get(&key).unwrap().module_path().to_string(), "b");
+        assert_eq!(
+            doc.types().get(&key).unwrap().module_path().map(ToString::to_string),
+            Some("b".to_owned())
+        );
     }
 
     #[test]
@@ -641,7 +652,10 @@ mod tests {
 
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let key = CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap();
-        assert_eq!(doc.traits().get(&key).unwrap().module_path().to_string(), "b");
+        assert_eq!(
+            doc.traits().get(&key).unwrap().module_path().map(ToString::to_string),
+            Some("b".to_owned())
+        );
     }
 
     #[test]
@@ -715,7 +729,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["b".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["b".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],
@@ -725,6 +739,77 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         assert!(encoded.contains("\"domain::a::Thing\""));
         assert!(encoded.contains("\"module_path\": \"b\""));
+    }
+
+    #[test]
+    fn test_encode_decode_preserves_omitted_and_explicit_root_placement() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let unit = || TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        doc.insert_type(
+            CatalogueEntryKey::try_new("RootPlaced".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit(),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_type(
+            CatalogueEntryKey::try_new("Unplaced".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit(),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_trait(
+            CatalogueEntryKey::try_new("RootPort".to_owned()).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["RootPlaced"]["module_path"], ".");
+        assert_eq!(value["types"]["Unplaced"]["module_path"], "");
+        assert_eq!(value["traits"]["RootPort"]["module_path"], ".");
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        let root_key = CatalogueEntryKey::try_new("RootPlaced".to_owned()).unwrap();
+        let unplaced_key = CatalogueEntryKey::try_new("Unplaced".to_owned()).unwrap();
+        let port_key = CatalogueEntryKey::try_new("RootPort".to_owned()).unwrap();
+        assert!(decoded.types()[&root_key].module_path().is_some_and(ModulePath::is_root));
+        assert_eq!(decoded.types()[&unplaced_key].module_path(), None);
+        assert!(decoded.traits()[&port_key].module_path().is_some_and(ModulePath::is_root));
     }
 
     #[test]
@@ -741,7 +826,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["a".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["a".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],
@@ -1433,7 +1518,7 @@ mod tests {
                     rhs: vec![TypeRef::new("/* relaxed */ ?Sized").unwrap()],
                     operator: BoundOp::Bound,
                 }],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1588,7 +1673,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1620,7 +1705,7 @@ mod tests {
                 vec![],
                 vec![duplicate.clone(), duplicate],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1655,7 +1740,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1692,7 +1777,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1857,7 +1942,7 @@ mod tests {
   "layer": "domain",
   "types": {},
   "traits": {
-    "KeywordTrait": {
+    "domain::KeywordTrait": {
       "action": "add",
       "role": { "SecondaryPort": {} },
       "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["Clone"] }],
@@ -1890,14 +1975,6 @@ mod tests {
         // structural encoder processes bounds / returns with the same context.
         use domain::tddd::CatalogueToExtendedCratePort;
         let mut paths = std::collections::HashMap::new();
-        paths.insert(
-            rustdoc_types::Id(1),
-            rustdoc_types::ItemSummary {
-                crate_id: 0,
-                path: vec!["domain".to_owned(), "KeywordTrait".to_owned()],
-                kind: rustdoc_types::ItemKind::Trait,
-            },
-        );
         paths.insert(
             rustdoc_types::Id(2),
             rustdoc_types::ItemSummary {
@@ -2080,6 +2157,75 @@ mod tests {
     }
 
     #[test]
+    fn test_encode_decode_type_delete_tombstone_preserves_explicit_root_marker() {
+        // Turning an explicitly root-placed live entry into a tombstone keeps
+        // `module_path: "."`; the tombstone must retain that placement in its
+        // identity and on a subsequent encode.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Type { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Type deletion");
+        };
+        assert_eq!(name.as_str(), "domain::GoneType");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["domain::GoneType"]["module_path"], ".");
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
+    }
+
+    #[test]
+    fn test_encode_decode_trait_delete_tombstone_preserves_explicit_root_marker() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": { "OldPort": { "action": "delete", "module_path": "." } },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let DeletionRecord::Trait { name, .. } = &doc.deletions()[0] else {
+            panic!("expected Trait deletion");
+        };
+        assert_eq!(name.as_str(), "domain::OldPort");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["traits"]["domain::OldPort"]["module_path"], ".");
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
+    }
+
+    #[test]
+    fn test_decode_type_delete_tombstone_rejects_root_marker_on_qualified_key() {
+        // A qualified key already fixes the module; an explicit root marker
+        // contradicts it and must fail closed like any other mismatch.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "tddd::GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(error.to_string().contains("tombstone key 'tddd::GoneType'"), "{error}");
+    }
+
+    #[test]
     fn test_decode_trait_delete_entry_becomes_deletion_record() {
         let json = r#"{
   "schema_version": 5,
@@ -2100,6 +2246,11 @@ mod tests {
             }
             other => panic!("expected Trait deletion, got {other:?}"),
         }
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert!(value["traits"]["OldPort"]["module_path"].is_null());
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(decoded, doc);
     }
 
     #[test]

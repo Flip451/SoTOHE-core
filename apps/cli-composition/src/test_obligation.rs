@@ -4,7 +4,6 @@ use std::num::NonZeroU8;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 use domain::tddd::test_obligation::ports::{ObligationFulfillmentVerifierPort, WaiverVerifierPort};
@@ -34,6 +33,7 @@ use infrastructure::test_obligation::waiver_verifier::{
     FailingWaiverVerifier, WaiverVerifierAdapter, waiver_verifier_fingerprint,
 };
 use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
+use usecase::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use usecase::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
@@ -265,7 +265,7 @@ impl TestObligationCompositionRoot {
         Arc::new(FsSpecDocumentLoader::new(self.workspace_root.clone(), self.items_dir()))
     }
 
-    fn catalogue_loader(&self) -> Arc<dyn CatalogueDocumentLoaderPort + Send + Sync> {
+    fn catalogue_loader(&self) -> Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync> {
         Arc::new(FsCatalogueDocumentLoader::new())
     }
 

@@ -1,5 +1,7 @@
 //! Serde codec for per-layer TDDD evaluation-result files.
 
+use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
 use domain::tddd::type_signals_doc::{
     BaselineHash, CatalogueDeclarationHash, Sha256Digest, Sha256DigestError, TypeSignalsCacheKey,
     TypeSignalsDocument, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
@@ -11,6 +13,7 @@ use sha2::Digest;
 use crate::tddd::catalogue_spec_signals_codec::{
     confidence_signal_to_str, parse_confidence_signal,
 };
+use crate::tddd::type_signals_evaluator::signal_tags::kind_tag_namespace;
 
 /// Codec error for per-layer evaluation-result files.
 #[derive(Debug, thiserror::Error)]
@@ -29,6 +32,8 @@ pub enum TypeSignalsCodecError {
     InvalidDigest { field: FreeText, source: Sha256DigestError },
     #[error("invalid confidence signal value: {0}")]
     InvalidSignal(FreeText),
+    #[error("invalid namespace for type-signal kind_tag: {0}")]
+    InvalidNamespace(FreeText),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,6 +51,10 @@ struct TypeSignalsDocDto {
 #[serde(deny_unknown_fields)]
 struct TypeSignalDto {
     type_name: String,
+    /// Catalogue rows carry `type`/`trait`; `free_function` and `unknown` rows
+    /// may omit this field or use explicit `null` for a report-only label.
+    #[serde(default)]
+    namespace: TypeSignalNamespaceField,
     kind_tag: String,
     signal: String,
     found_type: bool,
@@ -57,12 +66,84 @@ struct TypeSignalDto {
     extra_items: Vec<String>,
 }
 
+/// Namespace field for one persisted signal.
+///
+/// `Missing` is an explicit default sentinel because omitted namespaces are
+/// valid only for report-label kind tags, while catalogue rows must fail
+/// closed. The wire field therefore distinguishes omission from explicit null
+/// while the kind-tag validation decides whether either form is permitted.
+#[derive(Debug, Clone, Copy, Default)]
+enum TypeSignalNamespaceField {
+    #[default]
+    Missing,
+    Catalogue(TypeSignalNamespaceDto),
+    Label,
+}
+
+impl Serialize for TypeSignalNamespaceField {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::Missing => Err(<S::Error as serde::ser::Error>::custom(
+                "namespace is required on a type-signal row",
+            )),
+            Self::Catalogue(namespace) => namespace.serialize(serializer),
+            Self::Label => serializer.serialize_none(),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for TypeSignalNamespaceField {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let namespace = Option::<TypeSignalNamespaceDto>::deserialize(deserializer)?;
+        Ok(match namespace {
+            Some(namespace) => Self::Catalogue(namespace),
+            None => Self::Label,
+        })
+    }
+}
+
+/// Serde representation of a catalogue item's namespace.
+///
+/// The domain namespace intentionally remains serde-free; this infrastructure
+/// DTO keeps the wire vocabulary explicit and rejects unknown values during
+/// deserialization.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum TypeSignalNamespaceDto {
+    Type,
+    Trait,
+}
+
+impl From<CatalogueItemNamespace> for TypeSignalNamespaceDto {
+    fn from(namespace: CatalogueItemNamespace) -> Self {
+        match namespace {
+            CatalogueItemNamespace::Type => Self::Type,
+            CatalogueItemNamespace::Trait => Self::Trait,
+        }
+    }
+}
+
+impl From<TypeSignalNamespaceDto> for CatalogueItemNamespace {
+    fn from(namespace: TypeSignalNamespaceDto) -> Self {
+        match namespace {
+            TypeSignalNamespaceDto::Type => Self::Type,
+            TypeSignalNamespaceDto::Trait => Self::Trait,
+        }
+    }
+}
+
 /// Decodes a `<layer>-type-signals.json` string.
 ///
 /// # Errors
 ///
 /// Returns an error for malformed JSON, an unsupported schema, invalid hashes,
-/// or a non-UTC timestamp.
+/// a non-UTC timestamp, or an identity that does not match its kind tag.
 pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> {
     let dto: TypeSignalsDocDto = serde_json::from_str(json)?;
     let schema_version = TypeSignalsSchemaVersion::try_new(dto.schema_version)
@@ -104,7 +185,15 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
         declaration_hash: doc.cache_key().declaration_hash().as_digest().as_str().to_owned(),
         head_commit: doc.cache_key().head_commit().as_ref().to_owned(),
         baseline_hash: doc.cache_key().baseline_hash().as_digest().as_str().to_owned(),
-        signals: doc.signals().iter().map(signal_to_dto).collect(),
+        signals: doc
+            .signals()
+            .iter()
+            .map(|signal| {
+                let dto = signal_to_dto(signal);
+                validate_namespace_for_kind_tag(&dto.kind_tag, dto.namespace)?;
+                Ok(dto)
+            })
+            .collect::<Result<Vec<_>, TypeSignalsCodecError>>()?,
     };
     // Serialize through Value so every signal object uses canonical key order
     // before pretty-printing.
@@ -147,12 +236,28 @@ fn parse_head_commit(value: String) -> Result<CommitHash, TypeSignalsCodecError>
 }
 
 fn signal_from_dto(dto: TypeSignalDto) -> Result<TypeSignal, TypeSignalsCodecError> {
+    validate_namespace_for_kind_tag(&dto.kind_tag, dto.namespace)?;
     // An unknown value must fail the decode: mapping it to a default would let
     // an invalid cache document skip the cache-miss/self-healing path.
     let signal = parse_confidence_signal(&dto.signal)
         .ok_or_else(|| TypeSignalsCodecError::InvalidSignal(FreeText::new(dto.signal.clone())))?;
+    let identity = match dto.namespace {
+        TypeSignalNamespaceField::Missing => {
+            if kind_tag_namespace(&dto.kind_tag).is_some() {
+                return Err(TypeSignalsCodecError::InvalidNamespace(FreeText::new(&dto.kind_tag)));
+            }
+            ThreeWaySignalIdentity::Label { label: FreeText::new(dto.type_name) }
+        }
+        TypeSignalNamespaceField::Catalogue(namespace) => ThreeWaySignalIdentity::CatalogueItem {
+            item_name: FreeText::new(dto.type_name),
+            namespace: namespace.into(),
+        },
+        TypeSignalNamespaceField::Label => {
+            ThreeWaySignalIdentity::Label { label: FreeText::new(dto.type_name) }
+        }
+    };
     Ok(TypeSignal::new(
-        dto.type_name,
+        identity,
         dto.kind_tag,
         signal,
         dto.found_type,
@@ -162,9 +267,43 @@ fn signal_from_dto(dto: TypeSignalDto) -> Result<TypeSignal, TypeSignalsCodecErr
     ))
 }
 
+fn validate_namespace_for_kind_tag(
+    kind_tag: &str,
+    namespace: TypeSignalNamespaceField,
+) -> Result<(), TypeSignalsCodecError> {
+    let valid = match (kind_tag_namespace(kind_tag), namespace) {
+        (Some(expected), TypeSignalNamespaceField::Catalogue(actual)) => {
+            CatalogueItemNamespace::from(actual) == expected
+        }
+        // `unknown` is emitted for both typed tombstones and report-only
+        // labels, so it is the one intentionally ambiguous kind tag.
+        (None, TypeSignalNamespaceField::Catalogue(_)) if kind_tag == "unknown" => true,
+        (None, TypeSignalNamespaceField::Missing) => true,
+        (None, TypeSignalNamespaceField::Label) if kind_tag == "unknown" => true,
+        // `free_function` is a report label and must remain namespace-less.
+        (None, TypeSignalNamespaceField::Label) => true,
+        _ => false,
+    };
+    if valid {
+        Ok(())
+    } else {
+        Err(TypeSignalsCodecError::InvalidNamespace(FreeText::new(kind_tag)))
+    }
+}
+
 fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
+    let (type_name, namespace) = match signal.identity() {
+        ThreeWaySignalIdentity::CatalogueItem { item_name, namespace } => (
+            item_name.as_str().to_owned(),
+            TypeSignalNamespaceField::Catalogue((*namespace).into()),
+        ),
+        ThreeWaySignalIdentity::Label { label } => {
+            (label.as_str().to_owned(), TypeSignalNamespaceField::Label)
+        }
+    };
     TypeSignalDto {
-        type_name: signal.type_name().to_owned(),
+        type_name,
+        namespace,
         kind_tag: signal.kind_tag().to_owned(),
         signal: confidence_signal_to_str(signal.signal()).to_owned(),
         found_type: signal.found_type(),
@@ -175,247 +314,6 @@ fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
-mod tests {
-    use domain::ConfidenceSignal;
-    use domain::tddd::type_signals_doc::{
-        TypeSignalsAuthorityStatus, TypeSignalsReuseDecision, TypeSignalsReuseInput,
-        TypeSignalsWorktreeStatus, decide_type_signals_reuse,
-    };
-
-    use super::*;
-
-    const DIGEST: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-
-    fn sample_doc() -> TypeSignalsDocument {
-        let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
-        TypeSignalsDocument::new(
-            Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-            TypeSignalsCacheKey::new(
-                CatalogueDeclarationHash::new(digest.clone()),
-                CommitHash::try_new("a".repeat(40)).unwrap(),
-                BaselineHash::new(digest),
-            ),
-            vec![TypeSignal::new(
-                "Example",
-                "struct",
-                ConfidenceSignal::Blue,
-                true,
-                vec!["field".to_owned()],
-                vec![],
-                vec!["unexpected".to_owned()],
-            )],
-        )
-    }
-
-    #[test]
-    fn test_encode_decode_roundtrip_preserves_document() {
-        let document = sample_doc();
-        assert_eq!(decode(&encode(&document).unwrap()).unwrap(), document);
-    }
-
-    #[test]
-    fn test_encode_canonicalizes_json_keys_and_is_byte_stable() {
-        let document = sample_doc();
-
-        let first = encode(&document).unwrap();
-        let second = encode(&document).unwrap();
-
-        assert_eq!(first, second, "type-signal encoding must not churn JSON bytes");
-        assert!(
-            first.starts_with("{\n  \"baseline_hash\":"),
-            "type-signal keys must be canonicalized: {first}"
-        );
-        let signal = &first[first.find("\"extra_items\"").unwrap()..];
-        let extra_items = signal.find("\"extra_items\"").unwrap();
-        let found_items = signal.find("\"found_items\"").unwrap();
-        let found_type = signal.find("\"found_type\"").unwrap();
-        let kind_tag = signal.find("\"kind_tag\"").unwrap();
-        let signal_key = signal.find("\"signal\"").unwrap();
-        let type_name = signal.find("\"type_name\"").unwrap();
-        assert!(
-            extra_items < found_items
-                && found_items < found_type
-                && found_type < kind_tag
-                && kind_tag < signal_key
-                && signal_key < type_name,
-            "type-signal objects must be recursively canonicalized: {signal}"
-        );
-    }
-
-    #[test]
-    fn test_declaration_hash_changes_when_declaration_bytes_change() {
-        assert_eq!(
-            declaration_hash(b"type A = u8;").as_digest().as_str(),
-            "bdc16928bf7d4bbd73c69b65d1d3e4e644225f9c3322d589f1a63b5f37af0592"
-        );
-        assert_ne!(declaration_hash(b"type A = u8;"), declaration_hash(b"type A = u16;"));
-    }
-
-    #[test]
-    fn test_decode_rejects_unknown_fields() {
-        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![],
-        })
-        .unwrap();
-        payload
-            .as_object_mut()
-            .unwrap()
-            .insert("unknown_field".to_owned(), serde_json::Value::String(DIGEST.to_owned()));
-        assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
-    }
-
-    #[test]
-    fn test_decode_requires_head_commit() {
-        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![],
-        })
-        .unwrap();
-        payload.as_object_mut().unwrap().remove("head_commit");
-        assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
-    }
-
-    #[test]
-    fn test_decode_requires_baseline_hash() {
-        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![],
-        })
-        .unwrap();
-        payload.as_object_mut().unwrap().remove("baseline_hash");
-        assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
-    }
-
-    #[test]
-    fn test_decode_rejects_unknown_confidence_signal_value() {
-        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![signal_to_dto(&TypeSignal::new(
-                "Example",
-                "struct",
-                ConfidenceSignal::Blue,
-                true,
-                vec![],
-                vec![],
-                vec![],
-            ))],
-        })
-        .unwrap();
-        *payload.pointer_mut("/signals/0/signal").unwrap() =
-            serde_json::Value::String("bogus".to_owned());
-        assert!(
-            matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::InvalidSignal(_))),
-            "an unknown signal value must fail the decode instead of defaulting"
-        );
-    }
-
-    #[test]
-    fn test_decode_requires_declaration_hash() {
-        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![],
-        })
-        .unwrap();
-        payload.as_object_mut().unwrap().remove("declaration_hash");
-        assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
-    }
-
-    #[test]
-    fn test_decode_rejects_each_typed_codec_error_variant() {
-        let dto = TypeSignalsDocDto {
-            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
-            generated_at: "2026-04-18T12:00:00Z".to_owned(),
-            declaration_hash: DIGEST.to_owned(),
-            head_commit: "a".repeat(40),
-            baseline_hash: DIGEST.to_owned(),
-            signals: vec![],
-        };
-
-        let zero_schema = TypeSignalsDocDto { schema_version: 0, ..dto.clone() };
-        assert!(matches!(
-            decode(&serde_json::to_string(&zero_schema).unwrap()),
-            Err(TypeSignalsCodecError::InvalidSchemaVersion(TypeSignalsSchemaVersionError::Zero))
-        ));
-
-        let unsupported_schema = TypeSignalsDocDto { schema_version: 2, ..dto.clone() };
-        assert!(matches!(
-            decode(&serde_json::to_string(&unsupported_schema).unwrap()),
-            Err(TypeSignalsCodecError::UnsupportedSchemaVersion(_))
-        ));
-
-        let invalid_timestamp = TypeSignalsDocDto {
-            generated_at: "2026-04-18T12:00:00+09:00".to_owned(),
-            ..dto.clone()
-        };
-        assert!(matches!(
-            decode(&serde_json::to_string(&invalid_timestamp).unwrap()),
-            Err(TypeSignalsCodecError::InvalidTimestamp(_))
-        ));
-
-        let invalid_head = TypeSignalsDocDto { head_commit: "g".repeat(40), ..dto };
-        assert!(matches!(
-            decode(&serde_json::to_string(&invalid_head).unwrap()),
-            Err(TypeSignalsCodecError::InvalidTimestamp(_))
-        ));
-    }
-
-    #[test]
-    fn test_baseline_hash_changes_when_baseline_bytes_change() {
-        assert_eq!(
-            baseline_hash(b"baseline A").as_digest().as_str(),
-            "7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6"
-        );
-        assert_ne!(baseline_hash(b"baseline A"), baseline_hash(b"baseline B"));
-    }
-
-    #[test]
-    fn test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison() {
-        let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
-        let declaration = CatalogueDeclarationHash::new(digest.clone());
-        let head_commit = CommitHash::try_new("a".repeat(40)).unwrap();
-        let recorded_baseline = baseline_hash(b"baseline A");
-        let current_baseline = baseline_hash(b"baseline B");
-        let recorded = TypeSignalsCacheKey::new(
-            declaration.clone(),
-            head_commit.clone(),
-            recorded_baseline.clone(),
-        );
-        let current = TypeSignalsCacheKey::new(declaration, head_commit, current_baseline);
-
-        assert_eq!(recorded.baseline_hash(), &baseline_hash(b"baseline A"));
-        let input = TypeSignalsReuseInput::verify(
-            recorded,
-            current,
-            TypeSignalsWorktreeStatus::Clean,
-            TypeSignalsAuthorityStatus::Readable,
-        )
-        .unwrap();
-        assert_eq!(
-            decide_type_signals_reuse(&input),
-            TypeSignalsReuseDecision::ReevaluateWithoutExtraction,
-            "a changed rustdoc baseline digest must invalidate reuse"
-        );
-    }
-}
+#[allow(clippy::expect_used, clippy::indexing_slicing, clippy::unwrap_used)]
+#[path = "type_signals_codec_tests.rs"]
+mod tests;

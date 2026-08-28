@@ -25,7 +25,12 @@ impl EncoderState {
         entry: &TypeEntry,
         struct_kind: StructKind,
     ) -> Result<(), NewTypeGraphCodecError> {
-        let module_path = entry.module_path().clone();
+        let declared_module_path = entry.module_path().cloned().unwrap_or_default();
+        let module_path = self.effective_module_path(
+            type_name,
+            domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+            &declared_module_path,
+        );
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Type-declaration-level generics / where predicates are encoded into the
@@ -86,7 +91,12 @@ impl EncoderState {
         fields: Vec<domain::tddd::catalogue_v2::identifiers::TypeRef>,
         has_stripped_fields: bool,
     ) -> Result<(), NewTypeGraphCodecError> {
-        let module_path = entry.module_path().clone();
+        let declared_module_path = entry.module_path().cloned().unwrap_or_default();
+        let module_path = self.effective_module_path(
+            type_name,
+            domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+            &declared_module_path,
+        );
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
@@ -204,7 +214,12 @@ impl EncoderState {
         entry: &TypeEntry,
         variants: Vec<VariantDecl>,
     ) -> Result<(), NewTypeGraphCodecError> {
-        let module_path = entry.module_path().clone();
+        let declared_module_path = entry.module_path().cloned().unwrap_or_default();
+        let module_path = self.effective_module_path(
+            type_name,
+            domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+            &declared_module_path,
+        );
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
@@ -278,7 +293,12 @@ impl EncoderState {
         target: domain::tddd::catalogue_v2::TypeRef,
         alias_generics: &[MethodGenericParam],
     ) -> Result<(), NewTypeGraphCodecError> {
-        let module_path = entry.module_path().clone();
+        let declared_module_path = entry.module_path().cloned().unwrap_or_default();
+        let module_path = self.effective_module_path(
+            type_name,
+            domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+            &declared_module_path,
+        );
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Alias declarations carry their generic parameters in the `TypeAlias` kind.  Fall

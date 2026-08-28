@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use super::super::helpers::{
-    canonical_catalogue_identity, collect_methods_for_type, declared_trait_identities,
-    declared_type_identities, entry_role_kind, inherent_impls_for_type,
+    canonical_catalogue_identity, canonical_catalogue_trait_identity, collect_methods_for_type,
+    declared_trait_identities, declared_type_identities, entry_role_kind, inherent_impls_for_type,
     resolve_catalogue_entry_reference, standard_external_trait_identities, type_entries_for_target,
 };
 use super::super::identity_helpers::root_path_occurrence;
@@ -115,7 +115,7 @@ fn collect_public_methods<'a, E: TypeRefPathExtractorPort>(
                 if trait_entry.action() == ItemAction::Delete {
                     continue;
                 }
-                if canonical_catalogue_identity(
+                if canonical_catalogue_trait_identity(
                     trait_catalogue,
                     trait_name.as_str(),
                     trait_entry.module_path(),

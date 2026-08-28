@@ -13,14 +13,12 @@ use std::task::{Context, Poll, Waker};
 
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, InherentImplDeclV2, MethodDeclaration,
-    MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
-    TypeEntry, TypeKindV2, TypeRef,
+    AttestedCatalogueDocument, CatalogueDocument, CrateName, DeletionRecord, InherentImplDeclV2,
+    MethodDeclaration, MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry,
+    TraitImplDeclV2, TypeEntry, TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
@@ -68,6 +66,7 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::pre_review_gate::{
     ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
 };
@@ -378,26 +377,34 @@ impl SpecDocumentLoaderPort for FailingSpec {
 }
 
 struct StubCatalogue(CatalogueDocument);
-impl CatalogueDocumentLoaderPort for StubCatalogue {
-    fn load(&self, _p: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.0.clone())
+
+fn attest_catalogue(document: CatalogueDocument) -> AttestedCatalogueDocument {
+    AttestedCatalogueDocument::attest(b"T014 test catalogue", |_| {
+        Ok::<_, std::convert::Infallible>(document)
+    })
+    .unwrap()
+}
+
+impl AttestedCatalogueDocumentLoaderPort for StubCatalogue {
+    fn load(&self, _p: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+        Ok(attest_catalogue(self.0.clone()))
     }
 }
 
 struct StubCatalogues(Vec<(PathBuf, CatalogueDocument)>);
-impl CatalogueDocumentLoaderPort for StubCatalogues {
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for StubCatalogues {
+    fn load(&self, path: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
         self.0
             .iter()
             .find(|(known_path, _)| known_path == path)
-            .map(|(_, document)| document.clone())
+            .map(|(_, document)| attest_catalogue(document.clone()))
             .ok_or_else(|| CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
 
 struct FailingCatalogue;
-impl CatalogueDocumentLoaderPort for FailingCatalogue {
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+impl AttestedCatalogueDocumentLoaderPort for FailingCatalogue {
+    fn load(&self, path: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
         Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
@@ -868,7 +875,7 @@ fn money_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -907,7 +914,7 @@ fn qualified_money_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -938,7 +945,7 @@ fn money_catalogue_in_layer(
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -965,7 +972,7 @@ fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1026,7 +1033,7 @@ fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1055,7 +1062,7 @@ fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -1079,7 +1086,7 @@ fn trait_impl_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             entry_refs,
             vec![],
@@ -1192,7 +1199,7 @@ fn trait_entry(role: ContractRole) -> TraitEntry {
         vec![],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         None,
         entry_refs,
         vec![],
@@ -1626,7 +1633,7 @@ fn test_cited_anchor_ids_includes_method_only_refs() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1673,7 +1680,7 @@ fn test_cited_anchor_ids_skips_reference_method_refs() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1727,7 +1734,7 @@ fn test_cited_anchor_ids_skips_delete_method_refs() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1757,7 +1764,7 @@ fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
             vec![covering_method("compute", "AC-02")],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![SpecRef::new(
                 PathBuf::from("spec.json"),
@@ -1905,7 +1912,7 @@ fn test_obligation_declaration_text_with_workspace_qualified_trait_resolves_decl
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],
@@ -1965,7 +1972,7 @@ fn test_obligation_declaration_text_with_local_module_qualified_trait_resolves_d
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
             None,
             vec![],
             vec![],

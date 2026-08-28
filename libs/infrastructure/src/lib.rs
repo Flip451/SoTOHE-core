@@ -145,6 +145,35 @@ pub(crate) fn discover_isolated_repo_for_items_dir(
     Ok((repo, anchor))
 }
 
+/// Returns the canonical repository root enclosing `items_dir`.
+///
+/// Discovery is anchored on the supplied items directory and clears ambient
+/// Git repository-selection variables, so task-contract, impl-plan, and
+/// type-signal readers all use the same repository authority for a custom
+/// items-directory layout.
+///
+/// # Errors
+///
+/// Returns an I/O error when the items directory cannot be resolved, is
+/// symlinked, has no enclosing repository, or its discovered root cannot be
+/// canonicalized.
+pub fn repository_root_for_items_dir(
+    items_dir: &std::path::Path,
+) -> Result<std::path::PathBuf, std::io::Error> {
+    let (repository, anchor) = discover_isolated_repo_for_items_dir(items_dir)?;
+    let repository_root = repository.root().canonicalize().map_err(|error| {
+        crate::sanitized_failure::sanitized_io_error(crate::sanitized_failure::io_classification(
+            &error,
+        ))
+    })?;
+    if !anchor.starts_with(&repository_root) {
+        return Err(crate::sanitized_failure::sanitized_io_error(
+            "discovered repository does not enclose the items directory",
+        ));
+    }
+    Ok(repository_root)
+}
+
 pub(crate) fn resolve_items_dir_under_current_repo(
     items_dir: &std::path::Path,
 ) -> Result<std::path::PathBuf, std::io::Error> {
@@ -284,7 +313,9 @@ mod tests {
         StatusOverride, TrackId, TrackMetadata, TrackReader, TrackWriter, derive_track_status,
     };
 
-    use super::{InMemoryTrackStore, resolve_items_dir_under_current_repo};
+    use super::{
+        InMemoryTrackStore, repository_root_for_items_dir, resolve_items_dir_under_current_repo,
+    };
 
     fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
         domain::branch_strategy::BranchStrategySnapshot::new(
@@ -347,5 +378,51 @@ mod tests {
 
         assert_eq!(error.to_string(), "no enclosing git repository");
         assert!(!error.to_string().contains(&supplied_path));
+    }
+
+    #[test]
+    fn repository_root_for_items_dir_discovers_nested_repository() {
+        let repository = tempfile::tempdir().unwrap();
+        crate::verify::test_support::git_init(repository.path());
+        let items_dir = repository.path().join("custom/track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let root = repository_root_for_items_dir(&items_dir).unwrap();
+
+        assert_eq!(root, repository.path().canonicalize().unwrap());
+    }
+
+    #[test]
+    fn repository_root_for_items_dir_rejects_non_repository() {
+        let items_dir = tempfile::tempdir().unwrap();
+        let supplied_path = items_dir.path().display().to_string();
+
+        let error = repository_root_for_items_dir(items_dir.path()).unwrap_err();
+
+        assert_eq!(error.to_string(), "no enclosing git repository");
+        assert!(!error.to_string().contains(&supplied_path));
+    }
+
+    #[test]
+    fn repository_root_for_items_dir_rejects_a_root_redirected_outside_the_anchor() {
+        let outer_repository = tempfile::tempdir().unwrap();
+        crate::verify::test_support::git_init(outer_repository.path());
+
+        let inner_repository = tempfile::tempdir().unwrap();
+        let items_dir = inner_repository.path().join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        crate::verify::test_support::git_init(inner_repository.path());
+
+        let status = std::process::Command::new("git")
+            .args(["config", "core.worktree"])
+            .arg(outer_repository.path())
+            .current_dir(inner_repository.path())
+            .status()
+            .unwrap();
+        assert!(status.success(), "the fixture must redirect the reported worktree");
+
+        let error = repository_root_for_items_dir(&items_dir).unwrap_err();
+
+        assert_eq!(error.to_string(), "discovered repository does not enclose the items directory");
     }
 }
