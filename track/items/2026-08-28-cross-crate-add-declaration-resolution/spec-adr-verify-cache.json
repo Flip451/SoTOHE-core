@@ -1,0 +1,442 @@
+{
+  "entries": [
+    {
+      "claim_hash": "0a164b8f446ad9fff5cd2cd32743482121be0adb8ef71426d419c0c0c4d430fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "同じ track の層をまたぐ宣言先行の型・trait 参照を、完全修飾 identity を保った fail-closed な解決集合で実現する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a164b8f446ad9fff5cd2cd32743482121be0adb8ef71426d419c0c0c4d430fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "同じ track の層をまたぐ宣言先行の型・trait 参照を、完全修飾 identity を保った fail-closed な解決集合で実現する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "合成する項目の識別子は、宣言層の catalogue の crate 名を根とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合を作るとき、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9cf9b39fd3dde3a54f53c0ec39c4fbc12c66f059858ae784fdd5f3722de31be2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "合成する項目の識別子は、宣言層の catalogue の crate 名を根とする。bin ターゲットの別名は既存の正準化（`2026-08-25-0804` D2）を通す。\n\nモジュールの配置は宣言層自身の解決（明示した `module_path`、または省略時は `2026-08-25-0804` D3 の規則による未確定）をそのまま用いる。\n\n同一の識別子が参照側の rustdoc `paths` に既にあれば rustdoc を優先し、合成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ad7b7553cbb6bb079d126a7c6a4f13f6a6529e1ff82e218f9db742ce76096f28",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "参照側 catalogue に cross-crate 宣言を追加して、宣言を二重化する方式。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "参照側 catalogue に追加の記述は求めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b4b460bcf8146989fa679408ff060b5db28f1f5880d62d0791ad19e50474cac9",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "cross-crate 参照に限って短名 fallback を復活させる方式。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合を作るとき、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ba22f2bb710e47a5eba75fb4d1273baccfeb2cfdee28fe348bf51f8be8b01faf",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "cross-crate 参照を実装まで未解決のまま残す方式。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合を作るとき、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合を作るとき、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1155122f177b3bfa983491d998a55185ed9c0aef0270c24b4b6ad6db8bf8786",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「他の TDDD 有効層」の集合は `architecture-rules.json` の TDDD 有効層に委ね、本 ADR はそれを列挙しない。catalogue ファイルが track dir に無い層は宣言なしとして扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "合成する項目の識別子は、宣言層の catalogue の crate 名を根とする。bin ターゲットの別名は既存の正規化（`2026-08-25-0804` D2）を通す。\n\nモジュールの配置は宣言層自身の解決（明示した `module_path`、または省略時は `2026-08-25-0804` D3 の規則による未確定）をそのまま用いる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`module_path` の省略は crate root を意味せず、配置未指定を意味する（配置は解決規則により rustdoc から得る）。明示した `module_path` または修飾 key は、従来どおり完全一致で照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0030fe137ba7b6b4a8dc6842e26ba0c02a0ed31a09859f22f1d851b73bf5852d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、その宣言層の crate に属する外部項目として合成し、加える。参照側 catalogue に追加の記述は求めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "合成する項目の識別子は、宣言層の catalogue の crate 名を根とする。bin ターゲットの別名は既存の正規化（`2026-08-25-0804` D2）を通す。\n\nモジュールの配置は宣言層自身の解決（明示した `module_path`、または省略時は `2026-08-25-0804` D3 の規則による未確定）をそのまま用いる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`module_path` の省略は crate root を意味せず、配置未指定を意味する（配置は解決規則により rustdoc から得る）。明示した `module_path` または修飾 key は、従来どおり完全一致で照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc57a0f3ee59396d23baa32982c051968dffc47a0d079f3ecf680a209054134f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "9c0fac87cb0f8a0a7c7b72557f070a818478f65fa9f995c8328e0489cde7c185",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同一の識別子が参照側の rustdoc `paths` に既にあれば rustdoc を優先し、合成しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc57a0f3ee59396d23baa32982c051968dffc47a0d079f3ecf680a209054134f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。」また、「rustdoc にも catalogue にも無い参照が fail-closed で拒否される挙動は不変。」",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

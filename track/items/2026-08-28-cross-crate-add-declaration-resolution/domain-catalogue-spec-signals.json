@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "cf306d03ebef095f0eeda9b4dbf26f89b0276790f326d3bcbe21980382a05d01",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "153a14a29f3f08ca02789def44a2441f0f2b1aa2911115b5db019f26a7f2a02b",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCratePort"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "f36191bed5e88c723cbba0dca720f0c0371bd99f5b08a0d62d46d936caf6dd01",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "d2f6928581aa866a05cf3a693394e0e1143c7ce65ce5cc287d21f3fe1cdafe4c",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "entry_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorPort"
+    }
+  ]
+}

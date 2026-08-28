@@ -1,0 +1,154 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec": {
+      "action": "modify",
+      "docs": "Update CatalogueToExtendedCrateCodec cross-crate catalogue resolution (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter": {
+      "action": "modify",
+      "docs": "Update TypeSignalsExecutorAdapter catalogue-loading handoff (IN-01, CO-01, CO-02, AC-01, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    }
+  ]
+}

@@ -32,6 +32,444 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-28T12:54:10Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 6,
+              "message": "T001 の「so encode accepts the track catalogue map used by the resolution boundary」は upstream の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "T002 の「synthesize other-layer add declarations with declaring-crate identities, rustdoc precedence, and fail-closed lookup」は upstream の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 の「load available TDDD-layer catalogues once and hand the typed map to encode」は upstream の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 29,
+              "message": "SECTION-001 の「so the typed track-catalogue input is available at the single resolution boundary」は upstream の設計・挙動を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 39,
+              "message": "SECTION-002 の「compose declaring-layer add entries without duplicate declarations, short-name fallback, or unresolved tolerance」は upstream の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 49,
+              "message": "SECTION-003 の「collect available TDDD-layer catalogue documents and pass them through the port」は upstream の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9c2a5d36a32d7597458633a332f7b87f60d9b64c5e85ef58461f078cfd84035b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:58:05Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 6,
+              "message": "T001 の説明は resolution boundary の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "T002 の説明は cross-crate 合成、crate identity、rustdoc precedence、fail-closed lookup の挙動契約を再記述しています（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 の説明は catalogue の一括ロードと typed map handoff の挙動契約を再記述しています（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 29,
+              "message": "SECTION-001 の説明は typed catalogue input を単一 resolution boundary に渡す設計を再記述しています（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 39,
+              "message": "SECTION-002 の説明は duplicate 防止、short-name fallback 禁止、unresolved tolerance 禁止という挙動契約を再記述しています（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 49,
+              "message": "SECTION-003 の説明は全 TDDD layer catalogue の収集と port handoff の挙動契約を再記述しています（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71fb8b77b4940a5e71b416ab18f58c16dd43fcd0e888273d5cde12e20a55d673",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T13:02:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4008ab4b95c8ab7ce8e0da799d98dc6099b9be236e83a7c5865abcb3439a3eb9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T13:12:39Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 の対象には、`CatalogueToExtendedCratePort::encode` を直接呼ぶ `infrastructure::tddd::type_signals_evaluator::{evaluate_and_write,resolution_paths_for_catalogue}` が含まれていません。新しい track-catalogue 入力を渡すにはこの境界の変更が必須ですが、T002/T003 のどちらも対象として明記しておらず、executor が所有境界を発明する必要があります。担当タスクに対象 symbol と handoff 操作を追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 23,
+              "message": "`plan` が `summary` を欠いているため、GO-01 からタスクへの traceability がありません。GO 要素は `task-coverage.json` の対象外なので、`plan.summary` に GO-01 → T001/T002/T003 の簡潔な mapping を追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 6,
+              "message": "T001 は `task-coverage.json` で AC-01〜AC-03 に割り当てられていますが、説明は port の変更だけで validation 操作を含みません。対応する contract validation を明記するか、AC mapping を実際に検証するタスクへ限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "T002 は AC-01〜AC-03 の中心的な実装タスクですが、説明に regression/validation 操作がありません。`batch-plan.json` は 160 test lines を見積もっているため、その検証境界を anchor-only の操作として明記してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 は AC-01 と AC-03 に割り当てられていますが、二つの handoff 経路を変更するだけで validation 操作を記載していません。各経路の focused validation を明記するか、AC mapping を検証所有タスクへ移してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "todo の T002 は、独立に検証できる cross-crate synthesis/identity（AC-01・AC-02）と rustdoc precedence・strict negative resolution（AC-03）を一つに束ねています。各 unit を anchor と validation を持つ依存タスクへ分割してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "todo の T003 は、非重複 target と別々の contract obligations を持つ `catalogue_impl_signals` handoff と type-signals executor/evaluator handoff を一つに束ねています。両経路は AC-01/AC-03 に対して独立に検証できるため、別タスクへ分割してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4008ab4b95c8ab7ce8e0da799d98dc6099b9be236e83a7c5865abcb3439a3eb9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T13:19:27Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 names `infrastructure::tddd::type_signals_evaluator::resolution_paths_for_catalogue`, but that symbol is defined under `infrastructure::tddd::catalogue_to_extended_crate_codec` and only imported by the evaluator. This leaves the write boundary ambiguous and overlaps T002’s codec ownership. Keep the actual resolution function with T002 and name only the evaluator call-site symbol(s) T003 modifies; SECTION-003 mirrors the same invalid target.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "Todo task T002 still bundles independently verifiable units: cross-crate synthesis and declaring-layer identity/placement (AC-01/AC-02), and rustdoc precedence plus strict negative resolution (AC-03). Split these into dependency-ordered tasks with their own focused validations and anchor mappings.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "Todo task T003 explicitly bundles two independently verifiable handoff paths with separate targets and obligations: `catalogue_impl_signals` (IN-01/CO-01/AC-01) and the type-signals executor/evaluator path (IN-01/CO-01/CO-02/AC-01/AC-03). Split them into separate tasks and update coverage, attribution, estimates, and batch membership accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c242fb43a344be356a44d6a8169e20e7c89610f3dab4811c4cad33ff0a75819",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T13:22:48Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "Todo task T002 bundles independently verifiable behavior units: cross-crate synthesis with declaring-layer identity/placement (AC-01/AC-02), and rustdoc precedence with strict negative resolution (AC-03). Split these into dependency-ordered tasks with separate focused validations and anchor mappings.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "Todo task T003 bundles two independently verifiable handoff paths with distinct targets and obligations: `catalogue_impl_signals` (IN-01/CO-01/AC-01) and the type-signals executor/evaluator path (IN-01/CO-01/CO-02/AC-01/AC-03). Split them into separate tasks and update coverage, attribution, estimates, and batch membership accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:808f316a52a81824c779a6d170b51137a21895e5bfac6965613b3b93bf4405b4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T13:29:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed0887d524c7e2971180c41124cdd772fe58e73ef276e9503e3370c1dcfd0931",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T13:34:00Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 12,
+              "message": "T002 の「synthesize other-layer add declarations with declaring-layer identity and placement」は IN-01/IN-02・AC-01/AC-02 の挙動契約を散文で再記述しています。変更対象、実装・検証操作、anchor cite のみにしてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 18,
+              "message": "T003 の「prefer rustdoc identities and reject ungrounded cross-crate references」は AC-03 の rustdoc precedence と fail-closed 契約を散文で再記述しています。対象、操作、anchor cite のみにしてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 54,
+              "message": "SECTION-002 の「synthesize declaring-layer identities and placement, then validate rustdoc precedence and fail-closed negatives」は upstream の IN-01/IN-02・AC-01〜AC-03 を再記述しています。section description も対象・操作・anchor cite のみにしてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ed0887d524c7e2971180c41124cdd772fe58e73ef276e9503e3370c1dcfd0931",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T13:37:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee1e936638b858b00361f0e5eb9f0bdd141689f8fb8b6dff8891180ce48d090c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-28T12:53:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53b262b2931fa9061980a5c0870b04e10e47180b55d12bc853767d6070ac5979",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T13:06:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53b262b2931fa9061980a5c0870b04e10e47180b55d12bc853767d6070ac5979",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-28T11:33:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:352d4b837285325d4258f50f5e801808b47e396fb9aeb33b665a52ee66450305",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T11:36:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:352d4b837285325d4258f50f5e801808b47e396fb9aeb33b665a52ee66450305",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-28T12:20:21Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 9,
+              "message": "`CatalogueToExtendedCratePort` の `docs` は、解決集合・重複防止の挙動と設計理由を散文で再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 9,
+              "message": "`TypeSignalsExecutorPort` の `docs` は、同期実行や全 catalogue 集合のロード挙動を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 78,
+              "message": "`usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor` の `docs` は、catalogue の一括ロードと declaration owner 保持の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 10,
+              "message": "`infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec` の `docs` は、cross-crate add 合成と rustdoc 優先の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 69,
+              "message": "`infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter` の `docs` は、全 layer catalogue の評価と short-name fallback 禁止を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01ca99df5e6944f8d5e07af5bcc0d61b817f962425dae70c924f586d03baedd4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:34:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 9,
+              "message": "`CatalogueToExtendedCratePort` の `docs` は、解決集合・重複防止の挙動と設計理由を散文で再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 9,
+              "message": "`TypeSignalsExecutorPort` の `docs` は、同期実行や全 catalogue 集合のロード挙動を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 78,
+              "message": "`usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor` の `docs` は、catalogue の一括ロードと declaration owner 保持の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 10,
+              "message": "`infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec` の `docs` は、cross-crate add 合成と rustdoc 優先の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 69,
+              "message": "`infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter` の `docs` は、全 layer catalogue の評価と short-name fallback 禁止を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1f5e3c5a57a64fc6769ef9a18f57dac60a255e0318741db83afefdcbac18563",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:36:24Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 9,
+              "message": "`CatalogueToExtendedCratePort` の `docs` は、解決集合・重複防止の挙動と設計理由を散文で再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 9,
+              "message": "`TypeSignalsExecutorPort` の `docs` は、同期実行や全 catalogue 集合のロード挙動を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 78,
+              "message": "`usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor` の `docs` は、catalogue の一括ロードと declaration owner 保持の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 10,
+              "message": "`infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec` の `docs` は、cross-crate add 合成と rustdoc 優先の挙動を再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 69,
+              "message": "`infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter` の `docs` は、全 layer catalogue の評価と short-name fallback 禁止を upstream 契約として再記述しています。変更対象と anchor cite に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1f5e3c5a57a64fc6769ef9a18f57dac60a255e0318741db83afefdcbac18563",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:44:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1f5e3c5a57a64fc6769ef9a18f57dac60a255e0318741db83afefdcbac18563",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

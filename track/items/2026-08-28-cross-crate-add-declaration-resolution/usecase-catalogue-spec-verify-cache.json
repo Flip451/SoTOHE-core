@@ -1,0 +1,198 @@
+{
+  "entries": [
+    {
+      "claim_hash": "d2f6928581aa866a05cf3a693394e0e1143c7ce65ce5cc287d21f3fe1cdafe4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2f6928581aa866a05cf3a693394e0e1143c7ce65ce5cc287d21f3fe1cdafe4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2f6928581aa866a05cf3a693394e0e1143c7ce65ce5cc287d21f3fe1cdafe4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0030fe137ba7b6b4a8dc6842e26ba0c02a0ed31a09859f22f1d851b73bf5852d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c1155122f177b3bfa983491d998a55185ed9c0aef0270c24b4b6ad6db8bf8786",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0030fe137ba7b6b4a8dc6842e26ba0c02a0ed31a09859f22f1d851b73bf5852d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbe76860acd7a96e26cf1a64a9130dff868425e14ea1c88190bfed12432f2627",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cc57a0f3ee59396d23baa32982c051968dffc47a0d079f3ecf680a209054134f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

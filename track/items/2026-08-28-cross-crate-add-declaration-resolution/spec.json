@@ -1,0 +1,180 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-01",
+      "text": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        }
+      ],
+      "id": "CO-02",
+      "text": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        }
+      ],
+      "id": "CO-03",
+      "text": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "同じ track の層をまたぐ宣言先行の型・trait 参照を、完全修飾 identity を保った fail-closed な解決集合で実現する。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "参照側 catalogue に cross-crate 宣言を追加して、宣言を二重化する方式。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "cross-crate 参照に限って短名 fallback を復活させる方式。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-28-1034-cross-crate-add-declaration-resolution.md"
+          }
+        ],
+        "id": "OS-03",
+        "text": "cross-crate 参照を実装まで未解決のまま残す方式。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 12,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "参照先 crate の add 宣言を解決集合に加える",
+  "version": "1.0"
+}

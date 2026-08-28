@@ -1,0 +1,154 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {
+    "TypeSignalsExecutorPort": {
+      "action": "reference",
+      "docs": "Reference TypeSignalsExecutorPort for the TypeSignalsExecutorAdapter implementation edge (IN-01, CO-01, CO-02, AC-01, AC-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_layer",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::feature_declaration::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsExecutionError>"
+        }
+      ],
+      "module_path": "type_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor": {
+      "action": "modify",
+      "docs": "Update CatalogueImplSignalsInteractor catalogue-loading handoff (IN-01, CO-01, AC-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "catalogue_loader",
+              "ty": "std::sync::Arc<dyn AttestedCatalogueDocumentLoaderPort>"
+            },
+            {
+              "name": "ext_crate_codec",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort>"
+            },
+            {
+              "name": "evaluator",
+              "ty": "std::sync::Arc<dyn domain::tddd::signal_evaluator::port::SignalEvaluatorPort>"
+            },
+            {
+              "name": "rustdoc_crate_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort>"
+            },
+            {
+              "name": "layer_bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "feature_declaration_port",
+              "ty": "std::sync::Arc<dyn TdddActualFeatureDeclarationPort>"
+            },
+            {
+              "name": "symlink_guard",
+              "ty": "std::sync::Arc<dyn domain::symlink_guard_port::SymlinkGuardPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "catalogue_impl_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsInteractor",
+      "trait_ref": "CatalogueImplSignalsService"
+    }
+  ]
+}

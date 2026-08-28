@@ -1,0 +1,26 @@
+{
+  "baseline_hash": "4dc435027817f66afb5ee00ba1049062f43036c579bffbea51bad324c3b840d9",
+  "declaration_hash": "f36191bed5e88c723cbba0dca720f0c0371bd99f5b08a0d62d46d936caf6dd01",
+  "generated_at": "2026-08-28T13:46:59Z",
+  "head_commit": "002533b8024e926f42952ae169e41bc361aec446",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_items": [
+        "CatalogueImplSignalsService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorPort"
+    }
+  ]
+}

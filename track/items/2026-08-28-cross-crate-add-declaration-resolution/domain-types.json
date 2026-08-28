@@ -1,0 +1,126 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "traits": {
+    "CatalogueToExtendedCratePort": {
+      "action": "modify",
+      "docs": "Update CatalogueToExtendedCratePort::encode inputs for cross-crate catalogue resolution (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "encode",
+          "params": [
+            {
+              "name": "target_layer",
+              "ty": "&LayerId"
+            },
+            {
+              "name": "track_catalogues",
+              "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>"
+            },
+            {
+              "name": "baseline",
+              "ty": "&rustdoc_types::Crate"
+            },
+            {
+              "name": "current",
+              "ty": "&rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
+          "spec_refs": [
+            {
+              "anchor": "GO-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {}
+}

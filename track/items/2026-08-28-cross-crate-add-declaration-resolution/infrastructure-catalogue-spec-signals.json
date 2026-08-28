@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "10982e54d1117bc6e8e05c85a58ae76d70d3b7551bd97f2bd512e0e216f99c9e",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "9167d6ffce0e81be391c613699ad7bc68df7b015f2432103e7f62d64b10cc7b3",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+    },
+    {
+      "entry_hash": "2674f46da83d174cb82ca6f6707c181131c93dd2d59c6eb0cc0dc31f7db715c2",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+    }
+  ]
+}

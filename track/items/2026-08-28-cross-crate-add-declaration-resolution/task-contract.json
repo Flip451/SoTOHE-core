@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-28-cross-crate-add-declaration-resolution",
+  "entries": {
+    "T001": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueToExtendedCratePort"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      }
+    ],
+    "T004": [
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      }
+    ]
+  }
+}
