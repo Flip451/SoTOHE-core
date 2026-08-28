@@ -1466,22 +1466,22 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_function_label"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
         },
         {
@@ -1538,6 +1538,36 @@
           "layer": "usecase",
           "module_path": "usecase::pre_review_gate::tests",
           "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_deleted_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_label_distinct_from_same_named_catalogue_item"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_live_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
         }
       ]
     },
@@ -1558,22 +1588,22 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_function_label"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
         },
         {
@@ -1630,6 +1660,36 @@
           "layer": "usecase",
           "module_path": "usecase::pre_review_gate::tests",
           "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_deleted_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_label_distinct_from_same_named_catalogue_item"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_live_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
         }
       ]
     },
@@ -1650,22 +1710,22 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_null_namespace_for_catalogue_kind_tag"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_function_label"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_accepts_missing_namespace_for_unknown_label"
         },
         {
@@ -1722,6 +1782,36 @@
           "layer": "usecase",
           "module_path": "usecase::pre_review_gate::tests",
           "test_name": "coverage_duplicate_signal_identity_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_deleted_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_label_distinct_from_same_named_catalogue_item"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_coverage_keeps_same_name_live_type_and_trait_rows_independent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::mod_tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
         }
       ]
     },
@@ -1760,7 +1850,7 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
         },
         {
@@ -1797,23 +1887,33 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
         }
       ]
     },
@@ -1829,23 +1929,33 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
         }
       ]
     },
@@ -1861,23 +1971,33 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_rejects_catalogue_kind_without_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_unknown_catalogue_item_namespace"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_rejects_v5_signal_without_explicit_identity"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_encode_decode_roundtrip_keeps_same_named_type_trait_and_label_statuses"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_rejects_legacy_schema_with_catalogue_row_as_cache_miss"
         }
       ]
     },
@@ -1931,7 +2051,7 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
         },
         {
@@ -2021,7 +2141,7 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
         },
         {
@@ -2096,7 +2216,7 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_encode_decode_roundtrip_preserves_catalogue_item_namespaces"
         }
       ]
