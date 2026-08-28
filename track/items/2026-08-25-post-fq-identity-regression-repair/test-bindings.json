@@ -2513,7 +2513,18 @@
           "element_id": "IN-05"
         }
       },
-      "reason": "TaskContractCompositionRoot is wiring-only: its new(items_dir) discovers and canonicalizes the repository root with SystemGitRepo::discover_from, stores that root with the items directory, and constructs FsTaskContractReader, FsImplCatalogSignalReader, FsImplPlanReader, FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter for PreReviewGateInteractor and CoverageVerifyInteractor. It owns no identity, namespace, or signal logic of its own, so the IN-05 promise (namespace-keyed type/trait rows, no status mixing) has no observable branch at this entry. The wiring shape is asserted by task_contract_composition_root_is_wiring_only; repository-context discovery and fail-closed handling are covered by nested_custom_items_dir_discovers_repository_root and non_repository_items_dir_fails_closed in cli_composition::task_contract::tests. The IN-05 behaviour itself is exercised on the injected interactors by same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage and coverage_ambiguous_contract_key_fails_closed_for_same_named_rows in usecase::pre_review_gate::tests, which drive the same constructor surface this root wires."
+      "reason": "TaskContractCompositionRoot is wiring-only: its new(items_dir) obtains the canonical repository root through infrastructure::repository_root_for_items_dir, stores that root with the items directory, and constructs FsTaskContractReader, FsImplCatalogSignalReader, FsImplPlanReader, FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter for PreReviewGateInteractor and CoverageVerifyInteractor. It owns no identity, namespace, or signal logic of its own, so the IN-05 promise (namespace-keyed type/trait rows, no status mixing) has no observable branch at this entry. The wiring shape is asserted by task_contract_composition_root_is_wiring_only; repository-context discovery and fail-closed handling are covered by nested_custom_items_dir_discovers_repository_root and non_repository_items_dir_fails_closed in cli_composition::task_contract::tests. The IN-05 behaviour itself is exercised on the injected interactors by same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage and coverage_ambiguous_contract_key_fails_closed_for_same_named_rows in usecase::pre_review_gate::tests, which drive the same constructor surface this root wires."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::repository_root_for_items_dir",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "repository_root_for_items_dir is a repository-authority façade: it rejects symlinked components, canonicalises the items directory, discovers the enclosing repository with repository-selection variables ignored, and returns its canonical root. It carries no catalogue item, report label, namespace or signal status, so the IN-05 promise (namespace-bearing type/trait rows kept distinct from label-bearing function/trait-impl signals, no status mixing) has no observable branch on this surface; its only IN-05 relation is supplying the same repository root the pre-review gate reads its bindings and attested catalogue from. Its own behaviour is verified by repository_root_for_items_dir_discovers_nested_repository and repository_root_for_items_dir_rejects_non_repository in infrastructure::tests (nested items directory resolves to the enclosing repository root; a non-repository directory fails closed). The IN-05 behaviour of the gate that consumes this root is exercised by same_named_type_and_trait_contract_key_fails_closed_for_liveness_and_coverage and coverage_ambiguous_contract_key_fails_closed_for_same_named_rows in usecase::pre_review_gate::tests."
     }
   ],
   "track_id": "2026-08-25-post-fq-identity-regression-repair"

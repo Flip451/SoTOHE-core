@@ -15,9 +15,9 @@ use std::sync::Arc;
 
 use cli_driver::task_contract::TaskContractDriver;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort;
-use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::impl_catalog_signal_reader::FsImplCatalogSignalReader;
 use infrastructure::impl_plan_reader::FsImplPlanReader;
+use infrastructure::repository_root_for_items_dir;
 use infrastructure::task_contract_reader::FsTaskContractReader;
 use infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader;
 use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
@@ -53,16 +53,10 @@ impl TaskContractCompositionRoot {
     /// Returns [`CompositionError::Infrastructure`] when repository discovery or
     /// root canonicalization fails.
     pub fn new(items_dir: PathBuf) -> Result<Self, CompositionError> {
-        let repository = SystemGitRepo::discover_from(&items_dir).map_err(|error| {
+        let workspace_root = repository_root_for_items_dir(&items_dir).map_err(|error| {
             CompositionError::Infrastructure(format!(
                 "cannot discover repository for task-contract items directory '{}': {error}",
                 items_dir.display()
-            ))
-        })?;
-        let workspace_root = repository.root().canonicalize().map_err(|error| {
-            CompositionError::Infrastructure(format!(
-                "cannot canonicalize task-contract repository root '{}': {error}",
-                repository.root().display()
             ))
         })?;
         Ok(Self { workspace_root, items_dir })
@@ -135,7 +129,7 @@ mod tests {
         assert!(production_source.contains("FsTaskContractReader::new("));
         assert!(production_source.contains("FsImplCatalogSignalReader::new("));
         assert!(production_source.contains("FsImplPlanReader::new("));
-        assert!(production_source.contains("SystemGitRepo::discover_from(&items_dir)"));
+        assert!(production_source.contains("repository_root_for_items_dir(&items_dir)"));
         assert!(production_source.contains("Arc<dyn TaskContractReaderPort>"));
         assert!(production_source.contains("Arc<dyn ImplCatalogSignalReaderPort>"));
         assert!(production_source.contains("Arc<dyn ImplPlanReaderPort>"));

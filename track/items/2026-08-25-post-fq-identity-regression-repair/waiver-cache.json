@@ -394,8 +394,8 @@
       },
       "key": {
         "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
-        "declaration_hash": "bb21f3d713d771fc1906f8fef984f7ef6382d85558c6910262915380766b4022",
-        "waived_reason_hash": "b23d93c36fc0d4d7a99050c3f6002155b8e1960ed61762b7717391ab1ef5f6a6"
+        "declaration_hash": "0976bf05ca584e6efeaf1b84dc8d234fd6aeab0f7f868ecc197457dc441d1786",
+        "waived_reason_hash": "e271893723deb443a7b1aa9d0892192ba9b30c782ecfcecdfb146132f851b8b2"
       },
       "obligation_id": {
         "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot",
@@ -404,6 +404,30 @@
       },
       "verdict": {
         "citation": "Wires FsCatalogueDocumentLoader and FsTdddLayerBindingsAdapter into PreReviewGateInteractor and CoverageVerifyInteractor from one items-directory repository context",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        "entry_key": "infrastructure::repository_root_for_items_dir"
+      },
+      "key": {
+        "anchor_text_hash": "885052b091352244bfe466bb5812fc15af8302c586cd8b6239923a39e926a6f1",
+        "declaration_hash": "eda7e0edc0beebb94d339bbcbaa7d66df23d389b04e0de11acaa959c0d35941b",
+        "waived_reason_hash": "53423e7d04fc1e54a6ac5ce923c26355c8a425306026b50e623da19dad53dae1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::repository_root_for_items_dir",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Single repository authority for the task-contract, impl-plan, and type-signal readers so the IN-05 pre-review gate resolves layer bindings and its attested catalogue from the same repository as the artifacts.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

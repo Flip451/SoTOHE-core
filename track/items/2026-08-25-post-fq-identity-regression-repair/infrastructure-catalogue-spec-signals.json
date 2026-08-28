@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "f9a8afb110c859971e82d2ae406991555d717a18b5cf0acdffd870202a9d5666",
+  "catalogue_declaration_hash": "ba3ed7305fab23b46acd43d5c37cc1e4e603ce1c3e686f66343113687ed41b43",
   "schema_version": 1,
   "signals": [
     {
@@ -31,6 +31,11 @@
       "entry_hash": "e35f04f8a7073121ae86c58bc05aacff581c7cbc475057b1a1e73a2d0901a343",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+    },
+    {
+      "entry_hash": "1dfb80e3990439a9ac8468a1fcb1406b6ec4acd2b391bb6b0a854f4d7c7991b7",
+      "signal": "blue",
+      "type_name": "infrastructure::repository_root_for_items_dir"
     },
     {
       "entry_hash": "39ef208c54c554bbf45dc13f78cf21d325da0c2d3bdb101cfcf11440f6929998",

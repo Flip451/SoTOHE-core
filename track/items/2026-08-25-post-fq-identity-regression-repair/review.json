@@ -498,6 +498,13 @@
           "hash": "rvw1:sha256:5bf942b526db2ed40e456611fba37e865cb6247943dedb64d1912dd29e4c44be",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T04:51:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ae06b76b75cf7a627ebcef7a4172a2aec002c57ded81e775b8e39e0646d717f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1486,6 +1493,13 @@
           "at": "2026-08-28T00:03:48Z",
           "findings": [],
           "hash": "rvw1:sha256:ba6393a2bca684a4de50c35b909218131594cf623eab9fb4b1687358de2132a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T05:05:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13a244c22c09353ffdd0741d894b6507801b88ece258e6b60b7ba2411d55524c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2594,6 +2608,28 @@
           "hash": "rvw1:sha256:c10f6d9d7d0a6729428cc874ced79ce49f4585b80fc329b3b4a16750eac62890",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T04:52:45Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 163,
+              "message": "`repository_root_for_items_dir` discards the canonical anchor returned by `discover_isolated_repo_for_items_dir` and never verifies that Git's reported root encloses `items_dir`. Repository configuration such as `core.worktree` can make `rev-parse --show-toplevel` identify another tree; the composition root would then load repository-authoritative inputs from that tree while reading artifacts from the supplied directory. Retain the anchor and fail closed unless it is contained by the canonical root, following `resolve_items_dir_under_current_repo` / `FsReviewScopeConfigReader::ensure_encloses`, and add a cross-root regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a697ac4a19d872c35e12839272a35f53a0695743c1d17c1ef7e710d39d9af286",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T05:11:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f1b918816f2d1ba0648af9a408ff42b8663805508e8771d9499f8689a1202460",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2981,6 +3017,13 @@
           "at": "2026-08-28T03:25:16Z",
           "findings": [],
           "hash": "rvw1:sha256:f1be8a712d598d4690f4bf803348d235cb6af9a6946df38f7a0f637c69f1a758",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T05:06:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d27bed8843043d2819242a7fb0f350269aa66aa69e19bc82c7c7e0bcdd599c7a",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4033,6 +4076,13 @@
           "at": "2026-08-28T03:26:14Z",
           "findings": [],
           "hash": "rvw1:sha256:6c3ef0641859c3166e80b979a82c9260ed5e4c629341253b7485b4f7ee6a22b8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T04:52:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7c030ade8d22c5ae01814ece4a676face399a1f54d3664fa3df9ca433fe2158",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -1,6 +1,26 @@
 {
   "crate_name": "infrastructure",
   "functions": {
+    "infrastructure::repository_root_for_items_dir": {
+      "action": "add",
+      "docs": "Single repository authority for the task-contract, impl-plan, and type-signal readers so the IN-05 pre-review gate resolves layer bindings and its attested catalogue from the same repository as the artifacts.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<std::path::PathBuf, std::io::error::Error>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
     "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref": {
       "action": "modify",
       "docs": "Catalogue TypeRef canonicalization operation.",

@@ -27,7 +27,7 @@
       "methods": [
         {
           "action": "modify",
-          "docs": "Discovers and canonicalizes the repository root from items_dir with SystemGitRepo::discover_from, then wires the IN-05 pre-review gates; discovery failures produce CompositionError::Infrastructure.",
+          "docs": "Obtains the repository root through infrastructure::repository_root_for_items_dir and wires the IN-05 pre-review gates; failures produce CompositionError::Infrastructure.",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",

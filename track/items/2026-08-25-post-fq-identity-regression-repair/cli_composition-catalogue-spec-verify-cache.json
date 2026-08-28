@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "41b96ecd6e5e7a075890a83b2255dc9984d420548752662550918f45ea39f5e4",
+      "claim_hash": "748feef21d622dd2dd724b130a214d44ed318b11278777a4dd8b91008d3195cf",
       "claim_origin": {
         "data": {
           "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot",

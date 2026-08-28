@@ -349,6 +349,30 @@
       }
     },
     {
+      "brief": "Author a logic test covering 'entry' of infrastructure::repository_root_for_items_dir",
+      "declaration_hash": "71e7f7408a7366382184028bd4ac10ab760254e7779dce75adbd0b5c1ac2d766",
+      "id": {
+        "entry_key": "infrastructure::repository_root_for_items_dir",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::repository_root_for_items_dir",
+        "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref",
       "declaration_hash": "37386ccb879631cb74cb99214f13cc177aed1de14343087648eaba01955e4448",
       "id": {
