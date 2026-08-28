@@ -123,9 +123,6 @@ impl TaskContractCompositionRoot {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::fs;
-    use std::path::PathBuf;
-
-    use cli_driver::task_contract::TaskContractInput;
 
     use super::TaskContractCompositionRoot;
 
@@ -177,48 +174,14 @@ mod tests {
 
     #[test]
     fn nested_custom_items_dir_discovers_repository_root() {
-        let source_root =
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..").canonicalize().unwrap();
-        let source_track =
-            source_root.join("track/items/2026-08-25-post-fq-identity-regression-repair");
-        let temp_root = source_root.join("tmp");
-        if !temp_root.is_dir() || !source_track.join("task-contract.json").is_file() {
-            return;
-        }
-
-        let repository = tempfile::tempdir_in(temp_root).unwrap();
+        let repository = tempfile::tempdir().unwrap();
         crate::test_support::seed_repo(repository.path(), "track/task-contract-fixture");
-        fs::copy(
-            source_root.join("architecture-rules.json"),
-            repository.path().join("architecture-rules.json"),
-        )
-        .unwrap();
-
         let items_dir = repository.path().join("custom/track/items");
-        let track_dir = items_dir.join("2026-08-25-post-fq-identity-regression-repair");
-        fs::create_dir_all(&track_dir).unwrap();
-        for file in [
-            "task-contract.json",
-            "impl-plan.json",
-            "domain-type-signals.json",
-            "domain-types.json",
-            "domain-types-baseline.json",
-        ] {
-            fs::copy(source_track.join(file), track_dir.join(file)).unwrap();
-        }
+        fs::create_dir_all(&items_dir).unwrap();
 
-        let outcome = TaskContractCompositionRoot::new(items_dir)
-            .unwrap()
-            .task_contract_driver()
-            .handle(TaskContractInput::Check {
-                layer: Some("domain".to_owned()),
-                track_id: "2026-08-25-post-fq-identity-regression-repair".to_owned(),
-            });
-        let stderr = outcome.stderr.as_deref().unwrap_or_default();
-        assert!(
-            !stderr.contains("failed to read catalogue for layer 'domain'"),
-            "custom items_dir must still resolve architecture-rules.json from the repository root: {stderr}"
-        );
+        let root = TaskContractCompositionRoot::new(items_dir.clone()).unwrap();
+        assert_eq!(root.workspace_root, repository.path().canonicalize().unwrap());
+        assert_eq!(root.items_dir, items_dir);
     }
 
     #[test]
