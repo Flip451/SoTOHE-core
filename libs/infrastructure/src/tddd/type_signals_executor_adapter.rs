@@ -248,7 +248,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -307,6 +307,35 @@ mod tests {
         let rustdoc_json = minimal_rustdoc_json();
         std::fs::write(&rustdoc_path, &rustdoc_json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), rustdoc_json).unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{
+            "version": 2,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "domain-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["domain"] }
+                    }
+                },
+                {
+                    "crate": "infrastructure",
+                    "path": "libs/infrastructure",
+                    "may_depend_on": ["domain"],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "infrastructure-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                    }
+                }
+            ]
+        }"#,
+        )
+        .unwrap();
         crate::verify::test_support::git_init(root);
         crate::verify::test_support::run_git(root, &["add", "."]);
         crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
@@ -330,6 +359,33 @@ mod tests {
         assert_eq!(infra.catalogue_file(), "domain-types.json");
         assert_eq!(infra.baseline_file(), "domain-types-baseline.json");
         assert_eq!(infra.targets(), &["domain"]);
+    }
+
+    #[test]
+    fn test_adapter_implements_type_signals_executor_port() {
+        fn assert_port<T: TypeSignalsExecutorPort>() {}
+        assert_port::<TypeSignalsExecutorAdapter>();
+    }
+
+    #[cfg(feature = "test-helpers")]
+    #[test]
+    fn test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files() {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, rustdoc_path) = setup_feature_aware_workspace();
+            let items_dir = workspace.path().join("track/items");
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let adapter = TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(observer);
+
+            adapter
+                .evaluate_layer(
+                    &items_dir,
+                    &track_id(),
+                    workspace.path(),
+                    &domain_binding("infrastructure"),
+                    &[],
+                )
+                .expect("an enabled layer without a catalogue file contributes no declarations");
+        });
     }
 
     #[test]

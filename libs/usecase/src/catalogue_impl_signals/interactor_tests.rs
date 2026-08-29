@@ -7,7 +7,13 @@
 //! Happy-path / report-format tests live in `interactor_happy_tests.rs`, which
 //! is included as a submodule below so it can share these helpers.
 
-#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::indexing_slicing,
+    clippy::type_complexity
+)]
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
@@ -195,7 +201,8 @@ pub(super) struct FailingCodec;
 impl domain::tddd::CatalogueToExtendedCratePort for FailingCodec {
     fn encode(
         &self,
-        _doc: CatalogueDocument,
+        _target_layer: &LayerId,
+        _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
         _baseline: &Crate,
         _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
@@ -336,6 +343,27 @@ impl TdddLayerBindingsPort for StubLayerBindings {
         _layer_filter: Option<&str>,
     ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
         Ok(self.bindings.clone())
+    }
+}
+
+struct FilteringLayerBindings {
+    bindings: Vec<TdddLayerBinding>,
+    calls: Arc<Mutex<Vec<Option<String>>>>,
+}
+
+impl TdddLayerBindingsPort for FilteringLayerBindings {
+    fn load(
+        &self,
+        _workspace_root: &Path,
+        layer_filter: Option<&str>,
+    ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> {
+        self.calls.lock().unwrap().push(layer_filter.map(str::to_owned));
+        Ok(self
+            .bindings
+            .iter()
+            .filter(|binding| layer_filter.is_none_or(|filter| binding.layer_id == filter))
+            .cloned()
+            .collect())
     }
 }
 
@@ -550,7 +578,8 @@ struct CatalogueGatedItemCodec;
 impl domain::tddd::CatalogueToExtendedCratePort for CatalogueGatedItemCodec {
     fn encode(
         &self,
-        _doc: CatalogueDocument,
+        _target_layer: &LayerId,
+        _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
         _baseline: &Crate,
         _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
@@ -627,7 +656,8 @@ struct EmptyExtendedCrateCodec;
 impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
     fn encode(
         &self,
-        _doc: CatalogueDocument,
+        _target_layer: &LayerId,
+        _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
         _baseline: &Crate,
         _current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
@@ -636,18 +666,50 @@ impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
 }
 
 struct RecordingExtendedCrateCodec {
-    observed: Arc<Mutex<Option<(Crate, Crate)>>>,
+    observed: Arc<Mutex<Vec<(LayerId, BTreeMap<LayerId, CatalogueDocument>, Crate, Crate)>>>,
 }
 
 impl domain::tddd::CatalogueToExtendedCratePort for RecordingExtendedCrateCodec {
     fn encode(
         &self,
-        _doc: CatalogueDocument,
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
         baseline: &Crate,
         current: &Crate,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
-        *self.observed.lock().unwrap() = Some((baseline.clone(), current.clone()));
+        self.observed.lock().unwrap().push((
+            target_layer.clone(),
+            track_catalogues.clone(),
+            baseline.clone(),
+            current.clone(),
+        ));
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
+    }
+}
+
+struct TrackCatalogueLoader {
+    documents: BTreeMap<String, CatalogueDocument>,
+}
+
+impl AttestedCatalogueDocumentLoaderPort for TrackCatalogueLoader {
+    fn load(
+        &self,
+        path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
+        let file_name = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .ok_or_else(|| CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })?;
+        let document =
+            self.documents.get(file_name).cloned().ok_or_else(|| {
+                CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() }
+            })?;
+        Ok(domain::tddd::catalogue_v2::AttestedCatalogueDocument::attest(
+            b"T004 track catalogue",
+            |_| Ok::<_, std::convert::Infallible>(document),
+        )
+        .unwrap())
     }
 }
 
@@ -779,7 +841,7 @@ fn test_run_codec_receives_baseline_and_current_crates_in_order() {
     expected_baseline.crate_version = Some("baseline-fixture".to_owned());
     let mut expected_current = empty_rustdoc_crate();
     expected_current.crate_version = Some("current-fixture".to_owned());
-    let observed = Arc::new(Mutex::new(None));
+    let observed = Arc::new(Mutex::new(Vec::new()));
     let interactor = build_interactor(
         Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
         Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
@@ -794,9 +856,148 @@ fn test_run_codec_receives_baseline_and_current_crates_in_order() {
 
     interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
 
-    let (actual_baseline, actual_current) = observed.lock().unwrap().take().unwrap();
+    let (actual_target, actual_catalogues, actual_baseline, actual_current) =
+        observed.lock().unwrap().pop().unwrap();
+    assert_eq!(actual_target, LayerId::try_new("domain").unwrap());
+    assert_eq!(actual_catalogues.len(), 1);
+    assert_eq!(
+        actual_catalogues.get(&LayerId::try_new("domain").unwrap()).unwrap().crate_name().as_str(),
+        "domain"
+    );
     assert_eq!(actual_baseline, expected_baseline);
     assert_eq!(actual_current, expected_current);
+}
+
+#[test]
+fn test_run_codec_receives_all_track_catalogues_for_each_target_layer() {
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{CatalogueEntryKey, FieldDecl, FieldName, ModulePath};
+
+    let domain_layer = LayerId::try_new("domain").unwrap();
+    let usecase_layer = LayerId::try_new("usecase").unwrap();
+    let mut domain_doc = minimal_catalogue_doc("domain");
+    domain_doc.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut usecase_doc = minimal_catalogue_doc("usecase");
+    usecase_doc.insert_type(
+        CatalogueEntryKey::try_new("Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("id").unwrap(),
+                        TypeRef::new("domain::model::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let loader = TrackCatalogueLoader {
+        documents: BTreeMap::from([
+            ("domain-types.json".to_owned(), domain_doc.clone()),
+            ("usecase-types.json".to_owned(), usecase_doc.clone()),
+        ]),
+    };
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(loader),
+        Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(EmptyRustdocPort),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    let observations = observed.lock().unwrap();
+    assert_eq!(observations.len(), 2);
+    assert_eq!(observations[0].0, domain_layer);
+    assert_eq!(observations[1].0, usecase_layer);
+    for (_, catalogues, _, _) in observations.iter() {
+        assert_eq!(catalogues.len(), 2);
+        assert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));
+        assert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));
+        assert!(
+            catalogues
+                .get(&domain_layer)
+                .and_then(|doc| doc
+                    .types()
+                    .get(&CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap()))
+                .is_some_and(|entry| entry.action() == ItemAction::Add),
+            "the codec must receive the declaring-layer add without a usecase duplicate"
+        );
+        assert!(
+            catalogues
+                .get(&usecase_layer)
+                .is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains("UserId"))),
+            "the referencing catalogue must not duplicate the declaring-layer add"
+        );
+    }
+}
+
+#[test]
+fn test_run_skips_missing_non_target_catalogue_when_layer_is_selected() {
+    let domain_binding = stub_binding("domain");
+    let usecase_binding = stub_binding("usecase");
+    let binding_calls = Arc::new(Mutex::new(Vec::new()));
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([(
+                domain_binding.catalogue_file.clone(),
+                minimal_catalogue_doc("domain"),
+            )]),
+        }),
+        Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(EmptyRustdocPort),
+        Arc::new(FilteringLayerBindings {
+            bindings: vec![domain_binding, usecase_binding],
+            calls: Arc::clone(&binding_calls),
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor
+        .run("my-track".to_owned(), workspace.path().to_path_buf(), Some("domain".to_owned()))
+        .unwrap();
+
+    let observations = observed.lock().unwrap();
+    assert_eq!(observations.len(), 1);
+    assert_eq!(observations[0].0, LayerId::try_new("domain").unwrap());
+    assert_eq!(observations[0].1.len(), 1);
+    assert!(observations[0].1.contains_key(&LayerId::try_new("domain").unwrap()));
+    assert!(!observations[0].1.contains_key(&LayerId::try_new("usecase").unwrap()));
+    assert_eq!(binding_calls.lock().unwrap().as_slice(), &[None]);
 }
 
 // -------------------------------------------------------------------------
@@ -893,6 +1094,36 @@ fn test_run_catalogue_load_failure_returns_catalogue_load_error() {
     assert!(
         matches!(err, CatalogueImplSignalsError::CatalogueLoad(_, _)),
         "expected CatalogueLoad, got: {err:?}"
+    );
+}
+
+#[test]
+fn test_run_catalogue_layer_mismatch_returns_catalogue_load_error() {
+    let binding = stub_binding("domain");
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([(
+                binding.catalogue_file.clone(),
+                minimal_catalogue_doc("usecase"),
+            )]),
+        }),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+    );
+    let err =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+
+    assert!(
+        matches!(
+            &err,
+            CatalogueImplSignalsError::CatalogueLoad(layer, reason)
+                if layer.as_ref() == "domain"
+                    && reason.as_str().contains("declares layer 'usecase'")
+                    && reason.as_str().contains("bound to layer 'domain'")
+        ),
+        "a catalogue layer mismatch must fail closed, got: {err:?}"
     );
 }
 

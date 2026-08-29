@@ -33,6 +33,24 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-29T00:57:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e474a7648f4d9d5063b77c768f56d3cd8313d6066b7a04d46865599464e59f5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:22:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e474a7648f4d9d5063b77c768f56d3cd8313d6066b7a04d46865599464e59f5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -292,6 +310,313 @@
           "hash": "rvw1:sha256:ee1e936638b858b00361f0e5eb9f0bdd141689f8fb8b6dff8891180ce48d090c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T00:56:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:19:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T02:18:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:08:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:51:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:55:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:181eaf96f08ed8ef25e2f61efda36f9a8cfeb041d70633850c478a65126c01f0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-29T00:59:37Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 155,
+              "message": "The loader keys each decoded catalogue by `document.layer()` without verifying it matches the architecture binding that selected the file. A malformed or stale `domain-types.json` declaring `layer: infrastructure` can overwrite the real infrastructure entry in the shared map (or cause the target catalogue to be inserted under multiple layer keys), so `encode` may resolve/encode declarations from the wrong file and silently produce incorrect cross-layer identities. Reject the catalogue when its layer differs from `binding.layer_id()` (and prevent duplicate effective layer keys).",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:38f61d6107eee6b7ff33ab8b02b54e22c4e076f11287b25557b16ffe78a9e604",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T01:10:12Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 125,
+              "message": "`path.exists()` follows symlinks and returns false for a dangling symlink, so a configured non-target catalogue can be silently treated as absent before `reject_type_signals_path` runs. This violates the infrastructure security convention's fail-closed rule for dangling symlinks and lets a malformed/redirected catalogue silently remove declarations from the shared resolution set. Call the symlink guard before the existence decision (or inspect with `symlink_metadata`) and reject any symlink, including dangling links.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:35971b99def9c340facf207d1741c6d24c98fd0aee9f9e92e740c06441637dd1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T01:16:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0553f40645e8d1f0032eb5cfcef72db4b5def9d2ace913a480304a3f670af3ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:31:05Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 136,
+              "message": "非標準の `catalogue_file` から正しい crate stem を導出してください。`custom.json` のような許可済み override では `strip_suffix(\"-types.json\")` が失敗し、`CatalogueDocumentCodec::decode` に拡張子付きの `custom.json` が渡されるため、正当な `crate_name` が必ず `CrateNameMismatch` になります。既存の filename-stem 規則を再利用し、この形式の回帰テストを追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 388,
+              "message": "評価結果が依存する全 catalogue と `architecture-rules.json` を cache identity と入力再検証に含めてください。ここで他層 catalogue が新たな authoritative input になりましたが、後段の `TypeSignalsCacheKey` と `verify_evaluation_inputs_unchanged` は対象層 catalogue・HEAD・baseline しか検証しません。最初の worktree probe 後に他層 catalogue または rules が変わると、古い cache を成功扱いしたり、混在した snapshot の signal を永続化できます。これは semantics-affecting input を省いた fingerprint/hash drift です。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 129,
+              "message": "`未宣言の前提への依存`: configured catalogue が通常ファイルであることを前提にせず、open 前に拒否してください。symlink guard は FIFO や device を受理し、`read_bytes_file_limited` は metadata 後に `File::open` するため、FIFO を配置すると評価ゲートが無期限に停止し得ます。`symlink_metadata().file_type().is_file()` と opened-handle metadata を検証し、typed error で fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 123,
+              "message": "`未宣言の前提への依存`: 全 catalogue 読み込みの総量または layer 数に明示的な上限を設けてください。各ファイルには 16 MiB の上限がありますが、外部設定由来の全 binding を走査して decoded document を同時保持するため、総 I/O・memory は layer 数×16 MiB まで増えます。spec と environment-assumptions のどちらにも許容 layer 数や aggregate budget がなく、過大な rules/catalogue 集合で OOM し得ます。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0553f40645e8d1f0032eb5cfcef72db4b5def9d2ace913a480304a3f670af3ad",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T01:53:04Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 220,
+              "message": "`未宣言の前提への依存`: catalogue 読み込みを Linux 専用 helper に切り替えたため、macOS/Windows では通常ファイルでも常に `Unsupported` となり、type-signals 評価全体が失敗します。supported-platform 宣言は依然 TODO で、spec にも Linux 限定はありません。portable な guarded read を実装するか、正規の SoT で対応 platform を先に決定・宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 65,
+              "message": "`未宣言の前提への依存`: `64 layers` と aggregate `64 MiB` は新しい入力受理条件ですが、spec と environment-assumptions の resource-limit 宣言のどちらにも存在しません。architecture-rules.json が正当に選択した catalogue 集合を、この adapter 固有の未根拠な値で拒否することになります。上限・適用範囲・超過時動作を SoT に宣言してから使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 437,
+              "message": "評価結果が依存する全 catalogue と `architecture-rules.json` を cache identity と入力再検証に含めてください。ここで track catalogue map が authoritative input になりましたが、`TypeSignalsCacheKey` と `verify_evaluation_inputs_unchanged` は対象層 catalogue・HEAD・baseline しか表しません。さらに cache-hit 経路は map を読む前に return します。worktree probe 後の同時変更では stale cache を成功扱いでき、評価時にも混在 snapshot を永続化できます。semantics-affecting input を省いた fingerprint/hash drift です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:76f6635a76a885837703c6b941c0f0b3e3585bf7a607f5d6f986dfc10a9517e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T02:02:52Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 215,
+              "message": "非 Linux build ではこの `mut` が不要で、crate が継承する `warnings = \"deny\"` により `unused_mut` がコンパイルエラーになります。`File::metadata` は共有借用、`Read::take` は value receiver なので、binding から `mut` を外してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 215,
+              "message": "`未宣言の前提への依存`: 非 Linux 分岐は事前検査後に通常の `File::open` を行い、`trusted_items_root` を一切使用しません。検査と open の間に leaf または中間 directory が symlink/reparse point へ交換されると、root 外の通常ファイルを開いても opened metadata 検査を通過します。descriptor の no-follow と opened-path containment を portable に実装するか、対応 platform/concurrency 前提を SoT で明示して fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 125,
+              "message": "`未宣言の前提への依存`: configuration-driven loop は各 catalogue を最大 16 MiB 読み、decoded document をすべて map に保持しますが、layer 数または aggregate bytes の運用上の上限がありません。spec と environment-assumptions の resource-limit 欄にも前提がなく、過大な architecture-rules/catalogue 集合で大量 I/O と OOM を起こせます。総量を明示的に制限し、その値・範囲・超過動作を SoT に宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 468,
+              "message": "評価結果が依存する全 catalogue と `architecture-rules.json` を cache identity と入力再検証に含めてください。track catalogue map が authoritative input になりましたが、`TypeSignalsCacheKey` と `verify_evaluation_inputs_unchanged` は対象層 catalogue・HEAD・baseline しか表さず、cache-hit は map を読む前に return します。worktree probe 後の同時変更では stale cache を成功扱いでき、評価時にも混在 snapshot を永続化できます。semantics-affecting input を省いた fingerprint/hash drift です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fcbfa7fc176c201f0de49cf15e614ab0905c20bb4acb633936109aae9595c431",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T02:10:09Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 215,
+              "message": "`未宣言の前提への依存`: 非 Linux 分岐は事前検査後に通常の `File::open` を行い、`trusted_items_root` を使用しません。検査と open の間に leaf または中間 directory が symlink/reparse point へ交換されると、root 外の通常ファイルを開いても opened metadata 検査を通過します。descriptor の no-follow と opened-path containment を portable に実装するか、対応 platform/concurrency 前提を SoT で明示して fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 125,
+              "message": "`未宣言の前提への依存`: configuration-driven loop は各 catalogue を最大 16 MiB 読み、decoded document をすべて map に保持しますが、layer 数または aggregate bytes の運用上の上限がありません。spec と environment-assumptions の resource-limit 欄にも前提がなく、過大な architecture-rules/catalogue 集合で大量 I/O と OOM を起こせます。総量を明示的に制限し、その値・範囲・超過動作を SoT に宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 468,
+              "message": "評価結果が依存する全 catalogue と `architecture-rules.json` を cache identity と入力再検証に含めてください。track catalogue map が authoritative input になりましたが、`TypeSignalsCacheKey` と `verify_evaluation_inputs_unchanged` は対象層 catalogue・HEAD・baseline しか表さず、cache-hit は map を読む前に return します。worktree probe 後の同時変更では stale cache を成功扱いでき、評価時にも混在 snapshot を永続化できます。semantics-affecting input を省いた fingerprint/hash drift です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:864415e3bbbedcacf6f99cb901033a875ad9ebd80f7b5235109f01765bce562a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T02:24:58Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 487,
+              "message": "`declaration_hash` の wire contract を resolution-set fingerprint に置き換えないでください。この値は `spec_states`, `impl_catalog_signal_reader`, merge gate, signal report が対象層 catalogue の raw bytes hash と比較します。ここで複合 fingerprint を保存すると、生成直後の全 type-signals artifact が declaration-hash mismatch として拒否されます。既存の catalogue hash は維持し、resolution fingerprint には別の typed field/cache identity を導入してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 468,
+              "message": "評価開始時の resolution fingerprint が evaluation path に引き渡されていません。report 作成後に fingerprint を新規取得し、それを `initial_key` として直後に再検証しているため、catalogue map を line 443 で読み込んだ後から line 468 までの変更は検出されず、古い report に新しい hash を付けて永続化できます。map と fingerprint を同じ snapshot から作り、開始時の値を最後まで比較してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 178,
+              "message": "`architecture-rules.json` を fingerprint 用に直接読む前に trusted-root/symlink guard を適用してください。`read_bytes_file_limited` は `metadata` と `File::open` で symlink を追跡し、FIFO も開くため、workspace 内の rules leaf が symlink/FIFO なら root 外を読み取るか無期限に停止し、その後の guarded loader に到達しません。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 230,
+              "message": "`read_configured_catalogue` は事前の `symlink_metadata` 後に path-following `read_bytes_file_limited` を呼び、渡された trusted root を使用していません。検査と open の間に leaf または中間 directory が交換されると、root 外の通常ファイルや FIFOへ redirect できます。descriptor-pinned no-follow open と opened-path containment を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 176,
+              "message": "`未宣言の前提への依存`: fingerprint は全 configured catalogue の raw bytes を単一 `Vec` に蓄積し、別経路では decoded documents も全件保持します。各ファイルの 16 MiB 制限しかなく、layer 数・aggregate bytes の上限は spec と environment-assumptions のどちらにもないため、過大な設定で大量 I/O/OOM が可能です。総量を制限し、値・範囲・超過動作を SoT に宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 200,
+              "message": "fingerprint encodingで「catalogue 不在」と「存在する 0-byte catalogue」の両方を同じ `0u64` として表現しています。後者は decode すべき不正 input ですが、欠落状態から空ファイルへの変更で hash が変わらず、cache-hit や終了時再検証を通過できます。presence tag と length を別々に canonical encoding へ含めてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fac0742866b8851c64ec3affa733ee559771c13cba62d726dd4ee2ab70435bdd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T03:13:47Z",
+          "findings": [
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 469,
+              "message": "再読み込みした architecture-rules の target catalogue と、呼び出し時に渡された binding/catalogue が一致することを fail-closed で検証してください。map に target layer が通常存在するため、この条件分岐は再読込側 document を残しますが、`kinds`・`identity_index`・`declaration_hash` は先に読んだ document から作られます。binding と workspace rules が不一致、または rustdoc 実行中に rules/catalogue_file が変更された場合、start/end fingerprint は同じ新入力で一致したまま、2 つの target document を混在させた artifact を保存できます。target binding/bytes を比較して拒否するか、単一の attested target document を全経路で使用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:70aa7181c2a4bca6ae7354f38154fcd38454fdad696ad25493b975bdf5ce226a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T03:29:53Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 450,
+              "message": "binding 全体の `PartialEq` 比較は、evaluator が使用しない `catalogue_spec_signal_enabled` まで比較します。`TypeSignalsExecutorAdapter::to_infra_binding` はこの field を常に既定値 false にしますが、実際の architecture-rules.json では true なので、この repository の全 layer evaluation が必ず「binding does not match」で失敗します。layer_id・catalogue_file・targets など evaluator が受け取れる relevant fields のみを比較してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 355,
+              "message": "single-layer cache-hit 経路でも architecture-rules の snapshot を再検証してください。configured layer 数を一度確認した後に rules が single→multi または別 target binding へ変わると、worktree probe 後の `SkipEvaluation` は target catalogue・baseline・HEAD だけを再検証して return し、resolution fingerprint の start/end check に到達しません。intra-eval fingerprint を cache decision の前後でも比較し、変更時は再評価または error にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:af9dcc944e64a60a6a5faa777bed9641f51020220cb2266398a67b436f232ceb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T03:49:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:439292b6f79afeafa6fa53a288b004ca1503cc5adf40d2aebc1aea4f07afadb9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -308,6 +633,48 @@
           "at": "2026-08-28T13:06:13Z",
           "findings": [],
           "hash": "rvw1:sha256:53b262b2931fa9061980a5c0870b04e10e47180b55d12bc853767d6070ac5979",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T00:57:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:19:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T02:18:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:07:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:51:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:58:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e8b050ffd1e0c8c4ed642add1cc98d2ebcea1fb7c72ce6c778c86a9a9484b52",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -466,6 +833,90 @@
           "at": "2026-08-28T12:44:47Z",
           "findings": [],
           "hash": "rvw1:sha256:a1f5e3c5a57a64fc6769ef9a18f57dac60a255e0318741db83afefdcbac18563",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-29T00:58:43Z",
+          "findings": [
+            {
+              "category": "spec-compliance",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 214,
+              "message": "The new preload loop treats every catalogue loader error, including `CatalogueDocumentLoaderError::NotFound`, as a fatal `CatalogueLoad` error. This violates CO-02, which requires a TDDD-enabled layer with no catalogue file to be treated as having no declarations; a missing non-target layer therefore prevents evaluation of otherwise available target layers. Handle `NotFound` by skipping that layer while still failing on I/O/decode errors (and retain the target-layer missing check).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1f785c2f9568ba7d584fd36971ebc187c32376f1b964faabeeadbe161b47a705",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T01:10:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e892787cc08d1b0ac37e9312528d225239bec3988be79f670925bba16c1d44ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:25:35Z",
+          "findings": [
+            {
+              "category": "correctness/fail-closed",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 223,
+              "message": "読み込んだ `CatalogueDocument` の `layer()` を binding 由来の `catalogue_layer` と照合せず map に挿入しています。誤った layer を宣言する catalogue の `add` 項目が別層の解決集合へ混入し、AC-03 の fail-closed 要件に反して未根拠の cross-crate 参照を成立させ得ます。挿入前に layer の一致を検証して `CatalogueLoad` として拒否し、mismatch の回帰テストを追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 184,
+              "message": "layer 指定時は bindings を二度取得し、その後 catalogue を順次読み込むため、同時更新があると architecture binding、feature declaration、対象 catalogue、他層 catalogue が異なる世代から混在します。仕様にも環境前提宣言にも single-writer／snapshot 一貫性は記録されていません。単一の binding snapshot から対象を選び、catalogue 群も安定した一括 snapshot として取得するか、実行時の直列化前提を宣言・強制してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 200,
+              "message": "全層の `CatalogueDocument` を `BTreeMap` に同時保持する新しい eager-load 経路は、層数および catalogue 合計サイズが利用可能メモリ内に収まることへ依存します。CO-02 は対象集合だけを定め、環境前提宣言の Resource Limits は TODO のままで、合計上限や超過時動作がありません。層数／合計 bytes を制限して型付きエラーにするか、その上限を環境前提として宣言してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e892787cc08d1b0ac37e9312528d225239bec3988be79f670925bba16c1d44ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T02:21:59Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 223,
+              "message": "各 catalogue を個別に順次読み込み、`AttestedCatalogueDocument` を直ちに document へ変換しているため、複数ファイルが同一世代の track snapshot であることを確認できません。実行中に別プロセスが catalogue を更新すると、異なる世代の add 宣言を一つの解決集合へ混在させ得ます。spec に snapshot semantics はなく、環境宣言の Concurrency Model も TODO です。一括 snapshot を返す port を使うか、更新との直列化を宣言・強制してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 210,
+              "message": "全層の `CatalogueDocument` を同時に保持する eager-load 経路には、層数または catalogue 合計サイズの上限がありません。具体 adapter の一ファイル 16 MiB 制限でも合計量は制限されず、過大な binding 集合では型付きエラーではなくメモリ枯渇に依存します。spec は対象集合だけを定め、環境宣言の Resource Limits は TODO のままです。層数／合計 bytes の上限と超過時動作を実装または宣言してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cc87a0f4ab9f3829665dc2fb23982b6f3c5f7e79afd8a8d3e73d48800aa430e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T03:10:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ab916d8af477d8c91206ff87c65f69ed74a956770192f0b6f62ae80b101bd52",
           "type": "final",
           "verdict": "zero_findings"
         }

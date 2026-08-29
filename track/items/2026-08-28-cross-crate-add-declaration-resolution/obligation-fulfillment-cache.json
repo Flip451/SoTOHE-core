@@ -1,4 +1,1696 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "6bc21ab56b66b1c962f894d2e41a2c6d6173c49b732a37f917ab972d60fa9f08",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                                path.id != Id(UNRESOLVED_CRATE_ID)\n                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    let repository = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"ports\", \"Repository\"])\n        .expect(\"the declaring layer's trait add must be present\");\n    assert_eq!(repository.kind, ItemKind::Trait);\n    assert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    assert!(\n        !paths.values().any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the target catalogue must not duplicate the declaring-layer item\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\nassert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\nassert_eq!(summary.path, [\"domain\", \"model\", \"UserId\"]);\nassert_eq!(*id, rustdoc_id);\nassert_eq!(summary.crate_id, 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"expect(\"available other-layer catalogues must extend one resolution set\");\" ... \"expect(\"one normalized resolution set must cover every codec route\");\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"missing enabled catalogues are empty, not errors\"; ... \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "let user_id = item_id_for_path(&encoded, &[\"domain\", \"model\", \"UserId\"]);\nlet user_summary = &encoded.krate().paths[&user_id];\nassert_ne!(user_summary.crate_id, 0);\nassert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nlet future = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"RemoteFuture\"])\n        .expect(\"an omitted placement must remain represented\");\n    assert_eq!(future.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);\n    assert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));\n\nlet baseline = rustdoc_crate_with_root_and_paths(\n        \"sotp\",\n        [(1, vec![\"sotp\", \"commands\", \"run\"], ItemKind::Function)],\n    );\n    let encoded = encode_single_doc(doc, &baseline, &baseline)\n        .expect(\"function encoding must retain the package-facing path\");\n    let id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(\n    !encoded\n        .krate()\n        .paths\n        .values()\n        .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n    \"the referencing catalogue must not duplicate the external declaration\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_to_extended_crate_port::tests",
+          "test_name": "encode_contract_includes_target_layer_and_track_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
+        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(*id, rustdoc_id);\n    assert_eq!(summary.crate_id, 1);\n    assert_ne!(summary.crate_id, u32::MAX - 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "6bc21ab56b66b1c962f894d2e41a2c6d6173c49b732a37f917ab972d60fa9f08",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\nassert_eq!(repository.kind, ItemKind::Trait);\nassert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\nassert_eq!(future.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);\nassert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));\nassert!(\n    !paths.values().any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n    \"the target catalogue must not duplicate the declaring-layer item\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(user_summary.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\"); ... assert_eq!(*id, rustdoc_id); ... assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(\n        &CatalogueToExtendedCrateCodec::new(),\n        &target_layer,\n        &catalogues,\n        &empty,\n        &empty,\n    )\n    .expect(\"cross-layer add declarations must resolve as external identities\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "\"missing enabled catalogues are empty, not errors\";\nassert!(loaded.catalogues.contains_key(&LayerId::try_new(\"infrastructure\").unwrap()));\nassert!(\n    !loaded.catalogues.contains_key(&LayerId::try_new(\"domain\").unwrap()),\n    \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(encoded.krate().paths.values().any(|summary| { summary.path == vec![\"domain\", \"generated\", \"FutureType\"] }));\n\nlet id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\nassert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_codec_implements_catalogue_to_extended_crate_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_omitted_module_path_add_resolves_to_one_current_candidate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      },
+      "key": {
+        "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
+        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "expect(\"a referring-side rustdoc identity must win over the other-layer add\"); ... assert_eq!(*id, rustdoc_id); ... assert_ne!(summary.crate_id, u32::MAX - 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
+        "bound_tests_set_hash": "9c3a2110c4a2826eb586df74021a5b53da7959e6f5ae8c532823cc2829013df4",
+        "declaration_hash": "5a28598e71be3dc4d8315ee1cd4403f83bc6c376a05d22474f23a546619c57ac"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));\n        assert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));\n        assert!(\n            catalogues\n                .get(&domain_layer)\n                .and_then(|doc| doc\n                    .types()\n                    .get(&CatalogueEntryKey::try_new(\"domain::model::UserId\".to_owned()).unwrap()))\n                .is_some_and(|entry| entry.action() == ItemAction::Add),\n            \"the codec must receive the declaring-layer add without a usecase duplicate\"\n        );\n        assert!(\n            catalogues\n                .get(&usecase_layer)\n                .is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains(\"UserId\"))),\n            \"the referencing catalogue must not duplicate the declaring-layer add\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
+        "bound_tests_set_hash": "9c3a2110c4a2826eb586df74021a5b53da7959e6f5ae8c532823cc2829013df4",
+        "declaration_hash": "5a28598e71be3dc4d8315ee1cd4403f83bc6c376a05d22474f23a546619c57ac"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(observations.len(), 2);\n    assert_eq!(observations[0].0, domain_layer);\n    assert_eq!(observations[1].0, usecase_layer);\n    for (_, catalogues, _, _) in observations.iter() {\n        assert_eq!(catalogues.len(), 2);\n        assert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));\n        assert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
+        "bound_tests_set_hash": "9c3a2110c4a2826eb586df74021a5b53da7959e6f5ae8c532823cc2829013df4",
+        "declaration_hash": "5a28598e71be3dc4d8315ee1cd4403f83bc6c376a05d22474f23a546619c57ac"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(\n            catalogues\n                .get(&domain_layer)\n                .and_then(|doc| doc\n                    .types()\n                    .get(&CatalogueEntryKey::try_new(\"domain::model::UserId\".to_owned()).unwrap()))\n                .is_some_and(|entry| entry.action() == ItemAction::Add),\n            \"the codec must receive the declaring-layer add without a usecase duplicate\"\n        );\n        assert!(\n            catalogues\n                .get(&usecase_layer)\n                .is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains(\"UserId\"))),\n            \"the referencing catalogue must not duplicate the declaring-layer add\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
+        "bound_tests_set_hash": "1669bebf1755fd5343f9262b396e4a3e3c8532af88629e9e8d64d8f2adcc47c3",
+        "declaration_hash": "245989233a23c53c58fd2cf132bca97240862dbdd534f0b64be7ca9d8de806e1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_id.1.crate_id].name, \"domain\");\n        assert!(\n            !encoded\n                .krate()\n                .paths\n                .values()\n                .any(|summary| summary.path == [\"infrastructure\", \"model\", \"UserId\"]),\n            \"the target catalogue must not duplicate the declaring-layer item\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
+        "bound_tests_set_hash": "1669bebf1755fd5343f9262b396e4a3e3c8532af88629e9e8d64d8f2adcc47c3",
+        "declaration_hash": "245989233a23c53c58fd2cf132bca97240862dbdd534f0b64be7ca9d8de806e1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let encoded = CatalogueToExtendedCrateCodec::new()\n            .encode(&LayerId::try_new(\"infrastructure\").unwrap(), &loaded_documents, &empty, &empty)\n            .expect(\"other-layer add declarations must join the evaluator encode map\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
+        "bound_tests_set_hash": "1669bebf1755fd5343f9262b396e4a3e3c8532af88629e9e8d64d8f2adcc47c3",
+        "declaration_hash": "245989233a23c53c58fd2cf132bca97240862dbdd534f0b64be7ca9d8de806e1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "\"let loaded = load_track_catalogues(root, &track_dir, &trusted)\\n            .expect(\\\"architecture-rules must select every TDDD-enabled catalogue\\\");\" and \"assert!(\\n            !loaded.catalogues.contains_key(&LayerId::try_new(\\\"domain\\\").unwrap()),\\n            \\\"a TDDD-enabled layer without a catalogue file must contribute no declarations\\\"\\n        );\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
+        "bound_tests_set_hash": "1669bebf1755fd5343f9262b396e4a3e3c8532af88629e9e8d64d8f2adcc47c3",
+        "declaration_hash": "245989233a23c53c58fd2cf132bca97240862dbdd534f0b64be7ca9d8de806e1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(\n    !encoded\n        .krate()\n        .paths\n        .values()\n        .any(|summary| summary.path == [\"infrastructure\", \"model\", \"UserId\"]),\n    \"the target catalogue must not duplicate the declaring-layer item\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
+        "bound_tests_set_hash": "1669bebf1755fd5343f9262b396e4a3e3c8532af88629e9e8d64d8f2adcc47c3",
+        "declaration_hash": "245989233a23c53c58fd2cf132bca97240862dbdd534f0b64be7ca9d8de806e1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "        assert_ne!(user_id.1.crate_id, 0);\n        assert_eq!(encoded.krate().external_crates[&user_id.1.crate_id].name, \"domain\");\n        assert!(\n            !encoded\n                .krate()\n                .paths\n                .values()\n                .any(|summary| summary.path == [\"infrastructure\", \"model\", \"UserId\"]),\n            \"the target catalogue must not duplicate the declaring-layer item\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"
 }

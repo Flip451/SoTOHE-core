@@ -5,6 +5,7 @@
 //!
 //! [source: ADR 2026-05-11-2330 §D2, §D3]
 
+use std::collections::BTreeMap;
 use std::fmt::Write as FmtWrite;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -12,7 +13,10 @@ use std::sync::Arc;
 use domain::SymlinkGuardPort;
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, TdddLayerBindingsPort};
+use domain::tddd::catalogue_v2::{
+    AttestedCatalogueDocument, CatalogueDocument, CatalogueDocumentLoaderError, CrateName,
+    RustdocCratePort, TdddLayerBindingsPort,
+};
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
 
 use super::helpers::{map_symlink_guard_error, validate_binding_filename};
@@ -85,8 +89,10 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
     ///
     /// For each TDDD-enabled layer (or the single layer specified by `layer`):
     ///
-    /// 1. Load `<layer>-types.json` via `AttestedCatalogueDocumentLoaderPort`.
-    /// 2. Convert to `ExtendedCrate` (A) via `CatalogueToExtendedCratePort`.
+    /// 1. Load every TDDD-enabled `<layer>-types.json` via
+    ///    `AttestedCatalogueDocumentLoaderPort`.
+    /// 2. Convert the selected catalogue to `ExtendedCrate` (A) via
+    ///    `CatalogueToExtendedCratePort`, passing the complete track catalogue set.
     /// 3. Load `<layer>-types-baseline.json` (B) via `RustdocCratePort::load_from_path`.
     /// 4. Capture current TypeGraph (C) via `RustdocCratePort::capture_current`.
     /// 5. Run `SignalEvaluatorPort::evaluate(A, B, C)`.
@@ -153,9 +159,11 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             .map_err(map_symlink_guard_error)?;
         let track_dir = items_dir.join(&track_id);
 
-        // Resolve layer bindings via injected port (no std::fs in usecase).
-        let bindings = self.layer_bindings_port.load(&workspace_root, layer.as_deref()).map_err(
-            |e| match e {
+        // Resolve the complete layer-binding snapshot once via the injected port
+        // (no std::fs in usecase). A filtered load followed by an unfiltered load
+        // could combine two generations of architecture-rules.json.
+        let declaration_bindings =
+            self.layer_bindings_port.load(&workspace_root, None).map_err(|e| match e {
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::LoadFailed { reason } => {
                     CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(reason))
                 }
@@ -168,24 +176,79 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::NoLayers => {
                     CatalogueImplSignalsError::NoLayers
                 }
-            },
-        )?;
+            })?;
 
-        if bindings.is_empty() {
+        if declaration_bindings.is_empty() {
             return Err(CatalogueImplSignalsError::NoLayers);
         }
 
-        let declaration_bindings = if layer.is_some() {
-            self.layer_bindings_port.load(&workspace_root, None).map_err(|e| {
-                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(e.to_string()))
-            })?
+        let bindings = if let Some(layer_id) = layer.as_deref() {
+            let selected = declaration_bindings
+                .iter()
+                .filter(|binding| binding.layer_id == layer_id)
+                .cloned()
+                .collect::<Vec<_>>();
+            if selected.is_empty() {
+                return Err(CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                    "layer '{layer_id}' not found or not tddd.enabled in \
+                         architecture-rules.json"
+                ))));
+            }
+            selected
         } else {
-            bindings.clone()
+            declaration_bindings.clone()
         };
         let declaration = self
             .feature_declaration_port
             .load_for_actual(&track_dir, &workspace_root, &declaration_bindings)
             .map_err(CatalogueImplSignalsError::FeatureDeclaration)?;
+
+        // Load every TDDD-enabled catalogue against one architecture-rules
+        // binding snapshot before converting any document. The codec needs
+        // declarations from other layers to resolve cross-crate add references.
+        let mut attested_catalogues: Vec<(LayerId, AttestedCatalogueDocument)> = Vec::new();
+        for catalogue_binding in &declaration_bindings {
+            let catalogue_layer =
+                LayerId::try_new(catalogue_binding.layer_id.clone()).map_err(|error| {
+                    CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                        "invalid layer binding: {error}"
+                    )))
+                })?;
+            validate_binding_filename(&catalogue_binding.catalogue_file, "catalogue_file")?;
+            let catalogue_path = track_dir.join(&catalogue_binding.catalogue_file);
+            self.symlink_guard
+                .reject_symlinks_below(&catalogue_path, &items_dir)
+                .map_err(map_symlink_guard_error)?;
+            match self.catalogue_loader.load(&catalogue_path) {
+                Ok(attested_catalogue) => {
+                    attested_catalogues.push((catalogue_layer, attested_catalogue));
+                }
+                Err(CatalogueDocumentLoaderError::NotFound { .. }) => continue,
+                Err(error) => {
+                    return Err(CatalogueImplSignalsError::CatalogueLoad(
+                        catalogue_layer.clone(),
+                        diagnostic(error.to_string()),
+                    ));
+                }
+            }
+        }
+
+        let mut track_catalogues = BTreeMap::<LayerId, CatalogueDocument>::new();
+        for (catalogue_layer, attested_catalogue) in attested_catalogues {
+            let doc = attested_catalogue.into_document();
+            if doc.layer() != &catalogue_layer {
+                return Err(CatalogueImplSignalsError::CatalogueLoad(
+                    catalogue_layer.clone(),
+                    diagnostic(format!(
+                        "catalogue declares layer '{}' but is bound to layer '{}' in \
+                         architecture-rules.json",
+                        doc.layer().as_ref(),
+                        catalogue_layer.as_ref()
+                    )),
+                ));
+            }
+            track_catalogues.insert(catalogue_layer, doc);
+        }
 
         let mut report = String::new();
         let mut total_red: usize = 0;
@@ -198,27 +261,12 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 )))
             })?;
 
-            // --- Step 1: Load CatalogueDocument (TypeGraph A source) ---
-            // Guard: validate that catalogue_file is a plain filename (no `..` or
-            // directory separators) to prevent path traversal from a hostile
-            // architecture-rules.json binding, before joining with track_dir.
-            validate_binding_filename(&binding.catalogue_file, "catalogue_file")?;
-            let catalogue_path = track_dir.join(&binding.catalogue_file);
-            // Guard: reject symlinks in any component below items_dir to prevent
-            // path traversal via a malicious symlinked track directory.
-            self.symlink_guard
-                .reject_symlinks_below(&catalogue_path, &items_dir)
-                .map_err(map_symlink_guard_error)?;
-            let doc = self
-                .catalogue_loader
-                .load(&catalogue_path)
-                .map_err(|e| {
-                    CatalogueImplSignalsError::CatalogueLoad(
-                        typed_layer_id.clone(),
-                        diagnostic(e.to_string()),
-                    )
-                })?
-                .into_document();
+            if !track_catalogues.contains_key(&typed_layer_id) {
+                return Err(CatalogueImplSignalsError::CatalogueLoad(
+                    typed_layer_id.clone(),
+                    diagnostic("layer catalogue was not loaded into the track catalogue set"),
+                ));
+            }
 
             // --- Step 2: Convert CatalogueDocument → ExtendedCrate (A) ---
             // --- Step 3: Load baseline (TypeGraph B) ---
@@ -283,8 +331,10 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     )
                 })?;
 
-            let extended_a =
-                self.ext_crate_codec.encode(doc, &baseline_b, &current_c).map_err(|e| {
+            let extended_a = self
+                .ext_crate_codec
+                .encode(&typed_layer_id, &track_catalogues, &baseline_b, &current_c)
+                .map_err(|e| {
                     CatalogueImplSignalsError::ExtendedCrateConversion(
                         typed_layer_id.clone(),
                         diagnostic(e.to_string()),

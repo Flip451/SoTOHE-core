@@ -1,15 +1,15 @@
 {
   "baseline_hash": "cd7d618ea66ae2d66d3453d79d83345fd21c6f4645feecdcd1fe1a34bed5686d",
   "declaration_hash": "cf306d03ebef095f0eeda9b4dbf26f89b0276790f326d3bcbe21980382a05d01",
-  "generated_at": "2026-08-28T13:46:32Z",
-  "head_commit": "002533b8024e926f42952ae169e41bc361aec446",
+  "generated_at": "2026-08-29T04:02:27Z",
+  "head_commit": "f00c94285f4f1d96b02c24567a920728095d5c2a",
   "schema_version": 5,
   "signals": [
     {
       "found_type": true,
       "kind_tag": "secondary_port",
       "namespace": "trait",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "CatalogueToExtendedCratePort"
     }
   ]

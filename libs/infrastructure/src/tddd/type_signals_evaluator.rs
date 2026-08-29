@@ -14,7 +14,8 @@ mod signal_builder;
 pub(crate) mod signal_tags;
 
 use domain::tddd::CargoFeatureName;
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::LayerId;
+use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName};
 use domain::tddd::type_signals_doc::{BaselineHash, TypeSignalsCacheKey, TypeSignalsDocument};
 use domain::{FreeText, Timestamp, TrackId};
 use freshness::{RustdocJsonPathProvider, decide_reuse_for_recorded_document};
@@ -41,9 +42,13 @@ pub(crate) fn with_process_environment_lock<T>(action: impl FnOnce() -> T) -> T 
 
 use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
-use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, derive_filename_stem};
 use crate::tddd::catalogue_to_extended_crate_codec::{
     CatalogueToExtendedCrateCodec, normalized_paths_for_doc, resolution_paths_for_catalogue,
+};
+#[cfg(all(test, feature = "test-helpers"))]
+use crate::tddd::catalogue_to_extended_crate_codec::{
+    encode_document, resolution_paths_for_document,
 };
 use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
 use crate::tddd::type_signals_codec;
@@ -55,6 +60,12 @@ use crate::verify::tddd_layers::TdddLayerBinding;
 const MAX_TYPE_SIGNALS_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RUSTDOC_JSON_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
+
+#[derive(Debug)]
+struct LoadedTrackCatalogues {
+    bindings: Vec<TdddLayerBinding>,
+    catalogues: BTreeMap<LayerId, AttestedCatalogueDocument>,
+}
 
 /// Error returned when a layer's type signals cannot be evaluated safely.
 #[derive(Debug)]
@@ -100,6 +111,142 @@ pub(crate) fn type_signals_track_dir(items_dir: &Path, track_id: &TrackId) -> Pa
 pub(crate) fn reject_symlinked_type_signals_anchor(path: &Path, label: &str) -> Result<(), String> {
     crate::track::symlink_guard::reject_symlinks_up_to_root(path).map_err(|error| {
         format!("symlink guard: refusing to use {label} '{}': {error}", path.display())
+    })
+}
+
+fn load_track_catalogues(
+    workspace_root: &Path,
+    track_dir: &Path,
+    trusted_items_root: &Path,
+) -> Result<LoadedTrackCatalogues, EvaluateSignalsError> {
+    let bindings = crate::verify::tddd_layers::load_tddd_layers_from_workspace(workspace_root)
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot load TDDD layer bindings: {error}"
+            ))
+        })?;
+    let mut catalogues = BTreeMap::new();
+    for binding in &bindings {
+        let path = track_dir.join(binding.catalogue_file());
+        reject_type_signals_path(&path, trusted_items_root, "catalogue")?;
+        let Some(bytes) = read_configured_catalogue(&path, trusted_items_root)? else {
+            continue;
+        };
+        let name = derive_filename_stem(&path);
+        let document = AttestedCatalogueDocument::attest(&bytes, |source| {
+            let text = std::str::from_utf8(source).map_err(|error| error.to_string())?;
+            CatalogueDocumentCodec::decode(text, &name).map_err(|error| error.to_string())
+        })
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot decode catalogue '{}': {error}",
+                path.display()
+            ))
+        })?;
+        let expected_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "invalid layer id '{}': {error}",
+                binding.layer_id()
+            ))
+        })?;
+        if document.document().layer() != &expected_layer {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "catalogue '{}' declares layer '{}' but architecture binding selects '{}'",
+                path.display(),
+                document.document().layer(),
+                expected_layer
+            )));
+        }
+        if catalogues.insert(expected_layer.clone(), document).is_some() {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "duplicate effective TDDD catalogue layer '{}'",
+                expected_layer
+            )));
+        }
+    }
+    Ok(LoadedTrackCatalogues { bindings, catalogues })
+}
+
+/// Hashes architecture-rules.json and every configured catalogue file.
+pub(super) fn resolution_input_fingerprint(
+    workspace_root: &Path,
+    track_dir: &Path,
+    trusted_items_root: &Path,
+) -> Result<domain::CatalogueDeclarationHash, EvaluateSignalsError> {
+    let mut input = Vec::new();
+    let rules_path = workspace_root.join("architecture-rules.json");
+    match crate::track::symlink_guard::reject_symlinks_below(&rules_path, workspace_root) {
+        Ok(true) => {}
+        Ok(false) => {
+            return Err(EvaluateSignalsError::authoritative_input(
+                "architecture-rules.json not found".to_owned(),
+            ));
+        }
+        Err(error) => {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "symlink guard rejected architecture-rules.json '{}': {error}",
+                rules_path.display()
+            )));
+        }
+    }
+    let rules = read_workspace_file(&rules_path, workspace_root, "architecture-rules.json")?
+        .ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(
+                "architecture-rules.json not found".to_owned(),
+            )
+        })?;
+    encode_present_bytes(&mut input, &rules);
+    let bindings = crate::verify::tddd_layers::load_tddd_layers_from_workspace(workspace_root)
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot load TDDD layer bindings: {error}"
+            ))
+        })?;
+    for binding in bindings {
+        input.extend_from_slice(binding.layer_id().as_bytes());
+        let path = track_dir.join(binding.catalogue_file());
+        reject_type_signals_path(&path, trusted_items_root, "catalogue")?;
+        match read_configured_catalogue(&path, trusted_items_root)? {
+            Some(bytes) => encode_present_bytes(&mut input, &bytes),
+            None => input.push(0),
+        }
+    }
+    Ok(type_signals_codec::declaration_hash(&input))
+}
+
+fn encode_present_bytes(input: &mut Vec<u8>, bytes: &[u8]) {
+    input.push(1);
+    input.extend_from_slice(&(bytes.len() as u64).to_le_bytes());
+    input.extend_from_slice(bytes);
+}
+
+/// Reads one configured track catalogue only when it is present.
+///
+/// The caller must already have applied the symlink guard. The open itself
+/// uses the shared no-follow catalogue primitive so a concurrent replacement
+/// cannot turn a validated leaf into a symlink or FIFO.
+fn read_configured_catalogue(
+    path: &Path,
+    trusted_items_root: &Path,
+) -> Result<Option<Vec<u8>>, EvaluateSignalsError> {
+    read_workspace_file(path, trusted_items_root, "catalogue")
+}
+
+fn read_workspace_file(
+    path: &Path,
+    trusted_root: &Path,
+    label: &str,
+) -> Result<Option<Vec<u8>>, EvaluateSignalsError> {
+    crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
+        path,
+        Some(trusted_root),
+        MAX_CATALOGUE_BYTES as u64,
+    )
+    .map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read {label} '{}': {error}",
+            path.display()
+        ))
     })
 }
 
@@ -172,10 +319,10 @@ fn execute_with_dependencies(
     reject_type_signals_path(&baseline_path, &canonical_items, "baseline")?;
     let signal_path = track_dir.join(binding.signal_file());
     reject_type_signals_path(&signal_path, &canonical_items, "signal artifact")?;
-    let catalogue_bytes = inputs::read_bytes_file_limited(&catalogue_path, MAX_CATALOGUE_BYTES)
-        .map_err(|error| {
+    let catalogue_bytes = read_configured_catalogue(&catalogue_path, &canonical_items)?
+        .ok_or_else(|| {
             EvaluateSignalsError::authoritative_input(format!(
-                "cannot read catalogue '{}': {error}",
+                "cannot read catalogue '{}': file not found",
                 catalogue_path.display()
             ))
         })?;
@@ -198,11 +345,26 @@ fn execute_with_dependencies(
     let recorded = read_utf8_file_limited(&signal_path, MAX_TYPE_SIGNALS_BYTES)
         .ok()
         .and_then(|text| type_signals_codec::decode(&text).ok());
-    let reuse_decision = decide_reuse_for_recorded_document(
-        recorded.as_ref(),
-        &current_key,
-        worktree_is_clean(&canonical_workspace)?,
-    );
+    let cache_decision_start_resolution =
+        resolution_input_fingerprint(&canonical_workspace, &track_dir, &canonical_items)?;
+    let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
+        &canonical_workspace,
+    )
+    .map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot load TDDD layer bindings: {error}"
+        ))
+    })?;
+    validate_evaluator_binding(&configured_layers, binding)?;
+    let reuse_decision = if configured_layers.len() > 1 {
+        domain::TypeSignalsReuseDecision::ReextractAndEvaluate
+    } else {
+        decide_reuse_for_recorded_document(
+            recorded.as_ref(),
+            &current_key,
+            worktree_is_clean(&canonical_workspace)?,
+        )
+    };
     match reuse_decision {
         domain::TypeSignalsReuseDecision::SkipEvaluation => {
             verify_evaluation_inputs_unchanged(
@@ -211,6 +373,14 @@ fn execute_with_dependencies(
                 &baseline_path,
                 &current_key,
             )?;
+            let cache_decision_end_resolution =
+                resolution_input_fingerprint(&canonical_workspace, &track_dir, &canonical_items)?;
+            if cache_decision_start_resolution != cache_decision_end_resolution {
+                return Err(EvaluateSignalsError::authoritative_input(
+                    "architecture-rules or track catalogues changed during type-signal cache decision"
+                        .to_owned(),
+                ));
+            }
             return Ok(ExitCode::SUCCESS);
         }
         // Cargo's shared rustdoc output path is not keyed by the cache identity
@@ -242,10 +412,8 @@ fn execute_with_dependencies(
         &track_dir,
         &canonical_workspace,
         &canonical_items,
-        target_crate,
         binding,
         content,
-        declaration_hash,
         head_commit,
         &baseline_path,
         &baseline_json,
@@ -260,29 +428,47 @@ fn evaluate_and_write(
     track_dir: &Path,
     workspace_root: &Path,
     trusted_items_root: &Path,
-    target_crate: &str,
     binding: &TdddLayerBinding,
     rustdoc_json: String,
-    declaration_hash: domain::CatalogueDeclarationHash,
     head_commit: domain::CommitHash,
     baseline_path: &Path,
     baseline_json: &str,
     baseline_hash: BaselineHash,
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    let name = catalogue_path
-        .file_stem()
-        .and_then(|name| name.to_str())
-        .and_then(|name| name.strip_suffix("-types"))
-        .unwrap_or(target_crate);
-    let catalogue = CatalogueDocumentCodec::decode(
-        std::str::from_utf8(catalogue_bytes).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!("catalogue is not UTF-8: {error}"))
-        })?,
-        name,
-    )
-    .map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!("cannot decode catalogue: {error}"))
+    reject_type_signals_path(baseline_path, trusted_items_root, "baseline")?;
+    let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
     })?;
+    let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
+        EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
+    })?;
+    let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+    })?;
+    let start_resolution =
+        resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
+    let LoadedTrackCatalogues { bindings, catalogues } =
+        load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
+    validate_evaluator_binding(&bindings, binding)?;
+    let target_catalogue = catalogues.get(&target_layer).ok_or_else(|| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "target catalogue for layer '{}' is not present in the current resolution set",
+            target_layer
+        ))
+    })?;
+    let supplied_declaration_hash = type_signals_codec::declaration_hash(catalogue_bytes);
+    if target_catalogue.declaration_hash() != &supplied_declaration_hash {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "target catalogue bytes changed between the initial load and the attested resolution read"
+                .to_owned(),
+        ));
+    }
+    let declaration_hash = target_catalogue.declaration_hash().clone();
+    let catalogue = target_catalogue.document().clone();
+    let track_catalogues = catalogues
+        .into_iter()
+        .map(|(layer, attested)| (layer, attested.into_document()))
+        .collect::<BTreeMap<_, _>>();
     let mut kinds = BTreeMap::new();
     for (name, entry) in catalogue.types() {
         kinds
@@ -302,15 +488,9 @@ fn evaluate_and_write(
             .or_insert_with(Vec::new)
             .push(function_role_kind_tag(entry.role()));
     }
-    reject_type_signals_path(baseline_path, trusted_items_root, "baseline")?;
-    let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
-    })?;
-    let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
-        EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
-    })?;
-    let identity_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
-        .map_err(|error| EvaluateSignalsError::evaluation(error.to_string()))?;
+    let identity_paths =
+        resolution_paths_for_catalogue(&target_layer, &track_catalogues, &baseline, &current)
+            .map_err(|error| EvaluateSignalsError::evaluation(error.to_string()))?;
     let identity_index = build_type_signal_identity_index(&catalogue, &identity_paths)
         .map_err(EvaluateSignalsError::evaluation)?;
     let canonical_baseline_paths = normalized_paths_for_doc(&baseline, catalogue.crate_name());
@@ -318,7 +498,7 @@ fn evaluate_and_write(
     let canonical_baseline = crate_with_canonical_paths(&baseline, canonical_baseline_paths);
     let canonical_current = crate_with_canonical_paths(&current, canonical_current_paths);
     let extended = CatalogueToExtendedCrateCodec::new()
-        .encode(catalogue, &baseline, &current)
+        .encode(&target_layer, &track_catalogues, &baseline, &current)
         .map_err(|error| {
             EvaluateSignalsError::authoritative_input(format!("cannot convert catalogue: {error}"))
         })?;
@@ -338,6 +518,14 @@ fn evaluate_and_write(
             baseline_hash.clone(),
         ),
     )?;
+    let end_resolution =
+        resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
+    if start_resolution != end_resolution {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "architecture-rules or track catalogues changed during type-signal evaluation"
+                .to_owned(),
+        ));
+    }
     let generated_at = Timestamp::new(chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string())
         .map_err(|error| {
             EvaluateSignalsError::evaluation(format!("cannot create timestamp: {error}"))
@@ -356,6 +544,34 @@ fn evaluate_and_write(
         EvaluateSignalsError::cache_write(format!("cannot write type signals: {error}"))
     })?;
     Ok(ExitCode::SUCCESS)
+}
+
+fn evaluator_bindings_match(left: &TdddLayerBinding, right: &TdddLayerBinding) -> bool {
+    left.layer_id() == right.layer_id()
+        && left.catalogue_file() == right.catalogue_file()
+        && left.targets() == right.targets()
+}
+
+fn validate_evaluator_binding(
+    configured_bindings: &[TdddLayerBinding],
+    binding: &TdddLayerBinding,
+) -> Result<(), EvaluateSignalsError> {
+    let configured_binding = configured_bindings
+        .iter()
+        .find(|candidate| candidate.layer_id() == binding.layer_id())
+        .ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "type-signal layer '{}' is not configured in architecture-rules.json",
+                binding.layer_id()
+            ))
+        })?;
+    if !evaluator_bindings_match(configured_binding, binding) {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "type-signal binding for layer '{}' does not match architecture-rules.json",
+            binding.layer_id()
+        )));
+    }
+    Ok(())
 }
 
 fn crate_with_canonical_paths(
@@ -424,6 +640,7 @@ mod tests {
     use crate::tddd::ThreeWaySignal;
     use crate::verify::tddd_layers::parse_tddd_layers;
     use domain::FreeText;
+    use domain::tddd::catalogue_v2::CatalogueDocument;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
     fn rustdoc_json() -> String {
@@ -480,7 +697,7 @@ mod tests {
 
         let baseline = rustdoc_crate_with_paths(HashMap::new());
         let current = baseline.clone();
-        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
+        let resolution_paths = resolution_paths_for_document(&catalogue, &baseline, &current)
             .expect("the shared resolution set must include catalogue add declarations");
         let index = build_type_signal_identity_index(&catalogue, &resolution_paths)
             .expect("type-signal identity indexing must consume catalogue additions");
@@ -553,7 +770,7 @@ mod tests {
         ));
 
         let baseline = rustdoc_crate_with_paths(HashMap::new());
-        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &baseline)
+        let resolution_paths = resolution_paths_for_document(&catalogue, &baseline, &baseline)
             .expect("the shared resolution set must include both add declarations");
         let index = build_type_signal_identity_index(&catalogue, &resolution_paths)
             .expect("an add impl owner must resolve through the shared set");
@@ -862,10 +1079,8 @@ mod tests {
             &track_dir,
             root,
             &items_dir.canonicalize().unwrap(),
-            "infrastructure",
             &binding,
             current_json,
-            type_signals_codec::declaration_hash(catalogue_json.as_bytes()),
             read_head_commit(root).unwrap(),
             &baseline_path,
             &baseline_json,
@@ -892,6 +1107,406 @@ mod tests {
         assert!(
             persisted.signals().iter().any(|signal| signal.type_name() == "Removed"),
             "deletion handling must retain the baseline identity through Phase 1"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_and_write_loads_all_track_catalogues_for_encode() {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::{
+            CatalogueDocument, CatalogueEntryKey, CrateName, FieldDecl, FieldName, ModulePath,
+            TypeRef,
+        };
+
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        crate::verify::test_support::git_init(root);
+        let track_id = TrackId::try_new("cross-crate-handoff-track").unwrap();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(root.join("Cargo.toml"), "[workspace]\nmembers = []\nresolver = \"2\"\n")
+            .unwrap();
+        std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        let rules = r#"{
+            "version": 2,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "domain-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["domain"] }
+                    }
+                },
+                {
+                    "crate": "infrastructure",
+                    "path": "libs/infrastructure",
+                    "may_depend_on": ["domain"],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "infrastructure-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                    }
+                }
+            ]
+        }"#;
+        std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
+        let binding = parse_tddd_layers(rules)
+            .unwrap()
+            .into_iter()
+            .find(|layer| layer.layer_id() == "infrastructure")
+            .unwrap();
+
+        let mut target = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").unwrap(),
+            LayerId::try_new("infrastructure").unwrap(),
+        );
+        target.insert_type(
+            CatalogueEntryKey::try_new("Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("id").unwrap(),
+                            TypeRef::new("domain::model::UserId").unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let mut declaring = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        declaring.insert_type(
+            CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogue_json = CatalogueDocumentCodec::encode(&target).unwrap();
+        let declaring_json = CatalogueDocumentCodec::encode(&declaring).unwrap();
+        let baseline_json = rustdoc_json();
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let baseline_path = track_dir.join(binding.baseline_file());
+        std::fs::write(&catalogue_path, &catalogue_json).unwrap();
+        std::fs::write(&baseline_path, &baseline_json).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), declaring_json).unwrap();
+
+        let trusted = items_dir.canonicalize().unwrap();
+        let loaded = load_track_catalogues(root, &track_dir, &trusted)
+            .expect("architecture-rules must select every TDDD-enabled catalogue");
+        let loaded_documents = loaded
+            .catalogues
+            .iter()
+            .map(|(layer, attested)| (layer.clone(), attested.document().clone()))
+            .collect::<BTreeMap<_, _>>();
+        let empty = rustdoc_crate_with_paths(HashMap::new());
+        let encoded = CatalogueToExtendedCrateCodec::new()
+            .encode(&LayerId::try_new("infrastructure").unwrap(), &loaded_documents, &empty, &empty)
+            .expect("other-layer add declarations must join the evaluator encode map");
+        let user_id = encoded
+            .krate()
+            .paths
+            .iter()
+            .find(|(_, summary)| summary.path == ["domain", "model", "UserId"])
+            .map(|(id, summary)| (*id, summary.clone()))
+            .expect("domain::model::UserId must be a declaring-crate external item");
+        assert_ne!(user_id.1.crate_id, 0);
+        assert_eq!(encoded.krate().external_crates[&user_id.1.crate_id].name, "domain");
+        assert!(
+            !encoded
+                .krate()
+                .paths
+                .values()
+                .any(|summary| summary.path == ["infrastructure", "model", "UserId"]),
+            "the target catalogue must not duplicate the declaring-layer item"
+        );
+
+        let result = evaluate_and_write(
+            catalogue_json.as_bytes(),
+            &catalogue_path,
+            &track_dir,
+            root,
+            &items_dir.canonicalize().unwrap(),
+            &binding,
+            baseline_json.clone(),
+            read_head_commit(root).unwrap(),
+            &baseline_path,
+            &baseline_json,
+            type_signals_codec::baseline_hash(baseline_json.as_bytes()),
+        )
+        .expect("evaluator encode must consume every track catalogue");
+        assert_eq!(result, ExitCode::SUCCESS);
+
+        let persisted = type_signals_codec::decode(
+            &std::fs::read_to_string(track_dir.join(binding.signal_file())).unwrap(),
+        )
+        .unwrap();
+        assert!(
+            persisted.signals().iter().any(|signal| signal.type_name() == "Handler"),
+            "other-layer add declarations must reach encode through the evaluator handoff"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_and_write_rejects_stale_target_catalogue_input() {
+        let (workspace, items_dir, track_id, binding, _rustdoc_path) = setup_workspace();
+        let root = workspace.path();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let baseline_path = track_dir.join(binding.baseline_file());
+        let initial_catalogue = std::fs::read(&catalogue_path).unwrap();
+        let changed_catalogue =
+            format!("{} \n", std::str::from_utf8(&initial_catalogue).unwrap().trim_end());
+        std::fs::write(&catalogue_path, changed_catalogue).unwrap();
+        let baseline_json = std::fs::read_to_string(&baseline_path).unwrap();
+
+        let error = evaluate_and_write(
+            &initial_catalogue,
+            &catalogue_path,
+            &track_dir,
+            root,
+            &items_dir.canonicalize().unwrap(),
+            &binding,
+            rustdoc_json(),
+            read_head_commit(root).unwrap(),
+            &baseline_path,
+            &baseline_json,
+            type_signals_codec::baseline_hash(baseline_json.as_bytes()),
+        )
+        .expect_err("a stale caller catalogue must not mix with the attested target document");
+
+        assert!(error.to_string().contains("target catalogue bytes changed"), "got: {error}");
+    }
+
+    #[test]
+    fn test_load_track_catalogues_treats_enabled_layer_without_file_as_empty() {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join("missing-layer-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{
+            "version": 2,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "domain-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["domain"] }
+                    }
+                },
+                {
+                    "crate": "infrastructure",
+                    "path": "libs/infrastructure",
+                    "may_depend_on": ["domain"],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "infrastructure-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                    }
+                }
+            ]
+        }"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            CatalogueDocumentCodec::encode(&CatalogueDocument::new(
+                5,
+                CrateName::new("infrastructure").unwrap(),
+                LayerId::try_new("infrastructure").unwrap(),
+            ))
+            .unwrap(),
+        )
+        .unwrap();
+
+        let loaded = load_track_catalogues(root, &track_dir, &items_dir.canonicalize().unwrap())
+            .expect("missing enabled catalogues are empty, not errors");
+        assert!(loaded.catalogues.contains_key(&LayerId::try_new("infrastructure").unwrap()));
+        assert!(
+            !loaded.catalogues.contains_key(&LayerId::try_new("domain").unwrap()),
+            "a TDDD-enabled layer without a catalogue file must contribute no declarations"
+        );
+    }
+
+    #[test]
+    fn test_load_track_catalogues_uses_filename_stem_for_custom_catalogue_file() {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join("custom-catalogue-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let rules = r#"{
+            "version": 2,
+            "layers": [{
+                "crate": "infrastructure",
+                "path": "libs/infrastructure",
+                "may_depend_on": [],
+                "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "custom.json",
+                    "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                }
+            }]
+        }"#;
+        std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
+        let document = CatalogueDocument::new(
+            5,
+            CrateName::new("custom").unwrap(),
+            LayerId::try_new("infrastructure").unwrap(),
+        );
+        std::fs::write(
+            track_dir.join("custom.json"),
+            CatalogueDocumentCodec::encode(&document).unwrap(),
+        )
+        .unwrap();
+
+        let loaded =
+            load_track_catalogues(root, &track_dir, &items_dir.canonicalize().unwrap()).unwrap();
+        assert_eq!(
+            loaded
+                .catalogues
+                .get(&LayerId::try_new("infrastructure").unwrap())
+                .unwrap()
+                .document()
+                .crate_name()
+                .as_str(),
+            "custom"
+        );
+    }
+
+    #[test]
+    fn test_load_track_catalogues_mismatched_layer_is_rejected() {
+        use domain::tddd::catalogue_v2::{CatalogueDocument, CrateName};
+
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let mismatched = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            CatalogueDocumentCodec::encode(&mismatched).unwrap(),
+        )
+        .unwrap();
+
+        let error =
+            load_track_catalogues(workspace.path(), &track_dir, &items_dir.canonicalize().unwrap())
+                .expect_err("a catalogue layer must match its architecture binding");
+        let message = error.to_string();
+        assert!(message.contains("declares layer 'domain'"), "got: {message}");
+        assert!(message.contains("binding selects 'infrastructure'"), "got: {message}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_track_catalogues_dangling_symlink_is_rejected() {
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let catalogue_path = track_dir.join("infrastructure-types.json");
+        std::fs::remove_file(&catalogue_path).unwrap();
+        std::os::unix::fs::symlink(track_dir.join("missing-types.json"), &catalogue_path).unwrap();
+
+        let error =
+            load_track_catalogues(workspace.path(), &track_dir, &items_dir.canonicalize().unwrap())
+                .expect_err("a dangling catalogue symlink must not be treated as absent");
+        assert!(error.to_string().contains("symlink guard rejected catalogue"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_track_catalogues_rejects_fifo_before_opening() {
+        use std::time::Instant;
+
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let catalogue_path = track_dir.join("infrastructure-types.json");
+        std::fs::remove_file(&catalogue_path).unwrap();
+        let status = std::process::Command::new("mkfifo").arg(&catalogue_path).status().unwrap();
+        assert!(status.success(), "mkfifo must create the FIFO fixture");
+
+        let started = Instant::now();
+        let error =
+            load_track_catalogues(workspace.path(), &track_dir, &items_dir.canonicalize().unwrap())
+                .expect_err("a configured FIFO must fail closed");
+        assert!(
+            started.elapsed() < std::time::Duration::from_secs(1),
+            "FIFO rejection must not block"
+        );
+        assert!(error.to_string().contains("not a regular file"), "got: {error}");
+    }
+
+    #[test]
+    fn test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue() {
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let trusted = items_dir.canonicalize().unwrap();
+        let present = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted).unwrap();
+        std::fs::remove_file(track_dir.join("infrastructure-types.json")).unwrap();
+        let missing = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted).unwrap();
+        std::fs::write(track_dir.join("infrastructure-types.json"), []).unwrap();
+        let empty = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted).unwrap();
+        assert_ne!(present, missing, "a missing catalogue must not hash as a present catalogue");
+        assert_ne!(missing, empty, "a 0-byte catalogue must not hash as a missing catalogue");
+        assert_ne!(present, empty);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolution_input_fingerprint_rejects_symlinked_architecture_rules() {
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let trusted = items_dir.canonicalize().unwrap();
+        let rules_path = workspace.path().join("architecture-rules.json");
+        let real_rules = workspace.path().join("architecture-rules.real.json");
+        std::fs::rename(&rules_path, &real_rules).unwrap();
+        std::os::unix::fs::symlink(&real_rules, &rules_path).unwrap();
+
+        let error = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted)
+            .expect_err("a symlinked architecture-rules.json must fail closed");
+        assert!(
+            error.to_string().contains("symlink guard rejected architecture-rules.json"),
+            "got: {error}"
         );
     }
 
@@ -990,13 +1605,12 @@ mod tests {
                 kind: rustdoc_types::ItemKind::Struct,
             },
         )]));
-        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &baseline)
+        let resolution_paths = resolution_paths_for_document(&catalogue, &baseline, &baseline)
             .expect("the shared set must include both add declarations and the modify baseline");
         let identity_index = build_type_signal_identity_index(&catalogue, &resolution_paths)
             .expect("all declared identities must resolve through the shared set");
         let _ = identity_index;
-        let encoded = CatalogueToExtendedCrateCodec::new()
-            .encode(catalogue, &baseline, &baseline)
+        let encoded = encode_document(catalogue, &baseline, &baseline)
             .expect("mutual add and modify-to-add references must encode");
 
         let id_for = |path: &[&str]| {
@@ -1159,12 +1773,11 @@ mod tests {
             );
         }
 
-        let resolution_paths = resolution_paths_for_catalogue(&catalogue, &baseline, &current)
+        let resolution_paths = resolution_paths_for_document(&catalogue, &baseline, &current)
             .expect("all type actions must share one normalized resolution set");
         build_type_signal_identity_index(&catalogue, &resolution_paths)
             .expect("type-signal indexing must use the same normalized identities");
-        let encoded = CatalogueToExtendedCrateCodec::new()
-            .encode(catalogue, &baseline, &current)
+        let encoded = encode_document(catalogue, &baseline, &current)
             .expect("add, modify, reference, and function identities must encode under alias");
 
         let id_for = |path: &[&str]| {
