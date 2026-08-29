@@ -5,7 +5,7 @@
 
 GO-01 → T001/T002/T003/T004/T005.
 
-## Tasks (3/5 resolved)
+## Tasks (4/5 resolved)
 
 ### SECTION-001 — Resolution boundary
 
@@ -25,4 +25,4 @@ GO-01 → T001/T002/T003/T004/T005.
 > Modify the catalogue_impl_signals and type-signals executor/evaluator handoff paths as separate validation units (IN-01, CO-01, CO-02, AC-01, AC-03).
 
 - [x] **T004**: Modify usecase::catalogue_impl_signals to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused catalogue_impl_signals handoff validation (IN-01, CO-01, AC-01).
-- [ ] **T005**: Modify usecase::type_signals::ports, infrastructure::tddd::type_signals_executor_adapter, and infrastructure::tddd::type_signals_evaluator::evaluate_and_write to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused executor/evaluator handoff validation (IN-01, CO-01, CO-02, AC-01, AC-03).
+- [x] **T005**: Modify usecase::type_signals::ports, infrastructure::tddd::type_signals_executor_adapter, and infrastructure::tddd::type_signals_evaluator::evaluate_and_write to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused executor/evaluator handoff validation (IN-01, CO-01, CO-02, AC-01, AC-03).

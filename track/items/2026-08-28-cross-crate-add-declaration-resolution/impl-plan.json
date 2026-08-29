@@ -63,7 +63,7 @@
     {
       "description": "Modify usecase::type_signals::ports, infrastructure::tddd::type_signals_executor_adapter, and infrastructure::tddd::type_signals_evaluator::evaluate_and_write to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused executor/evaluator handoff validation (IN-01, CO-01, CO-02, AC-01, AC-03).",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
