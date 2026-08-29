@@ -454,7 +454,7 @@
       },
       "key": {
         "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
-        "bound_tests_set_hash": "bb1506d711928f2c91da814e2bc2c0a6717b1983b36ab5ca7119a10314cead89",
+        "bound_tests_set_hash": "1f599b4aaf6360821cd3a2e2d2684bf734263424bc79477da13cb87ce60617cd",
         "declaration_hash": "b7e041606435d74b5da58eb6812d2b65423a7aee780ba912f05ee4b43c7fc094"
       },
       "obligation_id": {
@@ -463,7 +463,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }\n        for line in [\n            \"test cli::tests::healthy ... ok\",\n            \"[PASS] item-pass\",\n            \"SomeRecord { status: failed_in_a_field }\",\n            \"a sentence mentions failed output but is not a gate diagnostic\",\n        ] {\n            assert!(!is_failure_line(line), \"unexpected failure line: {line}\");\n        }",
+        "citation": "assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }\n        for line in [\n            \"test cli::tests::healthy ... ok\",\n            \"[PASS] item-pass\",\n            \"SomeRecord { status: failed_in_a_field }\",\n            \"a sentence mentions failed output but is not a gate diagnostic\",\n        ] {\n            assert!(!is_failure_line(line), \"unexpected failure line: {line}\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -485,7 +485,7 @@
       },
       "key": {
         "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
-        "bound_tests_set_hash": "bb1506d711928f2c91da814e2bc2c0a6717b1983b36ab5ca7119a10314cead89",
+        "bound_tests_set_hash": "1f599b4aaf6360821cd3a2e2d2684bf734263424bc79477da13cb87ce60617cd",
         "declaration_hash": "b7e041606435d74b5da58eb6812d2b65423a7aee780ba912f05ee4b43c7fc094"
       },
       "obligation_id": {
@@ -494,7 +494,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }",
+        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n            \"- child exited with status 256\",\n            \"- could not start child command: missing\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }\n        for line in [\n            \"test cli::tests::healthy ... ok\",\n            \"[PASS] item-pass\",\n            \"SomeRecord { status: failed_in_a_field }\",\n            \"a sentence mentions failed output but is not a gate diagnostic\",\n        ] {\n            assert!(!is_failure_line(line), \"unexpected failure line: {line}\");\n        }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

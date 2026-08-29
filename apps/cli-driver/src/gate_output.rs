@@ -115,39 +115,58 @@ fn failure_excerpts_in_window(output: &[u8]) -> Vec<String> {
 /// Classifies the supported test, obligation, and aggregate gate diagnostics.
 ///
 /// The accepted grammar is deliberately narrow and line-oriented: project
-/// markers (`[FAIL]`, `[ERROR]`, `[BLOCKED]`), the stable failure prefixes and
-/// suffixes emitted by the supported Cargo/nextest/rustc commands, and the
-/// project-owned `test-obligation`/`cargo-make` failure prefixes. This function
-/// does not treat arbitrary occurrences of the word `failed` as diagnostics.
+/// markers (`[FAIL]`, `[ERROR]`, `[BLOCKED]`), the aggregate summary verdict
+/// (`FAIL`) and its summary bullets, the stable failure prefixes and suffixes
+/// emitted by the supported Cargo/nextest/rustc commands, and the project-owned
+/// `test-obligation`/`cargo-make` failure prefixes. This function does not treat
+/// arbitrary occurrences of the word `failed` as diagnostics.
 pub fn is_failure_line(line: &str) -> bool {
     let prefix = bounded_trimmed_prefix(line);
     let suffix = bounded_trimmed_suffix(line);
-    let marked_failure = starts_with_ascii_case_insensitive(prefix, "[fail]")
-        || starts_with_ascii_case_insensitive(prefix, "[error]")
-        || starts_with_ascii_case_insensitive(prefix, "[blocked]");
-    let cargo_test_failure = starts_with_ascii_case_insensitive(prefix, "test ")
-        && ends_with_ascii_case_insensitive(suffix, " ... failed");
-    let cargo_test_result = starts_with_ascii_case_insensitive(prefix, "test result: failed");
-    let nextest_failure = starts_with_ascii_case_insensitive(prefix, "fail [");
-    let nextest_summary = starts_with_ascii_case_insensitive(prefix, "summary ")
-        && prefix.split_ascii_whitespace().any(|word| {
+    let diagnostic_prefix = prefix.strip_prefix("- ").unwrap_or(prefix);
+    let diagnostic_suffix = suffix.strip_prefix("- ").unwrap_or(suffix);
+    let aggregate_summary_failure = diagnostic_prefix.eq_ignore_ascii_case("FAIL")
+        && diagnostic_suffix.eq_ignore_ascii_case("FAIL");
+    let aggregate_summary_failure_detail =
+        starts_with_ascii_case_insensitive(diagnostic_prefix, "child exited with status ")
+            || starts_with_ascii_case_insensitive(
+                diagnostic_prefix,
+                "could not start child command: ",
+            );
+    let marked_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "[fail]")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "[error]")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "[blocked]");
+    let cargo_test_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "test ")
+        && ends_with_ascii_case_insensitive(diagnostic_suffix, " ... failed");
+    let cargo_test_result =
+        starts_with_ascii_case_insensitive(diagnostic_prefix, "test result: failed");
+    let nextest_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "fail [");
+    let nextest_summary = starts_with_ascii_case_insensitive(diagnostic_prefix, "summary ")
+        && diagnostic_prefix.split_ascii_whitespace().any(|word| {
             word.eq_ignore_ascii_case("failed")
                 || word
                     .get(.."failed,".len())
                     .is_some_and(|candidate| candidate.eq_ignore_ascii_case("failed,"))
         });
-    let panic_line = starts_with_ascii_case_insensitive(prefix, "thread '")
-        && contains_ascii_case_insensitive(prefix, "' panicked at ");
+    let panic_line = starts_with_ascii_case_insensitive(diagnostic_prefix, "thread '")
+        && contains_ascii_case_insensitive(diagnostic_prefix, "' panicked at ");
     let obligation_failure =
-        starts_with_ascii_case_insensitive(prefix, "test-obligation check failed:")
-            || starts_with_ascii_case_insensitive(prefix, "test-obligation evaluate failed:");
-    let cargo_make_failure =
-        starts_with_ascii_case_insensitive(prefix, "error while executing command, exit code:");
-    let compiler_failure = starts_with_ascii_case_insensitive(prefix, "error:")
-        || starts_with_ascii_case_insensitive(prefix, "error[")
-        || starts_with_ascii_case_insensitive(prefix, "error ");
+        starts_with_ascii_case_insensitive(diagnostic_prefix, "test-obligation check failed:")
+            || starts_with_ascii_case_insensitive(
+                diagnostic_prefix,
+                "test-obligation evaluate failed:",
+            );
+    let cargo_make_failure = starts_with_ascii_case_insensitive(
+        diagnostic_prefix,
+        "error while executing command, exit code:",
+    );
+    let compiler_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "error:")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "error[")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "error ");
 
-    marked_failure
+    aggregate_summary_failure
+        || aggregate_summary_failure_detail
+        || marked_failure
         || cargo_test_failure
         || cargo_test_result
         || nextest_failure
@@ -609,6 +628,8 @@ mod tests {
             "[BLOCKED] review scope has findings",
             "Error while executing command, exit code: 23",
             "thread 'broken' panicked at src/lib.rs:1:1",
+            "- child exited with status 256",
+            "- could not start child command: missing",
         ] {
             assert!(is_failure_line(line), "expected failure line: {line}");
         }
@@ -619,6 +640,35 @@ mod tests {
             "a sentence mentions failed output but is not a gate diagnostic",
         ] {
             assert!(!is_failure_line(line), "unexpected failure line: {line}");
+        }
+    }
+
+    #[test]
+    fn test_failure_excerpts_keep_nested_gate_summary_verdict_and_item() {
+        let output =
+            b"FAIL\nlog: tmp/gate/inner.log\nfailures:\n- FAIL [   0.012s] cli::tests::broken\n";
+
+        assert_eq!(
+            failure_excerpts(output),
+            ["FAIL".to_owned(), "- FAIL [   0.012s] cli::tests::broken".to_owned(),]
+        );
+    }
+
+    #[test]
+    fn test_failure_excerpts_keep_nested_gate_summary_fallback_reasons() {
+        for (line, expected) in [
+            ("- child exited with status 256", "- child exited with status 256"),
+            (
+                "- could not start child command: missing",
+                "- could not start child command: missing",
+            ),
+        ] {
+            let output = format!("FAIL\nlog: tmp/gate/inner.log\nfailures:\n{line}\n");
+
+            assert_eq!(
+                failure_excerpts(output.as_bytes()),
+                ["FAIL".to_owned(), expected.to_owned()]
+            );
         }
     }
 

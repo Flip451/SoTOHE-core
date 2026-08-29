@@ -534,6 +534,12 @@ fi
 
 [tasks.ci-rust-local]
 private = true
+description = "[internal] Run Rust-only CI checks through the compact gate-output summary"
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-local", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
+
+[tasks.ci-rust-local-steps]
+private = true
 description = "[internal] Run Rust-only CI checks (fmt + semantic-dup clippy/test + feature-off CLI test/build + deny + check-layers + canonical-modules)"
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-feature-off-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
 
@@ -542,22 +548,35 @@ private = true
 description = "[internal] Run repo-wide CI checks with semantic-dup clippy/test, feature-off CLI tests, and a default feature-off binary build. Track-aware gates live in ci-track-local."
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-feature-off-local", "test-doc-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
+[tasks.ci-local-steps]
+private = true
+description = "[internal] Run repo-wide CI checks with semantic-dup clippy/test, feature-off CLI tests, and a default feature-off binary build. Track-aware gates live in ci-track-local."
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-feature-off-local", "test-doc-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
+
 [tasks.ci-track-local]
+private = true
+description = "[internal] Run local early-detection track-aware CI gates through the compact gate-output summary"
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-local", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
+
+[tasks.ci-track-local-steps]
 private = true
 description = "[internal] Run local early-detection track-aware CI gates (task-contract coverage + check liveness + ADR-baseline freeze + signal chains spec/catalogue/impl + test-obligation check). Remote CI plus branch protection enforce merge eligibility. Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
 dependencies = ["task-contract-coverage-local", "task-contract-check-local", "adr-baseline-check-commit-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 [tasks.ci-rust-container]
-description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-feature-off-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
+description = "[gate] Run Rust-only CI checks inside a pre-existing container through the compact gate-output summary (no docker compose)"
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-container", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-feature-off-local", "test-doc-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
-description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + ADR-baseline freeze + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."
-dependencies = ["task-contract-coverage-local", "task-contract-check-local", "adr-baseline-check-commit-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
+description = "[gate] Track-aware CI gates through the compact gate-output summary; requires a track/<id> branch context (no docker compose). Skip on base branch / non-track CI runs."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-container", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -715,22 +734,22 @@ command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "template-export-smoke-local"]
 
 [tasks.ci-rust]
-description = "[gate] Run Rust-only CI checks (docker compose) — inner loop for app developers"
+description = "[gate] Run Rust-only CI checks through the compact gate-output summary (docker compose) — inner loop for app developers"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-rust-local"]
+command = "bin/sotp"
+args = ["gate-output", "--name", "ci-rust", "--", "docker", "compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
 
 [tasks.ci]
-description = "[gate] Run repo-wide CI checks (docker compose). Track-aware gates: use ci-track."
+description = "[gate] Run repo-wide CI checks through the compact gate-output summary (docker compose). Track-aware gates: use ci-track."
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-local"]
+command = "bin/sotp"
+args = ["gate-output", "--name", "ci", "--", "docker", "compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-local"]
 
 [tasks.ci-track]
-description = "[gate] Run local early-detection track-aware CI gates (docker compose). Remote CI plus branch protection enforce merge eligibility. Assumes a track/<id> branch context."
+description = "[gate] Run local early-detection track-aware CI gates through the compact gate-output summary (docker compose). Remote CI plus branch protection enforce merge eligibility. Assumes a track/<id> branch context."
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-track-local"]
+command = "bin/sotp"
+args = ["gate-output", "--name", "ci-track", "--", "docker", "compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-track-local-steps"]
 
 [tasks.add]
 description = "[wrapper] Stage files for commit (use instead of git add)"

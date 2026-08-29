@@ -46,6 +46,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "be8b26e64ad6efd70f4b6f4cb974cb946001d217",
       "depends_on": [
         "T001"
       ],
@@ -60,7 +61,7 @@
       ],
       "description": "Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

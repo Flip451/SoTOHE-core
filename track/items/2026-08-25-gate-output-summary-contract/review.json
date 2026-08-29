@@ -99,6 +99,101 @@
           "hash": "rvw1:sha256:eb11167e4e0c6653150460829c0da92adf22f37f43e5df786d8721b7774bb579",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:30:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:613603cb28f46f726b66aa62fc85c455ebb4b50180343a03639969433c5d61d6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:38:06Z",
+          "findings": [
+            {
+              "category": "source-substring assertion",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 1094,
+              "message": "The regression uses raw source-substring checks (`case `, `if `, and `sed `) to decide whether legacy wrapper logic is absent. This violates `knowledge/conventions/testing.md`’s prohibition on source-substring assertions and is structurally unreliable: harmless description text can fail the test, while differently spelled script logic can pass. Parse `Makefile.toml` as TOML and assert that the task has no `script` field; the new `task_section` heuristic can then be removed.",
+              "severity": "P2"
+            },
+            {
+              "category": "regression coverage gap",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 1130,
+              "message": "The three dependency checks preserve only one sentinel gate per newly extracted `*-local-steps` task. T003/OUT-01 requires aggregate task membership to remain unchanged, but dropping any other gate (for example `clippy-local`, `check-layers-local`, or an ADR signal gate) would still pass this regression. Assert each child task’s complete direct dependency set so the migration cannot silently weaken an aggregate gate.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:613603cb28f46f726b66aa62fc85c455ebb4b50180343a03639969433c5d61d6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T07:46:57Z",
+          "findings": [
+            {
+              "category": "configuration parsing heuristic",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 448,
+              "message": "The replacement still determines whether `script` is absent with a hand-written line scan. `task_toml_optional_value` recognizes only the exact textual form `script = `, so valid TOML such as `script=[...]` or a quoted key is reported as absent and the wrapper regression passes incorrectly. This extends the line-based heuristic prohibited by `knowledge/conventions/prefer-type-safe-abstractions.md`; parse the task through a TOML decoder and inspect the resulting field structurally.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:ff2bf30e0ab7bdad0a11fe0718771c4f797b1b04e2de7180562592f3221f2806",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:14:08Z",
+          "findings": [
+            {
+              "category": "test correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 1163,
+              "message": "The new test unconditionally calls `task_dependency_set` for `ci-local` and `ci-container`, but those wrapper tasks intentionally have no `dependencies` field; their dependencies are on `ci-local-steps`. `task_toml_value` therefore panics with a missing-key error, so this regression test always fails. Restrict the exact dependency assertion to `ci-local-steps` (or inspect the dependency closure for the wrappers).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3fd0acdab0a0c2768a05c26ee9018188c5b7874f5a536d512c3080649983860c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:26:15Z",
+          "findings": [
+            {
+              "category": "test correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 1105,
+              "message": "The compose-wrapper assertion derives `child` from the current `*-local` task via `task_gate_child`, so the test does not independently verify the required mapping. A wrong shared mapping (for example, both `ci` and `ci-local` pointing to the wrong steps task) would be accepted. Use explicit expected child values for `ci-rust`, `ci`, and `ci-track` instead of deriving the oracle from the Makefile.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:2f3d7c6d3988113dce61805193094c7676185de35597336de1fe6ca653198295",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:30:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdafc32e0655d0eb955c252f4f5f50a98c066823bee6ef849f072eb20218737",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:45:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3fd0acdab0a0c2768a05c26ee9018188c5b7874f5a536d512c3080649983860c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T09:07:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e65f1873198f4a1f4f03c2d07fe2ff70e39dcb037d589a7c9d8451ff510e4b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -265,6 +360,35 @@
           "hash": "rvw1:sha256:5fbf2929a4eaeab7ff3ca0c3113c428983d11d3e1911088ff8dd5d2fe811db33",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:15:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e655ad938b17fb6628748be2e626c8c44ec54fc45dddbdc537a4ef65fbf07bdc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:47:13Z",
+          "findings": [
+            {
+              "category": "output contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 128,
+              "message": "Nested-summary recognition handles the bare `FAIL` verdict but not the project-owned fallback bullets emitted by `render_summary`: `- child exited with status ...` and `- could not start child command: ...`. When an aggregate wraps such a leaf failure, `failure_excerpts` returns only `FAIL`; since the excerpt list is nonempty, the outer renderer also suppresses its own status fallback. The final stdout therefore contains only `- FAIL`, with no failed item or short reason, violating AC-02. Recognize these summary bullet forms and add regressions for fallback and spawn failures.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e655ad938b17fb6628748be2e626c8c44ec54fc45dddbdc537a4ef65fbf07bdc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:56:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:be28c38e23b41917c77527ee6b4615976935434f2c4430720801533623df1950",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -362,6 +486,131 @@
           "at": "2026-08-29T06:58:48Z",
           "findings": [],
           "hash": "rvw1:sha256:bc692b102c791e6939af4c706a639bbfdcf698dcae69b4383d1935c65997842a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:29:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e4f0951adae8935bd333ab3d955b3c5c8aa4e87d9a13083475e41a4c5647bec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:37:11Z",
+          "findings": [
+            {
+              "category": "convention_contradiction",
+              "file": "Makefile.toml",
+              "line": 550,
+              "message": "`ci-local` と `ci-container` の依存一覧を private な `ci-local-steps` へ移したため、`knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md#D9` が指定する「両タスクの dependencies を Quality Gates の機械可読 SSoT とする」契約と矛盾する。既存の保守手順や検査が両タスクを読むと空のゲート一覧になるため、依存関係の発見可能な正本を維持するか、明示的な ADR 変更として関連する harness surface を同期する必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring_breakage",
+              "file": "Makefile.toml",
+              "line": 550,
+              "message": "新しい集約 wrapper は、すでに `gate-output` で包まれた `test-local` などを含む `ci-local-steps` をさらに `gate-output` で包む。leaf の失敗抜粋は `- FAIL …` のように再整形される一方、外側の failure classifier はその形式を失敗項目として認識せず、最終サマリには cargo-make の汎用的な exit-code 行しか残らない。このため失敗したテスト項目と短い理由を示すという briefing の AC-02 を満たさない。失敗する leaf を通した集約経路で項目名と理由が最終 stdout に残るよう wiring を修正する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e4f0951adae8935bd333ab3d955b3c5c8aa4e87d9a13083475e41a4c5647bec",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:10:40Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 548,
+              "message": "`ci-local` and `ci-container` retain the full quality-gate `dependencies` list while also invoking `ci-local-steps`, whose dependencies contain the same gates. Cargo-make therefore executes every gate twice for these aggregate tasks, doubling CI work and potentially repeating side effects. Remove the duplicated dependency path or make the wrapper depend only on the steps task while preserving the required gate-output boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e56cc2dbef5f347d68bfb15372e60123463b826dcc6b70290568f379d11a1b27",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:25:11Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 575,
+              "message": "The `env` flag does not make the aggregate dependencies run inside the `gate-output` command: cargo-make executes dependencies before the task command, so these gates emit raw output and a dependency failure prevents the `gate-output` command from running at all. The `condition` guards therefore cannot establish the required aggregate PASS/FAIL summary and log-path contract for either `ci-local` or `ci-container`. The dependency execution must be moved under the wrapped child command, or the wrapper must otherwise capture and summarize dependency failures.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6690f9a149804fa0cd0f573bb7c0ef3c70da3c2b03a64a536a0ba6cbf9e566a0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:29:43Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 191,
+              "message": "The new leaf conditions do not distinguish aggregate dependency execution from `*-steps` execution: `CARGO_MAKE_TASK` is the leaf task currently being run, so a dependency such as `fmt-check-local` satisfies `env = { CARGO_MAKE_TASK = \"fmt-check-local\" }` both when invoked from `ci-local`'s restored D9 dependency list and when invoked through `ci-local-steps`. Consequently the aggregate gates still execute every shared leaf twice, defeating the intended de-duplication and doubling CI work. The guard must use a flag propagated specifically to the wrapped child invocation (or remove the duplicate dependency path).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f790ad7c94f9f1bae63e5a91aeb25b03fd55af2befacfffd2ab72e3c8b1f7463",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:36:29Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 191,
+              "message": "The new leaf conditions do not distinguish aggregate dependency execution from `*-steps` execution: `CARGO_MAKE_TASK` is set to the task currently being executed, so a dependency such as `fmt-check-local` satisfies `env = { CARGO_MAKE_TASK = \"fmt-check-local\" }` both when invoked from `ci-local`'s restored D9 dependency list and when invoked through `ci-local-steps`. The aggregate gates therefore still execute shared leaves twice, defeating the intended de-duplication and doubling CI work. Use a flag propagated specifically to the wrapped child invocation, or remove the duplicate dependency path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e56cc2dbef5f347d68bfb15372e60123463b826dcc6b70290568f379d11a1b27",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T08:40:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e56cc2dbef5f347d68bfb15372e60123463b826dcc6b70290568f379d11a1b27",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:44:39Z",
+          "findings": [
+            {
+              "category": "convention_contradiction",
+              "file": "Makefile.toml",
+              "line": 750,
+              "message": "`knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md#D9` は `ci` wrapper が Docker 経由で `ci-local` に委譲すると定めているが、この wrapper は新設の `ci-local-steps` を直接実行している。したがって、文書化された SSoT である `ci-local` / `ci-container` の dependencies だけを保守しても `cargo make ci` の実行対象には反映されず、第三の手動同期リストが実際の gate membership を所有してしまう。外側の `gate-output` は維持したまま、子タスクを `ci-local` に戻す必要がある。",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring_breakage",
+              "file": "Makefile.toml",
+              "line": 549,
+              "message": "`ci-local` と `ci-container` に復元した dependencies は、cargo-make の仕様上 `gate-output` command より先に実行され、その stdout は wrapper に捕捉されない。成功時でも `test-local` 等の個別 `PASS`/log 行や未包装 verifier の出力が先に流れ、その後に集約 `PASS` が出るため、CN-01/CN-02/AC-01 の「対象タスクの stdout は単一判定とログパスに限り、個別 PASS 行を含まない」を満たさない。二重実行自体は briefing で受け入れ済みだが、最初の実行がサマリ契約を迂回することは受け入れられていないため、D9 の発見可能性と stdout 捕捉を両立する wiring が必要である。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e56cc2dbef5f347d68bfb15372e60123463b826dcc6b70290568f379d11a1b27",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T09:07:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:318aae924047291c157862001ce0062ac9eb489f1f05e9bb97b6ee20a8255bf7",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -544,6 +793,20 @@
           "at": "2026-08-29T06:48:06Z",
           "findings": [],
           "hash": "rvw1:sha256:0d792073d4fabea568a1324ec0f3a373b3b5ef9c6307feb941d561721b646572",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:28:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4aa49798788dc53cdb24f21ddb19987d1be03dbfbe12b878965183e188e13a55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:33:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4aa49798788dc53cdb24f21ddb19987d1be03dbfbe12b878965183e188e13a55",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -749,6 +1012,20 @@
           "at": "2026-08-29T06:50:57Z",
           "findings": [],
           "hash": "rvw1:sha256:4ac046dea17c8fc368137fba16f033f7d0bbbe49ef189b5b79bee3c9bfb4f04c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:11:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:070a2f577354f83f77b1016372499c51cb6b73b406be8ac52c7364a385cc08bf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T08:44:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:070a2f577354f83f77b1016372499c51cb6b73b406be8ac52c7364a385cc08bf",
           "type": "final",
           "verdict": "zero_findings"
         }
