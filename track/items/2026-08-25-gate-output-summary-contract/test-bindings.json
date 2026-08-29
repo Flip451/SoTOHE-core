@@ -208,6 +208,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ]
     },

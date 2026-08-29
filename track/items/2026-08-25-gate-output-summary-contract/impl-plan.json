@@ -40,6 +40,7 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "415476acda9074085f5283a265e6b724a05c485d",
       "description": "Layered shared gate-run mechanism across usecase, infrastructure, cli_driver, cli, and cli_composition, plus Makefile.toml and bin/sotp integration and focused regressions — standardize and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
       "id": "T001",
       "status": "done"
@@ -50,7 +51,7 @@
       ],
       "description": "Makefile.toml and bin/sotp test-execution and obligation-evaluation tasks plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

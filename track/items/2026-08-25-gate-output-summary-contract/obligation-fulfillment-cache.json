@@ -706,6 +706,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -717,7 +737,7 @@
       },
       "key": {
         "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -742,6 +762,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -753,7 +793,7 @@
       },
       "key": {
         "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -778,6 +818,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -789,7 +849,7 @@
       },
       "key": {
         "anchor_text_hash": "0674c93234dda4f663998efaf2fd0a5a487e3b3878c18a5ae1d1b4fc64df707e",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -814,6 +874,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -825,7 +905,7 @@
       },
       "key": {
         "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -834,7 +914,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())",
+        "citation": "assert_eq!(\n            stdout,\n            format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -850,6 +930,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -861,7 +961,7 @@
       },
       "key": {
         "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -870,7 +970,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(log_path.to_string_lossy().contains(\"tmp/gate/\")); ... assert_eq!(std::fs::read(&log_path).expect(\"execute should persist the complete log\"), b\"[PASS] item-pass\\n[FAIL] item: short reason\\nfull diagnostic detail\\n--- stderr ---\\nstderr detail\\n\"); ... assert!(!stdout.contains(\"full diagnostic detail\"));",
+        "citation": "assert!(log_path.to_string_lossy().contains(\"tmp/gate/\"));\n        assert_eq!(\n            std::fs::read(&log_path).expect(\"execute should persist the complete log\"),\n            b\"[PASS] item-pass\\n[FAIL] item: short reason\\nfull diagnostic detail\\n--- stderr ---\\nstderr detail\\n\"\n        );\n        assert_eq!(\n            stdout,\n            format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())\n        );\n        assert!(!stdout.contains(\"full diagnostic detail\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -886,6 +986,26 @@
           "layer": "cli",
           "module_path": "cli::commands::gate_output::tests",
           "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_success_renders_pass_summary_and_preserves_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code"
         }
       ],
       "edge_id": {
@@ -897,7 +1017,7 @@
       },
       "key": {
         "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
-        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "bound_tests_set_hash": "90eb0d76c3c0a03006230b1990d4499a76456987ed32ad26efef87c47a189932",
         "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
       },
       "obligation_id": {
@@ -906,7 +1026,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(exit, ExitCode::from(23));\n\nassert_eq!(exit, ExitCode::SUCCESS);",
+        "citation": "assert_eq!(exit, ExitCode::from(23));\n...\nassert_eq!(exit, ExitCode::SUCCESS);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

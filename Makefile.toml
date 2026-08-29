@@ -199,31 +199,31 @@ args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "wa
 
 [tasks.test-local]
 private = true
-description = "[internal] Run tests with all features (including semantic-dup) via nextest"
+description = "[internal] Run tests with all features (including semantic-dup) via nextest and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-local", "--", "cargo", "nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-cli-feature-off-local]
 private = true
-description = "[internal] Run CLI tests with semantic-dup disabled via nextest"
+description = "[internal] Run CLI tests with semantic-dup disabled via nextest and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["nextest", "run", "--locked", "--no-default-features", "-p", "cli", "--no-tests=warn"]
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-cli-feature-off-local", "--", "cargo", "nextest", "run", "--locked", "--no-default-features", "-p", "cli", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
-description = "[internal] Run documentation tests with all features (including semantic-dup)"
+description = "[internal] Run documentation tests with all features (including semantic-dup) and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["test", "--locked", "--doc", "--all-features"]
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-doc-local", "--", "cargo", "test", "--locked", "--doc", "--all-features"]
 
 [tasks.test-nocapture-local]
 private = true
-description = "[internal] Run tests with stdout/stderr shown"
+description = "[internal] Run tests with stdout/stderr captured in the full gate log and summarized"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["test", "--locked", "--all-features", "--", "--nocapture"]
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-nocapture-local", "--", "cargo", "test", "--locked", "--all-features", "--", "--nocapture"]
 
 [tasks.check-local]
 private = true
@@ -591,7 +591,7 @@ command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "test-doc-local"]
 
 [tasks.test-nocapture]
-description = "[wrapper] Run tests with stdout/stderr shown (docker compose)"
+description = "[wrapper] Run tests with stdout/stderr captured in the full gate log and summarized (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "test-nocapture-local"]
@@ -794,9 +794,9 @@ command = "bin/sotp"
 args = ["gate-output", "${@}"]
 
 [tasks.test-obligation-check]
-description = "[gate] Run the active track's pure-read test-obligation fulfillment gate. Active track auto-resolved from current git branch."
+description = "[gate] Run the active track's pure-read test-obligation fulfillment gate through the compact gate-output summary. Active track auto-resolved from current git branch."
 command = "bin/sotp"
-args = ["test-obligation", "check"]
+args = ["gate-output", "--name", "test-obligation-check", "--", "bin/sotp", "test-obligation", "check"]
 
 [tasks.track-active-gate]
 private = true
@@ -858,9 +858,9 @@ args = ["batch-plan", "check"]
 
 [tasks.test-obligation-check-local]
 private = true
-description = "[internal] Pure-read test-obligation fulfillment gate. Active track auto-resolved by CLI. Uses cargo-run so CI containers exercise the current source tree without requiring a host-installed bin/sotp."
+description = "[internal] Pure-read test-obligation fulfillment gate through the compact gate-output summary. Active track auto-resolved by CLI. Uses cargo-run so CI containers exercise the current source tree."
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
+args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-obligation-check-local", "--", "cargo", "run", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
 
 [tasks.adr-baseline-check-commit-local]
 private = true

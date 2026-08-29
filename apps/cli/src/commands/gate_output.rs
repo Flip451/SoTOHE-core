@@ -247,6 +247,102 @@ mod tests {
         assert!(!stdout.contains("DebugRecord"));
     }
 
+    fn execute_shell_gate(name: &str, shell: &str) -> (ExitCode, String) {
+        capture_stdout(|| {
+            execute(GateOutputArgs {
+                name: GateNameArg::new(name.to_owned()),
+                command: vec![
+                    OsString::from("/bin/sh"),
+                    OsString::from("-c"),
+                    OsString::from(shell),
+                ],
+            })
+        })
+    }
+
+    #[test]
+    fn test_test_execution_success_renders_pass_summary_and_preserves_log() {
+        let (exit, stdout) = execute_shell_gate(
+            &format!("t002-test-success-{}", std::process::id()),
+            "printf 'test test_execution::passes ... ok\\ntest result: ok. 1 passed; 0 failed\\n'; printf 'DebugRecord { pass: true }\\n' >&2",
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let log_path = reported_log_path(&stdout);
+        assert!(log_path.to_string_lossy().contains("tmp/gate/"));
+        assert_eq!(
+            std::fs::read(&log_path).expect("test execution should persist the complete log"),
+            b"test test_execution::passes ... ok\ntest result: ok. 1 passed; 0 failed\n--- stderr ---\nDebugRecord { pass: true }\n"
+        );
+        assert_eq!(stdout, format!("PASS\nlog: {}\n", log_path.display()));
+        assert!(!stdout.contains("test test_execution::passes"));
+        assert!(!stdout.contains("DebugRecord"));
+    }
+
+    #[test]
+    fn test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code() {
+        let (exit, stdout) = execute_shell_gate(
+            &format!("t002-test-failure-{}", std::process::id()),
+            "printf 'test test_execution::fails ... FAILED\\ntest result: FAILED. 0 passed; 1 failed\\n'; printf 'full failure detail\\n' >&2; exit 17",
+        );
+
+        assert_eq!(exit, ExitCode::from(17));
+        let log_path = reported_log_path(&stdout);
+        assert_eq!(
+            std::fs::read(&log_path).expect("failed test execution should persist the full log"),
+            b"test test_execution::fails ... FAILED\ntest result: FAILED. 0 passed; 1 failed\n--- stderr ---\nfull failure detail\n"
+        );
+        assert_eq!(
+            stdout,
+            format!(
+                "FAIL\nlog: {}\nfailures:\n- test test_execution::fails ... FAILED\n- test result: FAILED. 0 passed; 1 failed\n",
+                log_path.display()
+            )
+        );
+        assert!(!stdout.contains("full failure detail"));
+    }
+
+    #[test]
+    fn test_obligation_check_success_renders_pass_summary_and_preserves_log() {
+        let (exit, stdout) = execute_shell_gate(
+            &format!("t002-obligation-success-{}", std::process::id()),
+            "printf '[OK] test-obligation check passed: resolved_edges=69 uncited_findings=0\\n'; printf 'ObligationRecord { pass: true }\\n' >&2",
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let log_path = reported_log_path(&stdout);
+        assert_eq!(
+            std::fs::read(&log_path).expect("obligation check should persist the complete log"),
+            b"[OK] test-obligation check passed: resolved_edges=69 uncited_findings=0\n--- stderr ---\nObligationRecord { pass: true }\n"
+        );
+        assert_eq!(stdout, format!("PASS\nlog: {}\n", log_path.display()));
+        assert!(!stdout.contains("test-obligation check passed"));
+        assert!(!stdout.contains("ObligationRecord"));
+    }
+
+    #[test]
+    fn test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code() {
+        let (exit, stdout) = execute_shell_gate(
+            &format!("t002-obligation-failure-{}", std::process::id()),
+            "printf 'test-obligation check failed: missing binding\\n'; printf 'full obligation detail\\n' >&2; exit 19",
+        );
+
+        assert_eq!(exit, ExitCode::from(19));
+        let log_path = reported_log_path(&stdout);
+        assert_eq!(
+            std::fs::read(&log_path).expect("failed obligation check should persist the full log"),
+            b"test-obligation check failed: missing binding\n--- stderr ---\nfull obligation detail\n"
+        );
+        assert_eq!(
+            stdout,
+            format!(
+                "FAIL\nlog: {}\nfailures:\n- test-obligation check failed: missing binding\n",
+                log_path.display()
+            )
+        );
+        assert!(!stdout.contains("full obligation detail"));
+    }
+
     #[test]
     fn test_exit_code_from_u8_preserves_driver_value() {
         assert_eq!(exit_code_from_u8(23), ExitCode::from(23));

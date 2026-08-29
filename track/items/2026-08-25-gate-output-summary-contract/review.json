@@ -85,6 +85,20 @@
           "hash": "rvw1:sha256:f554ef14b2c571e77cbe53c988ed3084d0ca9ee6c382c2a849f8172dca47a8cc",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:42:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb11167e4e0c6653150460829c0da92adf22f37f43e5df786d8721b7774bb579",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:51:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb11167e4e0c6653150460829c0da92adf22f37f43e5df786d8721b7774bb579",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -299,6 +313,57 @@
           "hash": "rvw1:sha256:91c28d41df52108577155d08bae400f68942b052604fc4116290a31cb7764448",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:40:29Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 205,
+              "message": "The new `cargo run -p cli` wrappers at lines 205, 212, 219, 226, and 863 trigger `template-export-smoke-local`'s fail-closed scan, so `cargo make ci-local`/container CI will fail unconditionally. Use the supported exported `bin/sotp` gate-output surface or update the guard in the same change.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:29002b37a8e233479e004b217df510f150aeb0f375e97174d90af07135430734",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T06:45:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08bed8c73dcefa65a0ad0ee7d901a0b1385cea2ff5c238c16eac8a2424980e36",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:50:47Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 204,
+              "message": "The migrated CI leaf tasks now execute the workspace-relative `bin/sotp`, but that binary is ignored by both Git and Docker and the `tools` image does not install it. Consequently, fresh-checkout `ci-container` fails before `test-local`/`test-cli-feature-off-local`/`test-doc-local` can run, and `ci-track-container` similarly fails at `test-obligation-check-local`. Provide a current-source `sotp` executable within these CI paths instead of depending on a developer's ignored host binary.",
+              "severity": "P1"
+            },
+            {
+              "category": "command wiring inconsistency",
+              "file": "Makefile.toml",
+              "line": 226,
+              "message": "Wrapping `test-nocapture-local` with `gate-output` captures the child's stdout/stderr in the full log and emits only the compact summary, while the public `test-nocapture` task still promises to run tests “with stdout/stderr shown.” Update the public task contract to describe the new behavior (or preserve live output if that promise remains intended).",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08bed8c73dcefa65a0ad0ee7d901a0b1385cea2ff5c238c16eac8a2424980e36",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T06:58:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc692b102c791e6939af4c706a639bbfdcf698dcae69b4383d1935c65997842a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -465,6 +530,20 @@
           "at": "2026-08-29T04:17:46Z",
           "findings": [],
           "hash": "rvw1:sha256:840c888ee7c055691174c8880edb7fcecc045f9801a81403d4e3e3aabd256286",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:40:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d792073d4fabea568a1324ec0f3a373b3b5ef9c6307feb941d561721b646572",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:48:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d792073d4fabea568a1324ec0f3a373b3b5ef9c6307feb941d561721b646572",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -656,6 +735,20 @@
           "at": "2026-08-29T04:55:11Z",
           "findings": [],
           "hash": "rvw1:sha256:284d66b4df748fd19f0c3eb6fd2373b637a1d7ef189a3073087b88bb275b9dd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:41:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac046dea17c8fc368137fba16f033f7d0bbbe49ef189b5b79bee3c9bfb4f04c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:50:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac046dea17c8fc368137fba16f033f7d0bbbe49ef189b5b79bee3c9bfb4f04c",
           "type": "final",
           "verdict": "zero_findings"
         }
