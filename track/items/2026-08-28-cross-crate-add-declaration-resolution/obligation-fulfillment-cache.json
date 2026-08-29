@@ -25,6 +25,36 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed"
         },
         {
@@ -62,7 +92,7 @@
       },
       "key": {
         "anchor_text_hash": "6bc21ab56b66b1c962f894d2e41a2c6d6173c49b732a37f917ab972d60fa9f08",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -71,7 +101,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                                path.id != Id(UNRESOLVED_CRATE_ID)\n                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                        path.id != Id(UNRESOLVED_CRATE_ID)\n                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -97,6 +127,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -138,7 +198,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -147,7 +207,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    let repository = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"ports\", \"Repository\"])\n        .expect(\"the declaring layer's trait add must be present\");\n    assert_eq!(repository.kind, ItemKind::Trait);\n    assert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    assert!(\n        !paths.values().any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the target catalogue must not duplicate the declaring-layer item\"\n    );",
+        "citation": "expect(\"the declaring layer's type add must be present\");\n    assert_eq!(user_id.1.kind, ItemKind::Struct);\n    assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    let repository = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"ports\", \"Repository\"])\n        .expect(\"the declaring layer's trait add must be present\");\n    assert_eq!(repository.kind, ItemKind::Trait);\n    assert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -173,6 +233,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -214,7 +304,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -223,7 +313,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\nassert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\nassert_eq!(summary.path, [\"domain\", \"model\", \"UserId\"]);\nassert_eq!(*id, rustdoc_id);\nassert_eq!(summary.crate_id, 1);",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\nassert_eq!(*id, rustdoc_id);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -249,6 +339,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -290,7 +410,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -299,7 +419,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"expect(\"available other-layer catalogues must extend one resolution set\");\" ... \"expect(\"one normalized resolution set must cover every codec route\");\"",
+        "citation": "expect(\"available other-layer catalogues must extend one resolution set\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -325,6 +445,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -366,7 +516,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -375,7 +525,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"missing enabled catalogues are empty, not errors\"; ... \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
+        "citation": "assert!(loaded.catalogues.contains_key(&LayerId::try_new(\"infrastructure\").unwrap()));\n        assert!(\n            !loaded.catalogues.contains_key(&LayerId::try_new(\"domain\").unwrap()),\n            \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -401,6 +551,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -442,7 +622,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -451,7 +631,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "let user_id = item_id_for_path(&encoded, &[\"domain\", \"model\", \"UserId\"]);\nlet user_summary = &encoded.krate().paths[&user_id];\nassert_ne!(user_summary.crate_id, 0);\nassert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nlet future = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"RemoteFuture\"])\n        .expect(\"an omitted placement must remain represented\");\n    assert_eq!(future.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);\n    assert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));\n\nlet baseline = rustdoc_crate_with_root_and_paths(\n        \"sotp\",\n        [(1, vec![\"sotp\", \"commands\", \"run\"], ItemKind::Function)],\n    );\n    let encoded = encode_single_doc(doc, &baseline, &baseline)\n        .expect(\"function encoding must retain the package-facing path\");\n    let id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]);",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nlet user_id = item_id_for_path(&encoded, &[\"domain\", \"model\", \"UserId\"]);\n\n.any(|summary| { summary.path == vec![\"domain\", \"generated\", \"FutureType\"] })",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -477,6 +657,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -518,7 +728,7 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -527,7 +737,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                        path.id != Id(UNRESOLVED_CRATE_ID)\n                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -553,6 +763,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -594,7 +834,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -603,7 +843,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(\n    !encoded\n        .krate()\n        .paths\n        .values()\n        .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n    \"the referencing catalogue must not duplicate the external declaration\"\n);",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -629,6 +869,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -670,7 +940,7 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "0c89e79ab036e283fdbbee84bb2022e000e97f1c219f077b09c7d66f7d952a81",
+        "bound_tests_set_hash": "574c0e7b771d3fa853b947c138ad3560e4bc4a94fecd588f4f9e93b5ed2919cb",
         "declaration_hash": "9ea94db9481b351f409940e8d10caaf5079528ff16b23a856ccd2a9f4e7a401e"
       },
       "obligation_id": {
@@ -679,7 +949,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(*id, rustdoc_id);\n    assert_eq!(summary.crate_id, 1);\n    assert_ne!(summary.crate_id, u32::MAX - 1);",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n...\nassert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -705,6 +975,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -746,7 +1046,7 @@
       },
       "key": {
         "anchor_text_hash": "6bc21ab56b66b1c962f894d2e41a2c6d6173c49b732a37f917ab972d60fa9f08",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -755,7 +1055,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\nassert_eq!(repository.kind, ItemKind::Trait);\nassert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\nassert_eq!(future.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);\nassert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));\nassert!(\n    !paths.values().any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n    \"the target catalogue must not duplicate the declaring-layer item\"\n);",
+        "citation": "assert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\n    assert!(encoded.krate().index.values().any(|item| {\n        matches!(\n            &item.inner,\n            ItemEnum::Impl(impl_item)\n                if impl_item\n                    .trait_\n                    .as_ref()\n                    .is_some_and(|path| {\n                        path.id != Id(UNRESOLVED_CRATE_ID)\n                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {\n                                summary.path == [\"domain\", \"ports\", \"Repository\"]\n                                    && summary.crate_id != 0\n                            })\n                    })\n                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)\n        )\n    }));\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -781,6 +1081,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -822,7 +1152,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -831,7 +1161,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(user_summary.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);",
+        "citation": "expect(\"the declaring layer's type add must be present\");\n    assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n\n    let repository = paths\n        .values()\n        .find(|summary| summary.path == [\"domain\", \"ports\", \"Repository\"])\n        .expect(\"the declaring layer's trait add must be present\");\n    assert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);\n    assert!(\n        !paths.values().any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the target catalogue must not duplicate the declaring-layer item\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -857,6 +1187,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -898,7 +1258,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -907,7 +1267,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\"); ... assert_eq!(*id, rustdoc_id); ... assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n    &encoded.krate().index[&fields[0]].inner,\n    ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n));\n\nassert!(\n    !encoded\n        .krate()\n        .paths\n        .values()\n        .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n    \"the referencing catalogue must not duplicate the external declaration\"\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -933,6 +1293,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -974,7 +1364,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -983,7 +1373,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(\n        &CatalogueToExtendedCrateCodec::new(),\n        &target_layer,\n        &catalogues,\n        &empty,\n        &empty,\n    )\n    .expect(\"cross-layer add declarations must resolve as external identities\");",
+        "citation": "let paths = resolution_paths_for_catalogue(&target_layer, &catalogues, &empty, &empty)\n        .expect(\"available other-layer catalogues must extend one resolution set\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1009,6 +1399,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -1050,7 +1470,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -1059,7 +1479,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"missing enabled catalogues are empty, not errors\";\nassert!(loaded.catalogues.contains_key(&LayerId::try_new(\"infrastructure\").unwrap()));\nassert!(\n    !loaded.catalogues.contains_key(&LayerId::try_new(\"domain\").unwrap()),\n    \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"\n);",
+        "citation": "\"missing enabled catalogues are empty, not errors\";\n        assert!(loaded.catalogues.contains_key(&LayerId::try_new(\"infrastructure\").unwrap()));\n        assert!(\n            !loaded.catalogues.contains_key(&LayerId::try_new(\"domain\").unwrap()),\n            \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1085,6 +1505,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -1126,7 +1576,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -1135,7 +1585,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(encoded.krate().paths.values().any(|summary| { summary.path == vec![\"domain\", \"generated\", \"FutureType\"] }));\n\nlet id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]);",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\"); ... assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function); ... let id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]); ... assert!(encoded.krate().paths.values().any(|summary| { summary.path == vec![\"domain\", \"generated\", \"FutureType\"] }))",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1161,6 +1611,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -1202,7 +1682,7 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -1211,7 +1691,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));\n\nassert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == [\"usecase\", \"model\", \"UserId\"]),\n        \"the referencing catalogue must not duplicate the external declaration\"\n    );",
+        "citation": "assert_eq!(user_summary.crate_id, encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1237,6 +1717,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -1278,7 +1788,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -1287,7 +1797,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(\n        &encoded.krate().index[&fields[0]].inner,\n        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id\n    ));",
+        "citation": "assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, \"domain\");\n\nassert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));\n\nlet baseline = rustdoc_crate_with_root_and_paths(\n        \"sotp\",\n        [(1, vec![\"sotp\", \"commands\", \"run\"], ItemKind::Function)],\n    );\nlet encoded = encode_single_doc(doc, &baseline, &baseline)\n        .expect(\"function encoding must retain the package-facing path\");\nlet id = item_id_for_path(&encoded, &[\"cli\", \"commands\", \"run\"]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1313,6 +1823,36 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_reference_to_missing_crate_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_add_identity_rejects_qualified_baseline_collision"
         },
         {
           "layer": "infrastructure",
@@ -1354,7 +1894,7 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "fd451f70fd432c18e346c0b14cbe6623c9e9f327d280ed024b259783a2e9166b",
+        "bound_tests_set_hash": "4358c5a78e430a3da2e3d0718d4bb631ae702df60983542fa60662816dee7234",
         "declaration_hash": "44cb74553c163bf865e4cbc65f5b4842dd40d60576f036556785144aac14e642"
       },
       "obligation_id": {
@@ -1363,7 +1903,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "expect(\"a referring-side rustdoc identity must win over the other-layer add\"); ... assert_eq!(*id, rustdoc_id); ... assert_ne!(summary.crate_id, u32::MAX - 1);",
+        "citation": "assert_eq!(*id, rustdoc_id);\n    assert_eq!(summary.crate_id, 1); ... assert!(matches!(\n        error,\n        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)\n            if type_ref.as_str() == \"UserId\"\n    )); ... assert!(matches!(\n        error,\n        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)\n            if type_ref.as_str() == \"domain::missing::UserId\"\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

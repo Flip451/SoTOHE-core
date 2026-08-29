@@ -288,14 +288,14 @@ fn insert_catalogue_additions(
         if entry.action() != ItemAction::Add {
             continue;
         }
-        if external
-            && let Ok(identity) = FullyQualifiedItemPath::from_type_catalogue_entry_key(
-                catalogue.crate_name(),
-                key,
-                entry.module_path(),
-            )
-        {
-            let path = identity_path(&identity);
+        let declared_identity = catalogue_entry_identity(
+            catalogue.crate_name(),
+            key,
+            entry.module_path(),
+            CatalogueItemNamespace::Type,
+        )?;
+        if external {
+            let path = identity_path(&declared_identity);
             if known_paths.contains(&(path, PathNamespace::Type)) {
                 continue;
             }
@@ -322,14 +322,14 @@ fn insert_catalogue_additions(
         if entry.action() != ItemAction::Add {
             continue;
         }
-        if external
-            && let Ok(identity) = FullyQualifiedItemPath::from_trait_catalogue_entry_key(
-                catalogue.crate_name(),
-                key,
-                entry.module_path(),
-            )
-        {
-            let path = identity_path(&identity);
+        let declared_identity = catalogue_entry_identity(
+            catalogue.crate_name(),
+            key,
+            entry.module_path(),
+            CatalogueItemNamespace::Trait,
+        )?;
+        if external {
+            let path = identity_path(&declared_identity);
             if known_paths.contains(&(path, PathNamespace::Trait)) {
                 continue;
             }
@@ -363,21 +363,7 @@ fn resolve_add_identity(
     baseline: &BTreeSet<FullyQualifiedItemPath>,
     current: &BTreeSet<FullyQualifiedItemPath>,
 ) -> Result<FullyQualifiedItemPath, NewTypeGraphCodecError> {
-    let identity = match namespace {
-        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
-            crate_name,
-            key,
-            declared_module_path,
-        ),
-        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
-            crate_name,
-            key,
-            declared_module_path,
-        ),
-    }
-    .map_err(|error| {
-        invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
-    })?;
+    let identity = catalogue_entry_identity(crate_name, key, declared_module_path, namespace)?;
     let reference = TypeRef::new(if identity.is_placed() {
         identity.to_string()
     } else {
@@ -395,6 +381,45 @@ fn resolve_add_identity(
         namespace,
     )
     .map_err(map_identity_resolution_error)
+}
+
+fn catalogue_entry_identity(
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
+    declared_module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
+) -> Result<FullyQualifiedItemPath, NewTypeGraphCodecError> {
+    let identity = match namespace {
+        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+            crate_name,
+            key,
+            declared_module_path,
+        ),
+        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+            crate_name,
+            key,
+            declared_module_path,
+        ),
+    }
+    .map_err(|error| {
+        invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+    })?;
+    if key.as_str().contains("::") {
+        if let (Some(declared), Some(actual)) = (declared_module_path, identity.module_path()) {
+            if declared != actual {
+                return Err(invalid_type_ref(
+                    key.as_str(),
+                    format!(
+                        "catalogue key '{}' implies module_path '{}', but entry module_path is '{}',",
+                        key.as_str(),
+                        actual,
+                        declared
+                    ),
+                ));
+            }
+        }
+    }
+    Ok(identity)
 }
 
 fn insert_synthetic_summary(

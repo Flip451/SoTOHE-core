@@ -55,7 +55,7 @@
     {
       "description": "After T002, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused precedence and negative resolution validation (IN-02, OS-02, OS-03, CO-01, CO-03, AC-03).",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "76e029f0ffe4440a3e48fb5e0af9105655c7a86f",

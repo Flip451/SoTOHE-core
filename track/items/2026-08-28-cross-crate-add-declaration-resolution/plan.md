@@ -5,7 +5,7 @@
 
 GO-01 → T001/T002/T003/T004/T005.
 
-## Tasks (4/5 resolved)
+## Tasks (5/5 resolved)
 
 ### SECTION-001 — Resolution boundary
 
@@ -18,7 +18,7 @@ GO-01 → T001/T002/T003/T004/T005.
 > Modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused validation in dependency order (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
 
 - [x] **T002**: Modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused encode and resolution_paths_for_catalogue validation (IN-01, IN-02, OS-01, CO-01, CO-02, CO-03, AC-01, AC-02). (`76e029f0ffe4440a3e48fb5e0af9105655c7a86f`)
-- [ ] **T003**: After T002, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused precedence and negative resolution validation (IN-02, OS-02, OS-03, CO-01, CO-03, AC-03).
+- [x] **T003**: After T002, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused precedence and negative resolution validation (IN-02, OS-02, OS-03, CO-01, CO-03, AC-03).
 
 ### SECTION-003 — Catalogue handoff
 
