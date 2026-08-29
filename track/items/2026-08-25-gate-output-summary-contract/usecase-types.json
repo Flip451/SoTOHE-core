@@ -1,8 +1,882 @@
 {
   "crate_name": "usecase",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "command",
+              "ty": "Vec<std::ffi::os_str::OsString>"
+            }
+          ],
+          "returns": "Result<GateRunCommand, GateRunCommandError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "command",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[std::ffi::os_str::OsString]",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateRunCommand"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "i32"
+            }
+          ],
+          "returns": "GateExitCode",
+          "spec_refs": [
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_success",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "spec_refs": [
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "i32",
+          "spec_refs": [
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateExitCode"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_persisted_path",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "GateLogPath",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateLogPath"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "runner",
+              "ty": "std::sync::Arc<dyn GateProcessPort>"
+            },
+            {
+              "name": "logs",
+              "ty": "std::sync::Arc<dyn GateLogPersistencePort>"
+            }
+          ],
+          "returns": "GateRunInteractor",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateRunInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "reason",
+              "ty": "String"
+            }
+          ],
+          "returns": "GateAdapterFailureReason",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateAdapterFailureReason"
+    }
+  ],
   "layer": "usecase",
   "schema_version": 5,
-  "traits": {},
-  "types": {}
+  "trait_impls": [
+    {
+      "for_type": "GateRunCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateRunCommandError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateRunCommandError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateRunCommandError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GateExitCode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateExitCode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GateExitCode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "GateExitCode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GateExitCode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GateProcessOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateProcessError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateProcessError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateProcessError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GateLogPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GateLogPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GateLogPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GateLogPersistenceError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogPersistenceError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateLogPersistenceError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GateRunResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateRunError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateRunError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateRunError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GateRunInteractor",
+      "trait_ref": "GateRunService"
+    },
+    {
+      "for_type": "GateAdapterFailureReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateAdapterFailureReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GateAdapterFailureReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GateAdapterFailureReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GateAdapterFailureReason",
+      "trait_ref": "core::fmt::Display"
+    }
+  ],
+  "traits": {
+    "GateLogPersistencePort": {
+      "action": "add",
+      "docs": "Persistence boundary that selects a contained path, rejects outside-root and symlink traversal, performs the write, and returns the persisted path. It is deliberately synchronous for the single-shot CLI path, which performs one log write before returning.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "persist",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&GateRunCommand"
+            },
+            {
+              "name": "contents",
+              "ty": "&[u8]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<GateLogPath, GateLogPersistenceError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "gate_output",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "GateProcessPort": {
+      "action": "add",
+      "docs": "Secondary port for executing one validated gate command and returning its complete child output. It is deliberately synchronous for the single-shot CLI path, which performs one child run before returning.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&GateRunCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<GateProcessOutput, GateProcessError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "gate_output",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "GateRunService": {
+      "action": "add",
+      "docs": "Inbound application port for one gate execution operation. It is deliberately synchronous so the single-shot CLI orchestration keeps its one process run and one log write on one blocking path.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "GateRunCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<GateRunResult, GateRunError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "gate_output",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "GateAdapterFailureReason": {
+      "action": "add",
+      "docs": "Application-boundary transport value carrying opaque, unconstrained adapter diagnostic text. The application neither parses the text nor assigns it domain meaning.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateExitCode": {
+      "action": "add",
+      "docs": "Value-semantic wrapper for an operating-system child exit status.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateLogPath": {
+      "action": "add",
+      "docs": "Path value returned after the persistence port completes the corresponding gate-log write.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateLogPersistenceError": {
+      "action": "add",
+      "docs": "Persistence-boundary failures, including explicit containment and symlink-component rejection. Create/write diagnostics cross the port as typed GateAdapterFailureReason values without importing I/O types.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutsideRoot",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkComponent",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Clock",
+            "payload": {
+              "fields": [
+                "std::time::SystemTimeError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CreateDirectory",
+            "payload": {
+              "fields": [
+                "GateAdapterFailureReason"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Write",
+            "payload": {
+              "fields": [
+                "GateAdapterFailureReason"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateProcessError": {
+      "action": "add",
+      "docs": "Failure produced by the child-process secondary port before output is available. The spawn diagnostic crosses the port as a typed GateAdapterFailureReason without importing I/O types.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Spawn",
+            "payload": {
+              "fields": [
+                "GateAdapterFailureReason"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateProcessOutput": {
+      "action": "add",
+      "docs": "Complete opaque child-process bytes paired with the typed child status.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "exit_code",
+              "ty": "GateExitCode"
+            },
+            {
+              "name": "output",
+              "ty": "Vec<u8>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateRunCommand": {
+      "action": "add",
+      "docs": "Validated application command containing an opaque presentation label and a non-empty OS-native argv.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateRunCommandError": {
+      "action": "add",
+      "docs": "Validation failure for construction of a gate-run command.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyCommand",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateRunError": {
+      "action": "add",
+      "docs": "Application-operation failure returned when full-log persistence cannot complete.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Persist",
+            "payload": {
+              "fields": [
+                "GateLogPersistenceError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateRunInteractor": {
+      "action": "add",
+      "docs": "Application orchestrator coordinating child execution with full-log persistence through required ports.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateRunResult": {
+      "action": "add",
+      "docs": "Closed application result carrying the persisted path and the data needed by the primary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ChildExited",
+            "payload": {
+              "fields": [
+                {
+                  "name": "exit_code",
+                  "ty": "GateExitCode"
+                },
+                {
+                  "name": "output",
+                  "ty": "Vec<u8>"
+                },
+                {
+                  "name": "log_path",
+                  "ty": "GateLogPath"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SpawnFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "error",
+                  "ty": "GateProcessError"
+                },
+                {
+                  "name": "log_path",
+                  "ty": "GateLogPath"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    }
+  }
 }

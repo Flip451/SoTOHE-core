@@ -1,5 +1,31 @@
 {
-  "catalogue_declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
+  "catalogue_declaration_hash": "b4cce5b56e169a9409fc0a3f227199802ccc042ca5d7acda3c73c1e9802307b8",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "71413d3b260330621fcf566907615a2948e9d5db92534c13bae2107895e53086",
+      "signal": "blue",
+      "type_name": "CliCommand"
+    },
+    {
+      "entry_hash": "7cbe70b5561372fce87ddf2536d5040ffe797f31af631d0f2ee261caf1ffa78a",
+      "signal": "blue",
+      "type_name": "GateNameArg"
+    },
+    {
+      "entry_hash": "0e10a338778780b0d4a066c956ae0709e8a4820b9767cc1a30a9088e24c3be05",
+      "signal": "blue",
+      "type_name": "GateOutputArgs"
+    },
+    {
+      "entry_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "signal": "blue",
+      "type_name": "cli::commands::gate_output::execute"
+    },
+    {
+      "entry_hash": "84d4faf980fe47194a85319b3941ebd5fadef6130424329accb20e5c966b8765",
+      "signal": "blue",
+      "type_name": "cli::commands::gate_output::exit_code_from_u8"
+    }
+  ]
 }

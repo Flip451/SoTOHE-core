@@ -1,8 +1,159 @@
 {
-  "baseline_hash": "230863e2f887bc886ef1112154dd804f0f37bf73f79919c1b02f64eea5a74a7f",
-  "declaration_hash": "13b2812e7d20c49659aa60475c46bc175c9a37692430e6cb0e4c6fad98ac92d8",
-  "generated_at": "2026-08-25T06:48:07Z",
-  "head_commit": "05af0dbbce2408cca5864301b17503f7515e398e",
-  "schema_version": 4,
-  "signals": []
+  "baseline_hash": "deed89645a7f8c11300a9892eee7cabf8dd07ed6d578b133180b6b0390cb43ff",
+  "declaration_hash": "0cfb9f26ab61a17e50ed699b862398747d2d73b2cb9dd2233fb0510a7369f053",
+  "generated_at": "2026-08-29T05:46:50Z",
+  "head_commit": "d5fe0b557d59213a718f840f7365c212f8b6aecd",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateAdapterFailureReason"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateExitCode"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateLogPath"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateLogPersistenceError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "GateLogPersistencePort"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateProcessError"
+    },
+    {
+      "found_items": [
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateProcessOutput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "GateProcessPort"
+    },
+    {
+      "found_items": [
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "command",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateRunCommand"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateRunCommandError"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateRunError"
+    },
+    {
+      "found_items": [
+        "GateRunService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateRunInteractor"
+    },
+    {
+      "found_items": [
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateRunResult"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "GateRunService"
+    }
+  ]
 }

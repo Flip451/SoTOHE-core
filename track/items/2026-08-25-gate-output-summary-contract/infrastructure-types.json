@@ -1,8 +1,122 @@
 {
   "crate_name": "infrastructure",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "ProcessGateRunner",
+          "spec_refs": [
+            {"anchor": "AC-04", "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"}
+          ]
+        }
+      ],
+      "type_name": "ProcessGateRunner"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "FsGateLogPersistence",
+          "spec_refs": [
+            {"anchor": "IN-02", "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"}
+          ]
+        }
+      ],
+      "type_name": "FsGateLogPersistence"
+    }
+  ],
   "layer": "infrastructure",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ProcessGateRunner",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProcessGateRunner",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "ProcessGateRunner",
+      "trait_ref": "usecase::gate_output::GateProcessPort"
+    },
+    {
+      "for_type": "FsGateLogPersistence",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsGateLogPersistence",
+      "trait_ref": "usecase::gate_output::GateLogPersistencePort"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "FsGateLogPersistence": {
+      "action": "add",
+      "docs": "Filesystem adapter and exclusive enforcement owner for contained, symlink-safe gate-log writes beneath its trusted root.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "ProcessGateRunner": {
+      "action": "add",
+      "docs": "Process adapter that executes validated OS-native argv and returns complete captured output through GateProcessPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    }
+  }
 }

@@ -1,8 +1,32 @@
 {
-  "baseline_hash": "157026f8074c7ecd68b7106bad72c78aa1eb760a7688d715ff37e35f589c5dbb",
-  "declaration_hash": "14e274c5ae3fc63e9cf97db30e0517fde338c52be9cc7814057366a23c9b97fe",
-  "generated_at": "2026-08-25T06:48:21Z",
-  "head_commit": "05af0dbbce2408cca5864301b17503f7515e398e",
-  "schema_version": 4,
-  "signals": []
+  "baseline_hash": "6431ef9e66096b925a5835d6ffb9ac6bf5c72b78cbae388bc4521fe13b680357",
+  "declaration_hash": "b4b1e25bf2779ce4a8d1e9d307be2fcc9c141a3fa9d57654a19a41965a8bf111",
+  "generated_at": "2026-08-29T05:47:06Z",
+  "head_commit": "d5fe0b557d59213a718f840f7365c212f8b6aecd",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_items": [
+        "core::fmt::Debug",
+        "usecase::gate_output::GateLogPersistencePort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "FsGateLogPersistence"
+    },
+    {
+      "found_items": [
+        "core::default::Default",
+        "core::fmt::Debug",
+        "usecase::gate_output::GateProcessPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ProcessGateRunner"
+    }
+  ]
 }

@@ -1,5 +1,11 @@
 {
-  "catalogue_declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
+  "catalogue_declaration_hash": "76a44389aad4ed0c4e1d9a6bbc9c61eb07579439e2dba149b35609d945db3ed5",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "c5756b575bb49696225871c13290c735db4a1d372dc6ad4735995168ede2ab77",
+      "signal": "blue",
+      "type_name": "GateOutputComposition"
+    }
+  ]
 }

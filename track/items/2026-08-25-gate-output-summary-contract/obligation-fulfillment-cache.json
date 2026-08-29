@@ -1,4 +1,1618 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "a39950bab10c08536ce9e5c24a71377e771a5d64959280526b71e6866c9d9f22",
+        "declaration_hash": "6579f85dcc4d4ce82323f949b0b242534146f35cfbbd72d24443554fbe3a51ec"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            stdout,\n            \"FAIL\\nlog: tmp/gate/integration-failure.log\\nfailures:\\n- [FAIL] item-primary: short reason\"\n        );\nassert_eq!(\n            logs.contents.lock().expect(\"log lock should be available\").as_slice(),\n            [output]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "a39950bab10c08536ce9e5c24a71377e771a5d64959280526b71e6866c9d9f22",
+        "declaration_hash": "6579f85dcc4d4ce82323f949b0b242534146f35cfbbd72d24443554fbe3a51ec"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            stdout,\n            \"FAIL\\nlog: tmp/gate/integration-failure.log\\nfailures:\\n- [FAIL] item-primary: short reason\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPersistencePort"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "b32c925be9a7cb535ab1d23f77e0f595be339ddd3132b6bc707cbdc9194af3e2",
+        "declaration_hash": "ad9457562c0bb3bf06eba6876ff1592efb22bb3bba0bc7f15bfd3c2d9efb5597"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "trait_method:persist",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY)));\n        assert_eq!(\n            std::fs::read(path.as_path()).expect(\"persisted log should be readable\"),\n            complete_output\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateProcessPort"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "e3dbe067ddf90c0b8e2358532345c5feedd51ca3cdf061200329b8cc3fb129bc",
+        "declaration_hash": "7daaebbe5b7288dac5b955ceb0aa93b24e1891e471de7fe8fd8ecd084fed6ba3"
+      },
+      "obligation_id": {
+        "entry_key": "GateProcessPort",
+        "item_identifier": "trait_method:run",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.exit_code, GateExitCode::new(23));\n        assert_eq!(output.output, b\"stdout detail\\n--- stderr ---\\nstderr detail\\n\");\n...\n        assert_eq!(output.exit_code, GateExitCode::new(0));\n        assert_eq!(output.output, b\"success detail\\n\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "a39950bab10c08536ce9e5c24a71377e771a5d64959280526b71e6866c9d9f22",
+        "declaration_hash": "7e52005efffb278627633cc80c8d64564c43787d1fc5d0d4af38e245b8c62cca"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(log_path.as_path(), Path::new(\"tmp/gate/unit.log\"));\n...\nassert_eq!(\n    stdout,\n    \"FAIL\\nlog: tmp/gate/integration-failure.log\\nfailures:\\n- [FAIL] item-primary: short reason\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "a39950bab10c08536ce9e5c24a71377e771a5d64959280526b71e6866c9d9f22",
+        "declaration_hash": "7e52005efffb278627633cc80c8d64564c43787d1fc5d0d4af38e245b8c62cca"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            stdout,\n            \"FAIL\\nlog: tmp/gate/integration-failure.log\\nfailures:\\n- [FAIL] item-primary: short reason\"\n        );\n        assert!(!stdout.contains(\"item-pass\"));\n        assert!(!stdout.contains(\"full diagnostic detail\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_gate_summary_and_full_diagnostic_from_child"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "ProcessGateRunner"
+      },
+      "key": {
+        "anchor_text_hash": "c8f5c6e9f0407d2a2f5dd35debef79a4f7979c919cdae43e92fc1cae9c850d7d",
+        "bound_tests_set_hash": "5afda10649200e56f78dfdd661e037a21b48eb3dd3b8e55ee3073f8aca0b236a",
+        "declaration_hash": "19a95155a6de810393d475a232b896179286448f23a478549eb8228f5b5a28d2"
+      },
+      "obligation_id": {
+        "entry_key": "ProcessGateRunner",
+        "item_identifier": "trait_impl:usecase::gate_output::GateProcessPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.exit_code, GateExitCode::new(23));\nassert_eq!(output.exit_code, GateExitCode::new(23));\nassert_eq!(output.exit_code, GateExitCode::new(0));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_gate_summary_and_full_diagnostic_from_child"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "ProcessGateRunner"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "5afda10649200e56f78dfdd661e037a21b48eb3dd3b8e55ee3073f8aca0b236a",
+        "declaration_hash": "19a95155a6de810393d475a232b896179286448f23a478549eb8228f5b5a28d2"
+      },
+      "obligation_id": {
+        "entry_key": "ProcessGateRunner",
+        "item_identifier": "trait_impl:usecase::gate_output::GateProcessPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.exit_code, GateExitCode::new(23));\nassert_eq!(output.exit_code, GateExitCode::new(0));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "FsGateLogPersistence"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "b32c925be9a7cb535ab1d23f77e0f595be339ddd3132b6bc707cbdc9194af3e2",
+        "declaration_hash": "dfcb6afe63cb9c0fa7271b7b77158dbf1d9af7056ab362d40f4c888211ac047d"
+      },
+      "obligation_id": {
+        "entry_key": "FsGateLogPersistence",
+        "item_identifier": "trait_impl:usecase::gate_output::GateLogPersistencePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY))); assert_eq!(std::fs::read(path.as_path()).expect(\"persisted log should be readable\"), complete_output);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "FsGateLogPersistence"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "b32c925be9a7cb535ab1d23f77e0f595be339ddd3132b6bc707cbdc9194af3e2",
+        "declaration_hash": "dfcb6afe63cb9c0fa7271b7b77158dbf1d9af7056ab362d40f4c888211ac047d"
+      },
+      "obligation_id": {
+        "entry_key": "FsGateLogPersistence",
+        "item_identifier": "trait_impl:usecase::gate_output::GateLogPersistencePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY)));\n        assert_eq!(\n            std::fs::read(path.as_path()).expect(\"persisted log should be readable\"),\n            complete_output\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_excerpts_selects_failed_items_and_short_reasons"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::failure_excerpts"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "525744029976fdb292e1e4a46bbec02812711ac5c82eaa3a24ec7ef69c03cced",
+        "declaration_hash": "5d3ffddf64218dcb721d813533917f53c2076d1bd78a3504b5670e871f0651b0"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::failure_excerpts",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            failure_excerpts(output),\n            [\n                \"[FAIL] item-one: short reason\".to_owned(),\n                \"[FAIL] item-two: another reason\".to_owned(),\n            ]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_excerpts_selects_failed_items_and_short_reasons"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::failure_excerpts"
+      },
+      "key": {
+        "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
+        "bound_tests_set_hash": "525744029976fdb292e1e4a46bbec02812711ac5c82eaa3a24ec7ef69c03cced",
+        "declaration_hash": "5d3ffddf64218dcb721d813533917f53c2076d1bd78a3504b5670e871f0651b0"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::failure_excerpts",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            failure_excerpts(output),\n            [\n                \"[FAIL] item-one: short reason\".to_owned(),\n                \"[FAIL] item-two: another reason\".to_owned(),\n            ]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_helpers_accept_gate_formats_and_reject_internal_records"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::is_failure_line"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "bb1506d711928f2c91da814e2bc2c0a6717b1983b36ab5ca7119a10314cead89",
+        "declaration_hash": "b7e041606435d74b5da58eb6812d2b65423a7aee780ba912f05ee4b43c7fc094"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::is_failure_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }\n        for line in [\n            \"test cli::tests::healthy ... ok\",\n            \"[PASS] item-pass\",\n            \"SomeRecord { status: failed_in_a_field }\",\n            \"a sentence mentions failed output but is not a gate diagnostic\",\n        ] {\n            assert!(!is_failure_line(line), \"unexpected failure line: {line}\");\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_helpers_accept_gate_formats_and_reject_internal_records"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::is_failure_line"
+      },
+      "key": {
+        "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
+        "bound_tests_set_hash": "bb1506d711928f2c91da814e2bc2c0a6717b1983b36ab5ca7119a10314cead89",
+        "declaration_hash": "b7e041606435d74b5da58eb6812d2b65423a7aee780ba912f05ee4b43c7fc094"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::is_failure_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_render_summary_limits_success_to_verdict_and_log_and_lists_failure_lines"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      "key": {
+        "anchor_text_hash": "674badc84692674b3fd44d5190fd78688f38e376ea06a6d1f15f19ce8760be9e",
+        "bound_tests_set_hash": "bf7d49949027c8eb21dbf3cf3cc5f0f179e94a204a61b8f0338d34adcff0b0a0",
+        "declaration_hash": "e2bfb4b053a847e80e975c376b619468642cf141e2b019ce9f8ecfbbdfd27777"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(render_summary(&success), \"PASS\\nlog: tmp/gate/driver.log\");\n\n        let failure = GateRunResult::ChildExited {\n            exit_code: GateExitCode::new(1),\n            output: b\"[PASS] item-one\\n[FAIL] item-two: reason\\nInternalRecord { Debug: true }\\n\"\n                .to_vec(),\n            log_path: log_path(),\n        };\n        let rendered = render_summary(&failure);\n        assert!(rendered.contains(\"FAIL\\nlog: tmp/gate/driver.log\\nfailures:\"));\n        assert!(rendered.contains(\"- [FAIL] item-two: reason\"));\n        assert!(!rendered.contains(\"item-one\"));\n        assert!(!rendered.contains(\"InternalRecord\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_render_summary_limits_success_to_verdict_and_log_and_lists_failure_lines"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      "key": {
+        "anchor_text_hash": "a042f143ae0b2f2a1f20c6782c829446402418addf1ca4735c780671a763e55c",
+        "bound_tests_set_hash": "bf7d49949027c8eb21dbf3cf3cc5f0f179e94a204a61b8f0338d34adcff0b0a0",
+        "declaration_hash": "e2bfb4b053a847e80e975c376b619468642cf141e2b019ce9f8ecfbbdfd27777"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(render_summary(&success), \"PASS\\nlog: tmp/gate/driver.log\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_render_summary_limits_success_to_verdict_and_log_and_lists_failure_lines"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      "key": {
+        "anchor_text_hash": "0674c93234dda4f663998efaf2fd0a5a487e3b3878c18a5ae1d1b4fc64df707e",
+        "bound_tests_set_hash": "bf7d49949027c8eb21dbf3cf3cc5f0f179e94a204a61b8f0338d34adcff0b0a0",
+        "declaration_hash": "e2bfb4b053a847e80e975c376b619468642cf141e2b019ce9f8ecfbbdfd27777"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(render_summary(&success), \"PASS\\nlog: tmp/gate/driver.log\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_render_summary_limits_success_to_verdict_and_log_and_lists_failure_lines"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      "key": {
+        "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
+        "bound_tests_set_hash": "bf7d49949027c8eb21dbf3cf3cc5f0f179e94a204a61b8f0338d34adcff0b0a0",
+        "declaration_hash": "e2bfb4b053a847e80e975c376b619468642cf141e2b019ce9f8ecfbbdfd27777"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(rendered.contains(\"FAIL\\nlog: tmp/gate/driver.log\\nfailures:\"));\n        assert!(rendered.contains(\"- [FAIL] item-two: reason\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_preserves_utf8_boundary_and_configured_byte_limit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_bounds_failed_item_and_short_reason_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::truncate_line"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "16f8e1aeb04279ea9ba2c3dd99b19ce1e61638b9e6ed84b86f76e1820ab1dbeb",
+        "declaration_hash": "91359982873166bcca7a2b23f78490a6ff453e36da967979e67282445160f7aa"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::truncate_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(truncated.starts_with(\"[FAIL] aggregate-item: short reason\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_preserves_utf8_boundary_and_configured_byte_limit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_bounds_failed_item_and_short_reason_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::truncate_line"
+      },
+      "key": {
+        "anchor_text_hash": "674badc84692674b3fd44d5190fd78688f38e376ea06a6d1f15f19ce8760be9e",
+        "bound_tests_set_hash": "16f8e1aeb04279ea9ba2c3dd99b19ce1e61638b9e6ed84b86f76e1820ab1dbeb",
+        "declaration_hash": "91359982873166bcca7a2b23f78490a6ff453e36da967979e67282445160f7aa"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::truncate_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(truncated.starts_with(\"[FAIL] aggregate-item: short reason\"));\n        assert!(truncated.ends_with('…'));\n        assert!(truncated.len() <= MAX_FAILURE_LINE_BYTES + \"…\".len());\n        assert_eq!(excerpts, [truncated]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(log_path.to_string_lossy().contains(\"tmp/gate/\"));\n        assert_eq!(\n            std::fs::read(&log_path).expect(\"execute should persist the complete log\"),\n            b\"[PASS] item-pass\\n[FAIL] item: short reason\\nfull diagnostic detail\\n--- stderr ---\\nstderr detail\\n\"\n        );\n        assert_eq!(\n            stdout,\n            format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            stdout,\n            format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "0674c93234dda4f663998efaf2fd0a5a487e3b3878c18a5ae1d1b4fc64df707e",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, format!(\"PASS\\nlog: {}\\n\", log_path.display()));\n        assert!(!stdout.contains(\"[PASS] item\"));\n        assert!(!stdout.contains(\"DebugRecord\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "format!(\"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] item: short reason\\n\", log_path.display())",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(log_path.to_string_lossy().contains(\"tmp/gate/\")); ... assert_eq!(std::fs::read(&log_path).expect(\"execute should persist the complete log\"), b\"[PASS] item-pass\\n[FAIL] item: short reason\\nfull diagnostic detail\\n--- stderr ---\\nstderr detail\\n\"); ... assert!(!stdout.contains(\"full diagnostic detail\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "9f21c2649bda583a757aeeae4d3197c7dcf68009568a88001eb4f86e82af1fc4",
+        "declaration_hash": "402cff1dfc3728dc031ae74ba2324dff0ffbbcb894196e5e5e37afa79fb81836"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit, ExitCode::from(23));\n\nassert_eq!(exit, ExitCode::SUCCESS);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_exit_code_from_u8_preserves_driver_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8"
+      },
+      "key": {
+        "anchor_text_hash": "c8f5c6e9f0407d2a2f5dd35debef79a4f7979c919cdae43e92fc1cae9c850d7d",
+        "bound_tests_set_hash": "662dd10c36c4f13b525c607061246894c367e8cc2041b262ecf6e35814321b3b",
+        "declaration_hash": "e939624e79c5f2f5041883c02952a15556607af36e3de2480ba7d2a308df94ad"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code_from_u8(23), ExitCode::from(23));\n        assert_eq!(exit_code_from_u8(0), ExitCode::SUCCESS);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_exit_code_from_u8_preserves_driver_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "662dd10c36c4f13b525c607061246894c367e8cc2041b262ecf6e35814321b3b",
+        "declaration_hash": "e939624e79c5f2f5041883c02952a15556607af36e3de2480ba7d2a308df94ad"
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code_from_u8(23), ExitCode::from(23));\n        assert_eq!(exit_code_from_u8(0), ExitCode::SUCCESS);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateExitCode"
+      },
+      "key": {
+        "anchor_text_hash": "c8f5c6e9f0407d2a2f5dd35debef79a4f7979c919cdae43e92fc1cae9c850d7d",
+        "bound_tests_set_hash": "cd967388f21e2404c181eeebb47f9498ec17f33e3fd8b49019a6f53cf148b8e8",
+        "declaration_hash": "bbaa03cb20864a4c3b058ba782e7d9fff983c5ede3858970b83c2917d88dc731"
+      },
+      "obligation_id": {
+        "entry_key": "GateExitCode",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let success = GateExitCode::new(0);\n        let failure = GateExitCode::new(7);\n        assert!(success.is_success());\n        assert!(!failure.is_success());\n        assert_eq!(failure.value(), 7);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateExitCode"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "cd967388f21e2404c181eeebb47f9498ec17f33e3fd8b49019a6f53cf148b8e8",
+        "declaration_hash": "c6fda155e91a8674b63be344fb917b2e53be75201a4ec89b59d9ea008e294413"
+      },
+      "obligation_id": {
+        "entry_key": "GateExitCode",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let success = GateExitCode::new(0);\n        let failure = GateExitCode::new(7);\n        assert!(success.is_success());\n        assert!(!failure.is_success());\n        assert_eq!(failure.value(), 7);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "f2cf09c38b510e85de7d5f241f502aa468faaf58113cdb6fda657b54725bc1a1",
+        "declaration_hash": "cb7a3c416ab8a238b5b8d0a1413b4219bacba9c2c61bd03cb6b6c6f10fe65663"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(log_path.as_path(), Path::new(\"tmp/gate/aggregate.log\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "cd967388f21e2404c181eeebb47f9498ec17f33e3fd8b49019a6f53cf148b8e8",
+        "declaration_hash": "72cf2f91d293d2f2d58f5414212863971f7131150df2962ce7a5d058ed4be8a5"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let path = GateLogPath::from_persisted_path(PathBuf::from(\"tmp/gate/result.log\"));\n        assert_eq!(path.as_path(), Path::new(\"tmp/gate/result.log\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateProcessOutput"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "7a986273660cd61d57c6066225cddcca99f56d54fe20bdd2ffeab52c9cbc6908",
+        "declaration_hash": "664dec668317579cf33a821b20b3ed5ff61135005213cdd04b12c7b0466a0b67"
+      },
+      "obligation_id": {
+        "entry_key": "GateProcessOutput",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            logs.contents.lock().expect(\"log lock should be available\").as_slice(),\n            [b\"[FAIL] item-one: short reason\\nfull diagnostic detail\\n\".to_vec()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateProcessOutput"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "7a986273660cd61d57c6066225cddcca99f56d54fe20bdd2ffeab52c9cbc6908",
+        "declaration_hash": "2e5c65736fed490defb59aaa299266b12166d3793478ab19732f2e0cba6b3581"
+      },
+      "obligation_id": {
+        "entry_key": "GateProcessOutput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(log_path.as_path(), Path::new(\"tmp/gate/unit.log\"));\n            }\n            GateRunResult::SpawnFailed { error, .. } => {\n                panic!(\"unexpected spawn failure: {error:?}\");\n            }\n        }\n        assert_eq!(\n            logs.contents.lock().expect(\"log lock should be available\").as_slice(),\n            [b\"[FAIL] item-one: short reason\\nfull diagnostic detail\\n\".to_vec()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_process_and_persistence_ports_are_used_for_spawn_failures"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "c8f5c6e9f0407d2a2f5dd35debef79a4f7979c919cdae43e92fc1cae9c850d7d",
+        "bound_tests_set_hash": "737a942f3afe21a3aeb061b1abe1e52832d0a24d2d481e138ccb52188f90e50f",
+        "declaration_hash": "478ceaee41c31624d93b9ab271c02926ed3d36e584157b766e760a93f685abd5"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code.value(), 23);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPersistencePort"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "b32c925be9a7cb535ab1d23f77e0f595be339ddd3132b6bc707cbdc9194af3e2",
+        "declaration_hash": "daaa9dfc28a79fe8b2ad2ec0f87307472c96bb43f062d55d191e3ea46efebb53"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY)));\n        assert_eq!(\n            std::fs::read(path.as_path()).expect(\"persisted log should be readable\"),\n            complete_output\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateProcessPort"
+      },
+      "key": {
+        "anchor_text_hash": "c8f5c6e9f0407d2a2f5dd35debef79a4f7979c919cdae43e92fc1cae9c850d7d",
+        "bound_tests_set_hash": "e3dbe067ddf90c0b8e2358532345c5feedd51ca3cdf061200329b8cc3fb129bc",
+        "declaration_hash": "2b5538a38fbe73f6c18a5c72995a53f0a3ecb840158d47afa10b517b8ccb2c14"
+      },
+      "obligation_id": {
+        "entry_key": "GateProcessPort",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.exit_code, GateExitCode::new(23));\n        assert_eq!(output.output, b\"stdout detail\\n--- stderr ---\\nstderr detail\\n\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_success_summary_without_child_records"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "0674c93234dda4f663998efaf2fd0a5a487e3b3878c18a5ae1d1b4fc64df707e",
+        "bound_tests_set_hash": "c1c007efd86a87891240b2cd519c120ce8dd65bc7c551998ec1071668e3d71d0",
+        "declaration_hash": "448d04aaf172b9aa27dcd82ee5b8d086d46e49a1bd83e0f212d1eaae3caf330f"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/integration-success.log\");\n        assert!(!stdout.contains(\"item-pass\"));\n        assert!(!stdout.contains(\"DebugRecord\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "f2cf09c38b510e85de7d5f241f502aa468faaf58113cdb6fda657b54725bc1a1",
+        "declaration_hash": "5d430fc51c6e4675f347ecd659e33c4daffd909b17ea81c99c2cb3f31c7c40cd"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            logs.contents.lock().expect(\"log lock should be available\").as_slice(),\n            [b\"[FAIL] aggregate-item: short reason\\nfull diagnostic detail\\n\".to_vec()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "ff24aaa773005576e68c4f5368b23fa5b23dd1db3057c55315bcd6fe2faeb753",
+        "declaration_hash": "cea3509da2181fae16b6c1af2b10c0277919c815fa1db5536c85e8ec78b79a38"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/driver.log\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "1994a668536a49c2c82ba7c2e658b11af916c90b6806b8ab39a4dfdaeb8f3986",
+        "bound_tests_set_hash": "4634bad220452a1f8f107ff18200f232544435089c8d9d926e03360f4f95d05a",
+        "declaration_hash": "63593abb4ce2e48f66f99e9d4c16e13613c4d89c51ea1b081745aaa9250b42eb"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(stdout.contains(\"- [FAIL] item-primary: short reason\"));\n        assert!(!stdout.contains(\"item-pass\"));\n        assert!(!stdout.contains(\"unrelated diagnostic detail\"));\n        assert!(!stdout.contains(\"InternalRecord\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "0674c93234dda4f663998efaf2fd0a5a487e3b3878c18a5ae1d1b4fc64df707e",
+        "bound_tests_set_hash": "b0ce4fc265b920643af849601f7f03c57e55757b4e86afd5d8507808c72ee054",
+        "declaration_hash": "e1c4d239b8156ec8ecbdd0c8e2cc36d4f2e0aa42830018df1e1bf9efe1b7214e"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/driver.log\");\n        assert!(!stdout.contains(\"[PASS]\"));\n        assert!(!stdout.contains(\"Debug\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "94336928de226f357d0437b320f7364d36eac3ec92924cd128855931ab100bea",
+        "bound_tests_set_hash": "4634bad220452a1f8f107ff18200f232544435089c8d9d926e03360f4f95d05a",
+        "declaration_hash": "fd33ad13df511d3903e6f5e55b3cdbc83b8a31b771ca22a21d4f375945cc4db5"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(stdout.starts_with(\"FAIL\\nlog: tmp/gate/driver.log\\nfailures:\"));\n        assert!(stdout.contains(\"- [FAIL] item-primary: short reason\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "4bea743db2dfd8d3f9e9ec0857fee1e9e04f01053f51abf9449a778c29732440",
+        "bound_tests_set_hash": "b0ce4fc265b920643af849601f7f03c57e55757b4e86afd5d8507808c72ee054",
+        "declaration_hash": "e52276163d9c7b20999af24a9146d0ed1d6e61276d587953f60292fd268e631a"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/driver.log\");\n        assert!(!stdout.contains(\"[PASS]\"));\n        assert!(!stdout.contains(\"Debug\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputDriver"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "ff24aaa773005576e68c4f5368b23fa5b23dd1db3057c55315bcd6fe2faeb753",
+        "declaration_hash": "e52b7a2ef870c4a36af0c236e00c1370382f366c3de8b17b3e4bdd00ff9f0300"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputDriver",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(outcome.exit_code, 0); ... vec![OsString::from(\"check\")] ... assert_eq!(outcome.exit_code, 23);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_root_cli_command_dispatches_gate_output_log_and_exit_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "CliCommand"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "69af4acc8705819142f4d2e5ee67eeda89b1717d055964b9934fd1d429cf5beb",
+        "declaration_hash": "1d58569ad63131f7f9360250b6dc7c4a2abe9f740c2d6f4ab1afb586c394a915"
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(log_path.to_string_lossy().contains(\"tmp/gate/\"));\nassert_eq!(\n    std::fs::read(&log_path).expect(\"root dispatch should persist the complete log\"),\n    b\"[FAIL] root-item: short reason\\n--- stderr ---\\nfull diagnostic detail\\n\"\n);\nassert_eq!(\n    stdout,\n    format!(\n        \"FAIL\\nlog: {}\\nfailures:\\n- [FAIL] root-item: short reason\\n\",\n        log_path.display()\n    )\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_root_cli_command_dispatches_gate_output_log_and_exit_contract"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "CliCommand"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "bound_tests_set_hash": "69af4acc8705819142f4d2e5ee67eeda89b1717d055964b9934fd1d429cf5beb",
+        "declaration_hash": "ce2991edf805846a29258bf0385e3c0a11d0cca066bb26917240900f9397c3b5"
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let args = match cli.command {\n            Some(crate::CliCommand::GateOutput(args)) => args,\n            _ => panic!(\"expected root gate-output command\"),\n        };\n\n        let (exit, stdout) = capture_stdout(|| execute(args));\n\n        assert_eq!(exit, ExitCode::from(23));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::gate_output::tests",
+          "test_name": "test_gate_output_composition_wires_process_and_persistence"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputComposition"
+      },
+      "key": {
+        "anchor_text_hash": "ae05d47188ae5cd04205ee1419a32eb4e3408f46cfdd80432ffbe9b1c50c4110",
+        "bound_tests_set_hash": "b43093695af3dbcc9625c4fbc34a4fa864e06c330333ea7ab2a18382fa8437a4",
+        "declaration_hash": "ff3ab622f28516d27f229de434adf87da5e54757eeb6696afcf5621d2bd29219"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputComposition",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(log_path.starts_with(root.path().join(\"tmp/gate\")));\n        assert_eq!(\n            std::fs::read(&log_path).expect(\"composition should persist the complete log\"),\n            b\"[PASS] item-pass\\n--- stderr ---\\nDebugRecord\\n\"\n        );\n        assert_eq!(stdout, format!(\"PASS\\nlog: {}\", log_path.display()));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
   "track_id": "2026-08-25-gate-output-summary-contract"
 }

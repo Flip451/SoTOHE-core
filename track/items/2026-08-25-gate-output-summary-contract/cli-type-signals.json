@@ -1,8 +1,60 @@
 {
-  "baseline_hash": "03c36f75170b4ba42d318f7270e12d9160221a3e49ed2b958862e6cef833949c",
-  "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "generated_at": "2026-08-25T06:48:34Z",
-  "head_commit": "05af0dbbce2408cca5864301b17503f7515e398e",
-  "schema_version": 4,
-  "signals": []
+  "baseline_hash": "f41120c5869a056073034b482df4ab89abffdbd2f82c07fd79cd3d4f26757ef4",
+  "declaration_hash": "b4cce5b56e169a9409fc0a3f227199802ccc042ca5d7acda3c73c1e9802307b8",
+  "generated_at": "2026-08-29T05:47:22Z",
+  "head_commit": "d5fe0b557d59213a718f840f7365c212f8b6aecd",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CliCommand"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::str::traits::FromStr"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateNameArg"
+    },
+    {
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "GateOutputArgs"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli::commands::gate_output::execute"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "cli::commands::gate_output::exit_code_from_u8"
+    }
+  ]
 }

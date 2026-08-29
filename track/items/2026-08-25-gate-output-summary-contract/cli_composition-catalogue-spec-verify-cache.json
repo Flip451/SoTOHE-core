@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "claim_hash": "c5756b575bb49696225871c13290c735db4a1d372dc6ad4735995168ede2ab77",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputComposition",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

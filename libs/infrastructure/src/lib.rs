@@ -26,6 +26,7 @@ pub mod demo;
 pub mod disk_maintenance;
 pub mod dry_check;
 pub mod file_port;
+pub mod gate_output;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod grok_common;

@@ -788,6 +788,11 @@ description = "[gate] Run the default-config catalogue lint (primitive-obsession
 command = "bin/sotp"
 args = ["catalogue-lint", "check-active-track"]
 
+[tasks.gate-output]
+description = "[gate] Run a child gate through the shared full-log and compact-summary contract (usage: cargo make gate-output --name <name> -- <command> [args...])"
+command = "bin/sotp"
+args = ["gate-output", "${@}"]
+
 [tasks.test-obligation-check]
 description = "[gate] Run the active track's pure-read test-obligation fulfillment gate. Active track auto-resolved from current git branch."
 command = "bin/sotp"

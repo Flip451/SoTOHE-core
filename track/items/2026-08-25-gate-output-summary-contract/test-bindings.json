@@ -1,1 +1,447 @@
-{"track_id": "2026-08-25-gate-output-summary-contract", "records": []}
+{
+  "track_id": "2026-08-25-gate-output-summary-contract",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "GateRunInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "trait_method:persist",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "GateProcessPort",
+        "item_identifier": "trait_method:run",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ProcessGateRunner",
+        "item_identifier": "trait_impl:usecase::gate_output::GateProcessPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_captures_gate_summary_and_full_diagnostic_from_child"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_process_gate_runner_preserves_success_exit_code"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsGateLogPersistence",
+        "item_identifier": "trait_impl:usecase::gate_output::GateLogPersistencePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::failure_excerpts",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_excerpts_selects_failed_items_and_short_reasons"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::is_failure_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_failure_helpers_accept_gate_formats_and_reject_internal_records"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_render_summary_limits_success_to_verdict_and_log_and_lists_failure_lines"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::truncate_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_preserves_utf8_boundary_and_configured_byte_limit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_truncate_line_bounds_failed_item_and_short_reason_excerpt"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_child_exit_code_and_persists_log"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_execute_dispatches_success_without_child_output_in_summary"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::gate_output::tests",
+          "test_name": "test_exit_code_from_u8_preserves_driver_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateExitCode", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateExitCode", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogPath", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogPath", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_exit_code_and_log_path_are_value_wrappers"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateAdapterFailureReason", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-03"}},
+      "reason": "GateAdapterFailureReason only wraps opaque adapter diagnostic text and has no failed-item selection, reason shortening, or stdout-rendering behavior; therefore this DTO does not claim any part of IN-03's stdout diagnostic excerpt."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateLogPersistenceError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateLogPersistenceError only classifies why persistence failed (path rejection, clock, directory creation, or write); it does not represent a successful full-log write or a stdout log-path report, so it has no positive IN-02 behavior to bind."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateLogPersistenceError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "reason": "GateLogPersistenceError represents the failure path when the complete output cannot be persisted; the error value has no positive full-log availability or stdout behavior to verify for AC-03, which is owned by the successful persistence boundary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateProcessError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-04"}},
+      "reason": "GateProcessError only represents a spawn failure; exit-code preservation for started tasks is verified by GateProcessPort and ProcessGateRunner."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateProcessOutput", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateProcessOutput", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunCommand", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateRunCommand only carries validated command data and has no log persistence or stdout side effect; those behaviors are verified at the interactor and CLI boundaries."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunCommandError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateRunCommandError only represents rejection of an empty command during construction; no gate task executes on this path, so full-log persistence and stdout path reporting are owned by GateRunInteractor and the CLI output boundaries."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateRunError only reports a failed persistence operation; successful full-log storage and stdout path reporting are verified at the adapter and CLI boundaries."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "reason": "GateRunError only reports a failed persistence operation; detailed full-log availability is owned by the successful persistence path."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-01"}},
+      "reason": "GateRunResult transports status, opaque output, and log path; stdout restriction and failure-only rendering are owned by GateOutputDriver."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-03"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_persists_child_output_and_returns_child_result"},
+        {"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_process_and_persistence_ports_are_used_for_spawn_failures"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-01"}},
+      "reason": "GateRunResult transports the successful child result; PASS rendering, log-path presentation, and suppression of child records are owned by GateOutputDriver and CLI execute."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-02"}},
+      "reason": "GateRunResult transports the failed child result; FAIL rendering and short failure excerpts are owned by GateOutputDriver and CLI execute."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogPersistencePort", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateProcessPort", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-03"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_process_gate_runner_captures_both_streams_and_exit_code"},
+        {"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_process_gate_runner_preserves_success_exit_code"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateRunService", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_run_interactor_service_renders_success_summary_without_child_records"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunService", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-02"}},
+      "reason": "GateRunService is an inbound application port that returns the typed child result and persisted log path; it does not write stdout. The AC-02 FAIL judgment, log path, failed item, and short reason are rendered by cli_driver::render_summary at the output boundary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateRunService", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_service_applies_summary_log_contract_to_child_command"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunService", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-04"}},
+      "reason": "GateRunService returns the child result, while process-boundary exit conversion and existing check-command status are owned by the adapters and CLI layers."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"},
+        {"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputDriver", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-04"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_suppresses_child_pass_and_debug_records_on_success"},
+        {"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateOutputInput", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateOutputInput only transports the opaque label and argv; log persistence and stdout path reporting are owned by the interactor, driver, and CLI execution path."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CliCommand", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::gate_output::tests", "test_name": "test_root_cli_command_dispatches_gate_output_log_and_exit_contract"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CliCommand", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-01"}},
+      "reason": "CliCommand only registers parsing; successful stdout formatting is owned by the gate-output execute and driver tests."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CliCommand", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::gate_output::tests", "test_name": "test_root_cli_command_dispatches_gate_output_log_and_exit_contract"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateNameArg", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateNameArg only retains an opaque label; log creation and path reporting are owned by the persistence and CLI execution paths."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateNameArg", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-01"}},
+      "reason": "GateNameArg only retains an opaque label; the stdout summary restriction is owned by GateOutputDriver."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateOutputArgs", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateOutputArgs only transports parsed label and argv; full-log persistence and path reporting are owned by CLI execute."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateOutputArgs", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-03"}},
+      "reason": "GateOutputArgs only transports parsed label and argv; failure excerpt rendering is owned by GateOutputDriver."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateOutputArgs", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-01"}},
+      "reason": "GateOutputArgs only transports parsed label and argv; successful stdout formatting is owned by CLI execute and GateOutputDriver."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateOutputArgs", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-02"}},
+      "reason": "GateOutputArgs only transports parsed label and argv; failed stdout formatting is owned by CLI execute and GateOutputDriver."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateOutputComposition", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::gate_output::tests", "test_name": "test_gate_output_composition_wires_process_and_persistence"}]
+    }
+  ]
+}

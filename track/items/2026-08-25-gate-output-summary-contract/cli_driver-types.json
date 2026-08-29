@@ -1,8 +1,341 @@
 {
   "crate_name": "cli_driver",
-  "functions": {},
+  "functions": {
+    "cli_driver::gate_output::failure_excerpts": {
+      "action": "add",
+      "docs": "Select bounded presentation lines from opaque child output; String values remain free-form external text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "output",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "Vec<String>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::gate_output::is_failure_line": {
+      "action": "add",
+      "docs": "Strict classifier for the supported child-output formats, centralized with fixtures for each gate family.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "line",
+          "ty": "&str"
+        }
+      ],
+      "returns": "bool",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::gate_output::render_summary": {
+      "action": "add",
+      "docs": "Render the human-facing gate summary from the typed application result.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "result",
+          "ty": "&usecase::gate_output::GateRunResult"
+        }
+      ],
+      "returns": "String",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::gate_output::truncate_line": {
+      "action": "add",
+      "docs": "Bound one presentation-only free-form line without splitting UTF-8.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "line",
+          "ty": "&str"
+        }
+      ],
+      "returns": "String",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "command",
+              "ty": "Vec<std::ffi::os_str::OsString>"
+            }
+          ],
+          "returns": "GateOutputInput",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateOutputInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::gate_output::GateRunService>"
+            }
+          ],
+          "returns": "GateOutputDriver",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "invoke",
+          "params": [
+            {
+              "name": "input",
+              "ty": "GateOutputInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateOutputDriver"
+    }
+  ],
   "layer": "cli_driver",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "GateOutputInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::render::CommandOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "cli_driver::render::CommandOutcome",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "GateOutputDriver": {
+      "action": "add",
+      "docs": "Primary adapter that constructs the validated command, invokes GateRunService, and returns a rendered CommandOutcome.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateOutputInput": {
+      "action": "add",
+      "docs": "Driving-boundary DTO carrying a truly opaque presentation label and OS-native child argv tokens.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "cli_driver::render::CommandOutcome": {
+      "action": "reference",
+      "docs": "Existing CLI-driver result DTO carried unchanged for GateOutputDriver output.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "render",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    }
+  }
 }

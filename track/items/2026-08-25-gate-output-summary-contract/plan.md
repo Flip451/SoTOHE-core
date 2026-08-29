@@ -3,16 +3,16 @@
 
 ## Summary
 
-GO-01 is delivered by T001-T003 through one summary/log contract across shared behavior, leaf tasks, and aggregate gates.
-GO-02 is delivered by T001-T003 by preserving exit-code and existing check-command judgment throughout the migration.
+T001-T003: apply gate-output changes across shared, leaf, and aggregate paths (GO-01).
+T001-T003: update gate-output handling in place (GO-02).
 
-## Tasks (0/3 resolved)
+## Tasks (1/3 resolved)
 
 ### S1 — Shared summary and full-log behavior
 
-> Makefile.toml and bin/sotp gate-output handling and focused regressions — add and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-03; AC-01; AC-02; AC-03; AC-04.
+> Layered shared gate-run mechanism across usecase, infrastructure, cli_driver, cli, and cli_composition, plus Makefile.toml and bin/sotp integration and focused regressions — add and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.
 
-- [ ] **T001**: Makefile.toml and bin/sotp gate-output handling and focused regressions — standardize and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-03; AC-01; AC-02; AC-03; AC-04.
+- [x] **T001**: Layered shared gate-run mechanism across usecase, infrastructure, cli_driver, cli, and cli_composition, plus Makefile.toml and bin/sotp integration and focused regressions — standardize and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.
 
 ### S2 — Leaf test and obligation tasks
 

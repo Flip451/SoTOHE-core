@@ -7,8 +7,33 @@
       "scope_estimates": [
         {
           "scope": "harness-policy",
-          "production_lines": 160,
-          "test_lines": 110
+          "production_lines": 60,
+          "test_lines": 80
+        },
+        {
+          "scope": "usecase",
+          "production_lines": 180,
+          "test_lines": 170
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 130,
+          "test_lines": 140
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 140,
+          "test_lines": 170
+        },
+        {
+          "scope": "cli",
+          "production_lines": 90,
+          "test_lines": 90
+        },
+        {
+          "scope": "cli_composition",
+          "production_lines": 40,
+          "test_lines": 40
         }
       ],
       "oversize_justification": null

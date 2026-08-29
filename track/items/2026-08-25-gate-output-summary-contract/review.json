@@ -55,6 +55,253 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-29T04:01:14Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 56,
+              "message": "This new command reaches an external process and filesystem boundary with arbitrary OS-native argv and unbounded captured output, while the project’s environment-assumption declaration remains TODO and the spec does not define supported platforms, encoding, resource limits, or failure behavior. Declare these assumptions before exposing this dispatch path.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:f554ef14b2c571e77cbe53c988ed3084d0ca9ee6c382c2a849f8172dca47a8cc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:18:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f554ef14b2c571e77cbe53c988ed3084d0ca9ee6c382c2a849f8172dca47a8cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:44:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f554ef14b2c571e77cbe53c988ed3084d0ca9ee6c382c2a849f8172dca47a8cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-29T04:01:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2afb577272060f411de92e8e0d2968e5b88cd68d57bb821c272b530bb368fa31",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:23:58Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 20,
+              "message": "未宣言の前提への依存: `GateOutputComposition::build` は常に `ProcessGateRunner` を注入しますが、その driver から直接到達する実行経路は `Command::output()` で子プロセスの終了を無期限に待ち、stdout/stderr 全体を無制限にメモリへ保持します。spec に処理時間・出力サイズ・メモリ上限や超過時の動作はなく、`environment-assumptions.md` の資源上限も TODO のため、停止しない／大量出力する子プロセスが CLI を永久にブロックまたは OOM させます。上限と失敗動作を宣言・実装した runner を注入してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 22,
+              "message": "未宣言の前提への依存: `GateOutputComposition::build` は全 platform で `FsGateLogPersistence` を注入しますが、この adapter の保存経路は Linux の `/proc/self/fd` に依存し、非 Linux では常に `Unsupported` を返します。`environment-assumptions.md` の対応 platform は TODO のままで、spec にも Linux/procfs 必須条件がないため、macOS/Windows や procfs のない Linux では全 gate-output 実行が失敗します。Linux/procfs 制約を正式に宣言するか、対応 platform ごとの安全な adapter を配線してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2afb577272060f411de92e8e0d2968e5b88cd68d57bb821c272b530bb368fa31",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:56:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2afb577272060f411de92e8e0d2968e5b88cd68d57bb821c272b530bb368fa31",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-29T04:02:35Z",
+          "findings": [
+            {
+              "category": "output contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 125,
+              "message": "`SpawnFailed` の error を未加工で stdout に埋め込んでいるため、エラー文字列に改行や大量の内容が含まれると、短い理由だけという出力契約を破り、行数・サイズも無制限になります。`truncate_line` 相当の bounded rendering を適用してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 145,
+              "message": "`GateExitCode` の i32 値を `u8` に変換できない場合、実際の終了コードを常に 1 に置き換えます。256 超の終了コード（特に Windows のプロセス終了コード）では、FAIL 判定自体は維持されても既存の終了コードを保持できず、`render_summary` が表示する値とも不一致になります。境界での終了コード方針を明示・実装してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d280fc81bc164ce29abc14213aafb7e0774efd43a431bf19543195afefaf92af",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:13:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b5a4006af291e30c317a9f57153990b23e2107485246d4aae4d0ebd365e2c773",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:25:15Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 64,
+              "message": "未宣言の前提への依存: `failure_excerpts` は子プロセスの任意バイト列を lossily UTF-8 の行へ変換しますが、spec に encoding・不正バイト・改行形式の方針がなく、`environment-assumptions.md` の Input-Encoding Policy も TODO のままです。非 UTF-8 または未対応の改行では失敗項目・理由が欠落し得るため、入力方針を宣言して実装してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 76,
+              "message": "未宣言の前提への依存: cargo test、nextest、rustc、test-obligation、cargo-make の出力文字列を固定形式として分類していますが、対応する tool/output version や grammar は spec・環境前提のいずれにも宣言されていません。形式変更時は exit code が失敗でも項目と理由が消えるため、対応形式を宣言・固定するか、安定した typed/project-owned diagnostic を受け取ってください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 64,
+              "message": "未宣言の前提への依存: excerpt 数と出力行長は制限されていますが、制限適用前に任意長の child output を走査し、各行全体を lowercase 化します。入力・行サイズの上限と超過時動作は spec にも `environment-assumptions.md` の Resource Limits にもなく、大量出力や巨大な単一行で無制限の CPU・追加メモリを消費し得ます。処理前の上限と超過時動作を宣言・強制してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 114,
+              "message": "未宣言の前提への依存: `Path::display()` は非 Unicode パスを lossy に表示するため、そのような workspace path では stdout の log path が実ファイルを一意に指せません。対応 platform・filesystem path encoding は spec／環境前提で未宣言なので、対応範囲と lossless な表現を定義してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 160,
+              "message": "未宣言の前提への依存: `u8` に収まらない OS exit status を常に 1 に置換していますが、対応 platform／exit-status range は spec にも環境前提にもありません。Windows 等の広い終了コードでは CN-03/AC-04 の既存 exit code 保持を破り、fallback も実値ではなく status 1 と表示します。対応範囲を宣言するか、実際の status を保持できる境界へ変更してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b5a4006af291e30c317a9f57153990b23e2107485246d4aae4d0ebd365e2c773",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:44:33Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 79,
+              "message": "未宣言の前提への依存: UTF-8 replacement と LF/CRLF/CR の扱いを実装コメントだけで新たな presentation policy としています。spec には encoding・不正バイト・改行の契約がなく、`environment-assumptions.md` の Input-Encoding Policy も TODO のままです。非 UTF-8 の理由を変更して表示する方針を spec または環境前提へ記録してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 80,
+              "message": "未宣言の前提への依存: 最初の 64 KiB だけを検査して残りを無条件に捨てますが、この上限・適用範囲・超過時動作は spec にも Resource Limits 宣言にもありません。特に process adapter は stdout の後へ stderr を連結するため、64 KiB を超える stdout の後にある実際の失敗項目は必ず見落とされ、AC-02 の item/reason が status fallback に置き換わります。正式な上限と超過時動作を宣言し、末尾の失敗診断を失わない抽出にしてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 105,
+              "message": "未宣言の前提への依存: Cargo、nextest、rustc、test-obligation、cargo-make の文字列 grammar を固定しており、対応 tool/output version や ANSI/color の扱いは spec・環境前提のいずれにもありません。実装コメントや固定 fixture だけでは version 境界の宣言にならず、形式変更時には failure item/reason が消えます。対応形式を正式に宣言・固定するか、project-owned marker／typed diagnostic を受け取ってください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 191,
+              "message": "未宣言の前提への依存: `0..=255` 以外の OS status を 1 に正規化する方針は依然として実装コメントにしかなく、Supported Platforms の終了処理欄も TODO です。広い終了コードを持つ platform では実際の process status を変更するため、対応 platform と exit-status semantics を spec／環境前提へ記録するか、値を保持できる境界に変更してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 200,
+              "message": "未宣言の前提への依存: 非 Unicode path は escape されましたが、`to_str()` に成功する path は改行・carriage return・terminal control characters をそのまま `log:` 行へ埋め込みます。workspace root にそれらが含まれると stdout の行契約が壊れますが、対応 path 表現の制約は spec／環境前提にありません。Unicode 成否にかかわらず control characters を escape するか、許容 path を正式に宣言してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:29a9b735024a0ae37b541f51fb060b3eb28741d9149b34c942eeb03a82cb1346",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:57:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5fbf2929a4eaeab7ff3ca0c3113c428983d11d3e1911088ff8dd5d2fe811db33",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-25T07:16:49Z",
+          "findings": [
+            {
+              "category": "command wiring",
+              "file": "Makefile.toml",
+              "line": 794,
+              "message": "The documented `cargo make gate-output --name <name> -- <command> [args...]` invocation can pass the `--` separator through `$@`, but this wrapper does not strip it before invoking `bin/sotp`. The child command may therefore be parsed incorrectly; handle the separator as the other shell wrappers do.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:905a8f40436947d64c6073b81552f2f3658f137c51db479233ea66b3759a9167",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:19:36Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary",
+              "file": "Makefile.toml",
+              "line": 794,
+              "message": "The new Makefile task embeds shell control logic (`case ... shift`) to normalize arguments. The briefing explicitly requires Makefile.toml tasks to remain thin wrappers without `case`/`if`/`sed`; move separator handling into `bin/sotp` or otherwise keep this task declarative.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1961793971d7f023d75ffbb2b630ea248809954f2e519ad45d122628c3b1b26",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-25T07:22:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91c28d41df52108577155d08bae400f68942b052604fc4116290a31cb7764448",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:27:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91c28d41df52108577155d08bae400f68942b052604fc4116290a31cb7764448",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -120,6 +367,235 @@
           "hash": "rvw1:sha256:3b8b529efa5d7bea492ff0805d42f1a06fbc275cfa58887e6f340d140a9c7f2a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:16:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd780c6ad1cc998f4e4a93d4af46ee617ed0f8e4c9ea51e807f8b29fdf65a1be",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-25T07:19:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd780c6ad1cc998f4e4a93d4af46ee617ed0f8e4c9ea51e807f8b29fdf65a1be",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T08:39:54Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 36,
+              "message": "`plan.summary[0]` restates the upstream behavior/design rationale in prose: “GO-01 is delivered ... through one summary/log contract ...”. Keep the plan summary to target/operation/anchor information; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 37,
+              "message": "`plan.summary[1]` restates the upstream behavior contract in prose: “preserving exit-code and existing check-command judgment throughout the migration.” Keep the plan summary to target/operation/anchor information; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b6aa81b7ef3d795f864c2a30f0c0f8ae4c0b0a48c3cfa90b3f78897424178a7c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T08:47:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9fbcccac24596109f7e33c58c80bdd876421481e554f03ee5027d95f628a543a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T12:38:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:549e567b430311dd4569507ee1c847906c9cc675b866436814b9437cf3825af3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T12:44:22Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-contract.json",
+              "line": 114,
+              "message": "T001 omits the current `cli_driver::render::CommandOutcome` catalogue entry (`action: reference`) from its attributions. Reference entries also require attribution even when the owner makes no change; attribute this entry to T001, where `GateOutputDriver` converges on the existing outcome shape.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:549e567b430311dd4569507ee1c847906c9cc675b866436814b9437cf3825af3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T22:47:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1418fd85d3d1e6e3cd534d387d40e96814c43ae21470180d5126cad206304149",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:09:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0f67b271c4c6449904dfb14934b4becc141a3d9041d5546490dd40958a82e65",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:11:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0f67b271c4c6449904dfb14934b4becc141a3d9041d5546490dd40958a82e65",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:58:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:840c888ee7c055691174c8880edb7fcecc045f9801a81403d4e3e3aabd256286",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:17:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:840c888ee7c055691174c8880edb7fcecc045f9801a81403d4e3e3aabd256286",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-29T04:01:07Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 86,
+              "message": "`fs::write` の前後で symlink を検査していますが、検査と書き込みが分離しているため、その間にログファイルまたは親ディレクトリを symlink に置換されると trusted root 外へ書き込めます。検査と安全な作成を原子的に行ってください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 82,
+              "message": "ログ名が command name・PID・`SystemTime::as_nanos()` の組み合わせだけで、同一プロセスの並行呼び出しや時計精度の低い環境では衝突し得ます。`fs::write` は既存ファイルを切り詰めるため、別ゲートの完全ログを上書きして AC-03 を破壊します。排他的な一意ファイル作成を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 36,
+              "message": "`Command::output()` は stdout/stderr 全体を無制限にメモリへ読み込みます。完全ログ保持のための入力サイズ・メモリ上限、超過時の失敗動作が spec または環境前提に宣言されておらず、子プロセスが大量出力するとゲートが OOM または資源枯渇します。ストリーミングまたは明示的な上限を設けてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40661e2d35cff135191564fc4b8bffa9379fb358217c591a17170c1469b57a37",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:19:16Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 166,
+              "message": "ログファイル作成を Linux 専用の `/proc/self/fd` と `O_NOFOLLOW` に依存させ、`#[cfg(not(target_os = \"linux\"))]` では常に `Unsupported` を返しています。macOS/Windows 等では `FsGateLogPersistence` が必ず失敗し、環境前提にも対応 platform の宣言がありません。対応 platform を明示するか、各対応 platform の安全な実装を提供してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 156,
+              "message": "Linux 実装も `/proc` がマウントされていることを前提に `/proc/self/fd/<fd>` 経由でログを作成しています。procfs が利用できない Linux 環境では全ログ永続化が失敗しますが、この OS/filesystem 前提は spec または環境宣言に記録されていません。前提を宣言するか、procfs に依存しない安全な descriptor-relative 実装を用意してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3388310d865f52d811aa961d07b560f2a0ee0aedda6d3978afae2c32c44fd3c2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:56:50Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 81,
+              "message": "`fs::create_dir_all(&log_directory)` は descriptor-relative な安全な directory walk より前に実行され、`check_path` 後の race で `tmp` または `gate` を symlink に置換されると、trusted root 外にディレクトリを作成します。後段の `open_log_directory` が安全でも、この外部作成は既に発生しています。ディレクトリ作成も descriptor-relative な処理に統一し、path-based `create_dir_all` を削除してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9343bd9e1e988512416a4ec6d0e86064faa1a96e23e53ab096fdfb10701fda6d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T05:05:07Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 147,
+              "message": "`check_trusted_root()` の symlink 検査後に `trusted_root.canonicalize()` を実行しており、検査と canonicalize の間に root component を symlink へ置換されると、その symlink の指す外部ディレクトリを新たな trusted root として descriptor walk します。同様に non-Unix の `canonical_log_directory` も race 後の解決先を信頼します。入力 root を path-based canonicalize せず、検査済み descriptor から相対的に処理して fail closed にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c303a10b9f00d2f82ba505821bfa15d97eb8cfe86b6e8b14ca056b2bbc9fd20c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T05:13:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7f9d8ee2e467791c8a2fda1a52af85187a66e1c40011109f316313668be9234b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T05:22:57Z",
+          "findings": [
+            {
+              "category": "exit-status preservation",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 46,
+              "message": "`output.status.code().map_or(1, ...)` collapses abnormal child termination (for example, SIGINT/SIGTERM on Unix, where `code()` is `None`) into the ordinary exit code 1. This violates the required child-status preservation and loses interrupt/signal semantics even though the child did run. Represent abnormal termination explicitly across the port, or apply a documented status mapping, and add a signal-termination regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7f9d8ee2e467791c8a2fda1a52af85187a66e1c40011109f316313668be9234b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T05:33:29Z",
+          "findings": [
+            {
+              "category": "exit-status preservation",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 61,
+              "message": "`status.code() == None` represents distinct abnormal terminations (for example SIGINT versus SIGTERM on Unix), but this adapter collapses all of them into the invented `-1` exit code. The downstream boundary then converts that value to generic code 1, so the child status and interrupt semantics required by the briefing are still not preserved; the new test only codifies the lossy mapping. Carry normal exit and signal termination as distinct typed outcomes (including the signal value), and map them only at the process exit boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f7886c99abe80c4789ed0a0bd6fe3fd0e01c989037f947d3f4260f598ac88573",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T05:41:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16505e788f08c991b07431a118b474d60c418672ab86df81ec473b9a2e6a6a9f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -136,6 +612,50 @@
           "at": "2026-08-25T06:35:16Z",
           "findings": [],
           "hash": "rvw1:sha256:93cffdd48a118ead30a129e53adc9540894de4ac81bd4f05a781bc53f1a51d12",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:59:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0aa4be29a22483c7537e10398407b8b0f50239f6dc13439d8c3b2cd89ea25c69",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:21:24Z",
+          "findings": [
+            {
+              "category": "test-evidence substitution",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 55,
+              "message": "`GateProcessPort`'s contract fulfillment—and its CN-03 voluntary binding later in this file—uses only `test_gate_process_port_returns_complete_output_and_preserves_exit_judgment`, which invokes a test-only `StubRunner` preloaded with the exact asserted output. This is not evidence that the production process boundary preserves child exit status, so it substitutes a usecase double for layer-owned runtime behavior and overclaims the edge. Bind these records to the `ProcessGateRunner` infrastructure tests or a shared contract suite exercised against that adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0aa4be29a22483c7537e10398407b8b0f50239f6dc13439d8c3b2cd89ea25c69",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:25:08Z",
+          "findings": [
+            {
+              "category": "stale verifier verdict",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 51,
+              "message": "The updated `GateProcessPort` fulfillment and CN-03 voluntary binding have not been re-evaluated. `test-obligation results` reports two stale done-state verdicts, and `bin/sotp test-obligation check` exits 1 with `TestChanged` drift for AC-04 and CN-03; the cache still cites the previous usecase `StubRunner` tests. The host must rerun semantic evaluation so these infrastructure bindings receive fresh verdicts before the gate can be considered green.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:284d66b4df748fd19f0c3eb6fd2373b637a1d7ef189a3073087b88bb275b9dd9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:55:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:284d66b4df748fd19f0c3eb6fd2373b637a1d7ef189a3073087b88bb275b9dd9",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -172,6 +692,428 @@
           "at": "2026-08-25T06:24:51Z",
           "findings": [],
           "hash": "rvw1:sha256:0092874ad59c9c60f49c3e5148a15eee057fe9cc73011a4b55891f64f92d3abc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T06:53:36Z",
+          "findings": [
+            {
+              "category": "catalogue schema",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 465,
+              "message": "`ChildExitCode` declares its private `value` field with `has_stripped_fields: false`; private fields must be represented as stripped (`true`, with no visible fields).",
+              "severity": "P1"
+            },
+            {
+              "category": "catalogue schema",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 882,
+              "message": "`GateNameArg` declares its private `value` field with `has_stripped_fields: false`; private fields must be represented as stripped (`true`, with no visible fields).",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 54,
+              "message": "`cli::commands::gate_output::execute` repeats the upstream output, logging, and exit-code behavior contract in `docs`; replace the prose with the changed symbol plus anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 202,
+              "message": "`cli::commands::gate_output::render_summary` repeats the upstream PASS/FAIL and log-path contract in `docs`; retain only the symbol purpose and anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 904,
+              "message": "`GateOutputArgs` repeats input validation and opaque-command behavior from the upstream contract in `docs`; replace it with a concise symbol description plus anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 871,
+              "message": "`GateNameArg` repeats the upstream non-empty/path-safe validation behavior in `docs`; replace the behavioral prose with the symbol and anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 454,
+              "message": "`ChildExitCode` repeats the upstream exit-code and summary-separation behavior in `docs`; replace the behavioral prose with the symbol and anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 487,
+              "message": "`CliCommand` repeats the upstream command-surface and summary-contract behavior in `docs`; describe only the enum modification and cite the relevant anchors.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 118,
+              "message": "`cli::commands::gate_output::failure_excerpts` and `truncate_line` restate the failure-diagnostic presentation contract in `docs`; replace the behavioral prose with symbol descriptions and anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 30,
+              "message": "`cli::commands::gate_output::prepare_log_path` and `combined_output` restate the upstream full-log persistence contract in `docs`; replace the behavioral prose with symbol descriptions and anchor citations.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 94,
+              "message": "`cli::commands::gate_output::exit_code_from_i32` restates the upstream prohibition on parsing summary text in `docs`; replace it with the changed symbol and anchor citations.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08757b99b3515c9f07934e3a710a05097bc63c5ca98eff6293cdffa83e64b59a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T07:01:44Z",
+          "findings": [
+            {
+              "category": "open-set covering contract",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 145,
+              "message": "`cli::commands::gate_output::is_failure_line` promises to classify opaque, free-form output from heterogeneous child commands, but neither this entry nor its spec chain delegates failure identification to those commands, declares a conservative over-approximation, or records a strict parser with a depth estimate. New failure formats can therefore disappear from the AC-02 excerpt. Record one of the permitted open-set resolutions.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 54,
+              "message": "`cli::commands::gate_output::execute` restates the upstream logging, summary-output, and exit-code behavior in `docs`. Keep only the symbol’s operation and anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 94,
+              "message": "`cli::commands::gate_output::exit_code_from_i32` repeats the upstream prohibition on parsing summary text in `docs`. Express that behavior through the CN-03/AC-04 citations instead, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 454,
+              "message": "`ChildExitCode` repeats the upstream exit-code-versus-stdout contract in `docs` through the claim that it is never parsed from stdout. Retain the type-specific construction description and reference CN-03/AC-04 for the behavior, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08757b99b3515c9f07934e3a710a05097bc63c5ca98eff6293cdffa83e64b59a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T07:20:24Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 318,
+              "message": "`GateNameArg::new` returns `Result<Self, GateOutputError>`, but only `InvalidName` is constructible from this operation; `EmptyCommand`, `Clock`, `CreateLogDirectory`, and `Spawn` are unreachable. The entry provides no producible-subset or breadth justification.",
+              "severity": "P2"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 183,
+              "message": "`cli::commands::gate_output::prepare_log_path` can only produce `Clock` or `CreateLogDirectory` because it receives an already validated `GateNameArg`, yet returns the five-variant `GateOutputError` without documenting or justifying the unreachable variants.",
+              "severity": "P2"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 263,
+              "message": "`cli::commands::gate_output::run_child` can only produce `EmptyCommand` or `Spawn`, yet returns the five-variant `GateOutputError` without documenting or justifying the unreachable `InvalidName`, `Clock`, and `CreateLogDirectory` variants.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:a0c125776df0e40aae9571e90bfba78a0e491e12517b6b86a7ddaf874ca993b7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T07:25:32Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 200,
+              "message": "`cli::commands::gate_output::render_summary` models the three execution states with independent `exit_code: ChildExitCode` and `spawn_reason: Option<&str>` parameters. This admits contradictory values such as a successful exit code with a spawn-failure reason, which the renderer silently ignores. Replace the pair—ideally together with the associated output—with a dedicated completed/child-failed/spawn-failed outcome enum so invalid combinations are unrepresentable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a0c125776df0e40aae9571e90bfba78a0e491e12517b6b86a7ddaf874ca993b7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T07:40:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4c9bad8173dae05ba14c511c11a0446a448be705e80a2334e38691af03933b67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T07:42:48Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 980,
+              "message": "`GateRunOutcome::ChildFailed` accepts an unrestricted `ChildExitCode`, while `ChildExitCode::from_status` can construct the success code. The catalogue therefore still admits `ChildFailed { exit_code: 0, ... }`, contradicting the variant and its claimed closed outcome shape. Use a single `ChildExited { exit_code, output }` variant and classify success when rendering, or introduce a validated non-success exit-code type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4c9bad8173dae05ba14c511c11a0446a448be705e80a2334e38691af03933b67",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T07:57:17Z",
+          "findings": [
+            {
+              "category": "catalogue signature",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 335,
+              "message": "The `ChildExitCode::from_status` and `ChildExitCode::failure` method declarations use `Self` as their return type. The types checklist requires concrete type names; declare both returns as `ChildExitCode`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c34708bf0adbd47aa8a1f4b71881471757025a9bb7c0ca230e6416fd68f802e0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T08:02:57Z",
+          "findings": [
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 172,
+              "message": "`GateNameArg::new(String) -> GateNameArg` accepts every opaque CLI label, while `cli::commands::gate_output::prepare_log_path` declares no containment validation or encoding and `PrepareLogPathError` can report only clock/directory failures. Consequently no entry owns the fail-closed `tmp/gate/` boundary: a label containing `../` or an absolute-path prefix can escape the required directory. Assign exactly one owner by validating construction or safely encoding/rejecting labels during path preparation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0060cf626d4770f017e2c3fe3aa4cd61edf056de0d5bfebc6eea09fbae0e6089",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T08:16:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4da935b5430ef6d75f747be337f11fbb8fe1c9e1ce7d63bc7992a6d028c2cfd0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T08:18:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4da935b5430ef6d75f747be337f11fbb8fe1c9e1ce7d63bc7992a6d028c2cfd0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T08:32:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b365af9fd6b4b5933c4ff9226793b91446125a258d3dfab51b2d90a02765ada9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T08:34:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b365af9fd6b4b5933c4ff9226793b91446125a258d3dfab51b2d90a02765ada9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T11:04:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf62cdd249789ff6039e715fdf5209e8867c786094f7a02693ab07865228f3fb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T11:11:59Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 52,
+              "message": "`cli::commands::gate_output::execute`, `run_child`, `prepare_log_path`, and `render_summary` are declared as `FreeFunction`s in the `cli` process-entrypoint layer, but their contracts respectively own application orchestration, process/filesystem adapter operations, and result rendering. This contradicts the thin-bin contract in `type-designer-kind-selection.md` and `tddd-product-correctness.md`: `cli` should parse, dispatch, and convert the final exit code, while orchestration, secondary I/O adapters, and invoke/render belong in their corresponding usecase, infrastructure, and cli_driver layers.",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 172,
+              "message": "`cli::commands::gate_output::prepare_log_path` claims exclusive ownership of containment beneath `tmp/gate`, but it accepts no trusted root, returns an unrestricted `PathBuf`, and `PrepareLogPathError` can report only clock or directory-creation failures. It therefore cannot reject a symlinked `tmp`/`tmp/gate` component or preserve the guarantee across the later write, so the declared fail-closed owner cannot construct its required rejection data. The contract needs a persistence boundary that owns the actual write and represents outside-root/symlink rejection explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cf62cdd249789ff6039e715fdf5209e8867c786094f7a02693ab07865228f3fb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:01:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a29388ba0b3163690a3415a10a0b014919d4a3d329969bc7e217186e919865a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T12:09:22Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 254,
+              "message": "`GateLogPersistencePort::persist`, `GateProcessPort::run`, and the I/O-orchestrating `GateRunService::execute` are all declared synchronous (`is_async: false`), but none of their entry docs acknowledges or justifies the blocking process/filesystem boundary. Either make the ports async or record the deliberate bounded, single-shot CLI synchronization choice so adapter color is explicit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5a29388ba0b3163690a3415a10a0b014919d4a3d329969bc7e217186e919865a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-28T12:28:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084882b390bcd90741590b89f0d1c848d9b26b6b743eca0fc6fc99fdbffd6ac6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-28T12:31:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084882b390bcd90741590b89f0d1c848d9b26b6b743eca0fc6fc99fdbffd6ac6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:05:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59965374a0d34d84122816e5e5900bfbb6479ea4dcbef28798bcabae8a4ba764",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T01:08:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59965374a0d34d84122816e5e5900bfbb6479ea4dcbef28798bcabae8a4ba764",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T02:19:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9df1ae9889a44186ba51f2f7bad1743d2d5ad02404fef88342f422c43a25fae9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T02:21:45Z",
+          "findings": [
+            {
+              "category": "unsupported semantic placement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 482,
+              "message": "`GateAdapterFailureReason` is classified as a usecase `ValueObject`, but its docs explicitly describe unconstrained adapter diagnostic text to which the application assigns no domain meaning. That establishes neither invariant ownership nor semantics independent of adapter/workflow concerns; model this transport value as a DTO (or keep a documented opaque `String`) rather than stretching `ValueObject`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9df1ae9889a44186ba51f2f7bad1743d2d5ad02404fef88342f422c43a25fae9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T03:02:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:99d92b77db5f4b199c1250659f6b7a7af3567c3fb9c76e06f6557baccc7124bf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T03:05:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:99d92b77db5f4b199c1250659f6b7a7af3567c3fb9c76e06f6557baccc7124bf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-29T04:01:49Z",
+          "findings": [
+            {
+              "category": "error type confusion",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 131,
+              "message": "`GateLogPersistenceError::Clock` exposes `std::time::SystemTimeError` from the runtime adapter through the usecase API. This violates the declared boundary contract that adapter failures cross as `GateAdapterFailureReason` and leaks a runtime-specific error type to callers. Map the clock failure to a usecase-owned reason/value instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35917da9668b096b0024630526fd834335ac86ddf7a10923b3b8ac9ad4904e31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:18:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35917da9668b096b0024630526fd834335ac86ddf7a10923b3b8ac9ad4904e31",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T04:48:34Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 76,
+              "message": "`GateExitCode` assumes every child termination has an `i32` exit code, but processes can terminate without one—for example, via a Unix signal. Neither the spec nor the still-TODO environment declaration defines supported platforms or abnormal-termination mapping, so adapters must invent a value and cannot preserve the original status. Model termination explicitly or declare and enforce the platform/mapping contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 154,
+              "message": "The process boundary requires complete stdout/stderr to be materialized in an unbounded `Vec<u8>` and provides no timeout or cancellation contract. The spec requires a complete persisted log but declares no memory, output-size, or execution-time limits, while the environment declaration remains TODO; a noisy or hung gate can therefore exhaust memory or block indefinitely before persistence. Use streaming/bounded capture with explicit timeout behavior, or declare and enforce the relevant limits.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 194,
+              "message": "`GateLogPersistencePort::persist` receives no timestamp or clock dependency even though persistence can return `GateLogPersistenceError::Clock`; the runtime adapter must therefore obtain the current time behind this abstraction. This is distinct from the accepted `SystemTimeError` payload deviation: execution time is still required to enter through an explicit usecase-owned clock port, and no clock semantics are declared in the spec or environment assumptions. Inject a clock/timestamp explicitly into the orchestration contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35917da9668b096b0024630526fd834335ac86ddf7a10923b3b8ac9ad4904e31",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T04:59:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35917da9668b096b0024630526fd834335ac86ddf7a10923b3b8ac9ad4904e31",
           "type": "final",
           "verdict": "zero_findings"
         }

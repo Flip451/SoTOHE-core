@@ -1,0 +1,414 @@
+{
+  "entries": [
+    {
+      "claim_hash": "71413d3b260330621fcf566907615a2948e9d5db92534c13bae2107895e53086",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "71413d3b260330621fcf566907615a2948e9d5db92534c13bae2107895e53086",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0987401574beeee228838f4b257443116d78756e8293d6ad05b3a22eda3bd445",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "71413d3b260330621fcf566907615a2948e9d5db92534c13bae2107895e53086",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7cbe70b5561372fce87ddf2536d5040ffe797f31af631d0f2ee261caf1ffa78a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateNameArg",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7cbe70b5561372fce87ddf2536d5040ffe797f31af631d0f2ee261caf1ffa78a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateNameArg",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0fbd6a040c1f5a399b0385a01b929bf4e64eeb80cfc8493b2dadd1820c369575",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "フルログファイルのパス",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e10a338778780b0d4a066c956ae0709e8a4820b9767cc1a30a9088e24c3be05",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e10a338778780b0d4a066c956ae0709e8a4820b9767cc1a30a9088e24c3be05",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e10a338778780b0d4a066c956ae0709e8a4820b9767cc1a30a9088e24c3be05",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0987401574beeee228838f4b257443116d78756e8293d6ad05b3a22eda3bd445",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0e10a338778780b0d4a066c956ae0709e8a4820b9767cc1a30a9088e24c3be05",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0987401574beeee228838f4b257443116d78756e8293d6ad05b3a22eda3bd445",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a037191bfdc1e3fd08e159bce13b8fe907d208b7059dd7df7ebb6ac88285259b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24446b50425c990ba5ee7ec005ec8b0991ec078df5995cd0b9a066c2cf8a614a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "84d4faf980fe47194a85319b3941ebd5fadef6130424329accb20e5c966b8765",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b55b2cce2b45ccc9f9d4fbd852dc6633c5f80cd5badb1712b2b5f1381b56e3af",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "機械による合否は既存の exit code で、状態照会は既存の check 系コマンドで引き続き判定しなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "機械による合否は既存の exit code で",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "84d4faf980fe47194a85319b3941ebd5fadef6130424329accb20e5c966b8765",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクの成功・失敗は従来どおり exit code で判断でき",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli",
+  "schema_version": 1
+}
