@@ -356,15 +356,11 @@ fn execute_with_dependencies(
         ))
     })?;
     validate_evaluator_binding(&configured_layers, binding)?;
-    let reuse_decision = if configured_layers.len() > 1 {
-        domain::TypeSignalsReuseDecision::ReextractAndEvaluate
-    } else {
-        decide_reuse_for_recorded_document(
-            recorded.as_ref(),
-            &current_key,
-            worktree_is_clean(&canonical_workspace)?,
-        )
-    };
+    let reuse_decision = decide_reuse_for_recorded_document(
+        recorded.as_ref(),
+        &current_key,
+        worktree_is_clean(&canonical_workspace)?,
+    );
     match reuse_decision {
         domain::TypeSignalsReuseDecision::SkipEvaluation => {
             verify_evaluation_inputs_unchanged(

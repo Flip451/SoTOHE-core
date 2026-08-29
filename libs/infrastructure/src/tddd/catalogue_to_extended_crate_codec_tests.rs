@@ -622,6 +622,94 @@ fn test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates() 
 }
 
 #[test]
+fn test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("id").unwrap(),
+                        TypeRef::new("domain::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let resolution_paths =
+        resolution_paths_for_catalogue(&target_layer, &catalogues, &empty, &empty)
+            .expect("the unplaced declaring add remains in the shared resolution set");
+    let unplaced_summary = resolution_paths
+        .values()
+        .find(|summary| summary.path == ["domain", "UserId"])
+        .expect("the declaring layer's unplaced add must be represented");
+    assert_eq!(unplaced_summary.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &empty,
+        &empty,
+    )
+    .expect("a qualified reference must resolve an unplaced cross-layer add");
+
+    let user_id = item_id_for_path(&encoded, &["domain", "UserId"]);
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id
+    ));
+    assert_ne!(encoded.krate().paths[&user_id].crate_id, 0);
+    assert_eq!(
+        encoded.krate().external_crates[&encoded.krate().paths[&user_id].crate_id].name,
+        "domain"
+    );
+}
+
+#[test]
 fn test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add() {
     let target_layer = LayerId::try_new("usecase").unwrap();
     let target = make_doc_with_layer("usecase", "usecase");

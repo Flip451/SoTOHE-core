@@ -48,6 +48,35 @@
           "hash": "rvw1:sha256:9e474a7648f4d9d5063b77c768f56d3cd8313d6066b7a04d46865599464e59f5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:05:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a48b08daba196a1cefcdc1bd43edb8250f51d8324b47afea0513f4de1d6335ec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:14:42Z",
+          "findings": [
+            {
+              "category": "invariant correctness",
+              "file": "libs/domain/src/tddd/catalogue_v2/identity_resolution.rs",
+              "line": 325,
+              "message": "Removing `is_placed()` admits every unplaced identity whose rendered string matches, including declarations owned by `catalogue_crate`. For example, with an unplaced local `domain::UserId`, `crate::UserId` normalizes to `domain::UserId` and now resolves successfully even though D3 says qualified local paths require an exact placement and omitted `module_path` must not mean crate root. This weakens fail-closed local resolution in all callers of this shared resolver. Preserve the new match only for cross-crate identities (while retaining placed exact matches), and add a same-crate qualified-path regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a48b08daba196a1cefcdc1bd43edb8250f51d8324b47afea0513f4de1d6335ec",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T06:24:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b160814d2c9d845e20930ff914867cb9b21b37c0c76637c890ef76d58be897b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -685,6 +714,20 @@
           "at": "2026-08-29T05:12:22Z",
           "findings": [],
           "hash": "rvw1:sha256:daddd9057e6b42f66103045b026d8a63c0ec2515dd2fc5f667f3178c6ccb675a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:06:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:108a53996d3a16ac7e75a48a0d68a088feb7c22be712b91db27795bece18cac0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T06:15:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:108a53996d3a16ac7e75a48a0d68a088feb7c22be712b91db27795bece18cac0",
           "type": "final",
           "verdict": "zero_findings"
         }
