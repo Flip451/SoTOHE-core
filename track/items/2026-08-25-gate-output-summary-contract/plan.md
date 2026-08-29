@@ -24,4 +24,4 @@ T001-T003: update gate-output handling in place (GO-02).
 
 > Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.
 
-- [x] **T003**: Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.
+- [x] **T003**: Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04. (`16a3bcd17a8a95146184f179e357a59ebba8a248`)
