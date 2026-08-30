@@ -72,33 +72,43 @@ impl GateOutputDriver {
 
 /// Selects a bounded set of presentation-safe records from child output.
 ///
-/// The child bytes are not decoded or normalized. Only complete records made
-/// of ASCII bytes and separated by the summary's declared line separator are
-/// considered; non-ASCII and control-containing records are omitted. Known
-/// non-failure records are omitted, while otherwise unrecognized non-empty
-/// records remain eligible for the summary. At most eight records are returned;
-/// the persisted log path in the rendered summary remains the source for any
-/// omitted records.
+/// The child bytes are decoded strictly as UTF-8. Only complete records
+/// separated by the summary's declared line separator and free of control
+/// characters are considered; invalid UTF-8 and control-containing records are
+/// omitted. Known non-failure records are omitted, while otherwise
+/// unrecognized non-empty records remain eligible for the summary. Recognized
+/// failure records are selected before those conservative fallback records.
+/// At most eight records are returned; the persisted log path in the rendered
+/// summary remains the source for any omitted records.
 pub fn failure_excerpts(output: &[u8]) -> Vec<String> {
-    output
-        .split(|byte| *byte == b'\n')
-        .filter_map(ascii_failure_record)
-        .take(MAX_FAILURE_EXCERPTS)
-        .collect()
+    let mut recognized = Vec::with_capacity(MAX_FAILURE_EXCERPTS);
+    let mut fallback = Vec::with_capacity(MAX_FAILURE_EXCERPTS);
+
+    for (record, is_recognized) in output.split(|byte| *byte == b'\n').filter_map(failure_record) {
+        if is_recognized {
+            if recognized.len() < MAX_FAILURE_EXCERPTS {
+                recognized.push(record);
+            }
+        } else if fallback.len() < MAX_FAILURE_EXCERPTS {
+            fallback.push(record);
+        }
+    }
+
+    recognized.into_iter().chain(fallback).take(MAX_FAILURE_EXCERPTS).collect()
 }
 
-fn ascii_failure_record(record: &[u8]) -> Option<String> {
-    if record.is_empty() || !record.is_ascii() {
+fn failure_record(record: &[u8]) -> Option<(String, bool)> {
+    let record = std::str::from_utf8(record).ok()?;
+    if record.is_empty() {
         return None;
     }
 
-    let record = record.iter().map(|byte| char::from(*byte)).collect::<String>();
     if record.chars().any(char::is_control) {
         return None;
     }
 
     let trimmed = record.trim();
-    is_failure_line(trimmed).then(|| truncate_line(trimmed))
+    is_failure_line(trimmed).then(|| (truncate_line(trimmed), is_recognized_failure_line(trimmed)))
 }
 
 /// Classifies the supported test, obligation, and aggregate gate diagnostics.
@@ -117,10 +127,13 @@ pub fn is_failure_line(line: &str) -> bool {
     }
 
     let trimmed = line.trim();
-    let prefix = trimmed;
-    let suffix = trimmed;
-    let diagnostic_prefix = prefix.strip_prefix("- ").unwrap_or(prefix);
-    let diagnostic_suffix = suffix.strip_prefix("- ").unwrap_or(suffix);
+    !trimmed.is_empty()
+        && (is_recognized_failure_line(trimmed) || !is_known_non_failure_line(trimmed))
+}
+
+fn is_recognized_failure_line(line: &str) -> bool {
+    let diagnostic_prefix = line.strip_prefix("- ").unwrap_or(line);
+    let diagnostic_suffix = line.strip_prefix("- ").unwrap_or(line);
     let aggregate_summary_failure = diagnostic_prefix.eq_ignore_ascii_case("FAIL")
         && diagnostic_suffix.eq_ignore_ascii_case("FAIL");
     let aggregate_summary_failure_detail =
@@ -159,7 +172,23 @@ pub fn is_failure_line(line: &str) -> bool {
     let compiler_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "error:")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "error[")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "error ");
-    let known_non_failure = diagnostic_prefix.eq_ignore_ascii_case("PASS")
+    aggregate_summary_failure
+        || aggregate_summary_failure_detail
+        || marked_failure
+        || cargo_test_failure
+        || cargo_test_result
+        || nextest_failure
+        || nextest_summary
+        || panic_line
+        || obligation_failure
+        || cargo_make_failure
+        || compiler_failure
+}
+
+fn is_known_non_failure_line(line: &str) -> bool {
+    let diagnostic_prefix = line.strip_prefix("- ").unwrap_or(line);
+    let diagnostic_suffix = line.strip_prefix("- ").unwrap_or(line);
+    diagnostic_prefix.eq_ignore_ascii_case("PASS")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "[pass]")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "[ok]")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "[skip]")
@@ -175,19 +204,7 @@ pub fn is_failure_line(line: &str) -> bool {
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "internalrecord")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "debugrecord")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "obligationrecord")
-        || starts_with_ascii_case_insensitive(diagnostic_prefix, "somerecord");
-    aggregate_summary_failure
-        || aggregate_summary_failure_detail
-        || marked_failure
-        || cargo_test_failure
-        || cargo_test_result
-        || nextest_failure
-        || nextest_summary
-        || panic_line
-        || obligation_failure
-        || cargo_make_failure
-        || compiler_failure
-        || (!known_non_failure && !diagnostic_prefix.is_empty())
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "somerecord")
 }
 
 /// Renders the compact summary from the typed application result.
@@ -995,10 +1012,28 @@ mod tests {
     }
 
     #[test]
-    fn test_failure_excerpts_ignore_non_ascii_and_non_lf_records() {
+    fn test_failure_excerpts_prioritize_recognized_failures_over_fallback_records() {
+        let ordinary_lines = (0..MAX_FAILURE_EXCERPTS)
+            .map(|index| format!("ordinary diagnostic {index}"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let output = format!("{ordinary_lines}\n[FAIL] required-item: reason");
+
+        let excerpts = failure_excerpts(output.as_bytes());
+
+        assert_eq!(excerpts.first().map(String::as_str), Some("[FAIL] required-item: reason"));
+        assert_eq!(excerpts.len(), MAX_FAILURE_EXCERPTS);
+        assert!(!excerpts.iter().any(|excerpt| excerpt == "ordinary diagnostic 7"));
+    }
+
+    #[test]
+    fn test_failure_excerpts_keep_valid_utf8_and_reject_invalid_or_control_records() {
         let output = b"[FAIL] first: reason\r[FAIL] invalid: \xff reason\n[FAIL] third: reason\n";
 
         assert_eq!(failure_excerpts(output), ["[FAIL] third: reason".to_owned()]);
+
+        let valid_utf8 = "[FAIL] 日本語: 理由\n";
+        assert_eq!(failure_excerpts(valid_utf8.as_bytes()), ["[FAIL] 日本語: 理由".to_owned()]);
     }
 
     #[test]

@@ -310,6 +310,20 @@
           "hash": "rvw1:sha256:5c03bdc772654b69498bc89cf73591c0b5fddedb037b5d7b197d28bc72c88448",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:29:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4add6cc9d371463998f26a3848f09f66c67c4541fad0043fd0ef5ee130828843",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:41:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4add6cc9d371463998f26a3848f09f66c67c4541fad0043fd0ef5ee130828843",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -767,6 +781,35 @@
           "hash": "rvw1:sha256:91be9ccf288ec9ab3ef82db26e52073af82ff47c60128e1eda40a43d3850703f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:29:59Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 84,
+              "message": "`failure_excerpts` は返却上限が8件でも、入力中の全ての認識済み・フォールバック行を `Vec<String>` に蓄積してから `take` しています。大量の子プロセス出力では入力本体に加えて全行分の文字列を確保し、メモリ使用量が出力量に比例して増加します。各バケットを必要な上限まで保持するなど、選択処理自体も8件に制限してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:be194928d210c67e9b8a9592ca51924e72054bb82b48337d829dbd15a776f1d2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:35:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a21c98107fc4309c2fde6f7ae88f1358a5d8a286281faead6efc352249839b66",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:44:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a21c98107fc4309c2fde6f7ae88f1358a5d8a286281faead6efc352249839b66",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1047,6 +1090,35 @@
           "at": "2026-08-30T08:58:08Z",
           "findings": [],
           "hash": "rvw1:sha256:004fac2bfda03fc67c703008c6df0a6fb8f68d497888f4822b05857c90ac7039",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:27:58Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 882,
+              "message": "The nested `cargo run` in `test-obligation-check-local` still omits `--locked`; add it so every Cargo wrapper in this gate preserves the stale-lock protection.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:fb2fdb843eff095c4da86e4fa68ef2dab1723a50200b030fb800e9aca094a3df",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:29:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd4a1c7442fee28dd7c0f3cccd1d25e9ee0787901f1f883add959c7734e4ea7e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:40:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd4a1c7442fee28dd7c0f3cccd1d25e9ee0787901f1f883add959c7734e4ea7e",
           "type": "final",
           "verdict": "zero_findings"
         }

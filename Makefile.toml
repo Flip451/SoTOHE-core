@@ -202,28 +202,28 @@ private = true
 description = "[internal] Run tests with all features (including semantic-dup) via nextest and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-local", "--", "cargo", "nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-local", "--", "cargo", "nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-cli-feature-off-local]
 private = true
 description = "[internal] Run CLI tests with semantic-dup disabled via nextest and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-cli-feature-off-local", "--", "cargo", "nextest", "run", "--locked", "--no-default-features", "-p", "cli", "--no-tests=warn"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-cli-feature-off-local", "--", "cargo", "nextest", "run", "--locked", "--no-default-features", "-p", "cli", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
 description = "[internal] Run documentation tests with all features (including semantic-dup) and the compact gate-output summary"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-doc-local", "--", "cargo", "test", "--locked", "--doc", "--all-features"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-doc-local", "--", "cargo", "test", "--locked", "--doc", "--all-features"]
 
 [tasks.test-nocapture-local]
 private = true
 description = "[internal] Run tests with stdout/stderr captured in the full gate log and summarized"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-nocapture-local", "--", "cargo", "test", "--locked", "--all-features", "--", "--nocapture"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-nocapture-local", "--", "cargo", "test", "--locked", "--all-features", "--", "--nocapture"]
 
 [tasks.check-local]
 private = true
@@ -536,7 +536,7 @@ fi
 private = true
 description = "[internal] Run Rust-only CI checks through the compact gate-output summary"
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-local", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-local", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
 
 [tasks.ci-rust-local-steps]
 private = true
@@ -557,7 +557,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-featu
 private = true
 description = "[internal] Run local early-detection track-aware CI gates through the compact gate-output summary"
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-local", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-local", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
 
 [tasks.ci-track-local-steps]
 private = true
@@ -567,7 +567,7 @@ dependencies = ["task-contract-coverage-local", "task-contract-check-local", "ad
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container through the compact gate-output summary (no docker compose)"
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-container", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-rust-container", "--", "cargo", "make", "--allow-private", "ci-rust-local-steps"]
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
@@ -576,7 +576,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-featu
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates through the compact gate-output summary; requires a track/<id> branch context (no docker compose). Skip on base branch / non-track CI runs."
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-container", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "ci-track-container", "--", "cargo", "make", "--allow-private", "ci-track-local-steps"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -879,7 +879,7 @@ args = ["batch-plan", "check"]
 private = true
 description = "[internal] Pure-read test-obligation fulfillment gate through the compact gate-output summary. Active track auto-resolved by CLI. Uses cargo-run so CI containers exercise the current source tree."
 command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-obligation-check-local", "--", "cargo", "run", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
+args = ["run", "--locked", "--quiet", "-p", "cli", "--", "gate-output", "--name", "test-obligation-check-local", "--", "cargo", "run", "--locked", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
 
 [tasks.adr-baseline-check-commit-local]
 private = true

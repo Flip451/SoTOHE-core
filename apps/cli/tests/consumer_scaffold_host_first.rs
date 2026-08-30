@@ -1065,6 +1065,7 @@ fn test_root_aggregate_gate_wrappers_use_shared_summary_surface() {
             task_toml_string_array(&makefile, task, "args"),
             [
                 "run",
+                "--locked",
                 "--quiet",
                 "-p",
                 "cli",
