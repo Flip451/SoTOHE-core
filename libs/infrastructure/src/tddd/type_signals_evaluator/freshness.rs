@@ -1,26 +1,34 @@
-//! Cache-freshness helpers for the type-signal evaluator.
+//! Cache identity and bounded rustdoc-input fingerprint helpers.
 
-use std::path::PathBuf;
+use std::ffi::OsStr;
+use std::io::{Error, ErrorKind};
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::time::Duration;
 
-#[cfg(feature = "test-helpers")]
-use std::collections::BTreeMap;
-
-use domain::schema::SchemaExportError;
 use domain::tddd::CargoFeatureName;
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, RustdocCratePortError};
 use domain::tddd::type_signals_doc::{
-    TypeSignalsAuthorityStatus, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision,
-    TypeSignalsReuseInput, TypeSignalsWorktreeStatus, decide_type_signals_reuse,
+    RustdocExecutionIdentity, TypeSignalsAuthorityStatus, TypeSignalsCacheKey, TypeSignalsDocument,
+    TypeSignalsReuseDecision, TypeSignalsReuseInput, TypeSignalsWorktreeStatus,
+    decide_type_signals_reuse,
 };
 
-use crate::schema_export::RustdocSchemaExporter;
+use sha2::Digest as _;
 
-pub(super) trait RustdocJsonPathProvider {
-    fn export_rustdoc_json_path(
+#[path = "environment_fingerprint.rs"]
+mod environment_fingerprint;
+
+/// Port-backed rustdoc provider used by the evaluator.
+///
+/// Rustdoc I/O remains owned by [`RustdocCratePort`]. The identity resolver is
+/// only the cache-key side channel and does not read or construct a snapshot.
+pub(crate) trait RustdocProvider: RustdocCratePort {
+    fn execution_identity(
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<PathBuf, SchemaExportError>;
+    ) -> Result<RustdocExecutionIdentity, RustdocCratePortError>;
 }
 
 pub(crate) fn decide_reuse_for_recorded_document(
@@ -28,15 +36,10 @@ pub(crate) fn decide_reuse_for_recorded_document(
     current_key: &TypeSignalsCacheKey,
     worktree_clean: bool,
 ) -> TypeSignalsReuseDecision {
-    let authority_status = if recorded.is_some() {
-        TypeSignalsAuthorityStatus::Readable
-    } else {
-        TypeSignalsAuthorityStatus::Unreadable
-    };
     let Some(recorded) = recorded else {
         return TypeSignalsReuseDecision::ReextractAndEvaluate;
     };
-    let Some(reuse_input) = TypeSignalsReuseInput::verify(
+    let Some(input) = TypeSignalsReuseInput::verify(
         recorded.cache_key().clone(),
         current_key.clone(),
         if worktree_clean {
@@ -44,136 +47,498 @@ pub(crate) fn decide_reuse_for_recorded_document(
         } else {
             TypeSignalsWorktreeStatus::Dirty
         },
-        authority_status,
+        TypeSignalsAuthorityStatus::Readable,
     ) else {
         return TypeSignalsReuseDecision::ReextractAndEvaluate;
     };
-    decide_type_signals_reuse(&reuse_input)
+    decide_type_signals_reuse(&input)
 }
 
-impl RustdocJsonPathProvider for RustdocSchemaExporter {
-    fn export_rustdoc_json_path(
-        &self,
-        crate_name: &CrateName,
-        features: &[CargoFeatureName],
-    ) -> Result<PathBuf, SchemaExportError> {
-        Self::export_rustdoc_json_path_with_features(self, crate_name, features)
-    }
+const MAX_RUSTDOC_INPUT_DEPTH: usize = 64;
+const MAX_RUSTDOC_INPUT_ENTRIES: usize = 65_536;
+const MAX_RUSTDOC_INPUT_FILES: usize = 32_768;
+const MAX_RUSTDOC_INPUT_FILE_BYTES: u64 = 64 * 1024 * 1024;
+const MAX_RUSTDOC_INPUT_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
+const MAX_RUSTDOC_INPUT_PATH_BYTES: usize = 16 * 1024;
+const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v3\0";
+
+/// A bounded fingerprint failure. No partial digest is returned for any case.
+#[derive(Debug)]
+pub(super) enum RustdocInputFingerprintError {
+    Io { path: PathBuf, source: String },
+    Symlink { path: PathBuf },
+    DirectoryDepth { path: PathBuf, maximum: usize },
+    EntryCount { maximum: usize },
+    FileCount { maximum: usize },
+    FileBytes { path: PathBuf, bytes: u64, maximum: u64 },
+    TotalBytes { bytes: u64, maximum: u64 },
+    PathBytes { path: PathBuf, bytes: usize, maximum: usize },
+    EnvironmentBytes { name: String, bytes: usize, maximum: usize },
 }
 
-#[cfg(feature = "test-helpers")]
-#[derive(Clone)]
-pub struct RustdocLaunchObserver {
-    json_paths: BTreeMap<String, PathBuf>,
-    fallback_json_path: Option<PathBuf>,
-    launches: std::sync::Arc<std::sync::Mutex<BTreeMap<String, usize>>>,
-    feature_selections: std::sync::Arc<std::sync::Mutex<BTreeMap<String, Vec<Vec<String>>>>>,
-    before_export: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
-}
-
-#[cfg(feature = "test-helpers")]
-impl std::fmt::Debug for RustdocLaunchObserver {
+impl std::fmt::Display for RustdocInputFingerprintError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter
-            .debug_struct("RustdocLaunchObserver")
-            .field("json_paths", &self.json_paths)
-            .field("launches", &self.launches())
-            .finish_non_exhaustive()
+        match self {
+            Self::Io { path, source } => {
+                write!(formatter, "cannot fingerprint '{}': {source}", path.display())
+            }
+            Self::Symlink { path } => {
+                write!(formatter, "rustdoc input is a symlink: '{}'", path.display())
+            }
+            Self::DirectoryDepth { path, maximum } => write!(
+                formatter,
+                "rustdoc input directory depth exceeds {maximum}: '{}'",
+                path.display()
+            ),
+            Self::EntryCount { maximum } => {
+                write!(formatter, "rustdoc input entry count exceeds {maximum}")
+            }
+            Self::FileCount { maximum } => {
+                write!(formatter, "rustdoc input file count exceeds {maximum}")
+            }
+            Self::FileBytes { path, bytes, maximum } => write!(
+                formatter,
+                "rustdoc input '{}' is {bytes} bytes; maximum is {maximum}",
+                path.display()
+            ),
+            Self::TotalBytes { bytes, maximum } => {
+                write!(formatter, "rustdoc input corpus is {bytes} bytes; maximum is {maximum}")
+            }
+            Self::PathBytes { path, bytes, maximum } => write!(
+                formatter,
+                "rustdoc input path '{}' is {bytes} bytes; maximum is {maximum}",
+                path.display()
+            ),
+            Self::EnvironmentBytes { name, bytes, maximum } => write!(
+                formatter,
+                "rustdoc environment input '{name}' is {bytes} bytes; maximum is {maximum}"
+            ),
+        }
     }
 }
 
-#[cfg(feature = "test-helpers")]
-impl RustdocLaunchObserver {
-    #[must_use]
-    pub fn using_json_path(json_path: PathBuf) -> Self {
-        Self {
-            json_paths: BTreeMap::new(),
-            fallback_json_path: Some(json_path),
-            launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            before_export: None,
+/// Computes a complete, bounded implementation fingerprint.
+pub(super) fn rustdoc_input_fingerprint(
+    workspace_root: &Path,
+) -> Result<String, RustdocInputFingerprintError> {
+    let cargo_target_dir = validate_authoritative_cargo_inputs(workspace_root)?;
+    let paths = collect_rustdoc_input_paths(workspace_root, &cargo_target_dir)?;
+    let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
+    let mut total_bytes = 0_u64;
+    for path in paths {
+        let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
+        let metadata = std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
+        if metadata.file_type().is_symlink() || !metadata.is_file() {
+            return Err(RustdocInputFingerprintError::Symlink { path });
         }
-    }
-
-    /// Creates an observer that returns the matching rustdoc JSON file for
-    /// each requested crate. This lets composition tests assert layer-scoped
-    /// extraction without changing production rustdoc wiring.
-    #[must_use]
-    pub fn using_json_paths(json_paths: BTreeMap<String, PathBuf>) -> Self {
-        Self {
-            json_paths,
-            fallback_json_path: None,
-            launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            before_export: None,
-        }
-    }
-
-    /// Creates an observer that runs `before_export` immediately before the
-    /// simulated rustdoc export. This permits a test to model an input that was
-    /// unavailable for the reuse decision but is restored before persistence.
-    #[must_use]
-    pub fn using_json_path_with_before_export(
-        json_path: PathBuf,
-        before_export: std::sync::Arc<dyn Fn() + Send + Sync>,
-    ) -> Self {
-        Self {
-            json_paths: BTreeMap::new(),
-            fallback_json_path: Some(json_path),
-            launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
-            before_export: Some(before_export),
-        }
-    }
-
-    #[must_use]
-    pub fn launches(&self) -> usize {
-        self.launches.lock().map_or(0, |launches| launches.values().sum())
-    }
-
-    /// Returns the simulated rustdoc launch count for one crate.
-    #[must_use]
-    pub fn launches_for(&self, crate_name: &str) -> usize {
-        self.launches.lock().map_or(0, |launches| launches.get(crate_name).copied().unwrap_or(0))
-    }
-
-    /// Returns every feature selection supplied to simulated rustdoc for one crate.
-    #[must_use]
-    pub fn feature_selections_for(&self, crate_name: &str) -> Vec<Vec<String>> {
-        self.feature_selections.lock().map_or_else(
-            |_| Vec::new(),
-            |selections| selections.get(crate_name).cloned().unwrap_or_default(),
+        check_file_size(&path, metadata.len())?;
+        let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
+            &path,
+            Some(workspace_root),
+            MAX_RUSTDOC_INPUT_FILE_BYTES,
         )
+        .map_err(|error| io_error(&path, error))?
+        .ok_or_else(|| io_error(&path, Error::new(ErrorKind::NotFound, "input disappeared")))?;
+        check_file_size(&path, bytes.len() as u64)?;
+        total_bytes = total_bytes.checked_add(bytes.len() as u64).ok_or(
+            RustdocInputFingerprintError::TotalBytes {
+                bytes: u64::MAX,
+                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+            },
+        )?;
+        if total_bytes > MAX_RUSTDOC_INPUT_TOTAL_BYTES {
+            return Err(RustdocInputFingerprintError::TotalBytes {
+                bytes: total_bytes,
+                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+            });
+        }
+        append_len_prefixed_bytes(&mut canonical, &path_bytes(relative));
+        append_len_prefixed_bytes(&mut canonical, &metadata_generation(&metadata));
+        append_len_prefixed_bytes(&mut canonical, &sha256_bytes(&bytes));
     }
+    environment_fingerprint::append_environment_identity(&mut canonical, workspace_root)?;
+    Ok(hex_digest(&sha256_bytes(&canonical)))
+}
 
-    fn json_path_for(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
-        self.json_paths
-            .get(crate_name)
-            .cloned()
-            .or_else(|| self.fallback_json_path.clone())
-            .ok_or_else(|| SchemaExportError::CrateNotFound(crate_name.to_owned()))
+/// Checks Cargo's resolved graph before fingerprinting. An external path
+/// dependency or build-script target has inputs the bounded workspace walk
+/// cannot prove complete, so the operation fails before export or reuse.
+fn validate_authoritative_cargo_inputs(
+    workspace_root: &Path,
+) -> Result<PathBuf, RustdocInputFingerprintError> {
+    let manifest = workspace_root.join("Cargo.toml");
+    let manifest_metadata =
+        std::fs::symlink_metadata(&manifest).map_err(|error| io_error(&manifest, error))?;
+    if manifest_metadata.file_type().is_symlink() || !manifest_metadata.is_file() {
+        return Err(RustdocInputFingerprintError::Symlink { path: manifest });
+    }
+    let mut command = Command::new("cargo");
+    command
+        .args(["metadata", "--format-version", "1", "--no-deps", "--locked"])
+        .current_dir(workspace_root);
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        16 * 1024 * 1024,
+        Duration::from_secs(120),
+        "cargo metadata for rustdoc input validation",
+    )
+    .map_err(|error| io_error(workspace_root, Error::other(error.to_string())))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(io_error(
+            workspace_root,
+            Error::other(format!(
+                "cargo metadata exited with {}: {}",
+                output.status,
+                stderr.trim()
+            )),
+        ));
+    }
+    let metadata: serde_json::Value = serde_json::from_slice(&output.stdout).map_err(|error| {
+        io_error(workspace_root, Error::other(format!("cargo metadata JSON is invalid: {error}")))
+    })?;
+    let packages = metadata
+        .get("packages")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| io_error(workspace_root, Error::other("cargo metadata has no packages")))?;
+    let target_directory = metadata
+        .get("target_directory")
+        .and_then(serde_json::Value::as_str)
+        .map(PathBuf::from)
+        .ok_or_else(|| {
+            io_error(
+                workspace_root,
+                Error::other("cargo metadata has no authoritative target_directory"),
+            )
+        })?;
+    let target_directory = if target_directory.is_absolute() {
+        target_directory
+    } else {
+        workspace_root.join(target_directory)
+    };
+    let target_directory = crate::verify::path_safety::lexical_normalize(&target_directory);
+    crate::track::symlink_guard::reject_symlinks_up_to_root(&target_directory)
+        .map_err(|error| io_error(&target_directory, error))?;
+    let root = workspace_root.canonicalize().map_err(|error| io_error(workspace_root, error))?;
+    for package in packages {
+        let manifest = package
+            .get("manifest_path")
+            .and_then(serde_json::Value::as_str)
+            .map(PathBuf::from)
+            .ok_or_else(|| io_error(&root, Error::other("Cargo package has no manifest")))?;
+        let inside = manifest.canonicalize().map(|path| path.starts_with(&root)).unwrap_or(false);
+        if !inside && package.get("source").is_none_or(serde_json::Value::is_null) {
+            return Err(io_error(
+                &manifest,
+                Error::other(
+                    "external path dependency is not in the authoritative workspace snapshot",
+                ),
+            ));
+        }
+        validate_manifest_dependency_paths(&manifest, &root)?;
+        if let Some(dependencies) =
+            package.get("dependencies").and_then(serde_json::Value::as_array)
+        {
+            for dependency in dependencies {
+                let Some(path) =
+                    dependency.get("path").and_then(serde_json::Value::as_str).map(PathBuf::from)
+                else {
+                    continue;
+                };
+                let path = if path.is_absolute() {
+                    path
+                } else {
+                    manifest.parent().unwrap_or_else(|| Path::new(".")).join(path)
+                };
+                let path_inside = path
+                    .canonicalize()
+                    .map(|resolved| resolved.starts_with(&root))
+                    .unwrap_or(false);
+                if !path_inside {
+                    return Err(io_error(
+                        &path,
+                        Error::other(
+                            "external path dependency is not in the authoritative workspace snapshot",
+                        ),
+                    ));
+                }
+            }
+        }
+        let has_build_script =
+            package.get("targets").and_then(serde_json::Value::as_array).is_some_and(|targets| {
+                targets.iter().any(|target| {
+                    target
+                        .get("kind")
+                        .and_then(serde_json::Value::as_array)
+                        .is_some_and(|kinds| kinds.iter().any(|kind| kind == "custom-build"))
+                })
+            });
+        // Workspace-member build.rs is itself a regular source file in the
+        // fingerprint walk; generated outputs stay under the excluded target
+        // directory. Fail closed only for an out-of-workspace path package
+        // whose build script cannot be snapshotted. Registry crates carry a
+        // `source` and are not path packages.
+        if has_build_script
+            && !inside
+            && package.get("source").is_none_or(serde_json::Value::is_null)
+        {
+            return Err(io_error(
+                &manifest,
+                Error::other(
+                    "Cargo build-script inputs and generated outputs are not authoritative",
+                ),
+            ));
+        }
+    }
+    Ok(target_directory)
+}
+
+fn validate_manifest_dependency_paths(
+    manifest_path: &Path,
+    workspace_root: &Path,
+) -> Result<(), RustdocInputFingerprintError> {
+    let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
+        manifest_path,
+        Some(workspace_root),
+        MAX_RUSTDOC_INPUT_FILE_BYTES,
+    )
+    .map_err(|error| io_error(manifest_path, error))?
+    .ok_or_else(|| {
+        io_error(manifest_path, Error::new(ErrorKind::NotFound, "manifest disappeared"))
+    })?;
+    let document: toml::Value = toml::from_slice(&bytes).map_err(|error| {
+        io_error(workspace_root, Error::other(format!("Cargo manifest is invalid: {error}")))
+    })?;
+    let base = manifest_path.parent().unwrap_or_else(|| Path::new("."));
+    reject_external_manifest_paths(&document, base, workspace_root, manifest_path)
+}
+
+fn reject_external_manifest_paths(
+    value: &toml::Value,
+    base: &Path,
+    workspace_root: &Path,
+    manifest_path: &Path,
+) -> Result<(), RustdocInputFingerprintError> {
+    match value {
+        toml::Value::Table(table) => {
+            for (key, value) in table {
+                if key == "path" {
+                    let Some(path) = value.as_str() else {
+                        return Err(io_error(
+                            manifest_path,
+                            Error::other("Cargo dependency path is not a string"),
+                        ));
+                    };
+                    let dependency = base.join(path);
+                    let inside = dependency
+                        .canonicalize()
+                        .map(|path| path.starts_with(workspace_root))
+                        .unwrap_or(false);
+                    if !inside {
+                        return Err(io_error(
+                            &dependency,
+                            Error::other(
+                                "external path dependency is not in the authoritative workspace snapshot",
+                            ),
+                        ));
+                    }
+                }
+                reject_external_manifest_paths(value, base, workspace_root, manifest_path)?;
+            }
+        }
+        toml::Value::Array(values) => {
+            for value in values {
+                reject_external_manifest_paths(value, base, workspace_root, manifest_path)?;
+            }
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+fn collect_rustdoc_input_paths(
+    workspace_root: &Path,
+    cargo_target_dir: &Path,
+) -> Result<Vec<PathBuf>, RustdocInputFingerprintError> {
+    let mut paths = Vec::new();
+    walk_rustdoc_inputs(
+        workspace_root,
+        cargo_target_dir,
+        workspace_root,
+        0,
+        &mut WalkState::default(),
+        &mut paths,
+    )?;
+    paths.sort_by_key(|path| path_bytes(path.strip_prefix(workspace_root).unwrap_or(path)));
+    Ok(paths)
+}
+
+#[derive(Default)]
+struct WalkState {
+    entries: usize,
+    files: usize,
+    total_bytes: u64,
+}
+
+fn walk_rustdoc_inputs(
+    workspace_root: &Path,
+    cargo_target_dir: &Path,
+    directory: &Path,
+    depth: usize,
+    state: &mut WalkState,
+    paths: &mut Vec<PathBuf>,
+) -> Result<(), RustdocInputFingerprintError> {
+    let entries = std::fs::read_dir(directory).map_err(|error| io_error(directory, error))?;
+    for entry in entries {
+        state.entries = state.entries.saturating_add(1);
+        if state.entries > MAX_RUSTDOC_INPUT_ENTRIES {
+            return Err(RustdocInputFingerprintError::EntryCount {
+                maximum: MAX_RUSTDOC_INPUT_ENTRIES,
+            });
+        }
+        let entry = entry.map_err(|error| io_error(directory, error))?;
+        let path = entry.path();
+        let file_type = entry.file_type().map_err(|error| io_error(&path, error))?;
+        if file_type.is_dir() {
+            if is_excluded_rustdoc_directory(workspace_root, cargo_target_dir, &path) {
+                continue;
+            }
+            if depth >= MAX_RUSTDOC_INPUT_DEPTH {
+                return Err(RustdocInputFingerprintError::DirectoryDepth {
+                    path,
+                    maximum: MAX_RUSTDOC_INPUT_DEPTH,
+                });
+            }
+            walk_rustdoc_inputs(workspace_root, cargo_target_dir, &path, depth + 1, state, paths)?;
+        } else if file_type.is_symlink() {
+            if !is_excluded_rustdoc_directory(workspace_root, cargo_target_dir, &path) {
+                return Err(RustdocInputFingerprintError::Symlink { path });
+            }
+        } else if file_type.is_file() {
+            let metadata =
+                std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
+            let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
+            let length = path_bytes(relative).len();
+            if length > MAX_RUSTDOC_INPUT_PATH_BYTES {
+                return Err(RustdocInputFingerprintError::PathBytes {
+                    path,
+                    bytes: length,
+                    maximum: MAX_RUSTDOC_INPUT_PATH_BYTES,
+                });
+            }
+            check_file_size(&path, metadata.len())?;
+            state.files = state.files.saturating_add(1);
+            if state.files > MAX_RUSTDOC_INPUT_FILES {
+                return Err(RustdocInputFingerprintError::FileCount {
+                    maximum: MAX_RUSTDOC_INPUT_FILES,
+                });
+            }
+            state.total_bytes = state.total_bytes.checked_add(metadata.len()).ok_or(
+                RustdocInputFingerprintError::TotalBytes {
+                    bytes: u64::MAX,
+                    maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+                },
+            )?;
+            if state.total_bytes > MAX_RUSTDOC_INPUT_TOTAL_BYTES {
+                return Err(RustdocInputFingerprintError::TotalBytes {
+                    bytes: state.total_bytes,
+                    maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+                });
+            }
+            paths.push(path);
+        } else {
+            return Err(io_error(&path, Error::other("rustdoc input is not a regular file")));
+        }
+    }
+    Ok(())
+}
+
+fn is_excluded_rustdoc_directory(
+    workspace_root: &Path,
+    cargo_target_dir: &Path,
+    path: &Path,
+) -> bool {
+    path == cargo_target_dir
+        || (path.parent() == Some(workspace_root)
+            && matches!(
+                path.file_name().and_then(OsStr::to_str),
+                Some(
+                    ".git"
+                        | ".harness"
+                        | ".codex"
+                        | ".claude"
+                        | ".agents"
+                        | ".cache"
+                        | "track"
+                        | "tmp",
+                )
+            ))
+}
+
+fn check_file_size(path: &Path, bytes: u64) -> Result<(), RustdocInputFingerprintError> {
+    if bytes > MAX_RUSTDOC_INPUT_FILE_BYTES {
+        Err(RustdocInputFingerprintError::FileBytes {
+            path: path.to_path_buf(),
+            bytes,
+            maximum: MAX_RUSTDOC_INPUT_FILE_BYTES,
+        })
+    } else {
+        Ok(())
     }
 }
 
-#[cfg(feature = "test-helpers")]
-impl RustdocJsonPathProvider for RustdocLaunchObserver {
-    fn export_rustdoc_json_path(
-        &self,
-        crate_name: &CrateName,
-        features: &[CargoFeatureName],
-    ) -> Result<PathBuf, SchemaExportError> {
-        if let Some(before_export) = &self.before_export {
-            before_export();
-        }
-        if let Ok(mut launches) = self.launches.lock() {
-            *launches.entry(crate_name.as_str().to_owned()).or_default() += 1;
-        }
-        if let Ok(mut selections) = self.feature_selections.lock() {
-            selections
-                .entry(crate_name.as_str().to_owned())
-                .or_default()
-                .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
-        }
-        self.json_path_for(crate_name.as_str())
+fn io_error(path: &Path, error: Error) -> RustdocInputFingerprintError {
+    RustdocInputFingerprintError::Io { path: path.to_path_buf(), source: error.to_string() }
+}
+
+fn append_len_prefixed_bytes(output: &mut Vec<u8>, bytes: &[u8]) {
+    output.extend_from_slice(&(bytes.len() as u64).to_be_bytes());
+    output.extend_from_slice(bytes);
+}
+
+fn sha256_bytes(bytes: &[u8]) -> Vec<u8> {
+    sha2::Sha256::digest(bytes).to_vec()
+}
+
+fn hex_digest(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+fn os_bytes(value: &OsStr) -> Vec<u8> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt as _;
+        value.as_bytes().to_vec()
     }
+    #[cfg(windows)]
+    {
+        use std::os::windows::ffi::OsStrExt as _;
+        value.encode_wide().flat_map(u16::to_be_bytes).collect()
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        value.to_string_lossy().into_owned().into_bytes()
+    }
+}
+
+fn path_bytes(path: &Path) -> Vec<u8> {
+    os_bytes(path.as_os_str())
+}
+
+fn metadata_generation(metadata: &std::fs::Metadata) -> Vec<u8> {
+    let modified = metadata
+        .modified()
+        .ok()
+        .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+        .map_or(0_u128, |duration| duration.as_nanos());
+    let mut generation = modified.to_be_bytes().to_vec();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt as _;
+        generation.extend_from_slice(&metadata.dev().to_be_bytes());
+        generation.extend_from_slice(&metadata.ino().to_be_bytes());
+        generation.extend_from_slice(&metadata.ctime().to_be_bytes());
+        generation.extend_from_slice(&metadata.ctime_nsec().to_be_bytes());
+    }
+    generation
 }

@@ -1,16 +1,267 @@
 {
   "baseline_hash": "cd7d618ea66ae2d66d3453d79d83345fd21c6f4645feecdcd1fe1a34bed5686d",
-  "declaration_hash": "cf306d03ebef095f0eeda9b4dbf26f89b0276790f326d3bcbe21980382a05d01",
-  "generated_at": "2026-08-29T06:26:02Z",
-  "head_commit": "8226a5b1da532c47720459ee51ed0e05763909d6",
+  "declaration_hash": "1d036cf36d4a7bfbaa27f6920314a1c5166b1251bebbcb1e5cd3ae1539ddac67",
+  "generated_at": "2026-08-30T15:08:48Z",
+  "head_commit": "167ed9b5bf1b39f851386ddb0d73877a12742e3a",
+  "implementation_fingerprint": "92576d994b5e24375a7094c669aa76a957a14541101658b3453f17a789078f52",
+  "resolution_fingerprint": "3ba1c182807e43dad249d246303acd2bc798b3a1bef67e8bb6319b77c3880c75",
+  "rustdoc_execution_identity": {
+    "crate_name": "domain",
+    "expected_json_path": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5/doc/domain.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5"
+  },
   "schema_version": 5,
   "signals": [
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "AuthoritativeRustdocContext"
+    },
     {
       "found_type": true,
       "kind_tag": "secondary_port",
       "namespace": "trait",
       "signal": "blue",
       "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "RustdocCratePort"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CapturedRustdocJson"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CargoProfileName"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ExpectedRustdocJsonPath"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ImplementationFingerprint"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ResolutionFingerprint"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ResolvedCargoTargetDirectory"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentity"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentityError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocJsonHash"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocSnapshot"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "SchemaExporter"
     }
   ]
 }

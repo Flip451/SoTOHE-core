@@ -11,17 +11,18 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::SymlinkGuardPort;
-use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::{
     AttestedCatalogueDocument, CatalogueDocument, CatalogueDocumentLoaderError, CrateName,
     RustdocCratePort, TdddLayerBindingsPort,
 };
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
+use domain::tddd::{AuthoritativeRustdocContext, CatalogueToExtendedCratePort};
 
 use super::helpers::{map_symlink_guard_error, validate_binding_filename};
 use super::service::{
-    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService, diagnostic,
+    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+    RustdocExportPlan, diagnostic,
 };
 use super::validate_track_id;
 use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
@@ -91,12 +92,14 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
     ///
     /// 1. Load every TDDD-enabled `<layer>-types.json` via
     ///    `AttestedCatalogueDocumentLoaderPort`.
-    /// 2. Convert the selected catalogue to `ExtendedCrate` (A) via
-    ///    `CatalogueToExtendedCratePort`, passing the complete track catalogue set.
-    /// 3. Load `<layer>-types-baseline.json` (B) via `RustdocCratePort::load_from_path`.
-    /// 4. Capture current TypeGraph (C) via `RustdocCratePort::capture_current`.
-    /// 5. Run `SignalEvaluatorPort::evaluate(A, B, C)`.
-    /// 6. Format the human-readable markdown report section.
+    /// 2. Load each configured layer's `<layer>-types-baseline.json` (B) and
+    ///    current TypeGraph (C) through `RustdocCratePort`, retaining the
+    ///    pairs in a LayerId-keyed context map.
+    /// 3. Convert each selected catalogue to `ExtendedCrate` (A) via
+    ///    `CatalogueToExtendedCratePort`, passing the complete catalogue and
+    ///    rustdoc context sets.
+    /// 4. Run `SignalEvaluatorPort::evaluate(A, B, C)`.
+    /// 5. Format the human-readable markdown report section.
     ///
     /// The track items directory is derived from `workspace_root` as
     /// `workspace_root/track/items`.
@@ -181,6 +184,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         if declaration_bindings.is_empty() {
             return Err(CatalogueImplSignalsError::NoLayers);
         }
+        let export_plan = RustdocExportPlan::try_new(declaration_bindings.clone())?;
 
         let bindings = if let Some(layer_id) = layer.as_deref() {
             let selected = declaration_bindings
@@ -250,48 +254,45 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             track_catalogues.insert(catalogue_layer, doc);
         }
 
-        let mut report = String::new();
-        let mut total_red: usize = 0;
-
+        // Preserve the selected-layer contract: a requested layer still needs
+        // its catalogue, while an unselected configured layer may be absent.
         for binding in &bindings {
-            let layer_id = &binding.layer_id;
-            let typed_layer_id = LayerId::try_new(layer_id.clone()).map_err(|error| {
+            let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                    "invalid layer binding: {error}"
+                )))
+            })?;
+            if !track_catalogues.contains_key(&typed_layer_id) {
+                return Err(CatalogueImplSignalsError::CatalogueLoad(
+                    typed_layer_id,
+                    diagnostic("layer catalogue was not loaded into the track catalogue set"),
+                ));
+            }
+        }
+
+        // Load every configured layer's authoritative rustdoc pair once before
+        // any catalogue is encoded. The codec needs the declaring layer's
+        // current paths when it places cross-layer add declarations.
+        let mut rustdoc_contexts = BTreeMap::new();
+        for binding in export_plan.bindings() {
+            let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
                 CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
                     "invalid layer binding: {error}"
                 )))
             })?;
 
-            if !track_catalogues.contains_key(&typed_layer_id) {
-                return Err(CatalogueImplSignalsError::CatalogueLoad(
-                    typed_layer_id.clone(),
-                    diagnostic("layer catalogue was not loaded into the track catalogue set"),
-                ));
-            }
-
-            // --- Step 2: Convert CatalogueDocument → ExtendedCrate (A) ---
-            // --- Step 3: Load baseline (TypeGraph B) ---
-            // Guard: validate that baseline_file is a plain filename (no `..` or
-            // directory separators) for the same reason as catalogue_file above.
             validate_binding_filename(&binding.baseline_file, "baseline_file")?;
             let baseline_path = track_dir.join(&binding.baseline_file);
-            // Guard: same symlink rejection for the baseline path.
             self.symlink_guard
                 .reject_symlinks_below(&baseline_path, &items_dir)
                 .map_err(map_symlink_guard_error)?;
-            let baseline_b =
-                self.rustdoc_crate_port.load_from_path(&baseline_path).map_err(|e| {
-                    CatalogueImplSignalsError::BaselineLoad(
-                        typed_layer_id.clone(),
-                        diagnostic(e.to_string()),
-                    )
-                })?;
+            let baseline = self.rustdoc_crate_port.load_from_path(&baseline_path).map_err(|e| {
+                CatalogueImplSignalsError::BaselineLoad(
+                    typed_layer_id.clone(),
+                    diagnostic(e.to_string()),
+                )
+            })?;
 
-            // --- Step 4: Capture current TypeGraph (C) ---
-            // `schema_export.targets` is a Vec<String>; `capture_current` accepts one
-            // crate name.  The signal evaluator operates on a single (A, B, C) tuple,
-            // so multi-crate aggregation is not yet part of the port contract.
-            // We therefore require exactly one target: empty is an error, and
-            // multi-target is an error (fail-closed) until the port supports aggregation.
             let target_crate = match binding.targets.as_slice() {
                 [single] => CrateName::new(single.clone()).map_err(|error| {
                     CatalogueImplSignalsError::SchemaExport(
@@ -323,7 +324,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     diagnostic(format!("feature declaration omitted layer: {error}")),
                 )
             })?;
-            let current_c =
+            let current =
                 self.rustdoc_crate_port.capture_current(&target_crate, features).map_err(|e| {
                     CatalogueImplSignalsError::SchemaExport(
                         typed_layer_id.clone(),
@@ -331,9 +332,40 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     )
                 })?;
 
+            rustdoc_contexts.insert(
+                typed_layer_id.clone(),
+                AuthoritativeRustdocContext::new(
+                    typed_layer_id,
+                    baseline.crate_data().clone(),
+                    current,
+                ),
+            );
+        }
+
+        let mut report = String::new();
+        let mut total_red: usize = 0;
+
+        for binding in &bindings {
+            let layer_id = &binding.layer_id;
+            let typed_layer_id = LayerId::try_new(layer_id.clone()).map_err(|error| {
+                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                    "invalid layer binding: {error}"
+                )))
+            })?;
+
+            let rustdoc_context = rustdoc_contexts.get(&typed_layer_id).ok_or_else(|| {
+                CatalogueImplSignalsError::BaselineLoad(
+                    typed_layer_id.clone(),
+                    diagnostic("authoritative rustdoc context was not assembled"),
+                )
+            })?;
+            let baseline_b = rustdoc_context.baseline().clone();
+            let current_c = rustdoc_context.current().clone();
+
+            // --- Step 3: Convert CatalogueDocument → ExtendedCrate (A) ---
             let extended_a = self
                 .ext_crate_codec
-                .encode(&typed_layer_id, &track_catalogues, &baseline_b, &current_c)
+                .encode(&typed_layer_id, &track_catalogues, &rustdoc_contexts)
                 .map_err(|e| {
                     CatalogueImplSignalsError::ExtendedCrateConversion(
                         typed_layer_id.clone(),
@@ -341,7 +373,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     )
                 })?;
 
-            // --- Step 5: Evaluate ---
+            // --- Step 4: Evaluate ---
             let eval_report =
                 self.evaluator.evaluate(extended_a, baseline_b, current_c).map_err(|e| {
                     CatalogueImplSignalsError::Evaluation(
@@ -350,7 +382,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     )
                 })?;
 
-            // --- Step 6: Format the report section ---
+            // --- Step 5: Format the report section ---
             let _ = writeln!(report);
             let _ = writeln!(report, "## Layer: `{layer_id}`");
             let _ = writeln!(report);

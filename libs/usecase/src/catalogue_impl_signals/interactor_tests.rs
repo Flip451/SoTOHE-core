@@ -28,14 +28,19 @@ use domain::tddd::catalogue_v2::{
 use domain::tddd::extended_crate::ExtendedCrate;
 use domain::tddd::signal_evaluator::phase1_error::Phase1Error;
 use domain::tddd::signal_evaluator::port::SignalEvaluatorPort;
-use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
+use domain::tddd::{
+    AuthoritativeRustdocContext, CapturedRustdocJson, CargoFeatureName, ExpectedRustdocJsonPath,
+    LayerId, ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocSnapshot,
+    TdddFeatureDeclaration, construct_captured_rustdoc_json, construct_rustdoc_snapshot,
+};
 // ThreeWaySignal is not pub-re-exported from the parent module, so it cannot be
 // reached via `use super::*` and must be imported explicitly here.
 use domain::tddd::signal_evaluator::region::{ThreeWayEvaluationReport, ThreeWaySignal};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::{FreeText, SymlinkGuardError, SymlinkGuardPort, TrackId};
 use rustdoc_types::{
-    Crate, FORMAT_VERSION, Id, Item, ItemEnum, ItemKind, ItemSummary, Module, Struct, Visibility,
+    Crate, ExternalCrate, FORMAT_VERSION, Generics, Id, Item, ItemEnum, ItemKind, ItemSummary,
+    Module, Struct, Visibility,
 };
 
 use super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
@@ -65,6 +70,40 @@ pub(super) fn empty_rustdoc_crate() -> Crate {
         format_version: FORMAT_VERSION,
         target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
     }
+}
+
+fn decode_test_rustdoc(bytes: &[u8]) -> Result<Crate, RustdocCratePortError> {
+    serde_json::from_slice(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
+        crate_name: "test".to_owned(),
+        reason: error.to_string(),
+    })
+}
+
+fn captured_rustdoc(crate_data: Crate) -> CapturedRustdocJson {
+    let bytes = serde_json::to_vec(&crate_data).unwrap();
+    construct_captured_rustdoc_json(&bytes, decode_test_rustdoc).unwrap()
+}
+
+fn current_rustdoc(crate_name: &CrateName, crate_data: Crate) -> RustdocSnapshot {
+    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/usecase-rustdoc-test-target",
+    ))
+    .unwrap();
+    let expected = ExpectedRustdocJsonPath::try_new(
+        target.as_path().join(format!("{}.json", crate_name.as_str())),
+        &target,
+    )
+    .unwrap();
+    let identity = RustdocExecutionIdentity::new(
+        target,
+        crate_name.clone(),
+        vec![],
+        domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let bytes = serde_json::to_vec(&crate_data).unwrap();
+    construct_rustdoc_snapshot(identity, &bytes, decode_test_rustdoc).unwrap()
 }
 
 fn rustdoc_crate_with_gated_public_item() -> Crate {
@@ -161,6 +200,12 @@ pub(super) fn stub_binding(layer_id: &str) -> TdddLayerBinding {
     }
 }
 
+fn stub_binding_with_target(layer_id: &str, target: &str) -> TdddLayerBinding {
+    let mut binding = stub_binding(layer_id);
+    binding.targets = vec![target.to_owned()];
+    binding
+}
+
 // -------------------------------------------------------------------------
 // Mock ports — also re-used by `happy_tests`
 // -------------------------------------------------------------------------
@@ -203,8 +248,7 @@ impl domain::tddd::CatalogueToExtendedCratePort for FailingCodec {
         &self,
         _target_layer: &LayerId,
         _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
-        _baseline: &Crate,
-        _current: &Crate,
+        _rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(
             TypeRef::new("stub").unwrap(),
@@ -223,6 +267,22 @@ impl SignalEvaluatorPort for EmptyEvaluator {
         _b: Crate,
         _c: Crate,
     ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
+        Ok(ThreeWayEvaluationReport::new(vec![]))
+    }
+}
+
+struct RecordingExtendedCrateEvaluator {
+    observed: Arc<Mutex<Vec<ExtendedCrate>>>,
+}
+
+impl SignalEvaluatorPort for RecordingExtendedCrateEvaluator {
+    fn evaluate(
+        &self,
+        catalogue: ExtendedCrate,
+        _baseline: Crate,
+        _current: Crate,
+    ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
+        self.observed.lock().unwrap().push(catalogue);
         Ok(ThreeWayEvaluationReport::new(vec![]))
     }
 }
@@ -282,7 +342,7 @@ impl SignalEvaluatorPort for FailingEvaluator {
 pub(super) struct NeverCalledRustdocPort;
 
 impl RustdocCratePort for NeverCalledRustdocPort {
-    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
         panic!("NeverCalledRustdocPort::load_from_path must not be called in these tests")
     }
 
@@ -290,7 +350,7 @@ impl RustdocCratePort for NeverCalledRustdocPort {
         &self,
         _crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
         panic!("NeverCalledRustdocPort::capture_current must not be called in these tests")
     }
 }
@@ -299,16 +359,16 @@ impl RustdocCratePort for NeverCalledRustdocPort {
 pub(super) struct EmptyRustdocPort;
 
 impl RustdocCratePort for EmptyRustdocPort {
-    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
-        Ok(empty_rustdoc_crate())
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(empty_rustdoc_crate()))
     }
 
     fn capture_current(
         &self,
         _crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
-        Ok(empty_rustdoc_crate())
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(_crate_name, empty_rustdoc_crate()))
     }
 }
 
@@ -316,7 +376,7 @@ impl RustdocCratePort for EmptyRustdocPort {
 pub(super) struct FailingRustdocPort;
 
 impl RustdocCratePort for FailingRustdocPort {
-    fn load_from_path(&self, path: &Path) -> Result<Crate, RustdocCratePortError> {
+    fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
         Err(RustdocCratePortError::NotFound { path: path.to_path_buf() })
     }
 
@@ -324,7 +384,7 @@ impl RustdocCratePort for FailingRustdocPort {
         &self,
         crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
         Err(RustdocCratePortError::CaptureFailed {
             crate_name: crate_name.as_str().to_owned(),
             reason: "stub capture failure".to_owned(),
@@ -524,15 +584,15 @@ struct FeatureGatedRustdocPort {
 }
 
 impl RustdocCratePort for FeatureGatedRustdocPort {
-    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
-        Ok(rustdoc_crate_with_gated_public_item())
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(rustdoc_crate_with_gated_public_item()))
     }
 
     fn capture_current(
         &self,
         _crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
         self.observed_actual_features
             .lock()
             .unwrap()
@@ -543,7 +603,7 @@ impl RustdocCratePort for FeatureGatedRustdocPort {
                 reason: "feature-gated public item requires semantic-dup".to_owned(),
             });
         }
-        Ok(rustdoc_crate_with_gated_public_item())
+        Ok(current_rustdoc(_crate_name, rustdoc_crate_with_gated_public_item()))
     }
 }
 
@@ -580,8 +640,7 @@ impl domain::tddd::CatalogueToExtendedCratePort for CatalogueGatedItemCodec {
         &self,
         _target_layer: &LayerId,
         _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
-        _baseline: &Crate,
-        _current: &Crate,
+        _rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         Ok(ExtendedCrate::new(rustdoc_crate_with_gated_public_item(), BTreeMap::new()))
     }
@@ -590,17 +649,17 @@ impl domain::tddd::CatalogueToExtendedCratePort for CatalogueGatedItemCodec {
 struct UndeclaredFeatureRustdocPort;
 
 impl RustdocCratePort for UndeclaredFeatureRustdocPort {
-    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
-        Ok(rustdoc_crate_without_gated_public_item())
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(rustdoc_crate_without_gated_public_item()))
     }
 
     fn capture_current(
         &self,
         _crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
         assert!(features.is_empty(), "the track declares no feature for the gated catalogue item");
-        Ok(rustdoc_crate_without_gated_public_item())
+        Ok(current_rustdoc(_crate_name, rustdoc_crate_without_gated_public_item()))
     }
 }
 
@@ -658,15 +717,65 @@ impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
         &self,
         _target_layer: &LayerId,
         _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
-        _baseline: &Crate,
-        _current: &Crate,
+        _rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
     }
 }
 
 struct RecordingExtendedCrateCodec {
-    observed: Arc<Mutex<Vec<(LayerId, BTreeMap<LayerId, CatalogueDocument>, Crate, Crate)>>>,
+    observed: Arc<
+        Mutex<
+            Vec<(
+                LayerId,
+                BTreeMap<LayerId, CatalogueDocument>,
+                BTreeMap<LayerId, AuthoritativeRustdocContext>,
+            )>,
+        >,
+    >,
+}
+
+fn synthesized_cross_layer_handoff_crate() -> ExtendedCrate {
+    let external_crate_id = 7;
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.external_crates.insert(
+        external_crate_id,
+        ExternalCrate {
+            name: "domain".to_owned(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+    for (id, name, module_path) in
+        [(1, "UserId", vec!["domain", "model"]), (2, "PendingId", vec!["domain", "model"])]
+    {
+        let id = Id(id);
+        crate_.index.insert(
+            id,
+            Item {
+                id,
+                crate_id: external_crate_id,
+                name: Some(name.to_owned()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: rustdoc_types::StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        let mut path = module_path.into_iter().map(str::to_owned).collect::<Vec<_>>();
+        path.push(name.to_owned());
+        crate_
+            .paths
+            .insert(id, ItemSummary { crate_id: external_crate_id, path, kind: ItemKind::Struct });
+    }
+    ExtendedCrate::new(crate_, BTreeMap::new())
 }
 
 impl domain::tddd::CatalogueToExtendedCratePort for RecordingExtendedCrateCodec {
@@ -674,14 +783,12 @@ impl domain::tddd::CatalogueToExtendedCratePort for RecordingExtendedCrateCodec 
         &self,
         target_layer: &LayerId,
         track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
-        baseline: &Crate,
-        current: &Crate,
+        rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
         self.observed.lock().unwrap().push((
             target_layer.clone(),
             track_catalogues.clone(),
-            baseline.clone(),
-            current.clone(),
+            rustdoc_contexts.clone(),
         ));
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
     }
@@ -719,16 +826,309 @@ struct DistinguishableRustdocPort {
 }
 
 impl RustdocCratePort for DistinguishableRustdocPort {
-    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
-        Ok(self.baseline.clone())
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(self.baseline.clone()))
     }
 
     fn capture_current(
         &self,
         _crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<Crate, RustdocCratePortError> {
-        Ok(self.current.clone())
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(_crate_name, self.current.clone()))
+    }
+}
+
+struct LayerAwareRustdocPort;
+
+fn rustdoc_crate_with_layer_marker(layer: &str, phase: &str) -> Crate {
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.crate_version = Some(format!("{phase}-{layer}"));
+    crate_.paths.insert(
+        Id(1),
+        ItemSummary {
+            crate_id: 0,
+            path: vec![layer.to_owned(), "model".to_owned(), "Shared".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    crate_
+}
+
+impl RustdocCratePort for LayerAwareRustdocPort {
+    fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        let layer = path
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .and_then(|name| name.strip_suffix("-types-baseline"))
+            .unwrap_or("unknown");
+        Ok(captured_rustdoc(rustdoc_crate_with_layer_marker(layer, "baseline")))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(
+            crate_name,
+            rustdoc_crate_with_layer_marker(crate_name.as_str(), "current"),
+        ))
+    }
+}
+
+struct CrossLayerHandoffRustdocPort;
+
+fn rustdoc_crate_with_cross_layer_handoff_items(layer: &str, phase: &str) -> Crate {
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.crate_version = Some(format!("{phase}-{layer}"));
+    if layer == "domain" && phase == "current" {
+        for (id, name) in [(1, "UserId"), (2, "PendingId")] {
+            crate_.paths.insert(
+                Id(id),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "model".to_owned(), name.to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            );
+        }
+    }
+    crate_
+}
+
+impl RustdocCratePort for CrossLayerHandoffRustdocPort {
+    fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        let layer = path
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .and_then(|name| name.strip_suffix("-types-baseline"))
+            .unwrap_or("unknown");
+        Ok(captured_rustdoc(rustdoc_crate_with_cross_layer_handoff_items(layer, "baseline")))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(
+            crate_name,
+            rustdoc_crate_with_cross_layer_handoff_items(crate_name.as_str(), "current"),
+        ))
+    }
+}
+
+struct BinAliasHandoffRustdocPort {
+    requested_targets: Arc<Mutex<Vec<String>>>,
+}
+
+fn rustdoc_crate_with_root_name(root_name: &str) -> Crate {
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.index.insert(
+        Id(0),
+        Item {
+            id: Id(0),
+            crate_id: 0,
+            name: Some(root_name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+        },
+    );
+    crate_
+}
+
+fn bin_alias_domain_current() -> Crate {
+    let mut crate_ = rustdoc_crate_with_root_name("sotp");
+    crate_.paths.insert(
+        Id(1),
+        ItemSummary {
+            crate_id: 0,
+            path: vec!["sotp".to_owned(), "model".to_owned(), "UserId".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    crate_
+}
+
+fn referring_side_current() -> Crate {
+    let mut crate_ = rustdoc_crate_with_root_name("usecase");
+    crate_.external_crates.insert(
+        7,
+        ExternalCrate {
+            name: "domain".to_owned(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+    crate_.paths.insert(
+        Id(1),
+        ItemSummary {
+            crate_id: 7,
+            path: vec!["domain".to_owned(), "model".to_owned(), "UserId".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    crate_
+}
+
+impl RustdocCratePort for BinAliasHandoffRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(empty_rustdoc_crate()))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        self.requested_targets.lock().unwrap().push(crate_name.as_str().to_owned());
+        match crate_name.as_str() {
+            "domain_bin" => Ok(current_rustdoc(crate_name, bin_alias_domain_current())),
+            "usecase" => Ok(current_rustdoc(crate_name, referring_side_current())),
+            target => panic!("unexpected test rustdoc target: {target}"),
+        }
+    }
+}
+
+struct RustdocWinsAndAliasCodec {
+    observed: Arc<Mutex<Vec<ExtendedCrate>>>,
+}
+
+impl domain::tddd::CatalogueToExtendedCratePort for RustdocWinsAndAliasCodec {
+    fn encode(
+        &self,
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        use domain::tddd::catalogue_v2::CatalogueEntryKey;
+        use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
+
+        assert_eq!(target_layer.as_ref(), "usecase");
+        let domain_layer = LayerId::try_new("domain").unwrap();
+        let usecase_layer = LayerId::try_new("usecase").unwrap();
+        let declaring = track_catalogues.get(&domain_layer).expect("declaring catalogue");
+        let referring = track_catalogues.get(&usecase_layer).expect("referring catalogue");
+        let handler = referring
+            .types()
+            .get(&CatalogueEntryKey::try_new("Handler".to_owned()).unwrap())
+            .expect("the referring catalogue must contain the cross-crate reference");
+        let TypeKindV2::Struct(kind) = handler.kind() else {
+            panic!("the referring catalogue must contain a struct handler");
+        };
+        let StructShape::Plain { fields, .. } = &kind.shape else {
+            panic!("the referring handler must contain a named field");
+        };
+        assert_eq!(fields[0].ty.as_str(), "domain::model::UserId");
+
+        let declaring_current =
+            rustdoc_contexts.get(&domain_layer).expect("declaring-layer rustdoc context").current();
+        assert_eq!(declaring_current.index[&declaring_current.root].name.as_deref(), Some("sotp"));
+        let raw_declaring = declaring_current
+            .paths
+            .values()
+            .find(|summary| summary.path == ["sotp", "model", "UserId"])
+            .expect("the bin target must expose the raw rustdoc identity");
+        let mut canonical_declaring = raw_declaring.path.clone();
+        canonical_declaring[0] = declaring.crate_name().as_str().to_owned();
+
+        let referring_current = rustdoc_contexts
+            .get(&usecase_layer)
+            .expect("referring-layer rustdoc context")
+            .current();
+        let rustdoc_identity = referring_current
+            .paths
+            .values()
+            .filter(|summary| summary.path == ["domain", "model", "UserId"])
+            .collect::<Vec<_>>();
+        assert_eq!(rustdoc_identity.len(), 1, "the referencing rustdoc identity must be unique");
+        assert_eq!(rustdoc_identity[0].crate_id, 7);
+        assert_eq!(canonical_declaring, rustdoc_identity[0].path);
+
+        let encoded = ExtendedCrate::new(referring_current.clone(), BTreeMap::new());
+        self.observed.lock().unwrap().push(encoded.clone());
+        Ok(encoded)
+    }
+}
+
+struct CrossLayerHandoffCodec {
+    calls: Arc<Mutex<Vec<LayerId>>>,
+}
+
+impl domain::tddd::CatalogueToExtendedCratePort for CrossLayerHandoffCodec {
+    fn encode(
+        &self,
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        self.calls.lock().unwrap().push(target_layer.clone());
+        assert_eq!(target_layer.as_ref(), "usecase");
+
+        let domain_layer = LayerId::try_new("domain").unwrap();
+        let usecase_layer = LayerId::try_new("usecase").unwrap();
+        let declaring = track_catalogues
+            .get(&domain_layer)
+            .expect("the codec handoff must include the declaring-layer catalogue");
+        assert_eq!(declaring.crate_name().as_str(), "domain");
+
+        let explicit = declaring
+            .types()
+            .get(
+                &domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(
+                    "domain::model::UserId".to_owned(),
+                )
+                .unwrap(),
+            )
+            .expect("the explicit cross-crate add must reach the codec");
+        assert_eq!(explicit.action(), domain::tddd::catalogue_v2::ItemAction::Add);
+        assert_eq!(explicit.module_path().map(ToString::to_string), Some("model".to_owned()));
+
+        let omitted = declaring
+            .types()
+            .get(
+                &domain::tddd::catalogue_v2::CatalogueEntryKey::try_new("PendingId".to_owned())
+                    .unwrap(),
+            )
+            .expect("the omitted-placement cross-crate add must reach the codec");
+        assert!(omitted.module_path().is_none());
+
+        let referring = track_catalogues
+            .get(&usecase_layer)
+            .expect("the codec handoff must include the referring-layer catalogue");
+        assert!(
+            !referring
+                .types()
+                .keys()
+                .any(|key| key.as_str().contains("UserId") || key.as_str().contains("PendingId")),
+            "the referring catalogue must not duplicate declaring-layer additions"
+        );
+
+        let declaring_current = rustdoc_contexts
+            .get(&domain_layer)
+            .expect("the codec handoff must include the declaring-layer rustdoc context")
+            .current();
+        for expected in [["domain", "model", "UserId"], ["domain", "model", "PendingId"]] {
+            assert!(
+                declaring_current.paths.values().any(|summary| summary.path == expected),
+                "declaring-layer rustdoc must expose the cross-crate identity {expected:?}"
+            );
+        }
+        assert!(
+            !declaring_current
+                .paths
+                .values()
+                .any(|summary| summary.path == ["domain", "model", "Shared"]),
+            "an unrelated rustdoc item must not stand in for the add identity"
+        );
+
+        Ok(synthesized_cross_layer_handoff_crate())
     }
 }
 
@@ -856,7 +1256,7 @@ fn test_run_codec_receives_baseline_and_current_crates_in_order() {
 
     interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
 
-    let (actual_target, actual_catalogues, actual_baseline, actual_current) =
+    let (actual_target, actual_catalogues, actual_rustdoc_contexts) =
         observed.lock().unwrap().pop().unwrap();
     assert_eq!(actual_target, LayerId::try_new("domain").unwrap());
     assert_eq!(actual_catalogues.len(), 1);
@@ -864,8 +1264,11 @@ fn test_run_codec_receives_baseline_and_current_crates_in_order() {
         actual_catalogues.get(&LayerId::try_new("domain").unwrap()).unwrap().crate_name().as_str(),
         "domain"
     );
-    assert_eq!(actual_baseline, expected_baseline);
-    assert_eq!(actual_current, expected_current);
+    let actual_rustdoc_context = actual_rustdoc_contexts
+        .get(&actual_target)
+        .expect("codec must receive the target layer's rustdoc context");
+    assert_eq!(actual_rustdoc_context.baseline(), &expected_baseline);
+    assert_eq!(actual_rustdoc_context.current(), &expected_current);
 }
 
 #[test]
@@ -929,7 +1332,7 @@ fn test_run_codec_receives_all_track_catalogues_for_each_target_layer() {
         Arc::new(loader),
         Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
         Arc::new(EmptyEvaluator),
-        Arc::new(EmptyRustdocPort),
+        Arc::new(LayerAwareRustdocPort),
         Arc::new(StubLayerBindings {
             bindings: vec![stub_binding("domain"), stub_binding("usecase")],
         }),
@@ -942,7 +1345,7 @@ fn test_run_codec_receives_all_track_catalogues_for_each_target_layer() {
     assert_eq!(observations.len(), 2);
     assert_eq!(observations[0].0, domain_layer);
     assert_eq!(observations[1].0, usecase_layer);
-    for (_, catalogues, _, _) in observations.iter() {
+    for (_, catalogues, rustdoc_contexts) in observations.iter() {
         assert_eq!(catalogues.len(), 2);
         assert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));
         assert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));
@@ -961,7 +1364,244 @@ fn test_run_codec_receives_all_track_catalogues_for_each_target_layer() {
                 .is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains("UserId"))),
             "the referencing catalogue must not duplicate the declaring-layer add"
         );
+
+        assert_eq!(rustdoc_contexts.len(), 2);
+        for (layer, expected_baseline, expected_current) in [
+            (&domain_layer, "baseline-domain", "current-domain"),
+            (&usecase_layer, "baseline-usecase", "current-usecase"),
+        ] {
+            let context = rustdoc_contexts
+                .get(layer)
+                .expect("codec must receive every configured layer's rustdoc context");
+            assert_eq!(context.baseline().crate_version.as_deref(), Some(expected_baseline));
+            assert_eq!(context.current().crate_version.as_deref(), Some(expected_current));
+            assert!(
+                context
+                    .current()
+                    .paths
+                    .values()
+                    .any(|summary| { summary.path == [layer.as_ref(), "model", "Shared"] })
+            );
+        }
     }
+}
+
+#[test]
+fn test_run_codec_handoff_observes_synthesized_item_identity_and_module_placement() {
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{CatalogueEntryKey, FieldDecl, FieldName, ModulePath};
+
+    let usecase_layer = LayerId::try_new("usecase").unwrap();
+    let mut domain_doc = minimal_catalogue_doc("domain");
+    domain_doc.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    domain_doc.insert_type(
+        CatalogueEntryKey::try_new("PendingId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut usecase_doc = minimal_catalogue_doc("usecase");
+    usecase_doc.insert_type(
+        CatalogueEntryKey::try_new("Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![
+                        FieldDecl::new(
+                            FieldName::new("user_id").unwrap(),
+                            TypeRef::new("domain::model::UserId").unwrap(),
+                        ),
+                        FieldDecl::new(
+                            FieldName::new("pending_id").unwrap(),
+                            TypeRef::new("domain::model::PendingId").unwrap(),
+                        ),
+                    ],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let observed_items = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), domain_doc),
+                ("usecase-types.json".to_owned(), usecase_doc),
+            ]),
+        }),
+        Arc::new(CrossLayerHandoffCodec { calls: Arc::clone(&observed) }),
+        Arc::new(RecordingExtendedCrateEvaluator { observed: Arc::clone(&observed_items) }),
+        Arc::new(CrossLayerHandoffRustdocPort),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor
+        .run("my-track".to_owned(), workspace.path().to_path_buf(), Some("usecase".to_owned()))
+        .unwrap();
+
+    assert_eq!(observed.lock().unwrap().as_slice(), [usecase_layer]);
+    let encoded =
+        observed_items.lock().unwrap().pop().expect("the evaluator must observe TypeGraph A");
+    for (name, expected_path) in
+        [("UserId", ["domain", "model", "UserId"]), ("PendingId", ["domain", "model", "PendingId"])]
+    {
+        let (id, summary) = encoded
+            .krate()
+            .paths
+            .iter()
+            .find(|(_, summary)| summary.path == expected_path)
+            .unwrap_or_else(|| panic!("synthesized {name} must retain its resolved path"));
+        assert_eq!(summary.crate_id, 7);
+        assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, "domain");
+        assert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));
+    }
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| summary.path.first().map(String::as_str) == Some("usecase")),
+        "the synthesized items must not be rooted in the referencing crate"
+    );
+}
+
+#[test]
+fn test_run_codec_handoff_reuses_referencing_rustdoc_identity_and_canonicalizes_declaring_bin_target()
+ {
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{CatalogueEntryKey, FieldDecl, FieldName, ModulePath};
+
+    let mut domain_doc = minimal_catalogue_doc("domain");
+    domain_doc.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut usecase_doc = minimal_catalogue_doc("usecase");
+    usecase_doc.insert_type(
+        CatalogueEntryKey::try_new("Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("user_id").unwrap(),
+                        TypeRef::new("domain::model::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let requested_targets = Arc::new(Mutex::new(Vec::new()));
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), domain_doc),
+                ("usecase-types.json".to_owned(), usecase_doc),
+            ]),
+        }),
+        Arc::new(RustdocWinsAndAliasCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(BinAliasHandoffRustdocPort { requested_targets: Arc::clone(&requested_targets) }),
+        Arc::new(StubLayerBindings {
+            bindings: vec![
+                stub_binding_with_target("domain", "domain_bin"),
+                stub_binding("usecase"),
+            ],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor
+        .run("my-track".to_owned(), workspace.path().to_path_buf(), Some("usecase".to_owned()))
+        .unwrap();
+
+    assert_eq!(
+        requested_targets.lock().unwrap().clone(),
+        vec!["domain_bin".to_owned(), "usecase".to_owned()]
+    );
+    let encoded = observed.lock().unwrap().pop().expect("the codec must be invoked once");
+    let identity = encoded
+        .krate()
+        .paths
+        .values()
+        .filter(|summary| summary.path == ["domain", "model", "UserId"])
+        .collect::<Vec<_>>();
+    assert_eq!(identity.len(), 1, "rustdoc-wins must avoid a synthesized duplicate");
+    assert_eq!(identity[0].crate_id, 7, "the reused item must remain external rustdoc");
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| summary.path.first().map(String::as_str) == Some("sotp")),
+        "the bin-target root must be canonicalized to the declaring package name"
+    );
 }
 
 #[test]
@@ -979,7 +1619,7 @@ fn test_run_skips_missing_non_target_catalogue_when_layer_is_selected() {
         }),
         Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
         Arc::new(EmptyEvaluator),
-        Arc::new(EmptyRustdocPort),
+        Arc::new(LayerAwareRustdocPort),
         Arc::new(FilteringLayerBindings {
             bindings: vec![domain_binding, usecase_binding],
             calls: Arc::clone(&binding_calls),
@@ -997,6 +1637,17 @@ fn test_run_skips_missing_non_target_catalogue_when_layer_is_selected() {
     assert_eq!(observations[0].1.len(), 1);
     assert!(observations[0].1.contains_key(&LayerId::try_new("domain").unwrap()));
     assert!(!observations[0].1.contains_key(&LayerId::try_new("usecase").unwrap()));
+    let domain_context = observations[0]
+        .2
+        .get(&LayerId::try_new("domain").unwrap())
+        .expect("codec must receive the selected layer's rustdoc context");
+    assert!(
+        domain_context
+            .current()
+            .paths
+            .values()
+            .any(|summary| summary.path == ["domain", "model", "Shared"])
+    );
     assert_eq!(binding_calls.lock().unwrap().as_slice(), &[None]);
 }
 
@@ -1094,6 +1745,26 @@ fn test_run_catalogue_load_failure_returns_catalogue_load_error() {
     assert!(
         matches!(err, CatalogueImplSignalsError::CatalogueLoad(_, _)),
         "expected CatalogueLoad, got: {err:?}"
+    );
+}
+
+#[test]
+fn test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access() {
+    let bindings = (0..65).map(|index| stub_binding(&format!("layer_{index}"))).collect();
+    let interactor = build_interactor(
+        Arc::new(FailingLoader),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings }),
+    );
+
+    let error =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+
+    assert!(
+        matches!(error, CatalogueImplSignalsError::LayerLimitExceeded),
+        "a 65th configured layer must stop the run before feature or rustdoc access: {error:?}"
     );
 }
 

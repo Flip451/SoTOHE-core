@@ -1,32 +1,54 @@
 //! Per-layer type-signal evaluation with conservative rustdoc reuse.
 
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+#[path = "type_signals_evaluator/feature_selection.rs"]
+mod feature_selection;
 #[path = "type_signals_evaluator/freshness.rs"]
 pub(crate) mod freshness;
+#[allow(dead_code)]
 #[path = "type_signals_evaluator/inputs.rs"]
 pub(crate) mod inputs;
+#[path = "type_signals_evaluator/rustdoc_contexts.rs"]
+mod rustdoc_contexts;
 #[path = "type_signals_evaluator/signal_builder.rs"]
 mod signal_builder;
 #[path = "type_signals_evaluator/signal_tags.rs"]
 pub(crate) mod signal_tags;
 
-use domain::tddd::CargoFeatureName;
-use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName};
-use domain::tddd::type_signals_doc::{BaselineHash, TypeSignalsCacheKey, TypeSignalsDocument};
-use domain::{FreeText, Timestamp, TrackId};
-use freshness::{RustdocJsonPathProvider, decide_reuse_for_recorded_document};
-use inputs::{
-    read_head_commit, read_utf8_file_limited, verify_evaluation_inputs_unchanged, worktree_is_clean,
+#[cfg(all(test, feature = "test-helpers"))]
+use domain::tddd::AuthoritativeRustdocContext;
+use domain::tddd::catalogue_v2::CrateName;
+#[cfg(all(test, feature = "test-helpers"))]
+use domain::tddd::type_signals_doc::BaselineHash;
+#[cfg(all(test, feature = "test-helpers"))]
+use domain::tddd::type_signals_doc::{
+    CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
+    RustdocExecutionIdentity, RustdocSnapshot, construct_rustdoc_snapshot,
+};
+use domain::tddd::type_signals_doc::{
+    ImplementationFingerprint, ResolutionFingerprint, Sha256Digest, TypeSignalsCacheKey,
+};
+use domain::tddd::{CargoFeatureName, LayerId};
+use domain::{FreeText, TrackId};
+use feature_selection::{load_layer_feature_selections, resolve_execution_identities};
+use freshness::{RustdocProvider, decide_reuse_for_recorded_document};
+use inputs::{read_head_commit, read_utf8_file_limited_under_root, worktree_is_clean};
+pub(crate) use rustdoc_contexts::RustdocContextCache;
+#[cfg(all(test, feature = "test-helpers"))]
+use rustdoc_contexts::resolution_input_fingerprint;
+use rustdoc_contexts::{
+    RustdocContextCacheKey, assemble_rustdoc_contexts_from_snapshot,
+    current_implementation_fingerprint, evaluate_and_write_with_contexts,
+    load_authoritative_inputs, read_configured_catalogue, reject_type_signals_path,
 };
 use signal_builder::{build_type_signal_identity_index, build_type_signals_from_report};
 use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag};
 
 #[cfg(feature = "test-helpers")]
-pub use freshness::RustdocLaunchObserver;
+pub use crate::tddd::type_signals_executor_adapter::RustdocLaunchObserver;
 
 #[cfg(test)]
 static PROCESS_ENVIRONMENT_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
@@ -37,34 +59,117 @@ pub(crate) fn with_process_environment_lock<T>(action: impl FnOnce() -> T) -> T 
         Ok(guard) => guard,
         Err(poisoned) => poisoned.into_inner(),
     };
-    action()
+    temp_env::with_vars(
+        [
+            ("CARGO_HOME", None::<&str>),
+            ("RUSTC", None::<&str>),
+            ("RUSTDOC", None::<&str>),
+            ("RUSTC_WRAPPER", None::<&str>),
+            ("RUSTC_WORKSPACE_WRAPPER", None::<&str>),
+        ],
+        action,
+    )
 }
 
-use crate::schema_export::RustdocSchemaExporter;
-use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
-use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, derive_filename_stem};
-use crate::tddd::catalogue_to_extended_crate_codec::{
-    CatalogueToExtendedCrateCodec, normalized_paths_for_doc, resolution_paths_for_catalogue,
-};
 #[cfg(all(test, feature = "test-helpers"))]
-use crate::tddd::catalogue_to_extended_crate_codec::{
-    encode_document, resolution_paths_for_document,
-};
-use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
+use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
+use crate::tddd::rustdoc_crate_adapter::RustdocCrateAdapter;
 use crate::tddd::type_signals_codec;
-use crate::tddd::{CatalogueToExtendedCratePort, SignalEvaluatorPort};
-use crate::track::atomic_write::atomic_write_file;
-use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::TdddLayerBinding;
+
+#[cfg(all(test, feature = "test-helpers"))]
+use rustdoc_contexts::{BaselineSnapshot, load_track_catalogues, read_actual_baseline};
 
 const MAX_TYPE_SIGNALS_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RUSTDOC_JSON_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
+const TDDD_FEATURE_DECLARATION_FILE: &str = "tddd-features.json";
+const TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE: &str = "tddd-features-baseline.json";
 
-#[derive(Debug)]
-struct LoadedTrackCatalogues {
-    bindings: Vec<TdddLayerBinding>,
-    catalogues: BTreeMap<LayerId, AttestedCatalogueDocument>,
+type ResolutionPathsObserver<'a> =
+    &'a dyn Fn(&HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>);
+type EncodedCrateObserver<'a> = &'a dyn Fn(&domain::tddd::ExtendedCrate);
+
+#[cfg(all(test, feature = "test-helpers"))]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+fn snapshot_for_context_test(
+    crate_name: &str,
+    crate_data: &rustdoc_types::Crate,
+) -> RustdocSnapshot {
+    fn decode(
+        bytes: &[u8],
+    ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
+        serde_json::from_slice(bytes).map_err(|error| {
+            domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                crate_name: "test".to_owned(),
+                reason: error.to_string(),
+            }
+        })
+    }
+    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/sotohe-evaluator-test-target",
+    ))
+    .unwrap();
+    let expected = ExpectedRustdocJsonPath::try_new(
+        target.as_path().join(format!("{crate_name}.json")),
+        &target,
+    )
+    .unwrap();
+    let identity = RustdocExecutionIdentity::new(
+        target,
+        domain::tddd::catalogue_v2::CrateName::new(crate_name).unwrap(),
+        vec![],
+        CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let bytes = serde_json::to_vec(crate_data).unwrap();
+    construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+}
+
+#[cfg(all(test, feature = "test-helpers"))]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+fn legacy_cache_key(
+    declaration_hash: domain::CatalogueDeclarationHash,
+    head_commit: domain::CommitHash,
+    baseline_hash: domain::BaselineHash,
+) -> TypeSignalsCacheKey {
+    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/sotohe-evaluator-test-target",
+    ))
+    .unwrap();
+    let expected =
+        ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/legacy.json"), &target)
+            .unwrap();
+    let identity = RustdocExecutionIdentity::new(
+        target,
+        CrateName::new("legacy").unwrap(),
+        vec![],
+        CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let zero = Sha256Digest::try_new("0".repeat(64)).unwrap();
+    TypeSignalsCacheKey::new(
+        declaration_hash,
+        head_commit,
+        baseline_hash,
+        ImplementationFingerprint::new(zero.clone()),
+        ResolutionFingerprint::new(zero),
+        identity,
+    )
+}
+
+#[derive(Clone, Copy)]
+struct EvaluationObservers<'a> {
+    resolution_paths: Option<ResolutionPathsObserver<'a>>,
+    encoded_crate: Option<EncodedCrateObserver<'a>>,
+}
+
+impl EvaluationObservers<'_> {
+    fn none() -> Self {
+        Self { resolution_paths: None, encoded_crate: None }
+    }
 }
 
 /// Error returned when a layer's type signals cannot be evaluated safely.
@@ -114,142 +219,6 @@ pub(crate) fn reject_symlinked_type_signals_anchor(path: &Path, label: &str) -> 
     })
 }
 
-fn load_track_catalogues(
-    workspace_root: &Path,
-    track_dir: &Path,
-    trusted_items_root: &Path,
-) -> Result<LoadedTrackCatalogues, EvaluateSignalsError> {
-    let bindings = crate::verify::tddd_layers::load_tddd_layers_from_workspace(workspace_root)
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot load TDDD layer bindings: {error}"
-            ))
-        })?;
-    let mut catalogues = BTreeMap::new();
-    for binding in &bindings {
-        let path = track_dir.join(binding.catalogue_file());
-        reject_type_signals_path(&path, trusted_items_root, "catalogue")?;
-        let Some(bytes) = read_configured_catalogue(&path, trusted_items_root)? else {
-            continue;
-        };
-        let name = derive_filename_stem(&path);
-        let document = AttestedCatalogueDocument::attest(&bytes, |source| {
-            let text = std::str::from_utf8(source).map_err(|error| error.to_string())?;
-            CatalogueDocumentCodec::decode(text, &name).map_err(|error| error.to_string())
-        })
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot decode catalogue '{}': {error}",
-                path.display()
-            ))
-        })?;
-        let expected_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "invalid layer id '{}': {error}",
-                binding.layer_id()
-            ))
-        })?;
-        if document.document().layer() != &expected_layer {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "catalogue '{}' declares layer '{}' but architecture binding selects '{}'",
-                path.display(),
-                document.document().layer(),
-                expected_layer
-            )));
-        }
-        if catalogues.insert(expected_layer.clone(), document).is_some() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "duplicate effective TDDD catalogue layer '{}'",
-                expected_layer
-            )));
-        }
-    }
-    Ok(LoadedTrackCatalogues { bindings, catalogues })
-}
-
-/// Hashes architecture-rules.json and every configured catalogue file.
-pub(super) fn resolution_input_fingerprint(
-    workspace_root: &Path,
-    track_dir: &Path,
-    trusted_items_root: &Path,
-) -> Result<domain::CatalogueDeclarationHash, EvaluateSignalsError> {
-    let mut input = Vec::new();
-    let rules_path = workspace_root.join("architecture-rules.json");
-    match crate::track::symlink_guard::reject_symlinks_below(&rules_path, workspace_root) {
-        Ok(true) => {}
-        Ok(false) => {
-            return Err(EvaluateSignalsError::authoritative_input(
-                "architecture-rules.json not found".to_owned(),
-            ));
-        }
-        Err(error) => {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "symlink guard rejected architecture-rules.json '{}': {error}",
-                rules_path.display()
-            )));
-        }
-    }
-    let rules = read_workspace_file(&rules_path, workspace_root, "architecture-rules.json")?
-        .ok_or_else(|| {
-            EvaluateSignalsError::authoritative_input(
-                "architecture-rules.json not found".to_owned(),
-            )
-        })?;
-    encode_present_bytes(&mut input, &rules);
-    let bindings = crate::verify::tddd_layers::load_tddd_layers_from_workspace(workspace_root)
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot load TDDD layer bindings: {error}"
-            ))
-        })?;
-    for binding in bindings {
-        input.extend_from_slice(binding.layer_id().as_bytes());
-        let path = track_dir.join(binding.catalogue_file());
-        reject_type_signals_path(&path, trusted_items_root, "catalogue")?;
-        match read_configured_catalogue(&path, trusted_items_root)? {
-            Some(bytes) => encode_present_bytes(&mut input, &bytes),
-            None => input.push(0),
-        }
-    }
-    Ok(type_signals_codec::declaration_hash(&input))
-}
-
-fn encode_present_bytes(input: &mut Vec<u8>, bytes: &[u8]) {
-    input.push(1);
-    input.extend_from_slice(&(bytes.len() as u64).to_le_bytes());
-    input.extend_from_slice(bytes);
-}
-
-/// Reads one configured track catalogue only when it is present.
-///
-/// The caller must already have applied the symlink guard. The open itself
-/// uses the shared no-follow catalogue primitive so a concurrent replacement
-/// cannot turn a validated leaf into a symlink or FIFO.
-fn read_configured_catalogue(
-    path: &Path,
-    trusted_items_root: &Path,
-) -> Result<Option<Vec<u8>>, EvaluateSignalsError> {
-    read_workspace_file(path, trusted_items_root, "catalogue")
-}
-
-fn read_workspace_file(
-    path: &Path,
-    trusted_root: &Path,
-    label: &str,
-) -> Result<Option<Vec<u8>>, EvaluateSignalsError> {
-    crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
-        path,
-        Some(trusted_root),
-        MAX_CATALOGUE_BYTES as u64,
-    )
-    .map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot read {label} '{}': {error}",
-            path.display()
-        ))
-    })
-}
-
 /// Evaluates and writes type signals for one TDDD-enabled layer.
 ///
 /// # Errors
@@ -263,11 +232,42 @@ pub fn execute_type_signals_for_layer(
     binding: &TdddLayerBinding,
     features: &[CargoFeatureName],
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, &exporter)
+    let context_cache = RustdocContextCache::default();
+    execute_type_signals_for_layer_with_context_cache(
+        items_dir,
+        track_id,
+        workspace_root,
+        binding,
+        features,
+        &context_cache,
+    )
+}
+
+/// Evaluates one layer while reusing the immutable multilayer rustdoc context
+/// assembly held by the caller for the duration of a per-layer executor run.
+pub(crate) fn execute_type_signals_for_layer_with_context_cache(
+    items_dir: &Path,
+    track_id: &TrackId,
+    workspace_root: &Path,
+    binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
+    context_cache: &RustdocContextCache,
+) -> Result<ExitCode, EvaluateSignalsError> {
+    let rustdoc = RustdocCrateAdapter::new(workspace_root.to_path_buf());
+    execute_with_dependencies(
+        items_dir,
+        track_id,
+        workspace_root,
+        binding,
+        features,
+        &rustdoc,
+        context_cache,
+        EvaluationObservers::none(),
+    )
 }
 
 #[cfg(feature = "test-helpers")]
+#[allow(dead_code)]
 pub(crate) fn execute_type_signals_for_layer_with_launch_observer(
     items_dir: &Path,
     track_id: &TrackId,
@@ -276,16 +276,60 @@ pub(crate) fn execute_type_signals_for_layer_with_launch_observer(
     features: &[CargoFeatureName],
     observer: &RustdocLaunchObserver,
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, observer)
+    let context_cache = RustdocContextCache::default();
+    execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+        items_dir,
+        track_id,
+        workspace_root,
+        binding,
+        features,
+        observer,
+        &context_cache,
+    )
 }
 
+#[cfg(feature = "test-helpers")]
+pub(crate) fn execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+    items_dir: &Path,
+    track_id: &TrackId,
+    workspace_root: &Path,
+    binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
+    observer: &RustdocLaunchObserver,
+    context_cache: &RustdocContextCache,
+) -> Result<ExitCode, EvaluateSignalsError> {
+    let observe_resolution_paths =
+        |paths: &std::collections::HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>| {
+            observer.record_resolution_paths(paths);
+        };
+    let observe_encoded_crate = |encoded: &domain::tddd::ExtendedCrate| {
+        observer.record_encoded_crate(encoded);
+    };
+    execute_with_dependencies(
+        items_dir,
+        track_id,
+        workspace_root,
+        binding,
+        features,
+        observer,
+        context_cache,
+        EvaluationObservers {
+            resolution_paths: Some(&observe_resolution_paths),
+            encoded_crate: Some(&observe_encoded_crate),
+        },
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
 fn execute_with_dependencies(
     items_dir: &Path,
     track_id: &TrackId,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
     features: &[CargoFeatureName],
-    rustdoc: &impl RustdocJsonPathProvider,
+    rustdoc: &impl RustdocProvider,
+    context_cache: &RustdocContextCache,
+    observers: EvaluationObservers<'_>,
 ) -> Result<ExitCode, EvaluateSignalsError> {
     reject_symlinked_type_signals_anchor(workspace_root, "workspace_root")
         .map_err(EvaluateSignalsError::authoritative_input)?;
@@ -335,88 +379,180 @@ fn execute_with_dependencies(
         }
     };
     let declaration_hash = type_signals_codec::declaration_hash(&catalogue_bytes);
-    let (baseline_json, baseline_hash) = read_actual_baseline(&baseline_path)?;
     let head_commit = read_head_commit(&canonical_workspace)?;
-    let current_key = TypeSignalsCacheKey::new(
-        declaration_hash.clone(),
-        head_commit.clone(),
-        baseline_hash.clone(),
-    );
-    let recorded = read_utf8_file_limited(&signal_path, MAX_TYPE_SIGNALS_BYTES)
-        .ok()
-        .and_then(|text| type_signals_codec::decode(&text).ok());
-    let cache_decision_start_resolution =
-        resolution_input_fingerprint(&canonical_workspace, &track_dir, &canonical_items)?;
-    let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
-        &canonical_workspace,
+    let recorded_json = read_utf8_file_limited_under_root(
+        &signal_path,
+        &canonical_items,
+        MAX_TYPE_SIGNALS_BYTES as u64,
     )
     .map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
-            "cannot load TDDD layer bindings: {error}"
+            "cannot read type-signals cache '{}': {error}",
+            signal_path.display()
         ))
     })?;
-    validate_evaluator_binding(&configured_layers, binding)?;
-    let reuse_decision = decide_reuse_for_recorded_document(
-        recorded.as_ref(),
-        &current_key,
-        worktree_is_clean(&canonical_workspace)?,
-    );
-    match reuse_decision {
-        domain::TypeSignalsReuseDecision::SkipEvaluation => {
-            verify_evaluation_inputs_unchanged(
-                &canonical_workspace,
-                &catalogue_path,
-                &baseline_path,
-                &current_key,
-            )?;
-            let cache_decision_end_resolution =
-                resolution_input_fingerprint(&canonical_workspace, &track_dir, &canonical_items)?;
-            if cache_decision_start_resolution != cache_decision_end_resolution {
-                return Err(EvaluateSignalsError::authoritative_input(
-                    "architecture-rules or track catalogues changed during type-signal cache decision"
-                        .to_owned(),
-                ));
-            }
-            return Ok(ExitCode::SUCCESS);
-        }
-        // Cargo's shared rustdoc output path is not keyed by the cache identity
-        // or feature selection. Re-extract rather than trusting an unrelated
-        // producer's valid JSON document.
-        domain::TypeSignalsReuseDecision::ReevaluateWithoutExtraction => {}
-        domain::TypeSignalsReuseDecision::ReextractAndEvaluate => {}
+    let cache_decision_start_implementation =
+        current_implementation_fingerprint(&canonical_workspace)?;
+    let loaded_catalogues =
+        load_authoritative_inputs(&canonical_workspace, &track_dir, &canonical_items, rustdoc)?;
+    validate_evaluator_binding(&loaded_catalogues.bindings, binding)?;
+    let configured_layers = &loaded_catalogues.bindings;
+    let cache_decision_start_resolution =
+        loaded_catalogues.resolution_fingerprint.clone().ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(
+                "authoritative resolution snapshot has no fingerprint".to_owned(),
+            )
+        })?;
+    let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+    })?;
+    let target_catalogue = loaded_catalogues.catalogues.get(&target_layer).ok_or_else(|| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "target catalogue for layer '{target_layer}' is not present in the resolution snapshot"
+        ))
+    })?;
+    if target_catalogue.declaration_hash() != &declaration_hash {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "target catalogue changed while the authoritative resolution snapshot was assembled"
+                .to_owned(),
+        ));
     }
+    let baseline_hash = loaded_catalogues
+        .baselines
+        .get(&target_layer)
+        .map(|baseline| {
+            domain::tddd::type_signals_doc::BaselineHash::new(
+                baseline.json_hash().as_digest().clone(),
+            )
+        })
+        .ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "target baseline for layer '{target_layer}' is not present in the resolution snapshot"
+            ))
+        })?;
+    let feature_selections = load_layer_feature_selections(
+        &track_dir,
+        &canonical_workspace,
+        configured_layers,
+        &target_layer,
+        features,
+    )?;
+    let target_features = feature_selections.get(&target_layer).ok_or_else(|| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "feature declaration has no selection for target layer '{target_layer}'"
+        ))
+    })?;
     let target_crate_name = CrateName::new(target_crate).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
             "invalid rustdoc target crate '{target_crate}': {error}"
         ))
     })?;
-    let json_path =
-        rustdoc.export_rustdoc_json_path(&target_crate_name, features).map_err(|error| {
-            EvaluateSignalsError::evaluation(format!(
-                "rustdoc export failed for '{target_crate}': {error}"
-            ))
-        })?;
-    let content = read_utf8_file_limited(&json_path, MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
-        EvaluateSignalsError::evaluation(format!(
-            "cannot read rustdoc JSON '{}': {error}",
-            json_path.display()
+    let execution_identities =
+        resolve_execution_identities(configured_layers, &feature_selections, rustdoc)?;
+    let execution_identity = execution_identities.get(&target_layer).cloned().ok_or_else(|| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "rustdoc execution identity for target layer '{target_layer}' is unavailable"
         ))
     })?;
-    evaluate_and_write(
+    let implementation_digest = Sha256Digest::try_new(cache_decision_start_implementation.clone())
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "implementation fingerprint is invalid: {error}"
+            ))
+        })?;
+    let resolution_digest = cache_decision_start_resolution.as_digest().clone();
+    let current_key = TypeSignalsCacheKey::new(
+        declaration_hash.clone(),
+        head_commit.clone(),
+        baseline_hash.clone(),
+        ImplementationFingerprint::new(implementation_digest),
+        ResolutionFingerprint::new(resolution_digest),
+        execution_identity,
+    );
+    let recorded = recorded_json.as_deref().and_then(|text| {
+        type_signals_codec::decode_with_workspace_for_current(
+            text,
+            &canonical_workspace,
+            current_key.rustdoc_execution_identity(),
+        )
+        .ok()
+    });
+    let worktree_clean = worktree_is_clean(&canonical_workspace)?;
+    let reuse_decision =
+        decide_reuse_for_recorded_document(recorded.as_ref(), &current_key, worktree_clean);
+    match reuse_decision {
+        domain::TypeSignalsReuseDecision::SkipEvaluation => {
+            return Ok(ExitCode::SUCCESS);
+        }
+        domain::TypeSignalsReuseDecision::ReextractAndEvaluate => {}
+    }
+    let context_cache_key = RustdocContextCacheKey {
+        workspace_root: canonical_workspace.clone(),
+        track_dir: track_dir.clone(),
+        resolution_fingerprint: cache_decision_start_resolution.clone(),
+        current_implementation_fingerprint: cache_decision_start_implementation.clone(),
+        head_commit: head_commit.clone(),
+        feature_selections: feature_selections.clone(),
+        rustdoc_execution_identities: execution_identities.clone(),
+    };
+    let assembled_contexts = if let Some(cached) = context_cache.get(&context_cache_key)? {
+        cached
+    } else {
+        let target_current =
+            rustdoc.capture_current(&target_crate_name, target_features).map_err(|error| {
+                EvaluateSignalsError::evaluation(format!(
+                    "rustdoc export failed for '{target_crate}': {error}"
+                ))
+            })?;
+        if target_current.execution_identity() != current_key.rustdoc_execution_identity() {
+            return Err(EvaluateSignalsError::authoritative_input(
+                "rustdoc execution identity changed between cache-key resolution and snapshot capture",
+            ));
+        }
+        let assembled = assemble_rustdoc_contexts_from_snapshot(
+            configured_layers,
+            &target_layer,
+            &loaded_catalogues,
+            &target_current,
+            &feature_selections,
+            rustdoc,
+        )?;
+        context_cache.insert_or_get(context_cache_key, assembled)?
+    };
+    for (layer, context) in &assembled_contexts.contexts {
+        let expected = execution_identities.get(layer).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "rustdoc execution identity for configured layer '{layer}' is unavailable"
+            ))
+        })?;
+        if context.current_snapshot().execution_identity() != expected {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "rustdoc snapshot identity does not match configured layer '{layer}'"
+            )));
+        }
+    }
+
+    evaluate_and_write_with_contexts(
         &catalogue_bytes,
         &catalogue_path,
         &track_dir,
         &canonical_workspace,
         &canonical_items,
         binding,
-        content,
+        &assembled_contexts.contexts,
+        &assembled_contexts.baseline_snapshots,
+        &loaded_catalogues,
+        cache_decision_start_resolution,
+        cache_decision_start_implementation,
         head_commit,
         &baseline_path,
-        &baseline_json,
         baseline_hash,
+        current_key,
+        observers,
     )
 }
 
+#[cfg(all(test, feature = "test-helpers"))]
 #[allow(clippy::too_many_arguments)]
 fn evaluate_and_write(
     catalogue_bytes: &[u8],
@@ -431,7 +567,6 @@ fn evaluate_and_write(
     baseline_json: &str,
     baseline_hash: BaselineHash,
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    reject_type_signals_path(baseline_path, trusted_items_root, "baseline")?;
     let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
     })?;
@@ -441,105 +576,84 @@ fn evaluate_and_write(
     let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
     })?;
-    let start_resolution =
-        resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
-    let LoadedTrackCatalogues { bindings, catalogues } =
-        load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
-    validate_evaluator_binding(&bindings, binding)?;
-    let target_catalogue = catalogues.get(&target_layer).ok_or_else(|| {
+    let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
+        workspace_root,
+    )
+    .map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
-            "target catalogue for layer '{}' is not present in the current resolution set",
-            target_layer
+            "cannot load TDDD layer bindings: {error}"
         ))
     })?;
-    let supplied_declaration_hash = type_signals_codec::declaration_hash(catalogue_bytes);
-    if target_catalogue.declaration_hash() != &supplied_declaration_hash {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "target catalogue bytes changed between the initial load and the attested resolution read"
-                .to_owned(),
-        ));
+    let mut rustdoc_contexts = std::collections::BTreeMap::new();
+    let mut baseline_snapshots = std::collections::BTreeMap::new();
+    for configured_binding in &configured_layers {
+        let layer =
+            LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+            })?;
+        if layer == target_layer {
+            rustdoc_contexts.insert(
+                layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    layer.clone(),
+                    baseline.clone(),
+                    snapshot_for_context_test(binding.layer_id(), &current),
+                ),
+            );
+            baseline_snapshots.insert(
+                layer,
+                BaselineSnapshot { path: baseline_path.to_path_buf(), hash: baseline_hash.clone() },
+            );
+            continue;
+        }
+        let configured_baseline_path = track_dir.join(configured_binding.baseline_file());
+        let (configured_baseline_json, configured_baseline_hash) =
+            read_actual_baseline(&configured_baseline_path, trusted_items_root)?;
+        let configured_baseline = BaselineRustdocCodec::from_json(&configured_baseline_json)
+            .map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!(
+                    "cannot decode baseline for layer '{layer}': {error}"
+                ))
+            })?;
+        rustdoc_contexts.insert(
+            layer.clone(),
+            AuthoritativeRustdocContext::new(
+                layer.clone(),
+                configured_baseline.clone(),
+                snapshot_for_context_test(layer.as_ref(), &configured_baseline),
+            ),
+        );
+        baseline_snapshots.insert(
+            layer,
+            BaselineSnapshot { path: configured_baseline_path, hash: configured_baseline_hash },
+        );
     }
-    let declaration_hash = target_catalogue.declaration_hash().clone();
-    let catalogue = target_catalogue.document().clone();
-    let track_catalogues = catalogues
-        .into_iter()
-        .map(|(layer, attested)| (layer, attested.into_document()))
-        .collect::<BTreeMap<_, _>>();
-    let mut kinds = BTreeMap::new();
-    for (name, entry) in catalogue.types() {
-        kinds
-            .entry(name.as_str().to_owned())
-            .or_insert_with(Vec::new)
-            .push(data_role_kind_tag(entry.role(), entry.kind()));
-    }
-    for (name, entry) in catalogue.traits() {
-        kinds
-            .entry(name.as_str().to_owned())
-            .or_insert_with(Vec::new)
-            .push(contract_role_kind_tag(entry.role()));
-    }
-    for (name, entry) in catalogue.functions() {
-        kinds
-            .entry(name.to_string())
-            .or_insert_with(Vec::new)
-            .push(function_role_kind_tag(entry.role()));
-    }
-    let identity_paths =
-        resolution_paths_for_catalogue(&target_layer, &track_catalogues, &baseline, &current)
-            .map_err(|error| EvaluateSignalsError::evaluation(error.to_string()))?;
-    let identity_index = build_type_signal_identity_index(&catalogue, &identity_paths)
-        .map_err(EvaluateSignalsError::evaluation)?;
-    let canonical_baseline_paths = normalized_paths_for_doc(&baseline, catalogue.crate_name());
-    let canonical_current_paths = normalized_paths_for_doc(&current, catalogue.crate_name());
-    let canonical_baseline = crate_with_canonical_paths(&baseline, canonical_baseline_paths);
-    let canonical_current = crate_with_canonical_paths(&current, canonical_current_paths);
-    let extended = CatalogueToExtendedCrateCodec::new()
-        .encode(&target_layer, &track_catalogues, &baseline, &current)
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!("cannot convert catalogue: {error}"))
-        })?;
-    let report = SignalEvaluatorV2::with_workspace_root(workspace_root.to_path_buf())
-        .evaluate(extended, canonical_baseline, canonical_current)
-        .map_err(|error| {
-            EvaluateSignalsError::evaluation(format!("signal evaluation failed: {error:?}"))
-        })?;
-    reject_type_signals_path(catalogue_path, trusted_items_root, "catalogue")?;
-    verify_evaluation_inputs_unchanged(
-        workspace_root,
-        catalogue_path,
-        baseline_path,
-        &TypeSignalsCacheKey::new(
-            declaration_hash.clone(),
-            head_commit.clone(),
-            baseline_hash.clone(),
-        ),
-    )?;
-    let end_resolution =
+    let start_resolution =
         resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
-    if start_resolution != end_resolution {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "architecture-rules or track catalogues changed during type-signal evaluation"
-                .to_owned(),
-        ));
-    }
-    let generated_at = Timestamp::new(chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string())
-        .map_err(|error| {
-            EvaluateSignalsError::evaluation(format!("cannot create timestamp: {error}"))
-        })?;
-    let document = TypeSignalsDocument::new(
-        generated_at,
-        TypeSignalsCacheKey::new(declaration_hash, head_commit, baseline_hash),
-        build_type_signals_from_report(report.iter(), &kinds, &identity_index),
-    );
-    let encoded = type_signals_codec::encode(&document).map_err(|error| {
-        EvaluateSignalsError::cache_write(format!("cannot encode type signals: {error}"))
-    })?;
-    let signal_path = track_dir.join(binding.signal_file());
-    reject_type_signals_path(&signal_path, trusted_items_root, "signal artifact")?;
-    atomic_write_file(&signal_path, format!("{encoded}\n").as_bytes()).map_err(|error| {
-        EvaluateSignalsError::cache_write(format!("cannot write type signals: {error}"))
-    })?;
-    Ok(ExitCode::SUCCESS)
+    let start_implementation = current_implementation_fingerprint(workspace_root)?;
+    let loaded_catalogues = load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
+    evaluate_and_write_with_contexts(
+        catalogue_bytes,
+        catalogue_path,
+        track_dir,
+        workspace_root,
+        trusted_items_root,
+        binding,
+        &rustdoc_contexts,
+        &baseline_snapshots,
+        &loaded_catalogues,
+        start_resolution,
+        start_implementation,
+        head_commit,
+        baseline_path,
+        baseline_hash,
+        legacy_cache_key(
+            type_signals_codec::declaration_hash(catalogue_bytes),
+            read_head_commit(workspace_root)?,
+            type_signals_codec::baseline_hash(baseline_json.as_bytes()),
+        ),
+        EvaluationObservers::none(),
+    )
 }
 
 fn evaluator_bindings_match(left: &TdddLayerBinding, right: &TdddLayerBinding) -> bool {
@@ -570,73 +684,33 @@ fn validate_evaluator_binding(
     Ok(())
 }
 
-fn crate_with_canonical_paths(
-    krate: &rustdoc_types::Crate,
-    paths: std::collections::HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>,
-) -> rustdoc_types::Crate {
-    let mut canonical = krate.clone();
-    canonical.paths = paths;
-    if let Some(root) = canonical.index.get_mut(&canonical.root) {
-        if let Some(root_name) = canonical
-            .paths
-            .values()
-            .find(|summary| summary.crate_id == 0)
-            .and_then(|summary| summary.path.first())
-        {
-            root.name = Some(root_name.clone());
-        }
-    }
-    canonical
-}
-
-fn reject_type_signals_path(
-    path: &Path,
-    trusted_items_root: &Path,
-    label: &str,
-) -> Result<(), EvaluateSignalsError> {
-    reject_symlinks_below(path, trusted_items_root).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "symlink guard rejected {label} '{}': {error}",
-            path.display()
-        ))
-    })?;
-    Ok(())
-}
-
-fn read_actual_baseline(path: &Path) -> Result<(String, BaselineHash), EvaluateSignalsError> {
-    let bytes = inputs::read_bytes_file_limited(path, MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot read baseline '{}': {error}",
-            path.display()
-        ))
-    })?;
-    let baseline_json = String::from_utf8(bytes).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "baseline '{}' is not UTF-8: {error}",
-            path.display()
-        ))
-    })?;
-    BaselineRustdocCodec::from_json(&baseline_json).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot decode baseline '{}': {error}",
-            path.display()
-        ))
-    })?;
-    let hash = type_signals_codec::baseline_hash(baseline_json.as_bytes());
-    Ok((baseline_json, hash))
-}
+#[cfg(all(test, feature = "test-helpers"))]
+#[path = "type_signals_evaluator_properties.rs"]
+mod properties;
 
 #[cfg(test)]
 #[cfg(feature = "test-helpers")]
 #[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::unwrap_used)]
 mod tests {
-    use std::collections::HashMap;
+    use std::collections::{BTreeMap, HashMap};
 
     use super::*;
     use crate::tddd::ThreeWaySignal;
+    use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+    use crate::tddd::catalogue_to_extended_crate_codec::{
+        CatalogueToExtendedCrateCodec, normalized_paths_for_doc,
+    };
+    #[cfg(feature = "test-helpers")]
+    use crate::tddd::catalogue_to_extended_crate_codec::{
+        encode_document, resolution_paths_for_document,
+    };
     use crate::verify::tddd_layers::parse_tddd_layers;
     use domain::FreeText;
+    use domain::Timestamp;
+    use domain::tddd::CatalogueToExtendedCratePort;
     use domain::tddd::catalogue_v2::CatalogueDocument;
+    use domain::tddd::type_signals_doc::TypeSignalsDocument;
+    use rustdoc_contexts::verify_baseline_snapshots_unchanged;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
     fn rustdoc_json() -> String {
@@ -659,6 +733,255 @@ mod tests {
             target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
             format_version: rustdoc_types::FORMAT_VERSION,
         }
+    }
+
+    fn rustdoc_crate_with_root_and_paths(
+        root_name: &str,
+        paths: HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>,
+    ) -> rustdoc_types::Crate {
+        let mut crate_ = rustdoc_crate_with_paths(paths);
+        crate_.index.insert(
+            rustdoc_types::Id(0),
+            rustdoc_types::Item {
+                id: rustdoc_types::Id(0),
+                crate_id: 0,
+                name: Some(root_name.to_owned()),
+                span: None,
+                visibility: rustdoc_types::Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: rustdoc_types::ItemEnum::Module(rustdoc_types::Module {
+                    is_crate: true,
+                    items: vec![],
+                    is_stripped: false,
+                }),
+            },
+        );
+        crate_
+    }
+
+    fn cross_layer_handler_catalogue(
+        field_type: Option<&str>,
+        trait_ref: Option<&str>,
+    ) -> CatalogueDocument {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::TypeEntry;
+        use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+        use domain::tddd::catalogue_v2::{
+            CatalogueEntryKey, CrateName, FieldDecl, FieldName, ModulePath, TypeRef,
+        };
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("infrastructure").unwrap(),
+            LayerId::try_new("infrastructure").unwrap(),
+        );
+        let fields = field_type
+            .map(|field_type| {
+                vec![FieldDecl::new(
+                    FieldName::new("reference").unwrap(),
+                    TypeRef::new(field_type).unwrap(),
+                )]
+            })
+            .unwrap_or_default();
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new("Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields, has_stripped_fields: false },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        if let Some(trait_ref) = trait_ref {
+            catalogue.push_trait_impl(TraitImplDeclV2::new(
+                TypeRef::new(trait_ref).unwrap(),
+                TypeRef::new("Handler").unwrap(),
+            ));
+        }
+        catalogue
+    }
+
+    fn cross_layer_declaring_catalogue(
+        type_key: &str,
+        type_module_path: Option<domain::tddd::catalogue_v2::ModulePath>,
+        trait_key: Option<&str>,
+    ) -> CatalogueDocument {
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
+        use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+        use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+        use domain::tddd::catalogue_v2::{CatalogueEntryKey, CrateName, ModulePath};
+
+        let mut catalogue = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        catalogue.insert_type(
+            CatalogueEntryKey::try_new(type_key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                type_module_path,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        if let Some(trait_key) = trait_key {
+            catalogue.insert_trait(
+                CatalogueEntryKey::try_new(trait_key.to_owned()).unwrap(),
+                TraitEntry::new(
+                    ItemAction::Add,
+                    ContractRole::SecondaryPort,
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    Some(ModulePath::from_segments(vec!["ports".to_owned()]).unwrap()),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+        catalogue
+    }
+
+    fn setup_cross_layer_execute_workspace(
+        target: &CatalogueDocument,
+        declaring: Option<&CatalogueDocument>,
+        domain_current: &rustdoc_types::Crate,
+        infrastructure_current: &rustdoc_types::Crate,
+    ) -> (
+        tempfile::TempDir,
+        std::path::PathBuf,
+        TrackId,
+        TdddLayerBinding,
+        std::path::PathBuf,
+        std::path::PathBuf,
+    ) {
+        setup_cross_layer_execute_workspace_with_domain_target(
+            target,
+            declaring,
+            domain_current,
+            infrastructure_current,
+            "domain",
+        )
+    }
+
+    fn setup_cross_layer_execute_workspace_with_domain_target(
+        target: &CatalogueDocument,
+        declaring: Option<&CatalogueDocument>,
+        domain_current: &rustdoc_types::Crate,
+        infrastructure_current: &rustdoc_types::Crate,
+        domain_target: &str,
+    ) -> (
+        tempfile::TempDir,
+        std::path::PathBuf,
+        TrackId,
+        TdddLayerBinding,
+        std::path::PathBuf,
+        std::path::PathBuf,
+    ) {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        let track_id = TrackId::try_new("cross-layer-execute-track").unwrap();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::create_dir_all(root.join("src")).unwrap();
+        std::fs::write(root.join("src/lib.rs"), "pub struct Fixture;\n").unwrap();
+        std::fs::write(
+            root.join(".gitignore"),
+            "track/items/cross-layer-execute-track/infrastructure-type-signals.json\n",
+        )
+        .unwrap();
+        let rules = serde_json::json!({
+            "version": 2,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "domain-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": [domain_target] }
+                    }
+                },
+                {
+                    "crate": "infrastructure",
+                    "path": "libs/infrastructure",
+                    "may_depend_on": ["domain"],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": "infrastructure-types.json",
+                        "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                    }
+                }
+            ]
+        })
+        .to_string();
+        std::fs::write(root.join("architecture-rules.json"), &rules).unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            CatalogueDocumentCodec::encode(target).unwrap(),
+        )
+        .unwrap();
+        if let Some(declaring) = declaring {
+            std::fs::write(
+                track_dir.join("domain-types.json"),
+                CatalogueDocumentCodec::encode(declaring).unwrap(),
+            )
+            .unwrap();
+        }
+        let baseline = rustdoc_json();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline).unwrap();
+        std::fs::write(track_dir.join("infrastructure-types-baseline.json"), &baseline).unwrap();
+        let domain_current_path = root.join("domain-current.json");
+        let infrastructure_current_path = root.join("infrastructure-current.json");
+        std::fs::write(&domain_current_path, serde_json::to_string(domain_current).unwrap())
+            .unwrap();
+        std::fs::write(
+            &infrastructure_current_path,
+            serde_json::to_string(infrastructure_current).unwrap(),
+        )
+        .unwrap();
+        crate::verify::test_support::git_init(root);
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
+        let binding = parse_tddd_layers(&rules)
+            .unwrap()
+            .into_iter()
+            .find(|binding| binding.layer_id() == "infrastructure")
+            .unwrap();
+
+        (workspace, items_dir, track_id, binding, domain_current_path, infrastructure_current_path)
     }
 
     #[test]
@@ -1107,6 +1430,354 @@ mod tests {
     }
 
     #[test]
+    fn test_execute_type_signals_rejects_mismatched_cross_layer_candidate_fail_closed() {
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(Some("domain::model::Name"), None);
+            let declaring = cross_layer_declaring_catalogue("Name", None, None);
+            let domain_current = rustdoc_crate_with_paths(HashMap::from([(
+                rustdoc_types::Id(1),
+                rustdoc_types::ItemSummary {
+                    crate_id: 0,
+                    path: vec!["domain".to_owned(), "wrong".to_owned(), "Name".to_owned()],
+                    kind: rustdoc_types::ItemKind::Struct,
+                },
+            )]));
+            let infrastructure_current = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(
+                    &target,
+                    Some(&declaring),
+                    &domain_current,
+                    &infrastructure_current,
+                );
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("a mismatched external candidate must fail closed");
+            assert!(
+                error.to_string().contains("domain::model::Name"),
+                "the diagnostic must retain the fully-qualified unresolved identity: {error}"
+            );
+            assert_eq!(observer.launches_for("domain"), 1);
+            assert_eq!(observer.launches_for("infrastructure"), 1);
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_resolves_cross_layer_type_and_trait_adds() {
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(
+                Some("domain::model::Name"),
+                Some("domain::ports::Repository"),
+            );
+            let declaring = cross_layer_declaring_catalogue(
+                "domain::model::Name",
+                Some(
+                    domain::tddd::catalogue_v2::ModulePath::from_segments(vec!["model".to_owned()])
+                        .unwrap(),
+                ),
+                Some("domain::ports::Repository"),
+            );
+            let domain_current = rustdoc_crate_with_paths(HashMap::new());
+            let infrastructure_current = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(
+                    &target,
+                    Some(&declaring),
+                    &domain_current,
+                    &infrastructure_current,
+                );
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect("type and trait declarations from the other layer must resolve");
+
+            let signals = type_signals_codec::decode(
+                &std::fs::read_to_string(
+                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+            assert!(
+                signals.signals().iter().any(|signal| signal.type_name() == "Handler"),
+                "the target type must survive evaluation after both external declarations resolve"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_canonicalizes_bin_target_for_synthesized_external_add() {
+        use rustdoc_types::{ItemEnum, Type};
+
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(Some("domain::generated::Name"), None);
+            let declaring = cross_layer_declaring_catalogue("Name", None, None);
+            let domain_current = rustdoc_crate_with_root_and_paths(
+                "sotp",
+                HashMap::from([(
+                    rustdoc_types::Id(1),
+                    rustdoc_types::ItemSummary {
+                        crate_id: 0,
+                        path: vec!["sotp".to_owned(), "generated".to_owned(), "Name".to_owned()],
+                        kind: rustdoc_types::ItemKind::Struct,
+                    },
+                )]),
+            );
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace_with_domain_target(
+                    &target,
+                    Some(&declaring),
+                    &domain_current,
+                    &empty,
+                    "domain_bin",
+                );
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain_bin".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect("the evaluator must place the external add through the bin-target alias");
+
+            let resolution_snapshots = observer.resolution_path_snapshots();
+            assert_eq!(resolution_snapshots.len(), 1);
+            let resolved_paths = &resolution_snapshots[0];
+            let resolved_name = resolved_paths
+                .iter()
+                .find(|(_, summary)| summary.path == ["domain", "generated", "Name"])
+                .expect("the synthesized add must use the declaring crate root");
+            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);
+            assert!(
+                !resolved_paths
+                    .values()
+                    .any(|summary| summary.path == ["sotp", "generated", "Name"]),
+                "the bin target root must be canonicalized before the add is synthesized"
+            );
+
+            let encoded_crates = observer.encoded_crates();
+            assert_eq!(encoded_crates.len(), 1);
+            let encoded = &encoded_crates[0];
+            let name_id = encoded
+                .krate()
+                .paths
+                .iter()
+                .find(|(_, summary)| summary.path == ["domain", "generated", "Name"])
+                .map(|(id, _)| *id)
+                .expect("the encoded synthesized item must retain its resolved placement");
+            let name_summary = &encoded.krate().paths[&name_id];
+            assert_ne!(name_summary.crate_id, 0);
+            assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, "domain");
+
+            let handler_id = encoded
+                .krate()
+                .paths
+                .iter()
+                .find(|(_, summary)| summary.path == ["infrastructure", "Handler"])
+                .map(|(id, _)| *id)
+                .expect("the target Handler must be encoded");
+            let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+                panic!("expected Handler struct");
+            };
+            let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+                panic!("expected Handler named fields");
+            };
+            assert!(matches!(
+                &encoded.krate().index[&fields[0]].inner,
+                ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id
+            ));
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_65th_configured_layer_before_export() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let layers = (0..65)
+            .map(|index| {
+                serde_json::json!({
+                    "crate": format!("layer_{index}"),
+                    "path": format!("libs/layer_{index}"),
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": format!("layer_{index}-types.json"),
+                        "schema_export": {
+                            "method": "rustdoc",
+                            "targets": [format!("layer_{index}")]
+                        }
+                    }
+                })
+            })
+            .collect::<Vec<_>>();
+        std::fs::write(
+            workspace.path().join("architecture-rules.json"),
+            serde_json::json!({ "version": 2, "layers": layers }).to_string(),
+        )
+        .unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        let error = execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .expect_err("the 65th configured layer must fail before rustdoc export");
+
+        assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+        assert!(
+            error.to_string().contains("64"),
+            "the error must identify the layer budget: {error}"
+        );
+        assert_eq!(observer.launches(), 0, "the layer-budget failure must precede export");
+    }
+
+    #[test]
+    fn test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations() {
+        with_process_environment_lock(|| {
+            let target = CatalogueDocument::new(
+                5,
+                CrateName::new("infrastructure").unwrap(),
+                LayerId::try_new("infrastructure").unwrap(),
+            );
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(&target, None, &empty, &empty);
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect("an enabled layer without a catalogue must contribute no declarations");
+
+            let signals = type_signals_codec::decode(
+                &std::fs::read_to_string(
+                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+            assert!(signals.signals().is_empty());
+            assert_eq!(observer.launches_for("domain"), 1);
+            assert_eq!(observer.launches_for("infrastructure"), 1);
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_ungrounded_cross_layer_reference() {
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(Some("domain::model::Unknown"), None);
+            let declaring = cross_layer_declaring_catalogue(
+                "domain::model::Name",
+                Some(
+                    domain::tddd::catalogue_v2::ModulePath::from_segments(vec!["model".to_owned()])
+                        .unwrap(),
+                ),
+                None,
+            );
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(&target, Some(&declaring), &empty, &empty);
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("an ungrounded cross-crate reference must not use short-name fallback");
+            assert!(
+                error.to_string().contains("domain::model::Unknown"),
+                "the diagnostic must identify the ungrounded reference: {error}"
+            );
+        });
+    }
+
+    #[test]
+    fn test_adapter_evaluate_layer_rejects_ungrounded_cross_layer_reference() {
+        use crate::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
+        use domain::tddd::catalogue_v2::TdddLayerBinding as DomainTdddLayerBinding;
+        use usecase::type_signals::TypeSignalsExecutorPort;
+
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(Some("domain::model::Unknown"), None);
+            let declaring = cross_layer_declaring_catalogue(
+                "domain::model::Name",
+                Some(
+                    domain::tddd::catalogue_v2::ModulePath::from_segments(vec!["model".to_owned()])
+                        .unwrap(),
+                ),
+                None,
+            );
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, _infra_binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(&target, Some(&declaring), &empty, &empty);
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+            let binding = DomainTdddLayerBinding {
+                layer_id: "infrastructure".to_owned(),
+                catalogue_file: "infrastructure-types.json".to_owned(),
+                baseline_file: "infrastructure-types-baseline.json".to_owned(),
+                targets: vec!["infrastructure".to_owned()],
+            };
+
+            let error = TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(observer)
+                .evaluate_layer(&items_dir, &track_id, workspace.path(), &binding, &[])
+                .expect_err("evaluate_layer must reject an ungrounded cross-crate reference");
+            assert!(
+                error.to_string().contains("domain::model::Unknown"),
+                "the adapter diagnostic must identify the ungrounded reference: {error}"
+            );
+        });
+    }
+
+    #[test]
     fn test_evaluate_and_write_loads_all_track_catalogues_for_encode() {
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
@@ -1123,9 +1794,14 @@ mod tests {
         let items_dir = root.join("track/items");
         let track_dir = items_dir.join(track_id.as_ref());
         std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(root.join("Cargo.toml"), "[workspace]\nmembers = []\nresolver = \"2\"\n")
-            .unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
         std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::create_dir_all(root.join("src")).unwrap();
+        std::fs::write(root.join("src/lib.rs"), "pub struct Fixture;\n").unwrap();
         let rules = r#"{
             "version": 2,
             "layers": [
@@ -1219,6 +1895,7 @@ mod tests {
         std::fs::write(&catalogue_path, &catalogue_json).unwrap();
         std::fs::write(&baseline_path, &baseline_json).unwrap();
         std::fs::write(track_dir.join("domain-types.json"), declaring_json).unwrap();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline_json).unwrap();
 
         let trusted = items_dir.canonicalize().unwrap();
         let loaded = load_track_catalogues(root, &track_dir, &trusted)
@@ -1229,8 +1906,28 @@ mod tests {
             .map(|(layer, attested)| (layer.clone(), attested.document().clone()))
             .collect::<BTreeMap<_, _>>();
         let empty = rustdoc_crate_with_paths(HashMap::new());
+        let target_layer = LayerId::try_new("infrastructure").unwrap();
+        let declaring_layer = LayerId::try_new("domain").unwrap();
+        let rustdoc_contexts = BTreeMap::from([
+            (
+                target_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    target_layer.clone(),
+                    empty.clone(),
+                    snapshot_for_context_test("infrastructure", &empty),
+                ),
+            ),
+            (
+                declaring_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    declaring_layer,
+                    empty.clone(),
+                    snapshot_for_context_test("domain", &empty),
+                ),
+            ),
+        ]);
         let encoded = CatalogueToExtendedCrateCodec::new()
-            .encode(&LayerId::try_new("infrastructure").unwrap(), &loaded_documents, &empty, &empty)
+            .encode(&target_layer, &loaded_documents, &rustdoc_contexts)
             .expect("other-layer add declarations must join the evaluator encode map");
         let user_id = encoded
             .krate()
@@ -1485,6 +2182,51 @@ mod tests {
         assert_ne!(present, missing, "a missing catalogue must not hash as a present catalogue");
         assert_ne!(missing, empty, "a 0-byte catalogue must not hash as a missing catalogue");
         assert_ne!(present, empty);
+    }
+
+    #[test]
+    fn test_resolution_input_fingerprint_includes_feature_declaration_bytes() {
+        let (workspace, items_dir, track_id, _binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let trusted = items_dir.canonicalize().unwrap();
+        let feature_path = track_dir.join(TDDD_FEATURE_DECLARATION_FILE);
+        std::fs::write(&feature_path, r#"{"schema_version":1,"layers":{"infrastructure":[]}}"#)
+            .unwrap();
+        let first = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted).unwrap();
+        std::fs::write(
+            &feature_path,
+            r#"{"schema_version":1,"layers":{"infrastructure":["serde"]}}"#,
+        )
+        .unwrap();
+        let second = resolution_input_fingerprint(workspace.path(), &track_dir, &trusted).unwrap();
+        assert_ne!(first, second, "feature selection changes must invalidate resolution input");
+    }
+
+    #[test]
+    fn test_verify_baseline_snapshots_rejects_changed_baseline() {
+        let (workspace, items_dir, track_id, binding, _rustdoc_path) = setup_workspace();
+        let track_dir = items_dir.join(track_id.as_ref());
+        let baseline_path = track_dir.join(binding.baseline_file());
+        let baseline = std::fs::read(&baseline_path).unwrap();
+        let layer = LayerId::try_new(binding.layer_id().to_owned()).unwrap();
+        let snapshots = BTreeMap::from([(
+            layer,
+            BaselineSnapshot {
+                path: baseline_path.clone(),
+                hash: type_signals_codec::baseline_hash(&baseline),
+            },
+        )]);
+
+        std::fs::write(&baseline_path, format!("{}\n", rustdoc_json())).unwrap();
+        let error =
+            verify_baseline_snapshots_unchanged(&snapshots, &items_dir.canonicalize().unwrap())
+                .expect_err("a changed authoritative baseline must block persistence");
+
+        assert!(
+            error.to_string().contains("baseline for layer 'infrastructure' changed"),
+            "got: {error}"
+        );
+        let _ = workspace;
     }
 
     #[cfg(unix)]
@@ -1875,15 +2617,37 @@ mod tests {
         head_commit: domain::CommitHash,
     ) -> TypeSignalsDocument {
         let track_dir = items_dir.join(track_id.as_ref());
+        let workspace_root = items_dir.parent().and_then(Path::parent).unwrap();
         let catalogue = std::fs::read(track_dir.join("infrastructure-types.json")).unwrap();
         let (_, baseline_hash) =
-            read_actual_baseline(&track_dir.join("infrastructure-types-baseline.json")).unwrap();
+            read_actual_baseline(&track_dir.join("infrastructure-types-baseline.json"), items_dir)
+                .unwrap();
+        let implementation = freshness::rustdoc_input_fingerprint(workspace_root).unwrap();
+        let resolution =
+            resolution_input_fingerprint(workspace_root, &track_dir, items_dir).unwrap();
+        let rustdoc_path = workspace_root.join("infrastructure-rustdoc.json");
+        let rustdoc_path = std::fs::canonicalize(&rustdoc_path).unwrap();
+        let target =
+            ResolvedCargoTargetDirectory::try_new(rustdoc_path.parent().unwrap().to_path_buf())
+                .unwrap();
+        let expected = ExpectedRustdocJsonPath::try_new(rustdoc_path, &target).unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            CrateName::new("infrastructure").unwrap(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
         TypeSignalsDocument::new(
             Timestamp::new("2026-07-31T00:00:00Z").unwrap(),
             TypeSignalsCacheKey::new(
                 type_signals_codec::declaration_hash(&catalogue),
                 head_commit,
                 baseline_hash,
+                ImplementationFingerprint::new(Sha256Digest::try_new(implementation).unwrap()),
+                ResolutionFingerprint::new(resolution.as_digest().clone()),
+                identity,
             ),
             vec![],
         )
@@ -1954,13 +2718,184 @@ mod tests {
         .unwrap();
 
         assert_eq!(observer.launches(), 1);
-        let persisted = type_signals_codec::decode(
+        let persisted = type_signals_codec::decode_with_workspace(
             &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+            workspace.path(),
         )
         .unwrap();
         assert_eq!(
             persisted.cache_key(),
             current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
+        );
+    }
+
+    #[test]
+    fn test_execute_type_signals_context_cache_reextracts_after_source_change() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let context_cache = RustdocContextCache::default();
+            let first_observer = RustdocLaunchObserver::using_json_path(rustdoc_path.clone());
+            execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &first_observer,
+                &context_cache,
+            )
+            .unwrap();
+            assert_eq!(first_observer.launches(), 1);
+
+            std::fs::write(
+                workspace.path().join("libs/infrastructure/src/lib.rs"),
+                "pub struct ChangedFixture;",
+            )
+            .unwrap();
+            let second_observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &second_observer,
+                &context_cache,
+            )
+            .unwrap();
+            assert_eq!(
+                second_observer.launches(),
+                1,
+                "a changed implementation must not reuse a run-local rustdoc context"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_implementation_change_before_persist() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let source_path = workspace.path().join("libs/infrastructure/src/lib.rs");
+            let observer = RustdocLaunchObserver::using_json_path_with_before_export(
+                rustdoc_path,
+                std::sync::Arc::new(move || {
+                    std::fs::write(&source_path, "pub struct ChangedDuringExport;\n").unwrap();
+                }),
+            );
+
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("a source change during export must block persistence");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("changed during type-signal evaluation"),
+                "the error must identify the changed implementation: {error}"
+            );
+            assert!(
+                !signal_path(&items_dir, &track_id).exists(),
+                "a changed implementation must not publish a signal artifact"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs() {
+        with_process_environment_lock(|| {
+            let semantic_inputs = [
+                ("Cargo.toml", "\n# generated manifest change\n"),
+                ("Cargo.lock", "\n# generated lockfile change\n"),
+                (".cargo/config.toml", "[build]\nrustflags = []\n"),
+                ("rust-toolchain.toml", "[toolchain]\nchannel = \"stable\"\n"),
+                ("build-input.json", "{\"generated\":true}\n"),
+            ];
+
+            for (relative_path, replacement) in semantic_inputs {
+                let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+                let context_cache = RustdocContextCache::default();
+                let first_observer = RustdocLaunchObserver::using_json_path(rustdoc_path.clone());
+                execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &first_observer,
+                    &context_cache,
+                )
+                .unwrap_or_else(|error| {
+                    panic!("initial evaluation must succeed for {relative_path}: {error}")
+                });
+                assert_eq!(first_observer.launches(), 1, "initial evaluation must build a context");
+
+                let changed_path = workspace.path().join(relative_path);
+                if let Some(parent) = changed_path.parent() {
+                    std::fs::create_dir_all(parent).unwrap();
+                }
+                let mut changed = std::fs::read(&changed_path).unwrap_or_default();
+                changed.extend_from_slice(replacement.as_bytes());
+                std::fs::write(&changed_path, changed).unwrap();
+
+                let second_observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+                execute_type_signals_for_layer_with_launch_observer_and_context_cache(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &second_observer,
+                    &context_cache,
+                )
+                .unwrap_or_else(|error| {
+                    panic!("reevaluation must succeed for {relative_path}: {error}")
+                });
+                assert_eq!(
+                    second_observer.launches(),
+                    1,
+                    "a changed semantic input must invalidate the context cache: {relative_path}"
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[package]\nname = \"fingerprint-fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::create_dir_all(workspace.path().join("src")).unwrap();
+        std::fs::write(workspace.path().join("src/lib.rs"), "pub struct Fixture;\n").unwrap();
+        let oversized = workspace.path().join("oversized-input.bin");
+        std::fs::File::create(&oversized).unwrap().set_len(64 * 1024 * 1024 + 1).unwrap();
+
+        let error = freshness::rustdoc_input_fingerprint(workspace.path())
+            .expect_err("an oversized rustdoc input must fail closed");
+        assert!(matches!(error, freshness::RustdocInputFingerprintError::FileBytes { .. }));
+    }
+
+    #[test]
+    fn test_rustdoc_input_fingerprint_includes_nested_track_source_directory() {
+        let (workspace, _items_dir, _track_id, _binding, _rustdoc_path) = setup_workspace();
+        let nested_track = workspace.path().join("libs/infrastructure/src/track");
+        std::fs::create_dir_all(&nested_track).unwrap();
+
+        let before = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+        std::fs::write(nested_track.join("generated.rs"), "pub struct Generated;\n").unwrap();
+        let after = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+
+        assert_ne!(
+            before, after,
+            "a nested production track directory must not be treated as operational state"
         );
     }
 
@@ -1981,8 +2916,9 @@ mod tests {
         .unwrap();
 
         assert_eq!(observer.launches(), 1);
-        let persisted = type_signals_codec::decode(
+        let persisted = type_signals_codec::decode_with_workspace(
             &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+            workspace.path(),
         )
         .unwrap();
         assert_eq!(
@@ -2057,8 +2993,9 @@ mod tests {
             .unwrap_or_else(|error| panic!("{label} cache must be treated as a miss: {error}"));
 
             assert_eq!(observer.launches(), 1, "{label} cache must trigger evaluation");
-            let persisted = type_signals_codec::decode(
+            let persisted = type_signals_codec::decode_with_workspace(
                 &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                workspace.path(),
             )
             .unwrap();
             assert_eq!(
@@ -2125,8 +3062,9 @@ mod tests {
         .unwrap();
 
         assert_eq!(observer.launches(), 1, "a missing cache must trigger evaluation");
-        let persisted = type_signals_codec::decode(
+        let persisted = type_signals_codec::decode_with_workspace(
             &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+            workspace.path(),
         )
         .unwrap();
 
@@ -2205,8 +3143,11 @@ mod tests {
         .unwrap();
 
         assert_eq!(observer.launches(), 1, "unreadable cache must force reevaluation");
-        let replacement =
-            type_signals_codec::decode(&std::fs::read_to_string(&signal_file).unwrap()).unwrap();
+        let replacement = type_signals_codec::decode_with_workspace(
+            &std::fs::read_to_string(&signal_file).unwrap(),
+            root,
+        )
+        .unwrap();
         assert_eq!(
             replacement.cache_key(),
             current_cache_document(root, &items_dir, &track_id).cache_key()

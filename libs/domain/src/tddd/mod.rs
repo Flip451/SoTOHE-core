@@ -36,6 +36,16 @@ pub mod signal_evaluator;
 pub mod test_obligation;
 pub mod type_signals_doc;
 
+pub use type_signals_doc::{
+    BaselineHash, CapturedRustdocJson, CargoProfileName, CatalogueDeclarationHash,
+    ExpectedRustdocJsonPath, ImplementationFingerprint, ResolutionFingerprint,
+    ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocExecutionIdentityError,
+    RustdocJsonHash, RustdocSnapshot, Sha256Digest, Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION,
+    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsLoadResult, TypeSignalsReuseDecision,
+    TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError, construct_captured_rustdoc_json,
+    construct_rustdoc_snapshot,
+};
+
 pub use baseline_document::BaselineDocument;
 pub use baseline_graph_ports::{
     BaselineGraphLoader, BaselineGraphLoaderError, BaselineGraphRenderer,
@@ -44,7 +54,9 @@ pub use baseline_graph_ports::{
 pub use catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
-pub use catalogue_to_extended_crate_port::CatalogueToExtendedCratePort;
+pub use catalogue_to_extended_crate_port::{
+    AuthoritativeRustdocContext, CatalogueToExtendedCratePort,
+};
 pub use contract_map_content::ContractMapContent;
 pub use contract_map_options::ContractMapRenderOptions;
 pub use contract_map_renderer::{

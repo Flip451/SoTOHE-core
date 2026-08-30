@@ -119,9 +119,13 @@ pub use tddd::semantic_verify::{
     SemanticVerifyEntry, SpecAdrVerifyCacheDocument,
 };
 pub use tddd::type_signals_doc::{
-    BaselineHash, CatalogueDeclarationHash, Sha256Digest, Sha256DigestError,
-    TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsLoadResult,
-    TypeSignalsReuseDecision, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
+    BaselineHash, CapturedRustdocJson, CargoProfileName, CatalogueDeclarationHash,
+    ExpectedRustdocJsonPath, ImplementationFingerprint, ResolutionFingerprint,
+    ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocExecutionIdentityError,
+    RustdocJsonHash, RustdocSnapshot, Sha256Digest, Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION,
+    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsLoadResult, TypeSignalsReuseDecision,
+    TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError, construct_captured_rustdoc_json,
+    construct_rustdoc_snapshot,
 };
 pub use template_export::{
     TemplateBoundaryManifest, TemplateBoundaryManifestError, TemplatePathClassification,

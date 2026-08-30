@@ -908,13 +908,46 @@ mod tests {
         make_signals_with_hash(signals, 'a')
     }
 
+    fn test_cache_key(
+        declaration_hash: domain::CatalogueDeclarationHash,
+        head_commit: domain::CommitHash,
+        baseline_hash: domain::BaselineHash,
+    ) -> domain::TypeSignalsCacheKey {
+        let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-usecase-test-target",
+        ))
+        .unwrap();
+        let expected = domain::ExpectedRustdocJsonPath::try_new(
+            target.as_path().join("doc/legacy.json"),
+            &target,
+        )
+        .unwrap();
+        let identity = domain::RustdocExecutionIdentity::new(
+            target,
+            domain::tddd::catalogue_v2::CrateName::new("legacy").unwrap(),
+            vec![],
+            domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let zero = domain::Sha256Digest::try_new("0".repeat(64)).unwrap();
+        domain::TypeSignalsCacheKey::new(
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            domain::ImplementationFingerprint::new(zero.clone()),
+            domain::ResolutionFingerprint::new(zero),
+            identity,
+        )
+    }
+
     fn make_signals_with_hash(signals: Vec<TypeSignal>, hash_byte: char) -> TypeSignalsDocument {
         let declaration_hash = test_catalogue_with_hash(hash_byte).declaration_hash().clone();
         let baseline_digest =
             domain::Sha256Digest::try_new(hash_byte.to_string().repeat(64)).unwrap();
         TypeSignalsDocument::new(
             ts("2026-06-27T00:00:00Z"),
-            domain::TypeSignalsCacheKey::new(
+            test_cache_key(
                 declaration_hash,
                 domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(baseline_digest),

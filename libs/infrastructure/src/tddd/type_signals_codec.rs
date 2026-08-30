@@ -3,9 +3,12 @@
 use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
 use domain::tddd::type_signals_doc::{
-    BaselineHash, CatalogueDeclarationHash, Sha256Digest, Sha256DigestError, TypeSignalsCacheKey,
+    BaselineHash, CargoProfileName, CatalogueDeclarationHash, ExpectedRustdocJsonPath,
+    ImplementationFingerprint, ResolutionFingerprint, ResolvedCargoTargetDirectory,
+    RustdocExecutionIdentity, Sha256Digest, Sha256DigestError, TypeSignalsCacheKey,
     TypeSignalsDocument, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
 };
+use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use domain::{CommitHash, ContentHash, FreeText, Timestamp, TypeSignal};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
@@ -14,6 +17,8 @@ use crate::tddd::catalogue_spec_signals_codec::{
     confidence_signal_to_str, parse_confidence_signal,
 };
 use crate::tddd::type_signals_evaluator::signal_tags::kind_tag_namespace;
+
+const EXTERNAL_TARGET_IDENTITY_ROOT: &str = "/sotp-external-target";
 
 /// Codec error for per-layer evaluation-result files.
 #[derive(Debug, thiserror::Error)]
@@ -34,6 +39,8 @@ pub enum TypeSignalsCodecError {
     InvalidSignal(FreeText),
     #[error("invalid namespace for type-signal kind_tag: {0}")]
     InvalidNamespace(FreeText),
+    #[error("invalid rustdoc execution identity: {0}")]
+    InvalidExecutionIdentity(FreeText),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -44,7 +51,60 @@ struct TypeSignalsDocDto {
     declaration_hash: String,
     head_commit: String,
     baseline_hash: String,
+    implementation_fingerprint: String,
+    resolution_fingerprint: String,
+    rustdoc_execution_identity: RustdocExecutionIdentityDto,
     signals: Vec<TypeSignalDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RustdocExecutionIdentityDto {
+    target_directory: String,
+    crate_name: String,
+    features: Vec<String>,
+    profile: String,
+    expected_json_path: String,
+}
+
+/// Current-schema reuse-identity fields required to decode a type-signals document.
+#[cfg(test)]
+pub(crate) fn merge_fixture_reuse_identity(document: &mut serde_json::Value) {
+    let Some(object) = document.as_object_mut() else {
+        return;
+    };
+    object.entry("implementation_fingerprint".to_owned()).or_insert_with(json_zero_digest);
+    object.entry("resolution_fingerprint".to_owned()).or_insert_with(json_zero_digest);
+    object
+        .entry("rustdoc_execution_identity".to_owned())
+        .or_insert_with(json_fixture_execution_identity);
+}
+
+#[cfg(test)]
+fn json_zero_digest() -> serde_json::Value {
+    serde_json::Value::String("0".repeat(64))
+}
+
+#[cfg(test)]
+fn json_fixture_execution_identity() -> serde_json::Value {
+    serde_json::json!({
+        "target_directory": "/tmp/sotohe-fixture-target",
+        "crate_name": "domain",
+        "features": [],
+        "profile": "dev",
+        "expected_json_path": "/tmp/sotohe-fixture-target/doc/domain.json",
+    })
+}
+
+#[cfg(test)]
+fn test_execution_identity_dto() -> RustdocExecutionIdentityDto {
+    RustdocExecutionIdentityDto {
+        target_directory: "/tmp/sotohe-codec-test-target".to_owned(),
+        crate_name: "domain".to_owned(),
+        features: vec![],
+        profile: "dev".to_owned(),
+        expected_json_path: "/tmp/sotohe-codec-test-target/domain.json".to_owned(),
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -145,12 +205,47 @@ impl From<TypeSignalNamespaceDto> for CatalogueItemNamespace {
 /// Returns an error for malformed JSON, an unsupported schema, invalid hashes,
 /// a non-UTC timestamp, or an identity that does not match its kind tag.
 pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> {
-    let dto: TypeSignalsDocDto = serde_json::from_str(json)?;
-    let schema_version = TypeSignalsSchemaVersion::try_new(dto.schema_version)
+    decode_with_identity_root(json, std::path::Path::new("/sotp-workspace"), None)
+}
+
+/// Decodes a document for cache comparison using the currently resolved
+/// rustdoc identity to rebase a portable external target marker.
+///
+/// # Errors
+///
+/// Returns the same errors as [`decode`].
+pub(crate) fn decode_with_workspace(
+    json: &str,
+    workspace_root: &std::path::Path,
+) -> Result<TypeSignalsDocument, TypeSignalsCodecError> {
+    decode_with_identity_root(json, workspace_root, None)
+}
+
+pub(crate) fn decode_with_workspace_for_current(
+    json: &str,
+    workspace_root: &std::path::Path,
+    current_identity: &RustdocExecutionIdentity,
+) -> Result<TypeSignalsDocument, TypeSignalsCodecError> {
+    decode_with_identity_root(json, workspace_root, Some(current_identity.target_directory()))
+}
+
+fn decode_with_identity_root(
+    json: &str,
+    identity_root: &std::path::Path,
+    external_target_directory: Option<&ResolvedCargoTargetDirectory>,
+) -> Result<TypeSignalsDocument, TypeSignalsCodecError> {
+    let value: serde_json::Value = serde_json::from_str(json)?;
+    let schema_version = value
+        .get("schema_version")
+        .and_then(serde_json::Value::as_u64)
+        .ok_or(TypeSignalsCodecError::InvalidSchemaVersion(TypeSignalsSchemaVersionError::Zero))?;
+    let schema_version = u32::try_from(schema_version).unwrap_or(0);
+    let schema_version = TypeSignalsSchemaVersion::try_new(schema_version)
         .map_err(TypeSignalsCodecError::InvalidSchemaVersion)?;
     if schema_version.value() != domain::TYPE_SIGNALS_SCHEMA_VERSION {
         return Err(TypeSignalsCodecError::UnsupportedSchemaVersion(schema_version));
     }
+    let dto: TypeSignalsDocDto = serde_json::from_value(value)?;
     let generated_at = Timestamp::new(dto.generated_at.clone()).map_err(|_| {
         TypeSignalsCodecError::InvalidTimestamp(FreeText::new(dto.generated_at.clone()))
     })?;
@@ -161,6 +256,19 @@ pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> 
         CatalogueDeclarationHash::new(parse_digest("declaration_hash", dto.declaration_hash)?),
         parse_head_commit(dto.head_commit)?,
         BaselineHash::new(parse_digest("baseline_hash", dto.baseline_hash)?),
+        ImplementationFingerprint::new(parse_digest(
+            "implementation_fingerprint",
+            dto.implementation_fingerprint,
+        )?),
+        ResolutionFingerprint::new(parse_digest(
+            "resolution_fingerprint",
+            dto.resolution_fingerprint,
+        )?),
+        execution_identity_from_dto(
+            dto.rustdoc_execution_identity,
+            identity_root,
+            external_target_directory,
+        )?,
     );
     Ok(TypeSignalsDocument::with_schema_version(
         schema_version,
@@ -176,6 +284,19 @@ pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> 
 ///
 /// Returns an error when the document does not use the current schema.
 pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError> {
+    encode_with_workspace(doc, None)
+}
+
+/// Encodes a document, rewriting workspace-absolute rustdoc identity paths to
+/// repo-relative paths so tracked artifacts never contain a work-machine home.
+///
+/// # Errors
+///
+/// Returns an error when the document does not use the current schema.
+pub(crate) fn encode_with_workspace(
+    doc: &TypeSignalsDocument,
+    workspace_root: Option<&std::path::Path>,
+) -> Result<String, TypeSignalsCodecError> {
     if doc.schema_version().value() != domain::TYPE_SIGNALS_SCHEMA_VERSION {
         return Err(TypeSignalsCodecError::UnsupportedSchemaVersion(doc.schema_version()));
     }
@@ -185,6 +306,22 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
         declaration_hash: doc.cache_key().declaration_hash().as_digest().as_str().to_owned(),
         head_commit: doc.cache_key().head_commit().as_ref().to_owned(),
         baseline_hash: doc.cache_key().baseline_hash().as_digest().as_str().to_owned(),
+        implementation_fingerprint: doc
+            .cache_key()
+            .implementation_fingerprint()
+            .as_digest()
+            .as_str()
+            .to_owned(),
+        resolution_fingerprint: doc
+            .cache_key()
+            .resolution_fingerprint()
+            .as_digest()
+            .as_str()
+            .to_owned(),
+        rustdoc_execution_identity: execution_identity_to_dto(
+            doc.cache_key().rustdoc_execution_identity(),
+            workspace_root,
+        )?,
         signals: doc
             .signals()
             .iter()
@@ -199,6 +336,119 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
     // before pretty-printing.
     let value = serde_json::to_value(&dto).map_err(TypeSignalsCodecError::Json)?;
     serde_json::to_string_pretty(&value).map_err(TypeSignalsCodecError::Json)
+}
+
+fn portable_identity_path(
+    stored: String,
+    identity_root: &std::path::Path,
+    external_target_directory: Option<&ResolvedCargoTargetDirectory>,
+) -> std::path::PathBuf {
+    let path = std::path::PathBuf::from(stored);
+    if let Some(target_directory) = external_target_directory {
+        let marker = external_target_identity_path(target_directory.as_path());
+        if path == marker {
+            return target_directory.as_path().to_path_buf();
+        }
+        if let Ok(relative) = path.strip_prefix(&marker) {
+            return target_directory.as_path().join(relative);
+        }
+    }
+    if path.is_absolute() { path } else { identity_root.join(path) }
+}
+
+fn execution_identity_from_dto(
+    dto: RustdocExecutionIdentityDto,
+    identity_root: &std::path::Path,
+    external_target_directory: Option<&ResolvedCargoTargetDirectory>,
+) -> Result<RustdocExecutionIdentity, TypeSignalsCodecError> {
+    let target_directory = ResolvedCargoTargetDirectory::try_new(portable_identity_path(
+        dto.target_directory,
+        identity_root,
+        external_target_directory,
+    ))
+    .map_err(|error| {
+        TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+    })?;
+    let expected_json_path = ExpectedRustdocJsonPath::try_new(
+        portable_identity_path(dto.expected_json_path, identity_root, external_target_directory),
+        &target_directory,
+    )
+    .map_err(|error| {
+        TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+    })?;
+    let crate_name = CrateName::new(dto.crate_name).map_err(|error| {
+        TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+    })?;
+    let features = dto
+        .features
+        .into_iter()
+        .map(|feature| {
+            CargoFeatureName::try_new(feature).map_err(|error| {
+                TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let profile = CargoProfileName::try_new(dto.profile).map_err(|error| {
+        TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+    })?;
+    RustdocExecutionIdentity::new(
+        target_directory,
+        crate_name,
+        features,
+        profile,
+        expected_json_path,
+    )
+    .map_err(|error| {
+        TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(error.to_string()))
+    })
+}
+
+fn relativize_workspace_path(
+    path: &std::path::Path,
+    workspace_root: Option<&std::path::Path>,
+) -> String {
+    workspace_root
+        .and_then(|root| path.strip_prefix(root).ok())
+        .map(|relative| relative.display().to_string())
+        .unwrap_or_else(|| path.display().to_string())
+}
+
+fn execution_identity_to_dto(
+    identity: &RustdocExecutionIdentity,
+    workspace_root: Option<&std::path::Path>,
+) -> Result<RustdocExecutionIdentityDto, TypeSignalsCodecError> {
+    let target_path = identity.target_directory().as_path();
+    let (target_directory, external_target) = match workspace_root {
+        Some(root) => match target_path.strip_prefix(root) {
+            Ok(relative) => (relative.display().to_string(), false),
+            Err(_) => (external_target_identity_path(target_path).display().to_string(), true),
+        },
+        None => (target_path.display().to_string(), false),
+    };
+    let expected_relative =
+        identity.expected_json_path().as_path().strip_prefix(target_path).map_err(|_| {
+            TypeSignalsCodecError::InvalidExecutionIdentity(FreeText::new(
+                "expected rustdoc JSON path is outside the target directory",
+            ))
+        })?;
+    let expected_json_path = if external_target {
+        std::path::Path::new(&target_directory).join(expected_relative).display().to_string()
+    } else {
+        relativize_workspace_path(identity.expected_json_path().as_path(), workspace_root)
+    };
+    Ok(RustdocExecutionIdentityDto {
+        target_directory,
+        crate_name: identity.crate_name().as_str().to_owned(),
+        features: identity.features().iter().map(|feature| feature.as_str().to_owned()).collect(),
+        profile: identity.profile().as_str().to_owned(),
+        expected_json_path,
+    })
+}
+
+fn external_target_identity_path(path: &std::path::Path) -> std::path::PathBuf {
+    let bytes: [u8; 32] = sha2::Sha256::digest(path.to_string_lossy().as_bytes()).into();
+    let digest = Sha256Digest::from_content_hash(ContentHash::from_bytes(bytes));
+    std::path::Path::new(EXTERNAL_TARGET_IDENTITY_ROOT).join(digest.as_str())
 }
 
 /// Computes the SHA-256 digest of declaration file bytes.

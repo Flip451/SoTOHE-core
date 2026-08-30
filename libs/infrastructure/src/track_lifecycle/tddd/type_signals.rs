@@ -404,7 +404,7 @@ mod tests {
             let cargo = commands.path().join("cargo");
             fs::write(
                 &cargo,
-                "#!/bin/sh\nset -eu\nif [ \"$1\" = metadata ]; then\nprintf '%s\\n' '{\"packages\":[{\"name\":\"domain\",\"targets\":[{\"kind\":[\"lib\"],\"name\":\"domain\"}]}],\"target_directory\":\"target\"}'\nexit 0\nfi\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s' '{\"root\":0,\"crate_version\":null,\"includes_private\":false,\"index\":{},\"paths\":{},\"external_crates\":{},\"format_version\":57,\"target\":{\"triple\":\"\",\"target_features\":[]}}' > \"$CARGO_TARGET_DIR/doc/domain.json\"\n",
+                "#!/bin/sh\nset -eu\nif [ \"$1\" = metadata ]; then\nprintf '%s\\n' \"{\\\"packages\\\":[{\\\"name\\\":\\\"domain\\\",\\\"manifest_path\\\":\\\"$PWD/libs/domain/Cargo.toml\\\",\\\"targets\\\":[{\\\"kind\\\":[\\\"lib\\\"],\\\"name\\\":\\\"domain\\\"}]}],\\\"target_directory\\\":\\\"target\\\"}\"\nexit 0\nfi\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s' '{\"root\":0,\"crate_version\":null,\"includes_private\":false,\"index\":{},\"paths\":{},\"external_crates\":{},\"format_version\":57,\"target\":{\"triple\":\"\",\"target_features\":[]}}' > \"$CARGO_TARGET_DIR/doc/domain.json\"\n",
             )
             .expect("cargo shim is written");
             make_executable(&cargo);

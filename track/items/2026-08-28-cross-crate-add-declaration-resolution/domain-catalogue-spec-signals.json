@@ -1,11 +1,111 @@
 {
-  "catalogue_declaration_hash": "cf306d03ebef095f0eeda9b4dbf26f89b0276790f326d3bcbe21980382a05d01",
+  "catalogue_declaration_hash": "1d036cf36d4a7bfbaa27f6920314a1c5166b1251bebbcb1e5cd3ae1539ddac67",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "153a14a29f3f08ca02789def44a2441f0f2b1aa2911115b5db019f26a7f2a02b",
+      "entry_hash": "200e2e2d32184075c991ca74c8054bf0764d0d28984a954efb3b30addfdb623c",
+      "signal": "blue",
+      "type_name": "AuthoritativeRustdocContext"
+    },
+    {
+      "entry_hash": "dce15f0213e6681b2855d338642c30902acde9105c7b39c0bd4d01a65a2b3655",
+      "signal": "blue",
+      "type_name": "CapturedRustdocJson"
+    },
+    {
+      "entry_hash": "ffc5c86625e2458e9e310bc127c8cd83ddf1eaa81f31d123bf48622f99f75586",
+      "signal": "blue",
+      "type_name": "CargoProfileName"
+    },
+    {
+      "entry_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "signal": "blue",
+      "type_name": "ExpectedRustdocJsonPath"
+    },
+    {
+      "entry_hash": "23a404c0ac125b8b9b71460d9b19da561a104e75484d5b6d1eceaf13167eb407",
+      "signal": "blue",
+      "type_name": "ImplementationFingerprint"
+    },
+    {
+      "entry_hash": "08f9ad7e18e9530b57dc318dbd71cab6c409a72462bc3878e88fc9e8222ac056",
+      "signal": "blue",
+      "type_name": "ResolutionFingerprint"
+    },
+    {
+      "entry_hash": "99417c2759877df031e9829156524ebdaee84585f855024e798cfcecebbc47c3",
+      "signal": "blue",
+      "type_name": "ResolvedCargoTargetDirectory"
+    },
+    {
+      "entry_hash": "39a5cb47142a4193328a0da3ee3ddf909009bceeed602555d3e77b12632c8d94",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentity"
+    },
+    {
+      "entry_hash": "22282349ab86023a239d0419a386897f513d56cb512836719015c7810768ba2b",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentityError"
+    },
+    {
+      "entry_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "signal": "blue",
+      "type_name": "RustdocJsonHash"
+    },
+    {
+      "entry_hash": "bd79307f7920da5623d70a8fe76528d1068c698401a5d3f5302f8a8070de1716",
+      "signal": "blue",
+      "type_name": "RustdocSnapshot"
+    },
+    {
+      "entry_hash": "57ae9651be15225c5191ee0ed5cff9b41ffb36ee673283b4fb75afa46bc33f0e",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+    },
+    {
+      "entry_hash": "716ab89fb56ea83a2d2748d2b4edd15320f9f57234918f6a909668d36fc1451a",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+    },
+    {
+      "entry_hash": "5c479805dc6effd1beda5062aea57152020148a6330b0349a4e48c00a9021d02",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+    },
+    {
+      "entry_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+    },
+    {
+      "entry_hash": "d2a608c1d170eb9ca3fe2518e907dad0ec9becfd02e66faa0052f6274b4ff1e1",
       "signal": "blue",
       "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "entry_hash": "b4c0a8a008f6d624f9b8da36eb6d81728d72a5fe78f1e2dcacbdfe9f438bc853",
+      "signal": "blue",
+      "type_name": "RustdocCratePort"
+    },
+    {
+      "entry_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "signal": "blue",
+      "type_name": "SchemaExporter"
+    },
+    {
+      "entry_hash": "faba2dc4593b391588b587a8a5e5f3baa89539993661ce61b73f331bc2f1e7f6",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+    },
+    {
+      "entry_hash": "41e49e4fd8c3aa44186aa85be9b94aa2447e724a21b52aedbf5418ef90ef7705",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+    },
+    {
+      "entry_hash": "8cb8832d9610cf4e9c9470bfce7edac72a0a979c51f775f94376f9ffd46eba79",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
     }
   ]
 }

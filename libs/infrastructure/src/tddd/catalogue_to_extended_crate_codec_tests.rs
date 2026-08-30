@@ -16,7 +16,11 @@ use domain::tddd::catalogue_v2::{
     FieldName, FullyQualifiedItemPath, FunctionName, FunctionPath, MethodName, ModulePath,
     ParamName, TypeName, TypeRef, VariantName, WherePredicateDecl,
 };
-use domain::tddd::{CatalogueToExtendedCratePort, NewTypeGraphCodecError, SignalEvaluatorPort};
+use domain::tddd::{
+    AuthoritativeRustdocContext, CargoProfileName, CatalogueToExtendedCratePort,
+    ExpectedRustdocJsonPath, NewTypeGraphCodecError, ResolvedCargoTargetDirectory,
+    RustdocExecutionIdentity, RustdocSnapshot, SignalEvaluatorPort, construct_rustdoc_snapshot,
+};
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id, Item,
     ItemEnum, ItemKind, ItemSummary, Module, Term, TraitBoundModifier, Type, VariantKind,
@@ -31,12 +35,103 @@ fn make_doc(crate_name: &str) -> CatalogueDocument {
     make_doc_with_layer(crate_name, "domain")
 }
 
+fn snapshot_for_test(crate_name: &str, crate_data: &rustdoc_types::Crate) -> RustdocSnapshot {
+    fn decode(
+        bytes: &[u8],
+    ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
+        serde_json::from_slice(bytes).map_err(|error| {
+            domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                crate_name: "test".to_owned(),
+                reason: error.to_string(),
+            }
+        })
+    }
+    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/sotohe-codec-test-target",
+    ))
+    .unwrap();
+    let expected = ExpectedRustdocJsonPath::try_new(
+        target.as_path().join(format!("{crate_name}.json")),
+        &target,
+    )
+    .unwrap();
+    let identity = RustdocExecutionIdentity::new(
+        target,
+        CrateName::new(crate_name).unwrap(),
+        vec![],
+        CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let bytes = serde_json::to_vec(crate_data).unwrap();
+    construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+}
+
 fn make_doc_with_layer(crate_name: &str, layer_name: &str) -> CatalogueDocument {
     CatalogueDocument::new(
         2,
         CrateName::new(crate_name).unwrap(),
         LayerId::try_new(layer_name).expect("static valid"),
     )
+}
+
+fn target_rustdoc_contexts(
+    target_layer: &LayerId,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> BTreeMap<LayerId, AuthoritativeRustdocContext> {
+    BTreeMap::from([(
+        target_layer.clone(),
+        AuthoritativeRustdocContext::new(
+            target_layer.clone(),
+            baseline.clone(),
+            snapshot_for_test(target_layer.as_ref(), current),
+        ),
+    )])
+}
+
+fn rustdoc_contexts_for_catalogues(
+    catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> BTreeMap<LayerId, AuthoritativeRustdocContext> {
+    catalogues
+        .keys()
+        .map(|layer| {
+            (
+                layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    layer.clone(),
+                    baseline.clone(),
+                    snapshot_for_test(layer.as_ref(), current),
+                ),
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn test_encode_rejects_rustdoc_context_stored_under_different_layer_key() {
+    let target_layer = LayerId::try_new("domain").unwrap();
+    let context_layer = LayerId::try_new("usecase").unwrap();
+    let catalogue = make_doc_with_layer("domain", "domain");
+    let catalogues = BTreeMap::from([(target_layer.clone(), catalogue)]);
+    let contexts = BTreeMap::from([(
+        target_layer.clone(),
+        AuthoritativeRustdocContext::new(
+            context_layer,
+            rustdoc_crate_with_paths([]),
+            snapshot_for_test("usecase", &rustdoc_crate_with_paths([])),
+        ),
+    )]);
+
+    let error = CatalogueToExtendedCrateCodec::new()
+        .encode(&target_layer, &catalogues, &contexts)
+        .expect_err("a context keyed for another layer must fail closed");
+    let message = error.to_string();
+    assert!(message.contains("authoritative rustdoc context"));
+    assert!(message.contains("usecase"));
+    assert!(message.contains("domain"));
 }
 
 fn insert_empty_enum_type(doc: &mut CatalogueDocument, name: &str) {
@@ -202,12 +297,12 @@ fn encode_single_doc(
 ) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
     let target_layer = doc.layer().clone();
     let track_catalogues = BTreeMap::from([(target_layer.clone(), doc)]);
+    let rustdoc_contexts = target_rustdoc_contexts(&target_layer, baseline, current);
     <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &track_catalogues,
-        baseline,
-        current,
+        &rustdoc_contexts,
     )
 }
 
@@ -466,8 +561,10 @@ fn test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_externa
         (LayerId::try_new("domain").unwrap(), declaring),
     ]);
     let empty = rustdoc_crate_with_paths([]);
-    let paths = resolution_paths_for_catalogue(&target_layer, &catalogues, &empty, &empty)
-        .expect("available other-layer catalogues must extend one resolution set");
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("available other-layer catalogues must extend one resolution set");
 
     let user_id = paths
         .iter()
@@ -568,12 +665,12 @@ fn test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates() 
         (target_layer.clone(), target),
     ]);
     let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
     let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &empty,
-        &empty,
+        &rustdoc_contexts,
     )
     .expect("cross-layer add declarations must resolve as external identities");
 
@@ -619,6 +716,280 @@ fn test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates() 
             .any(|summary| summary.path == ["usecase", "model", "UserId"]),
         "the referencing catalogue must not duplicate the external declaration"
     );
+}
+
+#[test]
+fn test_generated_cross_layer_context_maps_use_declaring_current_placement() {
+    for case in 0..16_u32 {
+        let module = format!("generated_{case}");
+        let item = format!("Name{case}");
+        let reference = format!("domain::{module}::{item}");
+        let target_layer = LayerId::try_new("usecase").unwrap();
+        let declaring_layer = LayerId::try_new("domain").unwrap();
+
+        let mut target = make_doc_with_layer("usecase", "usecase");
+        target.insert_type(
+            CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("reference").unwrap(),
+                            TypeRef::new(reference).unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let mut declaring = make_doc_with_layer("domain", "domain");
+        declaring.insert_type(
+            CatalogueEntryKey::try_new(item.clone()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.clone()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogues =
+            BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+        let target_baseline = rustdoc_crate_with_paths([]);
+        let target_current = rustdoc_crate_with_paths([]);
+        let declaring_baseline = rustdoc_crate_with_paths([]);
+        let declaring_current = rustdoc_crate_with_paths([(
+            1,
+            vec!["domain", module.as_str(), item.as_str()],
+            ItemKind::Struct,
+        )]);
+        let rustdoc_contexts = BTreeMap::from([
+            (
+                target_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    target_layer.clone(),
+                    target_baseline,
+                    snapshot_for_test("infrastructure", &target_current),
+                ),
+            ),
+            (
+                declaring_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    declaring_layer,
+                    declaring_baseline,
+                    snapshot_for_test("domain", &declaring_current),
+                ),
+            ),
+        ]);
+
+        let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+            &CatalogueToExtendedCrateCodec::new(),
+            &target_layer,
+            &catalogues,
+            &rustdoc_contexts,
+        )
+        .expect("generated cross-layer declarations must resolve");
+        let item_id = item_id_for_path(&encoded, &["domain", module.as_str(), item.as_str()]);
+        let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+        let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+            panic!("expected generated Handler struct");
+        };
+        let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+            panic!("expected generated Handler fields");
+        };
+        assert!(matches!(
+            &encoded.krate().index[&fields[0]].inner,
+            ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == item_id
+        ));
+        assert_eq!(
+            encoded.krate().paths[&item_id].path,
+            ["domain", module.as_str(), item.as_str()]
+        );
+    }
+}
+
+#[test]
+fn test_property_cross_layer_context_completeness_and_declaring_placement() {
+    // A small deterministic generator keeps this property test reproducible
+    // without making the production codec depend on a test-only generator
+    // crate. Each generated state exercises a different declaration name,
+    // target-side distractor, and declaring-layer candidate shape.
+    let mut generator = PropertyGenerator::new(0x5eed_2026);
+    for _case in 0..48 {
+        let module = format!("module_{}", generator.next_u32() % 11);
+        let item = format!("Name{}", generator.next_u32() % 17);
+        let candidate_shape = generator.next_u32() % 3;
+        let reference = if candidate_shape == 1 {
+            format!("domain::{module}::{item}")
+        } else {
+            format!("domain::{item}")
+        };
+        let target_layer = LayerId::try_new("usecase").unwrap();
+        let declaring_layer = LayerId::try_new("domain").unwrap();
+
+        let mut target = make_doc_with_layer("usecase", "usecase");
+        target.insert_type(
+            CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("reference").unwrap(),
+                            TypeRef::new(reference).unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let mut declaring = make_doc_with_layer("domain", "domain");
+        declaring.insert_type(
+            CatalogueEntryKey::try_new(item.clone()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogues =
+            BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+        let target_baseline = rustdoc_crate_with_paths([]);
+        let mut target_current =
+            rustdoc_crate_with_paths([(1, vec!["domain", "target", "Other"], ItemKind::Struct)]);
+        target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+        let declaring_baseline = rustdoc_crate_with_paths([]);
+        let declaring_current = match candidate_shape {
+            0 => rustdoc_crate_with_paths([]),
+            1 => rustdoc_crate_with_paths([(
+                2,
+                vec!["domain", module.as_str(), item.as_str()],
+                ItemKind::Struct,
+            )]),
+            _ => rustdoc_crate_with_paths([
+                (2, vec!["domain", "alpha", item.as_str()], ItemKind::Struct),
+                (3, vec!["domain", "beta", item.as_str()], ItemKind::Struct),
+            ]),
+        };
+        let contexts = BTreeMap::from([
+            (
+                target_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    target_layer.clone(),
+                    target_baseline,
+                    snapshot_for_test("infrastructure", &target_current),
+                ),
+            ),
+            (
+                declaring_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    declaring_layer.clone(),
+                    declaring_baseline,
+                    snapshot_for_test("domain", &declaring_current),
+                ),
+            ),
+        ]);
+
+        let result =
+            CatalogueToExtendedCrateCodec::new().encode(&target_layer, &catalogues, &contexts);
+        if candidate_shape == 2 {
+            assert!(result.is_err(), "ambiguous declaring candidates must fail closed");
+        } else {
+            let encoded = result.expect("generated declaring candidate must be resolvable");
+            let expected_path = if candidate_shape == 1 {
+                vec!["domain", module.as_str(), item.as_str()]
+            } else {
+                vec!["domain", item.as_str()]
+            };
+            let item_id = item_id_for_path(&encoded, &expected_path);
+            let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+            let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+                panic!("generated Handler must remain a struct");
+            };
+            let ItemKind::Struct = encoded.krate().paths[&item_id].kind else {
+                panic!("generated declaring item must remain a struct path");
+            };
+            let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+                panic!("generated Handler must retain its field");
+            };
+            assert!(matches!(
+                &encoded.krate().index[&fields[0]].inner,
+                ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == item_id
+            ));
+            assert!(
+                !encoded
+                    .krate()
+                    .paths
+                    .values()
+                    .any(|summary| { summary.path == ["usecase", "target", item.as_str()] }),
+                "target-layer distractors must not place a declaring-layer add"
+            );
+        }
+
+        let mut missing_declaring = contexts.clone();
+        missing_declaring.remove(&declaring_layer);
+        let missing_declaring_error = CatalogueToExtendedCrateCodec::new()
+            .encode(&target_layer, &catalogues, &missing_declaring)
+            .expect_err("a missing declaring context must fail closed");
+        assert!(missing_declaring_error.to_string().contains("no authoritative rustdoc context"));
+
+        let mut missing_target = contexts;
+        missing_target.remove(&target_layer);
+        let missing_target_error = CatalogueToExtendedCrateCodec::new()
+            .encode(&target_layer, &catalogues, &missing_target)
+            .expect_err("a missing target context must fail closed");
+        assert!(missing_target_error.to_string().contains("no authoritative rustdoc context"));
+    }
+}
+
+struct PropertyGenerator {
+    state: u64,
+}
+
+impl PropertyGenerator {
+    fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
+
+    fn next_u32(&mut self) -> u32 {
+        self.state = self.state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+        (self.state >> 32) as u32
+    }
 }
 
 #[test]
@@ -672,8 +1043,9 @@ fn test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference() {
         (target_layer.clone(), target),
     ]);
     let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
     let resolution_paths =
-        resolution_paths_for_catalogue(&target_layer, &catalogues, &empty, &empty)
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
             .expect("the unplaced declaring add remains in the shared resolution set");
     let unplaced_summary = resolution_paths
         .values()
@@ -685,8 +1057,7 @@ fn test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference() {
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &empty,
-        &empty,
+        &rustdoc_contexts,
     )
     .expect("a qualified reference must resolve an unplaced cross-layer add");
 
@@ -707,6 +1078,279 @@ fn test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference() {
         encoded.krate().external_crates[&encoded.krate().paths[&user_id].crate_id].name,
         "domain"
     );
+}
+
+#[test]
+fn test_encode_cross_layer_omitted_module_path_uses_declaring_current_rustdoc() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::model::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "target", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current =
+        rustdoc_crate_with_paths([(2, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer.clone(),
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("an omitted external add must use the declaring layer's current placement");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "model", "Name"]);
+    assert_eq!(encoded.krate().paths[&name_id].path, ["domain", "model", "Name"]);
+    assert_ne!(encoded.krate().paths[&name_id].crate_id, 0);
+    assert!(
+        !encoded.krate().paths.values().any(|summary| summary.path == ["domain", "Name"]),
+        "the omitted external add must not remain at an unplaced crate-root spelling"
+    );
+
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id
+    ));
+}
+
+#[test]
+fn test_encode_cross_layer_omitted_module_path_without_declaring_rustdoc_uses_unplaced_catalogue_identity()
+ {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "referring", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current = rustdoc_crate_with_paths([]);
+    let declaring_context = AuthoritativeRustdocContext::new(
+        declaring_layer.clone(),
+        declaring_baseline,
+        snapshot_for_test("domain", &declaring_current),
+    );
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (declaring_layer, declaring_context),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("an absent declaring identity must synthesize an unplaced external add");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "Name"]);
+    let name_summary = &encoded.krate().paths[&name_id];
+    assert_ne!(name_summary.crate_id, 0);
+    assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, "domain");
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| summary.path == ["domain", "referring", "Name"]),
+        "the synthesized item must not use the referring-side rustdoc placement"
+    );
+
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id
+    ));
+}
+
+#[test]
+fn test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let target = make_doc_with_layer("usecase", "usecase");
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current =
+        rustdoc_crate_with_paths([(2, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer.clone(),
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("rustdoc must win when it supplies the same resolved identity");
+    let matching = paths
+        .iter()
+        .filter(|(_, summary)| summary.path == ["domain", "model", "Name"])
+        .collect::<Vec<_>>();
+    assert_eq!(matching.len(), 1, "the identity must not be synthesized twice");
+    assert_eq!(*matching[0].0, Id(1));
+    assert_eq!(matching[0].1.crate_id, 7);
 }
 
 #[test]
@@ -746,8 +1390,27 @@ fn test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add() {
         (LayerId::try_new("domain").unwrap(), declaring),
         (target_layer.clone(), target),
     ]);
-    let paths = resolution_paths_for_catalogue(&target_layer, &catalogues, &current, &current)
-        .expect("a referring-side rustdoc identity must win over the other-layer add");
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                rustdoc_crate_with_paths([]),
+                snapshot_for_test("infrastructure", &current),
+            ),
+        ),
+        (
+            LayerId::try_new("domain").unwrap(),
+            AuthoritativeRustdocContext::new(
+                LayerId::try_new("domain").unwrap(),
+                rustdoc_crate_with_paths([]),
+                snapshot_for_test("domain", &rustdoc_crate_with_paths([])),
+            ),
+        ),
+    ]);
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("a referring-side rustdoc identity must win over the other-layer add");
 
     let (id, summary) = paths
         .iter()
@@ -794,13 +1457,13 @@ fn test_encode_cross_layer_short_name_reference_fails_closed() {
         (target_layer.clone(), target),
     ]);
     let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
 
     let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &empty,
-        &empty,
+        &rustdoc_contexts,
     )
     .expect_err("a cross-layer short name must not use an external fallback");
     assert!(matches!(
@@ -827,13 +1490,13 @@ fn test_encode_cross_layer_short_name_trait_reference_fails_closed() {
         (target_layer.clone(), target),
     ]);
     let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
 
     let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &empty,
-        &empty,
+        &rustdoc_contexts,
     )
     .expect_err("a cross-layer short trait name must not use an external fallback");
     assert!(matches!(
@@ -873,13 +1536,13 @@ fn test_encode_cross_layer_reference_to_missing_crate_fails_closed() {
     );
     let catalogues = BTreeMap::from([(target_layer.clone(), target)]);
     let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = target_rustdoc_contexts(&target_layer, &empty, &empty);
 
     let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &empty,
-        &empty,
+        &rustdoc_contexts,
     )
     .expect_err("a missing declaring crate must not pass as an unresolved external");
     assert!(matches!(
@@ -918,13 +1581,13 @@ fn test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision()
         (1, vec!["usecase", "OwnType"], ItemKind::Struct),
         (2, vec!["domain", "RemoteType"], ItemKind::Enum),
     ]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &baseline, &baseline);
 
     let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
         &CatalogueToExtendedCrateCodec::new(),
         &target_layer,
         &catalogues,
-        &baseline,
-        &baseline,
+        &rustdoc_contexts,
     )
     .expect_err("an own-layer baseline collision must remain fail-closed");
     assert!(matches!(
@@ -961,8 +1624,10 @@ fn test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_prec
     let rustdoc =
         rustdoc_crate_with_paths([(1, vec!["domain", "declared", "UserId"], ItemKind::Struct)]);
 
-    let error = resolution_paths_for_catalogue(&target_layer, &catalogues, &rustdoc, &rustdoc)
-        .expect_err("a malformed add must not be hidden by rustdoc precedence");
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &rustdoc, &rustdoc);
+    let error =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect_err("a malformed add must not be hidden by rustdoc precedence");
     assert!(matches!(
         error,
         NewTypeGraphCodecError::InvalidTypeRef(ref type_ref, ref diagnostic)
@@ -1092,6 +1757,103 @@ fn test_resolution_paths_do_not_alias_external_rustdoc_root() {
         .find(|summary| summary.path.last().map(String::as_str) == Some("Thing"))
         .expect("external summary should remain in the resolution set");
     assert_eq!(summary.path, vec!["sotp".to_owned(), "external".to_owned(), "Thing".to_owned()]);
+}
+
+#[test]
+fn test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::model::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(target_layer.clone(), target), (declaring_layer.clone(), declaring)]);
+    let target_rustdoc = rustdoc_crate_with_root_and_paths("usecase", []);
+    let declaring_baseline = rustdoc_crate_with_root_and_paths("sotp", []);
+    let declaring_current = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [(1, vec!["sotp", "model", "Name"], ItemKind::Struct)],
+    );
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_rustdoc.clone(),
+                snapshot_for_test("infrastructure", &target_rustdoc),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer,
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("a declaring bin-target root must be canonicalized to the package root");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "model", "Name"]);
+    let name_summary = &encoded.krate().paths[&name_id];
+    assert_eq!(name_summary.path, ["domain", "model", "Name"]);
+    assert_ne!(name_summary.crate_id, 0);
+    assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, "domain");
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| { summary.path == ["sotp", "model", "Name"] }),
+        "the synthesized identity must not retain the bin-target rustdoc root"
+    );
 }
 
 #[test]

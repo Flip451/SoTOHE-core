@@ -11,46 +11,12 @@ use std::process::Command;
 use std::time::Duration;
 
 use domain::schema::SchemaExportError;
+use domain::tddd::CargoFeatureName;
+use domain::tddd::catalogue_v2::CrateName;
+use sha2::Digest as _;
 
 const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const MAX_CARGO_METADATA_DURATION: Duration = Duration::from_secs(120);
-
-/// Resolves the Cargo target directory for rustdoc extraction, respecting
-/// `CARGO_TARGET_DIR` and workspace config.
-///
-/// Extraction may safely fall back to Cargo's default target location when
-/// metadata is unavailable because it is about to launch rustdoc and create a
-/// fresh artifact. Snapshot reuse must instead use
-/// [`resolve_target_dir_strict`].
-pub(super) fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
-    if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
-        return resolve_configured_target_dir(
-            workspace_root,
-            PathBuf::from(dir),
-            "CARGO_TARGET_DIR",
-        );
-    }
-    let output = run_cargo_metadata(workspace_root, "cargo metadata")?;
-
-    if !output.status.success() {
-        return Ok(workspace_root.join("target"));
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&stdout) {
-        if let Some(target_directory) =
-            metadata.get("target_directory").and_then(|value| value.as_str())
-        {
-            return resolve_configured_target_dir(
-                workspace_root,
-                PathBuf::from(target_directory),
-                "cargo metadata target_directory",
-            );
-        }
-    }
-
-    Ok(workspace_root.join("target"))
-}
 
 /// Resolves the target directory for snapshot reuse.
 ///
@@ -94,6 +60,43 @@ pub(super) fn resolve_target_dir_strict(
         PathBuf::from(target_directory),
         "cargo metadata target_directory",
     )
+}
+
+/// Resolves the private Cargo target area used by one rustdoc selection.
+///
+/// Cargo's ordinary target directory is shared with unrelated commands. The
+/// rustdoc adapter therefore places each stable workspace/package/feature
+/// selection below a hidden, no-follow-created subtree. Ordinary Cargo
+/// rustdoc invocations continue to use the parent target directory and cannot
+/// overwrite this adapter's expected JSON by accident; cooperating adapter
+/// invocations are serialized by the lock in that subtree.
+pub(super) fn resolve_exclusive_target_dir(
+    workspace_root: &Path,
+    crate_name: &CrateName,
+    features: &[CargoFeatureName],
+    use_default_features: bool,
+) -> Result<PathBuf, SchemaExportError> {
+    let cargo_target_dir = resolve_target_dir_strict(workspace_root)?;
+    let trusted_workspace = checked_workspace_root(workspace_root)?;
+    let mut identity = Vec::new();
+    append_len_prefixed_bytes(&mut identity, &path_bytes(&trusted_workspace));
+    append_len_prefixed_bytes(&mut identity, crate_name.as_str().as_bytes());
+    append_len_prefixed_bytes(
+        &mut identity,
+        if use_default_features { b"default-features" } else { b"declared-features" },
+    );
+    for feature in features {
+        append_len_prefixed_bytes(&mut identity, feature.as_str().as_bytes());
+    }
+    let directory_name = hex_digest(&sha2::Sha256::digest(&identity));
+    let exclusive = cargo_target_dir.join(".sotp-rustdoc").join(directory_name);
+    crate::track::symlink_guard::reject_symlinks_up_to_root(&exclusive).map_err(|error| {
+        SchemaExportError::RustdocFailed(format!(
+            "exclusive rustdoc target directory symlink guard rejected '{}': {error}",
+            exclusive.display()
+        ))
+    })?;
+    Ok(exclusive)
 }
 
 fn run_cargo_metadata(
@@ -217,13 +220,28 @@ pub(super) fn absolutize_for_target_guard(path: &Path) -> Result<PathBuf, Schema
         .map_err(|e| SchemaExportError::RustdocFailed(format!("target-dir guard: {e}")))
 }
 
-/// Parse a rustdoc JSON file into a `rustdoc_types::Crate`.
-///
-/// # Errors
-/// Returns `SchemaExportError::ParseFailed` on I/O or JSON parse errors.
-pub(super) fn parse_rustdoc_json(path: &Path) -> Result<rustdoc_types::Crate, SchemaExportError> {
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| SchemaExportError::ParseFailed(format!("read error: {e}")))?;
-    serde_json::from_str(&content)
-        .map_err(|e| SchemaExportError::ParseFailed(format!("JSON parse error: {e}")))
+fn append_len_prefixed_bytes(output: &mut Vec<u8>, bytes: &[u8]) {
+    output.extend_from_slice(&(bytes.len() as u64).to_be_bytes());
+    output.extend_from_slice(bytes);
+}
+
+fn path_bytes(path: &Path) -> Vec<u8> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt as _;
+        path.as_os_str().as_bytes().to_vec()
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::ffi::OsStrExt as _;
+        path.as_os_str().encode_wide().flat_map(u16::to_be_bytes).collect()
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        path.to_string_lossy().into_owned().into_bytes()
+    }
+}
+
+fn hex_digest(digest: &[u8]) -> String {
+    digest.iter().map(|byte| format!("{byte:02x}")).collect()
 }

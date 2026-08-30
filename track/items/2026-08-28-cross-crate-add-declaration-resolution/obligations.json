@@ -1,8 +1,120 @@
 {
   "obligations": [
     {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+      "declaration_hash": "6500e05699f36c4b272c0758a362d54b63b8d61e3aca8b216bc974d97b98f96c",
+      "id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+      "declaration_hash": "78d3bf78202371601c41aee47b5ac2b3f39d3ad44373bb18057f7cccea6bd833",
+      "id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "declaration_hash": "3b4a4ade472945527a867dd53f447aa565fa1bfc7b1034fe092cde9e56dfc04a",
+      "id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
       "brief": "Author a contract test covering 'trait_method:encode' of CatalogueToExtendedCratePort",
-      "declaration_hash": "5e7f51dec9e702247d1bb4cb8df85882698ca2dd8b2f3a24b1ac53561a467310",
+      "declaration_hash": "a4a3f4c5e668cd722e8dbdd6af6852b71150f8f18657c92189441a0d6eaab476",
       "id": {
         "entry_key": "CatalogueToExtendedCratePort",
         "item_identifier": "trait_method:encode",
@@ -57,8 +169,116 @@
       }
     },
     {
+      "brief": "Author a contract test covering 'trait_method:load_from_path' of RustdocCratePort",
+      "declaration_hash": "bfc839b5bc43364f0bdf83b28ba59e6a22468d70479fdcdbd0effbb05b4085de",
+      "id": {
+        "entry_key": "RustdocCratePort",
+        "item_identifier": "trait_method:load_from_path",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "RustdocCratePort",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:capture_current' of RustdocCratePort",
+      "declaration_hash": "bfc839b5bc43364f0bdf83b28ba59e6a22468d70479fdcdbd0effbb05b4085de",
+      "id": {
+        "entry_key": "RustdocCratePort",
+        "item_identifier": "trait_method:capture_current",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "RustdocCratePort",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
       "brief": "Author a result test covering 'entry' of usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-      "declaration_hash": "1744ea5b74ea99250d223f6ab6a9ee1eeec952ad6ccbda3356a84ef411bbbee7",
+      "declaration_hash": "89f037886b1e51b0956ca36c46df2ac43c0a30e885c132aa873c1e2d5c35b30a",
       "id": {
         "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
         "item_identifier": "entry",
@@ -76,6 +296,82 @@
         {
           "element_id": "AC-01",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
       "target_entry": {
@@ -89,8 +385,120 @@
       }
     },
     {
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "declaration_hash": "e7a1235b7b05df63d0e0070404ea128ff08c4d7faf96342a5404bfb7c0d8ef25",
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort' of infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-      "declaration_hash": "86fbf19f207b4c7b48efbf936f7597d498b444db0835c5400030acdd89f6d2dc",
+      "declaration_hash": "ee42eaeabf5e32807365586d7cd8ee6187e6288e9bb6281262a7dfa49cdbadb3",
       "id": {
         "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
         "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
@@ -146,7 +554,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
-      "declaration_hash": "51364d080964dd22b98c2587a25299ae3c7d881e01bbfb8c2011cd2417ac0643",
+      "declaration_hash": "9ac9b0e301c244440c0350bdf4a54132839b13ba94ffcf77489dd2d3b57cb8c1",
       "id": {
         "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
         "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
@@ -172,10 +580,86 @@
         {
           "element_id": "AC-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
       "target_entry": {
         "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort' of infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+      "declaration_hash": "545642bd4e06ec95b7e29709f92cbdb9d1080b453217d363c0932205e0e2d875",
+      "id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
         "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
         "section_key": "traits"
       },

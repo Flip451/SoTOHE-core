@@ -498,27 +498,22 @@ mod tests {
     fn signal_json(baseline_hash: &str, head_commit: &str) -> String {
         let declaration_hash =
             type_signals_codec::declaration_hash(SAMPLE_CATALOGUE_JSON.as_bytes());
-        format!(
-            r#"{{
-  "schema_version": {},
-  "generated_at": "2026-06-27T00:00:00Z",
-  "declaration_hash": "{}",
-  "head_commit": "{}",
-  "baseline_hash": "{baseline_hash}",
-  "signals": [
-    {{
-      "type_name": "MyType",
-      "namespace": "type",
-      "kind_tag": "struct",
-      "signal": "blue",
-      "found_type": true
-    }}
-  ]
-}}"#,
-            domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
-            declaration_hash.as_digest().as_str(),
-            head_commit,
-        )
+        let mut document = serde_json::json!({
+            "schema_version": domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
+            "generated_at": "2026-06-27T00:00:00Z",
+            "declaration_hash": declaration_hash.as_digest().as_str(),
+            "head_commit": head_commit,
+            "baseline_hash": baseline_hash,
+            "signals": [{
+                "type_name": "MyType",
+                "namespace": "type",
+                "kind_tag": "struct",
+                "signal": "blue",
+                "found_type": true
+            }],
+        });
+        type_signals_codec::merge_fixture_reuse_identity(&mut document);
+        serde_json::to_string_pretty(&document).unwrap()
     }
 
     fn write_signal_fixture(
@@ -541,22 +536,24 @@ mod tests {
         .unwrap();
     }
 
-    const SAMPLE_SIGNALS_JSON: &str = r#"{
-  "schema_version": 5,
-  "generated_at": "2026-06-27T00:00:00Z",
-  "declaration_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "baseline_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "signals": [
-    {
-      "type_name": "MyType",
-      "namespace": "type",
-      "kind_tag": "struct",
-      "signal": "blue",
-      "found_type": true
+    fn sample_signals_json() -> String {
+        let mut document = serde_json::json!({
+            "schema_version": 5,
+            "generated_at": "2026-06-27T00:00:00Z",
+            "declaration_hash": "a".repeat(64),
+            "head_commit": "a".repeat(40),
+            "baseline_hash": "a".repeat(64),
+            "signals": [{
+                "type_name": "MyType",
+                "namespace": "type",
+                "kind_tag": "struct",
+                "signal": "blue",
+                "found_type": true
+            }],
+        });
+        type_signals_codec::merge_fixture_reuse_identity(&mut document);
+        serde_json::to_string_pretty(&document).unwrap()
     }
-  ]
-}"#;
 
     #[test]
     fn read_signals_returns_document_for_existing_file() {
@@ -779,7 +776,7 @@ mod tests {
         let track_dir = dir.path().join("my-track");
         fs::create_dir_all(&track_dir).unwrap();
         let real = track_dir.join("real-domain-type-signals.json");
-        fs::write(&real, SAMPLE_SIGNALS_JSON).unwrap();
+        fs::write(&real, sample_signals_json()).unwrap();
         std::os::unix::fs::symlink(&real, track_dir.join("domain-type-signals.json")).unwrap();
 
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
@@ -798,7 +795,7 @@ mod tests {
         let dir = temp_items_dir();
         let real_track_dir = dir.path().join("real-track");
         fs::create_dir_all(&real_track_dir).unwrap();
-        fs::write(real_track_dir.join("domain-type-signals.json"), SAMPLE_SIGNALS_JSON).unwrap();
+        fs::write(real_track_dir.join("domain-type-signals.json"), sample_signals_json()).unwrap();
         std::os::unix::fs::symlink(&real_track_dir, dir.path().join("my-track")).unwrap();
 
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
@@ -839,7 +836,7 @@ mod tests {
         let real_items_dir = dir.path().join("real-items");
         let track_dir = real_items_dir.join("my-track");
         fs::create_dir_all(&track_dir).unwrap();
-        fs::write(track_dir.join("domain-type-signals.json"), SAMPLE_SIGNALS_JSON).unwrap();
+        fs::write(track_dir.join("domain-type-signals.json"), sample_signals_json()).unwrap();
         let link_items_dir = dir.path().join("items");
         std::os::unix::fs::symlink(&real_items_dir, &link_items_dir).unwrap();
 

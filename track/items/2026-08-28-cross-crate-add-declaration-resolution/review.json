@@ -30,6 +30,245 @@
           "hash": "rvw1:sha256:a47bcc301397ef51b4a01cc7cb9b4a1873fd88ad32005ced874f6f64a67c94f3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:16:16Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md",
+              "line": 35,
+              "message": "D3 は見出しで再利用キーが「出力先」を識別すると決定していますが、キーの構成要素（line 35）には解決済み target directory や選択 crate・feature・profile・期待 JSON path が含まれていません。line 39 の読み取り制約だけではキャッシュキーの同一性を保証しないため、異なる出力先／選択コンテキストの結果を同一キーで再利用し得ます。",
+              "severity": "major"
+            },
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md",
+              "line": 39,
+              "message": "D3 は「設定済み catalogue の各 bytes」および「設定済み rustdoc baseline の各 bytes」を完全に fingerprint する open-set の決定を記録していますが、その完全追跡を Cargo・rustdoc・git・ドメイン型など既存 authority に委譲するのか、保守的 over-approximation とするのか、深さ見積り付きの strict implementation とするのかを記録していません。未解決の完全追跡コミットメントになっています。",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:b422283bf0a0226a61baee4aa5c0256e642074c42a1ee02f03d9f15f9e8d1cdd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:22:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d068cb779efa34fbd58c1b0acc04978ef9700b981fecfb53bc4f35f920166d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:28:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d068cb779efa34fbd58c1b0acc04978ef9700b981fecfb53bc4f35f920166d3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-30T04:29:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:09682e2e38e95e44987bc8d3a2abfdf62b3170d67fcc1c796d133c9d3880f72b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:03:32Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 169,
+              "message": "`$PWD` を JSON 文字列へ無加工で埋め込んでいるため、`tempfile::tempdir()` の親パスに `\"`、バックスラッシュ、改行などが含まれる環境では shim が不正な Cargo metadata JSON を返し、正常系テストが CLI 境界へ到達する前に失敗します。この一時パスの文字集合前提は spec／環境前提宣言にありません（未宣言の前提への依存）。`serde_json` などで manifest path を正しくエスケープしてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "test isolation",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 252,
+              "message": "`CARGO_HOME` だけを削除すると fingerprint 処理はホストの `$HOME/.cargo/config.toml` または `config` を読みます。そのファイルが symlink、非通常ファイル、過大、または読取不能なら、この成功期待テストは環境依存で失敗します。fixture 専用の一時ディレクトリへ `HOME` も向け、Cargo home の状態をテスト内で固定してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:09682e2e38e95e44987bc8d3a2abfdf62b3170d67fcc1c796d133c9d3880f72b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:19:26Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 170,
+              "message": "`manifest_path.to_string_lossy()` は Unix の非 UTF-8 パスを置換文字へ黙って変更するため、`TMPDIR` などに非 UTF-8 byte が含まれると shim が実在しない manifest path を返し、正常系テストが失敗します。workspace／一時パスを UTF-8 に限定する前提は spec と環境前提宣言のどちらにもありません（未宣言の前提への依存）。lossy 変換を避けるか、UTF-8 制約と失敗動作を契約として宣言してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:0cc452495e2ff740d1f52929336d064cfd1dc331835253f4801ae35cd914f5a6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:36:43Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 258,
+              "message": "`run_in_dir` はプロセス全体の current directory を変更しますが、`process_env_lock` は同じ mutex を取得するテストしか直列化しません。CLI の同一 unit-test binary には mutex を使わず `tempdir_in(std::env::current_dir())` を呼ぶ batch-plan テストなどがあり、並行するとこの fixture repository 内へ一時ファイルを作成して worktree/fingerprint 判定を不定にできます。これは宣言されていない並行実行前提への依存で、テスト独立性にも反します。プロセス cwd を変更せず metadata path を解決するか、`Command::current_dir` を使う子プロセスへ隔離してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:a5cc048f75d89f8551d46d761fc04e2e76577bf0d0c877733b01c9e11bd230b9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:44:37Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 254,
+              "message": "正常系 fixture を `tempdir_in(\"/tmp\")` に固定すると、`/tmp` が存在して書込み可能かつ symlink でない Unix 環境を暗黙に要求します。特に macOS では通常 `/tmp` が `/private/tmp` への symlink であり、D7 に従う workspace/target の ancestor symlink guard がこの成功テストを拒否します。この platform/filesystem 前提は spec と環境前提宣言にありません（未宣言の前提への依存）。環境の temp root を canonicalize・検証して使うなど、固定 `/tmp` を避けてください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1ba6e5cce45604b30d17aabbfdb1e4f2f1155e359a1203d5ccafb75656ab8e1b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:50:20Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 181,
+              "message": "`canonicalize()` は path の byte encoding を UTF-8 に変換しないため、`TMPDIR` が有効な非 UTF-8 Unix path の場合は `manifest_path.to_str()` が失敗し、この正常系テストが panic します。canonical temp root が UTF-8 になる前提は spec と環境前提宣言にありません（未宣言の前提への依存）。UTF-8 を要求しない fixture transport にするか、対応 encoding と非 UTF-8 時の動作を契約として宣言してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:5e0e8ffd53c04b41804cac9e51ce6c0ee71b14856527c979c0c25715b715b633",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T06:00:08Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 255,
+              "message": "親／子の判定を ambient な `SOTP_TYPE_SIGNALS_CHILD` の存在だけに委ねているため、CI や開発環境で同名変数が既に設定されていると fixture と子プロセスを作らず、通常の repository cwd で子側ロジックを実行してテストが失敗します。この環境変数が未設定という前提は宣言されていません（未宣言の前提への依存）。fixture 固有の nonce/path も検証する marker にしてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 259,
+              "message": "`current_exe()` を直接再実行する方式は、現在の test binary が OS からネイティブ実行可能であることを要求します。Cargo の target runner/QEMU 経由で Unix target のテストを実行している場合、親は動作してもこの `Command` は runner を経由せず `Exec format error` になります。こうした subprocess/platform 前提は spec と環境前提宣言にありません（未宣言の前提への依存）。runner を迂回する自己再実行を避けて隔離してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:54761f3375614014c29347b543edc9b96b1c7aec8d021f8e867fa6c62974b7e0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T06:10:46Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 78,
+              "message": "fixture を `tempdir_in(current_dir)` で作るため、テスト実行ディレクトリが書込み可能であることを暗黙に要求し、read-only source checkout では即座に失敗します。また通常の repository cwd では実行中に未追跡の nested repository を作るため、同じ mutex を取得しない並行テストの worktree-clean 判定や走査結果を汚染できます。この filesystem／並行実行前提は spec と環境前提宣言にありません（未宣言の前提への依存）。共有 source tree 外の隔離領域を使ってください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:9d163a50c720b568dd08e9b61cbf680846bb1c00541ac400b0f6cd38576737f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T06:27:34Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 78,
+              "message": "fixture を `tempdir_in(current_dir)` で作るため、テスト実行ディレクトリが書込み可能であることを暗黙に要求し、read-only source checkout では失敗します。また repository cwd では実行中に未追跡の nested repository を作り、同じ mutex を取得しない並行テストの worktree-clean 判定や走査結果を汚染します。briefing が要求するとおり、fixture を repository 外の隔離 temp directory に移してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:9d163a50c720b568dd08e9b61cbf680846bb1c00541ac400b0f6cd38576737f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:11:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd82fca3292a6230c367e7494775e853bc98e85e5c2897e554e8e11d9195d112",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:17:04Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 76,
+              "message": "isolated fixture を作った後も `root` 自体は canonicalize せず CLI へ渡しているため、`TMPDIR` が symlink を経由する環境では D7 の workspace ancestor symlink guard がこの正常系テストを拒否します。`target_dir` だけでなく fixture workspace と以降の全 path に canonical root を使用してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 177,
+              "message": "`tempfile::tempdir()` の絶対 path を `to_str()` へ渡しているため、非 UTF-8 の `TMPDIR` では正常系テストが panic します。temporary root が UTF-8 という前提は spec と環境前提宣言にありません（未宣言の前提への依存）。UTF-8 を要求しない fixture transport にするか、対応 encoding と失敗動作を契約化してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:dd82fca3292a6230c367e7494775e853bc98e85e5c2897e554e8e11d9195d112",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:27:39Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 80,
+              "message": "fixture を固定 `/tmp` 配下に作るため、すべての `cfg(unix)` 環境に `/tmp` が存在して書込み可能という未宣言の platform/filesystem 前提へ依存します。chroot、sandbox、read-only `/tmp` では正常系テストが fixture 作成前に失敗します。環境から得た隔離 temp root を検証して使い、固定 `/tmp` を避けてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/track/tddd/type_signals.rs",
+              "line": 186,
+              "message": "`/tmp` の canonical path に非 UTF-8 component がある場合、`to_string_lossy()` は manifest path を別の文字列へ変更し、shim が実在しない path を返します。panic を避けても正常系は失敗するため、lossy 変換では encoding 前提を解消できません（未宣言の前提への依存）。実在 path を保持できる transport を使うか、UTF-8 を保証できる root を明示的に選別してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:946585939a76c33a5ab6f8914e812ec0f3f1e72e88ddb5095eabe7207993170a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:38:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9996b715eb49d6a0ae690736451e4d5c0383408533187b31830d41fc246454a7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -75,6 +314,107 @@
           "at": "2026-08-29T06:24:45Z",
           "findings": [],
           "hash": "rvw1:sha256:0b160814d2c9d845e20930ff914867cb9b21b37c0c76637c890ef76d58be897b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:17:35Z",
+          "findings": [
+            {
+              "category": "type-level invariant",
+              "file": "libs/domain/src/tddd/catalogue_to_extended_crate_port.rs",
+              "line": 30,
+              "message": "`AuthoritativeRustdocContext` claims to bind a graph pair to one layer, but it stores no `LayerId` and performs no consistency check. A caller can insert a context for layer A under layer B in the `BTreeMap`, causing cross-crate resolution to use the wrong rustdoc graphs. Encode the layer identity in the value object or validate the key/value association before use.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/domain/src/tddd/catalogue_to_extended_crate_port.rs",
+              "line": 119,
+              "message": "The newly added test function does not follow the required `test_{target}_{condition}_{expected_result}` naming convention. Rename `authoritative_context_new_preserves_baseline_and_current_graphs` accordingly.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:9f4557decee9a4fdf0fad5a4875cc0f1ad5a3ccb58003d452e2810eb25f11337",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T14:30:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01783969895963b8429fb5f93bcf6e42b21220667e17fe9b501546c5b2de67ec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:37:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01783969895963b8429fb5f93bcf6e42b21220667e17fe9b501546c5b2de67ec",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:29:35Z",
+          "findings": [
+            {
+              "category": "broken invariant / external-boundary assumption",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 159,
+              "message": "`ExpectedRustdocJsonPath::try_new` uses lexical `Path::starts_with`, so a path such as `/target/../outside/current.json` is accepted as being inside the target directory. This violates the documented confinement invariant and can make adapters read rustdoc data outside the resolved target directory. Normalize/canonicalize or reject parent traversal before accepting the path.",
+              "severity": "P1"
+            },
+            {
+              "category": "type-level invariant",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 212,
+              "message": "`RustdocExecutionIdentity::new` accepts `target_directory` and an `ExpectedRustdocJsonPath` independently, without proving that the expected path belongs to the supplied target directory. Callers can construct an identity whose Cargo target is `/a` while its expected JSON path was validated under `/b`, producing an internally inconsistent cache identity. Tie the path to its target directory or validate the relationship in the constructor.",
+              "severity": "P1"
+            },
+            {
+              "category": "public API documentation gap",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 94,
+              "message": "Several newly public APIs lack the required documentation comments (and the fallible free constructors also lack `# Errors` sections): `digest_identity!`-generated `new`/`as_digest` methods for the new digest types, `CapturedRustdocJson::{json_hash,crate_data}`, `RustdocSnapshot::{execution_identity,json_hash,crate_data}`, `RustdocExecutionIdentity::{target_directory,crate_name,features,profile,expected_json_path}`, `TypeSignalsCacheKey::{implementation_fingerprint,resolution_fingerprint,rustdoc_execution_identity}`, `construct_captured_rustdoc_json`, and `construct_rustdoc_snapshot`. Add API docs at each public surface.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:2d31a4e979234f00d80d92e2c83e92a7a198d7b1f0a84dd91bce7d4d4830dc04",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:16:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3857c21455f5dddf73ef9f5eb61ac0e9c1c84d9ee5de3e668382e03a3be8a396",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:52:23Z",
+          "findings": [
+            {
+              "category": "testing convention",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 842,
+              "message": "`cache_key` hard-codes the new implementation fingerprint, resolution fingerprint, and rustdoc execution identity, so this “each isolated cache identity mismatch” test varies only the pre-existing declaration, HEAD, and baseline fields. The AC-04 reuse contract is therefore untested for all three newly authoritative identities; add isolated mismatch cases proving each one returns `ReextractAndEvaluate`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:3857c21455f5dddf73ef9f5eb61ac0e9c1c84d9ee5de3e668382e03a3be8a396",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:11:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7aa71ac088d07e63115c51e2f6ae5a08a40bb260bb2ee41ad756b14f51a8812e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:16:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7aa71ac088d07e63115c51e2f6ae5a08a40bb260bb2ee41ad756b14f51a8812e",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -437,6 +777,317 @@
           "hash": "rvw1:sha256:bc569c07de9c736db0c308eb58bcf55ab933650dbdd5ac7b30c734749dd96857",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:42:16Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 106,
+              "message": "T006 の「callers supply a complete LayerId-keyed authoritative rustdoc context map」は上流の境界契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 115,
+              "message": "T007 の「resolve ... from the declaring layer's unique current-rustdoc identity under rustdoc-wins precedence」「domain::model::Name wins ...」は上流の挙動契約・回帰条件の再記述です。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 38,
+              "message": "SECTION-004 の「so callers provide every TDDD layer's baseline/current rustdoc pair」は上流の境界契約の再記述です。セクション説明を変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 48,
+              "message": "SECTION-005 の「Use the declaring layer's authoritative current rustdoc ... while preserving fail-closed unplaced identity handling」は上流の挙動契約の再記述です。セクション説明を変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:f37206b5f5551c9bc51b79cd24247224e534f9d2add12c3823db9afea7427889",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T07:45:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90186e329e55c2a193f3c3987fe895023a6f3d926c230002ce49a4bd17b00409",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:52:15Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 5,
+              "message": "T001 is still attributed to `CatalogueToExtendedCratePort`, although it completed against the previous `encode` contract; T006 is the task that converges the implementation on the current `AuthoritativeRustdocContext`-map signature. Retaining T001 is a stale-carrier attribution. Remove this attribution without changing T001's done status.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 11,
+              "message": "T002 and T003 remain attributed to `CatalogueToExtendedCrateCodec`, but both completed before the current declaring-layer rustdoc-context behavior and revised encode boundary; T007 is the current convergence owner. These historical mappings are stale-carrier attributions and should be removed.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 23,
+              "message": "T004 remains attributed to `CatalogueImplSignalsInteractor`, although it completed with only the original catalogue handoff and does not assemble the complete per-layer rustdoc-context map required by the current entry; T008 is the convergence owner. Remove the stale T004 attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 35,
+              "message": "T005's attribution to `TypeSignalsExecutorAdapter` predates the complete authoritative-rustdoc-context route now owned by T009, so it is a stale-carrier attribution. Remove only the adapter attribution; retain T005's separate `TypeSignalsExecutorPort` attribution because that catalogue entry is an unchanged `action: reference` entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:90186e329e55c2a193f3c3987fe895023a6f3d926c230002ce49a4bd17b00409",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T07:55:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63c8628755cc50866b111fc0f1db77dbf92fc8277d80121042b41dea148c0f84",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:16:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b925ddee92d968d85ec5d85b909ea23499bf775c6e8aeeb78904ce339f8ce07",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:28:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b925ddee92d968d85ec5d85b909ea23499bf775c6e8aeeb78904ce339f8ce07",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:33:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4b925ddee92d968d85ec5d85b909ea23499bf775c6e8aeeb78904ce339f8ce07",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:48:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 89,
+              "message": "SECTION-009 の「Reject an export plan requiring a sixty-fifth layer before export, evaluation, or reuse begins」は上流の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 99,
+              "message": "SECTION-010 の「including nested track-directory exclusion and complete cache-key integration, with no partial fallback」は上流の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 109,
+              "message": "SECTION-011 の「120-second waiter」「no-follow Unix lock」「one identity-bearing immutable snapshot」「evaluation rejects ... generation change」は上流の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 204,
+              "message": "T012 の「so a required sixty-fifth layer fails before export, evaluation, or reuse」は上流の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 215,
+              "message": "T013 の「including exclusion of nested track directories, the D3 environment allowlist, bounded fail-closed input capture, clean-worktree reuse, and final fingerprint revalidation」は上流の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 226,
+              "message": "T014 の「every writer ... participates in one ... lock」「waiter fails after 120 seconds without retry or fallback」「one identity-bearing immutable snapshot」「evaluation rejects ... generation change」は上流の挙動契約を再記述しています。変更対象・操作・anchor cite のみにしてください（no-upstream-restatement policy）。",
+              "severity": "P2"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 226,
+              "message": "T014 はロック／待機タイムアウト、writer participation、immutable snapshot、platform/root rejection、generation/ABA 検証という複数の independently verifiable behavior units（AC-05〜AC-08）を一つの未着手タスクに束ねています。これらを個別タスクへ分割してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cd414b899fbf23b2244fcf23e86123d0c458622b410abe0646d9496a39c4c4fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:00:33Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/batch-plan.json",
+              "line": 184,
+              "message": "T017 と T018 はともに T016 完了後に ready になり、T017 は RustdocCrateAdapter、T018 は type_signals_evaluator の別ターゲットです。合算見積もりも infrastructure で production 80行・test 85行と ceiling 内ですが、BATCH-005（T016,T018）と BATCH-006（T017）に分離されています。T017 を BATCH-005 に含めれば依存順を保ったまま不要な直列化を除去できます。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:677491cc3632c379e86ea21f71b1803a7e7bea0c9ca1f3466c08c1d020bba37d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:06:44Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/batch-plan.json",
+              "line": 184,
+              "message": "T017 と T018 はともに T016 完了後に ready になり、T017 は RustdocCrateAdapter、T018 は type_signals_evaluator の別ターゲットです。合算見積もりは infrastructure で production 80行・test 85行と ceiling 内ですが、現在は T018 が BATCH-005、T017 が singleton の BATCH-006 に分かれ、T018 の完了を待って T017 を開始する不要な直列化になっています。T016 を BATCH-005 のみにし、T017 と T018 を BATCH-006 にまとめてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:54cc86d07f4d2ac89d0acd42e2dd9222ef5a973efcf2bf835f3067a5806aa8ce",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:12:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cce9360def613d7b9044b4674c8aeb538f172edab4b99808e7010845c6a6718d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T23:19:30Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 13,
+              "message": "`AuthoritativeRustdocContext` is attributed only to done task T006, but T006’s completed shape uses a plain current `Crate`; the current catalogue requires a `RustdocSnapshot` plus the snapshot accessor. T011 is the task that implements this snapshot boundary but omits the entry. Reassign `AuthoritativeRustdocContext` to T011 and remove its stale T006 attribution; retain T006’s separate `CatalogueToExtendedCratePort` attribution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cce9360def613d7b9044b4674c8aeb538f172edab4b99808e7010845c6a6718d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:22:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:edcb62d7a65c80d82e75e88c712a58259247a6bec4447d66f728003447c51991",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:23:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c427c7676f2736c8a49f23db390f66564e71810b63853e4b5ff00df141986f5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:26:43Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 219,
+              "message": "T013 bundles two independently verifiable behavior units at a 470-line estimate: (1) `TypeSignalsCodecError`/typed decoding that rejects invalid persisted execution identities (IN-03, CO-04, AC-04), and (2) evaluator fingerprint capture, reuse-key integration, and stale/generation validation (IN-03, IN-07, OS-04, CO-04, CO-07, AC-04, AC-06). Split these into separate tasks before implementation; they target different symbols and can remain dependency-ordered in the same feasible batch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c427c7676f2736c8a49f23db390f66564e71810b63853e4b5ff00df141986f5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T03:40:44Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 219,
+              "message": "T013 still bundles two independently verifiable behavior units: (1) `TypeSignalsCodecError`/typed decoding that rejects invalid persisted execution identities (IN-03, CO-04, AC-04), and (2) evaluator fingerprint capture, reuse-key integration, and stale/generation validation (IN-03, IN-07, OS-04, CO-04, CO-07, AC-04, AC-06). Split them into separate tasks before implementation; their distinct symbols and tests allow dependency-ordered execution in the same feasible batch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:314537780e14bf66789e59f77d2ba00bc1a2f0259904e9aa12c533b55077f106",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T03:48:08Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 265,
+              "message": "T018 now bundles two independently verifiable behavior units: (1) authoritative fingerprint capture, complete reuse-key/decision integration, and stale-reuse tests (IN-03, OS-04, CO-04, AC-04); and (2) final start/end generation revalidation with discard, path-reread, and ABA tests (IN-07, CO-07, AC-06). Split them into dependency-ordered tasks before implementation and repartition their estimates/batches; both units currently sit behind the single T018 boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:314537780e14bf66789e59f77d2ba00bc1a2f0259904e9aa12c533b55077f106",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T03:57:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cad1a7c156c39db9e173b51a5ed87b96b3df119e54951ad4c931f2f81138b9a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:10:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:660dbd57477a7d34d70868560c3dd9ef39ca7eb93a9d459fb3fb9d4afacc1b10",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:14:04Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 173,
+              "message": "T016 is attributed to `infrastructure::schema_export::RustdocSchemaExporter`, whose current catalogue shape replaces path-returning behavior with immutable `Vec<u8>` export APIs, but T016’s description targets only `RustdocCrateAdapter`. As written, T016 can complete without converging this modified entry. Extend T016’s target/operation to include `RustdocSchemaExporter` (or move that attribution to a task that does); retain the two baseline `action: reference` port attributions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:660dbd57477a7d34d70868560c3dd9ef39ca7eb93a9d459fb3fb9d4afacc1b10",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:15:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd82a19b3bbe97d6052cae1e50b5ea64e398f55c0803b9968a0e66719cb60fd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -730,6 +1381,1319 @@
           "hash": "rvw1:sha256:108a53996d3a16ac7e75a48a0d68a088feb7c22be712b91db27795bece18cac0",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:19:18Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 100,
+              "message": "外部レイヤーの baseline を読み込んで解決に使うようになりましたが、対象レイヤー以外の baseline は評価中に変更されていないことを検証していません。`evaluate_and_write_with_contexts` の最終検証も target の `baseline_path` だけです。そのため、外部 baseline の差し替え（または読み込み中の変更）により、キャッシュキーや検証済み入力と異なる rustdoc context で結果を書き込めます。全レイヤーの baseline をスナップショット／ハッシュ化し、書き込み前に再検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f8b52173b8e16902d9df7e6b6fd921f92cf3d7725cf943f427950f460cb3ef23",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:34:56Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 147,
+              "message": "新たに追加された他レイヤーの rustdoc JSON 読み込みが、`json_path` に対する symlink 拒否を行わず `read_utf8_file_limited`（通常の `File::open`）へ進みます。生成物パスが symlink に置き換えられると、trusted な rustdoc ではない外部ファイルを authoritative context として取り込みます。既存の symlink guard を読み込み直前に適用し、real-file semantics を維持してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8b43ce2c6f41c7b0c30c1642c3f20994fac1c7373d6373ba2980222e8340dfbb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:40:28Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 147,
+              "message": "新規追加された他レイヤーの rustdoc JSON 読み込みが、`json_path` の symlink 拒否なしに `read_utf8_file_limited`（通常の `File::open`）を呼び出しています。生成物パスを symlink に置換されると、trusted な rustdoc 以外のファイルを authoritative context として取り込むため、既存の symlink guard を読み込み直前に適用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7e994a5540c5b89b61850a8ddc188a2b89a48a15062f371b2aee00719792059c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:45:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e90559b7a98230c412e4e80f497dd887666574e44d411bd68d94a333acfbd73b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:31:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3c1ef127b1789bd012da7008e3f0b4fdda88443168177f0716467acb1adcc48",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:45:49Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 141,
+              "message": "`features` は呼び出し対象レイヤーの宣言から得た値ですが、ここでは同じ値を全 declaring layer の rustdoc export に渡しています。例えば infrastructure 専用 feature は domain の `cargo rustdoc --features` を失敗させ、同名 feature が存在すれば誤った current graph を生成します。LayerId ごとの feature selection を渡し、各 binding 自身の値で export してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 325,
+              "message": "完全な LayerId-keyed context map が port contract なのに、declaring layer の context 欠落を空の identity set に置換しています。このため declaring current rustdoc に一意の配置があっても、欠落した context をエラーにせず unplaced identity として encode できます。各 catalogue layer の context 存在を検証して typed error で fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 67,
+              "message": "baseline は symlink の事前検査後、trusted root を受け取らない `metadata` / `File::open` で再度開かれます。検査後の path 交換で root 外へ誘導でき、FIFO/device なら regular-file 検査なしに block します。全レイヤー baseline が新たな authoritative input になったため、descriptor-pinned no-follow open、regular-file 検査、opened-file containment を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 140,
+              "message": "`未宣言の前提への依存`: Cargo の共有 `target/doc/*.json` が export 完了から read まで他プロセスに上書きされないことを仮定しています。ローカルループ内の順序だけでは、異なる feature selection の並行評価による置換を防げず、正しい形式の別 graph を authoritative context として受理します。immutable snapshot を返す境界またはプロセス間ロックを導入し、concurrency model を宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 107,
+              "message": "`未宣言の前提への依存`: cache miss ごとに設定由来の全 layer を走査して rustdoc process と bounded file read を実行し、上位の per-layer ループと合わせて N² 回の process launch/I/O になります。layer 数・aggregate duration/process budget は spec と environment-assumptions のどちらにもなく、この外部 I/O ループには総量上限がありません。context を一回の run で共有するか、宣言済みの上限と超過動作を設けてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3c1ef127b1789bd012da7008e3f0b4fdda88443168177f0716467acb1adcc48",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T15:38:57Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 51,
+              "message": "`RustdocContextCacheKey` に current implementation/worktree の identity がありません。同じ adapter で一度評価した後、HEAD・catalogue・baseline・feature declaration を変えずに Rust source を編集すると、dirty worktree により再抽出が要求されても cache key は一致し、古い current rustdoc context を再利用して stale signal を保存します。current-source snapshot の fingerprint を key と終了時検証へ含めるか、run 境界で必ず cache を破棄してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 847,
+              "message": "全レイヤーの frozen feature declaration が rustdoc graph の semantic input になりましたが、`resolution_input_fingerprint` と書き込み前の再検証には含まれていません。line 847 のロード後に `tddd-features.json` が変わると、旧 selection で構築した context を新しい入力状態の artifact として保存できます。feature declaration の hash を開始・終了 fingerprint と cache identity に含めてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test regression",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 507,
+              "message": "完全な context map を要求する新しい検査と、cross-layer test fixtures が整合していません。例えばこのテストは `resolution_paths_for_catalogue` に複数 catalogue を渡しますが、helper は target context しか構築しないため、現在は `domain` context 欠落の `InvalidTypeRef` で panic します。line 609 など target-only context を渡す他の cross-layer tests も同様です。全 cross-layer fixture/helper に declaring context を渡してテスト回帰を解消してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 150,
+              "message": "lock path の symlink 検査と `create_dir_all` / `OpenOptions::open` が別操作で、`O_NOFOLLOW` は leaf にしか効きません。検査後に `target_dir` または祖先を symlink/reparse point へ交換すると、trusted target root 外に directory/lock file を作成でき、別の lock を取得したまま共有 rustdoc output を無保護で使用します。descriptor-pinned な作成・open と opened-handle containment で fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 156,
+              "message": "`未宣言の前提への依存`: `lock_exclusive` は待機期限も cancellation もない blocking call です。rustdoc subprocess の timeout は lock 取得後にしか始まらないため、停止した holder や多数の競合 process があると type-signals gate が無期限に停止します。`try_lock_exclusive` と宣言済みの deadline/超過エラーを使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 145,
+              "message": "`未宣言の前提への依存`: 新しい rustdoc lock は Unix/Windows 以外で常に失敗しますが、spec に platform 制限はなく、environment-assumptions の Supported Platforms 欄も TODO のままです。portable な locking boundary を実装するか、対応・非対応 platform と失敗動作を正規の宣言へ記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 21,
+              "message": "`未宣言の前提への依存`: `64 layers` は新しい入力受理条件ですが、spec と environment-assumptions の Resource Limits 欄には値・適用範囲・超過動作がありません。またこの検査より前の resolution fingerprint は全 binding を走査するため、事前 I/O の総量も制限できていません。正規に宣言した aggregate budget を境界の最初から適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` がこの module を production 937 行として検出し、700 行上限で失敗します。新しい context-cache、feature-selection、input-verification の各責務をサブモジュールへ分割し、機械ゲートを回復してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1,
+              "message": "codec/evaluator の変更に追加された検証は固定例の unit tests のみで、生成入力に対する context-map completeness、placement、cache invalidation の property-based test がありません。Testing Convention は infrastructure の codec と evaluator に property-based test と対応 obligation binding を必須としています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89e5ca820adf212fc0dac7f39f32ade54f0fed20b186c749c29b63998f9c1dab",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T15:47:26Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 51,
+              "message": "`RustdocContextCacheKey` と終了時検証に current implementation/worktree の identity がありません。同じ adapter で一度評価した後、HEAD・catalogue・baseline・feature selection を変えずに Rust source を編集すると cache hit になり、dirty worktree でも古い current rustdoc context から stale signal を保存できます。current-source snapshot を cache key と終了時検証へ含めるか、cache の寿命を明示的な immutable run 境界に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 847,
+              "message": "全レイヤーの frozen feature declaration が rustdoc graph の semantic input になりましたが、`resolution_input_fingerprint` と書き込み前の再検証には含まれていません。feature declaration のロード後に `tddd-features.json` が変わると、旧 selection で構築した context を新しい入力状態の artifact として保存できます。feature declaration を開始・終了 fingerprint と cache identity に含めてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test regression",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 507,
+              "message": "完全な context map を要求する実装と既存 cross-layer fixtures が不整合です。このテストは複数 catalogue を target-only context を作る helper に渡すため、`domain` context 欠落の `InvalidTypeRef` で失敗します。line 609 など他の cross-layer tests も同様です。すべての cross-layer fixture/helper に declaring-layer context を渡してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 150,
+              "message": "lock path の symlink 検査と `create_dir_all` / `OpenOptions::open` が別操作で、`O_NOFOLLOW` / reparse-point flag は leaf にしか効きません。検査後に `target_dir` または祖先を交換すると trusted target root 外へ directory/lock file を作成でき、別の lock を取得したまま共有 rustdoc output を使用します。descriptor-pinned な作成・open と opened-handle containment で fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 156,
+              "message": "`未宣言の前提への依存`: `lock_exclusive` は deadline も cancellation もない blocking call です。rustdoc subprocess の timeout は lock 取得後にしか始まらないため、停止した holder や競合 process により type-signals gate が無期限に停止します。宣言済みの期限を持つ `try_lock_exclusive` retry と超過エラーを使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 145,
+              "message": "`未宣言の前提への依存`: 新しい rustdoc lock は Unix/Windows 以外で常に失敗しますが、spec に platform 制限はなく、environment-assumptions の Supported Platforms 欄も TODO のままです。portable な locking boundary を実装するか、対応・非対応 platform と失敗動作を正規の宣言へ記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 21,
+              "message": "`未宣言の前提への依存`: `64 layers` は新しい入力受理条件ですが、spec と environment-assumptions の Resource Limits 欄には値・適用範囲・超過動作がありません。また、この検査より前に resolution fingerprint が全 binding を走査し target rustdoc も export するため、事前 I/O の総量は制限できていません。正規に宣言した aggregate budget を境界の最初から適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` がこの module を production 937 行として検出し、700 行上限で失敗します。context cache、feature selection、input verification などの責務をサブモジュールへ分割して機械ゲートを回復してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1,
+              "message": "codec/evaluator の変更に追加された検証は固定例の unit tests のみで、生成入力に対する context-map completeness、placement、cache invalidation の property-based test がありません。Testing Convention が infrastructure の codec/evaluator に要求する property-based test と対応 obligation binding を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89e5ca820adf212fc0dac7f39f32ade54f0fed20b186c749c29b63998f9c1dab",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T15:48:16Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 51,
+              "message": "`RustdocContextCacheKey` と終了時検証に current implementation/worktree の identity がありません。同じ adapter で一度評価した後、HEAD・catalogue・baseline・feature selection を変えずに Rust source を編集すると cache hit になり、dirty worktree でも古い current rustdoc context から stale signal を保存できます。current-source snapshot を cache key と終了時検証へ含めるか、cache の寿命を明示的な immutable run 境界に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 847,
+              "message": "全レイヤーの frozen feature declaration が rustdoc graph の semantic input になりましたが、`resolution_input_fingerprint` と書き込み前の再検証には含まれていません。feature declaration のロード後に `tddd-features.json` が変わると、旧 selection で構築した context を新しい入力状態の artifact として保存できます。feature declaration を開始・終了 fingerprint と cache identity に含めてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test regression",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 507,
+              "message": "完全な context map を要求する実装と既存 cross-layer fixtures が不整合です。このテストは複数 catalogue を target-only context を作る helper に渡すため、`domain` context 欠落の `InvalidTypeRef` で失敗します。line 609 など他の cross-layer tests も同様です。すべての cross-layer fixture/helper に declaring-layer context を渡してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 150,
+              "message": "lock path の symlink 検査と `create_dir_all` / `OpenOptions::open` が別操作で、`O_NOFOLLOW` / reparse-point flag は leaf にしか効きません。検査後に `target_dir` または祖先を交換すると trusted target root 外へ directory/lock file を作成でき、別の lock を取得したまま共有 rustdoc output を使用します。descriptor-pinned な作成・open と opened-handle containment で fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 156,
+              "message": "`未宣言の前提への依存`: `lock_exclusive` は deadline も cancellation もない blocking call です。rustdoc subprocess の timeout は lock 取得後にしか始まらないため、停止した holder や競合 process により type-signals gate が無期限に停止します。宣言済みの期限を持つ `try_lock_exclusive` retry と超過エラーを使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 145,
+              "message": "`未宣言の前提への依存`: 新しい rustdoc lock は Unix/Windows 以外で常に失敗しますが、spec に platform 制限はなく、environment-assumptions の Supported Platforms 欄も TODO のままです。portable な locking boundary を実装するか、対応・非対応 platform と失敗動作を正規の宣言へ記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 21,
+              "message": "`未宣言の前提への依存`: `64 layers` は新しい入力受理条件ですが、spec と environment-assumptions の Resource Limits 欄には値・適用範囲・超過動作がありません。また、この検査より前に resolution fingerprint が全 binding を走査し target rustdoc も export するため、事前 I/O の総量は制限できていません。正規に宣言した aggregate budget を境界の最初から適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` がこの module を production 937 行として検出し、700 行上限で失敗します。context cache、feature selection、input verification などの責務をサブモジュールへ分割して機械ゲートを回復してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1,
+              "message": "codec/evaluator の変更に追加された検証は固定例の unit tests のみで、生成入力に対する context-map completeness、placement、cache invalidation の property-based test がありません。Testing Convention が infrastructure の codec/evaluator に要求する property-based test と対応 obligation binding を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89e5ca820adf212fc0dac7f39f32ade54f0fed20b186c749c29b63998f9c1dab",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:38:18Z",
+          "findings": [
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` が本モジュールを production 760 行として検出し、上限 700 行で失敗します。残った evaluator/cache/input-verification の責務をさらにサブモジュールへ分割してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "`current_implementation_fingerprint` は workspace 内の非 dot `*.rs` だけを hash します。`Cargo.toml`、`Cargo.lock`、`.cargo`/toolchain 設定、target・RUSTFLAGS 等の rustdoc 環境、symlink 経由の Rust source が変わっても cache key と終了時検証が一致し、古い rustdoc context を新しい build 条件で再利用できます。`cargo rustdoc` の全 semantic input を fingerprint するか、cache を証明可能な immutable run に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "新たに呼ぶ `compute_corpus_fingerprint` は directory depth・file count・総 byte 数を制限せず、各 `.rs` を `std::fs::read` で丸ごと読みます。大きい／生成された source tree で type-signals gate が無制限にメモリ・時間・stack を消費できます。typed limit error を返す bounded snapshot に置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 91,
+              "message": "`.sotp-rustdoc-json.lock` はこの `RustdocJsonPathProvider` 実装だけが取得します。同じ repository の既存 exporter 呼び出しや外部の `cargo rustdoc` は lock を取らないため、command 終了後から line 100 の snapshot read までに同じ `target/doc/<crate>.json` を別 feature で上書きでき、誤った layer context を取り込みます。全 writer が通る exporter 境界で lock するか、export ごとに固有の output を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 279,
+              "message": "Windows 分岐は symlink/reparse-point の再検証前に `create_dir_all` し、その後も parent handle の containment を確認せず path-based `open` を行います。非 Unix/Windows 分岐は leaf さえ no-follow で開きません。検査との間に ancestor を交換すると trusted target 外へ directory/lock を作成できます。`is_safe_briefing_path` と `scope_config_loader.rs` の symlink 拒否と同じ fail-closed trusted-root 方針を、descriptor/handle-pinned open で全対応 platform に適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 349,
+              "message": "`context_cache.lock()` の guard を rustdoc export、全 filesystem/process I/O、signal write が終わるまで保持します。adapter/port は `Send + Sync` ですが、競合 caller は deadline・cancellation なしで待機します。Concurrency Model が TODO のため、single-caller/finite-holder 前提は未宣言です。critical section を短くするか、待機上限と取消しを正規に宣言・実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 105,
+              "message": "rustdoc output lock の競合期限を固定 30 秒にしましたが、spec と `environment-assumptions.md` の Resource Limits / Concurrency Model に値・範囲・超過動作がありません。正常な holder の rustdoc が 30 秒を超えるだけで並行 gate が失敗します。宣言済みの aggregate deadline と cancellation policy に基づく値にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 35,
+              "message": "`64 layers` は architecture-rules.json に対する新しい入力受理上限ですが、spec と `environment-assumptions.md` の Resource Limits 欄は TODO のままで、単位・適用範囲・超過動作が宣言されていません。consumer 所有の正規宣言に上限を記録し、その宣言から境界を実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 681,
+              "message": "追加された `0..16` テストは名前だけを変える固定列挙で、context-map completeness、配置候補の組合せ、cache invalidation を生成して不変条件を検証していません。Testing Convention が codec/evaluator に要求する property-based test を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2aad882d7e60757ef145c9f65c019476c5a0a20aa9fa821b0783731ef61a5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:39:20Z",
+          "findings": [
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` が本モジュールを production 760 行として検出し、上限 700 行で失敗します。残った evaluator/cache/input-verification の責務をさらにサブモジュールへ分割してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "`current_implementation_fingerprint` は非 dot `*.rs` だけを hash します。`Cargo.toml`、`Cargo.lock`、toolchain 設定、RUSTFLAGS などが変わっても古い rustdoc context を再利用できます。rustdoc の全 semantic input を fingerprint するか、cache を証明可能な immutable run に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "新たに呼ぶ `compute_corpus_fingerprint` は directory depth・file count・総 byte 数を制限せず、各 `.rs` を丸ごと読みます。大きな source tree で無制限にメモリ・時間・stack を消費するため、typed limit error を返す bounded snapshot に置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 91,
+              "message": "`.sotp-rustdoc-json.lock` はこの provider だけが取得します。既存 exporter や外部の `cargo rustdoc` は lock を取らないため、export 後から snapshot read までに別 feature の JSON へ上書きできます。全 writer が通る境界で lock するか、export ごとに固有の output を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 279,
+              "message": "Windows 分岐は再検証前に `create_dir_all` し、parent handle の containment を確認せず path-based `open` を行います。非 Unix/Windows 分岐は leaf も no-follow で開きません。全対応 platform で descriptor/handle-pinned open による fail-closed trusted-root 方針を適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 349,
+              "message": "`context_cache.lock()` の guard を rustdoc export、filesystem/process I/O、signal write の完了まで保持しています。競合 caller は deadline・cancellation なしで待機しますが、Concurrency Model は未宣言です。critical section を短くするか、待機上限と取消しを宣言・実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 105,
+              "message": "rustdoc output lock の競合期限は固定30秒ですが、Resource Limits / Concurrency Model に値・範囲・超過動作がありません。正常な rustdoc が30秒を超えるだけで並行 gate が失敗するため、宣言済みの deadline と cancellation policy に基づく値にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 35,
+              "message": "`64 layers` は architecture-rules.json に対する新しい入力受理上限ですが、Resource Limits 欄は TODO のままで、単位・適用範囲・超過動作が宣言されていません。consumer 所有の正規宣言に上限を記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 681,
+              "message": "追加された `0..16` テストは名前だけを変える固定列挙で、context-map completeness、配置候補の組合せ、cache invalidation の不変条件を生成していません。Testing Convention が codec/evaluator に要求する property-based test を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2aad882d7e60757ef145c9f65c019476c5a0a20aa9fa821b0783731ef61a5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:39:49Z",
+          "findings": [
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` が本モジュールを production 760 行として検出し、上限 700 行で失敗します。残った evaluator/cache/input-verification の責務をさらにサブモジュールへ分割してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "`current_implementation_fingerprint` は非 dot `*.rs` だけを hash します。`Cargo.toml`、`Cargo.lock`、toolchain 設定、RUSTFLAGS などが変わっても古い rustdoc context を再利用できます。rustdoc の全 semantic input を fingerprint するか、cache を証明可能な immutable run に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "新たに呼ぶ `compute_corpus_fingerprint` は directory depth・file count・総 byte 数を制限せず、各 `.rs` を丸ごと読みます。大きな source tree で無制限にメモリ・時間・stack を消費するため、typed limit error を返す bounded snapshot に置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 91,
+              "message": "`.sotp-rustdoc-json.lock` はこの provider だけが取得します。既存 exporter や外部の `cargo rustdoc` は lock を取らないため、export 後から snapshot read までに別 feature の JSON へ上書きできます。全 writer が通る境界で lock するか、export ごとに固有の output を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 279,
+              "message": "Windows 分岐は再検証前に `create_dir_all` し、parent handle の containment を確認せず path-based `open` を行います。非 Unix/Windows 分岐は leaf も no-follow で開きません。全対応 platform で descriptor/handle-pinned open による fail-closed trusted-root 方針を適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 349,
+              "message": "`context_cache.lock()` の guard を rustdoc export、filesystem/process I/O、signal write の完了まで保持しています。競合 caller は deadline・cancellation なしで待機しますが、Concurrency Model は未宣言です。critical section を短くするか、待機上限と取消しを宣言・実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 105,
+              "message": "rustdoc output lock の競合期限は固定30秒ですが、Resource Limits / Concurrency Model に値・範囲・超過動作がありません。正常な rustdoc が30秒を超えるだけで並行 gate が失敗するため、宣言済みの deadline と cancellation policy に基づく値にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 35,
+              "message": "`64 layers` は architecture-rules.json に対する新しい入力受理上限ですが、Resource Limits 欄は TODO のままで、単位・適用範囲・超過動作が宣言されていません。consumer 所有の正規宣言に上限を記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 681,
+              "message": "追加された `0..16` テストは名前だけを変える固定列挙で、context-map completeness、配置候補の組合せ、cache invalidation の不変条件を生成していません。Testing Convention が codec/evaluator に要求する property-based test を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2aad882d7e60757ef145c9f65c019476c5a0a20aa9fa821b0783731ef61a5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:46:05Z",
+          "findings": [
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` はこのモジュールを production 760 行として検出し、上限 700 行で失敗します。残っている evaluator/cache/input-verification の責務をサブモジュールへ分割してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "`current_implementation_fingerprint` は非 dot の `*.rs` だけを hash します。`Cargo.toml`、`Cargo.lock`、`.cargo/config.toml`、toolchain 設定、非 Rust の include 入力などが変わっても同じ cache key となり、古い rustdoc context を再利用できます。rustdoc の全 semantic input を fingerprint するか、cache を証明可能な immutable run に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "新たに呼ぶ `compute_corpus_fingerprint` は directory depth、file count、総 byte 数を制限せず、各 `.rs` ファイルを丸ごと読み込みます。大きな source tree で無制限に I/O、メモリ、時間、stack を消費するため、typed limit error を返す bounded snapshot に置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 91,
+              "message": "`.sotp-rustdoc-json.lock` を取得するのはこの provider だけです。既存 exporter や外部の `cargo rustdoc` はこの lock を無視できるため、export 完了後から snapshot read までに別 feature の有効な JSON へ上書きされ、そのまま authoritative context として受理され得ます。全 writer が通る境界で同期するか、export ごとに固有の output を使用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 279,
+              "message": "Windows 分岐は parent directory を descriptor/handle に固定せず、path-based な検査後に ancestor を追従して lock file を開きます。非 Unix/Windows 分岐は leaf 自体も no-follow で開きません。全対応 platform で fail-closed な trusted-root containment を実装するか、未対応 platform を明示的に拒否してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 349,
+              "message": "`context_cache.lock()` の guard を rustdoc export、filesystem/process I/O、signal write の完了まで保持しています。競合 caller は deadline や cancellation なしで待機しますが、Concurrency Model は未宣言です。critical section を短くするか、待機上限と取消しを宣言・実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 105,
+              "message": "rustdoc output lock の競合期限は固定 30 秒ですが、Resource Limits / Concurrency Model に値、適用範囲、超過動作が宣言されていません。rustdoc export 自体はこれより長く実行できるため、正常な並行 gate でも待機側が失敗します。宣言済みの deadline と cancellation policy に基づく値にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 35,
+              "message": "`64 layers` は `architecture-rules.json` に対する新しい入力受理上限ですが、Resource Limits 欄は TODO のままで、単位、適用範囲、超過動作が宣言されていません。consumer 所有の正規宣言にこの上限を記録してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 681,
+              "message": "追加された `0..16` テストは名前だけを変える固定列挙であり、context-map completeness、配置候補の組合せ、cache invalidation の不変条件を生成していません。Testing Convention が codec/evaluator に要求する property-based test を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2aad882d7e60757ef145c9f65c019476c5a0a20aa9fa821b0783731ef61a5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:50:56Z",
+          "findings": [
+            {
+              "category": "module-size gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 1,
+              "message": "`bin/sotp verify module-size` detects 760 production lines in this module, exceeding the 700-line limit. Split the remaining evaluator/cache/input-verification responsibilities into submodules.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "`current_implementation_fingerprint` hashes only non-dot `*.rs` files. Changes to `Cargo.toml`, `Cargo.lock`, `.cargo/config.toml`, toolchain configuration, or non-Rust include inputs can therefore reuse a stale rustdoc context. Fingerprint every semantic rustdoc input or restrict reuse to a provably immutable run.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 313,
+              "message": "The newly invoked `compute_corpus_fingerprint` has no directory-depth, file-count, or total-byte limit and reads each Rust file in full. A large source tree can consume unbounded stack, I/O, memory, and time. Replace it with a bounded snapshot that returns a typed limit error.",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 91,
+              "message": "Only this provider honors `.sotp-rustdoc-json.lock`; existing exporters and external `cargo rustdoc` processes do not. Another writer can overwrite the shared JSON after export and before snapshot reading, causing the wrong feature-specific document to be accepted as authoritative. Synchronize at a boundary shared by every writer or use export-unique output paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 279,
+              "message": "The Windows branch does not pin the parent directory with a descriptor/handle, so an ancestor can be replaced after path validation and followed while opening the lock. The fallback branch does not open even the leaf with no-follow semantics. Implement fail-closed trusted-root containment on every supported platform or explicitly reject unsupported platforms.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 349,
+              "message": "The `context_cache.lock()` guard remains held through rustdoc export, filesystem/process I/O, evaluation, and signal persistence. Because the adapter is `Send + Sync`, concurrent callers can wait indefinitely without a deadline or cancellation mechanism, while the project’s Concurrency Model is undeclared. Shorten the critical section or define and enforce bounded waiting/cancellation.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 105,
+              "message": "Rustdoc-output lock contention has a fixed 30-second timeout, but its value, scope, and overrun behavior are absent from the Resource Limits and Concurrency Model declarations. Since a valid rustdoc export may exceed 30 seconds, a normal concurrent gate can fail spuriously. Base the timeout and cancellation behavior on a declared policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 35,
+              "message": "The new 64-layer limit changes which `architecture-rules.json` inputs are accepted, but the Resource Limits declaration remains TODO and does not specify the limit’s unit, scope, or failure behavior. Record this limit in the consumer-owned environment-assumption declaration.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 681,
+              "message": "The added `0..16` loop only varies names through fixed enumeration; it does not generate context-map completeness cases, placement-candidate combinations, or cache-invalidation states. Add the property-based codec/evaluator coverage required by the Testing Convention.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2aad882d7e60757ef145c9f65c019476c5a0a20aa9fa821b0783731ef61a5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:02:54Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 294,
+              "message": "The persisted reuse key contains only the target declaration hash, HEAD, and target baseline hash. The newly computed implementation and resolution fingerprints are only compared with themselves during the current invocation. A clean same-HEAD run after changing nightly, Rust flags, Cargo environment, or external dependencies can therefore take `SkipEvaluation` and reuse signals produced from a different rustdoc graph. Bind every semantics-affecting fingerprint into the recorded cache key, or declare the required environment stability.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 361,
+              "message": "The fingerprint excludes directories by basename rather than excluding the resolved Cargo output directory. With an in-workspace custom target directory such as `CARGO_TARGET_DIR=build-cache`, rustdoc mutates `build-cache` between the initial and final fingerprints, so extraction rejects itself as a workspace change. Conversely, legitimate semantic inputs under names such as `src/target` or `src/tmp` are silently omitted. Resolve and exclude exact operational paths instead of matching every directory with these names.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 75,
+              "message": "未宣言の前提への依存: the rustdoc fingerprint assumes the workspace tree plus this fixed environment-variable allowlist contains every semantic Cargo input. Build scripts can depend on arbitrary environment variables, external path dependencies, toolchain contents, or other external files, so distinct rustdoc graphs can receive the same fingerprint. Neither the spec nor the still-unfilled environment-assumption declaration restricts those inputs.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 67,
+              "message": "未宣言の前提への依存: these hard-coded depth, entry, file, byte, path, and environment limits become user-visible validity rules for the entire non-excluded workspace—even an unrelated asset over 64 MiB blocks type-signal evaluation. The resource-limit section of the environment-assumption declaration remains TODO, so the limits, scope, and excess behavior have no owning contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 34,
+              "message": "未宣言の前提への依存: a track with more than 64 otherwise valid TDDD-enabled layers is rejected solely by this new export budget. The spec and environment-assumption declaration define no maximum layer/export count or aggregate process budget, so this configuration limit has no contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 420,
+              "message": "未宣言の前提への依存: lock contention is allowed for only 30 seconds even though the rustdoc command itself may run for up to 120 seconds. Two normal concurrent evaluations can therefore cause the second to fail while the first is still within its supported runtime. The concurrency declaration specifies neither this timeout nor required filesystem-lock semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 590,
+              "message": "未宣言の前提への依存: production type-signal evaluation now always fails on Windows and other non-Unix platforms because the output-lock adapter returns `Unsupported`. The supported-platform declaration is still TODO, so there is no contract permitting this platform regression. Implement the safe platform adapter or explicitly constrain supported platforms.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 452,
+              "message": "未宣言の前提への依存: comparing only start and end fingerprints does not detect an ABA mutation. A source can change while one declaring-layer rustdoc export runs and be restored before final verification, leaving a mixed-layer context whose final fingerprint equals the initial value and which is then persisted. Snapshot or lock the inputs across assembly, or declare and enforce an immutable-workspace concurrency model.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25d781df8eb89633d9d56772383c18958143ee7e572d1c534fbee00529cf18b7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:03:08Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 361,
+              "message": "`is_excluded_rustdoc_directory` excludes any nested directory named `target`, `track`, or `tmp`, not only workspace-root operational directories. A valid source such as `crate/src/target/mod.rs` is omitted from the fingerprint, so changing it can reuse a stale multilayer rustdoc context. Restrict exclusions to the intended root-relative paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 163,
+              "message": "The fingerprint hashes workspace files and environment-variable values, but not external semantic inputs behind them, such as `$CARGO_HOME/config.toml`, compiler/rustdoc/wrapper binaries, or dependency sources. Those inputs can change while the cache key remains identical, allowing stale rustdoc contexts to be reused. Hash the resolved artifacts or restrict reuse to an immutable extraction run.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 406,
+              "message": "The `.sotp-rustdoc-json.lock` is honored only by this provider. Ordinary `cargo rustdoc` and other existing schema-export paths can overwrite the shared JSON after this export completes and before the snapshot is read, causing the wrong layer or feature-specific document to be accepted. Use export-unique output paths or coordination shared by every writer.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 420,
+              "message": "Lock contention fails after a fixed 30 seconds, although the Resource Limits and Concurrency Model declarations remain TODO. A valid concurrent rustdoc export can exceed that duration and make another evaluation fail spuriously. Declare and enforce the timeout policy rather than embedding an ungrounded value.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 67,
+              "message": "The new fingerprint rejects workspaces using hard-coded depth, entry, file, byte, path, and environment-value limits, but none of these limits or their failure behavior is declared in `knowledge/conventions/environment-assumptions.md`. Record the supported bounds or derive them from an approved contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 34,
+              "message": "The 64-layer cap rejects otherwise valid `architecture-rules.json` configurations even though CO-02 delegates the layer set to that file and the Resource Limits declaration is still TODO. Declare this limit and its failure semantics, or remove the unsupported restriction.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 590,
+              "message": "Fresh rustdoc extraction is unconditionally unsupported on Windows, but the Supported Platforms declaration remains TODO. This makes platform support depend on an undeclared Unix-only assumption. Record Windows as unsupported with scope/reason or provide a handle-pinned implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 288,
+              "message": "The workspace fingerprint rejects every symlink outside a short exclusion list, including legitimate symlinked Cargo sources or build inputs. No supported-platform/input declaration states that workspaces must contain only real files, so valid projects can fail unexpectedly. Declare real-file-only semantics or safely fingerprint contained symlink targets.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 2611,
+              "message": "The evaluator’s new multilayer context cache and invalidation behavior is covered only by fixed example/table cases. The Testing Convention requires property-based evaluator coverage over generated inputs and states, including failure outcomes; the generated property test added in the codec test file does not exercise evaluator assembly or cache reuse.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25d781df8eb89633d9d56772383c18958143ee7e572d1c534fbee00529cf18b7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:04:59Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 362,
+              "message": "`is_excluded_rustdoc_directory` は再帰位置に関係なく basename が `track` / `target` / `tmp` なら除外するため、実際の production source である `libs/infrastructure/src/track/**`、`apps/cli-composition/src/track/**`、`apps/cli/src/commands/track/**` が fingerprint に入らない。context assembly 後にこれらが変わっても cache key と終了時 fingerprint は変化せず、dirty 判定後も stale context を再利用して signal を永続化できる。除外を workspace 直下の operational directory に限定し、nested source directory の変更による invalidation test を追加すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared concurrency assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 406,
+              "message": "`.sotp-rustdoc-json.lock` を取得するのはこの provider だけであり、同じ `target/doc` を使う既存の baseline/current exporter や外部の `cargo rustdoc` は lock を取得しない。別 feature の writer が export 完了後から snapshot read までに JSON を置換すると、完全だが誤った document を authoritative context として受理できる。全 writer が通る境界で同期するか、export ごとに固有の出力先を使うこと。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 420,
+              "message": "rustdoc output lock は最大 120 秒の export 全体で保持される一方、waiter は固定 30 秒で失敗する。`Send + Sync` adapter への正常な並行呼び出しでも、先行 export が 30 秒を超えるだけで後続 gate が失敗するが、この timeout・待機範囲・超過動作は Concurrency Model / Resource Limits のいずれにも宣言されていない。宣言済み policy に基づく timeout/cancellation にするか、同一 key の in-flight assembly を共有すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 34,
+              "message": "configured TDDD layer が 64 を超えると新しい context assembly は無条件に拒否するが、consumer-owned `environment-assumptions.md` の Resource Limits は TODO のままで、仕様にもこの上限の単位・適用範囲・超過動作がない。gate の入力受理条件として施行する前に宣言へ記録すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 67,
+              "message": "新しい rustdoc-input fingerprint は depth 64、65,536 entries、32,768 files、64 MiB/file、512 MiB total、16 KiB/path、64 KiB/environment value を超える workspace を拒否する。しかし Resource Limits 宣言は TODO で、これらの単位・範囲・失敗動作は仕様にも存在しない。すべての施行値を consumer-owned environment declaration に記録すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 591,
+              "message": "lock-file boundary は Windows とその他の non-Unix platform で常に `Unsupported` を返すため、変更後の type-signal evaluator は実質 Unix-only になる。一方 Supported Platforms 宣言は TODO で、仕様も Windows を対象外としていない。Unix-only を明示的に宣言するか、各対応 platform で fail-closed な parent-handle implementation を提供すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 788,
+              "message": "追加された property-style test は codec のみを実行し、現在の `test-bindings.json` にも登録されていない。また、変更された evaluator/context-cache 経路には context completeness、placement candidates、cache invalidation、failure states を生成する property-based test がない。Testing Convention が要求する codec/evaluator の property evidence と obligation binding を両方追加すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25d781df8eb89633d9d56772383c18958143ee7e572d1c534fbee00529cf18b7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:36:02Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 294,
+              "message": "記録済み結果の再利用判定に渡す `current_key` は依然として target catalogue hash・HEAD・target baseline hash の3項目だけである。実装 fingerprint と解決 fingerprint は現在の呼び出し中に変化しなかったことしか確認されず、記録値とは比較されない。そのため clean worktree のまま `RUSTFLAGS` や `CARGO_TARGET_DIR` が変わって rustdoc graph が変化しても `SkipEvaluation` が古い signal を成功として再利用する。D3 / AC-04 が列挙する実装・解決・resolved target・crate/features/profile・expected JSON path を永続化キーへ含めて比較すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 163,
+              "message": "`rustdoc_input_fingerprint` は workspace の走査と環境値 allowlist だけで fingerprint を作り、Cargo metadata、workspace 外の path dependency、build script の外部入力・生成物、または識別不能な toolchain / CARGO_HOME 内容を検出して拒否しない。例えば `path = \"../shared\"` の依存元が変わっても repository は clean、fingerprint も同一なので、古い signal/context を再利用できる。AC-04 / CO-04 のとおり authoritative input set を完全に確定できない構成は export 前に fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 361,
+              "message": "除外判定が workspace-relative path ではなく各階層の basename に適用されるため、production source の `libs/infrastructure/src/track/**`、`apps/cli-composition/src/track/**`、`apps/cli/src/commands/track/**` まで fingerprint から除外される。context assembly 後にこれらが変わっても cache key と終了時 fingerprint は変化せず、stale rustdoc context を永続化できる。除外を意図された workspace 直下の operational directories に限定すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "port bypass",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 166,
+              "message": "evaluator は承認済み type contract が sole rustdoc construction boundary とする `RustdocCratePort` / `RustdocCrateAdapter` を使わず、`RustdocSchemaExporter` を直接構築して infrastructure-local provider へ渡している。この経路では resolved target、crate/features/profile、expected path、bytes digest を束縛した identity-bearing snapshot を受け取れず、Architecture Verification Checklist の「Ports implemented, not bypassed」と D3/D8 を満たさない。rustdoc I/O を承認済み port/adapter 境界へ一本化すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency and snapshot integrity",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 395,
+              "message": "期待 JSON path と target directory を lock 取得前に解決し、通常の共有 Cargo target directory 上でこの provider だけが advisory lock に参加している。既存 exporter や外部 `cargo rustdoc` の参加、または target directory の専用所有を検証しないため、別 writer が JSON を置換しても完全な `String` として authoritative に受理できる。CO-06/CO-07/AC-06 が要求する専用所有・全 writer 参加・同一臨界区間での path 決定から bytes snapshot までを実装し、確認不能なら fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "spec conformance",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 420,
+              "message": "共有 rustdoc output lock の待機上限が 30 秒のままで、承認済み D6 / IN-05 / AC-07 の 120 秒契約と一致しない。正常な先行 export が30秒を超えるだけで後続評価が早期失敗する。上限を120秒にし、poll sleep によって契約時間を延長しない待機処理にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "ABA snapshot consistency",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 493,
+              "message": "評価開始時の fingerprint と、後から再読した path の終了時 fingerprint を比較するだけで、実際に評価する他層 catalogue/baseline/source bytes は開始 snapshot に束縛されていない。入力が A で開始した後、再読時に Bへ変わって評価へ入り、終了確認前にAへ戻ると start/end hash は一致し、B由来の結果を永続化できる。`BaselineSnapshot` も path+hash の再読だけで同じ ABA 問題を持つ。D8/IN-07どおり、解決済み content-addressed immutable snapshots の同じ bytes だけを評価へ渡すこと。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 788,
+              "message": "追加された唯一の property-style test は codec だけを実行し、現在の `test-bindings.json` にも登録されていない。変更された evaluator/adapter には、完全な再利用キー、外部入力拒否、65層目、120秒 lock と writer ownership、入力/output ABA を生成状態で検証する property-based test がない。Testing Convention に従い evaluator の property evidence を追加し、この codec property とともに該当 obligation へ binding すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25d781df8eb89633d9d56772383c18958143ee7e572d1c534fbee00529cf18b7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:49:46Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 294,
+              "message": "記録済み結果の再利用判定に渡す `current_key` は target catalogue hash・HEAD・target baseline hash の3項目だけである。実装 fingerprint と解決 fingerprint は現在の呼び出し中に変化しなかったことしか確認されず、記録値とは比較されない。そのため clean worktree のまま `RUSTFLAGS` や `CARGO_TARGET_DIR` が変わって rustdoc graph が変化しても、`SkipEvaluation` が古い signal を成功として再利用する。D3 / AC-04 が列挙する実装・解決・resolved target・crate/features/profile・expected JSON path を永続化キーへ含めて比較すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 163,
+              "message": "`rustdoc_input_fingerprint` は workspace の走査と環境値 allowlist だけで fingerprint を作り、Cargo metadata、workspace 外の path dependency、build script の外部入力・生成物、または識別不能な toolchain / CARGO_HOME 内容を検出して拒否しない。例えば `path = \"../shared\"` の依存元が変わっても repository は clean、fingerprint も同一なので、古い signal/context を再利用できる。AC-04 / CO-04 のとおり authoritative input set を完全に確定できない構成は export 前に fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "port bypass",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 166,
+              "message": "evaluator は承認済み type contract が sole rustdoc construction boundary とする `RustdocCratePort` / `RustdocCrateAdapter` を使わず、`RustdocSchemaExporter` を直接構築して infrastructure-local provider へ渡している。この経路では resolved target、crate/features/profile、expected path、bytes digest を束縛した identity-bearing snapshot を受け取れず、Architecture Verification Checklist の「Ports implemented, not bypassed」と D3/D8 を満たさない。rustdoc I/O を承認済み port/adapter 境界へ一本化すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency and snapshot integrity",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 398,
+              "message": "期待 JSON path と target directory を lock 取得前に解決し、通常の共有 Cargo target directory 上でこの provider だけが advisory lock に参加している。既存 exporter や外部 `cargo rustdoc` の参加、または target directory の専用所有を検証しないため、別 writer が JSON を置換しても完全な `String` として authoritative に受理できる。CO-06/CO-07/AC-06 が要求する専用所有・全 writer 参加・同一臨界区間での path 決定から bytes snapshot までを実装し、確認不能なら fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "ABA snapshot consistency",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 494,
+              "message": "評価開始時の fingerprint と、後から再読した path の終了時 fingerprint を比較するだけで、実際に評価する他層 catalogue/baseline/source bytes は開始 snapshot に束縛されていない。入力が A で開始した後、再読時に B へ変わって評価へ入り、終了確認前に A へ戻ると start/end hash は一致し、B 由来の結果を永続化できる。`BaselineSnapshot` も path+hash の再読だけで同じ ABA 問題を持つ。D8/IN-07どおり、解決済み content-addressed immutable snapshots の同じ bytes だけを評価へ渡すこと。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 788,
+              "message": "追加された唯一の property-style test は codec だけを実行し、現在の `test-bindings.json` にも登録されていない。変更された evaluator/adapter には、完全な再利用キー、外部入力拒否、65層目、writer ownership、入力/output ABA を生成状態で検証する property-based test がない。Testing Convention に従い evaluator の property evidence を追加し、この codec property とともに該当 obligation へ binding すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:56dbe31a1c947923c859ba38920817de4cf8055b14428c7f30a1d3e97d437cb4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T04:31:37Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 101,
+              "message": "`RustdocCrateAdapter::load_from_path` は `workspace_root` を trusted root として渡していますが、`read_optional_regular_file_bytes` の non-Linux 実装では trusted-root 検証が no-op です。さらに `reject_symlinks_below` は指定 root の配下であること自体を検証しないため、Windows 等では symlink でない workspace 外の任意の baseline path を読み込めます。全プラットフォームで canonical path または opened-file の所属が trusted root 配下であることを fail-closed に検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:64c04c3743f622fa59207fe422b8b70d76ddaabaa7815b31d446657967ee568e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T04:52:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a46c5765747237eaa85b6943136503343acdcf7c4d6a5d93b84386a82ad53039",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:56:13Z",
+          "findings": [
+            {
+              "category": "trusted-root and lock generation",
+              "file": "libs/infrastructure/src/tddd/rustdoc_output_lock.rs",
+              "line": 84,
+              "message": "lock 取得時に安全に開いた target-directory descriptor を保持せず、`read_bytes` は `target_dir` の文字列 path を再度開き直している。lock 取得後に target directory を rename して同名の実 directory を作ると、lock は旧 directory の inode に残る一方、snapshot は新 directory から読まれる。別 writer も新しい lock file を取得できるため排他が分裂する。directory handle と inode generation を `RustdocOutputLock` に保持し、全 output をその descriptor から `openat` すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency and snapshot integrity",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 118,
+              "message": "rustdoc capture は通常の resolved Cargo target directory をそのまま使用し、機能専用領域の所有や非協調 writer の排除を確認していない。外部の通常の `cargo rustdoc` は advisory lock を無視して同じ `target/doc/<crate>.json` を別 feature で上書きでき、その完全な JSON が requested identity の snapshot として受理される。CO-06/CO-07/AC-06どおり専用 target 領域を確保するか、非協調 writer を検出できなければ fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter I/O boundary",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 82,
+              "message": "公開された `export_rustdoc_json_path*` は export 中だけ lock を保持し、path を返す時点で lock を解放する。ドキュメントも caller に後続 read を委ねているため、別の協調 writer が read 前に同じ JSON を置換できる。`existing_rustdoc_json_path` も unlocked snapshot reuse を公開している。D8 の immutable snapshot 境界を保つため、これらを bytes/snapshot 返却へ変更するか非公開化すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 293,
+              "message": "`RUSTC` / `RUSTDOC` / wrapper path は absolute の場合でも lexical `starts_with` しか検査せず、relative value は無条件に許可される。例えば `/workspace/../outside/wrapper` は検査を通って workspace 外の未 fingerprint binary を実行でき、bare command も同じ `PATH` 文字列のまま内容だけ交換できる。正規化・実体解決後に trusted workspace 内へ閉じ、内容を fingerprint できない tool は AC-04 に従って拒否すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 387,
+              "message": "Cargo input fingerprint は workspace と Cargo home の config だけを読み、Cargo が workspace の親 directory から読む `.cargo/config.toml` を fingerprint も拒否もしていない。また `CARGO_HOME` 未設定時は allowlist 外の `HOME` から path を導出するが、その resolved path 自体を canonical encoding に含めない。親 config や HOME を切り替えて `build.rustflags` 等を変えても同一 fingerprint で古い signal を再利用できる。Cargo の完全な config hierarchy を identity に含めるか、外部 config を fail-closed にすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/baseline_capture.rs",
+              "line": 109,
+              "message": "既存 baseline の idempotent path が `std::fs::read_to_string` でファイル全体を無制限に読み込む。rustdoc JSON には他経路で 64 MiB 上限があるのに、この分岐だけ任意サイズを allocation でき、巨大な track artifact で process memory を枯渇させられる。同じ bounded no-follow reader と上限を使用すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/rustdoc_baseline_capture_adapter.rs",
+              "line": 123,
+              "message": "domain-port 側の baseline capture でも、既存 baseline を `std::fs::read_to_string` で無制限に読むため、巨大な artifact が bounded rustdoc capture を迂回して memory exhaustion を起こせる。64 MiB の bounded regular-file readerを使用して typed I/O errorへ変換すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 173,
+              "message": "exclusive-lock の property として binding されたこのテストは、単一 lock を取得して静的ファイルを一度読むだけである。第二 writer の排他、120秒 timeout、target ancestor の rename/replacement、非協調 writer の検出を一つも検証せず、現在の lock-generation 欠陥も通過する。Testing Convention と briefing の契約どおり、競合状態と target-generation を生成する property testを追加すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 829,
+              "message": "codec の generated-state property test は現在も `test-bindings.json` のどの obligation にも登録されていない。Testing Convention は codec property evidence を対象契約へ binding することを要求しているため、該当する codec contract/AC-02 obligationへこのテストを追加すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1daa25d4214fcb098d3cca30dbee2c326af85d1abbd016c5922ce8408a40bd46",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:11:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3881b392a4533c9340e1f9fc4b8d5acfedaae824c3911bf8eed12e604a93cb4a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:24:04Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 29,
+              "message": "実際の export は `Command::new(\"cargo\")` と `rustup +nightly` が選ぶ外部 toolchain を使うが、内容 hash を追加するのは明示的な `RUSTC` / `RUSTDOC` / wrapper だけである。`RUSTUP_HOME` も identity に含まれないため、同じ `PATH` / `RUSTUP_TOOLCHAIN` 文字列のまま cargo shim や nightly toolchain が更新されても implementation fingerprint は一致し、旧 signal を再利用できる。実際に使用する cargo・rustup・nightly rustc/rustdoc を解決して内容/generationを fingerprintするか、完全に識別できなければAC-04どおりfail-closedにすること。",
+              "severity": "P1"
+            },
+            {
+              "category": "serde codec break",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 52,
+              "message": "version 5 の cache identity に必須フィールドを追加したにもかかわらず、`implementation_fingerprint`、`resolution_fingerprint`、`rustdoc_execution_identity` を `serde(default)` で補完している。旧version-5 artifactが完全なcache keyを持つ文書としてdecodeされ、fabricated zero digestと`/tmp/.../legacy` identityがdomainへ渡るため、versioned schemaがmissing authoritative fieldsをfail-closedに拒否していない。schema versionを更新してこれらを必須化するか、欠落時にcodec errorを返すこと。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter contract regression",
+              "file": "libs/infrastructure/src/tddd/baseline_capture.rs",
+              "line": 163,
+              "message": "このlegacy baseline capture APIは従来default features付きでrustdocを実行していたが、現在は`capture_rustdoc_json(..., &[])`のDeclared modeを呼ぶため、`--no-default-features`が付与される。default featureが公開型を追加するcrateでは、既存のbaseline captureがその型を欠落させ、後続signal判定を誤らせる。feature引数を持たないこの経路はLegacy modeのimmutable-byte APIを使い、従来のdefault-feature semanticsを維持すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3881b392a4533c9340e1f9fc4b8d5acfedaae824c3911bf8eed12e604a93cb4a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:40:34Z",
+          "findings": [
+            {
+              "category": "adapter tool resolution",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 260,
+              "message": "`resolve_bare_tool` は PATH candidate を `symlink_metadata()` で調べ、regular file の場合だけ採用するため、標準的な rustup installation の `~/.cargo/bin/cargo -> rustup` symlink を無視する。その直後の処理は candidate を canonicalize して実体 bytes を fingerprint できる設計なのに到達せず、通常の rustup 環境で implementation fingerprint と全 type-signal evaluation が `bare tool path was not found` で停止する。PATH symlink は canonicalize 後の実体を no-follow/regular-file検証して fingerprint すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97aee2e03c7f3f3d1cbea759ca346ab54ff48edbc7a106478c69cdce9df385e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:46:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66ff8241a8fb37ecc3aec9465b215eb16919c483f3ba9e377055d5087081ab55",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:59:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f73b4570991f6671a19015b1ed39e43e75842dd514271452235e906ac1028202",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T10:04:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4176fbba28363f96af1c857c5216cdc71811ed06bb32d666045e03c6c04675e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T10:14:49Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 177,
+              "message": "`cargo metadata --no-deps` only describes workspace packages, not the resolved dependency closure that `cargo rustdoc` builds. The build-script check below therefore misses build scripts in path or registry dependencies; their untracked inputs/generated outputs can change rustdoc while the implementation fingerprint remains unchanged, allowing stale `SkipEvaluation` reuse contrary to D3/D4 and AC-04. Resolve and validate the selected rustdoc target's complete locked dependency graph, or otherwise attest every build-script input/output.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89368e3343bda9c615fc6b486b7f4ea4765a0d7dd7864628c0934cbc1b498a63",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T10:31:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e952b3a738e73483515c82086f37beace46ec327a11eddf30e783350519bef55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T10:36:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd683594876c2686139c3cf9fa0d4179c3ee63ba36f1ae12653437fb120b2d4f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T10:56:00Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 112,
+              "message": "`append_actual_rustdoc_tool_identity` hashes the PATH-resolved shims rather than the binaries selected by `cargo +nightly`. In a normal rustup installation, `cargo`, `rustc`, and `rustdoc` all canonicalize to the `rustup` executable, while the actual nightly binaries live under `RUSTUP_HOME/toolchains`. Updating the nightly toolchain can therefore change rustdoc output without changing this fingerprint, allowing stale reuse on a clean worktree. Resolve and snapshot the exact nightly cargo/rustc/rustdoc binaries, or fail closed if they cannot be identified.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 177,
+              "message": "`cargo metadata --no-deps` returns only workspace members, so the subsequent build-script validation never examines dependency packages that `cargo rustdoc` may compile. A path or registry dependency's build script can consume untracked inputs or generate different output while the implementation fingerprint remains unchanged, allowing stale `SkipEvaluation` reuse contrary to D3/D4 and AC-04. Validate the selected rustdoc target's complete locked dependency closure or otherwise attest every build-script input and output.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5a0122ef2ba1665488062b3d8197e9536e50cc29ed56d68630e2c3157c739074",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T11:06:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b502dd7afbcc7686aab75d1ce3309e608a54fb2e4f1b53b390d4fb91904565ce",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:46:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c9eeee0e404eb784e1ab735769cdd078275a15a5acf876ca6bdd4b84f25eae1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:56:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c9eeee0e404eb784e1ab735769cdd078275a15a5acf876ca6bdd4b84f25eae1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T13:25:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cec9499117f46d4be665c6b71240093278e1e099a7031b3097b9a8b965c2cfb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T13:29:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cec9499117f46d4be665c6b71240093278e1e099a7031b3097b9a8b965c2cfb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T13:57:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0036fd2663c9ef4eb78336be91c7bce52db80abd2e14aa55c3a7efd1f3a984a0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T14:03:07Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 308,
+              "message": "`encode_with_workspace` persists the execution-identity paths relative to the real workspace, but `decode` rebases those paths to the fixed `/sotp-workspace` prefix. The evaluator then compares this decoded cache key with a current key containing the checkout's actual absolute target paths, so identical clean runs can never satisfy cache-key equality and always re-extract. Decode relative identities against the current workspace (or compare a path-independent canonical representation on both sides).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0036fd2663c9ef4eb78336be91c7bce52db80abd2e14aa55c3a7efd1f3a984a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T14:11:39Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 383,
+              "message": "`relativize_workspace_path` falls back to serializing the raw absolute path whenever the resolved target lies outside the workspace. Absolute external `CARGO_TARGET_DIR` is explicitly supported, so a valid setting such as `/home/alice/.cache/cargo-target` will still place a work-machine home path in the tracked type-signals JSON, contrary to the stated portability contract. Encode supported external targets with a portable identity (for example, a stable marker plus digest) or fail closed instead of persisting the host path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97bea042b2b73ae42f0e54635683044f11f39c3008fa6d028ad71f5a54066c1a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T14:20:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9fc68dff8979090a383fc6c58b4768f689f2921aff13127f80ffaff89b083da3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T14:30:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce3a2ac70ad2ba9a5da6ed393225e2fa312ce044387208c8762dc77937a25b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T14:34:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce3a2ac70ad2ba9a5da6ed393225e2fa312ce044387208c8762dc77937a25b6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T14:49:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00950ddfc1efb4290f431bdf506726e3792fba0902729f181713c3dc91528488",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T14:54:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00950ddfc1efb4290f431bdf506726e3792fba0902729f181713c3dc91528488",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T15:03:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce4f7ecc192e3f72effc4dc6472ae4beac985688c17017c84aad53d2a2a09a6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T15:07:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce4f7ecc192e3f72effc4dc6472ae4beac985688c17017c84aad53d2a2a09a6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -804,6 +2768,151 @@
           "hash": "rvw1:sha256:862adc772a318f4c16d4d13a1e5140f7f1c45c5d7ba8d2a01037220581a12f60",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:17:33Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 365,
+              "message": "The IN-02 voluntary binding includes `test_evaluate_layer_canonicalizes_declaring_bin_target_alias_and_prefers_rustdoc_item`, which is an adapter test rather than a codec test constructing `AuthoritativeRustdocContext`; remove this binding to match the stated design intent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4cd24dd2b385742b2829be9353bcd319b2e9f5fd44ce4cea0fc0f4a399940260",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:20:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75dc89c82df7e7e33775a7ffb5e17fe3bcc5e220d67505a1ecc39fdf3965631c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:29:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f11a989040b176643dc979237138837d55330c117f6a35b29ecce69f9d38482a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:37:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f11a989040b176643dc979237138837d55330c117f6a35b29ecce69f9d38482a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T02:50:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c90514a5b266ed8b566d5ad1c86989fc0d0c619e9779ca9b0a7d3830ecec1ed8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:27:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c90514a5b266ed8b566d5ad1c86989fc0d0c619e9779ca9b0a7d3830ecec1ed8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:02:02Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 78,
+              "message": "The current obligations include a contract-conformance obligation for `infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter` implementing `RustdocCratePort`, but this file jumps from the two port-method bindings directly to `CatalogueToExtendedCratePort` without a fulfillment or waiver for that adapter obligation. Add the exact conformance record and bind appropriate `rustdoc_crate_adapter` tests; otherwise obligation coverage is incomplete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c90514a5b266ed8b566d5ad1c86989fc0d0c619e9779ca9b0a7d3830ecec1ed8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T05:15:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42e888b415155fb492be369196ba4f46ce411d8c2f9fb11b11724691422619c6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T07:14:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:47ffd698c1533db0725cf0ee08c030700622502239d8210f21a46550b5841148",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:44:50Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 93,
+              "message": "All bindings for `property_evaluator_*` use the wrong module path `infrastructure::tddd::type_signals_evaluator_properties`. The file is included as nested module `type_signals_evaluator::properties`, so these bindings cannot resolve to the real tests. Update the affected entries at lines 93, 98, 103, 168, 173, 178, 493, 498, 503, 508, 513, 518, 528, 533, and 538 to `infrastructure::tddd::type_signals_evaluator::properties`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9e6af7bbe97d20bec70e1772a5339a0f549d50887510e8cb623a371a57612803",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T12:50:12Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 93,
+              "message": "The capture_current contract and RustdocCrateAdapter conformance bindings claim evaluator lock/ABA property tests as fulfillment, but the briefing explicitly says those lock/ABA edges remain todo-owned and must not be rewritten as fulfillment. Remove the three property-test bindings from each record (lines 93–104 and 168–179).",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 528,
+              "message": "The execute_type_signals_for_layer fulfillment record binds the lock/ABA property tests `property_evaluator_reads_output_only_through_the_owned_lock`, `property_evaluator_rejects_an_io_aba_generation`, and `property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states` at lines 528–539. These correspond to the briefing's explicitly remaining todo lock/ABA edges, so they must not be represented as fulfillment.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1035021a69fb4f8961f83d011bbdaa2c6af85331fb1e1951b1982c8f57e736bb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T12:52:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d5a4281714ecd3f75a2258ed284958298cbd2fd440cd7306a663108720dc7a34",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:57:22Z",
+          "findings": [
+            {
+              "category": "test-obligation waiver",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 844,
+              "message": "The six `RustdocCratePort` waivers for IN-03, CO-04, AC-04, IN-07, CO-07, and AC-06 cannot be scoped to `trait_method:load_from_path`: waiver edge IDs contain only the entry key and anchor, while `capture_current` has the same entry key and anchors. The current verifier consequently returns `Waiver(Fail)` for all six because their load-only reasons do not justify waiving `capture_current`. Remove these shared-edge waivers or introduce a method-distinguishable waiver model; leave the todo `capture_current` fulfillment unresolved rather than recording invalid waivers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d5a4281714ecd3f75a2258ed284958298cbd2fd440cd7306a663108720dc7a34",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T13:03:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aabbb01a54c571529851c6dd63d5678fc49ac150174449624b61d6e4b1ec6b16",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -820,6 +2929,78 @@
           "at": "2026-08-28T11:36:12Z",
           "findings": [],
           "hash": "rvw1:sha256:352d4b837285325d4258f50f5e801808b47e396fb9aeb33b665a52ee66450305",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:33:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d63fbac223acd504d45709c0789ff82b5bd4a84da1f219a235238fb734a9625",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:41:00Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+              "line": 143,
+              "message": "`未宣言の前提への依存`: CO-04 が参照する D3 の fingerprint は workspace 内ファイルと列挙された環境値の文字列に閉じていますが、同じ path の compiler/wrapper、`CARGO_HOME` の内容、外部 path dependency、build script が読む任意の環境値も rustdoc graph を変更できます。これらが不変または不使用であるという前提は spec にも environment-assumptions 宣言にもなく、AC-04 を満たしたまま stale な型シグナルを再利用できます。外部 semantic input を authoritative snapshot に含めるか、hermetic な入力境界を宣言して強制する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+              "line": 167,
+              "message": "`未宣言の前提への依存`: CO-06/CO-07 の単一 lock は、同じ target directory を更新する全 writer がその lock に協調することを暗黙に仮定しています。通常の `cargo rustdoc` や別 exporter は lock を無視して期待 JSON を臨界区間中に置換できますが、spec と environment-assumptions のどちらにも非協調 writer の禁止や target directory の排他的所有がありません。そのため AC-06 の snapshot/ABA 保証が成立しません。全 writer を共通境界で同期するか export 固有出力を使う、または排他的所有を宣言して強制する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8d63fbac223acd504d45709c0789ff82b5bd4a84da1f219a235238fb734a9625",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:52:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7bb1afc165e021872d7a50a151a72413dacd0b390cc305cdbbf81cf157e70346",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:08:40Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+              "line": 57,
+              "message": "AC-04 は外部 path dependency、build script、toolchain、CARGO_HOME を「宣言済み hermetic boundary」に置くことを要求するが、どの環境宣言がその boundary を具体的に定義するかが記録されておらず、現行の environment-assumptions.md も TODO のままである。したがって、この変更は未宣言の外部環境前提に依存している。",
+              "severity": "major"
+            },
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+              "line": 143,
+              "message": "CO-04 の「宣言済み hermetic boundary」「固定した immutable toolchain・CARGO_HOME」「宣言済み build-script input」は、宣言の場所・形式・境界の判定方法・内容固定の方法が定義されていない。Phase 2/3 は authoritative input として何を採用できるかを独自に発明する必要があり、制約が具体的な契約としてテストできない。",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:bccd5e5bc81c3d01f455122d13632240d9123c13b8bbc780bae6e72e3fcd2902",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T19:17:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9947c57b35847fb6523e20d22265ba1ffebd383bd3f355fb1e842a12db855947",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:20:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9947c57b35847fb6523e20d22265ba1ffebd383bd3f355fb1e842a12db855947",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -962,6 +3143,334 @@
           "hash": "rvw1:sha256:a1f5e3c5a57a64fc6769ef9a18f57dac60a255e0318741db83afefdcbac18563",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:09:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d095ba0e26eb3abbb3f82be4b33378b5ccfd126c4b7502ceb63f9574750bce2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:18:32Z",
+          "findings": [
+            {
+              "category": "spec_refs missing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 10,
+              "message": "Catalogue entry `AuthoritativeRustdocContext` declares `new`, `baseline`, and `current` without method-level `spec_refs`. Since an omitted method action defaults to `add` and does not inherit the parent entry's references, obligation derivation will reject these load-bearing methods once the track is unfrozen. Add appropriate method-level spec anchors to all three declarations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d095ba0e26eb3abbb3f82be4b33378b5ccfd126c4b7502ceb63f9574750bce2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T07:28:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b801ca923633547230cfc3ef918874bb0df2b94e7653181a04b839bb50d64a2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T07:31:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b801ca923633547230cfc3ef918874bb0df2b94e7653181a04b839bb50d64a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T12:16:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81f99a68f7fe2fc19f3d0327823fe5a7d8736cdef8d30e05119e7ad5aa9d4f44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T12:23:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81f99a68f7fe2fc19f3d0327823fe5a7d8736cdef8d30e05119e7ad5aa9d4f44",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:18:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1affd97a7d3d7d742ab8787c8a269fd45c0950140a51e6fc1afc9e14445d1cbf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:24:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1affd97a7d3d7d742ab8787c8a269fd45c0950140a51e6fc1afc9e14445d1cbf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:46:55Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 873,
+              "message": "`domain::RustdocCratePort` declares filesystem/Cargo I/O methods `load_from_path` and `capture_current` as synchronous (`is_async: false`), while its docs describe locking, filesystem validation, export, and snapshot reads without acknowledging the synchronous choice. This port contract needs an explicit sync decision or async method shape before adapter implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 81,
+              "message": "`usecase::TypeSignalsExecutorPort::evaluate_layer` is synchronous even though its contract delegates work that loads catalogues and rustdoc contexts from filesystem-backed inputs; the catalogue does not acknowledge that synchronous I/O choice. Clarify the sync boundary or make the port async before adapter implementation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e2e6fe1b80c8191c4fa7f55bf744721e470fd514c81953d4535dfab54f8afb03",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T20:01:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0232e6f2ca8f442f98e06a5293d86b0e9cb51f97acd76eecc4a18da3a383ec4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T20:12:54Z",
+          "findings": [
+            {
+              "category": "spec_refs missing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 166,
+              "message": "The load-bearing methods on `ImplementationFingerprint`, `ResolutionFingerprint`, `RustdocJsonHash`, `ResolvedCargoTargetDirectory`, `CargoProfileName`, `ExpectedRustdocJsonPath`, `RustdocExecutionIdentity`, and `RustdocSnapshot` all omit method-level `spec_refs`. Their omitted actions default to `add`, so obligation derivation rejects every one as an ungrounded Add method. Add the applicable atomic IN/CO/AC references to each method.",
+              "severity": "P1"
+            },
+            {
+              "category": "action/spec_refs mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 875,
+              "message": "Methods on `RustdocCratePort`, `domain::tddd::type_signals_doc::TypeSignalsCacheKey`, `TypeSignalsDocument`, and `TypeSignalsReuseInput` omit both method actions and method-level refs. This defaults all of them to `add`: changed signatures such as `RustdocCratePort::{load_from_path,capture_current}` and `TypeSignalsCacheKey::new` should be `modify`, new accessors should be `add`, and unchanged baseline methods should be `reference`. The current declarations therefore misstate the frozen-baseline delta and also fail Add/Modify method grounding validation.",
+              "severity": "P1"
+            },
+            {
+              "category": "action mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 284,
+              "message": "`infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter::new(PathBuf) -> Self` is identical to the frozen-baseline constructor, but omitting its method action defaults it to `add`. Declare it as `reference`; as written it is both action-incoherent and treated as an ungrounded Add method.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 10,
+              "message": "`RustdocExportPlan::{try_new,bindings}` omit method-level `spec_refs`. Both default to `action: add`, so the newly declared plan cannot pass obligation derivation until its constructor and accessor are grounded in IN-04/CO-05/AC-05 as applicable.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 241,
+              "message": "The constructors for `ResolvedCargoTargetDirectory`, `CargoProfileName`, and `ExpectedRustdocJsonPath` all return the shared `RustdocExecutionIdentityError`, although each can structurally produce only its corresponding single variant. Callers of each constructor must therefore handle two impossible variants, and the method declarations neither identify the producible subset nor justify the broad error. Use operation-specific errors or document the exact subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 10,
+              "message": "`RustdocExportPlan::try_new` returns the full `CatalogueImplSignalsError`, but constructing a plan from an already supplied binding vector can only produce the layer-limit rejection; track validation, catalogue/baseline I/O, schema export, evaluation, symlink, and feature-declaration variants are unreachable. Give this constructor a narrow validation error or explicitly justify and document the producible subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 393,
+              "message": "`RustdocSnapshot::new` independently accepts a `RustdocExecutionIdentity`, `RustdocJsonHash`, and parsed `rustdoc_types::Crate`, admitting a snapshot whose hash and crate came from different bytes or whose identity names a different export. That contradicts the entry's same-locked-bytes invariant and AC-06. Construction must bind hashing and parsing to one captured byte value or require an unforgeable validated proof.",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 875,
+              "message": "`RustdocCratePort::load_from_path(&Path)` promises a `RustdocSnapshot`, but that value requires a complete `RustdocExecutionIdentity` containing target directory, crate, feature set, profile, and expected output path. A baseline path supplies none of the feature/profile/Cargo execution identity, so the adapter cannot construct a truthful snapshot without inventing data. Use a baseline-specific snapshot/return type or pass the full identity required to construct this value.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0232e6f2ca8f442f98e06a5293d86b0e9cb51f97acd76eecc4a18da3a383ec4b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T20:39:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b23bffbf23ade3a28cb5dd005969c9733e632e51d1db0dc1beec42a07a1d3c64",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T20:44:49Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 614,
+              "message": "`CapturedRustdocJson` is declared as a domain `ValueObject`, but `try_from_bytes` hashes and parses an external rustdoc JSON representation. Parsing/codec behavior belongs at an infrastructure boundary; it is not value-derived domain behavior. Keep the validated captured value in domain, but move byte decoding into an adapter/port or factory that supplies the validated result.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 540,
+              "message": "`RustdocSnapshot::new` still accepts an independently constructed `RustdocExecutionIdentity` and `CapturedRustdocJson`. The latter proves only that its hash and parsed crate share bytes; it does not prove those bytes came from the supplied identity's crate/features/profile/path or lock interval. A baseline capture from `load_from_path` can therefore be paired with an unrelated current-export identity. Construct the snapshot from one identity-bearing capture proof so this mixed-generation state is unrepresentable.",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 290,
+              "message": "`ResolvedCargoTargetDirectory` claims to represent a directory admitted after Unix descriptor-relative no-follow trusted-root validation, while its public `try_new(PathBuf)` explicitly establishes only that the path is absolute; `RustdocCrateAdapter` separately claims ownership of the security validation. This permits construction before the declared invariant holds and splits enforcement between layers. Either make the value require an unforgeable adapter-produced validation proof or narrow it to an absolute-path value and assign trusted-root enforcement solely to the adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b23bffbf23ade3a28cb5dd005969c9733e632e51d1db0dc1beec42a07a1d3c64",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T21:12:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5c8e74d186ac2c8bee58c00f15b594f5543b5fdf292d670cded6b7287f5b76e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T21:16:47Z",
+          "findings": [
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1064,
+              "message": "`RustdocCratePort` and `infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter` are declared as the sole construction boundary for `CapturedRustdocJson` and `RustdocSnapshot`, but both domain structs have stripped/private fields and expose only read accessors—neither has a public constructor or factory. Because the adapter is in another crate, it cannot construct either return value, making both port methods unimplementable. Declare a domain-owned construction API that the adapter can use while preserving the invariants, or relocate the proof types/ownership boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5c8e74d186ac2c8bee58c00f15b594f5543b5fdf292d670cded6b7287f5b76e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T21:38:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0aef0650837d7444729fab3572707ee6c89bac597b471206a7f0c54cc86b47",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T21:43:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0aef0650837d7444729fab3572707ee6c89bac597b471206a7f0c54cc86b47",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:12:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9c5525c090573e49a594a3e2f5ff8cd9b546e884f6fcdb107a074665bfd5978",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:16:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9c5525c090573e49a594a3e2f5ff8cd9b546e884f6fcdb107a074665bfd5978",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:32:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97b25dda82c4fd28840bbc707abc032fbd2b962ca5c2315db9039c7313904f8f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:36:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97b25dda82c4fd28840bbc707abc032fbd2b962ca5c2315db9039c7313904f8f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:10:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4018cf9efc7dd196419ac9d9cbcf5406b1d8814b1c7d62a45e0a9d4374713008",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:15:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4018cf9efc7dd196419ac9d9cbcf5406b1d8814b1c7d62a45e0a9d4374713008",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T07:47:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a87e19c1ecea0d687127bbe28ff86a9b23b7d01504d454f62dc07b721825d056",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T07:54:48Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 231,
+              "message": "`infrastructure::schema_export::RustdocSchemaExporter::new` omits its method action, which defaults to `add`, but the frozen baseline already contains the identical public `new(PathBuf) -> Self`. Declare this method as `reference`; otherwise the catalogue falsely records an added API.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 243,
+              "message": "The load-bearing byte-returning methods `RustdocSchemaExporter::export_rustdoc_json` and `export_rustdoc_json_with_features` omit method-level `spec_refs` entirely, leaving the exporter API change ungrounded despite the parent entry's references.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 669,
+              "message": "`RustdocExecutionIdentity::new` receives already-validated target-directory, profile, and expected-path value objects, and its added validation is only the target/expected-path pairing. It can therefore produce only `ExpectedJsonOutsideTargetDirectory`, yet it returns the shared `RustdocExecutionIdentityError` without documenting that subset, forcing callers to account for structurally unreachable `TargetDirectoryNotAbsolute` and `EmptyProfile` variants.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a87e19c1ecea0d687127bbe28ff86a9b23b7d01504d454f62dc07b721825d056",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T08:11:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13ca85feea942df6819c7eb75de70837235d4c75387bcabc0d2a68076f5b0fe6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T08:49:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71270b539107cce5941ed7de027a130ec9d03c1e0f30a096dc61e0b6744c8f33",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T08:58:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71270b539107cce5941ed7de027a130ec9d03c1e0f30a096dc61e0b6744c8f33",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1044,6 +3553,77 @@
           "at": "2026-08-29T03:10:34Z",
           "findings": [],
           "hash": "rvw1:sha256:1ab916d8af477d8c91206ff87c65f69ed74a956770192f0b6f62ae80b101bd52",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:18:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30cf7072a75a071515a3e2c6d752447933507c6316bed5ed482d92d9eea70b92",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:31:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:209d7b1c8c484adcdc9b62cb410d5299b470c9446e7763a173b958c9ebdd3d1f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T14:38:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:209d7b1c8c484adcdc9b62cb410d5299b470c9446e7763a173b958c9ebdd3d1f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:30:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fafbf908b9cc1a14f83276b463bf5ab8868da9091a9ad45ee0fe00c74259a5b3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:50:07Z",
+          "findings": [
+            {
+              "category": "public API documentation",
+              "file": "libs/usecase/src/catalogue_impl_signals/service.rs",
+              "line": 110,
+              "message": "`RustdocExportPlan::try_new` is a new public fallible API, but its rustdoc lacks the required `# Errors` section and does not state that `LayerLimitExceeded` is the sole producible variant. Because the return type is the broad `CatalogueImplSignalsError`, callers cannot determine the actual failure contract from the source API documentation. Add a `# Errors` section naming that variant.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:bb0cc71c0a159040897406147e0a1f6f413266404638bd7730455eee769df583",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T09:11:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccb72f7532fce5380f15638ae204ffbb65281268dead105ecc1555702b6aa2e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T09:19:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ccb72f7532fce5380f15638ae204ffbb65281268dead105ecc1555702b6aa2e5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:45:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6253226cac049d0457293b6908ecdf01ab786eb7205657ecee1d421d6320f71",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T12:58:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6253226cac049d0457293b6908ecdf01ab786eb7205657ecee1d421d6320f71",
           "type": "final",
           "verdict": "zero_findings"
         }

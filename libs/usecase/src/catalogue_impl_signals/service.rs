@@ -8,8 +8,8 @@
 use std::path::PathBuf;
 
 use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPortError;
-use domain::tddd::LayerId;
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
+use domain::tddd::{LayerId, catalogue_v2::TdddLayerBinding};
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
@@ -79,9 +79,52 @@ pub enum CatalogueImplSignalsError {
     /// No TDDD-enabled layers found.
     #[error("no TDDD-enabled layers found in architecture-rules.json")]
     NoLayers,
+    /// The configured rustdoc export plan exceeds the supported bound.
+    #[error("rustdoc export plan exceeds the maximum of 64 TDDD layers")]
+    LayerLimitExceeded,
     /// The actual-capture feature declaration could not be loaded or verified.
     #[error("feature declaration error: {0}")]
     FeatureDeclaration(TdddActualFeatureDeclarationPortError),
+}
+
+/// Validated rustdoc export plan for one catalogue implementation-signals run.
+#[derive(Debug, Clone)]
+pub struct RustdocExportPlan {
+    bindings: Vec<TdddLayerBinding>,
+}
+
+impl PartialEq for RustdocExportPlan {
+    fn eq(&self, other: &Self) -> bool {
+        self.bindings.iter().map(binding_identity).eq(other.bindings.iter().map(binding_identity))
+    }
+}
+
+impl Eq for RustdocExportPlan {}
+
+fn binding_identity(binding: &TdddLayerBinding) -> (&str, &str, &str, &[String]) {
+    (&binding.layer_id, &binding.catalogue_file, &binding.baseline_file, &binding.targets)
+}
+
+impl RustdocExportPlan {
+    /// Validates the maximum number of rustdoc layer exports.
+    ///
+    /// # Errors
+    ///
+    /// The sole producible error is
+    /// [`CatalogueImplSignalsError::LayerLimitExceeded`], returned when more
+    /// than 64 TDDD layer bindings are supplied.
+    pub fn try_new(bindings: Vec<TdddLayerBinding>) -> Result<Self, CatalogueImplSignalsError> {
+        if bindings.len() > 64 {
+            return Err(CatalogueImplSignalsError::LayerLimitExceeded);
+        }
+        Ok(Self { bindings })
+    }
+
+    /// Returns the complete validated export plan.
+    #[must_use]
+    pub fn bindings(&self) -> &[TdddLayerBinding] {
+        &self.bindings
+    }
 }
 
 pub(super) fn diagnostic(value: impl Into<String>) -> DiagnosticMessage {

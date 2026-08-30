@@ -19,7 +19,12 @@ use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
-use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
+use domain::tddd::catalogue_v2::RustdocCratePortError;
+use domain::tddd::type_signals_doc::{RustdocSnapshot, construct_rustdoc_snapshot};
+use domain::tddd::{
+    CargoFeatureName, CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
+    RustdocExecutionIdentity, catalogue_v2::CrateName,
+};
 use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
@@ -42,14 +47,21 @@ use trait_origins::build_trait_origins;
 
 #[path = "schema_export/path_resolution.rs"]
 mod path_resolution;
+use crate::tddd::rustdoc_output_lock::RustdocOutputLock;
 use path_resolution::{
-    absolutize_for_target_guard, checked_workspace_root, parse_rustdoc_json,
-    reject_symlinks_for_rustdoc_path,
+    absolutize_for_target_guard, checked_workspace_root, reject_symlinks_for_rustdoc_path,
+    resolve_exclusive_target_dir,
 };
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
     workspace_root: PathBuf,
+}
+
+#[derive(Clone, Copy)]
+enum RustdocRunMode {
+    Legacy,
+    Declared,
 }
 
 impl RustdocSchemaExporter {
@@ -59,11 +71,10 @@ impl RustdocSchemaExporter {
     }
 
     /// Runs `cargo +nightly rustdoc --output-format json` for `crate_name` and
-    /// returns the path to the generated JSON file.
+    /// returns an immutable copy of the generated JSON bytes.
     ///
-    /// The file is written inside the workspace's `target/doc/` directory.
-    /// The caller is responsible for reading or copying the file before the
-    /// next rustdoc run overwrites it.
+    /// The export lock remains held until the bytes have been copied, so the
+    /// caller never receives an unlocked path into Cargo's mutable output.
     ///
     /// # Errors
     ///
@@ -74,12 +85,11 @@ impl RustdocSchemaExporter {
     ///
     /// Returns [`SchemaExportError::CrateNotFound`] if the crate is not in the
     /// workspace.
-    pub fn export_rustdoc_json_path(
-        &self,
-        crate_name: &str,
-    ) -> Result<std::path::PathBuf, SchemaExportError> {
-        check_nightly_available()?;
-        bin_target::run_rustdoc(&self.workspace_root, crate_name)
+    pub fn export_rustdoc_json(&self, crate_name: &str) -> Result<Vec<u8>, SchemaExportError> {
+        let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
+            SchemaExportError::RustdocFailed(format!("invalid crate name '{crate_name}': {error}"))
+        })?;
+        self.capture_rustdoc_json_legacy(&package_name).map(|(_, bytes)| bytes)
     }
 
     /// Runs `cargo +nightly rustdoc --output-format json` with the validated
@@ -90,46 +100,135 @@ impl RustdocSchemaExporter {
     /// Returns [`SchemaExportError`] when the nightly toolchain is unavailable,
     /// Cargo cannot build the selected package and features, or the rustdoc JSON
     /// output path cannot be resolved safely.
-    pub fn export_rustdoc_json_path_with_features(
+    pub fn export_rustdoc_json_with_features(
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<std::path::PathBuf, SchemaExportError> {
-        check_nightly_available()?;
-        bin_target::run_rustdoc_with_features(&self.workspace_root, crate_name, features)
+    ) -> Result<Vec<u8>, SchemaExportError> {
+        self.capture_rustdoc_json(crate_name, features).map(|(_, bytes)| bytes)
     }
 
-    /// Resolves a previously generated rustdoc JSON path without launching rustdoc.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`SchemaExportError`] when target resolution or the path-safety
-    /// checks cannot establish a trusted existing-snapshot location.
-    pub fn existing_rustdoc_json_path(
+    /// Runs rustdoc and captures its expected output bytes while the common
+    /// target-directory lock remains held.
+    pub(crate) fn capture_rustdoc_json(
         &self,
-        crate_name: &str,
-    ) -> Result<std::path::PathBuf, SchemaExportError> {
-        let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
-            SchemaExportError::RustdocFailed(format!(
-                "invalid catalogue crate name `{crate_name}`: {error}"
-            ))
-        })?;
-        let resolution = resolve_rustdoc_root_name(&self.workspace_root, &package_name)
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<(RustdocExecutionIdentity, Vec<u8>), SchemaExportError> {
+        self.capture_rustdoc_json_with_mode(crate_name, features, RustdocRunMode::Declared)
+    }
+
+    pub(crate) fn capture_rustdoc_json_legacy(
+        &self,
+        crate_name: &CrateName,
+    ) -> Result<(RustdocExecutionIdentity, Vec<u8>), SchemaExportError> {
+        self.capture_rustdoc_json_with_mode(crate_name, &[], RustdocRunMode::Legacy)
+    }
+
+    fn capture_rustdoc_json_with_mode(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        mode: RustdocRunMode,
+    ) -> Result<(RustdocExecutionIdentity, Vec<u8>), SchemaExportError> {
+        check_nightly_available()?;
+        let target_directory = resolve_exclusive_target_dir(
+            &self.workspace_root,
+            crate_name,
+            features,
+            matches!(mode, RustdocRunMode::Legacy),
+        )?;
+        let lock = RustdocOutputLock::acquire(&target_directory)?;
+        let (identity, expected_path) =
+            self.rustdoc_execution_identity_for_target(crate_name, features, &target_directory)?;
+        let output_path = match mode {
+            RustdocRunMode::Legacy => bin_target::run_rustdoc(
+                &self.workspace_root,
+                crate_name.as_str(),
+                &target_directory,
+            )?,
+            RustdocRunMode::Declared => bin_target::run_rustdoc_with_features(
+                &self.workspace_root,
+                crate_name,
+                features,
+                &target_directory,
+            )?,
+        };
+        if output_path != expected_path {
+            return Err(SchemaExportError::RustdocFailed(format!(
+                "rustdoc JSON output path changed during export: expected '{}', got '{}'",
+                expected_path.display(),
+                output_path.display()
+            )));
+        }
+        let bytes = lock.read_bytes(&expected_path, 64 * 1024 * 1024)?;
+        Ok((identity, bytes))
+    }
+
+    /// Runs rustdoc and constructs an identity-bearing snapshot from bytes
+    /// copied while the shared output lock was held.
+    pub(crate) fn capture_rustdoc_snapshot(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        decode: fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>,
+    ) -> Result<RustdocSnapshot, SchemaExportError> {
+        let (identity, bytes) = self.capture_rustdoc_json(crate_name, features)?;
+        construct_rustdoc_snapshot(identity, &bytes, decode)
+            .map_err(|error| SchemaExportError::ParseFailed(error.to_string()))
+    }
+
+    /// Resolves the cache-key selection without reading the generated output.
+    pub(crate) fn rustdoc_execution_identity(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<(RustdocExecutionIdentity, PathBuf), SchemaExportError> {
+        let target_directory =
+            resolve_exclusive_target_dir(&self.workspace_root, crate_name, features, false)?;
+        self.rustdoc_execution_identity_for_target(crate_name, features, &target_directory)
+    }
+
+    fn rustdoc_execution_identity_for_target(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        target_directory: &Path,
+    ) -> Result<(RustdocExecutionIdentity, PathBuf), SchemaExportError> {
+        let resolution = resolve_rustdoc_root_name(&self.workspace_root, crate_name)
             .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
-        let target_dir = path_resolution::resolve_target_dir_strict(&self.workspace_root)?;
-        let path = target_dir
+        let target_directory_value =
+            ResolvedCargoTargetDirectory::try_new(target_directory.to_path_buf())
+                .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        let expected_path = target_directory
             .join("doc")
             .join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
-        ensure_rustdoc_json_path_safe(&target_dir, &path, "type-signals snapshot reuse")?;
-        Ok(path)
+        let expected_path_value =
+            ExpectedRustdocJsonPath::try_new(expected_path.clone(), &target_directory_value)
+                .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        let profile = CargoProfileName::try_new("dev".to_owned())
+            .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        let identity = RustdocExecutionIdentity::new(
+            target_directory_value,
+            crate_name.clone(),
+            features.to_vec(),
+            profile,
+            expected_path_value,
+        )
+        .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        Ok((identity, expected_path))
     }
 }
 
 impl SchemaExporter for RustdocSchemaExporter {
     fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> {
-        check_nightly_available()?;
-        let json_path = bin_target::run_rustdoc(&self.workspace_root, crate_name)?;
-        let krate = parse_rustdoc_json(&json_path)?;
+        let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
+            SchemaExportError::RustdocFailed(format!("invalid crate name '{crate_name}': {error}"))
+        })?;
+        let (_, bytes) = self.capture_rustdoc_json_legacy(&package_name)?;
+        let krate = serde_json::from_slice(&bytes).map_err(|error| {
+            SchemaExportError::ParseFailed(format!("JSON parse error: {error}"))
+        })?;
         build_schema_export(crate_name, &krate)
     }
 }
@@ -384,7 +483,7 @@ mod tests {
 
     use super::extract::{extract_enum_variants, extract_params, extract_receiver, format_return};
     use super::format_helpers::{collect_type_names, format_type};
-    use super::path_resolution::{resolve_configured_target_dir, resolve_target_dir_strict};
+    use super::path_resolution::resolve_configured_target_dir;
     use super::trait_origins::{build_trait_origins, resolve_trait_origin};
     use super::*;
 
@@ -491,50 +590,6 @@ mod tests {
 
         assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
         assert!(err.to_string().contains("symlink guard"));
-    }
-
-    #[test]
-    fn test_existing_rustdoc_json_path_resolvable_crate_returns_existing_target_doc_path() {
-        let workspace = tempfile::tempdir().unwrap();
-        let manifest = workspace.path().join("Cargo.toml");
-        let source = workspace.path().join("src/lib.rs");
-        std::fs::write(
-            &manifest,
-            "[package]\nname = \"fixture_workspace\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\nname = \"fixture_root\"\npath = \"src/lib.rs\"\n",
-        )
-        .unwrap();
-        std::fs::create_dir_all(source.parent().unwrap()).unwrap();
-        std::fs::write(&source, "pub struct Fixture;\n").unwrap();
-        let expected =
-            resolve_target_dir_strict(workspace.path()).unwrap().join("doc/fixture_root.json");
-        std::fs::create_dir_all(expected.parent().unwrap()).unwrap();
-        let rustdoc_json = format!(
-            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
-            rustdoc_types::FORMAT_VERSION
-        );
-        std::fs::write(&expected, rustdoc_json).unwrap();
-
-        let path = RustdocSchemaExporter::new(workspace.path().to_path_buf())
-            .existing_rustdoc_json_path("fixture_workspace")
-            .unwrap();
-
-        assert_eq!(path, expected);
-        assert!(path.is_file());
-        let content = std::fs::read_to_string(&path).unwrap();
-        let parsed: rustdoc_types::Crate = serde_json::from_str(&content).unwrap();
-        assert_eq!(parsed.format_version, rustdoc_types::FORMAT_VERSION);
-    }
-
-    #[test]
-    fn test_existing_rustdoc_json_path_unresolvable_workspace_returns_rustdoc_failed() {
-        let workspace = tempfile::tempdir().unwrap();
-        let missing_workspace = workspace.path().join("missing-workspace");
-
-        let error = RustdocSchemaExporter::new(missing_workspace)
-            .existing_rustdoc_json_path("fixture_workspace")
-            .unwrap_err();
-
-        assert!(matches!(error, SchemaExportError::RustdocFailed(_)));
     }
 
     #[cfg(unix)]

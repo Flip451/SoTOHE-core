@@ -9,11 +9,42 @@ use super::*;
 
 const DIGEST: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
+fn legacy_cache_key(
+    declaration_hash: domain::CatalogueDeclarationHash,
+    head_commit: domain::CommitHash,
+    baseline_hash: domain::BaselineHash,
+) -> domain::TypeSignalsCacheKey {
+    let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/sotohe-codec-test-target",
+    ))
+    .unwrap();
+    let expected =
+        domain::ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/legacy.json"), &target)
+            .unwrap();
+    let identity = domain::RustdocExecutionIdentity::new(
+        target,
+        domain::tddd::catalogue_v2::CrateName::new("legacy").unwrap(),
+        vec![],
+        domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let zero = domain::Sha256Digest::try_new("0".repeat(64)).unwrap();
+    domain::TypeSignalsCacheKey::new(
+        declaration_hash,
+        head_commit,
+        baseline_hash,
+        domain::ImplementationFingerprint::new(zero.clone()),
+        domain::ResolutionFingerprint::new(zero),
+        identity,
+    )
+}
+
 fn sample_doc() -> TypeSignalsDocument {
     let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
     TypeSignalsDocument::new(
         Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-        TypeSignalsCacheKey::new(
+        legacy_cache_key(
             CatalogueDeclarationHash::new(digest.clone()),
             CommitHash::try_new("a".repeat(40)).unwrap(),
             BaselineHash::new(digest),
@@ -34,7 +65,7 @@ fn sample_catalogue_item_doc() -> TypeSignalsDocument {
     let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
     TypeSignalsDocument::new(
         Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-        TypeSignalsCacheKey::new(
+        legacy_cache_key(
             CatalogueDeclarationHash::new(digest.clone()),
             CommitHash::try_new("a".repeat(40)).unwrap(),
             BaselineHash::new(digest),
@@ -72,7 +103,7 @@ fn sample_identity_collision_doc() -> TypeSignalsDocument {
     let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
     TypeSignalsDocument::new(
         Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-        TypeSignalsCacheKey::new(
+        legacy_cache_key(
             CatalogueDeclarationHash::new(digest.clone()),
             CommitHash::try_new("a".repeat(40)).unwrap(),
             BaselineHash::new(digest),
@@ -119,6 +150,99 @@ fn sample_identity_collision_doc() -> TypeSignalsDocument {
 fn test_encode_decode_roundtrip_preserves_document() {
     let document = sample_doc();
     assert_eq!(decode(&encode(&document).unwrap()).unwrap(), document);
+}
+
+#[test]
+fn test_workspace_relative_identity_roundtrip_uses_active_workspace() {
+    let workspace = std::path::Path::new("/tmp/sotohe-codec-workspace");
+    let target = domain::ResolvedCargoTargetDirectory::try_new(workspace.join("target")).unwrap();
+    let expected =
+        domain::ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
+            .unwrap();
+    let identity = domain::RustdocExecutionIdentity::new(
+        target,
+        domain::tddd::catalogue_v2::CrateName::new("domain").unwrap(),
+        vec![],
+        domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
+    let document = TypeSignalsDocument::new(
+        Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
+        domain::TypeSignalsCacheKey::new(
+            CatalogueDeclarationHash::new(digest.clone()),
+            CommitHash::try_new("a".repeat(40)).unwrap(),
+            BaselineHash::new(digest),
+            domain::ImplementationFingerprint::new(
+                Sha256Digest::try_new(DIGEST.to_owned()).unwrap(),
+            ),
+            domain::ResolutionFingerprint::new(Sha256Digest::try_new(DIGEST.to_owned()).unwrap()),
+            identity,
+        ),
+        vec![],
+    );
+
+    let encoded = encode_with_workspace(&document, Some(workspace)).unwrap();
+    assert!(encoded.contains("\"target_directory\": \"target\""));
+    assert!(encoded.contains("\"expected_json_path\": \"target/doc/domain.json\""));
+    assert_eq!(
+        decode_with_workspace_for_current(
+            &encoded,
+            workspace,
+            document.cache_key().rustdoc_execution_identity(),
+        )
+        .unwrap(),
+        document
+    );
+}
+
+#[test]
+fn test_external_identity_roundtrip_uses_portable_marker_and_current_target() {
+    let workspace = std::path::Path::new("/tmp/sotohe-codec-workspace");
+    let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/home/alice/.cache/cargo-target",
+    ))
+    .unwrap();
+    let expected =
+        domain::ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
+            .unwrap();
+    let identity = domain::RustdocExecutionIdentity::new(
+        target,
+        domain::tddd::catalogue_v2::CrateName::new("domain").unwrap(),
+        vec![],
+        domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
+    let document = TypeSignalsDocument::new(
+        Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
+        domain::TypeSignalsCacheKey::new(
+            CatalogueDeclarationHash::new(digest.clone()),
+            CommitHash::try_new("a".repeat(40)).unwrap(),
+            BaselineHash::new(digest),
+            domain::ImplementationFingerprint::new(
+                Sha256Digest::try_new(DIGEST.to_owned()).unwrap(),
+            ),
+            domain::ResolutionFingerprint::new(Sha256Digest::try_new(DIGEST.to_owned()).unwrap()),
+            identity,
+        ),
+        vec![],
+    );
+
+    let encoded = encode_with_workspace(&document, Some(workspace)).unwrap();
+    assert!(!encoded.contains("/home/alice/"));
+    assert!(encoded.contains(EXTERNAL_TARGET_IDENTITY_ROOT));
+    assert_eq!(
+        decode_with_workspace_for_current(
+            &encoded,
+            workspace,
+            document.cache_key().rustdoc_execution_identity(),
+        )
+        .unwrap(),
+        document
+    );
 }
 
 #[test]
@@ -169,7 +293,7 @@ fn test_encode_rejects_catalogue_kind_without_namespace() {
     let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
     let document = TypeSignalsDocument::new(
         Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-        TypeSignalsCacheKey::new(
+        legacy_cache_key(
             CatalogueDeclarationHash::new(digest.clone()),
             CommitHash::try_new("a".repeat(40)).unwrap(),
             BaselineHash::new(digest),
@@ -237,6 +361,9 @@ fn test_decode_rejects_unknown_fields() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![],
     })
     .unwrap();
@@ -255,6 +382,9 @@ fn test_decode_requires_head_commit() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![],
     })
     .unwrap();
@@ -270,6 +400,9 @@ fn test_decode_requires_baseline_hash() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![],
     })
     .unwrap();
@@ -285,6 +418,9 @@ fn test_decode_rejects_unknown_confidence_signal_value() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![signal_to_dto(&TypeSignal::new(
             ThreeWaySignalIdentity::Label { label: FreeText::new("Example") },
             "free_function".to_owned(),
@@ -312,6 +448,9 @@ fn test_decode_rejects_unknown_catalogue_item_namespace() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![signal_to_dto(&TypeSignal::new(
             ThreeWaySignalIdentity::CatalogueItem {
                 item_name: FreeText::new("Shared"),
@@ -340,6 +479,9 @@ fn test_decode_rejects_v5_signal_without_explicit_identity() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "Shared",
             "kind_tag": "value_object",
@@ -363,6 +505,9 @@ fn test_decode_accepts_missing_namespace_for_function_label() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "compute",
             "kind_tag": "free_function",
@@ -387,6 +532,9 @@ fn test_decode_accepts_missing_namespace_for_unknown_label() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "report::label",
             "kind_tag": "unknown",
@@ -411,6 +559,9 @@ fn test_decode_accepts_explicit_null_label_identity() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "Shared",
             "namespace": null,
@@ -435,6 +586,9 @@ fn test_decode_rejects_null_namespace_for_catalogue_kind_tag() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "Shared",
             "namespace": null,
@@ -458,6 +612,9 @@ fn test_decode_rejects_catalogue_namespace_for_function_label() {
         "declaration_hash": DIGEST,
         "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": DIGEST,
+        "implementation_fingerprint": DIGEST,
+        "resolution_fingerprint": DIGEST,
+        "rustdoc_execution_identity": test_execution_identity_dto(),
         "signals": [{
             "type_name": "compute",
             "namespace": "type",
@@ -481,6 +638,9 @@ fn test_decode_requires_declaration_hash() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![],
     })
     .unwrap();
@@ -496,6 +656,9 @@ fn test_decode_rejects_each_typed_codec_error_variant() {
         declaration_hash: DIGEST.to_owned(),
         head_commit: "a".repeat(40),
         baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
         signals: vec![],
     };
 
@@ -566,12 +729,9 @@ fn test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_reco
     let head_commit = CommitHash::try_new("a".repeat(40)).unwrap();
     let recorded_baseline = baseline_hash(b"baseline A");
     let current_baseline = baseline_hash(b"baseline B");
-    let recorded = TypeSignalsCacheKey::new(
-        declaration.clone(),
-        head_commit.clone(),
-        recorded_baseline.clone(),
-    );
-    let current = TypeSignalsCacheKey::new(declaration, head_commit, current_baseline);
+    let recorded =
+        legacy_cache_key(declaration.clone(), head_commit.clone(), recorded_baseline.clone());
+    let current = legacy_cache_key(declaration, head_commit, current_baseline);
 
     assert_eq!(recorded.baseline_hash(), &baseline_hash(b"baseline A"));
     let input = TypeSignalsReuseInput::verify(
@@ -583,7 +743,7 @@ fn test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_reco
     .unwrap();
     assert_eq!(
         decide_type_signals_reuse(&input),
-        TypeSignalsReuseDecision::ReevaluateWithoutExtraction,
+        TypeSignalsReuseDecision::ReextractAndEvaluate,
         "a changed rustdoc baseline digest must invalidate reuse"
     );
 }

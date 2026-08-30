@@ -1,16 +1,168 @@
 {
   "crate_name": "usecase",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Validates only the 64-layer export-plan bound; the sole producible CatalogueImplSignalsError variant is LayerLimitExceeded.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "bindings",
+              "ty": "Vec<domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding>"
+            }
+          ],
+          "returns": "Result<Self, CatalogueImplSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "bindings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding]",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "RustdocExportPlan"
+    }
+  ],
   "layer": "usecase",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsInteractor",
+      "trait_ref": "CatalogueImplSignalsService"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "RustdocExportPlan",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocExportPlan",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocExportPlan",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocExportPlan",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
   "traits": {
-    "TypeSignalsExecutorPort": {
+    "SchemaExporterPort": {
       "action": "reference",
-      "docs": "Reference TypeSignalsExecutorPort for the TypeSignalsExecutorAdapter implementation edge (IN-01, CO-01, CO-02, AC-01, AC-03).",
+      "docs": "Baseline-identical driven port for serialized schema export; the String return is an opaque JSON boundary representation rather than a domain concept, and the entry is carried so RustdocSchemaExporter trait-implementation edges remain explicit.",
       "informal_grounds": [],
       "methods": [
         {
           "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_as_json",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, SchemaExporterError>"
+        }
+      ],
+      "module_path": "export_schema",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "reference",
+      "docs": "Reference the unchanged synchronous per-layer execution boundary whose infrastructure implementation loads LayerId-keyed authoritative rustdoc contexts for the complete TDDD layer set before catalogue encoding (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03). evaluate_layer is intentionally blocking: catalogue and rustdoc filesystem work, export/snapshot capture, evaluation, and result persistence complete on the caller thread before it returns, with no internal async scheduling; async callers must explicitly isolate this boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "docs": "Synchronous blocking boundary: complete authoritative catalogue/rustdoc filesystem loading, export and immutable snapshot capture, evaluation, and result persistence on the caller thread before returning; no internal async scheduling is provided.",
           "has_default_impl": false,
           "is_async": false,
           "name": "evaluate_layer",
@@ -64,6 +216,18 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -73,9 +237,41 @@
     }
   },
   "types": {
+    "RustdocExportPlan": {
+      "action": "add",
+      "docs": "Validated immutable export plan containing at most 64 TDDD layer bindings; construction rejects the 65th required rustdoc export before export, evaluation, or cache reuse begins.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::service",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
     "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor": {
       "action": "modify",
-      "docs": "Update CatalogueImplSignalsInteractor catalogue-loading handoff (IN-01, CO-01, AC-01).",
+      "docs": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff, so declaring-layer placement is available to cross-crate add resolution (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -140,15 +336,221 @@
         {
           "anchor": "AC-01",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError": {
+      "action": "modify",
+      "docs": "Application failure vocabulary for fail-closed catalogue/implementation evaluation, including rejection of any export plan requiring more than 64 TDDD layers.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::layer_id::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::layer_id::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ExtendedCrateConversion",
+            "payload": {
+              "fields": [
+                "domain::tddd::layer_id::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SchemaExport",
+            "payload": {
+              "fields": [
+                "domain::tddd::layer_id::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "domain::tddd::layer_id::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkRejected",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkGuardIo",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "LayerLimitExceeded",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddActualFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     }
-  },
-  "trait_impls": [
-    {
-      "action": "modify",
-      "for_type": "CatalogueImplSignalsInteractor",
-      "trait_ref": "CatalogueImplSignalsService"
-    }
-  ]
+  }
 }

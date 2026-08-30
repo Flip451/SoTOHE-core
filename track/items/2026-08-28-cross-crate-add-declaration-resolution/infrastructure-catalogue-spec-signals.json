@@ -1,16 +1,41 @@
 {
-  "catalogue_declaration_hash": "10982e54d1117bc6e8e05c85a58ae76d70d3b7551bd97f2bd512e0e216f99c9e",
+  "catalogue_declaration_hash": "11f8d01145b995e4034281adf57140c91a03784c6903e6b0b3fe9f8c182ade0a",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "9167d6ffce0e81be391c613699ad7bc68df7b015f2432103e7f62d64b10cc7b3",
+      "entry_hash": "8ccabb0db8960c1d2b540592d069dad5ba37ee5b362bd21ccc5a5d275007f2fe",
+      "signal": "blue",
+      "type_name": "infrastructure::schema_export::RustdocSchemaExporter"
+    },
+    {
+      "entry_hash": "a7705b84d524aea98d0bf6b2bc4119b88a20318edfcbd5359c42371c38aea1ac",
       "signal": "blue",
       "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
     },
     {
-      "entry_hash": "2674f46da83d174cb82ca6f6707c181131c93dd2d59c6eb0cc0dc31f7db715c2",
+      "entry_hash": "b7b6b5c83f1a21218dc01752208beaaf9ec94a2af7de5d8d6115f501030c6e06",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+    },
+    {
+      "entry_hash": "7a47f8657ad4f7e03246159e394bdecd14021c9609475e99351ae28260f41f6a",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+    },
+    {
+      "entry_hash": "28a351d963efe34e9dbfadfd18e1aca7d29a193b13ba8f49f7a1fe3d4fe720bf",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+    },
+    {
+      "entry_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+    },
+    {
+      "entry_hash": "bb88776a8f2ecac7f71352dabd6dcc104b983eec3ac8c49d2b0c3d3cb46a1a37",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
     }
   ]
 }

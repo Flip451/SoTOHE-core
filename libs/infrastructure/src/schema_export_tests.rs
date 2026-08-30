@@ -100,9 +100,9 @@ mod tests {
         let crate_name = CrateName::new("infrastructure".to_owned()).unwrap();
         let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
 
-        let json_path =
-            exporter.export_rustdoc_json_path_with_features(&crate_name, &features).unwrap();
-        let document: Value = serde_json::from_slice(&std::fs::read(json_path).unwrap()).unwrap();
+        let json_bytes =
+            exporter.export_rustdoc_json_with_features(&crate_name, &features).unwrap();
+        let document: Value = serde_json::from_slice(&json_bytes).unwrap();
         let item_names = document["index"]
             .as_object()
             .unwrap()

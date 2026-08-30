@@ -4,8 +4,13 @@
 //! reuse. Cache reuse is valid only for a clean worktree at the recorded HEAD.
 
 use std::fmt;
+use std::path::{Component, Path, PathBuf};
 
+use sha2::Digest as _;
+
+use crate::tddd::CargoFeatureName;
 use crate::tddd::catalogue::TypeSignal;
+use crate::tddd::catalogue_v2::{CrateName, RustdocCratePortError};
 use crate::{CommitHash, ContentHash, Timestamp};
 
 /// Schema version for `<layer>-type-signals.json` documents.
@@ -45,6 +50,12 @@ impl Sha256Digest {
     }
 
     /// Validates and stores a lowercase SHA-256 hexadecimal digest.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Sha256DigestError::InvalidLength`] when `value` is not
+    /// exactly 64 characters, or [`Sha256DigestError::InvalidHex`] when it
+    /// contains a non-lowercase-hexadecimal character.
     pub fn try_new(value: String) -> Result<Self, Sha256DigestError> {
         if value.len() != 64 {
             return Err(Sha256DigestError::InvalidLength);
@@ -71,11 +82,13 @@ macro_rules! digest_identity {
         }
 
         impl $name {
+            /// Creates an identity from a validated SHA-256 digest.
             #[must_use]
             pub fn new(digest: Sha256Digest) -> Self {
                 Self { digest }
             }
 
+            /// Returns the underlying validated SHA-256 digest.
             #[must_use]
             pub fn as_digest(&self) -> &Sha256Digest {
                 &self.digest
@@ -86,6 +99,286 @@ macro_rules! digest_identity {
 
 digest_identity!(CatalogueDeclarationHash, "Identity of the normalized catalogue declaration.");
 digest_identity!(BaselineHash, "Identity of the actual rustdoc baseline bytes.");
+digest_identity!(
+    ImplementationFingerprint,
+    "Identity of the complete rustdoc implementation inputs."
+);
+digest_identity!(ResolutionFingerprint, "Identity of the complete rustdoc resolution inputs.");
+digest_identity!(RustdocJsonHash, "Identity of the exact captured rustdoc JSON bytes.");
+
+/// A resolved absolute Cargo target directory.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ResolvedCargoTargetDirectory {
+    path: PathBuf,
+}
+
+impl ResolvedCargoTargetDirectory {
+    /// Validates and stores an absolute Cargo target directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RustdocExecutionIdentityError::TargetDirectoryNotAbsolute`]
+    /// when `path` is relative.
+    pub fn try_new(path: PathBuf) -> Result<Self, RustdocExecutionIdentityError> {
+        if path.is_absolute() {
+            Ok(Self { path })
+        } else {
+            Err(RustdocExecutionIdentityError::TargetDirectoryNotAbsolute)
+        }
+    }
+
+    /// Returns the resolved target directory path.
+    #[must_use]
+    pub fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+/// A validated Cargo profile name.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CargoProfileName {
+    value: String,
+}
+
+impl CargoProfileName {
+    /// Validates and stores a non-empty profile name.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RustdocExecutionIdentityError::EmptyProfile`] when `value`
+    /// is empty or contains only whitespace.
+    pub fn try_new(value: String) -> Result<Self, RustdocExecutionIdentityError> {
+        if value.trim().is_empty() {
+            Err(RustdocExecutionIdentityError::EmptyProfile)
+        } else {
+            Ok(Self { value })
+        }
+    }
+
+    /// Returns the profile name.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
+}
+
+/// A rustdoc JSON path confined to a resolved Cargo target directory.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExpectedRustdocJsonPath {
+    path: PathBuf,
+}
+
+impl ExpectedRustdocJsonPath {
+    /// Validates an absolute JSON path against its target directory.
+    ///
+    /// Parent-directory components are rejected because this domain value
+    /// does not perform filesystem canonicalization.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory`]
+    /// when `path` is relative, contains parent traversal, or is not beneath
+    /// `target_directory`.
+    pub fn try_new(
+        path: PathBuf,
+        target_directory: &ResolvedCargoTargetDirectory,
+    ) -> Result<Self, RustdocExecutionIdentityError> {
+        let contains_parent_traversal =
+            path.components().any(|component| component == Component::ParentDir);
+        if path.is_absolute()
+            && !contains_parent_traversal
+            && path.starts_with(target_directory.as_path())
+        {
+            Ok(Self { path })
+        } else {
+            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)
+        }
+    }
+
+    /// Returns the expected JSON path.
+    #[must_use]
+    pub fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+/// Failure to construct one component of a rustdoc execution identity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RustdocExecutionIdentityError {
+    /// The target directory is not absolute.
+    TargetDirectoryNotAbsolute,
+    /// The expected JSON path is not beneath the target directory.
+    ExpectedJsonOutsideTargetDirectory,
+    /// The Cargo profile is empty.
+    EmptyProfile,
+}
+
+impl fmt::Display for RustdocExecutionIdentityError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::TargetDirectoryNotAbsolute => {
+                formatter.write_str("Cargo target directory must be absolute")
+            }
+            Self::ExpectedJsonOutsideTargetDirectory => formatter
+                .write_str("expected rustdoc JSON path is outside the Cargo target directory"),
+            Self::EmptyProfile => formatter.write_str("Cargo profile must not be empty"),
+        }
+    }
+}
+
+impl std::error::Error for RustdocExecutionIdentityError {}
+
+/// The exact Cargo/rustdoc selection used for one current export.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RustdocExecutionIdentity {
+    target_directory: ResolvedCargoTargetDirectory,
+    crate_name: CrateName,
+    features: Vec<CargoFeatureName>,
+    profile: CargoProfileName,
+    expected_json_path: ExpectedRustdocJsonPath,
+}
+
+impl RustdocExecutionIdentity {
+    /// Creates a value-equatable execution selection from validated components.
+    ///
+    /// The expected JSON path is revalidated against `target_directory` so the
+    /// identity cannot combine a target directory with a path validated for a
+    /// different target directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory`]
+    /// when `expected_json_path` is not confined to `target_directory`.
+    #[must_use = "the execution identity is required for capture and cache operations"]
+    pub fn new(
+        target_directory: ResolvedCargoTargetDirectory,
+        crate_name: CrateName,
+        features: Vec<CargoFeatureName>,
+        profile: CargoProfileName,
+        expected_json_path: ExpectedRustdocJsonPath,
+    ) -> Result<Self, RustdocExecutionIdentityError> {
+        let expected_json_path = ExpectedRustdocJsonPath::try_new(
+            expected_json_path.as_path().to_path_buf(),
+            &target_directory,
+        )?;
+        Ok(Self { target_directory, crate_name, features, profile, expected_json_path })
+    }
+
+    /// Returns the resolved Cargo target directory used for the export.
+    #[must_use]
+    pub fn target_directory(&self) -> &ResolvedCargoTargetDirectory {
+        &self.target_directory
+    }
+
+    /// Returns the crate selected for the export.
+    #[must_use]
+    pub fn crate_name(&self) -> &CrateName {
+        &self.crate_name
+    }
+
+    /// Returns the Cargo features selected for the export.
+    #[must_use]
+    pub fn features(&self) -> &[CargoFeatureName] {
+        &self.features
+    }
+
+    /// Returns the Cargo profile selected for the export.
+    #[must_use]
+    pub fn profile(&self) -> &CargoProfileName {
+        &self.profile
+    }
+
+    /// Returns the expected rustdoc JSON path for the export.
+    #[must_use]
+    pub fn expected_json_path(&self) -> &ExpectedRustdocJsonPath {
+        &self.expected_json_path
+    }
+}
+
+/// A typed rustdoc graph paired with the hash of the exact bytes decoded.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapturedRustdocJson {
+    json_hash: RustdocJsonHash,
+    crate_data: rustdoc_types::Crate,
+}
+
+impl CapturedRustdocJson {
+    /// Returns the hash of the exact bytes used to decode the rustdoc graph.
+    #[must_use]
+    pub fn json_hash(&self) -> &RustdocJsonHash {
+        &self.json_hash
+    }
+
+    /// Returns the decoded rustdoc graph.
+    #[must_use]
+    pub fn crate_data(&self) -> &rustdoc_types::Crate {
+        &self.crate_data
+    }
+}
+
+/// An identity-bearing, immutable current rustdoc capture.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RustdocSnapshot {
+    execution_identity: RustdocExecutionIdentity,
+    captured: CapturedRustdocJson,
+}
+
+impl RustdocSnapshot {
+    /// Returns the execution identity associated with this capture.
+    #[must_use]
+    pub fn execution_identity(&self) -> &RustdocExecutionIdentity {
+        &self.execution_identity
+    }
+
+    /// Returns the hash of the exact bytes used to decode this capture.
+    #[must_use]
+    pub fn json_hash(&self) -> &RustdocJsonHash {
+        self.captured.json_hash()
+    }
+
+    /// Returns the decoded rustdoc graph in this capture.
+    #[must_use]
+    pub fn crate_data(&self) -> &rustdoc_types::Crate {
+        self.captured.crate_data()
+    }
+}
+
+/// Constructs a content-addressed rustdoc value from one immutable byte slice.
+///
+/// # Errors
+///
+/// Returns the error produced by `decode` when the bytes are not a valid
+/// rustdoc graph.
+pub fn construct_captured_rustdoc_json(
+    bytes: &[u8],
+    decode: fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>,
+) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+    let crate_data = decode(bytes)?;
+    let digest: [u8; 32] = sha2::Sha256::digest(bytes).into();
+    Ok(CapturedRustdocJson {
+        json_hash: RustdocJsonHash::new(Sha256Digest::from_content_hash(ContentHash::from_bytes(
+            digest,
+        ))),
+        crate_data,
+    })
+}
+
+/// Constructs one identity-bearing snapshot from the same bytes used to decode it.
+///
+/// # Errors
+///
+/// Returns the error produced by `decode` when the bytes are not a valid
+/// rustdoc graph.
+pub fn construct_rustdoc_snapshot(
+    identity: RustdocExecutionIdentity,
+    bytes: &[u8],
+    decode: fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>,
+) -> Result<RustdocSnapshot, RustdocCratePortError> {
+    Ok(RustdocSnapshot {
+        execution_identity: identity,
+        captured: construct_captured_rustdoc_json(bytes, decode)?,
+    })
+}
 
 /// Complete identity of the inputs that govern a type-signals cache entry.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -93,6 +386,9 @@ pub struct TypeSignalsCacheKey {
     declaration_hash: CatalogueDeclarationHash,
     head_commit: CommitHash,
     baseline_hash: BaselineHash,
+    implementation_fingerprint: ImplementationFingerprint,
+    resolution_fingerprint: ResolutionFingerprint,
+    rustdoc_execution_identity: RustdocExecutionIdentity,
 }
 
 impl TypeSignalsCacheKey {
@@ -102,8 +398,18 @@ impl TypeSignalsCacheKey {
         declaration_hash: CatalogueDeclarationHash,
         head_commit: CommitHash,
         baseline_hash: BaselineHash,
+        implementation_fingerprint: ImplementationFingerprint,
+        resolution_fingerprint: ResolutionFingerprint,
+        rustdoc_execution_identity: RustdocExecutionIdentity,
     ) -> Self {
-        Self { declaration_hash, head_commit, baseline_hash }
+        Self {
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            implementation_fingerprint,
+            resolution_fingerprint,
+            rustdoc_execution_identity,
+        }
     }
 
     /// Returns the catalogue declaration identity.
@@ -122,6 +428,24 @@ impl TypeSignalsCacheKey {
     #[must_use]
     pub fn baseline_hash(&self) -> &BaselineHash {
         &self.baseline_hash
+    }
+
+    /// Returns the rustdoc implementation-input fingerprint.
+    #[must_use]
+    pub fn implementation_fingerprint(&self) -> &ImplementationFingerprint {
+        &self.implementation_fingerprint
+    }
+
+    /// Returns the rustdoc resolution-input fingerprint.
+    #[must_use]
+    pub fn resolution_fingerprint(&self) -> &ResolutionFingerprint {
+        &self.resolution_fingerprint
+    }
+
+    /// Returns the rustdoc execution identity.
+    #[must_use]
+    pub fn rustdoc_execution_identity(&self) -> &RustdocExecutionIdentity {
+        &self.rustdoc_execution_identity
     }
 }
 
@@ -148,6 +472,10 @@ impl std::error::Error for TypeSignalsSchemaVersionError {}
 
 impl TypeSignalsSchemaVersion {
     /// Validates and stores a non-zero schema version.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TypeSignalsSchemaVersionError::Zero`] when `value` is zero.
     pub fn try_new(value: u32) -> Result<Self, TypeSignalsSchemaVersionError> {
         if value == 0 {
             return Err(TypeSignalsSchemaVersionError::Zero);
@@ -254,9 +582,7 @@ impl TypeSignalsLoadResult {
 pub enum TypeSignalsReuseDecision {
     /// Both identities match, so no evaluation is needed.
     SkipEvaluation,
-    /// The declaration changed while the HEAD identity still matches.
-    ReevaluateWithoutExtraction,
-    /// The HEAD identity changed or cannot be determined.
+    /// At least one authoritative identity differs or cannot be reused.
     ReextractAndEvaluate,
 }
 
@@ -308,12 +634,10 @@ impl TypeSignalsReuseInput {
 /// Selects the fail-closed reuse path for one layer.
 #[must_use]
 pub fn decide_type_signals_reuse(input: &TypeSignalsReuseInput) -> TypeSignalsReuseDecision {
-    if input.current_key.head_commit() != input.recorded_key.head_commit() {
-        TypeSignalsReuseDecision::ReextractAndEvaluate
-    } else if input.current_key == input.recorded_key {
+    if input.current_key == input.recorded_key {
         TypeSignalsReuseDecision::SkipEvaluation
     } else {
-        TypeSignalsReuseDecision::ReevaluateWithoutExtraction
+        TypeSignalsReuseDecision::ReextractAndEvaluate
     }
 }
 
@@ -340,15 +664,57 @@ mod tests {
     fn baseline(value: &str) -> BaselineHash {
         BaselineHash::new(digest(value))
     }
+
+    fn execution_identity() -> RustdocExecutionIdentity {
+        execution_identity_with_profile("dev")
+    }
+
+    fn execution_identity_with_profile(profile: &str) -> RustdocExecutionIdentity {
+        let target =
+            ResolvedCargoTargetDirectory::try_new(PathBuf::from("/tmp/sotohe-type-signals-target"))
+                .unwrap();
+        let expected =
+            ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
+                .unwrap();
+        RustdocExecutionIdentity::new(
+            target,
+            CrateName::new("domain").unwrap(),
+            vec![],
+            CargoProfileName::try_new(profile.to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap()
+    }
     fn cache_key(
         declaration_value: &str,
         head_value: char,
         baseline_value: &str,
     ) -> TypeSignalsCacheKey {
+        cache_key_with_rustdoc_inputs(
+            declaration_value,
+            head_value,
+            baseline_value,
+            ImplementationFingerprint::new(digest(A)),
+            ResolutionFingerprint::new(digest(B)),
+            execution_identity(),
+        )
+    }
+
+    fn cache_key_with_rustdoc_inputs(
+        declaration_value: &str,
+        head_value: char,
+        baseline_value: &str,
+        implementation_fingerprint: ImplementationFingerprint,
+        resolution_fingerprint: ResolutionFingerprint,
+        rustdoc_execution_identity: RustdocExecutionIdentity,
+    ) -> TypeSignalsCacheKey {
         TypeSignalsCacheKey::new(
             declaration(declaration_value),
             head(head_value),
             baseline(baseline_value),
+            implementation_fingerprint,
+            resolution_fingerprint,
+            rustdoc_execution_identity,
         )
     }
 
@@ -367,6 +733,90 @@ mod tests {
 
     fn timestamp() -> Timestamp {
         Timestamp::new("2026-07-14T00:00:00Z").unwrap()
+    }
+
+    fn empty_rustdoc() -> rustdoc_types::Crate {
+        rustdoc_types::Crate {
+            root: rustdoc_types::Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: std::collections::HashMap::new(),
+            paths: std::collections::HashMap::new(),
+            external_crates: std::collections::HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+        }
+    }
+
+    fn decode_rustdoc(bytes: &[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError> {
+        serde_json::from_slice(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
+            crate_name: "test".to_owned(),
+            reason: error.to_string(),
+        })
+    }
+
+    #[test]
+    fn test_expected_rustdoc_json_path_rejects_parent_traversal() {
+        let target =
+            ResolvedCargoTargetDirectory::try_new(PathBuf::from("/tmp/sotohe-type-signals-target"))
+                .unwrap();
+        let escaped_path = target.as_path().join("../outside/current.json");
+
+        assert_eq!(
+            ExpectedRustdocJsonPath::try_new(escaped_path, &target),
+            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)
+        );
+    }
+
+    #[test]
+    fn test_rustdoc_execution_identity_rejects_expected_path_from_another_target() {
+        let target =
+            ResolvedCargoTargetDirectory::try_new(PathBuf::from("/tmp/sotohe-target-a")).unwrap();
+        let other_target =
+            ResolvedCargoTargetDirectory::try_new(PathBuf::from("/tmp/sotohe-target-b")).unwrap();
+        let expected = ExpectedRustdocJsonPath::try_new(
+            other_target.as_path().join("doc/domain.json"),
+            &other_target,
+        )
+        .unwrap();
+
+        assert_eq!(
+            RustdocExecutionIdentity::new(
+                target,
+                CrateName::new("domain").unwrap(),
+                vec![],
+                CargoProfileName::try_new("dev".to_owned()).unwrap(),
+                expected,
+            ),
+            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)
+        );
+    }
+
+    #[test]
+    fn test_construct_captured_rustdoc_json_hashes_and_decodes_one_byte_snapshot() {
+        let crate_data = empty_rustdoc();
+        let bytes = serde_json::to_vec(&crate_data).unwrap();
+        let captured = construct_captured_rustdoc_json(&bytes, decode_rustdoc).unwrap();
+        let expected: [u8; 32] = sha2::Sha256::digest(&bytes).into();
+
+        assert_eq!(captured.crate_data(), &crate_data);
+        assert_eq!(
+            captured.json_hash().as_digest().as_str(),
+            Sha256Digest::from_content_hash(ContentHash::from_bytes(expected)).as_str()
+        );
+    }
+
+    #[test]
+    fn test_construct_rustdoc_snapshot_binds_identity_and_decoded_bytes() {
+        let identity = execution_identity();
+        let crate_data = empty_rustdoc();
+        let bytes = serde_json::to_vec(&crate_data).unwrap();
+        let snapshot =
+            construct_rustdoc_snapshot(identity.clone(), &bytes, decode_rustdoc).unwrap();
+
+        assert_eq!(snapshot.execution_identity(), &identity);
+        assert_eq!(snapshot.crate_data(), &crate_data);
+        assert_eq!(snapshot.json_hash(), snapshot.captured.json_hash());
     }
 
     #[test]
@@ -412,17 +862,66 @@ mod tests {
 
     #[test]
     fn test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates() {
+        let recorded_key = cache_key(A, 'a', A);
+
         assert_eq!(
-            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(B, 'a', A),)),
-            TypeSignalsReuseDecision::ReevaluateWithoutExtraction
-        );
-        assert_eq!(
-            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'b', A),)),
+            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),
             TypeSignalsReuseDecision::ReextractAndEvaluate
         );
         assert_eq!(
-            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', B),)),
-            TypeSignalsReuseDecision::ReevaluateWithoutExtraction
+            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        assert_eq!(
+            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        // Keep every other cache-key component equal to the recorded key: an
+        // implementation-input change alone invalidates reuse.
+        assert_eq!(
+            decide_type_signals_reuse(&verified_input(
+                recorded_key.clone(),
+                cache_key_with_rustdoc_inputs(
+                    A,
+                    'a',
+                    A,
+                    ImplementationFingerprint::new(digest(B)),
+                    ResolutionFingerprint::new(digest(B)),
+                    execution_identity(),
+                ),
+            )),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        // A resolution-input change is independently sufficient to invalidate
+        // an otherwise matching cache entry.
+        assert_eq!(
+            decide_type_signals_reuse(&verified_input(
+                recorded_key.clone(),
+                cache_key_with_rustdoc_inputs(
+                    A,
+                    'a',
+                    A,
+                    ImplementationFingerprint::new(digest(A)),
+                    ResolutionFingerprint::new(digest(A)),
+                    execution_identity(),
+                ),
+            )),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        // Changing the rustdoc execution selection alone must also re-extract.
+        assert_eq!(
+            decide_type_signals_reuse(&verified_input(
+                recorded_key,
+                cache_key_with_rustdoc_inputs(
+                    A,
+                    'a',
+                    A,
+                    ImplementationFingerprint::new(digest(A)),
+                    ResolutionFingerprint::new(digest(B)),
+                    execution_identity_with_profile("release"),
+                ),
+            )),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
         );
     }
 

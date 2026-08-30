@@ -1,8 +1,17 @@
 {
   "baseline_hash": "4dc435027817f66afb5ee00ba1049062f43036c579bffbea51bad324c3b840d9",
-  "declaration_hash": "f36191bed5e88c723cbba0dca720f0c0371bd99f5b08a0d62d46d936caf6dd01",
-  "generated_at": "2026-08-29T06:26:30Z",
-  "head_commit": "8226a5b1da532c47720459ee51ed0e05763909d6",
+  "declaration_hash": "ed9409ee27f925f737b9affc9cd593998b23aaa610c97f8dbd5c79c1ac77460b",
+  "generated_at": "2026-08-30T15:09:17Z",
+  "head_commit": "167ed9b5bf1b39f851386ddb0d73877a12742e3a",
+  "implementation_fingerprint": "92576d994b5e24375a7094c669aa76a957a14541101658b3453f17a789078f52",
+  "resolution_fingerprint": "3ba1c182807e43dad249d246303acd2bc798b3a1bef67e8bb6319b77c3880c75",
+  "rustdoc_execution_identity": {
+    "crate_name": "usecase",
+    "expected_json_path": "target/.sotp-rustdoc/caa4404e1ff1453d558bafe4c64059fc13f3ae29253aac820fd2c6cc2ea0139b/doc/usecase.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/caa4404e1ff1453d558bafe4c64059fc13f3ae29253aac820fd2c6cc2ea0139b"
+  },
   "schema_version": 5,
   "signals": [
     {
@@ -14,6 +23,38 @@
       "namespace": "type",
       "signal": "blue",
       "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExportPlan"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "SchemaExporterPort"
     },
     {
       "found_type": true,

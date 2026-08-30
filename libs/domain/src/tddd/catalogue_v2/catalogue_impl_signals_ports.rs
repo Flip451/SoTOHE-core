@@ -7,7 +7,7 @@
 //! ## Design (ADR 2026-05-11-2330 §D2)
 //!
 //! `RustdocCratePort` wraps both baseline load (B-side) and live capture (C-side)
-//! of a `rustdoc_types::Crate`.  Injecting these via ports instead of calling
+//! of immutable, content-addressed rustdoc values. Injecting these via ports instead of calling
 //! infrastructure codecs directly keeps `libs/usecase` free of `infrastructure`
 //! dependencies (hexagonal architecture).
 //!
@@ -24,7 +24,9 @@ use sha2::Digest as _;
 
 use crate::tddd::CargoFeatureName;
 use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
-use crate::tddd::type_signals_doc::{CatalogueDeclarationHash, Sha256Digest};
+use crate::tddd::type_signals_doc::{
+    CapturedRustdocJson, CatalogueDeclarationHash, RustdocSnapshot, Sha256Digest,
+};
 use crate::{ContentHash, TrackId};
 
 // ---------------------------------------------------------------------------
@@ -202,7 +204,7 @@ impl std::error::Error for RustdocCratePortError {}
 // RustdocCratePort
 // ---------------------------------------------------------------------------
 
-/// Secondary port for loading or capturing `rustdoc_types::Crate` instances.
+/// Secondary port for loading or capturing immutable, identity-bearing rustdoc values.
 ///
 /// - `load_from_path`: loads a previously captured rustdoc JSON file (B-side baseline).
 /// - `capture_current`: captures the current crate's rustdoc JSON via the nightly
@@ -213,7 +215,7 @@ impl std::error::Error for RustdocCratePortError {}
 ///
 /// [source: ADR 2026-05-11-2330 D2]
 pub trait RustdocCratePort: Send + Sync {
-    /// Loads a `rustdoc_types::Crate` from the given JSON file path (B-side).
+    /// Loads a content-addressed baseline value from the given JSON file path (B-side).
     ///
     /// # Errors
     ///
@@ -223,9 +225,9 @@ pub trait RustdocCratePort: Send + Sync {
     ///
     /// Returns [`RustdocCratePortError::ParseFailed`] if JSON deserialization or
     /// format-version validation fails.
-    fn load_from_path(&self, path: &Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
+    fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError>;
 
-    /// Captures the current `rustdoc_types::Crate` via `cargo +nightly rustdoc`
+    /// Captures the current `RustdocSnapshot` via `cargo +nightly rustdoc`
     /// (C-side live capture) with the validated layer feature selection.
     ///
     /// # Errors
@@ -238,7 +240,7 @@ pub trait RustdocCratePort: Send + Sync {
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
+    ) -> Result<RustdocSnapshot, RustdocCratePortError>;
 }
 
 // ---------------------------------------------------------------------------

@@ -14,8 +14,6 @@ use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use thiserror::Error;
 
-use super::path_resolution::resolve_target_dir;
-
 const MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const MAX_SCHEMA_EXPORT_COMMAND_DURATION: Duration = Duration::from_secs(120);
 
@@ -199,21 +197,33 @@ pub fn resolve_rustdoc_root_name(
 pub(super) fn run_rustdoc(
     workspace_root: &Path,
     crate_name: &str,
+    target_directory: &Path,
 ) -> Result<PathBuf, SchemaExportError> {
     let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
         SchemaExportError::RustdocFailed(format!(
             "invalid catalogue crate name `{crate_name}`: {error}"
         ))
     })?;
-    run_rustdoc_for_package(workspace_root, &package_name, RustdocFeatureSelection::Legacy)
+    run_rustdoc_for_package(
+        workspace_root,
+        &package_name,
+        RustdocFeatureSelection::Legacy,
+        target_directory,
+    )
 }
 
 pub(super) fn run_rustdoc_with_features(
     workspace_root: &Path,
     crate_name: &CrateName,
     features: &[CargoFeatureName],
+    target_directory: &Path,
 ) -> Result<PathBuf, SchemaExportError> {
-    run_rustdoc_for_package(workspace_root, crate_name, RustdocFeatureSelection::Declared(features))
+    run_rustdoc_for_package(
+        workspace_root,
+        crate_name,
+        RustdocFeatureSelection::Declared(features),
+        target_directory,
+    )
 }
 
 #[derive(Clone, Copy)]
@@ -226,6 +236,7 @@ fn run_rustdoc_for_package(
     workspace_root: &Path,
     package_name: &CrateName,
     feature_selection: RustdocFeatureSelection<'_>,
+    target_directory: &Path,
 ) -> Result<PathBuf, SchemaExportError> {
     let crate_name = package_name.as_str();
     let resolution =
@@ -239,7 +250,7 @@ fn run_rustdoc_for_package(
         ),
     };
     let mut command = Command::new("cargo");
-    command.args(args).current_dir(workspace_root);
+    command.args(args).current_dir(workspace_root).env("CARGO_TARGET_DIR", target_directory);
     let output = crate::capability_exec::process::run_command_with_bounded_output(
         &mut command,
         MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES,
@@ -255,10 +266,10 @@ fn run_rustdoc_for_package(
         )));
     }
 
-    let target_dir = resolve_target_dir(workspace_root)?;
-    let path =
-        target_dir.join("doc").join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
-    super::ensure_rustdoc_json_path_safe(&target_dir, &path, "cargo rustdoc")?;
+    let path = target_directory
+        .join("doc")
+        .join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
+    super::ensure_rustdoc_json_path_safe(target_directory, &path, "cargo rustdoc")?;
     if path.is_file() {
         Ok(path)
     } else {

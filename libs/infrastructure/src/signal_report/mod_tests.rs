@@ -16,10 +16,41 @@ use super::*;
 
 static CWD_LOCK: Mutex<()> = Mutex::new(());
 
+fn test_cache_key(
+    declaration_hash: domain::CatalogueDeclarationHash,
+    head_commit: domain::CommitHash,
+    baseline_hash: domain::BaselineHash,
+) -> domain::TypeSignalsCacheKey {
+    let target = domain::ResolvedCargoTargetDirectory::try_new(PathBuf::from(
+        "/tmp/sotohe-infrastructure-test-target",
+    ))
+    .expect("test target is absolute");
+    let expected =
+        domain::ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/legacy.json"), &target)
+            .expect("test output is contained");
+    let identity = domain::RustdocExecutionIdentity::new(
+        target,
+        domain::tddd::catalogue_v2::CrateName::new("legacy").expect("test crate is valid"),
+        vec![],
+        domain::CargoProfileName::try_new("dev".to_owned()).expect("test profile is valid"),
+        expected,
+    )
+    .expect("test identity is internally consistent");
+    let zero = domain::Sha256Digest::try_new("0".repeat(64)).expect("test digest is valid");
+    domain::TypeSignalsCacheKey::new(
+        declaration_hash,
+        head_commit,
+        baseline_hash,
+        domain::ImplementationFingerprint::new(zero.clone()),
+        domain::ResolutionFingerprint::new(zero),
+        identity,
+    )
+}
+
 fn test_signal_document(signals: Vec<TypeSignal>) -> domain::TypeSignalsDocument {
     domain::TypeSignalsDocument::new(
         Timestamp::new("2026-08-27T00:00:00Z").expect("test timestamp must be valid"),
-        domain::TypeSignalsCacheKey::new(
+        test_cache_key(
             type_signals_codec::declaration_hash(b"test catalogue"),
             CommitHash::try_new("a".repeat(40)).expect("test commit must be valid"),
             type_signals_codec::baseline_hash(b"test baseline"),
@@ -271,7 +302,7 @@ fn fresh_impl_catalog_signals_with_timestamp(
     catalogue_text: &str,
     generated_at: &str,
 ) -> String {
-    serde_json::to_string_pretty(&serde_json::json!({
+    let mut document = serde_json::json!({
         "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
         "generated_at": generated_at,
         "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
@@ -288,8 +319,9 @@ fn fresh_impl_catalog_signals_with_timestamp(
             "signal": "yellow",
             "found_type": true,
         }],
-    }))
-    .expect("fixture signals must serialize")
+    });
+    type_signals_codec::merge_fixture_reuse_identity(&mut document);
+    serde_json::to_string_pretty(&document).expect("fixture signals must serialize")
 }
 
 fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {

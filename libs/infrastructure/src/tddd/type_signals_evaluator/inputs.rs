@@ -7,11 +7,8 @@ use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
-use domain::CommitHash;
-use domain::tddd::type_signals_doc::TypeSignalsCacheKey;
-
 use super::EvaluateSignalsError;
-use crate::tddd::type_signals_codec;
+use domain::CommitHash;
 
 pub(super) fn read_bytes_file_limited(
     path: &Path,
@@ -41,6 +38,28 @@ pub(super) fn read_utf8_file_limited(
 ) -> Result<String, io::Error> {
     let bytes = read_bytes_file_limited(path, maximum_bytes)?;
     String::from_utf8(bytes).map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+}
+
+/// Reads an optional UTF-8 artifact through the trusted no-follow file
+/// boundary. A present but malformed cache remains a cache miss; a path/I/O
+/// failure is returned so a race cannot silently turn an untrusted file into
+/// an absent cache.
+pub(super) fn read_utf8_file_limited_under_root(
+    path: &Path,
+    trusted_root: &Path,
+    maximum_bytes: u64,
+) -> Result<Option<String>, io::Error> {
+    let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
+        path,
+        Some(trusted_root),
+        maximum_bytes,
+    )?;
+    bytes
+        .map(|bytes| {
+            String::from_utf8(bytes)
+                .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+        })
+        .transpose()
 }
 
 const MAX_GIT_OUTPUT_BYTES: usize = 8 * 1024;
@@ -186,45 +205,6 @@ fn cleanup_status_probe<T>(
             format!("{error}; status probe cleanup failed: {cleanup}; reader join failed"),
         )),
     }
-}
-
-/// Rejects persistence when inputs change while rustdoc or evaluation is running.
-pub(super) fn verify_evaluation_inputs_unchanged(
-    workspace_root: &Path,
-    catalogue_path: &Path,
-    baseline_path: &Path,
-    initial_key: &TypeSignalsCacheKey,
-) -> Result<(), EvaluateSignalsError> {
-    if read_head_commit(workspace_root)? != *initial_key.head_commit() {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "repository HEAD changed during type-signal evaluation".to_owned(),
-        ));
-    }
-    let catalogue =
-        read_bytes_file_limited(catalogue_path, super::MAX_CATALOGUE_BYTES).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot re-read catalogue '{}': {error}",
-                catalogue_path.display()
-            ))
-        })?;
-    if type_signals_codec::declaration_hash(&catalogue) != *initial_key.declaration_hash() {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "catalogue changed during type-signal evaluation".to_owned(),
-        ));
-    }
-    let baseline =
-        read_bytes_file_limited(baseline_path, super::MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot re-read baseline '{}': {error}",
-                baseline_path.display()
-            ))
-        })?;
-    if type_signals_codec::baseline_hash(&baseline) != *initial_key.baseline_hash() {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "baseline changed during type-signal evaluation".to_owned(),
-        ));
-    }
-    Ok(())
 }
 
 #[cfg(test)]

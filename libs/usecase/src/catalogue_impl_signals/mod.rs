@@ -21,6 +21,7 @@ mod service;
 pub use interactor::CatalogueImplSignalsInteractor;
 pub use service::{
     CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+    RustdocExportPlan,
 };
 
 // ---------------------------------------------------------------------------
