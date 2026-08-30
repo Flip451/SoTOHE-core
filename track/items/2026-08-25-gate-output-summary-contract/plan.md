@@ -46,7 +46,7 @@ T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and c
 
 > libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07.
 
-- [x] **T006**: libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07.
+- [x] **T006**: libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07. (`b414acd4c6f8deb12c44b93e18a2af97f4ed3d18`)
 
 ### S7 — Post-execution outcome and rendering targets
 
