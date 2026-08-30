@@ -34,7 +34,7 @@ T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and c
 
 > libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05.
 
-- [x] **T004**: libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05.
+- [x] **T004**: libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05. (`888eb4aee35f01653d76f1d8f66f82b66c49d894`)
 
 ### S5 — Reservation consumption and no-reclaim targets
 

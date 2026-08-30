@@ -109,6 +109,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "888eb4aee35f01653d76f1d8f66f82b66c49d894",
       "depends_on": [
         "T003"
       ],
@@ -125,7 +126,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T005"
       ],
@@ -134,7 +134,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T006"
       ],
