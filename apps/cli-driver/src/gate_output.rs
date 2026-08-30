@@ -15,6 +15,7 @@ use usecase::gate_output::{
 
 use crate::render::CommandOutcome;
 
+const MAX_FAILURE_EXCERPTS: usize = 8;
 const MAX_FAILURE_LINE_BYTES: usize = 240;
 const CLI_EXIT_CODE_FALLBACK: u8 = 1;
 
@@ -69,15 +70,21 @@ impl GateOutputDriver {
     }
 }
 
-/// Selects bounded, presentation-safe records from child output.
+/// Selects a bounded set of presentation-safe records from child output.
 ///
 /// The child bytes are not decoded or normalized. Only complete records made
 /// of ASCII bytes and separated by the summary's declared line separator are
 /// considered; non-ASCII and control-containing records are omitted. Known
 /// non-failure records are omitted, while otherwise unrecognized non-empty
-/// records remain eligible for the summary.
+/// records remain eligible for the summary. At most eight records are returned;
+/// the persisted log path in the rendered summary remains the source for any
+/// omitted records.
 pub fn failure_excerpts(output: &[u8]) -> Vec<String> {
-    output.split(|byte| *byte == b'\n').filter_map(ascii_failure_record).collect()
+    output
+        .split(|byte| *byte == b'\n')
+        .filter_map(ascii_failure_record)
+        .take(MAX_FAILURE_EXCERPTS)
+        .collect()
 }
 
 fn ascii_failure_record(record: &[u8]) -> Option<String> {
@@ -684,10 +691,13 @@ mod tests {
         assert_eq!(outcome.exit_code, 23);
         let stdout = outcome.stdout.expect("failure should render stdout");
         assert!(stdout.starts_with("FAIL\nlog: tmp/gate/driver.log\nfailures:"));
-        assert_eq!(stdout.lines().count(), 13);
+        assert_eq!(stdout.lines().count(), 3 + MAX_FAILURE_EXCERPTS);
+        assert!(stdout.contains("log: tmp/gate/driver.log"));
         assert!(stdout.contains("- [FAIL] item-primary: short reason"));
-        let bounded_item = truncate_line(&format!("[FAIL] item-8: {}", "x".repeat(300)));
+        let bounded_item = truncate_line(&format!("[FAIL] item-6: {}", "x".repeat(300)));
         assert!(stdout.contains(&format!("- {bounded_item}")));
+        assert!(!stdout.contains("item-7"));
+        assert!(!stdout.contains("item-8"));
         assert!(
             stdout.lines().skip(3).all(|line| line.len() <= MAX_FAILURE_LINE_BYTES + "…".len() + 2)
         );
@@ -992,13 +1002,17 @@ mod tests {
     }
 
     #[test]
-    fn test_failure_excerpts_do_not_apply_an_implicit_input_or_line_budget() {
-        let output = (0..10)
+    fn test_failure_excerpts_apply_only_the_explicit_item_count_cap() {
+        let output = (0..(MAX_FAILURE_EXCERPTS + 2))
             .map(|index| format!("[FAIL] item-{index}: reason"))
             .collect::<Vec<_>>()
             .join("\n");
 
-        assert_eq!(failure_excerpts(output.as_bytes()).len(), 10);
+        let excerpts = failure_excerpts(output.as_bytes());
+
+        assert_eq!(excerpts.len(), MAX_FAILURE_EXCERPTS);
+        assert!(excerpts.iter().any(|excerpt| excerpt.contains("item-7")));
+        assert!(!excerpts.iter().any(|excerpt| excerpt.contains("item-8")));
     }
 
     #[cfg(unix)]

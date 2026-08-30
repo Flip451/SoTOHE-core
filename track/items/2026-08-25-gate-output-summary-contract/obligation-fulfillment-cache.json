@@ -3455,7 +3455,7 @@
       },
       "key": {
         "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
-        "bound_tests_set_hash": "35a099b594065c77d24f260a9ba97ce11ef9040986c782fe47d14b957976f80b",
+        "bound_tests_set_hash": "eebc7e89a19c9e51be694e4a076b14e365948e90e505ebea3ca715c7dca97a59",
         "declaration_hash": "ce8e8a617797cad27614b753c6dfbce296d6c5f01bb47af2cc9ba797cbc4fade"
       },
       "obligation_id": {
@@ -3464,7 +3464,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/driver.log\");\n\nassert!(stdout.starts_with(\"FAIL\\nlog unavailable: \"));\nassert!(stdout.contains(\"encoded name cannot be represented\"));\nassert!(!stdout.contains(\"log: \"));\n\nassert_eq!(\n    failure_stdout,\n    \"FAIL\\nlog unavailable: could not write the gate log: read-only\"\n);\nassert!(!failure_stdout.lines().any(|line| line.starts_with(\"log: \")));",
+        "citation": "assert_eq!(stdout, \"PASS\\nlog: tmp/gate/driver.log\"); ... assert!(stdout.starts_with(\"FAIL\\nlog unavailable: \")); ... assert!(!failure_stdout.lines().any(|line| line.starts_with(\"log: \")));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3645,7 +3645,7 @@
       },
       "key": {
         "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
-        "bound_tests_set_hash": "c86de9bc176e6f062aef821a917a303746d80f48ad190a45897d54dd3bbd4515",
+        "bound_tests_set_hash": "9f2441897a66e4a75a19c799225d82270b125d7fd512a051d209936eda088817",
         "declaration_hash": "862363715b790b29e35d70b1c8a865df2033a3e37cd249ff4281c88f2db0ba45"
       },
       "obligation_id": {
@@ -3654,7 +3654,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome.exit_code, 0); ... assert_eq!(outcome.exit_code, 23); ... .invoke(GateOutputInput::new(\"gate\".to_owned(), vec![OsString::from(\"check\")]))",
+        "citation": "assert_eq!(outcome.exit_code, 0); ... .invoke(GateOutputInput::new(\"gate\".to_owned(), vec![OsString::from(\"check\")])); ... assert_eq!(outcome.exit_code, 23);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
