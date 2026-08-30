@@ -4091,6 +4091,192 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "6a2554b6927bcd7bfcd50fab7585ceb6050f4972bcfb264c46b4ab83bb457634",
+        "bound_tests_set_hash": "963e959683e2407c24d6483f7625f627f312a151b0ec94d51e51ef7200c207aa",
+        "declaration_hash": "7707683dfea456d2183c3f12f53a9aecaaf92eefc30bc0ff186e49d3db01ad3d"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code, GateExitCode::new(23));\n                assert_eq!(output, b\"complete output\");\n                assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "b41001770544b063b79bcbb9ed67943531b567668b5e01ae83c7d999cace75de",
+        "bound_tests_set_hash": "594c242fc684b806ef010bc512014e08771f291ba20e915c2dd8f331295e64fe",
+        "declaration_hash": "17a7a815b883e039f8e1bf675abf1c627b1d2485c016cbcd4888e3c078b33e96"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:CN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "std::fs::rename(&log_directory, &moved_log_directory)\n            .expect(\"reserved parent directory should be movable\");\n        std::fs::create_dir(&log_directory).expect(\"replacement parent directory should be made\");\n\n        let result = persistence.persist(reservation, b\"must not publish outside trusted root\");\n\n        match result {\n            Err(GateLogWriteError::Write(_)) => {}\n            Err(error) => panic!(\"unexpected persistence error: {error:?}\"),\n            Ok(path) => panic!(\n                \"persist returned a path after the parent moved: {}\",\n                path.as_path().display()\n            ),\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "21f22efe5d9b290b5fbbc93b73d013aa4d2f5656c1745c7978a2133dd337100c",
+        "bound_tests_set_hash": "594c242fc684b806ef010bc512014e08771f291ba20e915c2dd8f331295e64fe",
+        "declaration_hash": "f106c0b69a27ab9fb57f273a9de958a440d210faa47629059f209f21dd79327c"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "match result {\n            Err(GateLogWriteError::Write(_)) => {}\n            Err(error) => panic!(\"unexpected persistence error: {error:?}\"),\n            Ok(path) => panic!(\n                \"persist returned a path after the parent moved: {}\",\n                path.as_path().display()\n            ),\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "6a2554b6927bcd7bfcd50fab7585ceb6050f4972bcfb264c46b4ab83bb457634",
+        "bound_tests_set_hash": "963e959683e2407c24d6483f7625f627f312a151b0ec94d51e51ef7200c207aa",
+        "declaration_hash": "9ba70f1bd625e3acc22f560b90fa73551240e6964189a3eff543cfc95b68b51a"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteOutcome",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code, GateExitCode::new(23));\n                assert_eq!(output, b\"complete output\");\n                assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_gate_run_interactor_reports_moved_parent_as_unavailable_without_log_path"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "b41001770544b063b79bcbb9ed67943531b567668b5e01ae83c7d999cace75de",
+        "bound_tests_set_hash": "be2b3d65a2c824de5c18e3b2354ad1551d711c916c743b88c2899134ddbc68a4",
+        "declaration_hash": "c499f1b1281832a8ec8ef508fd955b34025c686a499cd75ce0e9fdc5b09a1e88"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteOutcome",
+        "item_identifier": "voluntary:CN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));\n            }\n        }\n\n        let moved_files: Vec<_> = std::fs::read_dir(&moved_log_directory)\n            .expect(\"moved parent should remain readable\")\n            .map(|entry| entry.expect(\"moved log entry should be readable\").path())\n            .collect();\n        assert!(!moved_files.is_empty(), \"the moved parent should retain reserved files\");\n        for path in moved_files {\n            assert_eq!(\n                std::fs::read(path).expect(\"moved reserved file should remain readable\"),\n                b\"\",\n                \"the child output must not be written into the moved parent\"\n            );\n        }\n        assert_eq!(\n            std::fs::read_dir(root.path().join(LOG_DIRECTORY))\n                .expect(\"replacement parent should remain readable\")\n                .count(),\n            0\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_gate_run_interactor_reports_moved_parent_as_unavailable_without_log_path"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "21f22efe5d9b290b5fbbc93b73d013aa4d2f5656c1745c7978a2133dd337100c",
+        "bound_tests_set_hash": "be2b3d65a2c824de5c18e3b2354ad1551d711c916c743b88c2899134ddbc68a4",
+        "declaration_hash": "b76891d1a0c62d808167afd0c12a1bbac34fb0cba7c0119c94ff4891cade2971"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteOutcome",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     }
   ],
   "track_id": "2026-08-25-gate-output-summary-contract"

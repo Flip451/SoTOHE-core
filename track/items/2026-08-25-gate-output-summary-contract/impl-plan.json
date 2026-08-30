@@ -132,7 +132,7 @@
       ],
       "description": "libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07.",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

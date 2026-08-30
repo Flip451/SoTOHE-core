@@ -122,11 +122,13 @@ fn combine_output(stdout: &[u8], stderr: &[u8]) -> Vec<u8> {
 mod tests {
     use std::collections::HashSet;
     use std::ffi::OsString;
+    use std::sync::Arc;
 
     use super::*;
     use usecase::gate_output::{
         GateExitCode, GateLogReservation, GateLogReservationError, GateLogWriteError,
-        GateProcessPort,
+        GateLogWriteOutcome, GateProcessOutput, GateProcessPort, GateRunInteractor, GateRunResult,
+        GateRunService,
     };
 
     fn command(name: &str, shell: &str) -> GateRunCommand {
@@ -135,6 +137,26 @@ mod tests {
             vec![OsString::from("/bin/sh"), OsString::from("-c"), OsString::from(shell)],
         )
         .expect("test command should be valid")
+    }
+
+    #[cfg(target_os = "linux")]
+    struct ParentMovingRunner {
+        trusted_root: PathBuf,
+        moved_log_directory: PathBuf,
+    }
+
+    #[cfg(target_os = "linux")]
+    impl GateProcessPort for ParentMovingRunner {
+        fn run(&self, _command: &GateRunCommand) -> Result<GateProcessOutput, GateProcessError> {
+            let log_directory = self.trusted_root.join(LOG_DIRECTORY);
+            std::fs::rename(&log_directory, &self.moved_log_directory)
+                .expect("reserved parent directory should be movable");
+            std::fs::create_dir(&log_directory).expect("replacement parent should be created");
+            Ok(GateProcessOutput {
+                exit_code: GateExitCode::new(0),
+                output: b"child output must not be written outside root".to_vec(),
+            })
+        }
     }
 
     #[test]
@@ -411,6 +433,56 @@ mod tests {
         assert_eq!(
             std::fs::read_dir(&log_directory)
                 .expect("replacement parent directory should remain readable")
+                .count(),
+            0
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn test_gate_run_interactor_reports_moved_parent_as_unavailable_without_log_path() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let moved_root = tempfile::tempdir().expect("moved directory root should be created");
+        let trusted_root = root.path().to_path_buf();
+        let moved_log_directory = moved_root.path().join("moved-gate");
+        let persistence = Arc::new(FsGateLogPersistence::new(trusted_root.clone()));
+        let runner = Arc::new(ParentMovingRunner {
+            trusted_root,
+            moved_log_directory: moved_log_directory.clone(),
+        });
+        let interactor = GateRunInteractor::new(runner, persistence);
+
+        let result = GateRunService::execute(&interactor, command("moved-parent-outcome", "true"))
+            .expect("child execution should return a closed result");
+
+        match result {
+            GateRunResult::ChildExited { exit_code, log, .. } => {
+                assert_eq!(exit_code, GateExitCode::new(0));
+                assert!(matches!(
+                    log,
+                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))
+                ));
+            }
+            GateRunResult::SpawnFailed { error, .. } => {
+                panic!("unexpected spawn failure: {error:?}");
+            }
+        }
+
+        let moved_files: Vec<_> = std::fs::read_dir(&moved_log_directory)
+            .expect("moved parent should remain readable")
+            .map(|entry| entry.expect("moved log entry should be readable").path())
+            .collect();
+        assert!(!moved_files.is_empty(), "the moved parent should retain reserved files");
+        for path in moved_files {
+            assert_eq!(
+                std::fs::read(path).expect("moved reserved file should remain readable"),
+                b"",
+                "the child output must not be written into the moved parent"
+            );
+        }
+        assert_eq!(
+            std::fs::read_dir(root.path().join(LOG_DIRECTORY))
+                .expect("replacement parent should remain readable")
                 .count(),
             0
         );

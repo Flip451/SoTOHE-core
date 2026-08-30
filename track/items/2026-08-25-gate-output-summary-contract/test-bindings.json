@@ -817,6 +817,51 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "GateLogPersistencePort", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
       "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateLogWriteError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "reason": "GateLogWriteError is an error DTO and does not emit stdout. IN-02/CN-01 stdout path/reason presentation is owned by T007 (render_summary / GateOutputDriver); T006 binds persistence/interactor tests only where they observe final-publish behavior."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-06"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateLogWriteError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-01"}},
+      "reason": "GateLogWriteError is an error DTO and does not emit stdout. IN-02/CN-01 stdout path/reason presentation is owned by T007 (render_summary / GateOutputDriver); T006 binds persistence/interactor tests only where they observe final-publish behavior."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-06"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteError", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteOutcome", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-06"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateLogWriteOutcome", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-01"}},
+      "reason": "GateLogWriteOutcome is a result DTO and does not emit stdout. IN-02/CN-01 stdout path/reason presentation is owned by T007 (render_summary / GateOutputDriver); T006 binds persistence/interactor tests only where they observe final-publish behavior."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteOutcome", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-06"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_gate_run_interactor_reports_moved_parent_as_unavailable_without_log_path"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogWriteOutcome", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_gate_run_interactor_reports_moved_parent_as_unavailable_without_log_path"}]
     }
   ]
 }

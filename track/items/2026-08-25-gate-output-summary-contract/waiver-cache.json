@@ -767,6 +767,78 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "f3ad1eb2683029d1223523c0e2ea83f7ea514dff4a3ef0c7a3dfe240ed85af6e",
+        "waived_reason_hash": "e7970779cd4d489b9f265d7c5badbfe27e23eb21d2db194383ec900da1c81c90"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Error type for gate-log write and persistence operations.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "049b3cd39087e6d7a9119228def0e91b64353ab81c386253b1145acd2c614c71",
+        "waived_reason_hash": "e7970779cd4d489b9f265d7c5badbfe27e23eb21d2db194383ec900da1c81c90"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Error type for gate-log write and persistence operations.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "37a643f7db36fc2f3c829406e001f1270f14bf6e201c39b34b8e1576082a2ff5",
+        "waived_reason_hash": "52f81352c7780b6b842483ea1d46d89d2a33f4777cb6d350921f2e710d1a73e9"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteOutcome",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Closed result enum for gate-log persistence.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-25-gate-output-summary-contract"
