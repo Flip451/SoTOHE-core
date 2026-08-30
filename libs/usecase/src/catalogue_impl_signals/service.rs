@@ -187,6 +187,38 @@ mod tests {
         LayerId::try_new(value.to_owned()).unwrap()
     }
 
+    fn test_stub_bindings(count: usize) -> Vec<TdddLayerBinding> {
+        (0..count)
+            .map(|index| {
+                let layer_id = format!("layer-{index}");
+                TdddLayerBinding {
+                    layer_id: layer_id.clone(),
+                    catalogue_file: format!("{layer_id}-types.json"),
+                    baseline_file: format!("{layer_id}-types-baseline.json"),
+                    targets: vec![layer_id],
+                }
+            })
+            .collect()
+    }
+
+    #[test]
+    fn test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings() {
+        let bindings = test_stub_bindings(64);
+
+        let plan = RustdocExportPlan::try_new(bindings.clone()).unwrap();
+
+        assert!(
+            plan.bindings().iter().map(binding_identity).eq(bindings.iter().map(binding_identity))
+        );
+    }
+
+    #[test]
+    fn test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded() {
+        let result = RustdocExportPlan::try_new(test_stub_bindings(65));
+
+        assert!(matches!(result, Err(CatalogueImplSignalsError::LayerLimitExceeded)));
+    }
+
     #[test]
     fn test_catalogue_impl_signals_report_any_red_reflects_red_signals() {
         let report_no_red = CatalogueImplSignalsReport {
@@ -233,6 +265,7 @@ mod tests {
                 test_diagnostic("permission denied"),
             ),
             CatalogueImplSignalsError::NoLayers,
+            CatalogueImplSignalsError::LayerLimitExceeded,
             CatalogueImplSignalsError::FeatureDeclaration(
                 TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch,
             ),

@@ -5,7 +5,7 @@
 
 GO-01 original implementation and authoritative-context completion remain T001-T009; D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work is decomposed into T010-T019.
 
-## Tasks (8/19 resolved)
+## Tasks (10/19 resolved)
 
 ### SECTION-001 — Original resolution boundary
 
@@ -31,20 +31,20 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 
 > Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and revise the catalogue encoding boundary (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
 
-- [x] **T006**: Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and modify CatalogueToExtendedCratePort::encode; add focused boundary contract validation (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
+- [x] **T006**: Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and modify CatalogueToExtendedCratePort::encode; add focused boundary contract validation (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03). (`1a0afaede9d35c1ed05a041d4948dfa850c05bb1`)
 
 ### SECTION-005 — Declaring-layer placement
 
 > Modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused placement/regression validation (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-03, AC-01, AC-02, AC-03).
 
-- [x] **T007**: After T006, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec; add focused resolution/precedence/negative validation (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-03, AC-01, AC-02, AC-03).
+- [x] **T007**: After T006, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec; add focused resolution/precedence/negative validation (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-03, AC-01, AC-02, AC-03). (`1a0afaede9d35c1ed05a041d4948dfa850c05bb1`)
 
 ### SECTION-006 — Complete rustdoc context assembly
 
 > Preserve the completed catalogue_impl_signals context assembly and finish the outstanding executor/evaluator compile closure without absorbing the later D3-D8 work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
 
-- [x] **T008**: After T006, modify usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor to load every configured TDDD layer catalogue and authoritative baseline/current rustdoc pair, assemble the complete LayerId-keyed context map before encode, and add focused handoff validation (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
-- [ ] **T009**: After T006, finish the outstanding compile closure for the type-signals executor/evaluator authoritative-context handoff and its focused validation; do not absorb the D3-D8 fingerprint, export-limit, lock, or snapshot work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
+- [x] **T008**: After T006, modify usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor to load every configured TDDD layer catalogue and authoritative baseline/current rustdoc pair, assemble the complete LayerId-keyed context map before encode, and add focused handoff validation (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03). (`1a0afaede9d35c1ed05a041d4948dfa850c05bb1`)
+- [x] **T009**: After T006, finish the outstanding compile closure for the type-signals executor/evaluator authoritative-context handoff and its focused validation; do not absorb the D3-D8 fingerprint, export-limit, lock, or snapshot work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).
 
 ### SECTION-007 — Complete reuse identity
 
@@ -62,7 +62,7 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 
 > Modify the rustdoc export plan and catalogue implementation-signals orchestration; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05).
 
-- [ ] **T012**: Implement the rustdoc export plan and catalogue implementation-signals error/orchestration changes; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05).
+- [x] **T012**: Implement the rustdoc export plan and catalogue implementation-signals error/orchestration changes; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05).
 
 ### SECTION-010 — Persisted identity decoding
 

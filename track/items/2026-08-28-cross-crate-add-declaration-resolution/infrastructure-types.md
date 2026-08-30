@@ -14,7 +14,7 @@
 | infrastructure::schema_export::RustdocSchemaExporter | secondary_adapter | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec | secondary_adapter | modify | — | 🔵 | 🔵 |
 | infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter | secondary_adapter | modify | — | 🔵 | 🔵 |
-| infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter | secondary_adapter | modify | — | 🟡 | 🔵 |
+| infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter | secondary_adapter | modify | — | 🔵 | 🔵 |
 
 ## Free Functions
 

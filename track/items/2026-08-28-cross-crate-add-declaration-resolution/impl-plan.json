@@ -157,13 +157,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
       "description": "Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and modify CatalogueToExtendedCratePort::encode; add focused boundary contract validation (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
       "id": "T006",
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
       "depends_on": [
         "T006"
       ],
@@ -172,7 +172,7 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
       "depends_on": [
         "T006"
       ],
@@ -181,22 +181,19 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T006"
       ],
       "description": "After T006, finish the outstanding compile closure for the type-signals executor/evaluator authoritative-context handoff and its focused validation; do not absorb the D3-D8 fingerprint, export-limit, lock, or snapshot work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "Implement the domain catalogue entries for complete implementation/resolution fingerprints, rustdoc execution identity, complete cache keys, and fail-closed reuse decisions; add focused value, validation, equality, and reuse-decision tests (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08).",
       "id": "T010",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T010"
       ],
@@ -205,13 +202,11 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "Implement the rustdoc export plan and catalogue implementation-signals error/orchestration changes; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05).",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T009",
         "T010"
@@ -221,7 +216,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T011",
         "T012",
@@ -232,7 +226,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T014"
       ],
@@ -241,7 +234,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T015"
       ],
@@ -250,7 +242,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T016"
       ],
@@ -259,7 +250,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T016"
       ],
@@ -268,7 +258,6 @@
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "depends_on": [
         "T018"
       ],

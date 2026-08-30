@@ -1,10 +1,10 @@
 {
   "baseline_hash": "cd7d618ea66ae2d66d3453d79d83345fd21c6f4645feecdcd1fe1a34bed5686d",
   "declaration_hash": "1d036cf36d4a7bfbaa27f6920314a1c5166b1251bebbcb1e5cd3ae1539ddac67",
-  "generated_at": "2026-08-30T15:08:48Z",
-  "head_commit": "167ed9b5bf1b39f851386ddb0d73877a12742e3a",
-  "implementation_fingerprint": "92576d994b5e24375a7094c669aa76a957a14541101658b3453f17a789078f52",
-  "resolution_fingerprint": "3ba1c182807e43dad249d246303acd2bc798b3a1bef67e8bb6319b77c3880c75",
+  "generated_at": "2026-08-30T16:33:43Z",
+  "head_commit": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
+  "implementation_fingerprint": "6372bc1abff4b8479c8f9e9aafc625716e0b75cc54a96dbb1a627c0df697f825",
+  "resolution_fingerprint": "5efd9992b190d74313f9bc769e6fc134a1ca648b81bc65f99338eb258594ff6a",
   "rustdoc_execution_identity": {
     "crate_name": "domain",
     "expected_json_path": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5/doc/domain.json",

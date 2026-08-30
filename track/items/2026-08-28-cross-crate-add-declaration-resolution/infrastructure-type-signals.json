@@ -1,10 +1,10 @@
 {
   "baseline_hash": "037b291232dc713a13d816e996a358fc9c2193d3c9fd2dea5fae9b71fc291d62",
-  "declaration_hash": "11f8d01145b995e4034281adf57140c91a03784c6903e6b0b3fe9f8c182ade0a",
-  "generated_at": "2026-08-30T15:09:33Z",
-  "head_commit": "167ed9b5bf1b39f851386ddb0d73877a12742e3a",
-  "implementation_fingerprint": "92576d994b5e24375a7094c669aa76a957a14541101658b3453f17a789078f52",
-  "resolution_fingerprint": "3ba1c182807e43dad249d246303acd2bc798b3a1bef67e8bb6319b77c3880c75",
+  "declaration_hash": "8ed77b89f0e484d36d98c9a0e32dab283b2a5d894f3696ab848db202248949f4",
+  "generated_at": "2026-08-30T16:34:27Z",
+  "head_commit": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
+  "implementation_fingerprint": "6372bc1abff4b8479c8f9e9aafc625716e0b75cc54a96dbb1a627c0df697f825",
+  "resolution_fingerprint": "5efd9992b190d74313f9bc769e6fc134a1ca648b81bc65f99338eb258594ff6a",
   "rustdoc_execution_identity": {
     "crate_name": "infrastructure",
     "expected_json_path": "target/.sotp-rustdoc/4225fd0e0ab3e3b5382ac303795f8d5460081d934f46dc14c26a6c3b5fefdedb/doc/infrastructure.json",
@@ -65,7 +65,7 @@
       "found_type": true,
       "kind_tag": "secondary_adapter",
       "namespace": "type",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
     },
     {

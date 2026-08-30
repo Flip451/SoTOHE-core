@@ -701,7 +701,7 @@
         "kind": "struct",
         "shape": {
           "fields": [],
-          "has_stripped_fields": false,
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },

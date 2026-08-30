@@ -1129,7 +1129,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1153,7 +1153,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1177,7 +1177,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1201,7 +1201,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1225,7 +1225,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1244,12 +1244,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。",
+        "citation": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1273,7 +1273,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1297,7 +1297,7 @@
       }
     },
     {
-      "claim_hash": "2a930a2e7f4b3ca03f3196ce25a378ebb3161eb1e9a50b7b7e0856a75f2ec820",
+      "claim_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
@@ -1316,7 +1316,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。",
+        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。",
         "kind": "pass"
       }
     },

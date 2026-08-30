@@ -246,294 +246,6 @@
           "element_id": "IN-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "5e14dd20b3d6e6a9bb40d40686b195a2612d89310fcef065963cc5a9c39318a0"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter, and return the opaque CapturedRustdocJson value.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "5e14dd20b3d6e6a9bb40d40686b195a2612d89310fcef065963cc5a9c39318a0"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The obligation is for capture_current, but the waiver discusses load_from_path. capture_current is the method that resolves execution conditions and constructs the identity-bearing snapshot, so the cited IN-03 identity-binding promise remains testable for this edge."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "64d48ec1fcaeec1360a9473417123e650b4a379ceefee388b2d2d2c5397a113a"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "64d48ec1fcaeec1360a9473417123e650b4a379ceefee388b2d2d2c5397a113a"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The waiver addresses load_from_path, but this obligation edge is capture_current. capture_current resolves execution identity and runs rustdoc export, so CO-04's authoritative implementation-input and fail-closed policy is behavior that must be tested for this entry."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "40db8f2ad232a48aefed98e9b62f30434e4cb24ae25c0e005bbef127060b2abd"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"Synchronous baseline-only filesystem and decoding boundary\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "40db8f2ad232a48aefed98e9b62f30434e4cb24ae25c0e005bbef127060b2abd"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The waiver addresses load_from_path, but this obligation edge is trait_method:capture_current. The cited anchor promises a verifiable reuse gate for captured results, so the reason does not justify leaving capture_current untested."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "33064d5b22ec0fde9b3d85a35972be6391a12c93dc79c64500ebf34eb6879042"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "33064d5b22ec0fde9b3d85a35972be6391a12c93dc79c64500ebf34eb6879042"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The obligation is for trait_method:capture_current, whose declaration explicitly requires acquiring the trusted-root lock, verifying the expected output, and capturing immutable bytes. The waiver addresses only load_from_path, so it does not justify leaving capture_current's IN-07 lock and ABA-prevention behavior untested."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "22d5f369889f30ae48577758b42d88bd18fdca1ab4e06e5551eb2f19b66971f8"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"Baseline loading decodes and hashes one immutable byte vector into CapturedRustdocJson without claiming a current execution identity.\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "22d5f369889f30ae48577758b42d88bd18fdca1ab4e06e5551eb2f19b66971f8"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The obligation item is capture_current, whose declaration explicitly includes the trusted-root lock and expected-output verification. The waiver argues only that load_from_path lacks those behaviors, so it is not an entry-local justification for leaving the capture_current anchor untested."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "f2c4e3148cce8ef6564e044e8ed13d3a2dc739264d10d9c6c11085f37d792ac7"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "f2c4e3148cce8ef6564e044e8ed13d3a2dc739264d10d9c6c11085f37d792ac7"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "kind": "fail",
-        "reason": "The obligation item is trait_method:capture_current, whose declaration explicitly requires holding the trusted-root lock through export, output verification, hashing, and decoding. The waiver discusses load_from_path instead, so it does not justify leaving this capture_current AC-06 edge untested."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
       },
       "key": {
@@ -980,6 +692,246 @@
       },
       "verdict": {
         "citation": "評価は解決済み入力と rustdoc JSON の immutable な内容 snapshot だけを用い",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "ae030458a25aa5a8ec16662c2e656a3b74d547d077d6685fc72a3459ddcb13aa"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "9b4ad8d5269bc11ccf3207e6959a1e87c91facc7334d7f7d02ae26dca338a16f"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "3a63b4ad632f6fd088229351295b594937ec96ccc45a314902223953ce252957",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "13306cb1b2a00cc0bbda18ca0ca95f149ec5a622675f2ed8f35e00fd13dafaa3"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "936a2834195533ddea658060f751fe038e5d3e6102a38f2f4afb5d965a1f1d6a"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "7a7f92134156246d80b75199a80360c45cf7ef990f4760902721e7e6239d1162",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "0511ebc62b959c8b2145ca2103cfe117e43ca76239d5c7b2501cbd7b8cc95ef7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding, allowing omitted external-add placement to resolve from the declaring layer",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "b6fb148b497d09bdfd792a117e2de7eef3bc8cbf37396a6e61a97cc9a21f5631"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "061b0eaf54d16647e45f9c3c897a029dfdef15ae9ddfcff05812486c8ef89a67"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"rustdoc export と snapshot の再利用は、descriptor-relative かつ no-follow の trusted-root lock を提供できる Unix でだけ許可し\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "ff58d7aecad79a1f1e1955ff7d60a175854c06a609d33678872ca7ecee753889"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "cf0c3e3d95176c270eeecec8a2c474051d4cbff54a05f09fda2a0fb16523b864"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "f16c1ccc594fb10073a677d6e9d0fbc03d57c5a2a5f1488c43abb13840a2cf73"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

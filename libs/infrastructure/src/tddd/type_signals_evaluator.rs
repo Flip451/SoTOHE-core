@@ -1620,6 +1620,8 @@ mod tests {
     #[test]
     fn test_execute_type_signals_rejects_65th_configured_layer_before_export() {
         let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let recorded =
+            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
         let layers = (0..65)
             .map(|index| {
                 serde_json::json!({
@@ -1660,6 +1662,11 @@ mod tests {
             "the error must identify the layer budget: {error}"
         );
         assert_eq!(observer.launches(), 0, "the layer-budget failure must precede export");
+        assert_eq!(
+            std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+            recorded,
+            "a 65th required layer must not reuse or rewrite a recorded type-signals result"
+        );
     }
 
     #[test]

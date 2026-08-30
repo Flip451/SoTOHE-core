@@ -460,32 +460,32 @@
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_rejects_external_path_and_build_script_inputs"
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
       },
       {
         "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::properties",
+        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
         "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
       },
       {
@@ -1049,6 +1049,263 @@
         }
       },
       "reason": "This codec has no exporter, output lock, writer-participation check, or input/resolution generation recheck; it only transforms already captured inputs. AC-06's end-to-end lock and ABA guarantee is not entry-local behavior."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This T009 compile-closure only assembles D1/D2 authoritative rustdoc contexts and synthesizes cross-crate add items. It does not discover, bound, or fail-close the D3 implementation fingerprint of hermetic workspace inputs; that CO-04 fingerprint contract is later T010/T018 behavior, not this handoff."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This function's T009 surface is the encode handoff of a complete LayerId-keyed rustdoc context map. Complete cache-key equality, clean-worktree gating, and execution-identity reuse in AC-04 are T010/T018 reuse decisions, not the D1/D2 compile-closure under test here."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "Exclusive lock acquisition, the 120-second bound, and fail-closed lock errors are T014 adapter behavior. This T009 handoff does not take or fail the shared rustdoc output lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "CO-06's exclusive target-directory ownership and common-lock participation by every writer are T014/T015 adapter contracts. This T009 compile-closure does not export rustdoc JSON or own that lock boundary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "This orchestration entry has no lock file descriptor, timeout clock, or retry loop. After a reuse miss it only calls RustdocCratePort::capture_current; fail-closed 120-second lock acquisition, prohibition of lockless export and existing-JSON reuse, and refusal to retry are not local behavior of this function."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Unix-only descriptor-relative no-follow trusted-root lock handling is T017 platform admission. This T009 function does not open lock descriptors or inspect target-directory components."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "AC-08's restriction of export and snapshot reuse to a Unix trusted-root lock is T017 behavior. This T009 compile-closure neither acquires that lock nor decides platform support."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "Fixing resolved inputs as immutable content-addressed snapshots under one held lock is T016/T019 snapshot work. This T009 handoff consumes already-assembled AuthoritativeRustdocContext values and does not snapshot rustdoc output bytes."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This function neither verifies an expected rustdoc output path nor hashes JSON bytes while a lock is held. It consumes AuthoritativeRustdocContext values already assembled from port-captured snapshots, so CO-07's lock-scoped output capture and generation recheck are not local behavior of this orchestration entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "AC-06's exclusive lock from export through expected-output reading, writer participation, and ABA detection is T015/T016/T019 behavior. This T009 compile-closure does not hold that lock or compare start/end generations."
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"
