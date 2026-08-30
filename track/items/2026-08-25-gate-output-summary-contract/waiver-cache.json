@@ -195,6 +195,54 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "3ac0db8ba58a3a6d94068d677618d71a316bfdf909fad28bcddf44cfef6e9527",
+        "waived_reason_hash": "d8eeeace7490b94dfe3ab2478b1001354f2ce8f5adac95bd793bc9ba13973ae3"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "8cbe1c338f5833dcb6d007118659e43cf9eedde6f4cbb5e7fedeb23d9f6cda03",
+        "declaration_hash": "9020df1d4cee712e59c5a04869ab544caae0c3dd372361546b2535cb02919e3d",
+        "waived_reason_hash": "82968379ef2c71015a780be54e0cd07ab74d837a0132d5fd4a99a09d2ad2bf77"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "AC-02",
           "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         },

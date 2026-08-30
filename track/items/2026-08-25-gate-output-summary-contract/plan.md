@@ -10,7 +10,7 @@ T005: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs
 T006: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs final-publish containment targets plus focused regressions — add and test; IN-05; CN-06; AC-07.
 T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and conditional CLI/composition integration targets for post-execution write-outcome/result rendering plus focused regressions — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.
 
-## Tasks (6/7 resolved)
+## Tasks (7/7 resolved)
 
 ### S1 — Shared summary and full-log behavior
 
@@ -52,4 +52,4 @@ T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and c
 
 > libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.
 
-- [ ] **T007**: libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.
+- [x] **T007**: libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.

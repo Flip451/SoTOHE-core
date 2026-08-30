@@ -2128,7 +2128,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(is_failure_line(line), \"unrecognized line was excluded: {line}\");\n        }\n        assert!(!is_failure_line(\"   \"));",
+        "citation": "for line in [\n            \"test cli::tests::broken ... FAILED\",\n            \"test result: FAILED. 1 passed; 1 failed\",\n            \"    FAIL [   0.012s] cli::tests::broken\",\n            \"test-obligation check failed: missing binding\",\n            \"test-obligation evaluate failed: verifier unavailable\",\n            \"[FAIL] pre-commit: check failed\",\n            \"[BLOCKED] review scope has findings\",\n            \"Error while executing command, exit code: 23\",\n            \"thread 'broken' panicked at src/lib.rs:1:1\",\n            \"- child exited with status 256\",\n            \"- could not start child command: missing\",\n        ] {\n            assert!(is_failure_line(line), \"expected failure line: {line}\");\n        }\n        for line in [\n            \"test cli::tests::healthy ... ok\",\n            \"test result: ok. 1 passed; 0 failed\",\n            \"[PASS] item-pass\",\n            \"[OK] All checks passed.\",\n            \"[SKIP] not applicable\",\n            \"--- signal check PASSED ---\",\n            \"--- signal check SKIPPED ---\",\n            \"PASS\",\n            \"SomeRecord { status: failed_in_a_field }\",\n        ] {\n            assert!(!is_failure_line(line), \"unexpected failure line: {line}\");\n        }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2164,7 +2164,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(is_failure_line(line), \"unrecognized line was excluded: {line}\");",
+        "citation": "assert!(is_failure_line(line), \"unrecognized line was excluded: {line}\");\n        }\n        assert!(!is_failure_line(\"   \"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3224,6 +3224,42 @@
       },
       "verdict": {
         "citation": "match result {\n            GateRunResult::ChildExited { exit_code, output, log } => {\n                assert_eq!(exit_code.value(), 23);\n                assert_eq!(output, b\"[FAIL] item-one: short reason\\nfull diagnostic detail\\n\");\n                match log {\n                    GateLogWriteOutcome::Persisted(log_path) => {\n                        assert_eq!(log_path.as_path(), Path::new(\"tmp/gate/unit.log\"));\n                    }\n                    GateLogWriteOutcome::Unavailable(error) => {\n                        panic!(\"unexpected log write failure: {error:?}\");\n                    }\n                }\n            }\n            GateRunResult::SpawnFailed { error, .. } => {\n                panic!(\"unexpected spawn failure: {error:?}\");\n            }\n        }\n        assert_eq!(\n            logs.contents.lock().expect(\"log lock should be available\").as_slice(),\n            [b\"[FAIL] item-one: short reason\\nfull diagnostic detail\\n\".to_vec()]\n        );\n\nmatch result {\n            GateRunResult::ChildExited { exit_code, output, log } => {\n                assert_eq!(exit_code, GateExitCode::new(23));\n                assert_eq!(output, b\"complete output\");\n                assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));\n            }\n            GateRunResult::SpawnFailed { .. } => panic!(\"unexpected spawn failure\"),\n        }\n\nmatch result {\n            GateRunResult::SpawnFailed { error, log } => {\n                assert!(error.to_string().contains(\"missing child\"));\n                assert!(matches!(\n                    log,\n                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))\n                ));\n            }\n            GateRunResult::ChildExited { .. } => panic!(\"unexpected child result\"),\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::gate_output::tests",
+          "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::gate_output::tests",
+          "test_name": "test_gate_output_driver_renders_child_status_when_log_write_is_unavailable"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "6a2554b6927bcd7bfcd50fab7585ceb6050f4972bcfb264c46b4ab83bb457634",
+        "bound_tests_set_hash": "d693ec15423952d8e135dd80cb3ad3241bb58ed7357af8bbb50c9b359b0e16c8",
+        "declaration_hash": "6ae55d31e8e64dcc321ec172ba823cc3a060ad613a9f604ca3a635b02a4dc221"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(failure.exit_code, 23);\n        assert_eq!(\n            failure_stdout,\n            \"FAIL\\nlog unavailable: could not write the gate log: read-only\"\n        );\n        assert!(!failure_stdout.lines().any(|line| line.starts_with(\"log: \")));\n\n        assert_eq!(success.exit_code, 0);\n        assert!(success_stdout.starts_with(\"PASS\\nlog unavailable: \"));\n        assert!(!success_stdout.lines().any(|line| line.starts_with(\"log: \")));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

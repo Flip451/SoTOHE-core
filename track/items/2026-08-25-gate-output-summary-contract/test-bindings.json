@@ -523,6 +523,24 @@
       ]
     },
     {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-04"}},
+      "reason": "GateRunResult is a result DTO and does not reserve or prepare destinations. IN-04's unique-reserve-then-write flow is owned by GateLogPersistencePort, GateRunInteractor, and FsGateLogPersistence, and is already bound there."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-05"}},
+      "reason": "GateRunResult is produced only after reservation succeeds and the child execution path is entered; a reservation or preparation failure returns GateRunError::Prepare before any GateRunResult exists, so AC-05 is owned by GateRunInteractor and the output driver preparation-failure path."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateRunResult", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-06"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::gate_output::tests", "test_name": "test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable"},
+        {"layer": "cli_driver", "module_path": "cli_driver::gate_output::tests", "test_name": "test_gate_output_driver_renders_child_status_when_log_write_is_unavailable"}
+      ]
+    },
+    {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "GateLogPersistencePort", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "AC-03"}},
       "tests": [
