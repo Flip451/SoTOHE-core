@@ -10,7 +10,7 @@ T005: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs
 T006: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs final-publish containment targets plus focused regressions — add and test; IN-05; CN-06; AC-07.
 T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and conditional CLI/composition integration targets for post-execution write-outcome/result rendering plus focused regressions — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.
 
-## Tasks (4/7 resolved)
+## Tasks (5/7 resolved)
 
 ### S1 — Shared summary and full-log behavior
 
@@ -40,7 +40,7 @@ T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and c
 
 > libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.
 
-- [ ] **T005**: libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.
+- [x] **T005**: libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.
 
 ### S6 — Contained final-publication targets
 

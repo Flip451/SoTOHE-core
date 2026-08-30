@@ -4060,6 +4060,37 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::gate_output::tests",
+          "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPersistencePort"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "bound_tests_set_hash": "e7a4cb353b001f93f8e7eb7628ed17f07a1eff6e276a2579340fccbe8ef67b41",
+        "declaration_hash": "eebf1331cefc5b84668c89d090bae0b9ec5b5fa9d1fee19a83b333f829adfc83"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let reservation =\n            persistence.reserve(&command).expect(\"log destination should be reserved\");\n        let path =\n            persistence.persist(reservation, complete_output).expect(\"log should be persisted\");\n\n        assert!(path.as_path().starts_with(root.path().join(\"tmp/gate\")));\n        assert_eq!(\n            std::fs::read(path.as_path()).expect(\"persisted log should be readable\"),\n            complete_output\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     }
   ],
   "track_id": "2026-08-25-gate-output-summary-contract"

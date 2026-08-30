@@ -123,7 +123,7 @@
       ],
       "description": "libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

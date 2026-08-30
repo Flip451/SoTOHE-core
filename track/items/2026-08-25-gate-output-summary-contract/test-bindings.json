@@ -812,6 +812,11 @@
       "kind": "waiver",
       "edge_id": {"entry_key": "GateOutputArgs", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "CN-04"}},
       "reason": "GateOutputArgs transports GateNameArg and OS-native argv through clap; it does not calculate an encoded log name or own filesystem limits. The persistence adapter owns CN-04."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "GateLogPersistencePort", "anchor_id": {"file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::gate_output::tests", "test_name": "test_fs_gate_log_persistence_writes_the_complete_output_under_tmp_gate"}]
     }
   ]
 }
