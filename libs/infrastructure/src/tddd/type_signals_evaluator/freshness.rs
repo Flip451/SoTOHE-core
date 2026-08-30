@@ -64,7 +64,7 @@ const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerpr
 
 /// A bounded fingerprint failure. No partial digest is returned for any case.
 #[derive(Debug)]
-pub(super) enum RustdocInputFingerprintError {
+pub(crate) enum RustdocInputFingerprintError {
     Io { path: PathBuf, source: String },
     Symlink { path: PathBuf },
     DirectoryDepth { path: PathBuf, maximum: usize },
@@ -118,7 +118,7 @@ impl std::fmt::Display for RustdocInputFingerprintError {
 }
 
 /// Computes a complete, bounded implementation fingerprint.
-pub(super) fn rustdoc_input_fingerprint(
+pub(crate) fn rustdoc_input_fingerprint(
     workspace_root: &Path,
 ) -> Result<String, RustdocInputFingerprintError> {
     let cargo_target_dir = validate_authoritative_cargo_inputs(workspace_root)?;

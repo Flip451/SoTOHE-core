@@ -190,6 +190,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb",
       "description": "Modify libs/domain/src/tddd/type_signals_doc.rs::ImplementationFingerprint, ResolutionFingerprint, RustdocExecutionIdentity, TypeSignalsCacheKey, TypeSignalsReuseDecision, and TypeSignalsReuseInput; add focused value, validation, equality, and reuse-decision tests (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08).",
       "id": "T010",
       "status": "done"
@@ -200,7 +201,7 @@
       ],
       "description": "After T010, modify libs/domain/src/tddd/type_signals_doc.rs::CapturedRustdocJson, RustdocSnapshot, construct_captured_rustdoc_json, and construct_rustdoc_snapshot, plus libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort; add focused same-bytes and mixed-generation rejection tests (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07).",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "a85a73d45298014af3eda04ab9cbe40159ec8be4",
@@ -209,6 +210,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb",
       "depends_on": [
         "T009",
         "T010"
@@ -225,7 +227,7 @@
       ],
       "description": "After T011-T013, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter lock acquisition and failure propagation; add focused serialization, 120-second timeout, lock-operation failure, no-retry, and no-fallback tests (IN-05, OS-05, CO-06, AC-07).",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

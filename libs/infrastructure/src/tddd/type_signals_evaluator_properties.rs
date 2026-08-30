@@ -13,15 +13,19 @@ use domain::tddd::type_signals_doc::{
 use domain::{CommitHash, Timestamp};
 
 use super::freshness::{self, decide_reuse_for_recorded_document};
-use crate::tddd::rustdoc_output_lock::{RUSTDOC_OUTPUT_LOCK_TIMEOUT, RustdocOutputLock};
+#[cfg(unix)]
+use crate::tddd::rustdoc_output_lock::RUSTDOC_OUTPUT_LOCK_TIMEOUT;
+use crate::tddd::rustdoc_output_lock::RustdocOutputLock;
 
 const A: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const B: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 
+#[cfg(unix)]
 struct PropertyGenerator {
     state: u64,
 }
 
+#[cfg(unix)]
 impl PropertyGenerator {
     fn new(seed: u64) -> Self {
         Self { state: seed }
@@ -396,6 +400,64 @@ fn property_evaluator_generates_lock_contention_generation_and_uncooperative_wri
             "uncooperative output must fail closed: {uncooperative_error}"
         );
     }
+}
+
+#[cfg(not(unix))]
+#[test]
+fn test_non_unix_lock_acquisition_fails_closed() {
+    let target = tempfile::tempdir().expect("target tempdir");
+    let error =
+        RustdocOutputLock::acquire_for_test(target.path(), std::time::Duration::from_millis(25))
+            .expect_err("descriptor-relative rustdoc locks must be unsupported on non-Unix");
+    assert!(
+        error.to_string().contains("supported only on Unix"),
+        "non-Unix lock acquisition must fail closed: {error}"
+    );
+}
+
+#[test]
+fn property_export_source_holds_lock_from_path_selection_through_byte_read() {
+    let source = include_str!("../schema_export.rs");
+    let acquire = source
+        .find("let lock = RustdocOutputLock::acquire(&target_directory)?;")
+        .expect("export acquires the common lock");
+    let identity = source
+        .find(
+            "self.rustdoc_execution_identity_for_target(crate_name, features, &target_directory)?;",
+        )
+        .expect("expected path is selected after lock acquisition");
+    let export = source
+        .find("bin_target::run_rustdoc_with_features(")
+        .expect("export runs rustdoc while the lock is in scope");
+    let read = source
+        .find("lock.read_bytes(&expected_path, 64 * 1024 * 1024)?;")
+        .expect("bytes are read through the held lock");
+    assert!(
+        acquire < identity && identity < export && export < read,
+        "lock must remain held from expected-path selection through export and JSON-byte read"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback() {
+    use std::time::Duration;
+
+    let workspace = tempfile::tempdir().expect("lock-op workspace");
+    let not_a_directory = workspace.path().join("regular-file-target");
+    fs::write(&not_a_directory, b"not-a-directory").expect("regular file target");
+
+    let first = RustdocOutputLock::acquire_for_test(&not_a_directory, Duration::from_millis(25));
+    let first_error = first.expect_err("locking a regular file must fail closed");
+    assert!(
+        first_error.to_string().contains("lock")
+            || first_error.to_string().contains("directory")
+            || first_error.to_string().contains("cannot open"),
+        "lock-operation failure must be reported: {first_error}"
+    );
+
+    let retry = RustdocOutputLock::acquire_for_test(&not_a_directory, Duration::from_millis(25));
+    retry.expect_err("a failed lock operation must not retry into lockless success");
 }
 
 #[test]

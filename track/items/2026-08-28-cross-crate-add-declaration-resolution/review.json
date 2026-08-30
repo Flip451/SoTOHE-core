@@ -460,6 +460,20 @@
           "hash": "rvw1:sha256:42ac33feb353d7ba34b2c501380edc79af13182b918819102b1a6aaf661d92f4",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T19:43:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f54222990c26cec0410f8a96c520bff3c13f4b93e97eeebcc79e8ba2c5916d65",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T20:31:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f54222990c26cec0410f8a96c520bff3c13f4b93e97eeebcc79e8ba2c5916d65",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1193,6 +1207,20 @@
           "at": "2026-08-30T18:01:21Z",
           "findings": [],
           "hash": "rvw1:sha256:4eee9114382b411e7330813e89a9bff788fd80160c3042a882243f2f91df82f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T20:24:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7b5b88d8a47df6ccbb97db0aad4642f2fe043c47c71aff0a644959266c2a515",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T21:58:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a7b5b88d8a47df6ccbb97db0aad4642f2fe043c47c71aff0a644959266c2a515",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2873,6 +2901,150 @@
           "hash": "rvw1:sha256:3fe514aafa267e474c64a2724f9be42f530bad4e5c240d548d1891ea50d7520a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T19:46:55Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 224,
+              "message": "`workspace_input_fingerprint` is not authoritative: it hashes only four root-level paths and silently omits unreadable/missing files. Changes to workspace-member sources or other Cargo rustdoc inputs can occur during capture without changing this fingerprint, allowing an inconsistent snapshot to be accepted. Use the complete bounded authoritative input fingerprint and fail closed on every I/O/coverage error.",
+              "severity": "high"
+            },
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 226,
+              "message": "The start/end guard hashes only path names and file bytes, so an input can change A→B→A during rustdoc capture and compare equal. This violates the required no-ABA guarantee; include generation metadata in the capture consistency check or otherwise use the repository’s generation-aware authoritative fingerprint.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:4e078387b5f7d01f72bc03e1e66b8ab09785c012662e8e1c375a2e24a2ad1e39",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T19:56:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6bad71ee97ee1b5bbf082cdfbb205083f43431dfe9267b84167173f0cefd06de",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T20:42:28Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 180,
+              "message": "`未宣言の前提への依存`: 開始・終了 fingerprint は `PATH`、`RUSTDOCFLAGS` 等の process environment の現在値を再読するだけです。rustdoc 起動時だけ A→B、その後 A に戻ると両 fingerprint は一致し、B の環境で生成した snapshot を A の identity として受理します。AC-06 の no-ABA 契約を満たすには、取得した環境 snapshot を全 Cargo/rustdoc subprocess に固定するか、実行中の環境不変性を正式に宣言・強制してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter error mapping",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 218,
+              "message": "`rustdoc_input_fingerprint` の I/O、symlink、resource-limit failure と fingerprint mismatch がすべて `CaptureFailed` に変換されます。呼び出し側はこれを `EvaluateSignalsError::Evaluation` とするため、types/spec が要求する authoritative-input failure と rustdoc/lock failure の区別が失われます。authoritative-input failure を保持できる typed variantを追加して伝搬してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 455,
+              "message": "no-retry テストは `acquire_for_test` をテスト自身が二回呼ぶだけで、単一の取得処理内の試行回数を観測していません。adapter 側のテストも `capture()` を二回呼ぶ同じ構造なので、実装が各呼び出しで内部 retry してから失敗しても通過します。retry が仕様対象であるため、recording seam等で一回の capture における lock-operation attempt が一回だけであることを検証してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 505,
+              "message": "no-fallback 用の stale JSON は `target-area/doc/lockfail.json` に置かれていますが、adapter の実際の期待出力は private target の `.sotp-rustdoc/<selection-hash>/doc/lockfail.json` です。この fixture は fallback 候補にならないため、実装が実際の期待 path の既存 JSON を再利用する regression でもテストが失敗を返して通過できます。実際の exclusive target に stale JSON を置いた状態で lock operationだけを失敗させてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 403,
+              "message": "このテストは `include_str!` とエラー文の存在だけを確認しており、non-Unix 分岐がコンパイルされることも、capture が fail-closed になることも検証しません。Testing Convention は source の部分文字列を挙動の証拠にすることを明示的に禁止しています。対象 platform の compile/behavior testへ置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 416,
+              "message": "source 内の token 順序は lock の lifetime を証明しません。たとえば export と read の間に `drop(lock)` を追加しても、検索対象文字列の順序は変わらずこのテストは通過します。Testing Conventionに従い、競合 writerまたは recording boundaryを使って path selectionからbyte readまでlockが実際に保持されることを検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3f513acb036677197c2b66ad51f9c83d53ee1c80dd2a01b2c59fa666ea91612",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T20:58:09Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 180,
+              "message": "`未宣言の前提への依存`: 開始・終了 fingerprint は `PATH`、`RUSTDOCFLAGS` などの process environment の現在値を再読するだけです。rustdoc 起動時だけ環境が A→B、その後 A に戻ると両 fingerprint は一致し、B で生成した snapshot を A の identity として受理します。AC-06 の no-ABA 契約を満たすには、取得した環境 snapshot を全 Cargo/rustdoc subprocess に固定するか、実行中の環境不変性を正式に宣言・強制してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter error mapping",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 218,
+              "message": "`rustdoc_input_fingerprint` の I/O、symlink、resource-limit failure と fingerprint mismatch がすべて `CaptureFailed` に変換されます。呼び出し側はこれを `EvaluateSignalsError::Evaluation` とするため、types/spec が要求する authoritative-input failure と rustdoc/lock failure の区別が失われます。typed な区別を adapter 境界から保持してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 416,
+              "message": "このテストは source 内の token 順序しか検査せず、lock の lifetime を証明しません。export と read の間に `drop(lock)` を追加しても検索順序は変わらず通過します。また Testing Convention は `include_str!` と source 文字列検索を挙動の証拠にすることを禁止しています。競合 writer または recording boundary を用いた挙動テストへ置き換えてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 455,
+              "message": "no-retry テストは `acquire_for_test` をテスト自身が二回呼ぶだけで、単一の取得処理内の試行回数を観測していません。実装が各呼び出しで内部 retry してから失敗しても通過します。retry が明示的な契約なので、recording seam などで一回の capture/acquire における lock-operation attempt が一回だけであることを検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8dfbf221643e1deb77169bbc1f992a08c160e07568a3da39549e28141400c008",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T21:11:12Z",
+          "findings": [
+            {
+              "category": "non-Unix build correctness",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 335,
+              "message": "非 Unix の test build では `temp_env` の唯一の参照が `#[cfg(unix)]` テストと共に除去され、この無条件 import が `unused_imports` になります。crate は workspace の `warnings = \"deny\"` を継承するため、AC-08 の fail-closed テストへ到達する前にコンパイルが失敗します。import も `#[cfg(unix)]` で限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "non-Unix build correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 16,
+              "message": "非 Unix では `RUSTDOC_OUTPUT_LOCK_TIMEOUT` と `PropertyGenerator` の唯一の利用箇所が `#[cfg(unix)]` で除去されます。その結果、無条件 import は `unused_imports`、generator と methods は `dead_code` となり、`warnings = \"deny\"` により新しい non-Unix fail-closed テストを含む test build 自体が失敗します。これらの Unix 専用補助要素も `#[cfg(unix)]` で限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6103941d765d997481692ac372fd029713426a559d1c2b5ee2d026b404e8d4e7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T21:18:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:daf86c1df72975bcd26535460de8e4507bb5f2ca07ab27bbeeb515438c63005e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3140,6 +3312,123 @@
           "at": "2026-08-30T18:07:47Z",
           "findings": [],
           "hash": "rvw1:sha256:087b68a6a00c5257751ca46ae3b12bfc81598acb1a0033b93ac65168fc10c44a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T20:01:29Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 96,
+              "message": "`bin/sotp test-obligation check` fails: 9 stale-test drift instances across 8 edges (RustdocCratePort: IN-05, AC-07, IN-06, AC-06; RustdocCrateAdapter: IN-05, CO-06, AC-07, AC-08). The binding artifact’s frozen verdict must be refreshed after the bound test changes.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 96,
+              "message": "The diff removes `test_capture_current_with_exporter_forwards_declared_features` from the capture-current bindings, but the test still exists and no replacement exercises non-empty feature forwarding. This leaves a public behavior uncovered by the binding artifact.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2c5056646982fc578adb923fea11e61a060315ba34569eb1b45a3d4073c6a63a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T20:10:48Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 139,
+              "message": "`test_load_from_path_hashes_and_decodes_the_same_immutable_bytes` only exercises `load_from_path`, but it is also bound to the distinct `capture_current` obligation. This inflates capture coverage with an unrelated test and should be removed from that binding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b9fcbefc6e5c5a637affc3d8b7b50498b157170d55f06c7582643361dfe2a17d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T20:16:19Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 96,
+              "message": "`bin/sotp test-obligation check` still fails with 4 stale-test drift instances: RustdocCratePort/IN-05 (twice), RustdocCratePort/AC-07, RustdocCratePort/IN-06, and RustdocCratePort/AC-06. Refresh the frozen obligation verdict/cache after the bound test changes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2cde5f805a63e9abb1f1a71cff994e8dd6d765d1639bbb34eddb5dfccb2754f1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T20:22:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cde5f805a63e9abb1f1a71cff994e8dd6d765d1639bbb34eddb5dfccb2754f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T21:28:32Z",
+          "findings": [
+            {
+              "category": "test-evidence",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 164,
+              "message": "The newly bound `property_export_source_holds_lock_from_path_selection_through_byte_read` test reads `schema_export.rs` with `include_str!` and infers behavior from substring ordering. `knowledge/conventions/testing.md` explicitly says source-text assertions are not test evidence. It is bound again at line 239, allowing both obligations to pass without a behavioral test proving the lock spans path selection, export, and byte reading. Replace both bindings with behavioral evidence.",
+              "severity": "P1"
+            },
+            {
+              "category": "invalid-waiver",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2308,
+              "message": "This IN-06 waiver excuses the adapter because non-Unix rejection is compile-time selected, but fail-closed rejection on non-Unix and untrusted roots is precisely the adapter behavior required by IN-06 and declared in its type contract. The analogous RustdocCratePort AC-08 waiver at line 2616 has the same problem. These edges must be evaluated against the platform-admission tests rather than waived.",
+              "severity": "P1"
+            },
+            {
+              "category": "invalid-waiver",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2550,
+              "message": "The CO-06 waiver—and the RustdocCratePort/adapter IN-07 waivers at lines 2561 and 2572—incorrectly treats delegation to `RustdocSchemaExporter` and `RustdocOutputLock` as absence of contract behavior. `capture_current` is explicitly the public boundary promising locked export and snapshot construction, so these waivers suppress evaluation of behavior the port and adapter own. Replace them with behavioral bindings; the related adapter CO-07/AC-06 waivers should likewise retain evidence for the lock-scoped snapshot and start/end fingerprint checks they implement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a715512453d4d3fd014e27c3f1fc412976de11b62547423cfd1f5b8029205128",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T21:37:05Z",
+          "findings": [
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 96,
+              "message": "The current binding set does not pass its required gate. `bin/sotp test-obligation check --track-id 2026-08-28-cross-crate-add-declaration-resolution` reports `TestChanged` drift for multiple RustdocCratePort and RustdocCrateAdapter edges because the bound test bodies changed after their verdicts were frozen. Re-run the orchestrator-owned evaluation and confirm `check` exits 0 before approving these fulfillment records.",
+              "severity": "P1"
+            },
+            {
+              "category": "invalid-waiver",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2543,
+              "message": "The CO-07 waiver ignores a direct edge-local intersection: `capture_current` explicitly promises to acquire the trusted-root lock, export, verify the expected output, read immutable bytes, and construct the snapshot within that interval, while CO-07 requires output-path verification and byte snapshotting under the same lock. Discussing only ImplementationFingerprint/ResolutionFingerprint does not justify waiving the owned lock-and-snapshot behavior. Remove this waiver so the method-specific fulfillment tests are evaluated for CO-07, or bind suitable behavioral tests explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23f135e2158fe898295bfbb74a456f206248a202a974a5072034090d2db2bb4f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T21:55:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90e39fac4d0bae5b991de27208f6290996ef1a4e6511a04c66b273c7147770dd",
           "type": "final",
           "verdict": "zero_findings"
         }

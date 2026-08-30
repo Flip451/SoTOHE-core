@@ -62,6 +62,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
           "test_name": "test_load_from_path_invalid_json_returns_parse_failed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_hashes_and_decodes_the_same_immutable_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_symlinked_file_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_symlinked_parent_dir_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_outside_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
         }
       ]
     },
@@ -90,13 +115,53 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::schema_export::tests",
           "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "test_non_unix_lock_acquisition_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
         }
       ]
     },
@@ -111,37 +176,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_load_from_path_invalid_json_returns_parse_failed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
           "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_load_from_path_outside_workspace_root_returns_io_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_load_from_path_symlinked_file_returns_io_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_load_from_path_symlinked_parent_dir_returns_io_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
         },
         {
           "layer": "infrastructure",
@@ -150,13 +185,58 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_hashes_and_decodes_the_same_immutable_bytes"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::schema_export::tests",
           "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "test_non_unix_lock_acquisition_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
         }
       ]
     },
@@ -2067,6 +2147,479 @@
           "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
         }
       ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This value object stores one SHA-256 digest and one decoded rustdoc graph produced from caller-supplied bytes. It does not assemble cache identity, walk Cargo inputs, or decide type-signal reuse."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This value object has no cache lookup, worktree observation, or reuse gate. AC-04's complete identity match on a clean worktree is not behavior of the captured-json value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This value object has no target directory, lock handle, output path, or generation observation. It only retains the hash and graph of bytes already supplied by its constructor."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This value object neither resolves an expected rustdoc path nor holds a lock through output snapshotting. CO-07's lock-scoped capture is not local behavior of the stored hash and graph."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This value object has no exporter, writer-participation check, or fingerprint revalidation. Exclusive target ownership and ABA rejection are not observable on the captured-json type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This snapshot type stores an already resolved execution identity with a captured hash and graph. It does not discover authoritative inputs or decide cache reuse."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This snapshot type has no cache lookup or worktree check. AC-04's complete reuse gate is not behavior of the stored identity-bearing capture."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "The snapshot type has no public constructor from independently built identity and captured values, and it does not itself acquire a lock or reread paths. Mixed-generation assembly is excluded from this type's surface rather than detected as I/O ABA."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This snapshot type retains identity and captured bytes after construction. It does not confirm exclusive target ownership or compare start/end fingerprints before persist."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This snapshot type cannot hold a lock, reject non-cooperative writers, or detect ABA of rustdoc output. Those conditions are not local behavior of the stored proof value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This digest type has no cache, worktree, or reuse decision. AC-04's complete identity match is not behavior of the hash value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This digest type does not acquire a lock or snapshot JSON from an expected path. It only names the hash of bytes already in memory."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This digest type does not confirm target-directory ownership or hold a lock through output capture. CO-07 is not local behavior of the stored digest."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This digest type cannot lock a target directory, exclude writers, or recheck fingerprints. AC-06 lock and ABA conditions are not observable on the hash value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Descriptor-relative no-follow locking is compiled only on Unix; the non-Unix branch is a compile-time Unsupported return rather than a runtime path-based fallback. This adapter's lock tests therefore exercise the Unix exclusive-lock path, not a portable path-based lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "The port only loads a baseline file or captures a current snapshot. It does not assemble type-signal cache identity or decide reuse from fingerprints."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "The port has no type-signal cache or worktree cleanliness check. AC-04's reuse gate is not behavior of load_from_path or capture_current."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This context value carries already captured rustdoc graphs keyed by layer. It has no lock handle, expected output path, or generation observation, so mixed-generation and ABA prevention are not local behavior of the stored context."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This context type does not resolve an expected rustdoc path, acquire a target-directory lock, or snapshot JSON bytes. CO-07's lock-scoped capture is not behavior of the assembled context value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This context value does not own a target directory, participate in writer locking, or recheck fingerprints before persist. AC-06's exclusive-lock and ABA conditions are not observable on the context type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This error enum is fail-closed vocabulary for authoritative-input, evaluation, and cache-write failures. It does not assemble reuse identity or walk Cargo rustdoc inputs."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This error type does not discover or hash the D3 authoritative input set. CO-04's fingerprint policy is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This error enum has no cache lookup or reuse decision. AC-04's complete identity match is not local behavior of the error type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "reason": "This error type does not enumerate architecture layers or enforce the 64-layer export bound. IN-04's layer-limit behavior is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "reason": "This error enum does not iterate configured layers or continue after a 64-layer overflow. CO-05 is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "reason": "This error type does not implement the 64-layer ceiling or split-continuation policy. AC-05 is not local behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "This error enum does not acquire or time out a target-directory lock. IN-05's exclusive-lock serialization is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "This error type has no lock file, writer set, or trusted-root descriptor. CO-06's lock policy is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "This error enum does not wait on or retry a 120-second lock. AC-07's lock-failure stop is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "This error type does not open descriptor-relative lock files or inspect platform lock capability. IN-06 is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This error enum does not implement Unix-only trusted-root admission. AC-08 is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This error type does not hold a lock across export and JSON snapshotting. IN-07's generation-mixing prevention is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This error enum does not snapshot expected-output bytes or compare start/end fingerprints. CO-07 is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This error type does not own a target directory or detect ABA replacements. AC-06 is not local to the error vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_captured_rustdoc_json_hashes_and_decodes_one_byte_snapshot"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_distinct_byte_generations_yield_distinct_hashes"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "The port methods do not themselves create the exclusive .sotp-rustdoc subtree or enumerate every possible rustdoc writer. capture_current delegates that ownership and lock participation to RustdocSchemaExporter and RustdocOutputLock; bound tests cover 120-second timeout, contention, and lock-operation fail-closed without retry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "load_from_path hashes one immutable baseline byte vector and does not mix generations of a live export. capture_current has no rustdoc invocation of its own: it delegates to RustdocSchemaExporter::capture_rustdoc_snapshot, which acquires RustdocOutputLock before expected-path selection and holds it through read_bytes. The port surface has no unlocked re-read path."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "RustdocCrateAdapter::capture_current contains no cargo rustdoc invocation. It calls RustdocSchemaExporter::capture_rustdoc_snapshot, which acquires RustdocOutputLock before expected-path selection and holds that lock through JSON-byte read_bytes. Bound tests cover lock-operation failure, contention timeout, generation replacement, and locked-byte snapshot construction. The adapter has no second path that rereads Cargo output without the lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This adapter returns a hashed rustdoc snapshot. It does not compute implementation or resolution fingerprints and does not persist type-signal results, so start/end fingerprint agreement before persist is not adapter-local behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This adapter does not assemble TypeSignalsCacheKey fingerprints or compare them after capture. It cannot accept ABA by declaring fingerprints unchanged via path reread; those checks are not operations of load_from_path or capture_current."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "The port-relevant slice of CO-04 is constructing a validated rustdoc execution identity (crate, features, profile, expected JSON path) and hashing captured bytes. It is not the D3 workspace-file walk that produces ImplementationFingerprint; that walk is not a method of RustdocCratePort."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "The port-relevant slice of AC-08 on this Unix host is fail-closed rejection of a symlinked or unverifiable workspace/target root before export. Unsupported-platform handling is compiled only under cfg(not(unix)) in rustdoc_output_lock and is not an executable branch of capture_current here."
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"

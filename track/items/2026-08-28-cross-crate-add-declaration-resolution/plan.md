@@ -5,7 +5,7 @@
 
 GO-01 original implementation and authoritative-context completion remain T001-T009; D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work is decomposed into T010-T019.
 
-## Tasks (12/19 resolved)
+## Tasks (14/19 resolved)
 
 ### SECTION-001 — Original resolution boundary
 
@@ -50,13 +50,13 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 
 > Implement the domain-owned complete reuse identity and fail-closed reuse decision vocabulary from the approved type catalogue (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08).
 
-- [x] **T010**: Modify libs/domain/src/tddd/type_signals_doc.rs::ImplementationFingerprint, ResolutionFingerprint, RustdocExecutionIdentity, TypeSignalsCacheKey, TypeSignalsReuseDecision, and TypeSignalsReuseInput; add focused value, validation, equality, and reuse-decision tests (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08).
+- [x] **T010**: Modify libs/domain/src/tddd/type_signals_doc.rs::ImplementationFingerprint, ResolutionFingerprint, RustdocExecutionIdentity, TypeSignalsCacheKey, TypeSignalsReuseDecision, and TypeSignalsReuseInput; add focused value, validation, equality, and reuse-decision tests (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08). (`d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb`)
 
 ### SECTION-008 — Immutable rustdoc snapshot contract
 
 > Implement immutable rustdoc capture and identity-bearing snapshot construction at the domain boundary (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07).
 
-- [ ] **T011**: After T010, modify libs/domain/src/tddd/type_signals_doc.rs::CapturedRustdocJson, RustdocSnapshot, construct_captured_rustdoc_json, and construct_rustdoc_snapshot, plus libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort; add focused same-bytes and mixed-generation rejection tests (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07).
+- [x] **T011**: After T010, modify libs/domain/src/tddd/type_signals_doc.rs::CapturedRustdocJson, RustdocSnapshot, construct_captured_rustdoc_json, and construct_rustdoc_snapshot, plus libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort; add focused same-bytes and mixed-generation rejection tests (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07).
 
 ### SECTION-009 — Bounded rustdoc export planning
 
@@ -68,13 +68,13 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 
 > Modify infrastructure typed decoding to reject invalid persisted rustdoc execution identities as TypeSignalsCodecError::InvalidExecutionIdentity and add focused invalid-identity decode validation (IN-03, CO-04, AC-04).
 
-- [x] **T013**: After T009 and T010, modify infrastructure::tddd::type_signals_codec::TypeSignalsCodecError and its typed persisted-document decoder to reject invalid rustdoc execution identities as TypeSignalsCodecError::InvalidExecutionIdentity; add focused invalid-identity decode tests (IN-03, CO-04, AC-04).
+- [x] **T013**: After T009 and T010, modify infrastructure::tddd::type_signals_codec::TypeSignalsCodecError and its typed persisted-document decoder to reject invalid rustdoc execution identities as TypeSignalsCodecError::InvalidExecutionIdentity; add focused invalid-identity decode tests (IN-03, CO-04, AC-04). (`d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb`)
 
 ### SECTION-011 — Locked rustdoc export and snapshot integration
 
 > Modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, libs/infrastructure/src/schema_export.rs::RustdocSchemaExporter, and libs/infrastructure/src/tddd/type_signals_evaluator.rs::execute_type_signals_for_layer and EvaluateSignalsError; add focused validation (IN-03, IN-05, IN-06, IN-07, OS-04, OS-05, CO-06, CO-07, AC-04, AC-06, AC-07, AC-08).
 
-- [ ] **T014**: After T011-T013, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter lock acquisition and failure propagation; add focused serialization, 120-second timeout, lock-operation failure, no-retry, and no-fallback tests (IN-05, OS-05, CO-06, AC-07).
+- [x] **T014**: After T011-T013, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter lock acquisition and failure propagation; add focused serialization, 120-second timeout, lock-operation failure, no-retry, and no-fallback tests (IN-05, OS-05, CO-06, AC-07).
 - [ ] **T015**: After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to require exclusive target ownership and common-lock participation by every expected-output writer; add focused cooperative-writer and non-cooperative-writer rejection tests (CO-06, CO-07, AC-06).
 - [ ] **T016**: After T015, modify infrastructure::schema_export::RustdocSchemaExporter to expose immutable Vec<u8> export data, and modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter to determine, verify, read, hash, decode, and construct the current rustdoc snapshot from that one immutable byte capture while the common lock remains held; add focused same-bytes and output-replacement tests (IN-07, CO-07, AC-06).
 - [ ] **T017**: After T016, continue modifying the same infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter write target for trusted-root admission and failure propagation; keep this work in a later batch to avoid overlapping T016 ownership, and add focused non-Unix, relative escape, unverifiable root, and symlinked target-component rejection tests (IN-06, OS-05, CO-06, AC-08).

@@ -848,6 +848,34 @@ mod tests {
     }
 
     #[test]
+    fn test_construct_rustdoc_snapshot_distinct_byte_generations_yield_distinct_hashes() {
+        let identity = execution_identity();
+        let mut first_crate = empty_rustdoc();
+        first_crate.crate_version = Some("generation-a".to_owned());
+        let mut second_crate = empty_rustdoc();
+        second_crate.crate_version = Some("generation-b".to_owned());
+        let first_bytes = serde_json::to_vec(&first_crate).unwrap();
+        let second_bytes = serde_json::to_vec(&second_crate).unwrap();
+
+        let first =
+            construct_rustdoc_snapshot(identity.clone(), &first_bytes, decode_rustdoc).unwrap();
+        let second =
+            construct_rustdoc_snapshot(identity.clone(), &second_bytes, decode_rustdoc).unwrap();
+
+        assert_ne!(first.json_hash(), second.json_hash());
+        assert_eq!(
+            first.json_hash(),
+            construct_captured_rustdoc_json(&first_bytes, decode_rustdoc).unwrap().json_hash()
+        );
+        assert_eq!(
+            second.json_hash(),
+            construct_captured_rustdoc_json(&second_bytes, decode_rustdoc).unwrap().json_hash()
+        );
+        assert_eq!(first.execution_identity(), second.execution_identity());
+        assert_ne!(first.crate_data(), second.crate_data());
+    }
+
+    #[test]
     fn test_document_retains_only_required_freshness_inputs() {
         let document = TypeSignalsDocument::new(
             timestamp(),
