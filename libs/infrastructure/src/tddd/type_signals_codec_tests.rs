@@ -9,6 +9,117 @@ use super::*;
 
 const DIGEST: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
+struct PropertyGenerator {
+    state: u64,
+}
+
+impl PropertyGenerator {
+    fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
+
+    fn next_u32(&mut self) -> u32 {
+        self.state = self.state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+        (self.state >> 32) as u32
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum InvalidExecutionIdentityComponent {
+    TargetDirectory,
+    ExpectedJsonPath,
+    CrateName,
+    Feature,
+    Profile,
+}
+
+impl InvalidExecutionIdentityComponent {
+    fn from_case(case: u32) -> Self {
+        match case % 5 {
+            0 => Self::TargetDirectory,
+            1 => Self::ExpectedJsonPath,
+            2 => Self::CrateName,
+            3 => Self::Feature,
+            _ => Self::Profile,
+        }
+    }
+}
+
+fn valid_type_signals_doc_dto() -> TypeSignalsDocDto {
+    TypeSignalsDocDto {
+        schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
+        generated_at: "2026-04-18T12:00:00Z".to_owned(),
+        declaration_hash: DIGEST.to_owned(),
+        head_commit: "a".repeat(40),
+        baseline_hash: DIGEST.to_owned(),
+        implementation_fingerprint: DIGEST.to_owned(),
+        resolution_fingerprint: DIGEST.to_owned(),
+        rustdoc_execution_identity: test_execution_identity_dto(),
+        signals: vec![],
+    }
+}
+
+fn set_generated_invalid_execution_identity_component(
+    payload: &mut serde_json::Value,
+    component: InvalidExecutionIdentityComponent,
+    case: u32,
+    variation: u32,
+) {
+    let identity = payload
+        .get_mut("rustdoc_execution_identity")
+        .and_then(serde_json::Value::as_object_mut)
+        .expect("the valid fixture must contain an execution identity object");
+    let value = match component {
+        InvalidExecutionIdentityComponent::TargetDirectory => match variation % 3 {
+            0 => format!("/tmp/other-target-{case}"),
+            1 => format!("../other-target-{case}"),
+            _ => format!("/tmp/sotohe-codec-test-target/../other-target-{case}"),
+        },
+        InvalidExecutionIdentityComponent::ExpectedJsonPath => {
+            if variation % 2 == 0 {
+                format!("/tmp/other-target-{case}/domain.json")
+            } else {
+                format!("/tmp/sotohe-codec-test-target/../other-{case}.json")
+            }
+        }
+        InvalidExecutionIdentityComponent::CrateName => match variation % 3 {
+            0 => String::new(),
+            1 => format!("crate-name-{case}"),
+            _ => format!("{case}crate"),
+        },
+        InvalidExecutionIdentityComponent::Feature => match variation % 3 {
+            0 => String::new(),
+            1 => format!("-feature-{case}"),
+            _ => format!("feature/{case}"),
+        },
+        InvalidExecutionIdentityComponent::Profile => match variation % 3 {
+            0 => String::new(),
+            1 => " ".repeat((case % 3 + 1) as usize),
+            _ => "\t".repeat((case % 3 + 1) as usize),
+        },
+    };
+    match component {
+        InvalidExecutionIdentityComponent::TargetDirectory => {
+            identity.insert("target_directory".to_owned(), serde_json::Value::String(value));
+        }
+        InvalidExecutionIdentityComponent::ExpectedJsonPath => {
+            identity.insert("expected_json_path".to_owned(), serde_json::Value::String(value));
+        }
+        InvalidExecutionIdentityComponent::CrateName => {
+            identity.insert("crate_name".to_owned(), serde_json::Value::String(value));
+        }
+        InvalidExecutionIdentityComponent::Feature => {
+            identity.insert(
+                "features".to_owned(),
+                serde_json::Value::Array(vec![serde_json::Value::String(value)]),
+            );
+        }
+        InvalidExecutionIdentityComponent::Profile => {
+            identity.insert("profile".to_owned(), serde_json::Value::String(value));
+        }
+    }
+}
+
 fn legacy_cache_key(
     declaration_hash: domain::CatalogueDeclarationHash,
     head_commit: domain::CommitHash,
@@ -688,6 +799,53 @@ fn test_decode_rejects_each_typed_codec_error_variant() {
         decode(&serde_json::to_string(&invalid_head).unwrap()),
         Err(TypeSignalsCodecError::InvalidTimestamp(_))
     ));
+}
+
+#[test]
+fn test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity() {
+    let dto = valid_type_signals_doc_dto();
+
+    let mut outside_target = serde_json::to_value(&dto).unwrap();
+    outside_target["rustdoc_execution_identity"]["expected_json_path"] =
+        serde_json::Value::String("/tmp/other-target/domain.json".to_owned());
+    assert!(matches!(
+        decode(&outside_target.to_string()),
+        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))
+    ));
+
+    let mut empty_profile = serde_json::to_value(&dto).unwrap();
+    empty_profile["rustdoc_execution_identity"]["profile"] =
+        serde_json::Value::String("   ".to_owned());
+    assert!(matches!(
+        decode(&empty_profile.to_string()),
+        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))
+    ));
+}
+
+#[test]
+fn test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity()
+{
+    // This deterministic generator provides reproducible property coverage
+    // without adding a test-only generator dependency to the production crate.
+    let mut generator = PropertyGenerator::new(0x5eed_2026);
+    for case in 0..64_u32 {
+        let component = InvalidExecutionIdentityComponent::from_case(case);
+        let mut payload = serde_json::to_value(valid_type_signals_doc_dto()).unwrap();
+        set_generated_invalid_execution_identity_component(
+            &mut payload,
+            component,
+            case,
+            generator.next_u32(),
+        );
+
+        assert!(
+            matches!(
+                decode(&payload.to_string()),
+                Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))
+            ),
+            "generated invalid {component:?} case {case} was accepted"
+        );
+    }
 }
 
 #[test]

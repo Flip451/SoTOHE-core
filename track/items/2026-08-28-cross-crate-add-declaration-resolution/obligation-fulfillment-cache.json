@@ -31,7 +31,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let recorded_key = cache_key(A, 'a', A);\n\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\n        let decide_after_verification = |worktree_status, authority_status| {\n            TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                worktree_status,\n                authority_status,\n            )\n            .as_ref()\n            .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse)\n        };\n\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n    }\n{\n        let decide_after_verification = |worktree_status, authority_status| {\n            TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                worktree_status,\n                authority_status,\n            )\n            .as_ref()\n            .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse)\n        };\n\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -103,9 +103,8 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "category": "central_unverified",
-        "kind": "fail",
-        "reason": "The tests verify mismatches in declaration, HEAD, baseline, implementation fingerprint, resolution fingerprint, profile, worktree cleanliness, and authority readability, but they do not vary the resolved Cargo target directory, crate, feature set, or expected rustdoc JSON path. Thus they do not verify the anchor’s central requirement that reuse is rejected unless every listed execution-identity component matches."
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
@@ -7719,6 +7718,634 @@
       },
       "verdict": {
         "citation": "assert!(\n        matches!(error, CatalogueImplSignalsError::LayerLimitExceeded),\n        \"a 65th configured layer must stop the run before feature or rustdoc access: {error:?}\"\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CargoProfileName"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "37ca9dd73b58be19432c6e3178f7f5e22e2b39c7c714fed5c55956e753665f3c",
+        "declaration_hash": "fcc2d98282992446c2697d59b1903b421fe0d3df76069bc1ae2e37bfdc2bc8ab"
+      },
+      "obligation_id": {
+        "entry_key": "CargoProfileName",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "CargoProfileName::try_new(\"   \".to_owned()),\n            Err(RustdocExecutionIdentityError::EmptyProfile)",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CargoProfileName"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
+        "declaration_hash": "02c1f624fba6ac9eb23882a28a5644da8503b3c2bf3ddea3c0b366cb30c5e04a"
+      },
+      "obligation_id": {
+        "entry_key": "CargoProfileName",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_expected_rustdoc_json_path_rejects_parent_traversal"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "3c1e6afa6264733b19e571295da7924901595715fa16bdb3e5d1ba6b38187cd9",
+        "declaration_hash": "f40b61de5b460b479f27596af25dde3717750796aae889f0200d56d2e61f8a50"
+      },
+      "obligation_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            ExpectedRustdocJsonPath::try_new(escaped_path, &target),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );\n\nassert_eq!(\n            RustdocExecutionIdentity::new(\n                target,\n                CrateName::new(\"domain\").unwrap(),\n                vec![],\n                CargoProfileName::try_new(\"dev\".to_owned()).unwrap(),\n                expected,\n            ),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
+        "declaration_hash": "12ac2008b01518031d73b4352953090a2b71695230af1083491441cd3cc4e4a4"
+      },
+      "obligation_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ResolutionFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "d24f7e2e2a8f69ed718264204f7f04f7b1babd268880c631cebc9de675375f88",
+        "declaration_hash": "e4197c9dc6048577c88c11e4ae1356b08c598be91e5a5208b01646afcdb2cdc5"
+      },
+      "obligation_id": {
+        "entry_key": "ResolutionFingerprint",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "// A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ResolvedCargoTargetDirectory"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
+        "declaration_hash": "8c0222e6b129c53abcbf24b80e099962d383d7f7cca3943143c13b49d563f2bc"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n...\nassert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "ce353153a9036100e8f7b6064499ded01023ac5da1ffb73cb3ad21d3065b5a0c",
+        "declaration_hash": "0cdf2a9d122f0b4a2da777de4b5d554d983d6e0c77d3adc608e4218a8851f7b8"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
+        "declaration_hash": "da94a7a289a0a2601865faa452b79cf457d04161ca054fcb01d8d988dd87956d"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "beafa8abf6db167c122d59155b8d1f0993da36650764f50bae6b01570483b4fc",
+        "declaration_hash": "8f42df2c3ca59fcc57bf117ed3ba162b12f4df5be04055ab819919d40e16e039"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            ResolvedCargoTargetDirectory::try_new(PathBuf::from(\"relative-target\")),\n            Err(RustdocExecutionIdentityError::TargetDirectoryNotAbsolute)\n        );\n        assert_eq!(\n            CargoProfileName::try_new(\"   \".to_owned()),\n            Err(RustdocExecutionIdentityError::EmptyProfile)\n        );\n\nassert_eq!(\n            RustdocExecutionIdentity::new(\n                target,\n                CrateName::new(\"domain\").unwrap(),\n                vec![],\n                CargoProfileName::try_new(\"dev\".to_owned()).unwrap(),\n                expected,\n            ),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "89e9ae2be19df8f005fc3547e05797ff7517d2c03970777e280a8a7386936e03",
+        "declaration_hash": "ac49524783d28db33c747396edd97fadb69bffdef43a5611d28619965243b182"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "6500e78d6a2a70b31eba5e00b6ab8bfc1a3847db4663f57a91fd869037988194",
+        "declaration_hash": "02419cb3c9ac37cf3375df0e07d880a00d97950aa297a038096baf4d2fb1a395"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "6500e78d6a2a70b31eba5e00b6ab8bfc1a3847db4663f57a91fd869037988194",
+        "declaration_hash": "083118c29f69a8725fb1ab2e8ec9c61f0533afe308ebee7f85098da86ba50639"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "// Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_document_retains_only_required_freshness_inputs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "e3ced130186f3185446166774b46f3cb25160e43587492c6519d7910fc2c05e5",
+        "declaration_hash": "c41ecf914971634e97286dd1987cbdb0e8fe5a61154ff73b141b793e4b1a48b6"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().head_commit().as_ref(), &B[..40]);\n        assert_eq!(document.cache_key().baseline_hash().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().implementation_fingerprint().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().resolution_fingerprint().as_digest().as_str(), B);\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().target_directory().as_path(),\n            Path::new(\"/tmp/sotohe-type-signals-target\")\n        );\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().crate_name().as_str(),\n            \"domain\"\n        );\n        assert!(document.cache_key().rustdoc_execution_identity().features().is_empty());\n        assert_eq!(document.cache_key().rustdoc_execution_identity().profile().as_str(), \"dev\");\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().expected_json_path().as_path(),\n            Path::new(\"/tmp/sotohe-type-signals-target/doc/domain.json\")\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "2d3ec74a96b1adb7212f58edd008943e6ac2a336ffaaa86fd2492b58cff6dda4",
+        "declaration_hash": "4c35a21d1f3ea317f7ffbcf828c091508d670ff9f7080078d84b40b52c780cab"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n...\n// Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n...\n// A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n...\n// Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "195e4a9b644dfdd098f402d4b456c6042c4a4e5018af1b38d31f5a44282e51b5",
+        "declaration_hash": "78731ba1dc5a87b2312bf6be184963c2b071ae8f87d88c5dde42b7f21d365b07"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable,\n            ),\n            None\n        );\n        assert_eq!(\n            TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable,\n            ),\n            None\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "5f191d068792e7b1fcef58bdfa57f53bd4484efbe5f457a931a28a5aff66ddfb",
+        "declaration_hash": "24d9bebe356bd7f0b2225dc00758f911a746cec0bd01f4d8696782d43087a442"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "bound_tests_set_hash": "f7e584e18cc3d4eac3f1fe1993aa2ff3ebfdbac46529452562672758493a1f29",
+        "declaration_hash": "058f6295318521bade919f94abf6491e523123a5fd4d0370faafd4cf7b675806"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        decode(&outside_target.to_string()),\n        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n    ));\n\n    assert!(matches!(\n        decode(&empty_profile.to_string()),\n        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "bound_tests_set_hash": "f7e584e18cc3d4eac3f1fe1993aa2ff3ebfdbac46529452562672758493a1f29",
+        "declaration_hash": "abf73cf905fc648533f082fa43154644bbe5667f68c1827832da4c4b22e174a4"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        decode(&outside_target.to_string()),\n        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

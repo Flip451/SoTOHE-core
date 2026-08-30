@@ -453,146 +453,146 @@
           "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
           "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
         },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-        "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_rejects_external_path_and_build_script_inputs"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-        "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-        "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::schema_export::tests",
-        "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
-      },
-      {
-        "layer": "infrastructure",
-        "module_path": "infrastructure::schema_export::tests",
-        "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
-      }
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_rejects_external_path_and_build_script_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        }
       ]
     },
     {
@@ -1306,6 +1306,767 @@
         }
       },
       "reason": "AC-06's exclusive lock from export through expected-output reading, writer participation, and ABA detection is T015/T016/T019 behavior. This T009 compile-closure does not hold that lock or compare start/end generations."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_expected_rustdoc_json_path_rejects_parent_traversal"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This newtype only confines an expected rustdoc JSON path to a resolved target directory. It does not walk workspace inputs, compute fingerprints, or fail-close on excluded/external rustdoc graph inputs."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This path value has no lock, exporter, or generation observation, so lock-held snapshot and ABA guarantees are not its behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This type neither hashes rustdoc JSON bytes nor holds a target-directory lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "A confined path value does not acquire an exclusive lock or detect non-cooperating writers."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This digest newtype stores an already computed implementation hash. It does not discover rustdoc graph inputs or bind declaration, resolution, and execution identity into one fingerprint."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This value does not walk workspace files, exclude directories, or fail-close on external/symlink/limit inputs; those are fingerprint-construction concerns, not this stored digest."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "Holding a digest does not decide type-signal reuse or construct a complete cache key from hermetic inputs."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This digest wrapper does not assemble catalogue and baseline byte sets or fail-close on incomplete resolution snapshots."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "Storing a resolution digest does not implement cache reuse exclusivity or fingerprint construction."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "A resolution digest has no lock-held rustdoc snapshot or ABA comparison."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This type does not verify expected output paths or hash JSON under a lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This digest has no exclusive lock, writer participation, or ABA detector."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This newtype only stores a resolved Cargo target directory path used as one identity component. It does not compose the complete reuse identity or fingerprint rustdoc graph inputs."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This newtype stores a resolved target directory. It does not detect non-authoritative rustdoc inputs or produce authoritative-input errors."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Storing a target directory path does not open Unix lock descriptors or perform no-follow trusted-root validation."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This path value does not gate export on Unix lock availability."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This identity value pairs already-resolved selection fields. It does not walk D3 workspace inputs or fail-close on excluded/external fingerprint sources."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "An identity value does not acquire the shared rustdoc output lock or wait 120 seconds."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "This type does not exclusively own a target directory or route rustdoc writers through a common lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "This type has no lock timeout, lock-operation failure path, or retry loop."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Pairing identity components does not implement Unix descriptor-relative no-follow locking."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This identity value does not gate export on Unix trusted-root lock availability."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This error type reports identity construction failure. It does not encode fingerprint input sets or partial-fingerprint rejection."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Construction-error variants do not open lock descriptors or validate trusted roots."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This error type does not encode platform lock support or snapshot-reuse policy."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "A cache key compares already-supplied identity components. It does not construct implementation fingerprints from D3 workspace inputs."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "A comparable identity tuple does not snapshot rustdoc bytes under a lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This key type does not verify expected output paths or hash JSON while a lock is held."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "Cache-key equality is not exclusive-lock ownership or ABA detection."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_document_retains_only_required_freshness_inputs"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This document retains caller-supplied cache-key fields. It does not walk workspace inputs or derive implementation fingerprints from the D3 authoritative set."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This document type retains a cache key and signals. It does not itself reject reuse on a dirty worktree or incomplete fingerprint construction; that decision lives on decide_type_signals_reuse."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This enum is the reuse outcome vocabulary. Fail-closed fingerprint construction happens before the enum is produced, not as behavior of the enum type itself."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This input value carries recorded and current cache keys plus cleanliness/authority flags. It does not determine rustdoc output paths, hold an export lock, or snapshot JSON bytes, so IN-07 lock-held capture is not local behavior of this type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "Constructing a reuse input does not acquire exclusive target-directory ownership, require writer participation, or detect ABA replacements of rustdoc output."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "This error type is the decode-failure vocabulary for invalid persisted rustdoc execution identity. It does not assemble workspace rustdoc-graph inputs or compute implementation fingerprints."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        }
+      ]
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"

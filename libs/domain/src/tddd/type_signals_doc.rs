@@ -670,16 +670,32 @@ mod tests {
     }
 
     fn execution_identity_with_profile(profile: &str) -> RustdocExecutionIdentity {
-        let target =
-            ResolvedCargoTargetDirectory::try_new(PathBuf::from("/tmp/sotohe-type-signals-target"))
-                .unwrap();
-        let expected =
-            ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
-                .unwrap();
+        execution_identity_with_selection(
+            "/tmp/sotohe-type-signals-target",
+            "domain",
+            vec![],
+            profile,
+            "doc/domain.json",
+        )
+    }
+
+    fn execution_identity_with_selection(
+        target_path: &str,
+        crate_name: &str,
+        features: Vec<CargoFeatureName>,
+        profile: &str,
+        expected_relative_path: &str,
+    ) -> RustdocExecutionIdentity {
+        let target = ResolvedCargoTargetDirectory::try_new(PathBuf::from(target_path)).unwrap();
+        let expected = ExpectedRustdocJsonPath::try_new(
+            target.as_path().join(expected_relative_path),
+            &target,
+        )
+        .unwrap();
         RustdocExecutionIdentity::new(
             target,
-            CrateName::new("domain").unwrap(),
-            vec![],
+            CrateName::new(crate_name).unwrap(),
+            features,
             CargoProfileName::try_new(profile.to_owned()).unwrap(),
             expected,
         )
@@ -793,6 +809,18 @@ mod tests {
     }
 
     #[test]
+    fn test_rustdoc_execution_identity_components_with_invalid_values_return_errors() {
+        assert_eq!(
+            ResolvedCargoTargetDirectory::try_new(PathBuf::from("relative-target")),
+            Err(RustdocExecutionIdentityError::TargetDirectoryNotAbsolute)
+        );
+        assert_eq!(
+            CargoProfileName::try_new("   ".to_owned()),
+            Err(RustdocExecutionIdentityError::EmptyProfile)
+        );
+    }
+
+    #[test]
     fn test_construct_captured_rustdoc_json_hashes_and_decodes_one_byte_snapshot() {
         let crate_data = empty_rustdoc();
         let bytes = serde_json::to_vec(&crate_data).unwrap();
@@ -839,6 +867,22 @@ mod tests {
         assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);
         assert_eq!(document.cache_key().head_commit().as_ref(), &B[..40]);
         assert_eq!(document.cache_key().baseline_hash().as_digest().as_str(), A);
+        assert_eq!(document.cache_key().implementation_fingerprint().as_digest().as_str(), A);
+        assert_eq!(document.cache_key().resolution_fingerprint().as_digest().as_str(), B);
+        assert_eq!(
+            document.cache_key().rustdoc_execution_identity().target_directory().as_path(),
+            Path::new("/tmp/sotohe-type-signals-target")
+        );
+        assert_eq!(
+            document.cache_key().rustdoc_execution_identity().crate_name().as_str(),
+            "domain"
+        );
+        assert!(document.cache_key().rustdoc_execution_identity().features().is_empty());
+        assert_eq!(document.cache_key().rustdoc_execution_identity().profile().as_str(), "dev");
+        assert_eq!(
+            document.cache_key().rustdoc_execution_identity().expected_json_path().as_path(),
+            Path::new("/tmp/sotohe-type-signals-target/doc/domain.json")
+        );
     }
 
     #[test]
@@ -923,6 +967,65 @@ mod tests {
             )),
             TypeSignalsReuseDecision::ReextractAndEvaluate
         );
+    }
+
+    #[test]
+    fn test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts() {
+        let recorded_key = cache_key(A, 'a', A);
+        let changed_identities = [
+            execution_identity_with_selection(
+                "/tmp/sotohe-type-signals-target/doc",
+                "domain",
+                vec![],
+                "dev",
+                "domain.json",
+            ),
+            execution_identity_with_selection(
+                "/tmp/sotohe-type-signals-target",
+                "other_crate",
+                vec![],
+                "dev",
+                "doc/domain.json",
+            ),
+            execution_identity_with_selection(
+                "/tmp/sotohe-type-signals-target",
+                "domain",
+                vec![CargoFeatureName::try_new("serde".to_owned()).unwrap()],
+                "dev",
+                "doc/domain.json",
+            ),
+            execution_identity_with_selection(
+                "/tmp/sotohe-type-signals-target",
+                "domain",
+                vec![],
+                "release",
+                "doc/domain.json",
+            ),
+            execution_identity_with_selection(
+                "/tmp/sotohe-type-signals-target",
+                "domain",
+                vec![],
+                "dev",
+                "doc/other.json",
+            ),
+        ];
+
+        for identity in changed_identities {
+            assert_eq!(
+                decide_type_signals_reuse(&verified_input(
+                    recorded_key.clone(),
+                    cache_key_with_rustdoc_inputs(
+                        A,
+                        'a',
+                        A,
+                        ImplementationFingerprint::new(digest(A)),
+                        ResolutionFingerprint::new(digest(B)),
+                        identity,
+                    ),
+                )),
+                TypeSignalsReuseDecision::ReextractAndEvaluate
+            );
+        }
     }
 
     #[test]

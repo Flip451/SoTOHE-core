@@ -417,6 +417,49 @@
           "hash": "rvw1:sha256:7aa71ac088d07e63115c51e2f6ae5a08a40bb260bb2ee41ad756b14f51a8812e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:29:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:15e0122b7e381ac145f4e47ca30d532de2fa7588bfe53025508c2e16b67b1c4a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:37:48Z",
+          "findings": [
+            {
+              "category": "test-obligation coverage",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 981,
+              "message": "The target-directory case is not isolated: `execution_identity_with_selection` joins `doc/domain.json` beneath the changed target, so both `target_directory` and `expected_json_path` differ. This test would still pass if reuse stopped comparing the target directory because the path mismatch alone forces re-extraction. Keep a common valid expected path beneath both target directories so only `target_directory` changes.",
+              "severity": "P2"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 810,
+              "message": "This test name puts the expected behavior before the condition, so it does not follow the required `test_{target}_{condition}_{expected_result}` format. Use a name such as `test_rustdoc_execution_identity_components_with_invalid_values_return_errors`.",
+              "severity": "P2"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 978,
+              "message": "This test name puts `reextracts` before the condition and therefore does not follow `test_{target}_{condition}_{expected_result}`. Use a name such as `test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:15e0122b7e381ac145f4e47ca30d532de2fa7588bfe53025508c2e16b67b1c4a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T17:48:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42ac33feb353d7ba34b2c501380edc79af13182b918819102b1a6aaf661d92f4",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1100,6 +1143,56 @@
           "at": "2026-08-30T16:29:38Z",
           "findings": [],
           "hash": "rvw1:sha256:bfdc6080235ecd1a14f2b6e95ad9b62a011fb7343416d9a648b2635ae9e8e8b5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:27:07Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 193,
+              "message": "T010 の説明は「domain catalogue entries」とだけ記載しており、対象ファイルまたは具体的なシンボルを特定していません。実装者が変更境界を推測する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 201,
+              "message": "T011 の説明は「domain catalogue entries」とだけ記載しており、対象ファイルまたは具体的なシンボルを特定していません。実装者が変更境界を推測する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 207,
+              "message": "T012 の説明は「the rustdoc export plan and catalogue implementation-signals error/orchestration changes」と記載するだけで、対象ファイルまたは具体的なシンボルを特定していません。実装者が変更境界を推測する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 109,
+              "message": "SECTION-011 の説明は、ロック、writer participation、immutable snapshot、root rejection、fingerprint/reuse、generation/ABA の挙動と、T016/T017/T018/T019 の分割理由を長文で再説明しています。下流 plan section は対象 + 操作 + anchor cite に限定すべきで、上流の挙動契約・設計理由を再掲してはなりません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:61d174a3abe572c3d7d5d2b26dcc3e58268c6eeea4ab66c226b5ac5ae0029f30",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T17:32:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4eee9114382b411e7330813e89a9bff788fd80160c3042a882243f2f91df82f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T18:01:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4eee9114382b411e7330813e89a9bff788fd80160c3042a882243f2f91df82f7",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2722,6 +2815,64 @@
           "hash": "rvw1:sha256:7ee46fbabbe5f8f15675be090f96443a311480b17d84090f35185ddf2b2763dd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:28:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46b07a4adb9276ba41a4c22aaf5bc7e7e281f0257380f5a9229abbba9705b790",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:38:14Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec_tests.rs",
+              "line": 694,
+              "message": "The new invalid-identity coverage exercises only two fixed mutations (`expected_json_path` and `profile`). The Testing Convention requires property-based codec coverage for generated boundary and invalid representations; generate semantic-invalid cases across the persisted identity components and verify each maps to `InvalidExecutionIdentity`.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec_tests.rs",
+              "line": 694,
+              "message": "The new name places the expected result (`rejects`) before the condition, contrary to the required `test_{target}_{condition}_{expected_result}` form. Rename it to put the invalid-identity condition before the expected error result.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:46b07a4adb9276ba41a4c22aaf5bc7e7e281f0257380f5a9229abbba9705b790",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T17:50:56Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec_tests.rs",
+              "line": 28,
+              "message": "The generated invalid-identity property omits `target_directory`, even though AC-04 includes the resolved Cargo target directory and this is the identity’s trusted-root-sensitive path component. Add generated malformed/traversing target-directory representations and verify decoding fails closed with `InvalidExecutionIdentity`.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation binding",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec_tests.rs",
+              "line": 814,
+              "message": "The newly named fixed test and the new property test are not bound to the relevant obligations: the current bindings still reference the removed `test_decode_rejects_invalid_rustdoc_execution_identity` name. Consequently IN-03/AC-04 point to a nonexistent test and the property evidence is unbound; update the bindings to reference the new property test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e47a711726bf872aab2ce7b42d3dc1e2e53318b6e52dfba25bc7de17f563b1c8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T18:03:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3fe514aafa267e474c64a2724f9be42f530bad4e5c240d548d1891ea50d7520a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2953,6 +3104,42 @@
           "at": "2026-08-30T16:31:41Z",
           "findings": [],
           "hash": "rvw1:sha256:dc43c90ceba981c72cf47912a83dbc9b8939cd74df68747bd9806d62c23be42c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:27:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:949e3cb2a5fd13d0ccd6fadeb1ccd9cab47cb289a8c7077d32398484383e7eda",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T17:35:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:949e3cb2a5fd13d0ccd6fadeb1ccd9cab47cb289a8c7077d32398484383e7eda",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T18:01:31Z",
+          "findings": [
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 1323,
+              "message": "The current evidence is no longer gate-clean: `bin/sotp test-obligation check` exits 1 with 13 `TestChanged` drifts on done edges after the bound tests were renamed or expanded (including CargoProfileName, RustdocExecutionIdentity, TypeSignalsCacheKey, and TypeSignalsCodecError). Re-run the orchestrator-owned test-obligation evaluation and confirm the check passes before accepting these bindings.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:087b68a6a00c5257751ca46ae3b12bfc81598acb1a0033b93ac65168fc10c44a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T18:07:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:087b68a6a00c5257751ca46ae3b12bfc81598acb1a0033b93ac65168fc10c44a",
           "type": "final",
           "verdict": "zero_findings"
         }
