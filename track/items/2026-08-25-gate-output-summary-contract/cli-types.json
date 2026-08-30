@@ -3,7 +3,7 @@
   "functions": {
     "cli::commands::gate_output::execute": {
       "action": "add",
-      "docs": "Dispatch parsed gate arguments to the configured CLI driver and convert its final exit value to ExitCode.",
+      "docs": "Dispatch parsed gate arguments through the CLI boundary.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -38,12 +38,20 @@
         {
           "anchor": "AC-04",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "cli::commands::gate_output::exit_code_from_u8": {
       "action": "add",
-      "docs": "Convert the CLI-driver exit value to the process-boundary ExitCode.",
+      "docs": "Convert a CLI exit value to process ExitCode.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -155,7 +163,7 @@
   "types": {
     "CliCommand": {
       "action": "modify",
-      "docs": "Extend the existing top-level clap command enum with GateOutput(GateOutputArgs).",
+      "docs": "Top-level clap command enum extended with the gate-output command.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -535,7 +543,7 @@
     },
     "GateNameArg": {
       "action": "add",
-      "docs": "Retain the opaque CLI gate label as a distinct boundary value for log-path construction.",
+      "docs": "Opaque presentation label for a CLI gate invocation.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -563,12 +571,16 @@
         {
           "anchor": "CN-01",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateOutputArgs": {
       "action": "add",
-      "docs": "Clap DTO carrying a typed gate label and opaque OS-native child argv tokens.",
+      "docs": "Clap input carrying a typed gate label and OS-native argv.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -607,6 +619,10 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]

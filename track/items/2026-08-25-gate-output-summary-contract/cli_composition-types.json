@@ -16,7 +16,10 @@
           ],
           "returns": "cli_driver::gate_output::GateOutputDriver",
           "spec_refs": [
-            {"anchor": "IN-02", "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"}
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
           ]
         }
       ],
@@ -29,7 +32,7 @@
   "types": {
     "GateOutputComposition": {
       "action": "add",
-      "docs": "Composition root that wires the gate process and persistence adapters into GateRunInteractor and GateOutputDriver.",
+      "docs": "Composition root that wires the process adapter and the reservation-owning persistence adapter into GateRunInteractor and GateOutputDriver.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -45,6 +48,14 @@
       "spec_refs": [
         {
           "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]

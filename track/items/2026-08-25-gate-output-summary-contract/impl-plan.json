@@ -30,11 +30,55 @@
           "T003"
         ],
         "title": "Aggregate pre-commit gates"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Reservation and preparation targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08."
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Reservation consumption and no-reclaim targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07."
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Contained final-publication targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06."
+        ],
+        "id": "S7",
+        "task_ids": [
+          "T007"
+        ],
+        "title": "Post-execution outcome and rendering targets"
       }
     ],
     "summary": [
       "T001-T003: apply gate-output changes across shared, leaf, and aggregate paths (GO-01).",
-      "T001-T003: update gate-output handling in place (GO-02)."
+      "T001-T003: update gate-output handling in place (GO-02).",
+      "T004: libs/usecase/src/gate_output.rs, libs/infrastructure/src/gate_output.rs, and apps/cli-driver/src/gate_output.rs reservation/preparation symbols and focused regressions — add and test; IN-04; CN-04; CN-05; AC-05.",
+      "T005: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs reservation-consumption/no-reclaim targets plus focused regressions — add and test; IN-04; CN-05; CN-07; AC-08.",
+      "T006: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs final-publish containment targets plus focused regressions — add and test; IN-05; CN-06; AC-07.",
+      "T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and conditional CLI/composition integration targets for post-execution write-outcome/result rendering plus focused regressions — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06."
     ]
   },
   "schema_version": 2,
@@ -63,6 +107,40 @@
       "description": "Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
       "id": "T003",
       "status": "done"
+    },
+    {
+      "depends_on": [
+        "T003"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05.",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T004"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T005"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07.",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T006"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.",
+      "id": "T007",
+      "status": "todo"
     }
   ]
 }

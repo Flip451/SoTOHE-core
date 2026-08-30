@@ -194,6 +194,55 @@
         }
       ],
       "type_name": "GateAdapterFailureReason"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_reserved_path",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "GateLogReservation",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-05",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-05",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateLogReservation"
     }
   ],
   "layer": "usecase",
@@ -268,18 +317,6 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "for_type": "GateLogPersistenceError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "GateLogPersistenceError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "GateLogPersistenceError",
-      "trait_ref": "core::error::Error"
-    },
-    {
       "for_type": "GateRunResult",
       "trait_ref": "core::fmt::Debug"
     },
@@ -318,22 +355,89 @@
     {
       "for_type": "GateAdapterFailureReason",
       "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateLogReservation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogReservation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GateLogReservation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GateLogWriteOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogReservationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogReservationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateLogReservationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GateLogWriteError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GateLogWriteError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GateLogWriteError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
     "GateLogPersistencePort": {
       "action": "add",
-      "docs": "Persistence boundary that selects a contained path, rejects outside-root and symlink traversal, performs the write, and returns the persisted path. It is deliberately synchronous for the single-shot CLI path, which performs one log write before returning.",
+      "docs": "Secondary port for gate-log reservation and persistence. The API is deliberately synchronous to match the blocking filesystem boundary. IN-02; AC-03; IN-04; CN-05; AC-05; AC-06; CN-06; AC-07; CN-07.",
       "informal_grounds": [],
       "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "reserve",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&GateRunCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<GateLogReservation, GateLogReservationError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-05",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        },
         {
           "has_default_impl": false,
           "is_async": false,
           "name": "persist",
           "params": [
             {
-              "name": "command",
-              "ty": "&GateRunCommand"
+              "name": "reservation",
+              "ty": "GateLogReservation"
             },
             {
               "name": "contents",
@@ -341,10 +445,26 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<GateLogPath, GateLogPersistenceError>",
+          "returns": "Result<GateLogPath, GateLogWriteError>",
           "spec_refs": [
             {
-              "anchor": "IN-02",
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-06",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "AC-07",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-07",
               "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
             }
           ]
@@ -362,6 +482,34 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -371,7 +519,7 @@
     },
     "GateProcessPort": {
       "action": "add",
-      "docs": "Secondary port for executing one validated gate command and returning its complete child output. It is deliberately synchronous for the single-shot CLI path, which performs one child run before returning.",
+      "docs": "Secondary port for gate-process execution and output capture. The API is deliberately synchronous to match the blocking process boundary. CN-03; AC-04.",
       "informal_grounds": [],
       "methods": [
         {
@@ -415,7 +563,7 @@
     },
     "GateRunService": {
       "action": "add",
-      "docs": "Inbound application port for one gate execution operation. It is deliberately synchronous so the single-shot CLI orchestration keeps its one process run and one log write on one blocking path.",
+      "docs": "Inbound application port for gate-run execution. The API is deliberately synchronous to match its blocking collaborators. IN-02; IN-03; AC-01; AC-02; AC-03; AC-04; AC-05; AC-06; CN-07.",
       "informal_grounds": [],
       "methods": [
         {
@@ -437,6 +585,10 @@
             },
             {
               "anchor": "IN-03",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            },
+            {
+              "anchor": "CN-07",
               "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
             }
           ]
@@ -470,6 +622,18 @@
         {
           "anchor": "AC-04",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -481,7 +645,7 @@
   "types": {
     "GateAdapterFailureReason": {
       "action": "add",
-      "docs": "Application-boundary transport value carrying opaque, unconstrained adapter diagnostic text. The application neither parses the text nor assigns it domain meaning.",
+      "docs": "Opaque adapter diagnostic text carried across the application boundary.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -533,7 +697,7 @@
     },
     "GateLogPath": {
       "action": "add",
-      "docs": "Path value returned after the persistence port completes the corresponding gate-log write.",
+      "docs": "DTO for a persisted gate-log path. IN-02; AC-03; AC-06; CN-06; AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -556,12 +720,56 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
-    "GateLogPersistenceError": {
+    "GateLogReservation": {
       "action": "add",
-      "docs": "Persistence-boundary failures, including explicit containment and symlink-component rejection. Create/write diagnostics cross the port as typed GateAdapterFailureReason values without importing I/O types.",
+      "docs": "Opaque DTO for a gate-log reservation. IN-04; CN-05; CN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateLogReservationError": {
+      "action": "add",
+      "docs": "Failure while reserving a gate-log destination.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -603,6 +811,71 @@
             }
           },
           {
+            "name": "CreateFile",
+            "payload": {
+              "fields": [
+                "GateAdapterFailureReason"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EncodedNameTooLong",
+            "payload": {
+              "fields": [
+                "GateAdapterFailureReason"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateLogWriteError": {
+      "action": "add",
+      "docs": "Error type for gate-log write and persistence operations. IN-02; AC-06; CN-01; CN-06; AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutsideRoot",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkComponent",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
             "name": "Write",
             "payload": {
               "fields": [
@@ -624,14 +897,77 @@
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         },
         {
-          "anchor": "AC-03",
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    },
+    "GateLogWriteOutcome": {
+      "action": "add",
+      "docs": "Closed result enum for gate-log persistence. AC-06; CN-01; CN-06; AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Persisted",
+            "payload": {
+              "fields": [
+                "GateLogPath"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "GateLogWriteError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateProcessError": {
       "action": "add",
-      "docs": "Failure produced by the child-process secondary port before output is available. The spawn diagnostic crosses the port as a typed GateAdapterFailureReason without importing I/O types.",
+      "docs": "Child-process adapter failure before output is available.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -661,7 +997,7 @@
     },
     "GateProcessOutput": {
       "action": "add",
-      "docs": "Complete opaque child-process bytes paired with the typed child status.",
+      "docs": "Captured opaque child-process bytes and typed exit status.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -698,7 +1034,7 @@
     },
     "GateRunCommand": {
       "action": "add",
-      "docs": "Validated application command containing an opaque presentation label and a non-empty OS-native argv.",
+      "docs": "Validated input for one gate execution, with an opaque presentation label and OS-native argv.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -717,12 +1053,16 @@
         {
           "anchor": "IN-02",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateRunCommandError": {
       "action": "add",
-      "docs": "Validation failure for construction of a gate-run command.",
+      "docs": "Gate-run command construction failure.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -744,21 +1084,25 @@
         {
           "anchor": "IN-02",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateRunError": {
       "action": "add",
-      "docs": "Application-operation failure returned when full-log persistence cannot complete.",
+      "docs": "Gate execution failure before child-process launch.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Persist",
+            "name": "Prepare",
             "payload": {
               "fields": [
-                "GateLogPersistenceError"
+                "GateLogReservationError"
               ],
               "kind": "tuple"
             }
@@ -778,12 +1122,20 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateRunInteractor": {
       "action": "add",
-      "docs": "Application orchestrator coordinating child execution with full-log persistence through required ports.",
+      "docs": "Application interactor for gate execution. IN-02; IN-03; IN-04; AC-05; AC-06; CN-07; AC-08.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -806,12 +1158,32 @@
         {
           "anchor": "IN-03",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateRunResult": {
       "action": "add",
-      "docs": "Closed application result carrying the persisted path and the data needed by the primary adapter.",
+      "docs": "Closed application result enum for gate execution. CN-01; CN-03; AC-01; AC-02; IN-04; AC-05; AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -829,8 +1201,8 @@
                   "ty": "Vec<u8>"
                 },
                 {
-                  "name": "log_path",
-                  "ty": "GateLogPath"
+                  "name": "log",
+                  "ty": "GateLogWriteOutcome"
                 }
               ],
               "kind": "struct"
@@ -845,8 +1217,8 @@
                   "ty": "GateProcessError"
                 },
                 {
-                  "name": "log_path",
-                  "ty": "GateLogPath"
+                  "name": "log",
+                  "ty": "GateLogWriteOutcome"
                 }
               ],
               "kind": "struct"
@@ -874,6 +1246,18 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]

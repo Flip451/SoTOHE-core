@@ -4,6 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| GateLogWriteOutcome | enum | add | Persisted, Unavailable | 🔵 | 🔵 |
 | GateRunResult | enum | add | ChildExited, SpawnFailed | 🔵 | 🔵 |
 
 ## Value Objects
@@ -16,16 +17,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GateLogPersistenceError | error_type | add | OutsideRoot, SymlinkComponent, Clock, CreateDirectory, Write | 🔵 | 🔵 |
+| GateLogReservationError | error_type | add | OutsideRoot, SymlinkComponent, Clock, CreateDirectory, CreateFile, EncodedNameTooLong | 🔵 | 🔵 |
+| GateLogWriteError | error_type | add | OutsideRoot, SymlinkComponent, Write | 🔵 | 🔵 |
 | GateProcessError | error_type | add | Spawn | 🔵 | 🔵 |
 | GateRunCommandError | error_type | add | EmptyCommand | 🔵 | 🔵 |
-| GateRunError | error_type | add | Persist | 🔵 | 🔵 |
+| GateRunError | error_type | add | Prepare | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GateLogPersistencePort | secondary_port | add | fn persist(&self, command: &GateRunCommand, contents: &[u8]) -> Result<GateLogPath, GateLogPersistenceError> | 🔵 | 🔵 |
+| GateLogPersistencePort | secondary_port | add | fn reserve(&self, command: &GateRunCommand) -> Result<GateLogReservation, GateLogReservationError>, fn persist(&self, reservation: GateLogReservation, contents: &[u8]) -> Result<GateLogPath, GateLogWriteError> | 🔵 | 🔵 |
 | GateProcessPort | secondary_port | add | fn run(&self, command: &GateRunCommand) -> Result<GateProcessOutput, GateProcessError> | 🔵 | 🔵 |
 
 ## Application Services
@@ -46,6 +48,7 @@
 |------|------|--------|---------|--------|----------|
 | GateAdapterFailureReason | dto | add | — | 🔵 | 🔵 |
 | GateLogPath | dto | add | — | 🔵 | 🔵 |
+| GateLogReservation | dto | add | — | 🔵 | 🔵 |
 | GateProcessOutput | dto | add | — | 🔵 | 🔵 |
 
 ## Commands

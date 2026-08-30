@@ -3,59 +3,80 @@
   "track_id": "2026-08-25-gate-output-summary-contract",
   "task_estimates": [
     {
-      "task_id": "T001",
+      "task_id": "T004",
       "scope_estimates": [
         {
-          "scope": "harness-policy",
-          "production_lines": 60,
-          "test_lines": 80
-        },
-        {
           "scope": "usecase",
-          "production_lines": 180,
-          "test_lines": 170
-        },
-        {
-          "scope": "infrastructure",
-          "production_lines": 130,
-          "test_lines": 140
-        },
-        {
-          "scope": "cli_driver",
-          "production_lines": 140,
-          "test_lines": 170
-        },
-        {
-          "scope": "cli",
           "production_lines": 90,
           "test_lines": 90
         },
         {
-          "scope": "cli_composition",
-          "production_lines": 40,
+          "scope": "infrastructure",
+          "production_lines": 75,
+          "test_lines": 80
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 30,
           "test_lines": 40
         }
       ],
       "oversize_justification": null
     },
     {
-      "task_id": "T002",
+      "task_id": "T005",
       "scope_estimates": [
         {
-          "scope": "harness-policy",
-          "production_lines": 180,
-          "test_lines": 160
+          "scope": "usecase",
+          "production_lines": 0,
+          "test_lines": 40
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 0
         }
       ],
       "oversize_justification": null
     },
     {
-      "task_id": "T003",
+      "task_id": "T006",
       "scope_estimates": [
         {
-          "scope": "harness-policy",
-          "production_lines": 130,
-          "test_lines": 150
+          "scope": "usecase",
+          "production_lines": 20,
+          "test_lines": 20
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 125
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T007",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 30,
+          "test_lines": 30
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 50,
+          "test_lines": 70
+        },
+        {
+          "scope": "cli",
+          "production_lines": 35,
+          "test_lines": 55
+        },
+        {
+          "scope": "cli_composition",
+          "production_lines": 15,
+          "test_lines": 25
         }
       ],
       "oversize_justification": null
@@ -65,19 +86,20 @@
     {
       "id": "B1",
       "task_ids": [
-        "T001"
+        "T004",
+        "T005"
       ]
     },
     {
       "id": "B2",
       "task_ids": [
-        "T002"
+        "T006"
       ]
     },
     {
       "id": "B3",
       "task_ids": [
-        "T003"
+        "T007"
       ]
     }
   ]

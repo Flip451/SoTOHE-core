@@ -52,8 +52,21 @@ pub(crate) struct GateOutputArgs {
 /// Dispatches parsed gate arguments through the configured driver.
 pub(crate) fn execute(args: GateOutputArgs) -> ExitCode {
     let GateOutputArgs { name, command } = args;
-    let driver = GateOutputComposition::build(PathBuf::from("."));
-    let outcome = driver.invoke(GateOutputInput::new(name.as_str().to_owned(), command));
+    let input = GateOutputInput::new(name.as_str().to_owned(), command);
+    let outcome = {
+        #[cfg(test)]
+        {
+            if let Some(driver) = TEST_DRIVER.with(|slot| slot.borrow_mut().take()) {
+                driver.invoke(input)
+            } else {
+                GateOutputComposition::build(PathBuf::from(".")).invoke(input)
+            }
+        }
+        #[cfg(not(test))]
+        {
+            GateOutputComposition::build(PathBuf::from(".")).invoke(input)
+        }
+    };
     if let Some(stdout) = outcome.stdout {
         println!("{stdout}");
     }
@@ -70,13 +83,32 @@ pub(crate) fn exit_code_from_u8(code: u8) -> ExitCode {
 }
 
 #[cfg(test)]
+thread_local! {
+    static TEST_DRIVER: std::cell::RefCell<Option<cli_driver::gate_output::GateOutputDriver>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+#[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use std::io::{Read as _, Seek as _, SeekFrom, Write as _};
     use std::os::fd::AsRawFd as _;
     use std::path::PathBuf;
 
+    #[cfg(unix)]
+    use std::path::Path;
+    #[cfg(unix)]
+    use std::sync::Arc;
+
     use clap::{Parser, Subcommand};
+    #[cfg(unix)]
+    use infrastructure::gate_output::ProcessGateRunner;
+    #[cfg(unix)]
+    use usecase::gate_output::{
+        GateAdapterFailureReason, GateLogPath, GateLogPersistencePort, GateLogReservation,
+        GateLogReservationError, GateLogWriteError, GateProcessPort, GateRunCommand,
+        GateRunInteractor, GateRunService,
+    };
 
     use super::*;
 
@@ -90,6 +122,20 @@ mod tests {
     enum TestCommand {
         GateOutput(GateOutputArgs),
     }
+
+    #[cfg(unix)]
+    const PREPARE_MARKER_ENV: &str = "SOTP_GATE_OUTPUT_PREPARE_MARKER";
+    #[cfg(unix)]
+    const LOG_PREFIX_ENV: &str = "SOTP_GATE_OUTPUT_LOG_PREFIX";
+    #[cfg(unix)]
+    const PREPARE_CHILD_TEST: &str =
+        "commands::gate_output::tests::test_gate_output_child_writes_prepare_marker";
+    #[cfg(unix)]
+    const FAILURE_CHILD_TEST: &str =
+        "commands::gate_output::tests::test_gate_output_child_removes_log_and_exits_23";
+    #[cfg(unix)]
+    const SUCCESS_CHILD_TEST: &str =
+        "commands::gate_output::tests::test_gate_output_child_removes_log_and_exits_success";
 
     fn capture_stdout<T>(run: impl FnOnce() -> T) -> (T, String) {
         static STDOUT_REDIRECT: std::sync::Mutex<()> = std::sync::Mutex::new(());
@@ -132,6 +178,86 @@ mod tests {
         PathBuf::from(line.strip_prefix("log: ").expect("log line should have a prefix"))
     }
 
+    #[cfg(unix)]
+    fn child_test_command(test_name: &str) -> Vec<OsString> {
+        vec![
+            std::env::current_exe().expect("current test executable is available").into_os_string(),
+            OsString::from("--exact"),
+            OsString::from(test_name),
+            OsString::from("--ignored"),
+            OsString::from("--nocapture"),
+        ]
+    }
+
+    #[cfg(unix)]
+    fn remove_reserved_logs(prefix: &str) {
+        for entry in std::fs::read_dir(Path::new("tmp/gate")).expect("gate log directory exists") {
+            let entry = entry.expect("gate log entry should be readable");
+            if entry.file_name().to_string_lossy().starts_with(prefix) {
+                std::fs::remove_file(entry.path()).expect("reserved gate log should be removable");
+            }
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    #[ignore = "invoked as a child-process fixture"]
+    fn test_gate_output_child_writes_prepare_marker() {
+        let marker = std::env::var_os(PREPARE_MARKER_ENV).expect("prepare marker path is set");
+        std::fs::write(marker, b"child launched").expect("child marker should be written");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    #[ignore = "invoked as a child-process fixture"]
+    #[allow(clippy::exit)]
+    fn test_gate_output_child_removes_log_and_exits_23() {
+        let prefix = std::env::var(LOG_PREFIX_ENV).expect("gate log prefix is set");
+        remove_reserved_logs(&prefix);
+        std::process::exit(23);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    #[ignore = "invoked as a child-process fixture"]
+    fn test_gate_output_child_removes_log_and_exits_success() {
+        let prefix = std::env::var(LOG_PREFIX_ENV).expect("gate log prefix is set");
+        remove_reserved_logs(&prefix);
+    }
+
+    #[cfg(unix)]
+    struct FailingReserveLogs;
+
+    #[cfg(unix)]
+    impl GateLogPersistencePort for FailingReserveLogs {
+        fn reserve(
+            &self,
+            _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Err(GateLogReservationError::CreateFile(GateAdapterFailureReason::new(
+                "test reservation failure".to_owned(),
+            )))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
+            _contents: &[u8],
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            Err(GateLogWriteError::Write(GateAdapterFailureReason::new(
+                "test persistence should not be reached".to_owned(),
+            )))
+        }
+    }
+
+    #[cfg(unix)]
+    fn failing_reservation_driver() -> cli_driver::gate_output::GateOutputDriver {
+        let runner: Arc<dyn GateProcessPort> = Arc::new(ProcessGateRunner::new());
+        let logs: Arc<dyn GateLogPersistencePort> = Arc::new(FailingReserveLogs);
+        let service: Arc<dyn GateRunService> = Arc::new(GateRunInteractor::new(runner, logs));
+        cli_driver::gate_output::GateOutputDriver::new(service)
+    }
+
     #[test]
     fn test_gate_output_args_parse_opaque_name_and_trailing_command() {
         let cli = TestCli::try_parse_from([
@@ -164,7 +290,7 @@ mod tests {
             "--",
             "/bin/sh",
             "-c",
-            "printf '[FAIL] root-item: short reason\\n'; printf 'full diagnostic detail\\n' >&2; exit 23",
+            "printf '[FAIL] root-item: short reason\\n'; printf 'InternalRecord { stderr: true }\\n' >&2; exit 23",
         ])
         .expect("root gate-output command should parse");
         let args = match cli.command {
@@ -179,7 +305,7 @@ mod tests {
         assert!(log_path.to_string_lossy().contains("tmp/gate/"));
         assert_eq!(
             std::fs::read(&log_path).expect("root dispatch should persist the complete log"),
-            b"[FAIL] root-item: short reason\n--- stderr ---\nfull diagnostic detail\n"
+            b"[FAIL] root-item: short reason\n--- stderr ---\nInternalRecord { stderr: true }\n"
         );
         assert_eq!(
             stdout,
@@ -200,7 +326,7 @@ mod tests {
                     OsString::from("/bin/sh"),
                     OsString::from("-c"),
                     OsString::from(
-                        "printf '[PASS] item-pass\\n[FAIL] item: short reason\\nfull diagnostic detail\\n'; printf 'stderr detail\\n' >&2; exit 23",
+                        "printf '[PASS] item-pass\\n[FAIL] item: short reason\\nInternalRecord { detail: true }\\n'; printf 'InternalRecord { stderr: true }\\n' >&2; exit 23",
                     ),
                 ],
             })
@@ -211,14 +337,14 @@ mod tests {
         assert!(log_path.to_string_lossy().contains("tmp/gate/"));
         assert_eq!(
             std::fs::read(&log_path).expect("execute should persist the complete log"),
-            b"[PASS] item-pass\n[FAIL] item: short reason\nfull diagnostic detail\n--- stderr ---\nstderr detail\n"
+            b"[PASS] item-pass\n[FAIL] item: short reason\nInternalRecord { detail: true }\n--- stderr ---\nInternalRecord { stderr: true }\n"
         );
         assert_eq!(
             stdout,
             format!("FAIL\nlog: {}\nfailures:\n- [FAIL] item: short reason\n", log_path.display())
         );
         assert!(!stdout.contains("item-pass"));
-        assert!(!stdout.contains("full diagnostic detail"));
+        assert!(!stdout.contains("InternalRecord"));
         assert!(!stdout.contains("Debug"));
     }
 
@@ -245,6 +371,79 @@ mod tests {
         assert_eq!(stdout, format!("PASS\nlog: {}\n", log_path.display()));
         assert!(!stdout.contains("[PASS] item"));
         assert!(!stdout.contains("DebugRecord"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_reports_prepare_failure_without_log_path_or_child_launch() {
+        let marker_directory = tempfile::tempdir().expect("marker directory should be created");
+        let marker = marker_directory.path().join("prepare-marker");
+        let marker_value = marker.as_os_str().to_os_string();
+        let (exit, stdout) = temp_env::with_var(PREPARE_MARKER_ENV, Some(marker_value), || {
+            capture_stdout(|| {
+                execute_with_driver(
+                    failing_reservation_driver(),
+                    GateOutputArgs {
+                        name: GateNameArg::new("prepare-failure".to_owned()),
+                        command: child_test_command(PREPARE_CHILD_TEST),
+                    },
+                )
+            })
+        });
+
+        assert_eq!(exit, ExitCode::from(1));
+        assert!(stdout.starts_with("FAIL\nlog unavailable: "));
+        assert!(!stdout.lines().any(|line| line.starts_with("log: ")));
+        assert!(!marker.exists());
+    }
+
+    /// Unix-only fixture: the child unlinks the still-open reservation to force
+    /// the post-persist unavailable outcome; this relies on Unix unlink semantics.
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_preserves_child_status_when_log_persistence_is_unavailable() {
+        let process_id = std::process::id();
+        let failure_name = format!("t004-cli-post-persist-failure-{process_id}");
+        let (failure_exit, failure_stdout) =
+            temp_env::with_var(LOG_PREFIX_ENV, Some(failure_name.clone()), || {
+                execute_command_gate(&failure_name, child_test_command(FAILURE_CHILD_TEST))
+            });
+
+        assert_eq!(failure_exit, ExitCode::from(23));
+        assert!(failure_stdout.starts_with("FAIL\nlog unavailable: "));
+        assert!(!failure_stdout.contains("failures:"));
+        assert!(!failure_stdout.lines().any(|line| line.starts_with("log: ")));
+
+        let success_name = format!("t004-cli-post-persist-success-{process_id}");
+        let (success_exit, success_stdout) =
+            temp_env::with_var(LOG_PREFIX_ENV, Some(success_name.clone()), || {
+                execute_command_gate(&success_name, child_test_command(SUCCESS_CHILD_TEST))
+            });
+
+        assert_eq!(success_exit, ExitCode::SUCCESS);
+        assert!(success_stdout.starts_with("PASS\nlog unavailable: "));
+        assert!(!success_stdout.lines().any(|line| line.starts_with("log: ")));
+    }
+
+    #[cfg(unix)]
+    fn execute_with_driver(
+        driver: cli_driver::gate_output::GateOutputDriver,
+        args: GateOutputArgs,
+    ) -> ExitCode {
+        let previous = super::TEST_DRIVER.with(|slot| slot.borrow_mut().replace(driver));
+        assert!(previous.is_none(), "test driver slot should be empty");
+        let exit = execute(args);
+        super::TEST_DRIVER.with(|slot| {
+            assert!(slot.borrow().is_none(), "test driver should be consumed by execute");
+        });
+        exit
+    }
+
+    #[cfg(unix)]
+    fn execute_command_gate(name: &str, command: Vec<OsString>) -> (ExitCode, String) {
+        capture_stdout(|| {
+            execute(GateOutputArgs { name: GateNameArg::new(name.to_owned()), command })
+        })
     }
 
     fn execute_shell_gate(name: &str, shell: &str) -> (ExitCode, String) {
@@ -283,14 +482,14 @@ mod tests {
     fn test_test_execution_failure_renders_failure_excerpt_and_preserves_exit_code() {
         let (exit, stdout) = execute_shell_gate(
             &format!("t002-test-failure-{}", std::process::id()),
-            "printf 'test test_execution::fails ... FAILED\\ntest result: FAILED. 0 passed; 1 failed\\n'; printf 'full failure detail\\n' >&2; exit 17",
+            "printf 'test test_execution::fails ... FAILED\\ntest result: FAILED. 0 passed; 1 failed\\n'; printf 'InternalRecord { detail: true }\\n' >&2; exit 17",
         );
 
         assert_eq!(exit, ExitCode::from(17));
         let log_path = reported_log_path(&stdout);
         assert_eq!(
             std::fs::read(&log_path).expect("failed test execution should persist the full log"),
-            b"test test_execution::fails ... FAILED\ntest result: FAILED. 0 passed; 1 failed\n--- stderr ---\nfull failure detail\n"
+            b"test test_execution::fails ... FAILED\ntest result: FAILED. 0 passed; 1 failed\n--- stderr ---\nInternalRecord { detail: true }\n"
         );
         assert_eq!(
             stdout,
@@ -299,7 +498,7 @@ mod tests {
                 log_path.display()
             )
         );
-        assert!(!stdout.contains("full failure detail"));
+        assert!(!stdout.contains("InternalRecord"));
     }
 
     #[test]
@@ -324,14 +523,14 @@ mod tests {
     fn test_obligation_check_failure_renders_failure_excerpt_and_preserves_exit_code() {
         let (exit, stdout) = execute_shell_gate(
             &format!("t002-obligation-failure-{}", std::process::id()),
-            "printf 'test-obligation check failed: missing binding\\n'; printf 'full obligation detail\\n' >&2; exit 19",
+            "printf 'test-obligation check failed: missing binding\\n'; printf 'InternalRecord { detail: true }\\n' >&2; exit 19",
         );
 
         assert_eq!(exit, ExitCode::from(19));
         let log_path = reported_log_path(&stdout);
         assert_eq!(
             std::fs::read(&log_path).expect("failed obligation check should persist the full log"),
-            b"test-obligation check failed: missing binding\n--- stderr ---\nfull obligation detail\n"
+            b"test-obligation check failed: missing binding\n--- stderr ---\nInternalRecord { detail: true }\n"
         );
         assert_eq!(
             stdout,
@@ -340,7 +539,7 @@ mod tests {
                 log_path.display()
             )
         );
-        assert!(!stdout.contains("full obligation detail"));
+        assert!(!stdout.contains("InternalRecord"));
     }
 
     #[test]

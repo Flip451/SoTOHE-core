@@ -117,9 +117,33 @@ impl GateLogPath {
     }
 }
 
-/// Filesystem failures while selecting or writing a contained gate log.
+/// Opaque token for one persistence-owned gate-log reservation.
+#[derive(Debug, PartialEq, Eq)]
+pub struct GateLogReservation {
+    path: PathBuf,
+}
+
+impl GateLogReservation {
+    /// Wraps a path selected and exclusively created by a persistence adapter.
+    ///
+    /// This constructor is intentionally named for the adapter boundary; callers
+    /// should obtain reservations from [`GateLogPersistencePort::reserve`].
+    #[doc(hidden)]
+    #[must_use]
+    pub fn from_reserved_path(path: PathBuf) -> GateLogReservation {
+        GateLogReservation { path }
+    }
+
+    /// Borrows the reserved log path.
+    #[must_use]
+    pub fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+/// Filesystem failures while reserving a contained gate log.
 #[derive(Debug, Error)]
-pub enum GateLogPersistenceError {
+pub enum GateLogReservationError {
     /// The requested persistence location is not beneath the trusted root.
     #[error("gate log path is outside the trusted root: {0}")]
     OutsideRoot(PathBuf),
@@ -132,6 +156,23 @@ pub enum GateLogPersistenceError {
     /// The gate-log directory could not be created.
     #[error("could not create the gate-log directory: {0}")]
     CreateDirectory(GateAdapterFailureReason),
+    /// The reserved gate-log file could not be created.
+    #[error("could not create the gate-log file: {0}")]
+    CreateFile(GateAdapterFailureReason),
+    /// The encoded gate-log name cannot fit in a filesystem component.
+    #[error("encoded gate-log name is too long: {0}")]
+    EncodedNameTooLong(GateAdapterFailureReason),
+}
+
+/// Filesystem failures while writing a reserved gate log.
+#[derive(Debug, Error)]
+pub enum GateLogWriteError {
+    /// The requested persistence location is not beneath the trusted root.
+    #[error("gate log path is outside the trusted root: {0}")]
+    OutsideRoot(PathBuf),
+    /// A checked path component is a symbolic link.
+    #[error("gate log path contains a symlink component: {0}")]
+    SymlinkComponent(PathBuf),
     /// The complete gate output could not be written.
     #[error("could not write the gate log: {0}")]
     Write(GateAdapterFailureReason),
@@ -163,39 +204,59 @@ pub enum GateRunResult {
         exit_code: GateExitCode,
         /// The complete captured child output.
         output: Vec<u8>,
-        /// The path containing the complete captured output.
-        log_path: GateLogPath,
+        /// The outcome of persisting the complete captured output.
+        log: GateLogWriteOutcome,
     },
     /// The child could not be started, but the failure was logged.
     SpawnFailed {
         /// The process-launch failure.
         error: GateProcessError,
-        /// The path containing the launch diagnostic.
-        log_path: GateLogPath,
+        /// The outcome of persisting the launch diagnostic.
+        log: GateLogWriteOutcome,
     },
 }
 
-/// Application-operation failures returned when persistence cannot complete.
+/// Application-operation failures returned before child-process launch.
 #[derive(Debug, Error)]
 pub enum GateRunError {
-    /// The complete output could not be persisted.
-    #[error("could not persist gate output: {0}")]
-    Persist(GateLogPersistenceError),
+    /// The log destination could not be reserved.
+    #[error("could not prepare gate log: {0}")]
+    Prepare(GateLogReservationError),
+}
+
+/// Closed post-execution outcome for gate-log persistence.
+#[derive(Debug)]
+pub enum GateLogWriteOutcome {
+    /// The complete output was written and can be referenced by this path.
+    Persisted(GateLogPath),
+    /// The child result is available, but its complete output is unavailable.
+    Unavailable(GateLogWriteError),
 }
 
 /// Persistence boundary for contained, symlink-safe gate-log writes.
 pub trait GateLogPersistencePort: Send + Sync {
-    /// Persists complete child output and returns its resulting path.
+    /// Reserves a unique destination for one gate-log write.
     ///
     /// # Errors
     ///
-    /// Returns [`GateLogPersistenceError`] when the path is unsafe or the
-    /// directory/write operation fails.
-    fn persist(
+    /// Returns [`GateLogReservationError`] when the destination cannot be
+    /// prepared.
+    fn reserve(
         &self,
         command: &GateRunCommand,
+    ) -> Result<GateLogReservation, GateLogReservationError>;
+
+    /// Persists complete child output through a previously reserved destination.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`GateLogWriteError`] when the reserved destination cannot be
+    /// safely written.
+    fn persist(
+        &self,
+        reservation: GateLogReservation,
         contents: &[u8],
-    ) -> Result<GateLogPath, GateLogPersistenceError>;
+    ) -> Result<GateLogPath, GateLogWriteError>;
 }
 
 /// Secondary port for executing one validated gate command.
@@ -211,12 +272,13 @@ pub trait GateProcessPort: Send + Sync {
 
 /// Inbound application port for one synchronous gate execution.
 pub trait GateRunService: Send + Sync {
-    /// Executes the child and persists its full output before returning.
+    /// Reserves a destination, executes the child, and persists its full output
+    /// before returning.
     ///
     /// # Errors
     ///
-    /// Returns [`GateRunError::Persist`] when the full output cannot be
-    /// persisted.
+    /// Returns [`GateRunError::Prepare`] when the destination cannot be
+    /// reserved before child-process launch.
     fn execute(&self, command: GateRunCommand) -> Result<GateRunResult, GateRunError>;
 }
 
@@ -239,25 +301,27 @@ impl GateRunInteractor {
 
 impl GateRunService for GateRunInteractor {
     fn execute(&self, command: GateRunCommand) -> Result<GateRunResult, GateRunError> {
+        let reservation = self.logs.reserve(&command).map_err(GateRunError::Prepare)?;
+
         match self.runner.run(&command) {
             Ok(process_output) => {
-                let log_path = self
-                    .logs
-                    .persist(&command, &process_output.output)
-                    .map_err(GateRunError::Persist)?;
+                let log = match self.logs.persist(reservation, &process_output.output) {
+                    Ok(path) => GateLogWriteOutcome::Persisted(path),
+                    Err(error) => GateLogWriteOutcome::Unavailable(error),
+                };
                 Ok(GateRunResult::ChildExited {
                     exit_code: process_output.exit_code,
                     output: process_output.output,
-                    log_path,
+                    log,
                 })
             }
             Err(error) => {
                 let diagnostic = error.to_string();
-                let log_path = self
-                    .logs
-                    .persist(&command, diagnostic.as_bytes())
-                    .map_err(GateRunError::Persist)?;
-                Ok(GateRunResult::SpawnFailed { error, log_path })
+                let log = match self.logs.persist(reservation, diagnostic.as_bytes()) {
+                    Ok(path) => GateLogWriteOutcome::Persisted(path),
+                    Err(error) => GateLogWriteOutcome::Unavailable(error),
+                };
+                Ok(GateRunResult::SpawnFailed { error, log })
             }
         }
     }
@@ -307,11 +371,18 @@ mod tests {
     }
 
     impl GateLogPersistencePort for StubLogs {
-        fn persist(
+        fn reserve(
             &self,
             _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Ok(GateLogReservation::from_reserved_path(self.path.as_path().to_path_buf()))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
             contents: &[u8],
-        ) -> Result<GateLogPath, GateLogPersistenceError> {
+        ) -> Result<GateLogPath, GateLogWriteError> {
             self.contents.lock().expect("log lock should be available").push(contents.to_vec());
             Ok(self.path.clone())
         }
@@ -320,14 +391,84 @@ mod tests {
     struct FailingLogs;
 
     impl GateLogPersistencePort for FailingLogs {
-        fn persist(
+        fn reserve(
             &self,
             _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Ok(GateLogReservation::from_reserved_path(PathBuf::from("tmp/gate/failing.log")))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
             _contents: &[u8],
-        ) -> Result<GateLogPath, GateLogPersistenceError> {
-            Err(GateLogPersistenceError::Write(GateAdapterFailureReason::new(
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            Err(GateLogWriteError::Write(GateAdapterFailureReason::new("read-only".to_owned())))
+        }
+    }
+
+    struct RecordingLogs {
+        reserved_path: PathBuf,
+        reserve_calls: Mutex<usize>,
+        live_reservation: Mutex<Option<PathBuf>>,
+        persisted: Mutex<Vec<(PathBuf, Vec<u8>)>>,
+    }
+
+    impl GateLogPersistencePort for RecordingLogs {
+        fn reserve(
+            &self,
+            _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            *self.reserve_calls.lock().expect("reserve lock should be available") += 1;
+            assert!(
+                self.live_reservation
+                    .lock()
+                    .expect("live reservation lock should be available")
+                    .replace(self.reserved_path.clone())
+                    .is_none()
+            );
+            Ok(GateLogReservation::from_reserved_path(self.reserved_path.clone()))
+        }
+
+        fn persist(
+            &self,
+            reservation: GateLogReservation,
+            contents: &[u8],
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            let path = reservation.as_path().to_path_buf();
+            assert_eq!(
+                self.live_reservation
+                    .lock()
+                    .expect("live reservation lock should be available")
+                    .take(),
+                Some(path.clone())
+            );
+            self.persisted
+                .lock()
+                .expect("log lock should be available")
+                .push((path.clone(), contents.to_vec()));
+            Ok(GateLogPath::from_persisted_path(path))
+        }
+    }
+
+    struct FailingReserveLogs;
+
+    impl GateLogPersistencePort for FailingReserveLogs {
+        fn reserve(
+            &self,
+            _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Err(GateLogReservationError::CreateFile(GateAdapterFailureReason::new(
                 "read-only".to_owned(),
             )))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
+            _contents: &[u8],
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            panic!("persist must not be called after reservation failure")
         }
     }
 
@@ -349,6 +490,110 @@ mod tests {
     }
 
     #[test]
+    fn test_gate_run_command_only_validates_argv_not_log_name_length() {
+        let name = "%".repeat(100);
+        let command = GateRunCommand::try_new(name.clone(), vec![OsString::from("unit-check")])
+            .expect("command construction must not own filesystem name limits");
+
+        assert_eq!(command.name(), name);
+    }
+
+    #[test]
+    fn test_gate_run_interactor_returns_prepare_error_without_running_child() {
+        let runner = Arc::new(StubRunner {
+            result: Mutex::new(Some(Ok(GateProcessOutput {
+                exit_code: GateExitCode::new(0),
+                output: b"child must not run".to_vec(),
+            }))),
+        });
+        let interactor = GateRunInteractor::new(runner.clone(), Arc::new(FailingReserveLogs));
+
+        let result = interactor.execute(command());
+
+        assert!(matches!(
+            result,
+            Err(GateRunError::Prepare(GateLogReservationError::CreateFile(_)))
+        ));
+        assert!(runner.result.lock().expect("runner lock should be available").is_some());
+    }
+
+    #[test]
+    fn test_gate_run_interactor_passes_reserved_destination_to_persist() {
+        let reserved_path = PathBuf::from("tmp/gate/reserved-by-port.log");
+        let output = b"output written through reservation".to_vec();
+        let logs = Arc::new(RecordingLogs {
+            reserved_path: reserved_path.clone(),
+            reserve_calls: Mutex::new(0),
+            live_reservation: Mutex::new(None),
+            persisted: Mutex::new(Vec::new()),
+        });
+        let runner = Arc::new(StubRunner {
+            result: Mutex::new(Some(Ok(GateProcessOutput {
+                exit_code: GateExitCode::new(0),
+                output: output.clone(),
+            }))),
+        });
+        let interactor = GateRunInteractor::new(runner, logs.clone());
+
+        let result = interactor.execute(command()).expect("execution should succeed");
+
+        match result {
+            GateRunResult::ChildExited { log, .. } => match log {
+                GateLogWriteOutcome::Persisted(path) => {
+                    assert_eq!(path.as_path(), reserved_path.as_path());
+                }
+                GateLogWriteOutcome::Unavailable(error) => {
+                    panic!("reserved log should be persisted: {error:?}");
+                }
+            },
+            GateRunResult::SpawnFailed { error, .. } => {
+                panic!("unexpected spawn failure: {error:?}");
+            }
+        }
+        assert_eq!(
+            logs.persisted.lock().expect("log lock should be available").as_slice(),
+            &[(reserved_path, output)]
+        );
+    }
+
+    #[test]
+    fn test_gate_run_interactor_reserves_once_and_consumes_live_reservation() {
+        let reserved_path = PathBuf::from("tmp/gate/single-live-reservation.log");
+        let output = b"output must consume the live reservation".to_vec();
+        let logs = Arc::new(RecordingLogs {
+            reserved_path: reserved_path.clone(),
+            reserve_calls: Mutex::new(0),
+            live_reservation: Mutex::new(None),
+            persisted: Mutex::new(Vec::new()),
+        });
+        let runner = Arc::new(StubRunner {
+            result: Mutex::new(Some(Ok(GateProcessOutput {
+                exit_code: GateExitCode::new(0),
+                output: output.clone(),
+            }))),
+        });
+        let interactor = GateRunInteractor::new(runner, logs.clone());
+
+        let result = interactor.execute(command()).expect("execution should succeed");
+
+        assert!(matches!(
+            result,
+            GateRunResult::ChildExited { log: GateLogWriteOutcome::Persisted(_), .. }
+        ));
+        assert_eq!(*logs.reserve_calls.lock().expect("reserve lock should be available"), 1);
+        assert!(
+            logs.live_reservation
+                .lock()
+                .expect("live reservation lock should be available")
+                .is_none()
+        );
+        assert_eq!(
+            logs.persisted.lock().expect("log lock should be available").as_slice(),
+            &[(reserved_path, output)]
+        );
+    }
+
+    #[test]
     fn test_gate_run_interactor_persists_child_output_and_returns_child_result() {
         let logs = Arc::new(StubLogs {
             path: GateLogPath::from_persisted_path(PathBuf::from("tmp/gate/unit.log")),
@@ -365,10 +610,17 @@ mod tests {
         let result = interactor.execute(command()).expect("execution should succeed");
 
         match result {
-            GateRunResult::ChildExited { exit_code, output, log_path } => {
+            GateRunResult::ChildExited { exit_code, output, log } => {
                 assert_eq!(exit_code.value(), 23);
                 assert_eq!(output, b"[FAIL] item-one: short reason\nfull diagnostic detail\n");
-                assert_eq!(log_path.as_path(), Path::new("tmp/gate/unit.log"));
+                match log {
+                    GateLogWriteOutcome::Persisted(log_path) => {
+                        assert_eq!(log_path.as_path(), Path::new("tmp/gate/unit.log"));
+                    }
+                    GateLogWriteOutcome::Unavailable(error) => {
+                        panic!("unexpected log write failure: {error:?}");
+                    }
+                }
             }
             GateRunResult::SpawnFailed { error, .. } => {
                 panic!("unexpected spawn failure: {error:?}");
@@ -408,13 +660,20 @@ mod tests {
             GateRunService::execute(&interactor, command).expect("execution should succeed");
 
         match result {
-            GateRunResult::ChildExited { exit_code, output, log_path } => {
+            GateRunResult::ChildExited { exit_code, output, log } => {
                 assert_eq!(exit_code, GateExitCode::new(23));
                 assert_eq!(
                     output,
                     b"[FAIL] aggregate-item: short reason\nfull diagnostic detail\n"
                 );
-                assert_eq!(log_path.as_path(), Path::new("tmp/gate/aggregate.log"));
+                match log {
+                    GateLogWriteOutcome::Persisted(log_path) => {
+                        assert_eq!(log_path.as_path(), Path::new("tmp/gate/aggregate.log"));
+                    }
+                    GateLogWriteOutcome::Unavailable(error) => {
+                        panic!("unexpected log write failure: {error:?}");
+                    }
+                }
             }
             GateRunResult::SpawnFailed { error, .. } => {
                 panic!("unexpected spawn failure: {error:?}");
@@ -456,10 +715,17 @@ mod tests {
             GateRunService::execute(&interactor, command()).expect("execution should succeed");
 
         match result {
-            GateRunResult::ChildExited { exit_code, output, log_path } => {
+            GateRunResult::ChildExited { exit_code, output, log } => {
                 assert_eq!(exit_code, GateExitCode::new(0));
                 assert_eq!(output, b"[PASS] aggregate-item\ncomplete success output\n");
-                assert_eq!(log_path.as_path(), Path::new("tmp/gate/success.log"));
+                match log {
+                    GateLogWriteOutcome::Persisted(log_path) => {
+                        assert_eq!(log_path.as_path(), Path::new("tmp/gate/success.log"));
+                    }
+                    GateLogWriteOutcome::Unavailable(error) => {
+                        panic!("unexpected log write failure: {error:?}");
+                    }
+                }
             }
             GateRunResult::SpawnFailed { error, .. } => {
                 panic!("unexpected spawn failure: {error:?}");
@@ -487,9 +753,16 @@ mod tests {
         let result = interactor.execute(command()).expect("spawn failures are closed results");
 
         match result {
-            GateRunResult::SpawnFailed { error, log_path } => {
+            GateRunResult::SpawnFailed { error, log } => {
                 assert!(error.to_string().contains("missing"));
-                assert_eq!(log_path.as_path(), Path::new("tmp/gate/spawn.log"));
+                match log {
+                    GateLogWriteOutcome::Persisted(log_path) => {
+                        assert_eq!(log_path.as_path(), Path::new("tmp/gate/spawn.log"));
+                    }
+                    GateLogWriteOutcome::Unavailable(error) => {
+                        panic!("unexpected log write failure: {error:?}");
+                    }
+                }
             }
             GateRunResult::ChildExited { .. } => panic!("unexpected child result"),
         }
@@ -525,18 +798,48 @@ mod tests {
     }
 
     #[test]
-    fn test_gate_run_interactor_surfaces_persistence_error_after_process_output() {
+    fn test_gate_run_interactor_keeps_child_result_when_log_write_is_unavailable() {
         let runner = Arc::new(StubRunner {
             result: Mutex::new(Some(Ok(GateProcessOutput {
-                exit_code: GateExitCode::new(0),
+                exit_code: GateExitCode::new(23),
                 output: b"complete output".to_vec(),
             }))),
         });
         let interactor = GateRunInteractor::new(runner, Arc::new(FailingLogs));
 
-        let result = interactor.execute(command());
+        let result = interactor.execute(command()).expect("child result must be preserved");
 
-        assert!(matches!(result, Err(GateRunError::Persist(GateLogPersistenceError::Write(_)))));
+        match result {
+            GateRunResult::ChildExited { exit_code, output, log } => {
+                assert_eq!(exit_code, GateExitCode::new(23));
+                assert_eq!(output, b"complete output");
+                assert!(matches!(
+                    log,
+                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))
+                ));
+            }
+            GateRunResult::SpawnFailed { .. } => panic!("unexpected spawn failure"),
+        }
+
+        let runner = Arc::new(StubRunner {
+            result: Mutex::new(Some(Err(GateProcessError::Spawn(GateAdapterFailureReason::new(
+                "missing child".to_owned(),
+            ))))),
+        });
+        let interactor = GateRunInteractor::new(runner, Arc::new(FailingLogs));
+
+        let result = interactor.execute(command()).expect("spawn result must be preserved");
+
+        match result {
+            GateRunResult::SpawnFailed { error, log } => {
+                assert!(error.to_string().contains("missing child"));
+                assert!(matches!(
+                    log,
+                    GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(_))
+                ));
+            }
+            GateRunResult::ChildExited { .. } => panic!("unexpected child result"),
+        }
     }
 
     #[test]

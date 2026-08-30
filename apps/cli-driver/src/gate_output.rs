@@ -1,29 +1,21 @@
 //! Primary adapter and summary helpers for the `gate-output` command.
 //!
-//! Child output is an opaque byte stream at the use-case boundary. The driver
-//! applies these presentation policies before interpreting it: at most 64 KiB
-//! is inspected (the head and tail are retained when the stream is larger),
-//! bytes are decoded as UTF-8 with replacement for an invalid sequence, and
-//! LF, CRLF, and lone CR delimit diagnostic lines. The line classifier accepts
-//! only the documented, line-oriented gate formats below; unknown encodings
-//! and unknown formats remain available in the full persisted log but are not
-//! copied to stdout.
+//! Child output is opaque at the use-case boundary. The driver selects
+//! presentation-safe failure records for the human-facing summary; all other
+//! bytes remain available in the persisted log.
 
 use std::ffi::OsString;
 use std::path::Path;
 use std::sync::Arc;
 
 use usecase::gate_output::{
-    GateExitCode, GateProcessError, GateRunCommand, GateRunResult, GateRunService,
+    GateExitCode, GateLogReservationError, GateLogWriteError, GateLogWriteOutcome,
+    GateProcessError, GateRunCommand, GateRunError, GateRunResult, GateRunService,
 };
 
 use crate::render::CommandOutcome;
 
-const MAX_FAILURE_EXCERPT_LINES: usize = 8;
 const MAX_FAILURE_LINE_BYTES: usize = 240;
-const MAX_FAILURE_INPUT_BYTES: usize = 64 * 1024;
-const FAILURE_HEAD_BYTES: usize = MAX_FAILURE_INPUT_BYTES / 2;
-const FAILURE_TAIL_BYTES: usize = MAX_FAILURE_INPUT_BYTES - FAILURE_HEAD_BYTES;
 const CLI_EXIT_CODE_FALLBACK: u8 = 1;
 
 /// Driving-boundary input for one gate execution.
@@ -68,61 +60,58 @@ impl GateOutputDriver {
                 };
                 CommandOutcome { stdout: Some(render_summary(&result)), stderr: None, exit_code }
             }
-            Err(error) => CommandOutcome::failure(Some(error.to_string())),
+            Err(GateRunError::Prepare(error)) => CommandOutcome {
+                stdout: Some(render_prepare_failure(&error)),
+                stderr: None,
+                exit_code: CLI_EXIT_CODE_FALLBACK,
+            },
         }
     }
 }
 
-/// Selects bounded failure lines from opaque child output.
+/// Selects bounded, presentation-safe records from child output.
 ///
-/// The inspected input budget is limited to `MAX_FAILURE_INPUT_BYTES` bytes
-/// before decoding. A larger stream contributes equal head and tail windows;
-/// its middle is intentionally omitted so late stderr diagnostics remain
-/// discoverable without making processing depend on total output size. UTF-8
-/// is the supported presentation encoding; malformed sequences are replaced
-/// with `U+FFFD`. Both Unix-style and Windows-style line endings, as well as
-/// lone carriage returns, are accepted.
+/// The child bytes are not decoded or normalized. Only complete records made
+/// of ASCII bytes and separated by the summary's declared line separator are
+/// considered; non-ASCII and control-containing records are omitted. Known
+/// non-failure records are omitted, while otherwise unrecognized non-empty
+/// records remain eligible for the summary.
 pub fn failure_excerpts(output: &[u8]) -> Vec<String> {
-    if output.len() <= MAX_FAILURE_INPUT_BYTES {
-        return failure_excerpts_in_window(output);
-    }
-
-    let head = output.get(..FAILURE_HEAD_BYTES).unwrap_or_default();
-    let tail_start = output.len().saturating_sub(FAILURE_TAIL_BYTES);
-    let tail = output.get(tail_start..).unwrap_or_default();
-    let mut excerpts = failure_excerpts_in_window(head);
-    if excerpts.len() < MAX_FAILURE_EXCERPT_LINES {
-        excerpts.extend(
-            failure_excerpts_in_window(tail)
-                .into_iter()
-                .take(MAX_FAILURE_EXCERPT_LINES - excerpts.len()),
-        );
-    }
-    excerpts
+    output.split(|byte| *byte == b'\n').filter_map(ascii_failure_record).collect()
 }
 
-fn failure_excerpts_in_window(output: &[u8]) -> Vec<String> {
-    String::from_utf8_lossy(output)
-        .split(['\n', '\r'])
-        .filter_map(|line| {
-            let trimmed = line.trim();
-            if is_failure_line(trimmed) { Some(truncate_line(trimmed)) } else { None }
-        })
-        .take(MAX_FAILURE_EXCERPT_LINES)
-        .collect()
+fn ascii_failure_record(record: &[u8]) -> Option<String> {
+    if record.is_empty() || !record.is_ascii() {
+        return None;
+    }
+
+    let record = record.iter().map(|byte| char::from(*byte)).collect::<String>();
+    if record.chars().any(char::is_control) {
+        return None;
+    }
+
+    let trimmed = record.trim();
+    is_failure_line(trimmed).then(|| truncate_line(trimmed))
 }
 
 /// Classifies the supported test, obligation, and aggregate gate diagnostics.
 ///
-/// The accepted grammar is deliberately narrow and line-oriented: project
-/// markers (`[FAIL]`, `[ERROR]`, `[BLOCKED]`), the aggregate summary verdict
-/// (`FAIL`) and its summary bullets, the stable failure prefixes and suffixes
-/// emitted by the supported Cargo/nextest/rustc commands, and the project-owned
-/// `test-obligation`/`cargo-make` failure prefixes. This function does not treat
-/// arbitrary occurrences of the word `failed` as diagnostics.
+/// The accepted grammar is deliberately line-oriented: project markers
+/// (`[FAIL]`, `[ERROR]`, `[BLOCKED]`), the aggregate summary verdict (`FAIL`)
+/// and its summary bullets, the stable failure prefixes and suffixes emitted by
+/// the supported Cargo/nextest/rustc commands, and the project-owned
+/// `test-obligation`/`cargo-make` failure prefixes are recognized explicitly.
+/// Known success and internal-record lines are excluded. Unrecognized
+/// non-empty lines remain eligible so a new gate-output format cannot silently
+/// disappear from the failure summary.
 pub fn is_failure_line(line: &str) -> bool {
-    let prefix = bounded_trimmed_prefix(line);
-    let suffix = bounded_trimmed_suffix(line);
+    if line.chars().any(char::is_control) {
+        return false;
+    }
+
+    let trimmed = line.trim();
+    let prefix = trimmed;
+    let suffix = trimmed;
     let diagnostic_prefix = prefix.strip_prefix("- ").unwrap_or(prefix);
     let diagnostic_suffix = suffix.strip_prefix("- ").unwrap_or(suffix);
     let aggregate_summary_failure = diagnostic_prefix.eq_ignore_ascii_case("FAIL")
@@ -163,7 +152,23 @@ pub fn is_failure_line(line: &str) -> bool {
     let compiler_failure = starts_with_ascii_case_insensitive(diagnostic_prefix, "error:")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "error[")
         || starts_with_ascii_case_insensitive(diagnostic_prefix, "error ");
-
+    let known_non_failure = diagnostic_prefix.eq_ignore_ascii_case("PASS")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "[pass]")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "[ok]")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "[skip]")
+        || (starts_with_ascii_case_insensitive(diagnostic_prefix, "--- ")
+            && (ends_with_ascii_case_insensitive(diagnostic_suffix, " PASSED ---")
+                || ends_with_ascii_case_insensitive(diagnostic_suffix, " SKIPPED ---")))
+        || (starts_with_ascii_case_insensitive(diagnostic_prefix, "test ")
+            && ends_with_ascii_case_insensitive(diagnostic_suffix, " ... ok"))
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "test result: ok")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "log: ")
+        || diagnostic_prefix.eq_ignore_ascii_case("failures:")
+        || diagnostic_prefix.eq_ignore_ascii_case("--- stderr ---")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "internalrecord")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "debugrecord")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "obligationrecord")
+        || starts_with_ascii_case_insensitive(diagnostic_prefix, "somerecord");
     aggregate_summary_failure
         || aggregate_summary_failure_detail
         || marked_failure
@@ -175,16 +180,16 @@ pub fn is_failure_line(line: &str) -> bool {
         || obligation_failure
         || cargo_make_failure
         || compiler_failure
+        || (!known_non_failure && !diagnostic_prefix.is_empty())
 }
 
 /// Renders the compact summary from the typed application result.
 pub fn render_summary(result: &GateRunResult) -> String {
     match result {
-        GateRunResult::ChildExited { exit_code, output, log_path } => {
+        GateRunResult::ChildExited { exit_code, output, log } => {
             let verdict = if exit_code.is_success() { "PASS" } else { "FAIL" };
-            let mut lines =
-                vec![verdict.to_owned(), format!("log: {}", render_log_path(log_path.as_path()))];
-            if !exit_code.is_success() {
+            let mut lines = vec![verdict.to_owned(), render_log_outcome(log)];
+            if !exit_code.is_success() && matches!(log, GateLogWriteOutcome::Persisted(_)) {
                 lines.push("failures:".to_owned());
                 let excerpts = failure_excerpts(output);
                 if excerpts.is_empty() {
@@ -195,19 +200,59 @@ pub fn render_summary(result: &GateRunResult) -> String {
             }
             lines.join("\n")
         }
-        GateRunResult::SpawnFailed { error, log_path } => {
-            format!(
-                "FAIL\nlog: {}\nfailures:\n{}",
-                render_log_path(log_path.as_path()),
-                render_spawn_failure(error),
-            )
+        GateRunResult::SpawnFailed { error, log } => {
+            format!("FAIL\n{}\nfailures:\n{}", render_log_outcome(log), render_spawn_failure(error),)
         }
     }
 }
 
+fn render_prepare_failure(error: &GateLogReservationError) -> String {
+    format!("FAIL\nlog unavailable: {}", compact_reason(&render_reservation_error_reason(error)))
+}
+
+fn render_log_outcome(log: &GateLogWriteOutcome) -> String {
+    match log {
+        GateLogWriteOutcome::Persisted(path) => {
+            format!("log: {}", render_log_path(path.as_path()))
+        }
+        GateLogWriteOutcome::Unavailable(error) => {
+            format!("log unavailable: {}", compact_reason(&render_write_error_reason(error)))
+        }
+    }
+}
+
+fn render_reservation_error_reason(error: &GateLogReservationError) -> String {
+    match error {
+        GateLogReservationError::OutsideRoot(_) => {
+            "gate log path is outside the trusted root".to_owned()
+        }
+        GateLogReservationError::SymlinkComponent(_) => {
+            "gate log path contains a symlink component".to_owned()
+        }
+        GateLogReservationError::Clock(error) => error.to_string(),
+        GateLogReservationError::CreateDirectory(reason)
+        | GateLogReservationError::CreateFile(reason)
+        | GateLogReservationError::EncodedNameTooLong(reason) => reason.to_string(),
+    }
+}
+
+fn render_write_error_reason(error: &GateLogWriteError) -> String {
+    match error {
+        GateLogWriteError::OutsideRoot(_) => "gate log path is outside the trusted root".to_owned(),
+        GateLogWriteError::SymlinkComponent(_) => {
+            "gate log path contains a symlink component".to_owned()
+        }
+        GateLogWriteError::Write(reason) => format!("could not write the gate log: {reason}"),
+    }
+}
+
 fn render_spawn_failure(error: &GateProcessError) -> String {
-    let detail = error.to_string().split_whitespace().collect::<Vec<_>>().join(" ");
+    let detail = compact_reason(&error.to_string());
     truncate_line(&format!("- could not start child command: {detail}"))
+}
+
+fn compact_reason(reason: &str) -> String {
+    truncate_line(&reason.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 /// Truncates one presentation line without splitting UTF-8.
@@ -245,42 +290,6 @@ fn render_log_path(path: &Path) -> String {
     }
 }
 
-fn bounded_trimmed_prefix(line: &str) -> &str {
-    let bytes = line.as_bytes();
-    let mut start = 0;
-    while start < bytes.len()
-        && start < MAX_FAILURE_LINE_BYTES
-        && bytes.get(start).is_some_and(|byte| byte.is_ascii_whitespace())
-    {
-        start += 1;
-    }
-
-    let mut end = (start + MAX_FAILURE_LINE_BYTES).min(bytes.len());
-    while end > start && !line.is_char_boundary(end) {
-        end -= 1;
-    }
-    line.get(start..end).unwrap_or_default()
-}
-
-fn bounded_trimmed_suffix(line: &str) -> &str {
-    let bytes = line.as_bytes();
-    let mut end = bytes.len();
-    let mut whitespace_bytes = 0;
-    while end > 0
-        && whitespace_bytes < MAX_FAILURE_LINE_BYTES
-        && bytes.get(end - 1).is_some_and(|byte| byte.is_ascii_whitespace())
-    {
-        end -= 1;
-        whitespace_bytes += 1;
-    }
-
-    let mut start = end.saturating_sub(MAX_FAILURE_LINE_BYTES);
-    while start < end && !line.is_char_boundary(start) {
-        start += 1;
-    }
-    line.get(start..end).unwrap_or_default()
-}
-
 fn starts_with_ascii_case_insensitive(value: &str, pattern: &str) -> bool {
     value
         .as_bytes()
@@ -309,8 +318,9 @@ mod tests {
 
     use super::*;
     use usecase::gate_output::{
-        GateAdapterFailureReason, GateLogPath, GateLogPersistenceError, GateLogPersistencePort,
-        GateProcessError, GateProcessOutput, GateProcessPort, GateRunError, GateRunInteractor,
+        GateAdapterFailureReason, GateLogPath, GateLogPersistencePort, GateLogReservation,
+        GateLogWriteError, GateProcessError, GateProcessOutput, GateProcessPort, GateRunError,
+        GateRunInteractor,
     };
 
     struct StubService {
@@ -364,13 +374,60 @@ mod tests {
     }
 
     impl GateLogPersistencePort for IntegrationLogs {
-        fn persist(
+        fn reserve(
             &self,
             _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Ok(GateLogReservation::from_reserved_path(self.path.as_path().to_path_buf()))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
             contents: &[u8],
-        ) -> Result<GateLogPath, GateLogPersistenceError> {
+        ) -> Result<GateLogPath, GateLogWriteError> {
             self.contents.lock().expect("log lock should be available").push(contents.to_vec());
             Ok(self.path.clone())
+        }
+    }
+
+    struct FailingReserveLogs;
+
+    impl GateLogPersistencePort for FailingReserveLogs {
+        fn reserve(
+            &self,
+            _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Err(GateLogReservationError::EncodedNameTooLong(GateAdapterFailureReason::new(
+                "encoded name cannot be represented".to_owned(),
+            )))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
+            _contents: &[u8],
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            panic!("persist must not be called after reservation failure")
+        }
+    }
+
+    struct FailingWriteLogs;
+
+    impl GateLogPersistencePort for FailingWriteLogs {
+        fn reserve(
+            &self,
+            _command: &GateRunCommand,
+        ) -> Result<GateLogReservation, GateLogReservationError> {
+            Ok(GateLogReservation::from_reserved_path("tmp/gate/unavailable.log".into()))
+        }
+
+        fn persist(
+            &self,
+            _reservation: GateLogReservation,
+            _contents: &[u8],
+        ) -> Result<GateLogPath, GateLogWriteError> {
+            Err(GateLogWriteError::Write(GateAdapterFailureReason::new("read-only".to_owned())))
         }
     }
 
@@ -398,8 +455,93 @@ mod tests {
         GateLogPath::from_persisted_path("tmp/gate/driver.log".into())
     }
 
+    fn persisted_log() -> GateLogWriteOutcome {
+        GateLogWriteOutcome::Persisted(log_path())
+    }
+
     fn driver(result: Result<GateRunResult, GateRunError>) -> GateOutputDriver {
         GateOutputDriver::new(Arc::new(StubService { result: Mutex::new(Some(result)) }))
+    }
+
+    fn real_interactor_driver(
+        result: Result<GateProcessOutput, GateProcessError>,
+    ) -> GateOutputDriver {
+        let runner = Arc::new(IntegrationRunner { result: Mutex::new(Some(result)) });
+        let service: Arc<dyn GateRunService> =
+            Arc::new(GateRunInteractor::new(runner, Arc::new(FailingWriteLogs)));
+        GateOutputDriver::new(service)
+    }
+
+    #[test]
+    fn test_gate_output_driver_rejects_overlong_encoded_name_before_running_child() {
+        let runner = Arc::new(IntegrationRunner {
+            result: Mutex::new(Some(Ok(GateProcessOutput {
+                exit_code: GateExitCode::new(0),
+                output: b"child should not run".to_vec(),
+            }))),
+        });
+        let service: Arc<dyn GateRunService> =
+            Arc::new(GateRunInteractor::new(runner.clone(), Arc::new(FailingReserveLogs)));
+
+        let outcome = GateOutputDriver::new(service)
+            .invoke(GateOutputInput::new("%".repeat(100), vec![OsString::from("check")]));
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.expect("preparation failure should render stdout");
+        assert!(stdout.starts_with("FAIL\nlog unavailable: "));
+        assert!(stdout.contains("encoded name cannot be represented"));
+        assert!(!stdout.contains("log: "));
+        assert!(outcome.stderr.is_none());
+        assert!(runner.result.lock().expect("runner lock should be available").is_some());
+    }
+
+    #[test]
+    fn test_gate_output_driver_renders_child_status_when_log_write_is_unavailable() {
+        let failure = real_interactor_driver(Ok(GateProcessOutput {
+            exit_code: GateExitCode::new(23),
+            output: b"[FAIL] item-one: short reason\n".to_vec(),
+        }))
+        .invoke(GateOutputInput::new(
+            "unavailable-failure".to_owned(),
+            vec![OsString::from("check")],
+        ));
+
+        assert_eq!(failure.exit_code, 23);
+        let failure_stdout = failure.stdout.expect("failure should render stdout");
+        assert_eq!(
+            failure_stdout,
+            "FAIL\nlog unavailable: could not write the gate log: read-only"
+        );
+        assert!(!failure_stdout.contains("failures:"));
+        assert!(!failure_stdout.lines().any(|line| line.starts_with("log: ")));
+
+        let success = real_interactor_driver(Ok(GateProcessOutput {
+            exit_code: GateExitCode::new(0),
+            output: b"success output\n".to_vec(),
+        }))
+        .invoke(GateOutputInput::new(
+            "unavailable-success".to_owned(),
+            vec![OsString::from("check")],
+        ));
+
+        assert_eq!(success.exit_code, 0);
+        let success_stdout = success.stdout.expect("success should render stdout");
+        assert!(success_stdout.starts_with("PASS\nlog unavailable: "));
+        assert!(!success_stdout.lines().any(|line| line.starts_with("log: ")));
+
+        let spawn = real_interactor_driver(Err(GateProcessError::Spawn(
+            GateAdapterFailureReason::new("missing child".to_owned()),
+        )))
+        .invoke(GateOutputInput::new(
+            "unavailable-spawn".to_owned(),
+            vec![OsString::from("check")],
+        ));
+
+        assert_eq!(spawn.exit_code, 1);
+        let spawn_stdout = spawn.stdout.expect("spawn failure should render stdout");
+        assert!(spawn_stdout.starts_with("FAIL\nlog unavailable: "));
+        assert!(spawn_stdout.contains("failures:\n- could not start child command:"));
+        assert!(!spawn_stdout.lines().any(|line| line.starts_with("log: ")));
     }
 
     #[test]
@@ -407,7 +549,7 @@ mod tests {
         let outcome = driver(Ok(GateRunResult::ChildExited {
             exit_code: GateExitCode::new(0),
             output: b"[PASS] item-one\nInternalRecord { Debug: true }\n".to_vec(),
-            log_path: log_path(),
+            log: persisted_log(),
         }))
         .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
 
@@ -424,7 +566,7 @@ mod tests {
         let success = GateRunResult::ChildExited {
             exit_code: GateExitCode::new(0),
             output: b"[PASS] item-one\nInternalRecord { Debug: true }\n".to_vec(),
-            log_path: log_path(),
+            log: persisted_log(),
         };
         assert_eq!(render_summary(&success), "PASS\nlog: tmp/gate/driver.log");
 
@@ -432,7 +574,7 @@ mod tests {
             exit_code: GateExitCode::new(1),
             output: b"[PASS] item-one\n[FAIL] item-two: reason\nInternalRecord { Debug: true }\n"
                 .to_vec(),
-            log_path: log_path(),
+            log: persisted_log(),
         };
         let rendered = render_summary(&failure);
         assert!(rendered.contains("FAIL\nlog: tmp/gate/driver.log\nfailures:"));
@@ -442,32 +584,114 @@ mod tests {
     }
 
     #[test]
-    fn test_gate_output_driver_propagates_nonzero_exit_and_renders_bounded_failure_excerpt() {
+    fn test_render_summary_keeps_child_verdict_when_log_write_is_unavailable() {
+        let result = GateRunResult::ChildExited {
+            exit_code: GateExitCode::new(0),
+            output: Vec::new(),
+            log: GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            )),
+        };
+
+        let rendered = render_summary(&result);
+
+        assert_eq!(rendered, "PASS\nlog unavailable: could not write the gate log: read-only");
+        assert!(!rendered.lines().any(|line| line.starts_with("log: ")));
+
+        let result = GateRunResult::ChildExited {
+            exit_code: GateExitCode::new(23),
+            output: b"[FAIL] item-one: short reason\n".to_vec(),
+            log: GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            )),
+        };
+        let rendered = render_summary(&result);
+
+        assert_eq!(rendered, "FAIL\nlog unavailable: could not write the gate log: read-only");
+        assert!(!rendered.contains("failures:"));
+        assert!(!rendered.lines().any(|line| line.starts_with("log: ")));
+
+        let result = GateRunResult::SpawnFailed {
+            error: GateProcessError::Spawn(GateAdapterFailureReason::new(
+                "missing child command".to_owned(),
+            )),
+            log: GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            )),
+        };
+        let rendered = render_summary(&result);
+
+        assert!(
+            rendered.starts_with("FAIL\nlog unavailable: could not write the gate log: read-only")
+        );
+        assert!(rendered.contains("failures:\n- could not start child command: "));
+        assert!(!rendered.lines().any(|line| line.starts_with("log: ")));
+    }
+
+    #[test]
+    fn test_gate_output_driver_preserves_child_status_when_log_write_is_unavailable() {
+        let failure = driver(Ok(GateRunResult::ChildExited {
+            exit_code: GateExitCode::new(23),
+            output: b"[FAIL] item-one: short reason\n".to_vec(),
+            log: GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            )),
+        }))
+        .invoke(GateOutputInput::new("gate-failure".to_owned(), vec![OsString::from("check")]));
+
+        assert_eq!(failure.exit_code, 23);
+        let failure_stdout = failure.stdout.expect("failure should render stdout");
+        assert_eq!(
+            failure_stdout,
+            "FAIL\nlog unavailable: could not write the gate log: read-only"
+        );
+        assert!(!failure_stdout.contains("failures:"));
+        assert!(!failure_stdout.lines().any(|line| line.starts_with("log: ")));
+
+        let success = driver(Ok(GateRunResult::ChildExited {
+            exit_code: GateExitCode::new(0),
+            output: b"success output\n".to_vec(),
+            log: GateLogWriteOutcome::Unavailable(GateLogWriteError::Write(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            )),
+        }))
+        .invoke(GateOutputInput::new("gate-success".to_owned(), vec![OsString::from("check")]));
+
+        assert_eq!(success.exit_code, 0);
+        let success_stdout = success.stdout.expect("success should render stdout");
+        assert_eq!(
+            success_stdout,
+            "PASS\nlog unavailable: could not write the gate log: read-only"
+        );
+        assert!(!success_stdout.lines().any(|line| line.starts_with("log: ")));
+    }
+
+    #[test]
+    fn test_gate_output_driver_propagates_nonzero_exit_and_renders_all_declared_failure_excerpts() {
         let output = std::iter::once("[PASS] item-pass".to_owned())
             .chain(std::iter::once("[FAIL] item-primary: short reason".to_owned()))
-            .chain(
-                (0..(MAX_FAILURE_EXCERPT_LINES + 1))
-                    .map(|index| format!("[FAIL] item-{index}: {}", "x".repeat(300))),
-            )
-            .chain(std::iter::once("unrelated diagnostic detail".to_owned()))
+            .chain((0..9).map(|index| format!("[FAIL] item-{index}: {}", "x".repeat(300))))
             .chain(std::iter::once("InternalRecord { Debug: true }".to_owned()))
             .collect::<Vec<_>>()
             .join("\n");
         let outcome = driver(Ok(GateRunResult::ChildExited {
             exit_code: GateExitCode::new(23),
             output: output.into_bytes(),
-            log_path: log_path(),
+            log: persisted_log(),
         }))
         .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
 
         assert_eq!(outcome.exit_code, 23);
         let stdout = outcome.stdout.expect("failure should render stdout");
         assert!(stdout.starts_with("FAIL\nlog: tmp/gate/driver.log\nfailures:"));
-        assert_eq!(stdout.lines().count(), MAX_FAILURE_EXCERPT_LINES + 3);
-        assert!(stdout.lines().skip(3).all(|line| line.len() <= MAX_FAILURE_LINE_BYTES + 5));
+        assert_eq!(stdout.lines().count(), 13);
         assert!(stdout.contains("- [FAIL] item-primary: short reason"));
+        let bounded_item = truncate_line(&format!("[FAIL] item-8: {}", "x".repeat(300)));
+        assert!(stdout.contains(&format!("- {bounded_item}")));
+        assert!(
+            stdout.lines().skip(3).all(|line| line.len() <= MAX_FAILURE_LINE_BYTES + "…".len() + 2)
+        );
         assert!(!stdout.contains("item-pass"));
-        assert!(!stdout.contains("unrelated diagnostic detail"));
         assert!(!stdout.contains("InternalRecord"));
         assert!(outcome.stderr.is_none());
     }
@@ -477,9 +701,9 @@ mod tests {
         let service = Arc::new(RecordingService {
             result: Mutex::new(Some(Ok(GateRunResult::ChildExited {
                 exit_code: GateExitCode::new(23),
-                output: b"[PASS] aggregate-pass\n[FAIL] aggregate-item: short reason\nfull diagnostic detail\n"
+                output: b"[PASS] aggregate-pass\n[FAIL] aggregate-item: short reason\nInternalRecord { Debug: true }\n"
                     .to_vec(),
-                log_path: log_path(),
+                log: persisted_log(),
             }))),
             seen: Mutex::new(None),
         });
@@ -509,9 +733,8 @@ mod tests {
 
     #[test]
     fn test_gate_run_interactor_service_renders_failure_excerpt_from_persisted_output() {
-        let output =
-            b"[PASS] item-pass\n[FAIL] item-primary: short reason\nfull diagnostic detail\n"
-                .to_vec();
+        let output = b"[PASS] item-pass\n[FAIL] item-primary: short reason\nInternalRecord { Debug: true }\n"
+            .to_vec();
         let (driver, logs) =
             integration_driver(23, output.clone(), "tmp/gate/integration-failure.log");
 
@@ -527,7 +750,7 @@ mod tests {
             "FAIL\nlog: tmp/gate/integration-failure.log\nfailures:\n- [FAIL] item-primary: short reason"
         );
         assert!(!stdout.contains("item-pass"));
-        assert!(!stdout.contains("full diagnostic detail"));
+        assert!(!stdout.contains("InternalRecord"));
         assert_eq!(
             logs.contents.lock().expect("log lock should be available").as_slice(),
             [output]
@@ -560,40 +783,40 @@ mod tests {
     fn test_gate_output_driver_renders_spawn_failure_and_service_failure_separately() {
         let spawn = driver(Ok(GateRunResult::SpawnFailed {
             error: GateProcessError::Spawn(GateAdapterFailureReason::new("missing".to_owned())),
-            log_path: log_path(),
+            log: persisted_log(),
         }))
         .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
         assert_eq!(spawn.exit_code, 1);
         assert!(spawn.stdout.expect("spawn failure should render stdout").contains("missing"));
 
-        let service_failure = driver(Err(GateRunError::Persist(
-            usecase::gate_output::GateLogPersistenceError::Write(GateAdapterFailureReason::new(
-                "read-only".to_owned(),
-            )),
-        )))
-        .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
-        assert_eq!(service_failure.exit_code, 1);
+        let preparation_failure =
+            driver(Err(GateRunError::Prepare(GateLogReservationError::CreateDirectory(
+                GateAdapterFailureReason::new("read-only".to_owned()),
+            ))))
+            .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
+        assert_eq!(preparation_failure.exit_code, 1);
         assert!(
-            service_failure
-                .stderr
-                .expect("service failure should use stderr")
+            preparation_failure
+                .stdout
+                .expect("preparation failure should use stdout")
                 .contains("read-only")
         );
     }
 
     #[test]
-    fn test_spawn_failure_summary_is_one_bounded_line() {
-        let reason = format!("first line\n{}\nlast line", "x".repeat(MAX_FAILURE_LINE_BYTES));
+    fn test_spawn_failure_summary_compacts_the_reason_to_one_line() {
+        let reason = format!("first line\n{}\nlast line", "x".repeat(300));
         let summary = render_summary(&GateRunResult::SpawnFailed {
             error: GateProcessError::Spawn(GateAdapterFailureReason::new(reason)),
-            log_path: log_path(),
+            log: persisted_log(),
         });
 
         assert_eq!(summary.lines().count(), 4);
         let failure_line = summary.lines().nth(3).expect("spawn failure line should exist");
         assert!(failure_line.starts_with("- could not start child command: "));
         assert!(failure_line.contains("first line"));
-        assert!(failure_line.len() <= MAX_FAILURE_LINE_BYTES + "…".len());
+        assert!(!failure_line.contains("last line"));
+        assert!(failure_line.len() <= MAX_FAILURE_LINE_BYTES + "…".len() + 2);
         assert!(failure_line.ends_with('…'));
     }
 
@@ -602,7 +825,7 @@ mod tests {
         let outcome = driver(Ok(GateRunResult::ChildExited {
             exit_code: GateExitCode::new(256),
             output: Vec::new(),
-            log_path: log_path(),
+            log: persisted_log(),
         }))
         .invoke(GateOutputInput::new("gate".to_owned(), vec![OsString::from("check")]));
 
@@ -635,12 +858,66 @@ mod tests {
         }
         for line in [
             "test cli::tests::healthy ... ok",
+            "test result: ok. 1 passed; 0 failed",
             "[PASS] item-pass",
+            "[OK] All checks passed.",
+            "[SKIP] not applicable",
+            "--- signal check PASSED ---",
+            "--- signal check SKIPPED ---",
+            "PASS",
             "SomeRecord { status: failed_in_a_field }",
-            "a sentence mentions failed output but is not a gate diagnostic",
         ] {
             assert!(!is_failure_line(line), "unexpected failure line: {line}");
         }
+    }
+
+    #[test]
+    fn test_failure_excerpts_exclude_internal_records_longer_than_diagnostic_prefix() {
+        let internal_record = format!("InternalRecord {{ details: {} }}", "x".repeat(240));
+        let output = format!("[FAIL] item-one: short reason\n{internal_record}\n");
+
+        assert!(!is_failure_line(&internal_record));
+        assert_eq!(
+            failure_excerpts(output.as_bytes()),
+            ["[FAIL] item-one: short reason".to_owned()]
+        );
+    }
+
+    #[test]
+    fn test_failure_helpers_include_unrecognized_non_empty_lines() {
+        for line in [
+            "new gate format: item did not complete",
+            "a sentence mentions failed output but is not a gate diagnostic",
+            "warning: unused variable: `value`",
+            "Compiling gate-check v1.0.0",
+        ] {
+            assert!(is_failure_line(line), "unrecognized line was excluded: {line}");
+        }
+        assert!(!is_failure_line("   "));
+    }
+
+    #[test]
+    fn test_render_log_errors_omit_paths_from_prepare_and_unavailable_reasons() {
+        let path = std::path::PathBuf::from("tmp/gate/private.log");
+
+        let prepare = render_prepare_failure(&GateLogReservationError::OutsideRoot(path.clone()));
+        assert_eq!(prepare, "FAIL\nlog unavailable: gate log path is outside the trusted root");
+        assert!(!prepare.contains(path.to_string_lossy().as_ref()));
+
+        let unavailable = render_log_outcome(&GateLogWriteOutcome::Unavailable(
+            GateLogWriteError::SymlinkComponent(path.clone()),
+        ));
+        assert_eq!(unavailable, "log unavailable: gate log path contains a symlink component");
+        assert!(!unavailable.contains(path.to_string_lossy().as_ref()));
+    }
+
+    #[test]
+    fn test_failure_excerpts_reject_control_styling_without_interpretation() {
+        let output = b"\x1b[1m\x1b[91merror\x1b[0m: compiler failure\n\x1b[31mtest cli::tests::colored ... FAILED\x1b[0m\n";
+
+        assert!(!is_failure_line("\x1b[1m\x1b[91merror\x1b[0m: compiler failure"));
+        assert!(!is_failure_line("\x1b[31mtest cli::tests::colored ... FAILED\x1b[0m"));
+        assert!(failure_excerpts(output).is_empty());
     }
 
     #[test]
@@ -673,8 +950,9 @@ mod tests {
     }
 
     #[test]
-    fn test_truncate_line_preserves_utf8_boundary_and_configured_byte_limit() {
-        let line = format!("[FAIL] {}", "あ".repeat(MAX_FAILURE_LINE_BYTES));
+    fn test_truncate_line_bounds_long_reason_without_splitting_utf8() {
+        let line = format!("[FAIL] {}", "あ".repeat(240));
+
         let truncated = truncate_line(&line);
         let prefix = truncated.strip_suffix('…').expect("long line should be truncated");
         assert!(prefix.len() <= MAX_FAILURE_LINE_BYTES);
@@ -684,22 +962,18 @@ mod tests {
     }
 
     #[test]
-    fn test_truncate_line_bounds_failed_item_and_short_reason_excerpt() {
-        let line =
-            format!("[FAIL] aggregate-item: short reason {}", "あ".repeat(MAX_FAILURE_LINE_BYTES));
+    fn test_failure_excerpts_bounds_oversized_failure_reason() {
+        let line = "[FAIL] aggregate-item: short reason ".to_owned() + &"x".repeat(300);
 
-        let truncated = truncate_line(&line);
         let excerpts = failure_excerpts(line.as_bytes());
 
-        assert!(truncated.starts_with("[FAIL] aggregate-item: short reason"));
-        assert!(truncated.ends_with('…'));
-        assert!(truncated.len() <= MAX_FAILURE_LINE_BYTES + "…".len());
-        assert_eq!(excerpts, [truncated]);
+        assert_eq!(excerpts, [truncate_line(&line)]);
+        assert!(excerpts.first().expect("oversized failure excerpt should exist").ends_with('…'));
     }
 
     #[test]
     fn test_failure_excerpts_selects_failed_items_and_short_reasons() {
-        let output = b"[PASS] item-pass\n[FAIL] item-one: short reason\nunrelated detail\n[FAIL] item-two: another reason\nInternalRecord { Debug: true }\n";
+        let output = b"[PASS] item-pass\n[FAIL] item-one: short reason\nInternalRecord { Debug: true }\n[FAIL] item-two: another reason\n";
 
         assert_eq!(
             failure_excerpts(output),
@@ -711,27 +985,20 @@ mod tests {
     }
 
     #[test]
-    fn test_failure_excerpts_apply_utf8_replacement_and_all_supported_line_endings() {
-        let output = b"[FAIL] first: reason\r[FAIL] invalid: \xff reason\n[FAIL] third: reason\r\n";
+    fn test_failure_excerpts_ignore_non_ascii_and_non_lf_records() {
+        let output = b"[FAIL] first: reason\r[FAIL] invalid: \xff reason\n[FAIL] third: reason\n";
 
-        assert_eq!(
-            failure_excerpts(output),
-            [
-                "[FAIL] first: reason".to_owned(),
-                "[FAIL] invalid: � reason".to_owned(),
-                "[FAIL] third: reason".to_owned(),
-            ]
-        );
+        assert_eq!(failure_excerpts(output), ["[FAIL] third: reason".to_owned()]);
     }
 
     #[test]
-    fn test_failure_excerpts_use_a_bounded_head_and_tail_budget() {
-        let mut output = vec![b' '; MAX_FAILURE_INPUT_BYTES];
-        output.extend_from_slice(b"[FAIL] middle-window: reason");
-        output.resize(MAX_FAILURE_INPUT_BYTES + FAILURE_TAIL_BYTES, b' ');
-        output.extend_from_slice(b"\n[FAIL] tail-window: reason");
+    fn test_failure_excerpts_do_not_apply_an_implicit_input_or_line_budget() {
+        let output = (0..10)
+            .map(|index| format!("[FAIL] item-{index}: reason"))
+            .collect::<Vec<_>>()
+            .join("\n");
 
-        assert_eq!(failure_excerpts(&output), ["[FAIL] tail-window: reason".to_owned()]);
+        assert_eq!(failure_excerpts(output.as_bytes()).len(), 10);
     }
 
     #[cfg(unix)]
@@ -744,7 +1011,7 @@ mod tests {
         let result = GateRunResult::ChildExited {
             exit_code: GateExitCode::new(0),
             output: Vec::new(),
-            log_path: GateLogPath::from_persisted_path(path.clone()),
+            log: GateLogWriteOutcome::Persisted(GateLogPath::from_persisted_path(path.clone())),
         };
 
         assert_eq!(render_log_path(&path), format!("{path:?}"));

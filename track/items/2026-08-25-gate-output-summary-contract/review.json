@@ -52,6 +52,34 @@
           "hash": "rvw1:sha256:b801015504e06caaa9f270b4811360f74ff0bf784ec2376ce6e9d795d690df45",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:26:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d6e847573b95850d6b24e910460b7d46846b94975a57322d50171d2fb44d4d6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:30:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d6e847573b95850d6b24e910460b7d46846b94975a57322d50171d2fb44d4d6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:59:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01216f83467a9204bfe12c3f86e6d087dc7148c9394568ef95b1391842f8eebc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:03:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01216f83467a9204bfe12c3f86e6d087dc7148c9394568ef95b1391842f8eebc",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -194,6 +222,94 @@
           "hash": "rvw1:sha256:c7e65f1873198f4a1f4f03c2d07fe2ff70e39dcb037d589a7c9d8451ff510e4b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:37:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc7213b0fd1e41b3344a10bf7e0d9edc0a8acc52dfc34ac8b85d9f3e743bdf83",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:12:01Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 255,
+              "message": "未宣言の前提への依存: 新しい回帰テストは `/bin/sh`、外部の `touch`、および `find -maxdepth … -delete` の存在と挙動に依存していますが、spec に対応環境の定義はなく、`environment-assumptions.md` の platform 宣言も TODO のままです。特に `touch` が存在しない環境では、子プロセスが誤って起動されても marker が作られず、AC-05 のテストが偽陽性になります。必要な shell/tooling を正式に宣言するか、外部 utility に依存しない test fixture で子起動とログ削除を検証してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:dc7213b0fd1e41b3344a10bf7e0d9edc0a8acc52dfc34ac8b85d9f3e743bdf83",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:09:25Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 308,
+              "message": "未宣言の前提への依存: `\"%\".repeat(100)` が必ずログ名として実現不能になると仮定していますが、D1/CN-05 は名前の実現可能性を実際の永続化先に委ねており、spec に固定の component 上限はなく、`environment-assumptions.md` の Resource Limits も TODO です。約340 bytes の生成名を許容する filesystem では予約が正当に成功して child が起動し、このテストは実装が契約どおりでも失敗します。実際の保存先の `NAME_MAX` から拒否される入力を構成するか、決定的に予約失敗を返す persistence double で marker 契約を検証してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 158,
+              "message": "未宣言の前提への依存: post-persist failure fixture は、親の persistence adapter が予約ファイルを開いたままでも child の `remove_file` が成功する Unix-style unlink semantics に依存しています。対応 platform は宣言されておらず、削除共有を許さない platform/filesystem では fixture が panic/別 status になり、期待する child status 23/0 と unavailable contractを検証できません。対応 platform と unlink 条件を宣言して test を限定するか、filesystem semantics に依存しない注入可能な persistence failure を使用してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:44ee69ec8ff9b21e08309a37a20712c1e5cd679132389a0251b7c9edb9438f6d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:34:55Z",
+          "findings": [
+            {
+              "category": "test independence",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 201,
+              "message": "`gate_log_name_max` assumes the ignored, untracked `tmp/gate` directory already exists before the code under test runs. A clean or isolated test invocation therefore panics at `File::open`, making this test depend on execution order/shared filesystem state; `fpathconf` may also validly return an indeterminate `-1`. This also adds an avoidable unsafe filesystem-limit probe to the CLI fixture. Use a deterministic reserve-failure test double/seam, or explicitly create an owned fixture directory and handle an indeterminate limit before querying it.",
+              "severity": "P2"
+            },
+            {
+              "category": "cfg boundary",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 369,
+              "message": "`execute_command_gate` is compiled on every target, but all three call sites are inside `#[cfg(unix)]` tests. On non-Unix test builds it becomes unused, so the workspace’s `clippy --all-targets -- -D warnings` path fails with `dead_code`. Apply the same `#[cfg(unix)]` bound to this fixture helper.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1fbd21626efdd2f18a1e2149a2d77e5185c3d9a109c3ce8fbd3b362cb158b8e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:48:44Z",
+          "findings": [
+            {
+              "category": "no-op bypass",
+              "file": "apps/cli/src/commands/gate_output.rs",
+              "line": 410,
+              "message": "The prepare-failure regression bypasses the production `execute` handler and instead calls a test-only `execute_with_driver` that duplicates its parse/dispatch/emit body. Consequently the marker and output assertions remain green even if production `execute` later stops invoking the driver correctly or mishandles its `CommandOutcome`. Factor this injectable-driver helper into the production path so `execute` delegates to it, then exercise that shared path with `FailingReserveLogs`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:67c77e4eabf4ecb6632e248bdc8870af278857f40bb9a7913da6e1dde2c2b9cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:54:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c03bdc772654b69498bc89cf73591c0b5fddedb037b5d7b197d28bc72c88448",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -232,6 +348,87 @@
           "at": "2026-08-29T04:56:25Z",
           "findings": [],
           "hash": "rvw1:sha256:2afb577272060f411de92e8e0d2968e5b88cd68d57bb821c272b530bb368fa31",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:37:41Z",
+          "findings": [
+            {
+              "category": "layer-responsibility",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 90,
+              "message": "`cli_composition` tests should remain minimal wiring/smoke coverage, but these tests assert persistence, reservation ordering, unique filename allocation, and presentation behavior already owned by lower layers. Move these cases to the infrastructure/usecase/cli-driver tests and retain only the composition wiring assertion.",
+              "severity": "minor"
+            },
+            {
+              "category": "external-boundary-assumptions",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 95,
+              "message": "The added child commands assume `/bin/sh` plus GNU/POSIX utilities and shell semantics (`find -maxdepth`, `wc`, `touch`), while `knowledge/conventions/environment-assumptions.md` has no declared supported-platform/tooling assumption. This makes the composition test suite fail on environments without those paths/utilities; declare the assumption or use a portable in-process test double.",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:9e09f34074e5ca13829892bca42a9a2692f5a036831102a56f8a5c966607890e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:49:54Z",
+          "findings": [
+            {
+              "category": "no-op-bypass",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 36,
+              "message": "This test no longer verifies the composition wiring: `size_of_val(&driver) > 0` is a compile/layout assertion that will pass regardless of whether `ProcessGateRunner`, `FsGateLogPersistence`, and `GateRunInteractor` are correctly connected. Restore a minimal behavioral smoke test that invokes the returned driver and verifies the wired process/persistence path.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:0b1734c1592976d06b47830755479e31ddda8faedb346c78753b6624243a2694",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:59:36Z",
+          "findings": [
+            {
+              "category": "no-op-bypass",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 76,
+              "message": "The smoke test exercises `GateOutputComposition::wire` with test doubles instead of the public `GateOutputComposition::build` path. Consequently it cannot detect incorrect construction or injection of `ProcessGateRunner` and `FsGateLogPersistence` (including a wrong `trusted_root`), so the concrete composition wiring remains unverified. Test the public builder with a minimal real-adapter smoke case, or otherwise add assertions that cover the concrete adapters.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:1d26f0bfce68967b826a5c0635f9d3722969c3402e978728cc65970b5db933a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T17:04:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:795521fe72b93875ffd35e58892ef3b1746f68fb83633a21e36b02da07e4a622",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:11:07Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-composition/src/gate_output.rs",
+              "line": 35,
+              "message": "未宣言の前提への依存: `#[cfg(unix)]` removes the only test on non-Unix targets but leaves `OsString` and `super::*` imports compiled and unused. Because workspace warnings are denied, `cargo clippy --all-targets`/test compilation fails on those targets. The supported-platform declaration is still TODO, so non-Unix cannot be excluded implicitly; gate the entire test module/imports or retain a portable smoke test.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:795521fe72b93875ffd35e58892ef3b1746f68fb83633a21e36b02da07e4a622",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T17:15:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc513bfe64c72d722c464ce0ccb747bca90e9f0b05ac1f2273de621c13079992",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -387,6 +584,173 @@
           "at": "2026-08-29T08:56:34Z",
           "findings": [],
           "hash": "rvw1:sha256:be28c38e23b41917c77527ee6b4615976935434f2c4430720801533623df1950",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:08:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30695cb0c5da39621c5d6f199948202372aa5e0e535af59f701eb834046095d7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:15:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30695cb0c5da39621c5d6f199948202372aa5e0e535af59f701eb834046095d7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:37:37Z",
+          "findings": [
+            {
+              "category": "business logic in adapter",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 241,
+              "message": "`is_known_non_failure_line` receives only the 240-byte `diagnostic_prefix`, so an internal record longer than 240 bytes no longer satisfies `fields.ends_with('}')` and is treated as an eligible failure line. Consequently `failure_excerpts` can expose/truncate verbose `InternalRecord { ... }` data in stdout, violating the documented exclusion of internal records. Classify the complete trimmed line (or otherwise recognize the record shape without the bounded prefix).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7ae7a62c139e66495586d9239e7550e08b9df9bea674d996c1ba48466f6567b2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:43:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58ea697955182ee09b95ad703a061791c93c8c550c6b60f987fcb74fa3e7aba0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:13:18Z",
+          "findings": [
+            {
+              "category": "output-contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 223,
+              "message": "The catch-all admits every unrecognized non-empty child-output line as a failure excerpt. Routine cargo/cargo-make chatter, warnings, and verbose diagnostics can therefore consume the eight-line budget before the actual failure, while also violating the contract that stdout contain only failed items and short reasons. Keep explicit failure-shaped lines prioritized and do not treat arbitrary non-empty output as a failure.",
+              "severity": "P1"
+            },
+            {
+              "category": "output-contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 290,
+              "message": "For a nonzero `ChildExited` result, failure excerpts are appended even when `log` is `GateLogWriteOutcome::Unavailable`. The current contract limits this state to the child FAIL verdict plus the short log-unavailability reason; detailed child diagnostics must not be added when the full log was not persisted. Branch on the log outcome before rendering `failures:`.",
+              "severity": "P1"
+            },
+            {
+              "category": "output-contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 308,
+              "message": "Preparation errors are rendered through `GateLogReservationError::to_string()`, but `OutsideRoot` and `SymlinkComponent` contain `PathBuf` values. Those variants therefore print a nonexistent or rejected candidate path despite the Prepare contract requiring FAIL plus a short reason and no log path. Render a path-free, variant-specific presentation reason.",
+              "severity": "P1"
+            },
+            {
+              "category": "output-contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 317,
+              "message": "Unavailable write errors are rendered through `GateLogWriteError::to_string()`, whose `OutsideRoot` and `SymlinkComponent` variants include the reserved path. This exposes the incomplete path in stdout even though the Unavailable contract explicitly forbids showing it. Map the typed error to a short path-free reason.",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 83,
+              "message": "未宣言の前提への依存: failure extraction directly assumes lossy UTF-8 decoding, LF/CR line framing, ANSI CSI grammar, and fixed 64-KiB/head-tail and line-count/byte budgets. These process-output encoding and resource assumptions are recorded only in source comments; neither the current spec nor the consumer-owned `environment-assumptions.md` declaration records them. Declare the supported encoding/control grammar and limit behavior in an owned contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:58ea697955182ee09b95ad703a061791c93c8c550c6b60f987fcb74fa3e7aba0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:05:59Z",
+          "findings": [
+            {
+              "category": "output-contract",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 309,
+              "message": "`GateLogWriteError::Write` now drops its typed context and renders only the opaque reason. The current gate-output tests therefore fail in all three Unavailable child-status cases: actual output is `log unavailable: read-only`, while the contract expects `log unavailable: could not write the gate log: read-only`. Preserve the path-free `could not write the gate log:` context for this variant.",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 83,
+              "message": "未宣言の前提への依存: failure extraction still directly assumes lossy UTF-8 decoding, LF/CR framing, ANSI CSI grammar, and fixed 64-KiB/head-tail and line-count/byte budgets. Neither the current spec nor the consumer-owned `environment-assumptions.md` declaration records these process-output encoding and resource assumptions; source comments alone are not the required owned contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ecdf1ffe26b76cafd8ab05b413c60f9dcb5562389d9e75b3bf500ef9b2743c11",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:11:02Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 83,
+              "message": "未宣言の前提への依存: failure extraction still directly assumes lossy UTF-8 decoding, LF/CR framing, ANSI CSI grammar, and fixed 64-KiB/head-tail and line-count/byte budgets. Neither the current spec nor the consumer-owned `environment-assumptions.md` declaration records these process-output encoding and resource assumptions; source comments alone are not the required owned contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7946ac05e41ec562509af561919c202269405825373eff42eeb1901e84c7b1b1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:21:56Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 83,
+              "message": "未宣言の前提への依存: `failure_excerpts` still implements generic process-output interpretation through lossy UTF-8 decoding, LF/CR framing, ANSI-CSI parsing, and fixed 64-KiB/head-tail plus line-count/byte budgets. None of these encoding or resource contracts exists in the current spec or consumer environment declaration. Remove this generic decoding/budget machinery and restrict extraction to explicitly declared summary/failure-shaped representations, as required by the briefing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7946ac05e41ec562509af561919c202269405825373eff42eeb1901e84c7b1b1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:35:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:174269acf2d81d3daccd7e99e6f758e925f958935259917691bf6e07a5d49e4d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T23:46:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:de00b14737eb163fa0acab760090d8f68b9a2a51501a35aedcb01d2a3391647c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T23:57:50Z",
+          "findings": [
+            {
+              "category": "output-classification",
+              "file": "apps/cli-driver/src/gate_output.rs",
+              "line": 155,
+              "message": "The catch-all marks several project-owned success records as failure excerpts because `known_non_failure` omits `[OK]`, `[SKIP]`, and `--- … PASSED ---`. These formats are emitted throughout the wrapped Make/cargo signal gates, so when a later aggregate step fails, earlier successful/skipped step output is copied into `failures:` despite IN-03/AC-02 limiting it to failed items and short reasons. Classify these stable success formats as non-failures before applying the unrecognized-line fallback.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:de00b14737eb163fa0acab760090d8f68b9a2a51501a35aedcb01d2a3391647c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T00:04:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30571df7574d49d9b4dcc77421f34df66f97d844e28c3ce309e60d5ea6274e5d",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -613,6 +977,50 @@
           "hash": "rvw1:sha256:318aae924047291c157862001ce0062ac9eb489f1f05e9bb97b6ee20a8255bf7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:02:41Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 27,
+              "message": "This template now ships repository-specific Linux/x86_64 and Docker runtime assumptions in a consumer-owned declaration. That contradicts the document’s rule that templates must provide placeholders rather than project-specific defaults, causing non-Linux consumers to inherit an inappropriate platform policy. Keep placeholders or record and implement the required template-wide policy decision separately.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a818efbfb5a6f457e72ea18eab4aeb29c38c192ff4216761776d214a17a471e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:06:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eca4c888b0983ca083a01c024544c3440f2085cd7f38b3401fdeb260c41ba75a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:17:41Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 41,
+              "message": "`exclusive create` と no-follow directory open まで Linux 固有 API と記載していますが、現行 adapter は両方を `#[cfg(unix)]` の `openat(O_EXCL | O_NOFOLLOW)` で実装しており、Linux 固有なのは `RenameFlags::EXCHANGE` による publish と明示的な platform gate です。portability boundary を誤って伝えるため、Linux-only 条件を exchange publish に帰属させ、残りは Unix descriptor-relative operations と記述してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:eca4c888b0983ca083a01c024544c3440f2085cd7f38b3401fdeb260c41ba75a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:20:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f02a3d1ef0a660a933f739b07954a2cf7fec1924a213df8f1078ef64dbc398c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -816,6 +1224,259 @@
           "hash": "rvw1:sha256:e807b8e6e7565a332f0faa44cf1ee12f5ed253a543bf3fddac82465a81481508",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:12:01Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 83,
+              "message": "T004’s description is not executable at the required boundary: “Align the existing gate-output implementation” does not identify a concrete target file or symbol. Name the affected symbols/files, while retaining the operation and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 83,
+              "message": "T004 bundles independently verifiable behavior units: reservation/preparation failure before child launch (AC-05) and typed post-execution write outcomes preserving the child result (AC-06). Split these into separate todo tasks before implementation begins, with one task per acceptance criterion.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 36,
+              "message": "Section S4 restates the upstream behavior contract in prose (“reservation-before-execute,” “preparation and post-execution write failures”) instead of using only target + operation + anchor cites. Remove the behavioral restatement; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d29bacd1ab340bea136fbd5f14142e20a61195c8fc41268cd7618d8ba86e5828",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:32:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5d0352921a08fae3b1ab3fa21c4c1cc531423a7bdeb35be7fbf8a11259a092e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T13:44:32Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`IN-02`, `IN-03`, `CN-01`, `AC-02`, and `AC-03` still map only to T001–T003, although their current texts add pre-launch preparation failures and post-launch persistence failures that those completed tasks predate. T004 and T005 are the tasks that add and test those paths, so both must be mapped to these load-bearing elements.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-contract.json",
+              "line": 8,
+              "message": "T001 remains attributed to the current `GateLogPersistencePort`, `GateRunError`, and `GateRunResult` entries, but its recorded completion has the former one-step persistence port, `Persist` error variant, and `log_path` result shape. Those do not conform to the current catalogue shapes whose convergence belongs to T004/T005; remove these stale T001 attributions.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-contract.json",
+              "line": 128,
+              "message": "T004 is attributed to `GateLogPersistencePort`, but T004 owns only `reserve` and the pre-launch path while the entry's required `persist(reservation, …) -> GateLogWriteError` shape is explicitly deferred to T005. The port cannot conform at T004 completion without absorbing T005's work, so T004 must not be a converging owner of this entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5d0352921a08fae3b1ab3fa21c4c1cc531423a7bdeb35be7fbf8a11259a092e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T13:51:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23de8b7f35f6253a14f4cfcd353cd18ae30a299aeb36254c22c65047968a2429",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T15:19:21Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`task-coverage.json` over-attributes the follow-up tasks: T004 and T005 are mapped to IN-02, IN-03, CN-01, AC-02, and AC-03, but their task descriptions and anchors cover only IN-04/CN-04/CN-05 with AC-05 or AC-06. Neither task names validation or regression work for those earlier contracts, so these mappings are implausible load-bearing coverage. Remove the stale mappings or explicitly add the corresponding validation ownership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e7b5e6228a9c78bd161e04c08f2c99b80f9818d7aa9aa96ffcfe2e31e4785e12",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T15:21:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:688bc6a11ebe70777d249d935aefccbe6fe300446eaae080ca2277896d9101ab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T15:25:44Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`IN-02`, `IN-03`, `CN-01`, `AC-02`, and `AC-03` still map only to completed T001–T003, although their current texts include the pre-launch preparation-failure and post-launch persistence-failure paths implemented and tested by T004/T005. These load-bearing mappings are semantically incomplete; add T004 and T005 to each affected element.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:688bc6a11ebe70777d249d935aefccbe6fe300446eaae080ca2277896d9101ab",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T15:28:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b5e6228a9c78bd161e04c08f2c99b80f9818d7aa9aa96ffcfe2e31e4785e12",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:07:56Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`task-coverage.json` still assigns T004 and T005 to IN-02, IN-03, CN-01, AC-02, and AC-03, although both task descriptions are anchored only to IN-04/CN-04/CN-05 and AC-05 or AC-06. Their generic “focused regressions” text does not establish validation ownership for those earlier contracts, making these mappings implausible load-bearing coverage. Remove the stale mappings or explicitly add validation ownership and anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad67fb6afd26e1810f0f782335fc0b3035ae7a31b2c682bc031d645ddfc785ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T17:10:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b2cacf7d312aad51474446349babd377a64fb298a06213346d744ab5c18a744c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T18:04:46Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`IN-02`, `IN-03`, `CN-01`, `AC-02`, and `AC-03` still map only to T001–T003, although their current texts include the pre-launch preparation-failure and post-launch persistence-failure paths implemented by T004/T005. These load-bearing mappings are semantically incomplete; add T004 and T005 to each affected element.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b2cacf7d312aad51474446349babd377a64fb298a06213346d744ab5c18a744c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:19:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad67fb6afd26e1810f0f782335fc0b3035ae7a31b2c682bc031d645ddfc785ed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:56:04Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`task-coverage.json` still maps T004 and T005 to IN-02, IN-03, CN-01, AC-02, and AC-03, but their descriptions and explicit anchors cover only the reservation/write follow-up elements (IN-04/05, CN-04/05/06/07, AC-05/06/07/08). The generic “focused regressions” wording does not establish validation ownership for those earlier contracts. Remove these stale mappings or add explicit validation ownership and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 101,
+              "message": "Todo task T005 bundles three independently verifiable behavior units: typed post-execution write outcome (AC-06), last-publish containment (AC-07), and reservation-consumption/lifecycle behavior (AC-08). Split T005 before implementation starts, naming separate task boundaries and retaining the corresponding IN/CN/AC anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0be48fd6d5161c742c4d55a43eb69f9b1af4306139b17348e24a37e81f6e887c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T19:59:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:408fe9d7beae88dc67327a23599e2633698d0f81910ec232a0f095ce50c6cdca",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T20:03:20Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/task-coverage.json",
+              "line": 8,
+              "message": "`IN-02`, `IN-03`, `CN-01`, `AC-02`, and `AC-03` still map only to T001–T003, although their current texts include the pre-launch preparation-failure and post-launch persistence-failure paths implemented by T004/T005. Add T004 and T005 to each affected load-bearing mapping.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/impl-plan.json",
+              "line": 101,
+              "message": "T005 bundles three independently verifiable behavior units while still `todo`: reservation consumption/no-reclaim lifecycle (`CN-07`/`AC-08`), final-publish containment (`IN-05`/`CN-06`/`AC-07`), and post-execution write-outcome/result rendering (`AC-06`). Split these into dependency-ordered tasks with their respective usecase/infrastructure and renderer targets before implementation starts.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:408fe9d7beae88dc67327a23599e2633698d0f81910ec232a0f095ce50c6cdca",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T20:14:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ffa1732d934813a4d74ea65324919c7ab754cc9dc96bf7db1ae4969f8652001",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T20:16:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ffa1732d934813a4d74ea65324919c7ab754cc9dc96bf7db1ae4969f8652001",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T21:56:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d90a96c81f51985489ebfb90e7982195ed6b54fc63dd17a10e9d58fb099b923",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T21:58:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d90a96c81f51985489ebfb90e7982195ed6b54fc63dd17a10e9d58fb099b923",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:11:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b1cd5d4dbbfb20c0ed78fcb4deac648932195aa205e8ea57ce379bc9a8846732",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:33:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b1cd5d4dbbfb20c0ed78fcb4deac648932195aa205e8ea57ce379bc9a8846732",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -945,6 +1606,414 @@
           "hash": "rvw1:sha256:16505e788f08c991b07431a118b474d60c418672ab86df81ec473b9a2e6a6a9f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:37:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:325d8371e6e4942a60f0b440a0e59ff11aecb8cd9c83a818b12c145ae6214f5c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:16:05Z",
+          "findings": [
+            {
+              "category": "reserved-destination integrity",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 149,
+              "message": "`reserve` は排他的に作成した `File` をここで破棄し、予約をパスだけに縮退させています。その後 `persist` は子プロセス実行後に同名 leaf を `O_TRUNC` で開き直すため、予約済みファイルや親ディレクトリが通常ファイル／hard link に置換された場合、別 inode（trusted root 外にも別名を持つ inode を含む）を上書きします。`O_NOFOLLOW` と `metadata.is_file()` はこの置換を検出しません。予約に descriptor または inode identity を保持して一度だけ消費し、置換時は fail closed にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "filesystem precondition violation",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 168,
+              "message": "`persist` は `open_log_directory` を再利用していますが、この helper は全 component を `open_or_create_directory_at` で開くため、予約後に `tmp/gate` が削除されると書込み処理がディレクトリを再作成します。直前の `check_write_path` も存在有無を捨てるため防げません。予約済みディレクトリの存在は persist の前提であり、これは `filesystem-persistence-guard.md` が禁止する暗黙の state transition です。persist では作成しない descriptor walk を使い、欠落時はそのまま失敗させてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 17,
+              "message": "未宣言の前提への依存: 全保存先の filesystem component 上限を 255 bytes と固定していますが、spec は実際の保存先での実現可能性を adapter に委ねており、`environment-assumptions.md` の platform/resource 宣言も TODO のままです。より小さい `NAME_MAX` の mount ではこの検査を通過して `openat` の `ENAMETOOLONG` が `CreateFile` に誤分類され、より大きい mount では実現可能な名前を拒否します。開いたログディレクトリから上限を取得するか、255-byte 制約を正式に宣言して強制してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:325d8371e6e4942a60f0b440a0e59ff11aecb8cd9c83a818b12c145ae6214f5c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T17:40:24Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 350,
+              "message": "`symlink_metadata(path)` は leaf symlink だけを拒否し、中間 component の symlink は追跡します。直前の `check_reserved_path` とは分離されているため、その後に `tmp/gate` を移動して元ディレクトリへの symlink に置換すると、`dev`/`ino` は一致したまま両 verification を通過し、symlink を含む（場合によっては trusted root 外へ解決される）パスを persisted path として返せます。`scope_config_loader.rs` の symlink-rejection tests と同じ fail-closed 方針に従い、persist 時の identity 検証も trusted-root descriptor から `NOFOLLOW` で各 component を辿ってください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 83,
+              "message": "未宣言の前提への依存: `reserved_files` は成功した予約ごとに開いた `File` を保持し、同じ adapter に `persist` が必ず到達することを無制限に仮定しています。token の放棄、取消し、停止しない child、または `Send + Sync` port の並行利用では entry・file descriptor・空の予約ファイルが回収されず増え続けます。spec に outstanding reservation の上限や取消し処理はなく、`environment-assumptions.md` の Resource Limits／Concurrency Model も TODO です。予約数を制限して失敗動作を定義し、取消し・token drop 時にも回収できる lifecycle にしてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "reservation rollback",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 134,
+              "message": "排他的な leaf 作成に成功した後、`file.metadata()` または reservation-state lock が失敗すると、そのまま `Err` を返して作成済みの空ファイルを残します。この場合は予約失敗として子プロセスを起動せず「ログ未作成」と報告する一方、`tmp/gate` には orphan file が存在し、AC-05 の失敗状態と一致しません。map への登録完了まで rollback guard を保持し、途中失敗では descriptor-relative に作成済み leaf を削除してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:958552b6c250fce920fb3b3906f7140725d356530883ccf05865a8aa4b8c9af0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:07:38Z",
+          "findings": [
+            {
+              "category": "reserved-path race",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 264,
+              "message": "`persist` の書込み後 verification は、書込み前に開いた同じ `log_directory_handle` を再利用しています。その descriptor を取得した後に別 process が `tmp/gate` を rename／置換すると、両 verification と書込みは旧ディレクトリ上で成功しますが、返される lexical `log_path` は新しいディレクトリを指し、完全ログを参照できません。旧ディレクトリが trusted root 外へ移動された場合は containment も失われます。`sync_all` 後に trusted root からログディレクトリを改めて `NOFOLLOW` で開き直し、その fresh descriptor で leaf identity を確認してからパスを返してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "rollback TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 530,
+              "message": "rollback helper は `statat` で inode identity を確認した後、別 syscall の `unlinkat` で名前を削除しています。この間に予約 leaf が通常ファイルへ置換されると、identity を確認していない置換後の entry を削除できます。予約失敗や adapter drop が無関係なファイルを消す TOCTOU であり、fail-closed ではありません。さらに stat／unlink の失敗もすべて破棄されます。conditional removal を原子的に成立させるか、それが不可能な場合は置換可能な名前を best-effort cleanup で削除しない設計にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 21,
+              "message": "未宣言の前提への依存: pending reservation 上限を 64 に固定していますが、この値・適用範囲・超過時動作は spec に存在せず、`environment-assumptions.md` の Resource Limits／Concurrency Model も TODO です。また reservation token だけを破棄しても registry entry は回収されず、adapter 自体が drop されるまで slot と descriptor が残るため、64 回の取消しで以後の正常な予約が恒久的に拒否されます。上限と取消し semantics を正式に宣言し、token 放棄時に slot を回収できる lifecycle を実装してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:bb51a9bb9be25bd5e8bc7ac540f38aa854f0e03ad0723c42a8a7ed35a661c6af",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:24:15Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 193,
+              "message": "未宣言の前提への依存: 書込み前の identity 検査後に別 process が予約ファイルの親ディレクトリを trusted root 外へ rename すると、保持済み descriptor に対する `set_len`／`write_all` は移動後のファイルへ書き込みます。書込み後にパスを開き直しても、既に発生した root 外への書込みを検出するだけで取り消せません。spec に予約中の directory ownership はなく、`environment-assumptions.md` の Concurrency Model も TODO です。予約から書込み完了まで親ディレクトリを移動できない実行・権限境界を宣言して強制するか、検証済み root 内へ最後に publish する方式へ変更してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 169,
+              "message": "未宣言の前提への依存: 成功した `reserve` は開いた `File` を無制限の registry に保持し、token の破棄・取消しでは entry を回収しません。adapter drop で descriptor は閉じますが予約済みの空ファイルは意図的に残るため、並行または中断された実行で file descriptor を枯渇させ、反復する中断では filesystem inode も増え続けます。spec に outstanding reservation／取消し／shutdown の契約はなく、Resource Limits と Concurrency Model も TODO です。上限と超過動作を宣言・実装し、取消しと stale reservation の安全な回収経路を設けてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "reservation rollback",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 154,
+              "message": "排他的な leaf 作成後の `file.metadata()` が I/O error を返すと、`reserve` は `CreateFile` で失敗しますが、作成済みの空ファイルは directory entry として残ります。これは起動前の予約失敗を「ログ未作成」とする AC-05 と一致しません。排他的作成後に失敗し得る処理を残さないか、置換ファイルを誤削除しない安全な rollback／stale-reservation 処理へ移してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:32ececbb65a72942277b7174cb2b6408457764f177489aeb40fc7bf187441814",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:33:18Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 183,
+              "message": "未宣言の前提への依存: 書込み前の identity 検査後に別 process が予約ファイルの親ディレクトリを trusted root 外へ rename すると、保持済み descriptor に対する `set_len`／`write_all` は移動後のファイルへ書き込みます。書込み後の fresh descriptor 検査は失敗を報告できますが、既に発生した root 外への書込みは取り消せません。spec に予約中の directory ownership はなく、`environment-assumptions.md` の Concurrency Model も TODO です。予約から書込み完了まで親ディレクトリを移動できない権限・実行境界を宣言して強制するか、検証済み root 内へ最後に publish する方式へ変更してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 159,
+              "message": "未宣言の前提への依存: 成功した予約は開いた `File` を上限のない registry に保持し、reservation token の破棄・取消しでは entry を回収しません。adapter drop で descriptor は閉じますが、予約済みの空ファイルは残るため、並行または中断された実行で file descriptor を枯渇させ、反復する中断では filesystem inode も増え続けます。spec に outstanding reservation／取消し／shutdown の契約はなく、Resource Limits と Concurrency Model も TODO です。上限と超過動作を宣言・実装し、取消しと stale reservation の安全な回収経路を設けてください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:3b43893879e543fdcbedfd00c6f798866b053c553f4f7f596703c36aa06f0e2d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T20:24:44Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 183,
+              "message": "`persist` は D2/CN-06 が要求する last-publish を実装しておらず、予約済み inode を書込み前に検査した直後、その descriptorへ直接 `set_len`／`write_all` しています。この間に親ディレクトリが trusted root 外へ移動すると root 外の inode が更新され、後段の再検査はエラーを返すだけで既発生の書込みを防げません。内容を一時領域へ書いて同期し、trusted root から最終段階で再解決・検証した予約先への publish を最後の filesystem mutation としてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b43893879e543fdcbedfd00c6f798866b053c553f4f7f596703c36aa06f0e2d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T20:52:29Z",
+          "findings": [
+            {
+              "category": "reservation TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 376,
+              "message": "予約 leaf の identity は `renameat` より前に別 syscall で検査されています。その検査後に同名 entry が通常ファイル／hard linkへ置換されると、`renameat` は未検証の置換 entry を無条件に削除して staged file を公開し、後段の検査も staged inode を確認して成功を返します。これでは「予約済み保存先への publish」が TOCTOU で迂回されます。destination の identity と置換を単一の原子的 publish protocol に結び付け、途中の leaf replacement は既存 entry を削除せず失敗させてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "rollback TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 333,
+              "message": "`cleanup_staged_log` も `statat` ベースの identity 検査と `unlinkat` が分離しています。検査と unlink の間に staging name が置換されると、transaction-owned ではない置換後の entry を削除できます。エラーも破棄されるため、失敗時の rollback は fail-closed ではありません。名前を持たない staging inodeなど、close だけで安全に破棄できる方式を使うか、identity と削除を原子的に成立させてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 188,
+              "message": "未宣言の前提への依存: staging file を `trusted_root/tmp` に作り、`tmp/gate` へ `renameat` しているため、両ディレクトリが同一 filesystem にあることを仮定しています。`tmp/gate` が別 mount の正当な trusted-root 配置では rename が `EXDEV` となり、すべての persist が失敗します。この filesystem-topology 制約は ADR/spec にありません。staging inode を destination と同じ filesystem（例: 検証済み log directory 内）に作るか、cross-device publish を安全に処理してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:8cbe501206961eacd128c599beb0260a52bfe1b6206b854e916df690f850d84d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T21:13:41Z",
+          "findings": [
+            {
+              "category": "rollback TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 235,
+              "message": "最初の `RENAME_EXCHANGE` 後に identity 検査が失敗すると、rollback は両 name の現在の inode を再検証せず、同じ exchange をもう一度実行します。検査失敗の原因が concurrent replacement だった場合、この rollback は transaction-owned ではない entry を予約名または staging 名へ移動し、fail-closed ではありません。rollback 前に staged／reserved の両 identity が期待どおりであることを確認し、一致しない場合は追加の名前変更を行わず失敗させてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "stale staging state",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 290,
+              "message": "reusable staging entry の directory または leaf identity が失われると、その無効な entry を state に戻して直ちに失敗するため、以後の全 persist が同じ検査で恒久的に失敗します。例えば一度成功した後に `tmp/gate` が正当に置換され、新しい directory で次の reserve が成功しても、旧 directory の reusable stage が adapter を使用不能にします。identity 不一致時は TOCTOU unlink を行わず stale state を破棄し、現在の検証済み directory に新しい staging entry を作成してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:c1d397ba9ac722aba05954f34979fbbb0d4b8db80a996a1cd6501eb1afd423da",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T21:22:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e885662321c26e3b68303002536d08891e8e961edf1dd5e0937db822473e55a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T21:32:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58eeafdc00387b1b55789d58b28b12f86abc234d7a48352c699bf659c3ead49b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T23:47:17Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 415,
+              "message": "`reserve` は `#[cfg(unix)]` で macOS 等の非 Linux Unix でも成功しますが、`persist` の `publish_staged_log` は `#[cfg(target_os = \"linux\")]` 以外で常に `Unsupported` を返します。そのため対応 platform の環境では、子プロセス起動前の予約に成功した後、必ずログ保存に失敗し、AC-03/AC-06 の通常経路を満たせません。Linux 限定を環境前提として明示して予約段階から拒否するか、各対応 Unix platform の descriptor-relative publish 実装を提供してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1e9ccfa99f383874ef21fc0de77cff855db07daa872adb5382ff4951d461c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:53:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:473bd98be8bc9aadb31e0435ad117eae4a8a43a32cc92b38823b80380523e28d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T00:00:12Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 135,
+              "message": "未宣言の前提への依存: `reserve` は全 non-Linux target で無条件に失敗しますが、spec、infrastructure type contract、`environment-assumptions.md` のいずれにも Linux-only の対応範囲が宣言されていません。そのため macOS/Windows 等ではすべての gate 実行が子プロセス起動前に失敗し、同ファイル内の portable success tests も失敗します。Linux-only を正式な対応 platform として契約化するか、対応 target の安全な adapter を実装してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 255,
+              "message": "`ensure_platform_support` は `target_os = \"linux\"` だけで publish capability が利用可能と判断しますが、実際の `RENAME_EXCHANGE` は kernel version と destination filesystem の対応にも依存します。未対応の Linux filesystem では reserve と child 実行が成功した後、全 persist が同じ publish error で失敗します。この capability 条件も spec／環境前提にはありません。予約時に実際の保存先で capability を検証して起動前に失敗させるか、安全な fallback publish を提供してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:473bd98be8bc9aadb31e0435ad117eae4a8a43a32cc92b38823b80380523e28d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T00:15:52Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 135,
+              "message": "未宣言の前提への依存: `reserve` は `ensure_platform_support` により Linux 以外では常に失敗しますが、track spec、infrastructure-types、および environment-assumptions の Supported Platforms 欄はいずれも Linux-only を宣言していません。これにより macOS/Windows では全ログ予約が失敗します。Linux-only を spec/environment assumption に明記するか、対応プラットフォーム向けの安全な実装を提供してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "filesystem TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 317,
+              "message": "`probe_rename_exchange` は probe のファイル記述子を閉じた後、名前だけを使って `unlinkat` しています。作成・交換と削除の間に並行プロセスが probe 名を置換すると、その無関係な置換ファイルを削除します。2 個目の作成失敗時の cleanup にも同じ競合があります。予約処理が守る inode identity 境界を capability probe が迂回しないよう、競合下で名前を unlink しない cleanup 方式にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d0463b26c2583d547dc53b4b592fdfce4f4755e53df1d05f95faa69d68c63eb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T00:30:01Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 135,
+              "message": "未宣言の前提への依存: `reserve` は Linux 以外で常に失敗しますが、track spec、infrastructure-types、および Current Files から解決した environment-assumptions は Linux-only を宣言しておらず、Supported Platforms 欄も TODO のままです。これにより macOS/Windows では全ログ予約が失敗します。Linux-only を spec/environment declaration に記録するか、安全な対応実装を提供してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "filesystem failure atomicity",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 310,
+              "message": "`stage_probe_file` は reusable stage の内容を消去せず返すため、前回の persist 失敗後には部分的または完全なログを保持し得ます。最初の `RENAME_EXCHANGE` はその inode を新しい公開用 `.log` 名へ移し、2回目の exchange が失敗すると reserve はエラーを返す一方で、過去のログがその公開名に残ります。これは準備失敗時にログを作成しない契約を破ります。専用の検証済み空 probe を使うか、交換を failure-atomic にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "filesystem collision handling",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 300,
+              "message": "新規 probe 名の作成は `AlreadyExists` を再試行せず、そのまま予約失敗にします。probe ファイルは Drop 時にも残り、名前は PID とプロセス内でリセットされる sequence だけなので、以前と同じ PID が再利用されると典型的な最初の予約で同名ファイルに衝突し、子プロセス起動前に gate が誤って失敗します。予約名や通常の stage 名と同様に、衝突時は有界再試行してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:74f7feecadcf20a0c69cb3e86346716e1862f0d4e14836344864a01362e9be77",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T00:41:08Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 135,
+              "message": "未宣言の前提への依存: `reserve` は Linux 以外で常に失敗しますが、track spec、infrastructure-types、および Current Files から解決した environment-assumptions は Linux-only を宣言しておらず、Supported Platforms 欄も TODO のままです。これにより macOS/Windows では全ログ予約が失敗します。Linux-only を spec/environment declaration に記録するか、安全な対応実装を提供してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4a39c9e8fa00abe91d2f9cec9054b62037122ba6fb3c5138fb106ac2b1c23f23",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:04:11Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 166,
+              "message": "`reserve` は `open_new_log_file` で最終ログ名のファイルを作成した後、staging probe (`stage_probe_file` / `probe_rename_exchange`) を実行しますが、probe が失敗した場合にそのファイルを削除・無効化していません。Linux で rename-exchange が利用不能、または probe 後半の検証・復元に失敗すると、`reserve` はエラーを返す一方で `tmp/gate/<final-name>.log` を残します。AC-05 の「予約・準備失敗時はフルログ未作成」に違反し、後続処理からは未予約のログファイルとして見えるため、probe 失敗時も candidate と staging inode の状態を安全に復旧する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f6358c0238c4cc4dce50d448cc93fe8e46a706d4a7bbb1aa268e3967baa4bf5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:18:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d09564a4a8690b4f402da861bb0807c784cabaf7745a4f4bfee8e54a916bf9f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:25:59Z",
+          "findings": [
+            {
+              "category": "filesystem TOCTOU",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 462,
+              "message": "`cleanup_probe_file_if_owned` は `statat` で inode identity を確認した後、同じ名前を別 syscall の `unlinkat` で削除しています。この間に並行プロセスが leaf を置換すると、確認済み probe ではなく置換後の無関係なファイルを削除します。予約失敗時の cleanup でも呼ばれるため、CN-07 が禁止する TOCTOU unlink を再導入しています。失敗時は仕様が許容する空の exclusive file を残し、名前による reclaim を行わないでください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d09564a4a8690b4f402da861bb0807c784cabaf7745a4f4bfee8e54a916bf9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:36:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9cd45cc108598c823aa9d97d8976ce49940bbb84b146ce34bbace77263d93233",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:48:39Z",
+          "findings": [
+            {
+              "category": "source assertion test",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 1335,
+              "message": "このテストは `include_str!` で usecase の Rust source を読み、メソッド名の部分文字列で「cancel API がない」ことを証明しています。`knowledge/conventions/testing.md` は source の文字列検索をテスト証拠に使うことを明示的に禁止しており、コメントや整形変更でも誤判定するうえ、usecase trait surface の責務を infrastructure テストへ重複させています。CN-07 の証拠は usecase 側の compile-time/API schema または test-obligation binding で表現してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a2a61b7556ac42d17e0d37a40057b03b041ff90935ee00fe6cd597a999e31f11",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T04:57:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d695913260409389aba7c2879e170f4a5ac87473a320154e01a147da4e9520d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:37:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca802ec91207fd4a74b2bc0a290071dd0db268bb2531589d48c70c835105ac26",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1035,6 +2104,494 @@
           "hash": "rvw1:sha256:070a2f577354f83f77b1016372499c51cb6b73b406be8ac52c7364a385cc08bf",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:36:22Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 498,
+              "message": "`test_gate_output_driver_rejects_overlong_encoded_name_before_running_child` only exercises pre-launch reservation failure; it does not verify child output persistence, failure excerpts, or normal result rendering. It is incorrectly bound to GateRunError IN-02/AC-03 and GateOutputDriver IN-02/IN-03/AC-02/AC-03, creating false test-obligation coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8320a4e447a5f4f299a76562e76b5bbec3abf6c9fb3c4969b6605dcd143bf2c5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:42:55Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 568,
+              "message": "The binding artifact references nonexistent tests `test_gate_output_composition_reports_prepare_failure_without_log_path` and `test_gate_output_composition_reports_unavailable_log_after_child_launch` at multiple locations (first at lines 568–569). `bin/sotp test-obligation check` reports both as `bound test source not found`, so these bindings cannot fulfill their obligations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c26f64b594b4364dadae2488f60876c9fb55f5a304eabbca11fe81e0feb291e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T16:45:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:25f34b11e1cec58b547faf711bde758384320ae849d37f456219be5499bb5146",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:11:06Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 7,
+              "message": "The GateRunInteractor fulfillment still does not cover AC-05's complete pre-launch failure contract. The cited use-case test verifies `GateRunError::Prepare` and that the child is not run, but no bound test verifies the required `FAIL`/log-unavailable stdout behavior. Bind the existing driver-level preparation-failure test or equivalent evidence.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 117,
+              "message": "The GateRunService fulfillment has the same pre-launch gap: its bound tests cover the returned preparation error and post-launch persistence failure, but not the short no-log stdout result required by the current contract. Add the existing preparation-failure driver test to this fulfillment or otherwise provide end-to-end evidence.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 247,
+              "message": "The `render_summary` fulfillment claims an obligation whose current references include AC-05, yet both bound tests exercise only normal results or post-launch write failures. Neither verifies rendering for reservation/preparation failure. Add direct evidence for that branch, or correct the upstream catalogue association if `render_summary` does not own preparation errors.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 469,
+              "message": "The GateOutputDriver bindings for IN-02, IN-03, AC-02, and AC-03 omit their newly required pre-launch reservation/preparation-failure branch. They cite persisted-log and post-launch write-failure tests only, even though `test_gate_output_driver_rejects_overlong_encoded_name_before_running_child` exercises the missing behavior and is bound only to AC-05 below. Bind that evidence to each affected edge.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 565,
+              "message": "The GateOutputComposition IN-02 binding cites only a missing-child spawn test that expects a persisted path. It does not exercise any central branch of the expanded IN-02 contract—successful child-log persistence, reservation failure without a path, or post-launch persistence failure without a path. Bind an appropriate composition smoke test or waive the edge if composition only owns wiring.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 668,
+              "message": "The new GateOutputComposition IN-04 binding is unsupported by its sole test. That test only checks the reported path's directory prefix; it does not verify unique destination reservation or that execution output is written through the reserved destination. Add composition-level evidence for the reserve-then-persist flow or waive this non-owned behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25f34b11e1cec58b547faf711bde758384320ae849d37f456219be5499bb5146",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T18:04:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53548f5ef65272853e521d0e0bd55dd39863c86835997be0a55d4ce1b8bf3f10",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:12:55Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 55,
+              "message": "This T004-pending artifact claims fulfillment for later-task-owned behavior instead of using ownership waivers. In particular, the added GateLogPersistencePort reserve/persist fulfillment records (lines 55–96), GateLogPersistencePort AC-03 binding (line 437), GateLogPath AC-06 binding (line 583), GateRunService AC-06 binding (line 655), and GateOutputDriver AC-06 binding (line 670) require T005/T006/T007 behavior even though those tasks remain unimplemented. These later-owned edges should remain waived until their owning task lands.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8f121220fb3f23945f124d325eab6d297f02315c620234102cf9fcee8d93a5d7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T22:25:43Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 28,
+              "message": "The artifact still claims fulfillment for T005–T007-owned behavior even though the current execution unit is T004 and those tasks remain unimplemented. Added later-task tests remain in the GateRunInteractor fulfillment (reserved-destination and unavailable-write cases), GateRunService fulfillment, FsGateLogPersistence conformance fulfillment (unique reservation and write-failure cases), render_summary fulfillment, and CLI execute fulfillment. These claims can require later-task admission; the later-owned edges should be represented by ownership waivers until T005–T007 land.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:14411dc6d224deb48dd5594a405fbe0b65207110aad558a93a23592ccc6b0662",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T22:37:29Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 42,
+              "message": "The new waivers incorrectly defer T004-owned reservation/preparation promises to T005. The GateLogPersistencePort waivers for IN-04, AC-05, and CN-05 (lines 42, 47, and 52) and the GateLogReservation waivers for IN-04 and CN-05 (lines 609 and 614) state that T004 does not claim these behaviors, but T004's plan explicitly owns the reserve/preparation symbols and AC-05 flow. This leaves T004-owned edges unbound and can allow the T004 gate to pass without binding its required reservation behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f60a0b1cb6ded070a72aa4325f3690863e4be153bb77f46e7ec2185259852e32",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T22:41:40Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 613,
+              "message": "The `GateLogReservation` bindings at lines 613–619 use `test_gate_run_interactor_passes_reserved_destination_to_persist`, which exercises T005's reservation-consumption/persist flow, not T004's pre-launch reservation/preparation behavior. Because T005 remains unimplemented, these voluntary bindings require later-task admission and should remain ownership waivers in this T004 unit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f06c57b573ec065f463a5c07c2bb2f9dd8b4a122f8dfc1267ca68324bb2a9c4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T22:43:49Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 501,
+              "message": "`test_gate_output_driver_rejects_overlong_encoded_name_before_running_child` is bound to GateOutputDriver IN-02, IN-03, AC-02, and AC-03 (for example lines 501–530), but it only verifies a pre-launch reservation failure and that the child is not run. It provides no evidence for successful log-path output, child failure excerpts, or post-launch persistence behavior. These bindings create false coverage; retain the test only for the T004 AC-05/preparation edge.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:862ef4e655fb20b778d33abd6929dc9d06c389d1a64c1bb56e5b2f19322e86ad",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T22:46:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:709195f39d36452a9878c8385f756f79ac162da42760ea6c5568a6c9c7e89013",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T22:55:02Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 42,
+              "message": "The `GateLogPersistencePort::reserve` fulfillment cites only reservation-failure tests. Neither test observes a successful reservation, distinct destination selection, or collision avoidance, so the T004-owned IN-04/CN-05 contract is not demonstrated. Add a reserve-only success/collision test that does not depend on T005 persistence behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 202,
+              "message": "The `FsGateLogPersistence` conformance record proves one ordinary reserve/write and rejection of an overlong name, but never verifies the T004-owned CN-05 collision-avoidance requirement. Bind a T004 test that obtains distinct reservations or otherwise exercises collision retry without admitting T005 consumption behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 280,
+              "message": "This fulfillment binds `test_failure_helpers_ignore_unrecognized_non_empty_lines`, which asserts the opposite of the current `is_failure_line` catalogue contract: unrecognized non-empty lines must remain eligible so new failure formats do not silently disappear. The cited evidence therefore contradicts both IN-03 and AC-02; use conforming evidence or route an intentional contract change through type design.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 320,
+              "message": "The sole `truncate_line` test asserts that a long presentation line remains unchanged, while the current catalogue defines this entry as bounding one opaque presentation line and ties it to the short-reason contract. This is contradictory evidence, not fulfillment of IN-03/CN-01. Restore bounded evidence or correct the upstream type contract before claiming fulfillment.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 505,
+              "message": "The GateOutputDriver bindings for IN-03 and AC-02 cite a test that requires nine 300-character failure reasons to be rendered without shortening. That expectation contradicts the current short-reason/bounded-presentation contract, so it cannot substantiate these edges. Bind a focused bounded-excerpt test or route the intended contract change upstream.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:709195f39d36452a9878c8385f756f79ac162da42760ea6c5568a6c9c7e89013",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:04:53Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 270,
+              "message": "The `failure_excerpts` fulfillment cites only a nominal example containing two already-short failure lines. It never exercises the catalogue promise to select bounded presentation lines or the IN-03/AC-02 boundary for an oversized reason, so this record lacks evidence for a central part of the obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 285,
+              "message": "The sole `is_failure_line` test covers recognized formats and known non-failures, but not the current catalogue requirement that unrecognized non-empty lines remain eligible so new diagnostic formats cannot silently disappear. Add conforming evidence for that path or route an intentional catalogue change before claiming fulfillment.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 325,
+              "message": "`test_spawn_failure_summary_compacts_the_reason_to_one_line` exercises `render_summary` and whitespace compaction, not the `truncate_line` entry's catalogue contract to bound an opaque presentation line. It also preserves a 300-character segment unchanged. This cannot fulfill the IN-03/CN-01 truncation obligation; bind a direct boundary test or correct the upstream contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4dafcd1a6e1c7af2282b3dd2a483f4422b78a958db9ea0d8158e319ced989cd6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T23:45:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb016c571481b55492fdcf7f59f8a0c06bca7167e25f9865a869c76148326125",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T23:57:32Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 115,
+              "message": "The CN-07/AC-08 bindings cover consumption and an ordinary dropped reservation, but omit the existing `test_fs_gate_log_persistence_does_not_remove_replaced_reservation_on_drop`. Without that evidence, an adapter that TOCTOU-unlinks a replacement file would still satisfy every bound test, contrary to the explicit no-reclaim rule. Bind that test to the persistence-port and adapter fulfillments and the GateLogReservation CN-07/AC-08 edges.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 411,
+              "message": "The GateLogPath AC-03 binding cites only a value-wrapper test that round-trips a `PathBuf`; it does not establish that detailed diagnostics are available at the path only after complete persistence or that no path is exposed on preparation/write failure. Since GateLogPath is a DTO with no independent persistence behavior, use a canonical no-observable waiver like the adjacent AC-06/CN-06/AC-07 records, or bind evidence that actually observes AC-03.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 698,
+              "message": "This GateRunError waiver ignores IN-02's pre-launch failure clause—the exact behavior represented by `GateRunError::Prepare`. The same preparation-error and driver tests already bound to AC-03/AC-05 verify that the child is not launched, no path is shown, and a short reason is rendered. Bind those tests here instead of waiving a verifiable edge.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bb016c571481b55492fdcf7f59f8a0c06bca7167e25f9865a869c76148326125",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T00:03:08Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 7,
+              "message": "The GateRunInteractor/GateRunService fulfillment sets do not verify AC-08's “at most one live reservation per execution” rule. `test_gate_run_interactor_passes_reserved_destination_to_persist` proves that one token reaches `persist`, but its fake does not count `reserve` calls, so an implementation that reserves twice and leaks the first token would still pass. Add and bind a recording test that asserts exactly one reservation is obtained and consumed per execution.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 100,
+              "message": "The persist and adapter-conformance fulfillments still do not exercise CN-06/AC-07's explicit post-reservation parent-directory move or replacement case. The cited tests replace the reserved leaf or remove the directory entirely; an implementation that rejects those cases but follows a substituted parent directory could pass every bound test. Add a regression that replaces or moves the parent after reservation and verifies persistence fails without returning an outside-root path, then bind it to both records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0bdd44a7f430f9679a408287b8692e147cee8752c88956ecac778a3f7ff99675",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:02:48Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 45,
+              "message": "The new required tests are listed in fulfillment records, but the required edge-specific bindings are still missing: `test_gate_run_interactor_reserves_once_and_consumes_live_reservation` is not bound to GateRunInteractor/GateRunService AC-08, and `test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path` is not bound to FsGateLogPersistence CN-06/AC-07. These omissions leave the newly requested promises without edge coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:37f9ce5eb627d2937ae3f5a931c02b9bcdfc4f0955892b4cf67a5c39dba73dd4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:05:21Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 806,
+              "message": "The parent-directory-move test is bound to the wrong entry: `test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path` is attached to GateLogPersistencePort CN-06/AC-07 (lines 806–812), but the test exercises the infrastructure implementation and must be bound to FsGateLogPersistence CN-06/AC-07. The required FsGateLogPersistence edge bindings are currently absent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:284305a62f594d6ae19afe02e8651a6104183364eadd7a4a8d4f0a35406d9264",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7875bd098c9f9c7f810b9f2fe660e15dd0e95861742ee30ab982dfc1e2456503",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7875bd098c9f9c7f810b9f2fe660e15dd0e95861742ee30ab982dfc1e2456503",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:52:13Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 45,
+              "message": "The required edge-specific bindings are missing. `test_gate_run_interactor_reserves_once_and_consumes_live_reservation` appears only in fulfillment records and is not bound to GateRunInteractor AC-08 or GateRunService AC-08. `test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path` also appears only in fulfillment records and is not bound to FsGateLogPersistence CN-06 or AC-07. These newly requested promises therefore remain unbound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:37f9ce5eb627d2937ae3f5a931c02b9bcdfc4f0955892b4cf67a5c39dba73dd4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:55:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6db91d179977a29bb33e334c01bc10eeda4cf55c3299d33d1812c8a71ca0e904",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T02:00:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6db91d179977a29bb33e334c01bc10eeda4cf55c3299d33d1812c8a71ca0e904",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T02:11:10Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 518,
+              "message": "The required AC-08 recording binding is not present for the usecase edges: GateRunInteractor AC-08 is incorrectly represented by a waiver at lines 518–519, and GateRunService AC-08 has no edge binding. The recording test `test_gate_run_interactor_reserves_once_and_consumes_live_reservation` must be bound to both edges.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage gap",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 115,
+              "message": "`test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path` appears only in fulfillment records (for example line 115); there are no FsGateLogPersistence edge bindings for CN-06 or AC-07. The new infrastructure test must be bound to both required persist edges.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b9552de20b029a96075296b52fd8e800cbc196d54b5dbc481b17911a50e183c6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T02:14:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a4df8c538264241ba5520e58a6a88502eba6c9b81d03a6e5fefd7219afce7924",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T02:16:50Z",
+          "findings": [
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 533,
+              "message": "These GateRunInteractor waivers are not no-observable cases. The interactor directly owns full-log persistence/result production for IN-02, carries the diagnostic output consumed for IN-03, and preserves the child result when persistence fails under AC-06. Existing use-case and cross-crate driver tests in this file already observe those promises; bind them instead of waiving the edges merely because stdout rendering occurs downstream.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 548,
+              "message": "The GateRunService IN-02/IN-03/AC-03 waivers likewise discard verifiable application-port behavior. `execute` returns the result, output, persisted path, and unavailable-log outcome that the driver renders, and the existing interactor-service tests exercise those flows end to end. Replace these “no stdout” waivers with bindings to the available use-case/driver evidence; stdout ownership alone does not make the port edges unobservable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a4df8c538264241ba5520e58a6a88502eba6c9b81d03a6e5fefd7219afce7924",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T02:22:11Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 533,
+              "message": "The GateRunInteractor IN-02 binding covers only completed persistence, so it omits IN-02’s pre-launch reservation-failure and post-launch persistence-failure branches; the IN-03 binding likewise omits the pre-launch short-reason branch. Bind the existing `test_gate_output_driver_rejects_overlong_encoded_name_before_running_child` to both edges and `test_gate_output_driver_renders_child_status_when_log_write_is_unavailable` to IN-02.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 559,
+              "message": "The GateRunService edge bindings remain incomplete: IN-02 lacks both the pre-launch and unavailable-log paths, IN-03 and AC-03 lack the pre-launch path, and AC-06 cites only the use-case result without the available stdout/exit-status driver evidence. Add the existing overlong-name and unavailable-log driver tests to the corresponding edge records so each full anchor is observed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ab6225ad85b135ed7e69da2608dd03e0ba22ff946c8502b5c0dd7bd77c4b15d3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T02:25:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5be86009e1a7cf26e3ecc66cec23a5d755980bc94a455807b374cbb89407c043",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:47:20Z",
+          "findings": [
+            {
+              "category": "artifact_integrity",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/test-bindings.json",
+              "line": 296,
+              "message": "The artifact now declares the same fulfillment obligation multiple times: FsGateLogPersistence appears three times, GateRunInteractor five times, and GateRunService four times. Check-time binding lookup uses the first matching fulfillment while evaluation iterates every record, so these duplicates can make check and evaluate use different evidence sets and create redundant/conflicting verdict work. Merge each obligation’s tests into one fulfillment record and remove the duplicate rows.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1cb39d1479b292cbe7eeffec98c1c1995ab577d1af4f0961f6113f24b73e60ba",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T04:55:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2c573934eb58902433186d432b932769d5a5e49d70fb26889410e4a56f8593f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T05:04:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81fda168ee350cddcbf12178d59744dcaa96e7eb01dc56f4a4097bcb18a1270f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1051,6 +2608,85 @@
           "at": "2026-08-25T06:05:03Z",
           "findings": [],
           "hash": "rvw1:sha256:92e23e02004f491f8d14789ee4bef3d1ffd267fc3c1239972e5066e7c7e23d20",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:34:38Z",
+          "findings": [
+            {
+              "category": "environment-assumption declaration",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json",
+              "line": 103,
+              "message": "CN-04/CN-05 はファイルシステムのコンポーネント長制限、エンコード、プロセス実行境界に依存する契約を追加しているが、環境前提宣言は未記入の TODO のままである。対象 platform、制限の単位・範囲・超過時動作、プロセス条件などが宣言または spec の前提として確定されておらず、未宣言の前提への依存となる。",
+              "severity": "major"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json",
+              "line": 51,
+              "message": "ログ名を事前に実現できないケースを AC-05 が追加した一方、CN-01 と AC-01/AC-02 は対象タスクの stdout に必ず tmp/gate/ 配下のフルログパスを含める契約になっている。保存先を作成できない事前拒否ではそのパスを提示できないため、事前拒否時の stdout 契約が相互に両立せず、受入れ判定を決定的に実施できない。",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:2097252cb17a6bdcda3f1afa41d53e85ecb78f2133f98af4d1fb6c19a66379ae",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T10:46:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d8e9da27f9998c392d52b731b16f78cdf53d912f8df8b135b780696a96d57c5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:50:16Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json",
+              "line": 61,
+              "message": "AC-06 は子プロセス起動後の永続化失敗を明示的に扱っていますが、IN-02 と AC-03 は起動済みの全実行についてフルログの保存・参照可能性を無条件に要求しています。予約後の書込み／flush が失敗した場合、これらを同時に満たせず、stdout と exit code で永続化失敗をどう示すかも未定義です。子プロセスの終了状態を保持したまま、この分岐でのフルログ保証と観測可能な結果を定義してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0d8e9da27f9998c392d52b731b16f78cdf53d912f8df8b135b780696a96d57c5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T10:55:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2de33da4abc49fef251f267e26cf29eb575403f0eb5022cc48a8ba9076e3830e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:06:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef4371211dc534a20c987c532c46f5967da6cbd679741cf8196d482330f5561c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:10:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef4371211dc534a20c987c532c46f5967da6cbd679741cf8196d482330f5561c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:04:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcbdf1f75a33102f457db54d17dbc8e7c130c8a945f4ccd57591964a1d9cca44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T04:14:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcbdf1f75a33102f457db54d17dbc8e7c130c8a945f4ccd57591964a1d9cca44",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1431,6 +3067,413 @@
           "hash": "rvw1:sha256:99d92b77db5f4b199c1250659f6b7a7af3567c3fb9c76e06f6557baccc7124bf",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:07:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b22bb9044aa21537e635eb4c23f4024267a4bcf5ba1a559223cfed9fa20e65bd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:15:39Z",
+          "findings": [
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 699,
+              "message": "`usecase::GateRunCommand` and `GateRunCommandError::EncodedNameTooLong` claim ownership of rejecting labels that exceed a percent-encoded filesystem-component budget, while `GateLogPersistencePort::persist` is the declared owner of path selection. The command contract has neither the persistence adapter's filename layout nor the target filesystem's actual component limit, so it cannot authoritatively construct `encoded_bytes`/`max_bytes`; changing adapters or suffix layout can make this precheck reject valid commands or miss invalid names. Keep filename feasibility with the persistence owner, exposing a pre-execution reservation/preparation operation if validation must happen before running the child.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b22bb9044aa21537e635eb4c23f4024267a4bcf5ba1a559223cfed9fa20e65bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T11:24:10Z",
+          "findings": [
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 203,
+              "message": "`usecase::GateLogReservation` は「永続化ポートが予約したことを証明する opaque state」と定義されていますが、同じ usecase 公開 API に `from_reserved_path(PathBuf)` があり、任意の呼び出し側が未予約・未検証のパスから予約トークンを生成できます。`GateLogPersistencePort::persist` がこの値を信頼して予約済み保存先へ書き込む契約であるため、CN-05 の予約・名前実現可能性の専有所有が型で強制されず、上位層から予約処理を迂回できます。予約トークンの生成を persistence adapter が独占できる API 形状にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:338d5d117b5379dd64ffa598a36e476aa763a73262a422fb5a462348629d67c4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T11:42:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0ceca2cf78b8cda00351c23ebfa3f28b18da1180920a8220b6ebc4fa243ea4fe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T11:51:49Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 340,
+              "message": "`usecase::GateLogReservation` implements `Clone` even though `GateLogPersistencePort::persist` consumes the reservation as proof of one unique reserved destination. Cloning creates multiple independently consumable tokens for the same reservation, admitting repeated writes or aliases that defeat the one-reservation/one-destination contract. Remove `Clone` or explicitly model reusable reservation semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 773,
+              "message": "`usecase::GateLogWriteOutcome::Unavailable(GateLogPersistenceError)` can carry reservation-only failures such as `Clock`, `CreateDirectory`, and `EncodedNameTooLong`, producing an impossible post-execution state. Conversely, the shared error type makes the phase-specific API imprecise. Split reservation and write errors, or otherwise narrow the post-execution outcome to failures `persist` can produce.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 203,
+              "message": "`usecase::GateLogReservation::as_path` is a new load-bearing method with no `spec_refs`, unlike the other added method declarations. Exposing the reserved destination is material to IN-04/CN-05 and must be explicitly traced.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+              "line": 544,
+              "message": "`cli::GateNameArg` and `cli::GateOutputArgs` repeat CN-04/CN-05’s ownership contract in prose through “without judging filename … feasibility” and “persistence remains the exclusive … owner.” Keep only their presentation-boundary purpose and rely on the anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+              "line": 52,
+              "message": "`cli_driver::gate_output::render_summary`, `cli_driver::GateOutputDriver`, and `cli_driver::GateOutputInput` restate AC-05/AC-06/CN-04 behavior in prose, including suppression of incomplete paths, preservation of the child verdict, and filename-feasibility ownership. Retain symbol purpose and anchor citations instead, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/infrastructure-types.json",
+              "line": 73,
+              "message": "`infrastructure::FsGateLogPersistence` restates CN-05’s ownership contract by enumerating encoded-name feasibility, reservation, collision avoidance, and writes. Describe it as the `GateLogPersistencePort` adapter and leave the behavioral contract to its anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 357,
+              "message": "The docs for `usecase::GateLogPersistencePort`, `GateRunService`, `GateLogWriteOutcome`, `GateRunCommand`, `GateRunCommandError`, `GateRunError`, `GateRunInteractor`, and `GateRunResult` reproduce CN-04/CN-05/AC-05/AC-06’s ownership and pre-/post-launch behavior. Keep the type/port purpose and synchronization justification, and reference the existing anchors rather than repeating the contract, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:0ceca2cf78b8cda00351c23ebfa3f28b18da1180920a8220b6ebc4fa243ea4fe",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T12:13:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b75b3f4d386775ee23191d5100c617df01f3c8e4c43c55c0f1fdfb1502e65e26",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T12:17:53Z",
+          "findings": [
+            {
+              "category": "open-set covering contract",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+              "line": 28,
+              "message": "`cli_driver::gate_output::is_failure_line` classifies opaque output produced by heterogeneous gate commands, but the entry no longer delegates format recognition to those commands, declares a conservative over-approximation, or records a strict classifier with a depth estimate. A new or changed gate-output format can therefore disappear from the AC-02 failure excerpt.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 375,
+              "message": "`usecase::GateLogPersistencePort`, `GateProcessPort`, and the I/O-orchestrating `GateRunService` declare every method synchronous, but their shortened docs no longer acknowledge or justify blocking filesystem/process execution. Restore the deliberate single-shot synchronous-boundary justification or make the ports async.",
+              "severity": "P1"
+            },
+            {
+              "category": "Liskov violation in trait design",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 383,
+              "message": "`usecase::GateLogPersistencePort::reserve` must atomically reserve a unique filesystem destination, but `GateLogReservationError` has no variant for failure to create/open the reserved leaf. `CreateDirectory` cannot truthfully represent permission, descriptor-exhaustion, or other leaf-reservation I/O failures, so a filesystem implementor cannot honor the fail-closed contract without misclassifying them. Add a reservation/create-file failure variant carrying adapter diagnostics.",
+              "severity": "P1"
+            },
+            {
+              "category": "public enum evolution ambiguity",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 830,
+              "message": "`usecase::GateLogWriteOutcome` and `GateRunResult` are public enums that the CLI driver must match to render results, but their docs no longer indicate whether exhaustive matching is intentional or future variants are permitted. Restore the closed-set intent or declare extension-tolerant/non-exhaustive intent.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:b75b3f4d386775ee23191d5100c617df01f3c8e4c43c55c0f1fdfb1502e65e26",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T12:34:26Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 377,
+              "message": "`GateLogPersistencePort` の `docs` は、単なる型の責務を超えて「同期・blocking である理由」と reserve/write の実行順序を散文で再説明しています。ADR/spec の設計理由・挙動契約は docs に複製せず、変更対象と anchor cite のみを残してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 472,
+              "message": "`GateProcessPort` の `docs` は、単一呼び出し・子プロセス完了待ち・結果分類という同期設計の理由を再記述しています。ADR/spec の設計理由を docs に持ち込まず、型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 516,
+              "message": "`GateRunService` の `docs` は、reservation、child completion、log persistence の順序と同期/blocking の理由を上流の挙動契約として再記述しています。docs は変更対象・操作・anchor cite に限定してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:2b4e9b132e4d75aad10d4239fbd47f98efb1bb726f3d10857b5d45ed63211ce5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T12:37:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9cea115f9edcd2bec636470544d26fe2e31fdc1a945327062ce18ec663f5680e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T12:51:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0838a923874c3c6978b6be4217499bf48944dbef05ac6c001b0c6a12ca564377",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T12:54:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0838a923874c3c6978b6be4217499bf48944dbef05ac6c001b0c6a12ca564377",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T15:18:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fbc979c5d1de41a9916cdc601f7e7ed49c64e2f0b90abcac222460319cfa76cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T15:25:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fbc979c5d1de41a9916cdc601f7e7ed49c64e2f0b90abcac222460319cfa76cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:27:49Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 403,
+              "message": "`GateLogPersistencePort` の docs は、許可された同期理由を超えて、reservation の消費、last-publish 前の書込み、trusted-root 再検証、親移動時の失敗、cancel/reclaim 制約まで上流契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 530,
+              "message": "`GateProcessPort` の docs は、reserve/run/write の順序と単一実行で並行処理がない理由を上流の設計理由として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 574,
+              "message": "`GateRunService` の docs は、予約のライフサイクル、実行順序、cancel/reclaim 不在を上流契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 716,
+              "message": "`GateLogPath` の docs は、last publish 時の trusted-root 再検証と out-of-root path を生成しない fail-closed 挙動を再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 756,
+              "message": "`GateLogReservation` の docs は、persist による消費、未消費 drop の扱い、cancel/reclaim/TOCTOU unlink の禁止を上流契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 875,
+              "message": "`GateLogWriteError` の docs は、last publish 時の trusted-root 再検証、親移動・置換時の失敗条件を上流の fail-closed 契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 939,
+              "message": "`GateLogWriteOutcome` の docs は、last-publish containment failure の variant 選択と out-of-root path を返さない挙動を上流契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 1158,
+              "message": "`GateRunInteractor` の docs は、予約成功後のみ子プロセスを実行する順序、reservation の個数・消費、cancel/reclaim 不在を上流契約として再記述しています。docs は型の責務と anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08a7e396ca61df5c11ee093316c3a2e91fca642920d5a0ffe1fbc693f8116e67",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T19:32:05Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 403,
+              "message": "`GateLogPersistencePort` の docs が reservation 消費、last publish 前の再検証、親移動時の fail-closed 挙動、cancel/reclaim 制約を上流契約として再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 530,
+              "message": "`GateProcessPort` の docs が reserve/run/write の順序と単一実行・非並行の設計理由を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 574,
+              "message": "`GateRunService` の docs が予約、子プロセス実行、persist の順序と reservation lifecycle の制約を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 716,
+              "message": "`GateLogPath` の docs が last-publish 時の trusted-root 再検証と out-of-root path を生成しない挙動を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 756,
+              "message": "`GateLogReservation` の docs が persist による消費、未消費 drop、cancel/reclaim、TOCTOU unlink の扱いを上流契約として再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 875,
+              "message": "`GateLogWriteError` の docs が last-publish 時の trusted-root 再検証と親移動・置換時の失敗条件を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 939,
+              "message": "`GateLogWriteOutcome` の docs が last-publish containment failure の variant 選択と out-of-root path を返さない挙動を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 1158,
+              "message": "`GateRunInteractor` の docs が reserve 成功後のみ実行する順序、reservation の数・消費、cancel/reclaim 不在を上流契約として再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 1206,
+              "message": "`GateRunResult` の docs が exhaustive matching と全 child-execution outcome を明示的に処理する設計理由を再記述しています。docs は型の責務と spec_refs の anchor cite に縮約してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:08a7e396ca61df5c11ee093316c3a2e91fca642920d5a0ffe1fbc693f8116e67",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T19:36:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:605510f67ef235c1e6d3de8c42ad3ea2be62dbc6fd50fedac4ac323abe6c2b0d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T19:40:16Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 714,
+              "message": "`usecase::GateLogPath` and `usecase::GateLogReservation` are declared with role `Dto`, but their docs classify them as “Value object” types. That contradicts the catalogue’s role axis and obscures whether these are boundary transport values or semantically stable application value objects. Keep the `Dto` terminology or change the role with the required semantic-placement grounds.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 401,
+              "message": "`usecase::GateLogPersistencePort`, `GateProcessPort`, and `GateRunService` expose blocking filesystem/process operations with `is_async: false`, but their shortened docs now contain only type-duty descriptions and anchor lists; none acknowledges or justifies the synchronous API color. Record the deliberate synchronous choice without restating upstream behavior, or make the ports async.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/infrastructure-types.json",
+              "line": 73,
+              "message": "`infrastructure::FsGateLogPersistence` reproduces CN-06/AC-07/CN-07/AC-08 behavior in prose—last-publish revalidation, moved-parent rejection, consuming the reservation, and the no-cancel/reclaim/cap policy. Reduce the docs to the adapter’s type duty plus anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "public enum evolution ambiguity",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+              "line": 937,
+              "message": "`usecase::GateLogWriteOutcome` and `GateRunResult` are public enums consumed through exhaustive matching by orchestration/rendering code, but their current docs no longer state whether the sets are intentionally closed or extension-tolerant. Add concise closed-set or `#[non_exhaustive]` intent without reproducing the upstream behavior contract.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:605510f67ef235c1e6d3de8c42ad3ea2be62dbc6fd50fedac4ac323abe6c2b0d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-29T19:46:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c498632bd730758f2eefd463115250ff10ec2b23012a6778580ec9bf3e880e3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:46:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcbfe96a53e5552597217aad63ee97668eba7c99491941cff4cb238e4bc8db64",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T03:49:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcbfe96a53e5552597217aad63ee97668eba7c99491941cff4cb238e4bc8db64",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1491,6 +3534,63 @@
           "at": "2026-08-29T04:59:52Z",
           "findings": [],
           "hash": "rvw1:sha256:35917da9668b096b0024630526fd834335ac86ddf7a10923b3b8ac9ad4904e31",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:08:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10f1ca358b5ffe2bc0cf3a4ccd5677071b8ef7317db4fd424af3fefa7ce20065",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T10:14:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10f1ca358b5ffe2bc0cf3a4ccd5677071b8ef7317db4fd424af3fefa7ce20065",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T16:37:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0fe2af6fc2abddee958936b7ec3e28d3dc0dcbc7eeea4a74e3aee847f33bb63f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-29T17:13:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0fe2af6fc2abddee958936b7ec3e28d3dc0dcbc7eeea4a74e3aee847f33bb63f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:03:29Z",
+          "findings": [
+            {
+              "category": "error type confusion",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 155,
+              "message": "`GateLogReservationError::Clock` exposes the concrete runtime type `std::time::SystemTimeError` through the usecase API. This leaks the infrastructure clock failure representation to interactor callers and contradicts the usecase error abstraction; map it to an opaque usecase-level reservation error (or inject an explicit usecase-owned clock port).",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:acd9934761bc6e6f6e6e174bbb0fdf5ab7b3890d78424c85ef044d977d9d679f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T01:40:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acd9934761bc6e6f6e6e174bbb0fdf5ab7b3890d78424c85ef044d977d9d679f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T01:44:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acd9934761bc6e6f6e6e174bbb0fdf5ab7b3890d78424c85ef044d977d9d679f",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -1,22 +1,21 @@
 //! Infrastructure adapters for gate process execution and log persistence.
 
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+mod fs_paths;
+mod fs_persistence;
+
+use std::path::PathBuf;
 use std::process::Command;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use usecase::gate_output::{
-    GateAdapterFailureReason, GateExitCode, GateLogPath, GateLogPersistenceError,
-    GateLogPersistencePort, GateProcessError, GateProcessOutput, GateProcessPort, GateRunCommand,
+    GateAdapterFailureReason, GateExitCode, GateLogPath, GateLogPersistencePort,
+    GateLogReservation, GateLogReservationError, GateLogWriteError, GateProcessError,
+    GateProcessOutput, GateProcessPort, GateRunCommand,
 };
 
-const LOG_DIRECTORY: &str = "tmp/gate";
-const MAX_LOG_CREATE_ATTEMPTS: usize = 64;
 const UNKNOWN_ABNORMAL_EXIT_CODE: i32 = -1;
 
-static LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+#[cfg(test)]
+const LOG_DIRECTORY: &str = fs_paths::LOG_DIRECTORY;
 
 /// Process adapter that executes validated OS-native argv and captures both
 /// child output streams.
@@ -77,234 +76,31 @@ fn abnormal_exit_code(_status: &std::process::ExitStatus) -> i32 {
 /// Filesystem adapter that writes complete gate output beneath a trusted root.
 #[derive(Debug)]
 pub struct FsGateLogPersistence {
-    trusted_root: PathBuf,
+    inner: fs_persistence::FsGateLogPersistence,
 }
 
 impl FsGateLogPersistence {
     /// Creates a persistence adapter rooted at `trusted_root`.
     #[must_use]
     pub fn new(trusted_root: PathBuf) -> FsGateLogPersistence {
-        FsGateLogPersistence { trusted_root }
+        FsGateLogPersistence { inner: fs_persistence::FsGateLogPersistence::new(trusted_root) }
     }
 }
 
 impl GateLogPersistencePort for FsGateLogPersistence {
-    fn persist(
+    fn reserve(
         &self,
         command: &GateRunCommand,
+    ) -> Result<GateLogReservation, GateLogReservationError> {
+        GateLogPersistencePort::reserve(&self.inner, command)
+    }
+
+    fn persist(
+        &self,
+        reservation: GateLogReservation,
         contents: &[u8],
-    ) -> Result<GateLogPath, GateLogPersistenceError> {
-        self.check_trusted_root()?;
-        let log_directory = self.trusted_root.join(LOG_DIRECTORY);
-        self.check_path(&log_directory, true)?;
-
-        let log_directory_handle = open_log_directory(&self.trusted_root).map_err(|error| {
-            GateLogPersistenceError::CreateDirectory(GateAdapterFailureReason::new(
-                error.to_string(),
-            ))
-        })?;
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(GateLogPersistenceError::Clock)?
-            .as_nanos();
-
-        for _ in 0..MAX_LOG_CREATE_ATTEMPTS {
-            let sequence = LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-            let filename = format!(
-                "{}-{}-{timestamp}-{sequence}.log",
-                encode_name(command.name()),
-                std::process::id(),
-            );
-            let log_path = log_directory.join(filename);
-            self.check_path(&log_path, false)?;
-
-            let file_result = open_new_log_file(&log_path, &log_directory_handle);
-            let mut file = match file_result {
-                Ok(file) => file,
-                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
-                Err(error) => {
-                    return Err(GateLogPersistenceError::Write(GateAdapterFailureReason::new(
-                        error.to_string(),
-                    )));
-                }
-            };
-            let metadata = file.metadata().map_err(|error| {
-                GateLogPersistenceError::Write(GateAdapterFailureReason::new(error.to_string()))
-            })?;
-            if !metadata.is_file() {
-                return Err(GateLogPersistenceError::Write(GateAdapterFailureReason::new(
-                    "new gate-log path is not a regular file".to_owned(),
-                )));
-            }
-            file.write_all(contents).and_then(|()| file.sync_all()).map_err(|error| {
-                GateLogPersistenceError::Write(GateAdapterFailureReason::new(error.to_string()))
-            })?;
-            return Ok(GateLogPath::from_persisted_path(log_path));
-        }
-
-        Err(GateLogPersistenceError::Write(GateAdapterFailureReason::new(
-            "could not allocate a unique gate-log filename".to_owned(),
-        )))
-    }
-}
-
-/// Opens the trusted log directory by walking each path component without
-/// following symlinks. The returned descriptor remains pinned to the checked
-/// directory while each log leaf is created with `openat`.
-#[cfg(unix)]
-fn open_log_directory(trusted_root: &Path) -> io::Result<File> {
-    let anchor = if trusted_root.is_absolute() { Path::new("/") } else { Path::new(".") };
-    let root = open_directory_nofollow(anchor)?;
-    let trusted_root = open_directory_components_nofollow(root, trusted_root.components())?;
-    open_directory_components_nofollow(trusted_root, Path::new(LOG_DIRECTORY).components())
-}
-
-#[cfg(unix)]
-fn open_directory_components_nofollow(
-    mut directory: File,
-    components: std::path::Components<'_>,
-) -> io::Result<File> {
-    for component in components {
-        let name = match component {
-            std::path::Component::RootDir | std::path::Component::CurDir => continue,
-            std::path::Component::Normal(name) => name,
-            std::path::Component::ParentDir => {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "gate-log root cannot contain a parent component",
-                ));
-            }
-            std::path::Component::Prefix(_) => {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "gate-log root cannot contain a path prefix",
-                ));
-            }
-        };
-        directory = open_or_create_directory_at(&directory, name)?;
-    }
-    Ok(directory)
-}
-
-#[cfg(unix)]
-fn open_directory_nofollow(path: &Path) -> io::Result<File> {
-    rustix::fs::open(
-        path,
-        rustix::fs::OFlags::RDONLY
-            | rustix::fs::OFlags::DIRECTORY
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
-        rustix::fs::Mode::empty(),
-    )
-    .map(File::from)
-    .map_err(Into::into)
-}
-
-#[cfg(unix)]
-fn open_directory_at_nofollow(parent: &File, name: &std::ffi::OsStr) -> io::Result<File> {
-    rustix::fs::openat(
-        parent,
-        name,
-        rustix::fs::OFlags::RDONLY
-            | rustix::fs::OFlags::DIRECTORY
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
-        rustix::fs::Mode::empty(),
-    )
-    .map(File::from)
-    .map_err(Into::into)
-}
-
-#[cfg(unix)]
-fn open_or_create_directory_at(parent: &File, name: &std::ffi::OsStr) -> io::Result<File> {
-    match open_directory_at_nofollow(parent, name) {
-        Ok(directory) => Ok(directory),
-        Err(error) if error.kind() == io::ErrorKind::NotFound => {
-            match rustix::fs::mkdirat(parent, name, rustix::fs::Mode::from_raw_mode(0o777)) {
-                Ok(()) | Err(rustix::io::Errno::EXIST) => {}
-                Err(error) => return Err(error.into()),
-            }
-            open_directory_at_nofollow(parent, name)
-        }
-        Err(error) => Err(error),
-    }
-}
-
-#[cfg(not(unix))]
-fn open_log_directory(_trusted_root: &Path) -> io::Result<File> {
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "descriptor-relative gate-log persistence is unsupported on this platform",
-    ))
-}
-
-/// Creates a new log leaf without following a raced parent or leaf symlink.
-///
-/// Unix targets use descriptor-relative `openat` after walking the trusted root
-/// and `tmp/gate` components. Other targets fail closed because this adapter has
-/// no equivalent descriptor-relative, no-follow directory API on those targets.
-#[cfg(unix)]
-fn open_new_log_file(path: &Path, parent: &File) -> io::Result<File> {
-    let file_name = path.file_name().ok_or_else(|| {
-        io::Error::new(io::ErrorKind::InvalidInput, "gate-log path has no file name")
-    })?;
-    rustix::fs::openat(
-        parent,
-        file_name,
-        rustix::fs::OFlags::WRONLY
-            | rustix::fs::OFlags::CREATE
-            | rustix::fs::OFlags::EXCL
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
-        rustix::fs::Mode::from_raw_mode(0o600),
-    )
-    .map(File::from)
-    .map_err(Into::into)
-}
-
-#[cfg(not(unix))]
-fn open_new_log_file(_path: &Path, _parent: &File) -> io::Result<File> {
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "descriptor-relative gate-log persistence is unsupported on this platform",
-    ))
-}
-
-impl FsGateLogPersistence {
-    fn check_trusted_root(&self) -> Result<(), GateLogPersistenceError> {
-        if self.trusted_root.as_os_str().is_empty() {
-            return Err(GateLogPersistenceError::OutsideRoot(PathBuf::from(LOG_DIRECTORY)));
-        }
-        match crate::track::symlink_guard::reject_symlinks_up_to_root(&self.trusted_root) {
-            Ok(()) => Ok(()),
-            Err(error) if crate::track::symlink_guard::is_symlink_rejection(&error) => {
-                let component = find_symlink_component(&self.trusted_root)
-                    .unwrap_or_else(|| self.trusted_root.clone());
-                Err(GateLogPersistenceError::SymlinkComponent(component))
-            }
-            Err(error) => Err(GateLogPersistenceError::CreateDirectory(
-                GateAdapterFailureReason::new(error.to_string()),
-            )),
-        }
-    }
-
-    fn check_path(&self, path: &Path, is_directory: bool) -> Result<(), GateLogPersistenceError> {
-        if !path.starts_with(&self.trusted_root) {
-            return Err(GateLogPersistenceError::OutsideRoot(path.to_path_buf()));
-        }
-        match crate::track::symlink_guard::reject_symlinks_below(path, &self.trusted_root) {
-            Ok(_) => Ok(()),
-            Err(error) if crate::track::symlink_guard::is_symlink_rejection(&error) => {
-                let component = find_symlink_component(path).unwrap_or_else(|| path.to_path_buf());
-                Err(GateLogPersistenceError::SymlinkComponent(component))
-            }
-            Err(error) if is_directory => Err(GateLogPersistenceError::CreateDirectory(
-                GateAdapterFailureReason::new(error.to_string()),
-            )),
-            Err(error) => Err(GateLogPersistenceError::Write(GateAdapterFailureReason::new(
-                error.to_string(),
-            ))),
-        }
+    ) -> Result<GateLogPath, GateLogWriteError> {
+        GateLogPersistencePort::persist(&self.inner, reservation, contents)
     }
 }
 
@@ -321,39 +117,17 @@ fn combine_output(stdout: &[u8], stderr: &[u8]) -> Vec<u8> {
     output
 }
 
-fn encode_name(name: &str) -> String {
-    let mut encoded = String::new();
-    for byte in name.bytes() {
-        if byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'-') {
-            encoded.push(char::from(byte));
-        } else {
-            encoded.push_str(&format!("%{byte:02X}"));
-        }
-    }
-    if encoded.is_empty() { "gate".to_owned() } else { encoded }
-}
-
-fn find_symlink_component(path: &Path) -> Option<PathBuf> {
-    for ancestor in path.ancestors() {
-        if ancestor.as_os_str().is_empty() {
-            break;
-        }
-        if let Ok(metadata) = ancestor.symlink_metadata() {
-            if metadata.file_type().is_symlink() {
-                return Some(ancestor.to_path_buf());
-            }
-        }
-    }
-    None
-}
-
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
+    use std::collections::HashSet;
     use std::ffi::OsString;
 
     use super::*;
-    use usecase::gate_output::{GateExitCode, GateProcessPort};
+    use usecase::gate_output::{
+        GateExitCode, GateLogReservation, GateLogReservationError, GateLogWriteError,
+        GateProcessPort,
+    };
 
     fn command(name: &str, shell: &str) -> GateRunCommand {
         GateRunCommand::try_new(
@@ -438,12 +212,252 @@ mod tests {
         let command = command("persist-contract", "true");
         let complete_output = b"stdout\n--- stderr ---\nstderr\nopaque byte: \xFF\n";
 
-        let path = persistence.persist(&command, complete_output).expect("log should be persisted");
+        let reservation =
+            persistence.reserve(&command).expect("log destination should be reserved");
+        let path =
+            persistence.persist(reservation, complete_output).expect("log should be persisted");
 
-        assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY)));
+        assert!(path.as_path().starts_with(root.path().join("tmp/gate")));
         assert_eq!(
             std::fs::read(path.as_path()).expect("persisted log should be readable"),
             complete_output
+        );
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_reserves_unique_destinations_before_persisting() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let command = command("unique-reservations", "true");
+
+        let first_reservation =
+            persistence.reserve(&command).expect("first log destination should be reserved");
+        let second_reservation =
+            persistence.reserve(&command).expect("second log destination should be reserved");
+        let first_path = first_reservation.as_path().to_path_buf();
+        let second_path = second_reservation.as_path().to_path_buf();
+
+        assert_ne!(first_path, second_path);
+        assert!(first_path.starts_with(root.path().join("tmp/gate")));
+        assert!(second_path.starts_with(root.path().join("tmp/gate")));
+
+        let first_log = persistence
+            .persist(first_reservation, b"first reserved output")
+            .expect("first reserved log should be persisted");
+        let second_log = persistence
+            .persist(second_reservation, b"second reserved output")
+            .expect("second reserved log should be persisted");
+
+        assert_eq!(first_log.as_path(), first_path);
+        assert_eq!(second_log.as_path(), second_path);
+        assert_eq!(
+            std::fs::read(&first_path).expect("first persisted log should be readable"),
+            b"first reserved output"
+        );
+        assert_eq!(
+            std::fs::read(&second_path).expect("second persisted log should be readable"),
+            b"second reserved output"
+        );
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_allows_sixteen_live_reservations_without_pending_cap() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let command = command("many-live-reservations", "true");
+        let mut reservations = Vec::with_capacity(16);
+        let mut reserved_paths = HashSet::with_capacity(16);
+
+        for _ in 0..16 {
+            let reservation = persistence
+                .reserve(&command)
+                .expect("the adapter must not impose a small pending-reservation cap");
+            let path = reservation.as_path().to_path_buf();
+            assert!(reserved_paths.insert(path.clone()), "every reservation needs a unique path");
+            let metadata = std::fs::metadata(&path).expect("reserved file should exist");
+            assert!(metadata.is_file(), "reserved destination should be a regular file");
+            assert_eq!(metadata.len(), 0, "reservation should remain an empty file");
+            reservations.push(reservation);
+        }
+
+        assert_eq!(reserved_paths.len(), 16);
+        for (index, reservation) in reservations.into_iter().enumerate() {
+            let contents = format!("reserved output {index}");
+            let persisted_path = persistence
+                .persist(reservation, contents.as_bytes())
+                .expect("every live reservation should be persistable");
+            assert!(reserved_paths.contains(&persisted_path.as_path().to_path_buf()));
+            assert_eq!(
+                std::fs::read(persisted_path.as_path())
+                    .expect("persisted output should be readable"),
+                contents.as_bytes()
+            );
+        }
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_rejects_reusing_consumed_reservation() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("single-use-reservation", "true"))
+            .expect("log destination should be reserved");
+        let reserved_path = reservation.as_path().to_path_buf();
+        let duplicate_reservation = GateLogReservation::from_reserved_path(reserved_path.clone());
+
+        persistence
+            .persist(reservation, b"first persisted output")
+            .expect("first persistence should consume the reservation");
+        let second_result = persistence.persist(duplicate_reservation, b"second output");
+
+        assert!(matches!(second_result, Err(GateLogWriteError::Write(_))));
+        assert_eq!(
+            std::fs::read(&reserved_path).expect("first persisted log should remain readable"),
+            b"first persisted output"
+        );
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_reports_write_failure_without_persisted_path() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("missing-reserved-file", "true"))
+            .expect("log destination should be reserved");
+        let reserved_path = reservation.as_path().to_path_buf();
+        std::fs::remove_file(&reserved_path).expect("reserved file should be removed");
+
+        let result = persistence.persist(reservation, b"output cannot be written");
+
+        assert!(matches!(result, Err(GateLogWriteError::Write(_))));
+        assert!(!reserved_path.exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_gate_log_persistence_rejects_replaced_reserved_file() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let outside = tempfile::tempdir().expect("outside root should be created");
+        let outside_file = outside.path().join("outside.log");
+        std::fs::write(&outside_file, b"outside content").expect("outside file should be written");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("replaced-reservation", "true"))
+            .expect("log destination should be reserved");
+        let reserved_path = reservation.as_path().to_path_buf();
+        std::fs::remove_file(&reserved_path).expect("reserved file should be removed");
+        std::fs::hard_link(&outside_file, &reserved_path)
+            .expect("replacement hard link should be created");
+
+        let result = persistence.persist(reservation, b"must not overwrite replacement");
+
+        assert!(matches!(result, Err(GateLogWriteError::Write(_))));
+        assert_eq!(
+            std::fs::read(&outside_file).expect("outside file should be readable"),
+            b"outside content"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_gate_log_persistence_does_not_recreate_deleted_log_directory() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("deleted-directory", "true"))
+            .expect("log destination should be reserved");
+        let log_directory = root.path().join(LOG_DIRECTORY);
+        std::fs::remove_dir_all(&log_directory).expect("log directory should be removed");
+
+        let result = persistence.persist(reservation, b"must not recreate directory");
+
+        assert!(matches!(result, Err(GateLogWriteError::Write(_))));
+        assert!(!log_directory.exists());
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn test_fs_gate_log_persistence_rejects_moved_parent_without_outside_root_path() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let moved_root = tempfile::tempdir().expect("moved directory root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("moved-parent", "true"))
+            .expect("log destination should be reserved");
+        let reserved_path = reservation.as_path().to_path_buf();
+        let file_name = reserved_path.file_name().expect("reservation should have a file name");
+        let log_directory = root.path().join(LOG_DIRECTORY);
+        let moved_log_directory = moved_root.path().join("moved-gate");
+
+        std::fs::rename(&log_directory, &moved_log_directory)
+            .expect("reserved parent directory should be movable");
+        std::fs::create_dir(&log_directory).expect("replacement parent directory should be made");
+
+        let result = persistence.persist(reservation, b"must not publish outside trusted root");
+
+        match result {
+            Err(GateLogWriteError::Write(_)) => {}
+            Err(error) => panic!("unexpected persistence error: {error:?}"),
+            Ok(path) => panic!(
+                "persist returned a path after the parent moved: {}",
+                path.as_path().display()
+            ),
+        }
+        assert_eq!(
+            std::fs::read(moved_log_directory.join(file_name))
+                .expect("moved reservation should remain readable"),
+            b""
+        );
+        assert_eq!(
+            std::fs::read_dir(&log_directory)
+                .expect("replacement parent directory should remain readable")
+                .count(),
+            0
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_gate_log_persistence_keeps_unpersisted_reservation_on_drop() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let reserved_path;
+        {
+            let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+            let reservation = persistence
+                .reserve(&command("dropped-reservation", "true"))
+                .expect("log destination should be reserved");
+            reserved_path = reservation.as_path().to_path_buf();
+            assert!(reserved_path.exists());
+            assert_eq!(
+                std::fs::read(&reserved_path).expect("reserved file should be readable"),
+                b""
+            );
+        }
+
+        assert!(reserved_path.exists());
+        assert_eq!(
+            std::fs::read(&reserved_path).expect("unconsumed reservation should remain readable"),
+            b""
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_gate_log_persistence_does_not_remove_replaced_reservation_on_drop() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let reservation = persistence
+            .reserve(&command("replaced-drop", "true"))
+            .expect("log destination should be reserved");
+        let reserved_path = reservation.as_path().to_path_buf();
+        std::fs::remove_file(&reserved_path).expect("reserved file should be removed");
+        std::fs::write(&reserved_path, b"replacement").expect("replacement should be written");
+
+        drop(persistence);
+
+        assert_eq!(
+            std::fs::read(&reserved_path).expect("replacement should remain readable"),
+            b"replacement"
         );
     }
 
@@ -456,9 +470,9 @@ mod tests {
             .expect("symlink should be created");
         let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
 
-        let result = persistence.persist(&command("symlink-contract", "true"), b"log");
+        let result = persistence.reserve(&command("symlink-contract", "true"));
 
-        assert!(matches!(result, Err(GateLogPersistenceError::SymlinkComponent(_))));
+        assert!(matches!(result, Err(GateLogReservationError::SymlinkComponent(_))));
     }
 
     #[test]
@@ -467,9 +481,11 @@ mod tests {
         let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
         let command = command("../opaque name", "true");
 
-        let path = persistence.persist(&command, b"log").expect("log should be persisted");
+        let reservation =
+            persistence.reserve(&command).expect("log destination should be reserved");
+        let path = persistence.persist(reservation, b"log").expect("log should be persisted");
 
-        assert!(path.as_path().starts_with(root.path().join(LOG_DIRECTORY)));
+        assert!(path.as_path().starts_with(root.path().join("tmp/gate")));
         assert!(
             !path
                 .as_path()
@@ -477,6 +493,42 @@ mod tests {
                 .expect("log should have a filename")
                 .to_string_lossy()
                 .contains('/')
+        );
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_rejects_overlong_encoded_name_during_reservation() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+        let command = command(&"%".repeat(100), "true");
+        let log_directory = root.path().join(LOG_DIRECTORY);
+
+        let result = persistence.reserve(&command);
+
+        assert!(matches!(result, Err(GateLogReservationError::EncodedNameTooLong(_))));
+        assert_eq!(
+            std::fs::read_dir(log_directory)
+                .expect("reservation should create the log directory")
+                .count(),
+            0
+        );
+    }
+
+    #[test]
+    fn test_fs_gate_log_persistence_reserve_failure_leaves_no_complete_log_under_trusted_root() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        std::fs::write(root.path().join("tmp"), b"not a directory")
+            .expect("blocking path should be written");
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+
+        let result = persistence.reserve(&command("blocked-preparation", "true"));
+
+        assert!(matches!(result, Err(GateLogReservationError::CreateDirectory(_))));
+        assert!(!root.path().join(LOG_DIRECTORY).exists());
+        assert_eq!(
+            std::fs::read_dir(root.path()).expect("trusted root should remain readable").count(),
+            1,
+            "reserve failure must not leave a complete log under the trusted root"
         );
     }
 }

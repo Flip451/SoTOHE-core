@@ -1,39 +1,39 @@
 {
-  "catalogue_declaration_hash": "1c23e467d30578c03a058da3152dbcac5e17b1e02ad1c7ae5baa196d82904616",
+  "catalogue_declaration_hash": "66138994a8983cc8eb80110c38d96549efe0ba043e3c2c8c009f26cc6dae595d",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "entry_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "signal": "blue",
       "type_name": "GateOutputDriver"
     },
     {
-      "entry_hash": "648d9c9ae225cf0e95690a0f6aa06db4867a9c9a0856e43b1056fc29cf37933f",
+      "entry_hash": "03a847aa59c5a3fce2c2a9d99cbe3a0b21fa9aafdfbf7451b0d19d0e27a33923",
       "signal": "blue",
       "type_name": "GateOutputInput"
     },
     {
-      "entry_hash": "252ae5016396612bf0b4386cdf3387e22beb745d72e43b39bf245a8905e0a8d6",
+      "entry_hash": "66ea06a5ed7760eb0de12b1897b5a996b2ac5e7d23ab18e64fbcd8fbdef8b9d1",
       "signal": "blue",
       "type_name": "cli_driver::render::CommandOutcome"
     },
     {
-      "entry_hash": "65f8f6eb594012c212f875960c126fe02392442262820918b30cbeaf5d6c860b",
+      "entry_hash": "8d717125d44220ec8f43dfb3ce70f900680f1b08ca85aec44d243d6e1d6e8048",
       "signal": "blue",
       "type_name": "cli_driver::gate_output::failure_excerpts"
     },
     {
-      "entry_hash": "fdb8828ebdab90aa10077eb48afc03561c18a1b8120b3ed574b9d535bff8ce99",
+      "entry_hash": "612049c1bbb0fbf3a28c89d85a850f1e210325922e0320b58ecee4f6a564aa46",
       "signal": "blue",
       "type_name": "cli_driver::gate_output::is_failure_line"
     },
     {
-      "entry_hash": "dacfe02975b0c370e3ffdc8b04dd695d0c86763f7e511db5f72b1fa118bf8997",
+      "entry_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
       "signal": "blue",
       "type_name": "cli_driver::gate_output::render_summary"
     },
     {
-      "entry_hash": "e21450cef41de91c2c3677b436a10fb561b4024e4a2adcdc7f2ff506b162ad4a",
+      "entry_hash": "e4044850feb47731c8ede2f0bf995a846da2eaf002b06f6a5728dbfb7b97bad7",
       "signal": "blue",
       "type_name": "cli_driver::gate_output::truncate_line"
     }

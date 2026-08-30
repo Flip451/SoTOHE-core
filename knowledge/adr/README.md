@@ -293,6 +293,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ワークフロー副産物によるディスク衛生の修繕 — scope diff の untracked ディレクトリ計測失敗と template export テストの /tmp scaffold リーク](2026-08-02-0643-workflow-byproduct-disk-hygiene.md) | Proposed | 2026-08-02 |
 | [template export 統合テストの source fixture 隔離配置](2026-08-14-0442-template-export-test-source-fixture-placement.md) | Proposed | 2026-08-14 |
 | [ゲートの標準出力をサマリ契約にする](2026-08-25-0425-gate-output-summary-contract.md) | Proposed | 2026-08-25 |
+| [ゲートログ名の実現可能性は永続化境界が担う](2026-08-29-1030-gate-log-name-feasibility.md) | Proposed | 2026-08-29 |
 
 ### DRY / リファクタ
 

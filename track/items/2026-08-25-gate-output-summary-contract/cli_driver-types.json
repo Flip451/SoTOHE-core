@@ -3,7 +3,7 @@
   "functions": {
     "cli_driver::gate_output::failure_excerpts": {
       "action": "add",
-      "docs": "Select bounded presentation lines from opaque child output; String values remain free-form external text.",
+      "docs": "Select bounded presentation lines from opaque child output.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -27,7 +27,7 @@
     },
     "cli_driver::gate_output::is_failure_line": {
       "action": "add",
-      "docs": "Strict classifier for the supported child-output formats, centralized with fixtures for each gate family.",
+      "docs": "Conservatively classify opaque child-output lines for summary inclusion: unrecognized non-empty lines remain eligible so new gate-output formats cannot silently disappear from failure excerpts; only known non-failure lines are excluded.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -51,7 +51,7 @@
     },
     "cli_driver::gate_output::render_summary": {
       "action": "add",
-      "docs": "Render the human-facing gate summary from the typed application result.",
+      "docs": "Render a human-facing gate summary.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -78,12 +78,20 @@
         {
           "anchor": "AC-02",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "cli_driver::gate_output::truncate_line": {
       "action": "add",
-      "docs": "Bound one presentation-only free-form line without splitting UTF-8.",
+      "docs": "Bound one opaque presentation line.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -203,7 +211,7 @@
   "types": {
     "GateOutputDriver": {
       "action": "add",
-      "docs": "Primary adapter that constructs the validated command, invokes GateRunService, and returns a rendered CommandOutcome.",
+      "docs": "Primary adapter for GateRunService.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -242,12 +250,20 @@
         {
           "anchor": "AC-04",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "GateOutputInput": {
       "action": "add",
-      "docs": "Driving-boundary DTO carrying a truly opaque presentation label and OS-native child argv tokens.",
+      "docs": "Driving-boundary input with an opaque presentation label and OS-native argv.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -266,12 +282,16 @@
         {
           "anchor": "IN-02",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "cli_driver::render::CommandOutcome": {
       "action": "reference",
-      "docs": "Existing CLI-driver result DTO carried unchanged for GateOutputDriver output.",
+      "docs": "Existing CLI result DTO with free-form presentation text and a process exit value.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

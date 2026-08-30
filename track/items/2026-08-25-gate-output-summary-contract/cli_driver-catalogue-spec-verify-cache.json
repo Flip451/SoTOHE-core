@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -10,22 +10,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "citation": "フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -34,22 +34,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -58,22 +58,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "0987401574beeee228838f4b257443116d78756e8293d6ad05b3a22eda3bd445",
+      "evidence_hash": "3ed963fd82b304ea8a7a8d3daacfece2e406fadac9434ceed3cd48d9f99082da",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+          "text_label": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "citation": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -82,22 +82,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "citation": "stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -106,22 +106,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "a037191bfdc1e3fd08e159bce13b8fe907d208b7059dd7df7ebb6ac88285259b",
+      "evidence_hash": "f6f169ad22562a24ba6cfb54417bcd0685d54b44b91418f631b171552a221600",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。"
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。起動前の予約・準備失敗ではフルログは作成されず、stdout の短い理由でその状態を確認できる。起動後にフルログの保存が失敗する場合は、完全なフルログを参照できないことを stdout の短い理由で確認でき、完全でないログのパスは示されない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。",
+        "citation": "詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3ce33deb3631a0a30e45b22e9f22ec69d09d500d10b89283484c648495407532",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputDriver",
@@ -145,7 +145,55 @@
       }
     },
     {
-      "claim_hash": "648d9c9ae225cf0e95690a0f6aa06db4867a9c9a0856e43b1056fc29cf37933f",
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputDriver",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "26bc19a298afd72359433180d048dc912c8540e64c362f26159ddf33186b1254",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "ログ名を保存先で実現できない場合、永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき、対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ名を保存先で実現できない場合、永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき、対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputDriver",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b12732d284290fec43a4f895cecbf0d7d5c3803600a2a4cda4b9d2f548a3efcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "子プロセスの起動後にフルログの保存失敗が報告されても、stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。フルログの保存が完了していない場合は、完全でないログのパスをフルログパスとして示さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスの起動後にフルログの保存失敗が報告されても、stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。フルログの保存が完了していない場合は、完全でないログのパスをフルログパスとして示さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "03a847aa59c5a3fce2c2a9d99cbe3a0b21fa9aafdfbf7451b0d19d0e27a33923",
       "claim_origin": {
         "data": {
           "entry_key": "GateOutputInput",
@@ -154,22 +202,46 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8cc5488b3f1099a42356321d54b96adcf1ef72ebc5641dca686bb3bb462abb49",
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象タスクはフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "citation": "子プロセスを実行できた各対象タスクは",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "252ae5016396612bf0b4386cdf3387e22beb745d72e43b39bf245a8905e0a8d6",
+      "claim_hash": "03a847aa59c5a3fce2c2a9d99cbe3a0b21fa9aafdfbf7451b0d19d0e27a33923",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputInput",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "013185711e3f353729714bfb1dddea3e11458517387be319aa0665e08f7d9dad",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66ea06a5ed7760eb0de12b1897b5a996b2ac5e7d23ab18e64fbcd8fbdef8b9d1",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::render::CommandOutcome",
@@ -193,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "252ae5016396612bf0b4386cdf3387e22beb745d72e43b39bf245a8905e0a8d6",
+      "claim_hash": "66ea06a5ed7760eb0de12b1897b5a996b2ac5e7d23ab18e64fbcd8fbdef8b9d1",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::render::CommandOutcome",
@@ -217,7 +289,7 @@
       }
     },
     {
-      "claim_hash": "65f8f6eb594012c212f875960c126fe02392442262820918b30cbeaf5d6c860b",
+      "claim_hash": "8d717125d44220ec8f43dfb3ce70f900680f1b08ca85aec44d243d6e1d6e8048",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::failure_excerpts",
@@ -226,22 +298,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "65f8f6eb594012c212f875960c126fe02392442262820918b30cbeaf5d6c860b",
+      "claim_hash": "8d717125d44220ec8f43dfb3ce70f900680f1b08ca85aec44d243d6e1d6e8048",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::failure_excerpts",
@@ -250,12 +322,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
         },
         "kind": "spec_element"
       },
@@ -265,7 +337,7 @@
       }
     },
     {
-      "claim_hash": "fdb8828ebdab90aa10077eb48afc03561c18a1b8120b3ed574b9d535bff8ce99",
+      "claim_hash": "612049c1bbb0fbf3a28c89d85a850f1e210325922e0320b58ecee4f6a564aa46",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::is_failure_line",
@@ -274,22 +346,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "fdb8828ebdab90aa10077eb48afc03561c18a1b8120b3ed574b9d535bff8ce99",
+      "claim_hash": "612049c1bbb0fbf3a28c89d85a850f1e210325922e0320b58ecee4f6a564aa46",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::is_failure_line",
@@ -298,22 +370,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "citation": "失敗した項目および各項目の短い理由を示す。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "dacfe02975b0c370e3ffdc8b04dd695d0c86763f7e511db5f72b1fa118bf8997",
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::render_summary",
@@ -322,22 +394,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "0fbd6a040c1f5a399b0385a01b929bf4e64eeb80cfc8493b2dadd1820c369575",
+      "evidence_hash": "ce5fbbfc718688318769ba91a3ba3aeee372a6df81f963c7c0194fbe31c0945a",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。"
+          "text_label": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。子プロセス起動前に予約・準備が失敗した場合は、FAIL の判定とログ未作成を示す短い理由に限り、存在しないフルログパスを出力してはならない。子プロセス起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する PASS または FAIL の判定とフルログ未作成または参照不能を示す短い理由に限り、完全でないログのパスをフルログパスとして出力してはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。",
+        "citation": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "dacfe02975b0c370e3ffdc8b04dd695d0c86763f7e511db5f72b1fa118bf8997",
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::render_summary",
@@ -361,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "dacfe02975b0c370e3ffdc8b04dd695d0c86763f7e511db5f72b1fa118bf8997",
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::render_summary",
@@ -370,22 +442,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "0987401574beeee228838f4b257443116d78756e8293d6ad05b3a22eda3bd445",
+      "evidence_hash": "3ed963fd82b304ea8a7a8d3daacfece2e406fadac9434ceed3cd48d9f99082da",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+          "text_label": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "citation": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "dacfe02975b0c370e3ffdc8b04dd695d0c86763f7e511db5f72b1fa118bf8997",
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::render_summary",
@@ -394,22 +466,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ef26857a594f4c4612297789e52e9396269d18abeffd08ebdc7b805574884c34",
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。"
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "citation": "stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e21450cef41de91c2c3677b436a10fb561b4024e4a2adcdc7f2ff506b162ad4a",
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::gate_output::render_summary",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "26bc19a298afd72359433180d048dc912c8540e64c362f26159ddf33186b1254",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "ログ名を保存先で実現できない場合、永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき、対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_driver::gate_output::render_summary",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b12732d284290fec43a4f895cecbf0d7d5c3803600a2a4cda4b9d2f548a3efcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "子プロセスの起動後にフルログの保存失敗が報告されても、stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。フルログの保存が完了していない場合は、完全でないログのパスをフルログパスとして示さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e4044850feb47731c8ede2f0bf995a846da2eaf002b06f6a5728dbfb7b97bad7",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::truncate_line",
@@ -418,22 +538,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b04a013504810a185881a45980cc844fb7884292f74e7fdb4ceeb282109cd8",
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。"
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
+        "citation": "失敗した項目と短い理由だけを stdout の診断抜粋として表示する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e21450cef41de91c2c3677b436a10fb561b4024e4a2adcdc7f2ff506b162ad4a",
+      "claim_hash": "e4044850feb47731c8ede2f0bf995a846da2eaf002b06f6a5728dbfb7b97bad7",
       "claim_origin": {
         "data": {
           "entry_key": "cli_driver::gate_output::truncate_line",
@@ -442,17 +562,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "0fbd6a040c1f5a399b0385a01b929bf4e64eeb80cfc8493b2dadd1820c369575",
+      "evidence_hash": "ce5fbbfc718688318769ba91a3ba3aeee372a6df81f963c7c0194fbe31c0945a",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。"
+          "text_label": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。子プロセス起動前に予約・準備が失敗した場合は、FAIL の判定とログ未作成を示す短い理由に限り、存在しないフルログパスを出力してはならない。子プロセス起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する PASS または FAIL の判定とフルログ未作成または参照不能を示す短い理由に限り、完全でないログのパスをフルログパスとして出力してはならない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象タスクの stdout は PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。",
+        "citation": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。",
         "kind": "pass"
       }
     }

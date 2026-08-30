@@ -1,14 +1,14 @@
 {
-  "catalogue_declaration_hash": "b4b1e25bf2779ce4a8d1e9d307be2fcc9c141a3fa9d57654a19a41965a8bf111",
+  "catalogue_declaration_hash": "759c330a5c539f2cafbf0f0df0d9e1ccd668caa8c81fdd01f6f366b4839ab943",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "38e0db682acee9e78e386f603cbe8e11c134d90fbadbfc2bec78c75aa7bc1d79",
+      "entry_hash": "755d8c0ee759951a0e1953857d0f35f03311d5b9d8d1f27fe80f35c707c49ee1",
       "signal": "blue",
       "type_name": "FsGateLogPersistence"
     },
     {
-      "entry_hash": "5a22618369f56404d66c8e0bf096a0c0cb9a01cda7088bf7745059f92a1d9098",
+      "entry_hash": "bb67f1e4686159da61daa49162e549311c0b6edc70b301ddcffadeddfe92fb97",
       "signal": "blue",
       "type_name": "ProcessGateRunner"
     }

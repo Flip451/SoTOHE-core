@@ -11,7 +11,10 @@
           "params": [],
           "returns": "ProcessGateRunner",
           "spec_refs": [
-            {"anchor": "AC-04", "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"}
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
           ]
         }
       ],
@@ -31,7 +34,10 @@
           ],
           "returns": "FsGateLogPersistence",
           "spec_refs": [
-            {"anchor": "IN-02", "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"}
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
           ]
         }
       ],
@@ -66,7 +72,7 @@
   "types": {
     "FsGateLogPersistence": {
       "action": "add",
-      "docs": "Filesystem adapter and exclusive enforcement owner for contained, symlink-safe gate-log writes beneath its trusted root.",
+      "docs": "Filesystem adapter for GateLogPersistencePort. CN-06; AC-07; CN-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -89,12 +95,40 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
         }
       ]
     },
     "ProcessGateRunner": {
       "action": "add",
-      "docs": "Process adapter that executes validated OS-native argv and returns complete captured output through GateProcessPort.",
+      "docs": "Process adapter for GateProcessPort.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
