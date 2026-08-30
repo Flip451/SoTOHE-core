@@ -650,7 +650,9 @@ mod tests {
             "{\n  \"schema_version\": 5,\n  \"crate_name\": \"infrastructure\",\n  \"layer\": \"infrastructure\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
         )
         .unwrap();
-        let rustdoc_path = root.join("infrastructure-rustdoc.json");
+        let exclusive = root.join(".sotp-rustdoc").join("fixture");
+        std::fs::create_dir_all(&exclusive).unwrap();
+        let rustdoc_path = exclusive.join("infrastructure-rustdoc.json");
         let rustdoc_json = minimal_rustdoc_json();
         std::fs::write(&rustdoc_path, &rustdoc_json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), rustdoc_json).unwrap();
@@ -861,8 +863,10 @@ mod tests {
                 .unwrap();
             std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline).unwrap();
 
-            let domain_current_path = root.join("domain-current.json");
-            let infrastructure_current_path = root.join("infrastructure-current.json");
+            let exclusive = root.join(".sotp-rustdoc").join("fixture");
+            std::fs::create_dir_all(&exclusive).unwrap();
+            let domain_current_path = exclusive.join("domain-current.json");
+            let infrastructure_current_path = exclusive.join("infrastructure-current.json");
             std::fs::write(
                 &domain_current_path,
                 rustdoc_json_with_paths(

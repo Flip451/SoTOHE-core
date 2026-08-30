@@ -196,6 +196,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "3c360756c3b0745799a5ba2c7e1308116083d1fa",
       "depends_on": [
         "T010"
       ],
@@ -220,6 +221,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "3c360756c3b0745799a5ba2c7e1308116083d1fa",
       "depends_on": [
         "T011",
         "T012",
@@ -235,7 +237,7 @@
       ],
       "description": "After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to require exclusive target ownership and common-lock participation by every expected-output writer; add focused cooperative-writer and non-cooperative-writer rejection tests (CO-06, CO-07, AC-06).",
       "id": "T015",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

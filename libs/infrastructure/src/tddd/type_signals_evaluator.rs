@@ -963,8 +963,9 @@ mod tests {
         let baseline = rustdoc_json();
         std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), &baseline).unwrap();
-        let domain_current_path = root.join("domain-current.json");
-        let infrastructure_current_path = root.join("infrastructure-current.json");
+        let domain_current_path = exclusive_observer_json_path(root, "domain-current.json");
+        let infrastructure_current_path =
+            exclusive_observer_json_path(root, "infrastructure-current.json");
         std::fs::write(&domain_current_path, serde_json::to_string(domain_current).unwrap())
             .unwrap();
         std::fs::write(
@@ -1667,6 +1668,29 @@ mod tests {
             recorded,
             "a 65th required layer must not reuse or rewrite a recorded type-signals result"
         );
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_non_exclusive_target_directory() {
+        let (workspace, items_dir, track_id, binding, exclusive_path) = setup_workspace();
+        let shared_path = workspace.path().join("infrastructure-rustdoc.json");
+        std::fs::copy(&exclusive_path, &shared_path).unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(shared_path);
+
+        let error = execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .expect_err("a shared Cargo target must not be treated as authoritative");
+        assert!(
+            error.to_string().contains(".sotp-rustdoc"),
+            "non-exclusive target ownership must fail closed: {error}"
+        );
+        assert_eq!(observer.launches(), 0, "export must not run without exclusive ownership");
     }
 
     #[test]
@@ -2553,6 +2577,12 @@ mod tests {
         );
     }
 
+    fn exclusive_observer_json_path(root: &Path, file_name: &str) -> PathBuf {
+        let dir = root.join(".sotp-rustdoc").join("fixture");
+        std::fs::create_dir_all(&dir).unwrap();
+        dir.join(file_name)
+    }
+
     fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {
         let workspace = tempfile::tempdir().unwrap();
         let root = workspace.path();
@@ -2584,7 +2614,7 @@ mod tests {
             "{\n  \"schema_version\": 5,\n  \"crate_name\": \"infrastructure\",\n  \"layer\": \"infrastructure\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
         )
         .unwrap();
-        let rustdoc_path = root.join("infrastructure-rustdoc.json");
+        let rustdoc_path = exclusive_observer_json_path(root, "infrastructure-rustdoc.json");
         let json = rustdoc_json();
         std::fs::write(&rustdoc_path, &json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
@@ -2632,7 +2662,8 @@ mod tests {
         let implementation = freshness::rustdoc_input_fingerprint(workspace_root).unwrap();
         let resolution =
             resolution_input_fingerprint(workspace_root, &track_dir, items_dir).unwrap();
-        let rustdoc_path = workspace_root.join("infrastructure-rustdoc.json");
+        let rustdoc_path =
+            exclusive_observer_json_path(workspace_root, "infrastructure-rustdoc.json");
         let rustdoc_path = std::fs::canonicalize(&rustdoc_path).unwrap();
         let target =
             ResolvedCargoTargetDirectory::try_new(rustdoc_path.parent().unwrap().to_path_buf())

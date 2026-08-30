@@ -416,6 +416,59 @@ fn test_non_unix_lock_acquisition_fails_closed() {
 }
 
 #[test]
+fn property_execute_type_signals_requires_exclusive_target_before_capture() {
+    let evaluator = include_str!("type_signals_evaluator.rs");
+    let identities = evaluator
+        .find("resolve_execution_identities(")
+        .expect("evaluator resolves rustdoc execution identities");
+    let capture = evaluator
+        .find("rustdoc.capture_current(&target_crate_name, target_features)")
+        .expect("evaluator captures current rustdoc through the port");
+    assert!(
+        identities < capture,
+        "exclusive identity admission must precede current rustdoc capture"
+    );
+
+    let feature_selection = include_str!("type_signals_evaluator/feature_selection.rs");
+    let identity = feature_selection
+        .find("rustdoc.execution_identity(&target, features)")
+        .expect("identities come from the rustdoc provider");
+    let exclusive = feature_selection
+        .find("require_exclusive_rustdoc_target(")
+        .expect("each identity target must be exclusive");
+    assert!(
+        identity < exclusive,
+        "exclusive target ownership must be required after identity resolution"
+    );
+}
+
+#[test]
+fn property_capture_current_rechecks_workspace_fingerprint_around_locked_export() {
+    let source = include_str!("rustdoc_crate_adapter.rs");
+    let start = source
+        .find("let start_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;")
+        .expect("capture starts with a workspace fingerprint");
+    let export = source
+        .find(".capture_rustdoc_snapshot(crate_name, features, decode_rustdoc_bytes)")
+        .expect("capture delegates to the locked exporter");
+    let exclusive = source
+        .find("require_exclusive_snapshot_target(crate_name, &snapshot)?;")
+        .expect("captured snapshot must remain on an exclusive target");
+    let end = source
+        .find(
+            "let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;",
+        )
+        .expect("capture rechecks the workspace fingerprint");
+    let reject = source
+        .find("reject_changed_workspace_fingerprint(crate_name, &start_fingerprint, &end_fingerprint)?;")
+        .expect("changed fingerprints discard the capture");
+    assert!(
+        start < export && export < exclusive && exclusive < end && end < reject,
+        "capture_current must fingerprint, lock-export, require exclusive ownership, then discard on fingerprint change"
+    );
+}
+
+#[test]
 fn property_export_source_holds_lock_from_path_selection_through_byte_read() {
     let source = include_str!("../schema_export.rs");
     let acquire = source

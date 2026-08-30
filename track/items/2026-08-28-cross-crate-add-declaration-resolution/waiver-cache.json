@@ -771,30 +771,6 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "CO-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "936a2834195533ddea658060f751fe038e5d3e6102a38f2f4afb5d965a1f1d6a"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
           "element_id": "AC-07",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -884,54 +860,6 @@
       },
       "verdict": {
         "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "cf0c3e3d95176c270eeecec8a2c474051d4cbff54a05f09fda2a0fb16523b864"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "f16c1ccc594fb10073a677d6e9d0fbc03d57c5a2a5f1488c43abb13840a2cf73"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2852,6 +2780,30 @@
       },
       "verdict": {
         "citation": "\"timeout, unsupported platform, untrusted roots, and non-authoritative outputs fail without retry or fallback.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
+        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
+        "waived_reason_hash": "f694235a38107c7763a28d68f54de751aaa52dad94c26ddad5b7e26054d6a761"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "全 writer（通常の Cargo rustdoc と別 exporter を含む）は同じ lock と所有境界を通らなければならない",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

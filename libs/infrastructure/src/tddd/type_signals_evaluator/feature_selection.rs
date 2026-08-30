@@ -43,6 +43,10 @@ pub(super) fn resolve_execution_identities(
                     "cannot resolve rustdoc execution identity for layer '{layer}': {error}"
                 ))
             })?;
+            crate::schema_export::require_exclusive_rustdoc_target(
+                identity.target_directory().as_path(),
+            )
+            .map_err(|error| EvaluateSignalsError::authoritative_input(error.to_string()))?;
             Ok((layer, identity))
         })
         .collect()

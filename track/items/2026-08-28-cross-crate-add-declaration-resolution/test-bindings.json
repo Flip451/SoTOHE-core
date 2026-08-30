@@ -162,6 +162,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_capture_current_rechecks_workspace_fingerprint_around_locked_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
         }
       ]
     },
@@ -237,6 +252,26 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_cooperative_writers_serialize_on_the_exclusive_target_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_capture_current_rechecks_workspace_fingerprint_around_locked_export"
         }
       ]
     },
@@ -672,6 +707,26 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::schema_export::tests",
           "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_non_exclusive_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_execute_type_signals_requires_exclusive_target_before_capture"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
         }
       ]
     },
@@ -1316,17 +1371,6 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
         "anchor_id": {
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-06"
-        }
-      },
-      "reason": "CO-06's exclusive target-directory ownership and common-lock participation by every writer are T014/T015 adapter contracts. This T009 compile-closure does not export rustdoc JSON or own that lock boundary."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
           "element_id": "AC-07"
         }
       },
@@ -1364,28 +1408,6 @@
         }
       },
       "reason": "Fixing resolved inputs as immutable content-addressed snapshots under one held lock is T016/T019 snapshot work. This T009 handoff consumes already-assembled AuthoritativeRustdocContext values and does not snapshot rustdoc output bytes."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-07"
-        }
-      },
-      "reason": "This function neither verifies an expected rustdoc output path nor hashes JSON bytes while a lock is held. It consumes AuthoritativeRustdocContext values already assembled from port-captured snapshots, so CO-07's lock-scoped output capture and generation recheck are not local behavior of this orchestration entry."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "AC-06"
-        }
-      },
-      "reason": "AC-06's exclusive lock from export through expected-output reading, writer participation, and ABA detection is T015/T016/T019 behavior. This T009 compile-closure does not hold that lock or compare start/end generations."
     },
     {
       "kind": "voluntary_binding",
@@ -2620,6 +2642,17 @@
         }
       },
       "reason": "The port-relevant slice of AC-08 on this Unix host is fail-closed rejection of a symlinked or unverifiable workspace/target root before export. Unsupported-platform handling is compiled only under cfg(not(unix)) in rustdoc_output_lock and is not an executable branch of capture_current here."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "This evaluator requires exclusive .sotp-rustdoc target ownership on resolved execution identities and fail-closes when a shared Cargo target is supplied. It does not acquire the 120-second rustdoc output lock, serialize concurrent exporters, or route writers through RustdocOutputLock; those lock-participation mechanics are performed by RustdocSchemaExporter during capture_current, not by this orchestration function."
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"

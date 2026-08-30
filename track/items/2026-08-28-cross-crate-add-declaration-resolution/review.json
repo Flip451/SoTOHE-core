@@ -1223,6 +1223,20 @@
           "hash": "rvw1:sha256:a7b5b88d8a47df6ccbb97db0aad4642f2fe043c47c71aff0a644959266c2a515",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T22:48:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22c0d1b10ec4c9c05289c554ff6d9279cf6020cbf6b7134807115d65e37b49ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T23:19:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22c0d1b10ec4c9c05289c554ff6d9279cf6020cbf6b7134807115d65e37b49ae",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3045,6 +3059,35 @@
           "hash": "rvw1:sha256:daf86c1df72975bcd26535460de8e4507bb5f2ca07ab27bbeeb515438c63005e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T22:51:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ae199fbd90b5d67f0fad02c889de87f5696a321f14f84011b1d025801c4d271",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T23:23:14Z",
+          "findings": [
+            {
+              "category": "exclusive-target admission",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 28,
+              "message": "`require_exclusive_rustdoc_target` treats the mere presence of a `.sotp-rustdoc` component anywhere in the path as proof of exclusive ownership. For example, an ordinary target such as `/work/.sotp-rustdoc/project/target` is accepted even though its writers need not participate in `RustdocOutputLock`; the evaluator could then treat their JSON as authoritative. CO-06/CO-07/AC-06 require fail-closed verification of the adapter-owned target boundary. Validate the expected `.sotp-rustdoc/<selection>` structure relative to the resolved Cargo target root, or require an equivalent ownership proof, instead of scanning arbitrary ancestors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1ae199fbd90b5d67f0fad02c889de87f5696a321f14f84011b1d025801c4d271",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T23:35:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1603e5e0a42a7bed4e44ea209f119d2096b07f0a8d1046a647de5a37b6f7a804",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3429,6 +3472,64 @@
           "at": "2026-08-30T21:55:32Z",
           "findings": [],
           "hash": "rvw1:sha256:90e39fac4d0bae5b991de27208f6290996ef1a4e6511a04c66b273c7147770dd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T22:50:17Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 174,
+              "message": "These tests exercise `RustdocCrateAdapter::execution_identity`, not `RustdocCratePort::capture_current`; they cannot fulfill the capture-current contract binding. Remove them from this record or bind them only to the adapter behavior they actually test.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 724,
+              "message": "These property tests inspect `schema_export` source or exercise `RustdocOutputLock` directly without invoking `execute_type_signals_for_layer`; they are not evidence for that evaluator entry. Remove these bindings or replace them with tests that execute the evaluator.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 169,
+              "message": "`property_capture_current_rechecks_workspace_fingerprint_around_locked_export` is a source-substring assertion, which the testing convention explicitly disallows as behavioral evidence. It should not be used to fulfill these bindings.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1c6cd7ddf24d7c0dadf2ea60c2a5e65c5ac6303a831be81de8e570f54723d904",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T22:56:10Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 719,
+              "message": "`property_execute_type_signals_requires_exclusive_target_before_capture` is a source-substring assertion (`include_str!` plus `find`) rather than a behavioral test. The testing convention explicitly disallows using source assertions as obligation evidence, so this new fulfillment binding must be removed or replaced with a test that executes the evaluator.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:6a995d0c412ea3055606cca5780986c1a3d6bb1a8affb56daa78976532e4220e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-30T22:58:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8008ab4ae47b4edc75dc89b8c0eeb1f5d59d5f487fe457141045d1d435bc01e3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-30T23:21:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c6cd7ddf24d7c0dadf2ea60c2a5e65c5ac6303a831be81de8e570f54723d904",
           "type": "final",
           "verdict": "zero_findings"
         }

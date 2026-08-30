@@ -48,6 +48,7 @@ use trait_origins::build_trait_origins;
 #[path = "schema_export/path_resolution.rs"]
 mod path_resolution;
 use crate::tddd::rustdoc_output_lock::RustdocOutputLock;
+pub(crate) use path_resolution::require_exclusive_rustdoc_target;
 use path_resolution::{
     absolutize_for_target_guard, checked_workspace_root, reject_symlinks_for_rustdoc_path,
     resolve_exclusive_target_dir,

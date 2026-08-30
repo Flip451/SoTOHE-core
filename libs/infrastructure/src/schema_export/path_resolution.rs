@@ -17,6 +17,29 @@ use sha2::Digest as _;
 
 const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const MAX_CARGO_METADATA_DURATION: Duration = Duration::from_secs(120);
+pub(crate) const EXCLUSIVE_RUSTDOC_TARGET_COMPONENT: &str = ".sotp-rustdoc";
+
+/// Rejects a Cargo target directory that is not this adapter's private subtree.
+///
+/// Ordinary Cargo rustdoc writes into the shared parent target directory and
+/// does not participate in the rustdoc output lock. JSON from that shared area
+/// is never treated as authoritative. The target must be exactly one selection
+/// directory below the private marker; accepting a marker anywhere in the path
+/// would also admit ordinary directories nested below an unrelated marker.
+pub(crate) fn require_exclusive_rustdoc_target(target: &Path) -> Result<(), SchemaExportError> {
+    let owns_exclusive_component =
+        target.parent().and_then(Path::file_name).is_some_and(|component| {
+            component == std::ffi::OsStr::new(EXCLUSIVE_RUSTDOC_TARGET_COMPONENT)
+        });
+    if owns_exclusive_component {
+        Ok(())
+    } else {
+        Err(SchemaExportError::RustdocFailed(format!(
+            "target directory '{}' is not an exclusive {EXCLUSIVE_RUSTDOC_TARGET_COMPONENT} area; refusing to treat rustdoc JSON as authoritative",
+            target.display()
+        )))
+    }
+}
 
 /// Resolves the target directory for snapshot reuse.
 ///
@@ -89,13 +112,14 @@ pub(super) fn resolve_exclusive_target_dir(
         append_len_prefixed_bytes(&mut identity, feature.as_str().as_bytes());
     }
     let directory_name = hex_digest(&sha2::Sha256::digest(&identity));
-    let exclusive = cargo_target_dir.join(".sotp-rustdoc").join(directory_name);
+    let exclusive = cargo_target_dir.join(EXCLUSIVE_RUSTDOC_TARGET_COMPONENT).join(directory_name);
     crate::track::symlink_guard::reject_symlinks_up_to_root(&exclusive).map_err(|error| {
         SchemaExportError::RustdocFailed(format!(
             "exclusive rustdoc target directory symlink guard rejected '{}': {error}",
             exclusive.display()
         ))
     })?;
+    require_exclusive_rustdoc_target(&exclusive)?;
     Ok(exclusive)
 }
 
@@ -244,4 +268,28 @@ fn path_bytes(path: &Path) -> Vec<u8> {
 
 fn hex_digest(digest: &[u8]) -> String {
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::require_exclusive_rustdoc_target;
+    use std::path::Path;
+
+    #[test]
+    fn exclusive_target_requires_private_marker_as_immediate_parent() {
+        assert!(
+            require_exclusive_rustdoc_target(Path::new("cargo-target/.sotp-rustdoc/selection",))
+                .is_ok()
+        );
+        assert!(
+            require_exclusive_rustdoc_target(Path::new("work/.sotp-rustdoc/project/target",))
+                .is_err()
+        );
+        assert!(
+            require_exclusive_rustdoc_target(
+                Path::new("cargo-target/.sotp-rustdoc/selection/doc",)
+            )
+            .is_err()
+        );
+    }
 }

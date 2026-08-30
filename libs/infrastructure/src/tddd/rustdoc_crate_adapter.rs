@@ -177,6 +177,7 @@ impl RustdocCratePort for RustdocCrateAdapter {
                     reason: other.to_string(),
                 },
             })?;
+        require_exclusive_snapshot_target(crate_name, &snapshot)?;
         let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
         reject_changed_workspace_fingerprint(crate_name, &start_fingerprint, &end_fingerprint)?;
         Ok(snapshot)
@@ -190,13 +191,21 @@ impl RustdocProvider for RustdocCrateAdapter {
         features: &[CargoFeatureName],
     ) -> Result<RustdocExecutionIdentity, RustdocCratePortError> {
         reject_workspace_root(&self.workspace_root, crate_name)?;
-        RustdocSchemaExporter::new(self.workspace_root.clone())
+        let identity = RustdocSchemaExporter::new(self.workspace_root.clone())
             .rustdoc_execution_identity(crate_name, features)
             .map(|(identity, _)| identity)
             .map_err(|error| RustdocCratePortError::CaptureFailed {
                 crate_name: crate_name.as_str().to_owned(),
                 reason: error.to_string(),
-            })
+            })?;
+        crate::schema_export::require_exclusive_rustdoc_target(
+            identity.target_directory().as_path(),
+        )
+        .map_err(|error| RustdocCratePortError::CaptureFailed {
+            crate_name: crate_name.as_str().to_owned(),
+            reason: error.to_string(),
+        })?;
+        Ok(identity)
     }
 }
 
@@ -236,6 +245,19 @@ fn reject_changed_workspace_fingerprint(
             reason: "workspace input fingerprint changed during rustdoc capture".to_owned(),
         })
     }
+}
+
+fn require_exclusive_snapshot_target(
+    crate_name: &CrateName,
+    snapshot: &RustdocSnapshot,
+) -> Result<(), RustdocCratePortError> {
+    crate::schema_export::require_exclusive_rustdoc_target(
+        snapshot.execution_identity().target_directory().as_path(),
+    )
+    .map_err(|error| RustdocCratePortError::CaptureFailed {
+        crate_name: crate_name.as_str().to_owned(),
+        reason: error.to_string(),
+    })
 }
 
 fn reject_workspace_root(
@@ -332,7 +354,6 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
-    #[cfg(unix)]
     use temp_env;
 
     #[test]
@@ -545,7 +566,7 @@ mod tests {
     #[test]
     fn test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes() {
         let workspace = tempfile::tempdir().unwrap();
-        let output = workspace.path().join("target/doc/domain.json");
+        let output = workspace.path().join(".sotp-rustdoc").join("fixture/doc/domain.json");
         std::fs::create_dir_all(output.parent().unwrap()).unwrap();
         let json = format!(
             r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
@@ -570,7 +591,7 @@ mod tests {
     #[test]
     fn test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced() {
         let workspace = tempfile::tempdir().unwrap();
-        let output = workspace.path().join("target/doc/domain.json");
+        let output = workspace.path().join(".sotp-rustdoc").join("fixture/doc/domain.json");
         std::fs::create_dir_all(output.parent().unwrap()).unwrap();
         let first = format!(
             r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
@@ -610,5 +631,105 @@ mod tests {
     fn test_rustdoc_crate_adapter_is_send_sync() {
         fn assert_send_sync<T: Send + Sync>() {}
         assert_send_sync::<RustdocCrateAdapter>();
+    }
+
+    fn lockfail_workspace() -> (tempfile::TempDir, RustdocCrateAdapter, CrateName) {
+        let workspace = tempfile::tempdir().unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[package]\nname = \"lockfail\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::create_dir_all(workspace.path().join("src")).unwrap();
+        std::fs::write(workspace.path().join("src/lib.rs"), "pub struct Fixture;\n").unwrap();
+        let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+        let crate_name = CrateName::new("lockfail").unwrap();
+        (workspace, adapter, crate_name)
+    }
+
+    #[test]
+    fn test_execution_identity_owns_exclusive_sotp_rustdoc_target() {
+        let (workspace, adapter, crate_name) = lockfail_workspace();
+        let cargo_target = workspace.path().join("cargo-target");
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
+                let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                let exclusive = identity.target_directory().as_path();
+                assert!(
+                    exclusive.starts_with(cargo_target.join(".sotp-rustdoc")),
+                    "cooperative writers must own a private .sotp-rustdoc subtree: {}",
+                    exclusive.display()
+                );
+                assert!(
+                    identity.expected_json_path().as_path().starts_with(exclusive),
+                    "expected rustdoc JSON must stay inside the exclusive target"
+                );
+                assert!(
+                    !identity.expected_json_path().as_path().starts_with(cargo_target.join("doc")),
+                    "the shared Cargo rustdoc directory must not be authoritative"
+                );
+            });
+        });
+    }
+
+    #[test]
+    fn test_non_cooperative_parent_cargo_target_json_is_not_authoritative() {
+        let (workspace, adapter, crate_name) = lockfail_workspace();
+        let cargo_target = workspace.path().join("cargo-target");
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
+                let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                let shared_json = cargo_target.join("doc").join("lockfail.json");
+                std::fs::create_dir_all(shared_json.parent().unwrap()).unwrap();
+                std::fs::write(&shared_json, b"non-cooperative-writer").unwrap();
+                assert_ne!(
+                    identity.expected_json_path().as_path(),
+                    shared_json.as_path(),
+                    "JSON written outside the exclusive lock boundary must not be the expected output"
+                );
+                crate::schema_export::require_exclusive_rustdoc_target(
+                    identity.target_directory().as_path(),
+                )
+                .unwrap();
+            });
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_cooperative_writers_serialize_on_the_exclusive_target_lock() {
+        use std::time::Duration;
+
+        let (workspace, adapter, crate_name) = lockfail_workspace();
+        let cargo_target = workspace.path().join("cargo-target");
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
+                let first = adapter.execution_identity(&crate_name, &[]).unwrap();
+                let second = adapter.execution_identity(&crate_name, &[]).unwrap();
+                assert_eq!(
+                    first.target_directory(),
+                    second.target_directory(),
+                    "cooperative writers for one selection must share the exclusive target"
+                );
+                let exclusive = first.target_directory().as_path().to_path_buf();
+                let held = RustdocOutputLock::acquire(&exclusive).unwrap();
+                let contender = exclusive.clone();
+                let contention = std::thread::spawn(move || {
+                    crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
+                        &contender,
+                        Duration::from_millis(25),
+                    )
+                })
+                .join()
+                .unwrap()
+                .unwrap_err();
+                assert!(
+                    contention.to_string().contains("timed out"),
+                    "cooperative writers must serialize through the exclusive lock: {contention}"
+                );
+                drop(held);
+            });
+        });
     }
 }
