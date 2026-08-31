@@ -37,12 +37,12 @@ use feature_selection::{load_layer_feature_selections, resolve_execution_identit
 use freshness::{RustdocProvider, decide_reuse_for_recorded_document};
 use inputs::{read_head_commit, read_utf8_file_limited_under_root, worktree_is_clean};
 pub(crate) use rustdoc_contexts::RustdocContextCache;
-#[cfg(all(test, feature = "test-helpers"))]
 use rustdoc_contexts::resolution_input_fingerprint;
 use rustdoc_contexts::{
     RustdocContextCacheKey, assemble_rustdoc_contexts_from_snapshot,
     current_implementation_fingerprint, evaluate_and_write_with_contexts,
-    load_authoritative_inputs, read_configured_catalogue, reject_type_signals_path,
+    load_authoritative_inputs, map_rustdoc_capture_error, read_configured_catalogue,
+    reject_type_signals_path,
 };
 use signal_builder::{build_type_signal_identity_index, build_type_signals_from_report};
 use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag};
@@ -89,86 +89,202 @@ const TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE: &str = "tddd-features-baseline.jso
 type ResolutionPathsObserver<'a> =
     &'a dyn Fn(&HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>);
 type EncodedCrateObserver<'a> = &'a dyn Fn(&domain::tddd::ExtendedCrate);
+type ReuseObserver<'a> = &'a dyn Fn();
 
-#[cfg(all(test, feature = "test-helpers"))]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
-fn snapshot_for_context_test(
-    crate_name: &str,
-    crate_data: &rustdoc_types::Crate,
-) -> RustdocSnapshot {
-    fn decode(
-        bytes: &[u8],
-    ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
-        serde_json::from_slice(bytes).map_err(|error| {
-            domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
-                crate_name: "test".to_owned(),
-                reason: error.to_string(),
-            }
-        })
+#[cfg(test)]
+#[cfg(feature = "test-helpers")]
+#[allow(clippy::expect_used, clippy::unwrap_used, clippy::too_many_arguments)]
+mod evaluator_test_support {
+    use super::*;
+
+    pub(super) fn snapshot_for_context_test(
+        crate_name: &str,
+        crate_data: &rustdoc_types::Crate,
+    ) -> RustdocSnapshot {
+        fn decode(
+            bytes: &[u8],
+        ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError>
+        {
+            serde_json::from_slice(bytes).map_err(|error| {
+                domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                    crate_name: CrateName::new("test").unwrap(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })
+        }
+        let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-evaluator-test-target",
+        ))
+        .unwrap();
+        let expected = ExpectedRustdocJsonPath::try_new(
+            target.as_path().join(format!("{crate_name}.json")),
+            &target,
+        )
+        .unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            domain::tddd::catalogue_v2::CrateName::new(crate_name).unwrap(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let bytes = serde_json::to_vec(crate_data).unwrap();
+        construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
     }
-    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
-        "/tmp/sotohe-evaluator-test-target",
-    ))
-    .unwrap();
-    let expected = ExpectedRustdocJsonPath::try_new(
-        target.as_path().join(format!("{crate_name}.json")),
-        &target,
-    )
-    .unwrap();
-    let identity = RustdocExecutionIdentity::new(
-        target,
-        domain::tddd::catalogue_v2::CrateName::new(crate_name).unwrap(),
-        vec![],
-        CargoProfileName::try_new("dev".to_owned()).unwrap(),
-        expected,
-    )
-    .unwrap();
-    let bytes = serde_json::to_vec(crate_data).unwrap();
-    construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
-}
 
-#[cfg(all(test, feature = "test-helpers"))]
-#[allow(clippy::expect_used, clippy::unwrap_used)]
-fn legacy_cache_key(
-    declaration_hash: domain::CatalogueDeclarationHash,
-    head_commit: domain::CommitHash,
-    baseline_hash: domain::BaselineHash,
-) -> TypeSignalsCacheKey {
-    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
-        "/tmp/sotohe-evaluator-test-target",
-    ))
-    .unwrap();
-    let expected =
-        ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/legacy.json"), &target)
-            .unwrap();
-    let identity = RustdocExecutionIdentity::new(
-        target,
-        CrateName::new("legacy").unwrap(),
-        vec![],
-        CargoProfileName::try_new("dev".to_owned()).unwrap(),
-        expected,
-    )
-    .unwrap();
-    let zero = Sha256Digest::try_new("0".repeat(64)).unwrap();
-    TypeSignalsCacheKey::new(
-        declaration_hash,
-        head_commit,
-        baseline_hash,
-        ImplementationFingerprint::new(zero.clone()),
-        ResolutionFingerprint::new(zero),
-        identity,
-    )
+    #[cfg(all(test, feature = "test-helpers"))]
+    #[allow(clippy::expect_used, clippy::unwrap_used)]
+    fn legacy_cache_key(
+        declaration_hash: domain::CatalogueDeclarationHash,
+        head_commit: domain::CommitHash,
+        baseline_hash: domain::BaselineHash,
+    ) -> TypeSignalsCacheKey {
+        let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-evaluator-test-target",
+        ))
+        .unwrap();
+        let expected =
+            ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/legacy.json"), &target)
+                .unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            CrateName::new("legacy").unwrap(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let zero = Sha256Digest::try_new("0".repeat(64)).unwrap();
+        TypeSignalsCacheKey::new(
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            ImplementationFingerprint::new(zero.clone()),
+            ResolutionFingerprint::new(zero),
+            identity,
+        )
+    }
+
+    #[cfg(all(test, feature = "test-helpers"))]
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn evaluate_and_write(
+        catalogue_bytes: &[u8],
+        catalogue_path: &Path,
+        track_dir: &Path,
+        workspace_root: &Path,
+        trusted_items_root: &Path,
+        binding: &TdddLayerBinding,
+        rustdoc_json: String,
+        head_commit: domain::CommitHash,
+        baseline_path: &Path,
+        baseline_json: &str,
+        baseline_hash: BaselineHash,
+    ) -> Result<ExitCode, EvaluateSignalsError> {
+        let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
+        })?;
+        let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
+            EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
+        })?;
+        let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+        })?;
+        let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
+            workspace_root,
+        )
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot load TDDD layer bindings: {error}"
+            ))
+        })?;
+        let mut rustdoc_contexts = std::collections::BTreeMap::new();
+        let mut baseline_snapshots = std::collections::BTreeMap::new();
+        for configured_binding in &configured_layers {
+            let layer =
+                LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
+                    EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+                })?;
+            if layer == target_layer {
+                rustdoc_contexts.insert(
+                    layer.clone(),
+                    AuthoritativeRustdocContext::new(
+                        layer.clone(),
+                        baseline.clone(),
+                        snapshot_for_context_test(binding.layer_id(), &current),
+                    ),
+                );
+                baseline_snapshots.insert(
+                    layer,
+                    BaselineSnapshot {
+                        path: baseline_path.to_path_buf(),
+                        hash: baseline_hash.clone(),
+                    },
+                );
+                continue;
+            }
+            let configured_baseline_path = track_dir.join(configured_binding.baseline_file());
+            let (configured_baseline_json, configured_baseline_hash) =
+                read_actual_baseline(&configured_baseline_path, trusted_items_root)?;
+            let configured_baseline = BaselineRustdocCodec::from_json(&configured_baseline_json)
+                .map_err(|error| {
+                    EvaluateSignalsError::authoritative_input(format!(
+                        "cannot decode baseline for layer '{layer}': {error}"
+                    ))
+                })?;
+            rustdoc_contexts.insert(
+                layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    layer.clone(),
+                    configured_baseline.clone(),
+                    snapshot_for_context_test(layer.as_ref(), &configured_baseline),
+                ),
+            );
+            baseline_snapshots.insert(
+                layer,
+                BaselineSnapshot { path: configured_baseline_path, hash: configured_baseline_hash },
+            );
+        }
+        let start_resolution =
+            resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
+        let start_implementation = current_implementation_fingerprint(workspace_root)?;
+        let loaded_catalogues =
+            load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
+        evaluate_and_write_with_contexts(
+            catalogue_bytes,
+            catalogue_path,
+            track_dir,
+            workspace_root,
+            trusted_items_root,
+            binding,
+            &rustdoc_contexts,
+            &baseline_snapshots,
+            &loaded_catalogues,
+            start_resolution,
+            start_implementation,
+            head_commit,
+            baseline_path,
+            baseline_hash,
+            legacy_cache_key(
+                type_signals_codec::declaration_hash(catalogue_bytes),
+                read_head_commit(workspace_root)?,
+                type_signals_codec::baseline_hash(baseline_json.as_bytes()),
+            ),
+            EvaluationObservers::none(),
+        )
+    }
 }
 
 #[derive(Clone, Copy)]
 struct EvaluationObservers<'a> {
     resolution_paths: Option<ResolutionPathsObserver<'a>>,
     encoded_crate: Option<EncodedCrateObserver<'a>>,
+    before_reuse: Option<ReuseObserver<'a>>,
 }
 
 impl EvaluationObservers<'_> {
     fn none() -> Self {
-        Self { resolution_paths: None, encoded_crate: None }
+        Self { resolution_paths: None, encoded_crate: None, before_reuse: None }
     }
 }
 
@@ -316,6 +432,7 @@ pub(crate) fn execute_type_signals_for_layer_with_launch_observer_and_context_ca
         EvaluationObservers {
             resolution_paths: Some(&observe_resolution_paths),
             encoded_crate: Some(&observe_encoded_crate),
+            before_reuse: None,
         },
     )
 }
@@ -482,6 +599,33 @@ fn execute_with_dependencies(
         decide_reuse_for_recorded_document(recorded.as_ref(), &current_key, worktree_clean);
     match reuse_decision {
         domain::TypeSignalsReuseDecision::SkipEvaluation => {
+            if let Some(observe) = observers.before_reuse {
+                observe();
+            }
+            let end_implementation = current_implementation_fingerprint(&canonical_workspace)?;
+            if end_implementation != cache_decision_start_implementation {
+                return Err(EvaluateSignalsError::authoritative_input(
+                    "workspace Rust implementation changed during type-signal evaluation",
+                ));
+            }
+            let end_resolution =
+                resolution_input_fingerprint(&canonical_workspace, &track_dir, &canonical_items)?;
+            if end_resolution != cache_decision_start_resolution {
+                return Err(EvaluateSignalsError::authoritative_input(
+                    "architecture-rules, track catalogues, rustdoc baselines, or feature declarations changed during type-signal evaluation",
+                ));
+            }
+            let end_head_commit = read_head_commit(&canonical_workspace)?;
+            if end_head_commit != head_commit {
+                return Err(EvaluateSignalsError::authoritative_input(
+                    "HEAD changed during type-signal evaluation",
+                ));
+            }
+            if !worktree_is_clean(&canonical_workspace)? {
+                return Err(EvaluateSignalsError::authoritative_input(
+                    "workspace worktree changed during type-signal evaluation",
+                ));
+            }
             return Ok(ExitCode::SUCCESS);
         }
         domain::TypeSignalsReuseDecision::ReextractAndEvaluate => {}
@@ -500,9 +644,10 @@ fn execute_with_dependencies(
     } else {
         let target_current =
             rustdoc.capture_current(&target_crate_name, target_features).map_err(|error| {
-                EvaluateSignalsError::evaluation(format!(
-                    "rustdoc export failed for '{target_crate}': {error}"
-                ))
+                map_rustdoc_capture_error(
+                    error,
+                    format!("rustdoc export failed for '{target_crate}'"),
+                )
             })?;
         if target_current.execution_identity() != current_key.rustdoc_execution_identity() {
             return Err(EvaluateSignalsError::authoritative_input(
@@ -552,110 +697,6 @@ fn execute_with_dependencies(
     )
 }
 
-#[cfg(all(test, feature = "test-helpers"))]
-#[allow(clippy::too_many_arguments)]
-fn evaluate_and_write(
-    catalogue_bytes: &[u8],
-    catalogue_path: &Path,
-    track_dir: &Path,
-    workspace_root: &Path,
-    trusted_items_root: &Path,
-    binding: &TdddLayerBinding,
-    rustdoc_json: String,
-    head_commit: domain::CommitHash,
-    baseline_path: &Path,
-    baseline_json: &str,
-    baseline_hash: BaselineHash,
-) -> Result<ExitCode, EvaluateSignalsError> {
-    let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
-    })?;
-    let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
-        EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
-    })?;
-    let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
-    })?;
-    let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
-        workspace_root,
-    )
-    .map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot load TDDD layer bindings: {error}"
-        ))
-    })?;
-    let mut rustdoc_contexts = std::collections::BTreeMap::new();
-    let mut baseline_snapshots = std::collections::BTreeMap::new();
-    for configured_binding in &configured_layers {
-        let layer =
-            LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
-            })?;
-        if layer == target_layer {
-            rustdoc_contexts.insert(
-                layer.clone(),
-                AuthoritativeRustdocContext::new(
-                    layer.clone(),
-                    baseline.clone(),
-                    snapshot_for_context_test(binding.layer_id(), &current),
-                ),
-            );
-            baseline_snapshots.insert(
-                layer,
-                BaselineSnapshot { path: baseline_path.to_path_buf(), hash: baseline_hash.clone() },
-            );
-            continue;
-        }
-        let configured_baseline_path = track_dir.join(configured_binding.baseline_file());
-        let (configured_baseline_json, configured_baseline_hash) =
-            read_actual_baseline(&configured_baseline_path, trusted_items_root)?;
-        let configured_baseline = BaselineRustdocCodec::from_json(&configured_baseline_json)
-            .map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!(
-                    "cannot decode baseline for layer '{layer}': {error}"
-                ))
-            })?;
-        rustdoc_contexts.insert(
-            layer.clone(),
-            AuthoritativeRustdocContext::new(
-                layer.clone(),
-                configured_baseline.clone(),
-                snapshot_for_context_test(layer.as_ref(), &configured_baseline),
-            ),
-        );
-        baseline_snapshots.insert(
-            layer,
-            BaselineSnapshot { path: configured_baseline_path, hash: configured_baseline_hash },
-        );
-    }
-    let start_resolution =
-        resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
-    let start_implementation = current_implementation_fingerprint(workspace_root)?;
-    let loaded_catalogues = load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
-    evaluate_and_write_with_contexts(
-        catalogue_bytes,
-        catalogue_path,
-        track_dir,
-        workspace_root,
-        trusted_items_root,
-        binding,
-        &rustdoc_contexts,
-        &baseline_snapshots,
-        &loaded_catalogues,
-        start_resolution,
-        start_implementation,
-        head_commit,
-        baseline_path,
-        baseline_hash,
-        legacy_cache_key(
-            type_signals_codec::declaration_hash(catalogue_bytes),
-            read_head_commit(workspace_root)?,
-            type_signals_codec::baseline_hash(baseline_json.as_bytes()),
-        ),
-        EvaluationObservers::none(),
-    )
-}
-
 fn evaluator_bindings_match(left: &TdddLayerBinding, right: &TdddLayerBinding) -> bool {
     left.layer_id() == right.layer_id()
         && left.catalogue_file() == right.catalogue_file()
@@ -694,6 +735,7 @@ mod properties;
 mod tests {
     use std::collections::{BTreeMap, HashMap};
 
+    use super::evaluator_test_support::{evaluate_and_write, snapshot_for_context_test};
     use super::*;
     use crate::tddd::ThreeWaySignal;
     use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
@@ -708,10 +750,34 @@ mod tests {
     use domain::FreeText;
     use domain::Timestamp;
     use domain::tddd::CatalogueToExtendedCratePort;
-    use domain::tddd::catalogue_v2::CatalogueDocument;
+    use domain::tddd::catalogue_v2::{CatalogueDocument, RustdocCratePortError};
     use domain::tddd::type_signals_doc::TypeSignalsDocument;
     use rustdoc_contexts::verify_baseline_snapshots_unchanged;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
+
+    #[test]
+    fn test_rustdoc_fingerprint_failure_between_snapshots_is_authoritative_input() {
+        let error = map_rustdoc_capture_error(
+            RustdocCratePortError::AuthoritativeInput {
+                crate_name: CrateName::new("infrastructure").unwrap(),
+                reason: FreeText::new("workspace input fingerprint changed during rustdoc capture"),
+            },
+            "rustdoc export failed for 'infrastructure'",
+        );
+
+        assert!(
+            matches!(&error, EvaluateSignalsError::AuthoritativeInput(_)),
+            "a fingerprint failure must remain an authoritative-input error: {error}"
+        );
+        assert!(
+            !matches!(&error, EvaluateSignalsError::Evaluation(_)),
+            "a fingerprint failure must not be reported as evaluation: {error}"
+        );
+        assert!(
+            error.to_string().contains("fingerprint changed"),
+            "the fingerprint failure reason must be preserved: {error}"
+        );
+    }
 
     fn rustdoc_json() -> String {
         format!(
@@ -1693,6 +1759,242 @@ mod tests {
         assert_eq!(observer.launches(), 0, "export must not run without exclusive ownership");
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_lock_failure_does_not_reuse_or_retry() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, _observer_path) = setup_workspace();
+            let commands = tempfile::tempdir().unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let invocations = workspace.path().join("rustdoc-invocations");
+            let metadata = serde_json::json!({
+                "packages": [{
+                    "name": "infrastructure",
+                    "targets": [{"kind": ["lib"], "name": "infrastructure"}]
+                }],
+                "target_directory": target_directory,
+            })
+            .to_string();
+            write_evaluator_test_toolchain(
+                commands.path(),
+                &metadata,
+                "printf '%s\\n' invoked >> \"$SOTOHE_TEST_RUSTDOC_INVOCATIONS\"\nexit 1",
+            );
+            let path = minimal_test_command_path(commands.path());
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_RUSTDOC_INVOCATIONS", Some(invocations.as_os_str())),
+                ],
+                || {
+                    let original = write_cache(
+                        &items_dir,
+                        &track_id,
+                        read_head_commit(workspace.path()).unwrap(),
+                    );
+                    let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+                    let crate_name = CrateName::new("infrastructure").unwrap();
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let target = identity.target_directory().as_path();
+                    std::fs::create_dir_all(target).unwrap();
+                    std::fs::create_dir(target.join(".sotp-rustdoc-json.lock")).unwrap();
+
+                    let error = execute_with_dependencies(
+                        &items_dir,
+                        &track_id,
+                        workspace.path(),
+                        &binding,
+                        &[],
+                        &adapter,
+                        &RustdocContextCache::default(),
+                        EvaluationObservers::none(),
+                    )
+                    .expect_err("a lock operation failure must stop evaluation");
+
+                    assert!(
+                        error.to_string().contains("lock"),
+                        "the evaluator must preserve the lock failure: {error}"
+                    );
+                    assert!(
+                        !invocations.exists(),
+                        "a failed lock operation must not launch a lockless rustdoc export"
+                    );
+                    assert_eq!(
+                        std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                        original,
+                        "a lock failure must not reuse or replace the existing cache"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_waits_on_held_exclusive_lock() {
+        use std::time::Duration;
+
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, _observer_path) = setup_workspace();
+            let commands = tempfile::tempdir().unwrap();
+            let cargo_target = tempfile::tempdir().unwrap();
+            let target_directory = cargo_target.path().to_path_buf();
+            let invocations = target_directory.join("rustdoc-invocations");
+            let metadata = serde_json::json!({
+                "packages": [{
+                    "name": "infrastructure",
+                    "targets": [{"kind": ["lib"], "name": "infrastructure"}]
+                }],
+                "target_directory": target_directory,
+            })
+            .to_string();
+            let rustdoc_json = rustdoc_json();
+            write_evaluator_test_toolchain(
+                commands.path(),
+                &metadata,
+                &format!(
+                    "printf '%s\\n' invoked >> \"$SOTOHE_TEST_RUSTDOC_INVOCATIONS\"\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s\\n' '{rustdoc_json}' > \"$CARGO_TARGET_DIR/doc/infrastructure.json\"\nexit 0"
+                ),
+            );
+            let path = minimal_test_command_path(commands.path());
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_RUSTDOC_INVOCATIONS", Some(invocations.as_os_str())),
+                ],
+                || {
+                    assert_eq!(
+                        crate::tddd::rustdoc_output_lock::RUSTDOC_OUTPUT_LOCK_TIMEOUT,
+                        Duration::from_secs(120)
+                    );
+                    let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+                    let crate_name = CrateName::new("infrastructure").unwrap();
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path().to_path_buf();
+                    let held =
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire(&exclusive)
+                            .unwrap();
+                    let thread_items_dir = items_dir.clone();
+                    let thread_track_id = track_id.clone();
+                    let thread_workspace_root = workspace.path().to_path_buf();
+                    let thread_binding = binding.clone();
+                    let contender = std::thread::spawn(move || {
+                        let adapter = RustdocCrateAdapter::new(thread_workspace_root.clone());
+                        let context_cache = RustdocContextCache::default();
+                        execute_with_dependencies(
+                            &thread_items_dir,
+                            &thread_track_id,
+                            &thread_workspace_root,
+                            &thread_binding,
+                            &[],
+                            &adapter,
+                            &context_cache,
+                            EvaluationObservers::none(),
+                        )
+                    });
+
+                    std::thread::sleep(Duration::from_millis(80));
+                    assert!(
+                        !contender.is_finished(),
+                        "type-signal evaluation must wait on the exclusive rustdoc lock"
+                    );
+                    assert!(
+                        !invocations.exists(),
+                        "evaluation must not launch a lockless export while the lock is held"
+                    );
+                    drop(held);
+                    let _result = contender.join().unwrap();
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_rejects_symlinked_output_on_no_follow_read() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, _observer_path) = setup_workspace();
+            let commands = tempfile::tempdir().unwrap();
+            let outside = tempfile::tempdir().unwrap();
+            let outside_json = outside.path().join("infrastructure.json");
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::write(&outside_json, rustdoc_json()).unwrap();
+            let metadata = serde_json::json!({
+                "packages": [{
+                    "name": "infrastructure",
+                    "targets": [{"kind": ["lib"], "name": "infrastructure"}]
+                }],
+                "target_directory": target_directory,
+            })
+            .to_string();
+            write_evaluator_test_toolchain(
+                commands.path(),
+                &metadata,
+                "mkdir -p \"$CARGO_TARGET_DIR/doc\"\nln -s \"$SOTOHE_TEST_SYMLINK_TARGET\" \"$CARGO_TARGET_DIR/doc/infrastructure.json\"\nexit 0",
+            );
+            let path = minimal_test_command_path(commands.path());
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_SYMLINK_TARGET", Some(outside_json.as_os_str())),
+                ],
+                || {
+                    let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+                    let error = execute_with_dependencies(
+                        &items_dir,
+                        &track_id,
+                        workspace.path(),
+                        &binding,
+                        &[],
+                        &adapter,
+                        &RustdocContextCache::default(),
+                        EvaluationObservers::none(),
+                    )
+                    .expect_err("a symlinked rustdoc output must fail closed");
+
+                    assert!(
+                        error.to_string().contains("symlink"),
+                        "the evaluator must preserve the no-follow symlink rejection: {error}"
+                    );
+                    assert!(
+                        !signal_path(&items_dir, &track_id).exists(),
+                        "a symlinked output must not publish a signal artifact"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(not(unix))]
+    #[test]
+    fn test_execute_type_signals_rejects_non_unix_rustdoc_target_before_export() {
+        let (workspace, items_dir, track_id, binding, _observer_path) = setup_workspace();
+        let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+
+        let error = execute_with_dependencies(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &adapter,
+            &RustdocContextCache::default(),
+            EvaluationObservers::none(),
+        )
+        .expect_err("unsupported platforms must fail closed before rustdoc export");
+
+        assert!(
+            error.to_string().contains("supported only on Unix"),
+            "the evaluator must expose the unsupported-platform guard: {error}"
+        );
+    }
+
     #[test]
     fn test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations() {
         with_process_environment_lock(|| {
@@ -2583,10 +2885,73 @@ mod tests {
         dir.join(file_name)
     }
 
-    fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {
+    #[cfg(unix)]
+    fn write_test_executable(path: &Path, contents: &str) {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        std::fs::write(path, contents).unwrap();
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn prepend_test_command_path(directory: &Path) -> std::ffi::OsString {
+        let mut entries = vec![directory.to_path_buf()];
+        entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        std::env::join_paths(entries).unwrap()
+    }
+
+    #[cfg(unix)]
+    fn minimal_test_command_path(directory: &Path) -> std::ffi::OsString {
+        std::env::join_paths([directory, Path::new("/usr/bin"), Path::new("/bin")]).unwrap()
+    }
+
+    #[cfg(unix)]
+    fn write_metadata_test_toolchain(commands: &Path) {
+        write_test_executable(
+            &commands.join("cargo"),
+            "#!/bin/sh\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
+        );
+        write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
+        write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
+    }
+
+    #[cfg(unix)]
+    fn write_evaluator_test_toolchain(commands: &Path, metadata: &str, rustdoc_command: &str) {
+        write_test_executable(&commands.join("rustup"), "#!/bin/sh\nexit 0\n");
+        write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
+        write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
+        let cargo = format!(
+            "#!/bin/sh\nif [ \"$1\" = \"metadata\" ]; then\nprintf '%s\\n' '{metadata}'\nexit 0\nfi\n{rustdoc_command}\n"
+        );
+        write_test_executable(&commands.join("cargo"), &cargo);
+    }
+
+    #[cfg(unix)]
+    fn metadata_test_output(target_directory: &Path, marker: &str) -> Vec<u8> {
+        serde_json::json!({
+            "packages": [],
+            "target_directory": target_directory,
+            "metadata_marker": marker,
+        })
+        .to_string()
+        .into_bytes()
+    }
+
+    struct TestWorkspace {
+        _temp_dir: tempfile::TempDir,
+        root: PathBuf,
+    }
+
+    impl TestWorkspace {
+        fn path(&self) -> &Path {
+            &self.root
+        }
+    }
+
+    fn setup_workspace() -> (TestWorkspace, PathBuf, TrackId, TdddLayerBinding, PathBuf) {
         let workspace = tempfile::tempdir().unwrap();
-        let root = workspace.path();
-        crate::verify::test_support::git_init(root);
+        let root = workspace.path().canonicalize().unwrap();
+        crate::verify::test_support::git_init(&root);
         let track_id = TrackId::try_new("feature-input-track").unwrap();
         let items_dir = root.join("track/items");
         let track_dir = items_dir.join(track_id.as_ref());
@@ -2614,7 +2979,7 @@ mod tests {
             "{\n  \"schema_version\": 5,\n  \"crate_name\": \"infrastructure\",\n  \"layer\": \"infrastructure\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
         )
         .unwrap();
-        let rustdoc_path = exclusive_observer_json_path(root, "infrastructure-rustdoc.json");
+        let rustdoc_path = exclusive_observer_json_path(&root, "infrastructure-rustdoc.json");
         let json = rustdoc_json();
         std::fs::write(&rustdoc_path, &json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
@@ -2637,11 +3002,12 @@ mod tests {
             }]
         }"#;
         std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
-        crate::verify::test_support::run_git(root, &["add", "."]);
-        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
+        std::fs::write(track_dir.join("plan.md"), "fixture plan\n").unwrap();
+        crate::verify::test_support::run_git(&root, &["add", "."]);
+        crate::verify::test_support::run_git(&root, &["commit", "--quiet", "-m", "fixture"]);
         let binding = parse_tddd_layers(rules).unwrap().pop().unwrap();
 
-        (workspace, items_dir, track_id, binding, rustdoc_path)
+        (TestWorkspace { _temp_dir: workspace, root }, items_dir, track_id, binding, rustdoc_path)
     }
 
     fn signal_path(items_dir: &Path, track_id: &TrackId) -> PathBuf {
@@ -2710,6 +3076,31 @@ mod tests {
         encoded
     }
 
+    fn execute_with_encoded_crate_observer(
+        items_dir: &Path,
+        track_id: &TrackId,
+        workspace_root: &Path,
+        binding: &TdddLayerBinding,
+        rustdoc: &RustdocLaunchObserver,
+        encoded_observer: &dyn Fn(&domain::tddd::ExtendedCrate),
+    ) -> Result<ExitCode, EvaluateSignalsError> {
+        let context_cache = RustdocContextCache::default();
+        execute_with_dependencies(
+            items_dir,
+            track_id,
+            workspace_root,
+            binding,
+            &[],
+            rustdoc,
+            &context_cache,
+            EvaluationObservers {
+                resolution_paths: None,
+                encoded_crate: Some(encoded_observer),
+                before_reuse: None,
+            },
+        )
+    }
+
     #[test]
     fn test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache() {
         let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
@@ -2731,6 +3122,297 @@ mod tests {
         );
         assert_eq!(observer.launches(), 0);
         assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_metadata_output_change_invalidates_reuse() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let commands = tempfile::tempdir().unwrap();
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::write(&metadata_path, metadata_test_output(&target_directory, "generation-a"))
+                .unwrap();
+            write_metadata_test_toolchain(commands.path());
+            let path = prepend_test_command_path(commands.path());
+
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("CARGO_TARGET_DIR", None::<&std::ffi::OsStr>),
+                ],
+                || {
+                    let original = write_cache(
+                        &items_dir,
+                        &track_id,
+                        read_head_commit(workspace.path()).unwrap(),
+                    );
+                    std::fs::write(
+                        &metadata_path,
+                        metadata_test_output(&target_directory, "generation-b"),
+                    )
+                    .unwrap();
+                    let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+                    execute_type_signals_for_layer_with_launch_observer(
+                        &items_dir,
+                        &track_id,
+                        workspace.path(),
+                        &binding,
+                        &[],
+                        &observer,
+                    )
+                    .expect("changed Cargo metadata must trigger a fresh evaluation");
+
+                    assert_eq!(observer.launches(), 1);
+                    let persisted = type_signals_codec::decode_with_workspace(
+                        &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                        workspace.path(),
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        persisted.cache_key(),
+                        current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
+                    );
+                    assert_ne!(
+                        persisted.cache_key().implementation_fingerprint(),
+                        type_signals_codec::decode(&original)
+                            .unwrap()
+                            .cache_key()
+                            .implementation_fingerprint(),
+                        "metadata output must change the implementation cache identity"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_metadata_failure_does_not_reuse_existing_cache() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let commands = tempfile::tempdir().unwrap();
+            write_test_executable(&commands.path().join("cargo"), "#!/bin/sh\nexit 1\n");
+            let path = minimal_test_command_path(commands.path());
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+            let error = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+                execute_type_signals_for_layer_with_launch_observer(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &observer,
+                )
+                .expect_err("Cargo metadata failure must fail before cache reuse")
+            });
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("cargo metadata"),
+                "metadata failure must remain an authoritative-input error: {error}"
+            );
+            assert_eq!(observer.launches(), 0, "metadata failure must not launch rustdoc");
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original,
+                "metadata failure must not replace the old cache"
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_path_tool_resolution_failure_does_not_reuse_existing_cache() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let commands = tempfile::tempdir().unwrap();
+            write_test_executable(
+                &commands.path().join("cargo"),
+                "#!/bin/sh\nprintf '%s\\n' '{\"packages\":[],\"target_directory\":\"target\"}'\n",
+            );
+            let path = minimal_test_command_path(commands.path());
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+            let error = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+                execute_type_signals_for_layer_with_launch_observer(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &observer,
+                )
+                .expect_err("PATH tool resolution failure must fail before cache reuse")
+            });
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("rustc")
+                    || error.to_string().contains("rustdoc")
+                    || error.to_string().contains("PATH"),
+                "PATH resolution failure must remain authoritative: {error}"
+            );
+            assert_eq!(observer.launches(), 0, "PATH failure must not launch rustdoc");
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original,
+                "PATH failure must not replace the old cache"
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_accepts_aba_generation_before_cache_reuse() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original_cache =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let rules_path = workspace.path().join("architecture-rules.json");
+            let original_rules = std::fs::read(&rules_path).unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let rules_path_for_mutation = rules_path.clone();
+            let original_for_mutation = original_rules.clone();
+            let mutate_aba = move || {
+                let replacement_b =
+                    rules_path_for_mutation.with_file_name("architecture-rules.b.tmp");
+                std::fs::write(&replacement_b, b"{\n  \"version\": 2,\n  \"layers\": []\n}\n")
+                    .unwrap();
+                std::fs::rename(&replacement_b, &rules_path_for_mutation).unwrap();
+                let replacement_a =
+                    rules_path_for_mutation.with_file_name("architecture-rules.a.tmp");
+                std::fs::write(&replacement_a, &original_for_mutation).unwrap();
+                std::fs::rename(&replacement_a, &rules_path_for_mutation).unwrap();
+            };
+            let context_cache = RustdocContextCache::default();
+
+            let result = execute_with_dependencies(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+                &context_cache,
+                EvaluationObservers {
+                    resolution_paths: None,
+                    encoded_crate: None,
+                    before_reuse: Some(&mutate_aba),
+                },
+            )
+            .expect("an A-B-A path replacement returning to the start bytes is reusable");
+
+            assert_eq!(std::fs::read(&rules_path).unwrap(), original_rules);
+            assert_eq!(result, ExitCode::SUCCESS);
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original_cache,
+                "an ABA generation must not alter the existing cache"
+            );
+            assert_eq!(observer.launches(), 0, "cache reuse must not launch rustdoc");
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_rejects_head_change_before_cache_reuse() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original_cache =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let root = workspace.path().to_path_buf();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let mutate_head = move || {
+                crate::verify::test_support::run_git(
+                    &root,
+                    &["commit", "--quiet", "--allow-empty", "-m", "cache reuse head change"],
+                );
+            };
+            let context_cache = RustdocContextCache::default();
+
+            let error = execute_with_dependencies(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+                &context_cache,
+                EvaluationObservers {
+                    resolution_paths: None,
+                    encoded_crate: None,
+                    before_reuse: Some(&mutate_head),
+                },
+            )
+            .expect_err("a HEAD change must fail before cache reuse");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("HEAD changed"),
+                "the cache-reuse path must report the changed HEAD: {error}"
+            );
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original_cache,
+                "a changed HEAD must not alter the existing cache"
+            );
+            assert_eq!(observer.launches(), 0, "cache reuse must not launch rustdoc");
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_rejects_dirty_worktree_before_cache_reuse() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original_cache =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let operational_path =
+                workspace.path().join("track/items").join(track_id.as_ref()).join("plan.md");
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let mutate_worktree = move || {
+                std::fs::write(&operational_path, "changed fixture plan\n").unwrap();
+            };
+            let context_cache = RustdocContextCache::default();
+
+            let error = execute_with_dependencies(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+                &context_cache,
+                EvaluationObservers {
+                    resolution_paths: None,
+                    encoded_crate: None,
+                    before_reuse: Some(&mutate_worktree),
+                },
+            )
+            .expect_err("a dirty worktree must fail before cache reuse");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("worktree changed"),
+                "the cache-reuse path must report the dirty worktree: {error}"
+            );
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original_cache,
+                "a dirty worktree must not alter the existing cache"
+            );
+            assert_eq!(observer.launches(), 0, "cache reuse must not launch rustdoc");
+        });
     }
 
     #[test]
@@ -2839,6 +3521,153 @@ mod tests {
             assert!(
                 !signal_path(&items_dir, &track_id).exists(),
                 "a changed implementation must not publish a signal artifact"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_changed_generation_before_persist() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let source_path = workspace.path().join("libs/infrastructure/src/lib.rs");
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let mutate_source = move |_: &domain::tddd::ExtendedCrate| {
+                std::fs::write(&source_path, "pub struct ChangedGeneration;\n").unwrap();
+            };
+
+            let error = execute_with_encoded_crate_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &observer,
+                &mutate_source,
+            )
+            .expect_err("a changed implementation generation must fail closed");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("changed during type-signal evaluation"),
+                "the changed generation must be reported: {error}"
+            );
+            assert!(
+                !signal_path(&items_dir, &track_id).exists(),
+                "a changed generation must not publish a signal artifact"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_discards_result_before_persist_when_resolution_changes() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let signal = signal_path(&items_dir, &track_id);
+            let prior = b"prior-cache-generation";
+            std::fs::write(&signal, prior).unwrap();
+            let rules_path = workspace.path().join("architecture-rules.json");
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let mutate_resolution = move |_: &domain::tddd::ExtendedCrate| {
+                let mut changed = std::fs::read(&rules_path).unwrap();
+                changed.extend_from_slice(b"\n ");
+                std::fs::write(&rules_path, changed).unwrap();
+            };
+
+            let error = execute_with_encoded_crate_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &observer,
+                &mutate_resolution,
+            )
+            .expect_err("a changed resolution generation must discard the result");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("architecture-rules")
+                    || error.to_string().contains("changed during type-signal evaluation"),
+                "the resolution change must be reported: {error}"
+            );
+            assert_eq!(
+                std::fs::read(&signal).unwrap(),
+                prior,
+                "discard-before-persist must preserve the prior cache bytes"
+            );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_path_reread_generation_change() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let catalogue_path = items_dir.join(track_id.as_ref()).join(binding.catalogue_file());
+            let mut changed = std::fs::read(&catalogue_path).unwrap();
+            changed.extend_from_slice(b"\n ");
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let mutate_catalogue = move |_: &domain::tddd::ExtendedCrate| {
+                std::fs::write(&catalogue_path, &changed).unwrap();
+            };
+
+            let error = execute_with_encoded_crate_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &observer,
+                &mutate_catalogue,
+            )
+            .expect_err("a changed catalogue path must not be accepted on reread");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("architecture-rules")
+                    || error.to_string().contains("track catalogues"),
+                "the path reread must detect the changed generation: {error}"
+            );
+            assert!(
+                !signal_path(&items_dir, &track_id).exists(),
+                "a changed catalogue generation must not publish a signal artifact"
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_accepts_aba_generation_after_path_restoration() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let rules_path = workspace.path().join("architecture-rules.json");
+            let original = std::fs::read(&rules_path).unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let rules_path_for_mutation = rules_path.clone();
+            let original_for_mutation = original.clone();
+            let mutate_aba = move |_: &domain::tddd::ExtendedCrate| {
+                let replacement_b =
+                    rules_path_for_mutation.with_file_name("architecture-rules.b.tmp");
+                std::fs::write(&replacement_b, b"{\n  \"version\": 2,\n  \"layers\": []\n}\n")
+                    .unwrap();
+                std::fs::rename(&replacement_b, &rules_path_for_mutation).unwrap();
+                let replacement_a =
+                    rules_path_for_mutation.with_file_name("architecture-rules.a.tmp");
+                std::fs::write(&replacement_a, &original_for_mutation).unwrap();
+                std::fs::rename(&replacement_a, &rules_path_for_mutation).unwrap();
+            };
+
+            let result = execute_with_encoded_crate_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &observer,
+                &mutate_aba,
+            )
+            .expect("an A-B-A path replacement returning to the start bytes must persist");
+
+            assert_eq!(std::fs::read(&rules_path).unwrap(), original);
+            assert_eq!(result, ExitCode::SUCCESS);
+            assert!(
+                signal_path(&items_dir, &track_id).exists(),
+                "an A-B-A generation returning to the start bytes must publish the result"
             );
         });
     }

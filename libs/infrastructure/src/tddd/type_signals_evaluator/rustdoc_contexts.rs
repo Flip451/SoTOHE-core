@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName};
+use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName, RustdocCratePortError};
 use domain::tddd::type_signals_doc::{
     BaselineHash, CapturedRustdocJson, RustdocExecutionIdentity, RustdocSnapshot,
     TypeSignalsCacheKey, TypeSignalsDocument,
@@ -42,6 +42,24 @@ pub(crate) use resolution_fingerprint::{
 /// exceeding this count fails closed instead of allowing unbounded aggregate
 /// process and I/O work from configuration.
 pub(super) const MAX_RUSTDOC_CONTEXT_EXPORTS: usize = 64;
+
+pub(super) fn map_rustdoc_capture_error(
+    error: RustdocCratePortError,
+    context: impl Into<String>,
+) -> EvaluateSignalsError {
+    let context = context.into();
+    match error {
+        RustdocCratePortError::AuthoritativeInput { reason, .. } => {
+            EvaluateSignalsError::authoritative_input(format!("{context}: {reason}"))
+        }
+        other @ (RustdocCratePortError::NotFound { .. }
+        | RustdocCratePortError::Io { .. }
+        | RustdocCratePortError::ParseFailed { .. }
+        | RustdocCratePortError::CaptureFailed { .. }) => {
+            EvaluateSignalsError::evaluation(format!("{context}: {other}"))
+        }
+    }
+}
 
 #[derive(Debug)]
 pub(super) struct AssembledRustdocContexts {
@@ -429,9 +447,10 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
             })?;
             let snapshot =
                 rustdoc.capture_current(&target_crate, selected_features).map_err(|error| {
-                    EvaluateSignalsError::evaluation(format!(
-                        "rustdoc export failed for layer '{layer}' ('{target}'): {error}"
-                    ))
+                    map_rustdoc_capture_error(
+                        error,
+                        format!("rustdoc export failed for layer '{layer}' ('{target}')"),
+                    )
                 })?;
             if snapshot.execution_identity().crate_name() != &target_crate
                 || snapshot.execution_identity().features() != selected_features

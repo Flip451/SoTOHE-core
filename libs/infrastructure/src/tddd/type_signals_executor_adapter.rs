@@ -165,14 +165,14 @@ impl RustdocLaunchObserver {
         }
     }
 
-    fn json_path_for(&self, crate_name: &str) -> Result<PathBuf, RustdocCratePortError> {
+    fn json_path_for(&self, crate_name: &CrateName) -> Result<PathBuf, RustdocCratePortError> {
         self.json_paths
-            .get(crate_name)
+            .get(crate_name.as_str())
             .cloned()
             .or_else(|| self.fallback_json_path.clone())
             .ok_or_else(|| RustdocCratePortError::CaptureFailed {
-                crate_name: crate_name.to_owned(),
-                reason: "test rustdoc path was not configured".to_owned(),
+                crate_name: crate_name.clone(),
+                reason: domain::FreeText::new("test rustdoc path was not configured"),
             })
     }
 }
@@ -184,7 +184,10 @@ impl RustdocCratePort for RustdocLaunchObserver {
             if error.kind() == std::io::ErrorKind::NotFound {
                 RustdocCratePortError::NotFound { path: path.to_path_buf() }
             } else {
-                RustdocCratePortError::Io { path: path.to_path_buf(), reason: error.to_string() }
+                RustdocCratePortError::Io {
+                    path: path.to_path_buf(),
+                    reason: domain::FreeText::new(error.to_string()),
+                }
             }
         })?;
         construct_captured_rustdoc_json(&bytes, decode_observed_rustdoc)
@@ -207,10 +210,10 @@ impl RustdocCratePort for RustdocLaunchObserver {
                 .or_default()
                 .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
         }
-        let path = self.json_path_for(crate_name.as_str())?;
+        let path = self.json_path_for(crate_name)?;
         let bytes = std::fs::read(&path).map_err(|error| RustdocCratePortError::Io {
             path: path.clone(),
-            reason: error.to_string(),
+            reason: domain::FreeText::new(error.to_string()),
         })?;
         let identity = observed_execution_identity(&path, crate_name, features)?;
         construct_rustdoc_snapshot(identity, &bytes, decode_observed_rustdoc)
@@ -224,7 +227,7 @@ impl RustdocProvider for RustdocLaunchObserver {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
     ) -> Result<RustdocExecutionIdentity, RustdocCratePortError> {
-        let path = self.json_path_for(crate_name.as_str())?;
+        let path = self.json_path_for(crate_name)?;
         observed_execution_identity(&path, crate_name, features)
     }
 }
@@ -232,15 +235,20 @@ impl RustdocProvider for RustdocLaunchObserver {
 #[cfg(feature = "test-helpers")]
 fn decode_observed_rustdoc(bytes: &[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError> {
     let text = std::str::from_utf8(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
-        crate_name: "test-observer".to_owned(),
-        reason: error.to_string(),
+        crate_name: fixed_test_crate_name("test_observer"),
+        reason: domain::FreeText::new(error.to_string()),
     })?;
     crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec::from_json(text).map_err(|error| {
         RustdocCratePortError::ParseFailed {
-            crate_name: "test-observer".to_owned(),
-            reason: error.to_string(),
+            crate_name: fixed_test_crate_name("test_observer"),
+            reason: domain::FreeText::new(error.to_string()),
         }
     })
+}
+
+#[cfg(feature = "test-helpers")]
+fn fixed_test_crate_name(value: &str) -> CrateName {
+    CrateName::new(value).unwrap_or_else(|_| std::process::abort())
 }
 
 #[cfg(feature = "test-helpers")]
@@ -251,27 +259,36 @@ fn observed_execution_identity(
 ) -> Result<RustdocExecutionIdentity, RustdocCratePortError> {
     let path = std::fs::canonicalize(path).map_err(|error| RustdocCratePortError::Io {
         path: path.to_path_buf(),
-        reason: error.to_string(),
+        reason: domain::FreeText::new(error.to_string()),
     })?;
-    let target_directory = path.parent().ok_or_else(|| RustdocCratePortError::Io {
-        path: path.clone(),
-        reason: "test rustdoc path has no parent".to_owned(),
-    })?;
+    let target_directory = path
+        .parent()
+        .and_then(|parent| {
+            if parent.file_name() == Some(std::ffi::OsStr::new("doc")) {
+                parent.parent()
+            } else {
+                Some(parent)
+            }
+        })
+        .ok_or_else(|| RustdocCratePortError::Io {
+            path: path.clone(),
+            reason: domain::FreeText::new("test rustdoc path has no target directory"),
+        })?;
     let target_directory = ResolvedCargoTargetDirectory::try_new(target_directory.to_path_buf())
         .map_err(|error| RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+            crate_name: crate_name.clone(),
+            reason: domain::FreeText::new(error.to_string()),
         })?;
     let expected = ExpectedRustdocJsonPath::try_new(path, &target_directory).map_err(|error| {
         RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+            crate_name: crate_name.clone(),
+            reason: domain::FreeText::new(error.to_string()),
         }
     })?;
     let profile = CargoProfileName::try_new("dev".to_owned()).map_err(|error| {
         RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+            crate_name: crate_name.clone(),
+            reason: domain::FreeText::new(error.to_string()),
         }
     })?;
     RustdocExecutionIdentity::new(
@@ -282,8 +299,8 @@ fn observed_execution_identity(
         expected,
     )
     .map_err(|error| RustdocCratePortError::CaptureFailed {
-        crate_name: crate_name.as_str().to_owned(),
-        reason: error.to_string(),
+        crate_name: crate_name.clone(),
+        reason: domain::FreeText::new(error.to_string()),
     })
 }
 

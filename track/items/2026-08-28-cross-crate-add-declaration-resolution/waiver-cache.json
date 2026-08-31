@@ -9,8 +9,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "25a070941a927e03d4deb2fef42c0eb410165779d6df34ee73f8fc10879b885c",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
         "waived_reason_hash": "6761aa549a903fe02f136a99d9f008a79f00c40e5c2eccc857793d4fddb7d909"
       },
       "obligation_id": {
@@ -19,7 +19,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder and derives the content hash from that same slice, yielding CapturedRustdocJson without placing JSON parsing behavior on the value object.",
+        "citation": "\"Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -33,8 +33,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "25a070941a927e03d4deb2fef42c0eb410165779d6df34ee73f8fc10879b885c",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
         "waived_reason_hash": "e728945ab9e8c45346258afe5b3de4f34627b8e2b3f4f1521515702c460213fd"
       },
       "obligation_id": {
@@ -43,7 +43,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder and derives the content hash from that same slice",
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -57,8 +57,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "25a070941a927e03d4deb2fef42c0eb410165779d6df34ee73f8fc10879b885c",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
         "waived_reason_hash": "eb2817540baaa84b0af47a16a76e214cd1487fa8d44feb62c601bf279df09708"
       },
       "obligation_id": {
@@ -67,7 +67,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder and derives the content hash from that same slice",
+        "citation": "Opaque-byte captured rustdoc JSON constructor",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -81,8 +81,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "25a070941a927e03d4deb2fef42c0eb410165779d6df34ee73f8fc10879b885c",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
         "waived_reason_hash": "1812abc69f8b6251386b4e9af5cbcd35597b068f3602c769c5a1156ad46aae41"
       },
       "obligation_id": {
@@ -91,7 +91,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder",
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -105,8 +105,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "25a070941a927e03d4deb2fef42c0eb410165779d6df34ee73f8fc10879b885c",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
         "waived_reason_hash": "84ff63d6ffee609ae5536c5cb384f00e85232766658f81dc08114936102813d4"
       },
       "obligation_id": {
@@ -115,7 +115,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder and derives the content hash from that same slice",
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -129,8 +129,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "9995110e2de96544a4acb5d853250f25dd37eac2d32a6943482917449d4a1291",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
         "waived_reason_hash": "15254ca11ac06d301c954a7be5377650d0f0a4e4737474638b607b9d77322249"
       },
       "obligation_id": {
@@ -139,7 +139,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Domain-owned identity-bearing construction seam that binds one RustdocExecutionIdentity to the content hash and typed decode produced from the exact same immutable byte slice in a single call\"",
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -153,8 +153,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "9995110e2de96544a4acb5d853250f25dd37eac2d32a6943482917449d4a1291",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
         "waived_reason_hash": "da05a97041d50e5a530698a09a16efb2714d494d01eca5b2ec6fb2982c172e59"
       },
       "obligation_id": {
@@ -163,7 +163,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned identity-bearing construction seam that binds one RustdocExecutionIdentity to the content hash and typed decode produced from the exact same immutable byte slice in a single call",
+        "citation": "\"Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -177,8 +177,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "9995110e2de96544a4acb5d853250f25dd37eac2d32a6943482917449d4a1291",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
         "waived_reason_hash": "e0f01a0468ca8f893ea161caafa142dcfe0e18b790f1958cd2653503b3841a52"
       },
       "obligation_id": {
@@ -187,7 +187,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Domain-owned identity-bearing construction seam that binds one RustdocExecutionIdentity to the content hash and typed decode produced from the exact same immutable byte slice in a single call",
+        "citation": "Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -201,8 +201,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "9995110e2de96544a4acb5d853250f25dd37eac2d32a6943482917449d4a1291",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
         "waived_reason_hash": "71f8b3eb54a37842c2e2974a37d5ab761d4947cb26ba0033e7bfe84761b0d291"
       },
       "obligation_id": {
@@ -211,7 +211,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "解決済み入力は content-addressed の in-memory snapshot に固定し、出力は同一 lock の臨界区間で期待 path の確認と JSON bytes の snapshot 読み取りまで完了する。target directory の専用所有と全 writer の同一 lock 参加を確認できない場合は出力を authoritative として扱わない。結果を書き出す前に開始時 snapshot との fingerprint 一致を確認する。",
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -225,8 +225,8 @@
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "9995110e2de96544a4acb5d853250f25dd37eac2d32a6943482917449d4a1291",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
         "waived_reason_hash": "168a185602c8d26d2bee1b368f5a19c133430b7e7c1774725ac0bf7d3783eca6"
       },
       "obligation_id": {
@@ -235,631 +235,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "RustdocCrateAdapter supplies the decoder and calls this function inside the trusted-root lock interval rather than pairing an identity with an independently constructed capture.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "774f3ccf098f572e04cd1119784a725238520799b1217f12c128ab3375d1de0c"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "Synchronous blocking-I/O secondary port and the sole public construction boundary for captured rustdoc values.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "513d6acc65a3b5fc778faf01131246d6d9f65b761d4cc514ffc98570687b5eb1"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "Baseline loading decodes and hashes one immutable byte vector into CapturedRustdocJson without claiming a current execution identity.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "3253432cd0cb49f0441f4f342d8796cde4c3a9ee832fe0b00b4d1e9e55f56cf1"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "\"Baseline loading decodes and hashes one immutable byte vector into CapturedRustdocJson without claiming a current execution identity. capture_current constructs RustdocSnapshot as one identity-bearing capture proof inside the same trusted-root lock interval\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "24d31987b03a3677486870e2d60f7fe01f3bd6d4822ddd4f0ea00ed6cefb9945"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "ef9d8c0f71fcc202567be0c82f582f9b9c9bc63d32146f3d021b8a7e0534a243"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "d1b8854fbf087b9405cfc026ddb66efe8aa953d42dd2ab106037f693aa6ffb25"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "3a63b4ad632f6fd088229351295b594937ec96ccc45a314902223953ce252957",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "294c6c1ca3582098a67dfaf59593462ce71ff0c771689dc3b3851713507af0a4"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"new\"))",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "ffb5aac9c9fd6b1b7bd0e210284ad1e7809a8beca79b5ab622323e72e78925e8"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "fields: [], has_stripped_fields: true",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "7a7f92134156246d80b75199a80360c45cf7ef990f4760902721e7e6239d1162",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "826bf01266fcfbdf2563e8687e77f5a178e7c5382af027e8104ef2343008b053"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "name: MethodName(Identifier(\"new\")), receiver: None",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "f6ec7deb4b3de137468622770eabfecf0214d65c4ab13836c8adc55f9b927caa"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"new\"))",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "cffb1830461ff4cad80a771cee53b7db20b5562fdf2fad057e3bc86b4429f166"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff, so declaring-layer placement is available to cross-crate add resolution (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "3a2634086df55981150ac8bbfdf31929cf392f58b75f35fd0fcdb858add8b9f9"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "2c3dc50b26bdd4d4fe8d059206b036fd38a7b742ee458178e194aaf6046d0d0b"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "0a8bfa5e2e5d97f798f162ab18ece081cf300d5af20aebf1d8672b746d1b526d",
-        "waived_reason_hash": "5d9609041f29f834862e861eeeb3c0cdff4531722c312dae543f42f8d52697d5"
-      },
-      "obligation_id": {
-        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-        "item_identifier": "entry",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "\"Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff, so declaring-layer placement is available to cross-crate add resolution\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "c345e8c58d2cd8875736a77851acbdbcaac9a4b0e6e9a3b743ec56bde1693188",
-        "waived_reason_hash": "82bbd9e3d809ddaf9556a76f3ff1375083448859dfa1b2514f6f47e6968aafbe"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-        "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Resolve each external add against its declaring layer's authoritative baseline/current rustdoc context, while preserving target-layer evaluation and rustdoc-wins precedence (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "207c001a3de695747b6c19c9635d955b9b9b67a38d112c77a46222114512ae21",
-        "waived_reason_hash": "89d18645d6e051fadee4a35f6c5458ed66c81c74bc1cd351917d73dd4b9dce5e"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"Resolve each external add against its declaring layer's authoritative baseline/current rustdoc context\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "d12eabf2abf2116f442eef3a5580369f69de8f433b33dfa6722c4bf071257a14",
-        "waived_reason_hash": "fcd446a096d6352e96ea913712eaa34497c17b3fa8e404413c02ea6af929ab60"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "shape: Unit",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "743c89b352459cb2659ab2abae64b13c74858d31403e8f346c1e6156b155fc18",
-        "waived_reason_hash": "432076ff808d52eca7b1c412ca5626590fb38eea9dac8828eb271c4a5f6fa2c6"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-        "item_identifier": "voluntary:CO-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"Resolve each external add against its declaring layer's authoritative baseline/current rustdoc context, while preserving target-layer evaluation and rustdoc-wins precedence (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "b3f57db70591e8116bb9d5a61272c68d3d6ae63580a45ee5fa7f6ec6a987d0c9",
-        "waived_reason_hash": "4feae7841d9683eed1158741e720505cabcbf2592e6e5b74366c49e51a16ef3d"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-        "item_identifier": "voluntary:AC-06",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "評価は解決済み入力と rustdoc JSON の immutable な内容 snapshot だけを用い",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "ae030458a25aa5a8ec16662c2e656a3b74d547d077d6685fc72a3459ddcb13aa"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "9b4ad8d5269bc11ccf3207e6959a1e87c91facc7334d7f7d02ae26dca338a16f"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "3a63b4ad632f6fd088229351295b594937ec96ccc45a314902223953ce252957",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "13306cb1b2a00cc0bbda18ca0ca95f149ec5a622675f2ed8f35e00fd13dafaa3"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "7a7f92134156246d80b75199a80360c45cf7ef990f4760902721e7e6239d1162",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "0511ebc62b959c8b2145ca2103cfe117e43ca76239d5c7b2501cbd7b8cc95ef7"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding, allowing omitted external-add placement to resolve from the declaring layer",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "b6fb148b497d09bdfd792a117e2de7eef3bc8cbf37396a6e61a97cc9a21f5631"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "061b0eaf54d16647e45f9c3c897a029dfdef15ae9ddfcff05812486c8ef89a67"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"rustdoc export と snapshot の再利用は、descriptor-relative かつ no-follow の trusted-root lock を提供できる Unix でだけ許可し\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "ff58d7aecad79a1f1e1955ff7d60a175854c06a609d33678872ca7ecee753889"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding",
+        "citation": "\"Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -873,7 +249,7 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
         "declaration_hash": "3e263d78e9826600bb22ea846fa4c226739eceae467682d268ac1d1c0528e9dd",
         "waived_reason_hash": "5cf34fc96d0b787c92280b52e8a15b207d31ea5de20b4d8623444370080c2514"
       },
@@ -883,7 +259,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")])), docs: Some(DocString(\"Validated expected rustdoc JSON path confined to the resolved Cargo target directory and bound into the cache identity.\"))",
+        "citation": "Validated expected rustdoc JSON path confined to the resolved Cargo target directory and bound into the cache identity.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -897,7 +273,7 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
         "declaration_hash": "942c9084bdd5cb876b209b4427c674a061ab9cd8b1fd24f2df0167fa289abdcb",
         "waived_reason_hash": "78f8b8a052563602688f72acea876f65e51cbbdfe8e71bdf0c19c2daa19c1654"
       },
@@ -921,7 +297,7 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
         "declaration_hash": "7042464e6dab185ac34e186fc0cf845e9909ef4cd8a2439ed1c08a0405c01e00",
         "waived_reason_hash": "273fe8a3be7e4036a298738ea745a5c879345e23dbd7ead84c0d2b9500f3fc42"
       },
@@ -931,7 +307,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: [], generics: [], where_predicates: []",
+        "citation": "Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -945,7 +321,7 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
         "declaration_hash": "2b909310f250b8a95b100974e82969a9631a59ec65ecbebff4d69ccacf5cb171",
         "waived_reason_hash": "15e1d0d7ecebed2a94f31a5c6dae56c4d73d4101126f9673eac24cc1ede41fb7"
       },
@@ -955,7 +331,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Validated expected rustdoc JSON path confined to the resolved Cargo target directory and bound into the cache identity.",
+        "citation": "invariants: [], ... methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -969,157 +345,13 @@
         "entry_key": "ImplementationFingerprint"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "84140b2fcc72d629bbc8b3edf745e5c10f978088059ade0671069a6f325727b8",
-        "waived_reason_hash": "6847f2dcb408bef628dfac6e9e02d3b0117862be9b26cac3601944c5d06d83b1"
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "11741c2c974a67604c261140a2a9082b01c454b7b50696aec4b142e99e978cfd",
+        "waived_reason_hash": "6c6ee85524732052bd6e43834769bcf3d5c1211d1e32a04ebc9696f41f89ec0b"
       },
       "obligation_id": {
         "entry_key": "ImplementationFingerprint",
         "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "role: ValueObject { invariants: [] }",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ImplementationFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "aa66500d55ca747e02493fb4e049ebcaebd4e0608d4d7b6f4d2c686de2fa3382",
-        "waived_reason_hash": "473686f0eaa4f6cddd35020abc6430efae3a32aa1737a2c6beb20eb4c022a15b"
-      },
-      "obligation_id": {
-        "entry_key": "ImplementationFingerprint",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ImplementationFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "d44244de8a1cd4cda035aeccdba1b99052bc4590d5435c6a15d6fbdf5d93a214",
-        "waived_reason_hash": "77a3d44bd1eef0a3a3011ad81d85dc6ebc32ca8a029f3bf136c0e23e983a6c8e"
-      },
-      "obligation_id": {
-        "entry_key": "ImplementationFingerprint",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolutionFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "647e2fb875bfb371d6a770d4bf3b27cc89bbc6e598595a0cd81ebd6a797a0627",
-        "waived_reason_hash": "3c853e5067230577ab69c8faaeac16330f2edfe242e68d077af37270ffa77b47"
-      },
-      "obligation_id": {
-        "entry_key": "ResolutionFingerprint",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolutionFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "11d18d11ee8ec6338b609a8473704821662afbb9be43d9125c70f1b9323a2d54",
-        "waived_reason_hash": "039dc02399dd5b90896ca8fd95a6fb7589c4e5dfc1377532070ac7014e82e139"
-      },
-      "obligation_id": {
-        "entry_key": "ResolutionFingerprint",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、workspace 内で Cargo rustdoc の入力となる通常ファイルの相対 path と内容 hash、および D3 が列挙する環境値を含める。",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolutionFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "6ccb08f8e1fdb5f59e5b8f4dd2afcecb79ae47199f47dbe7c0d3642045a44bba",
-        "waived_reason_hash": "b802db4dc2e6a81661d1e4daadca3656de03248fda6b0785509290418f4cc5bd"
-      },
-      "obligation_id": {
-        "entry_key": "ResolutionFingerprint",
-        "item_identifier": "voluntary:IN-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "shape: Plain { fields: [], has_stripped_fields: true }",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolutionFingerprint"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "fda4dc43436bd30fa9b4f0ca046b0afe11966e39a92dbe695a69a0d14369d24c",
-        "waived_reason_hash": "a543f96182f8696e639f92fcf604eef679ee48ff1a6becbba325c21e6b10325e"
-      },
-      "obligation_id": {
-        "entry_key": "ResolutionFingerprint",
-        "item_identifier": "voluntary:CO-07",
         "obligation_kind": "logic"
       },
       "verdict": {
@@ -1131,23 +363,71 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-06",
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ImplementationFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
+        "declaration_hash": "6e90658ba4e8b720920f6f108c805366a538b342e727199c99912d00f11934b7",
+        "waived_reason_hash": "4c11548d6c836f2e28277a0b5b5309e0b45571dcecf0dedc7510496b8134d950"
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationFingerprint",
+        "item_identifier": "voluntary:CO-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")])), docs: Some(DocString(\"Implementation input fingerprint (IN-03).\")), spec_refs: [SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-03\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"CO-04\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-04\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ImplementationFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "2f6051c9eef7160b1420b7a97ed5a93f9bbd0ad7e5da59f1e92081801b776ae8",
+        "waived_reason_hash": "111dea38d0aa194abf8737fc873eba58f3467c96752217f5a3d5327cbf923125"
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationFingerprint",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         "entry_key": "ResolutionFingerprint"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "828c7e92537d58cc5eeecab39888145c549a8fee18580845b8ee093371a518e7",
-        "waived_reason_hash": "2c4d77d851f52bcbea455260bbcccbcf125f827146c44bce4f0adb7038690112"
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "edba60ea8a6a3691c9c1c495163c8d58cffcca11b174857b9cbd5bfbe0af3d0f",
+        "waived_reason_hash": "6bff1322c765010c7985d842f3e6e39ea2ed95e085059d4825115abe7b0f9961"
       },
       "obligation_id": {
         "entry_key": "ResolutionFingerprint",
-        "item_identifier": "voluntary:AC-06",
+        "item_identifier": "voluntary:IN-03",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Content identity of architecture rules and the complete configured catalogue and rustdoc-baseline byte sets captured from one authoritative resolution snapshot.",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1161,8 +441,8 @@
         "entry_key": "ResolvedCargoTargetDirectory"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "d91187b2e7cb456c37442898e43a61c9a593d26a7680d1c6afa8b29a9b0ebc15",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "cd9ce1e7a1e5ab863451a201c32439bcf7f988761acfc6b5f86dce2b43e45752",
         "waived_reason_hash": "9300347ffba63688c5eee1e2332c690e2b98355843669cfeb3b60d3f25b45bc7"
       },
       "obligation_id": {
@@ -1171,7 +451,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Resolved absolute Cargo target directory value. It validates only absoluteness and deliberately carries no trusted-root or no-follow admission claim",
+        "citation": "Resolved Cargo target directory value (IN-03).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1185,8 +465,8 @@
         "entry_key": "ResolvedCargoTargetDirectory"
       },
       "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "50ff34f8b955af5b7faae7dc9a5293cc27b7e118fd94c2b27ccfe1289a0aa72b",
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
+        "declaration_hash": "5b5d3783f7729c68d18e917db6151ccbca56a6c2a8ece8e06561ed38d575e385",
         "waived_reason_hash": "e44737b757c8550504ad5732b48f9becc7188eee4763ec2a9c6f0310f9aef12f"
       },
       "obligation_id": {
@@ -1195,79 +475,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "It validates only absoluteness and deliberately carries no trusted-root or no-follow admission claim",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolvedCargoTargetDirectory"
-      },
-      "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "4c5b352c842cbe1d45c19be62c7df93149ef93994eb27a3286a00a096824a42a",
-        "waived_reason_hash": "f72095d4dba6e64f10b9ba160103f070823c84ee24a63983baf39f7d1a3988da"
-      },
-      "obligation_id": {
-        "entry_key": "ResolvedCargoTargetDirectory",
-        "item_identifier": "voluntary:IN-06",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "It validates only absoluteness and deliberately carries no trusted-root or no-follow admission claim",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "ResolvedCargoTargetDirectory"
-      },
-      "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "66103d695e1e34364d64f928cb746e248a7b44602843604196d0a4489e24640a",
-        "waived_reason_hash": "d527616151d7a883c3cfb6f62b9bf9c8c5e337cc039ee6e1c870a02ba632a7e5"
-      },
-      "obligation_id": {
-        "entry_key": "ResolvedCargoTargetDirectory",
-        "item_identifier": "voluntary:AC-08",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "It validates only absoluteness and deliberately carries no trusted-root or no-follow admission claim",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocExecutionIdentity"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "bd74f516bf2ed91f5fa39e958d749396cc1b9d5ae0bacaaf7e404b4fbd6ce751",
-        "waived_reason_hash": "3768734a775e27a4aa6d232d1e629069d2f43d4adcded211d1c4ba77bd618a09"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocExecutionIdentity",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Value-equatable selection of the resolved absolute Cargo target directory, crate, validated feature set, profile, and expected rustdoc JSON path used for one export.",
+        "citation": "docs: Some(DocString(\"Resolved Cargo target directory value (IN-03).\")), methods: [],",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1281,8 +489,8 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "3a63b4ad632f6fd088229351295b594937ec96ccc45a314902223953ce252957",
-        "declaration_hash": "74bf446b7c76891eebb7961bdcc848fcdf412ddd387e7bbf28b806abb9e648b1",
+        "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
+        "declaration_hash": "958bad497c411ebcbe314c8fca92ea508ca0a9578168eb0f0eb25e217380f31b",
         "waived_reason_hash": "75960aa65e7d2d9d22da6033c2738859a4780cad143dbd226a78b87ae65e7e1a"
       },
       "obligation_id": {
@@ -1291,7 +499,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Value-equatable selection of the resolved absolute Cargo target directory, crate, validated feature set, profile, and expected rustdoc JSON path used for one export.",
+        "citation": "Rustdoc execution identity (IN-03, IN-05, IN-06).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1305,8 +513,8 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "b37716e106e4b8ee31893dda95472607c3514369e80e6d7c834c5875ec759799",
+        "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
+        "declaration_hash": "1575ab2f3b2b9a195df157b4e608d4931d8bda29b275e92d570b80f4dcd7f0d4",
         "waived_reason_hash": "84f809bd8841184fd6c023f8e1f915373fbedf39279db6a332da2da414ff46b2"
       },
       "obligation_id": {
@@ -1315,7 +523,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")])), docs: Some(DocString(\"Rustdoc execution identity (IN-03, IN-05, IN-06).\")), spec_refs: [SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-03\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-05\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"CO-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-07\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1329,8 +537,8 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "7a7f92134156246d80b75199a80360c45cf7ef990f4760902721e7e6239d1162",
-        "declaration_hash": "7ed2eeb7d548aa6a8b40a30087f3cbd9010fc6aa7abee6572aedee924df3bf37",
+        "anchor_text_hash": "2b33c5753bacca9470ee03c51e459da56db19acd1317262f133e6c9405867c72",
+        "declaration_hash": "d41bb644d4f37ef1bc88be2d02477c5e1d31fbd3288560a03c655f1a30f5116f",
         "waived_reason_hash": "2d58c52b391b42739a2e8a2c6ae8bb490888dd6fba2d6a51d1bb663b948f8ad1"
       },
       "obligation_id": {
@@ -1339,7 +547,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1353,8 +561,8 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "61e563abf2eee645eb33badf0a5b181cf12f4b00c74747a7f2dfc16762c51d26",
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "1a29b288283a72fa323bea04ad31a5521746139ae48591b2d4eccd0506f7f54e",
         "waived_reason_hash": "c243c2c4fc10083dfccc217b469c522ba023463e1c21dfe94a39eae3f3d37ad0"
       },
       "obligation_id": {
@@ -1363,7 +571,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "trusted-root admission remains solely owned by RustdocCrateAdapter when it creates the capture proof.",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1377,8 +585,8 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "a32296152a7f7b3c1ce8ca0dc6616241ab0bf1a605975edb929bd76d75790d40",
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "91e971264b2ea5a296a783fdcd4e38bdf965dafab1f693e4d2a47425cada882a",
         "waived_reason_hash": "73af69a54e8e194d92780b866f41b63128c5308dfe329908488248d14d99c30a"
       },
       "obligation_id": {
@@ -1387,7 +595,31 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "trusted-root admission remains solely owned by RustdocCrateAdapter when it creates the capture proof.",
+        "citation": "docs: Some(DocString(\"Rustdoc execution identity (IN-03, IN-05, IN-06).\")), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      "key": {
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "96f49838bb0521b51040fd2263071487d51bfbaaa05fe7ae191a7d6ea58ff5ac",
+        "waived_reason_hash": "6b1163afd0469eb4efd97a17140c49933595c83534b38b29b6f64de04f226859"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Rustdoc execution identity error vocabulary (IN-03, IN-06).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1401,8 +633,8 @@
         "entry_key": "RustdocExecutionIdentityError"
       },
       "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "22679f8cca6b69c8cf0f2adaa3bcd1e7c33ca043a7ef2b7dcbc02f7e29eef57e",
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
+        "declaration_hash": "61c2e61107947e22965632a714526681ceb6d3d91334e69eaf570944f4f7b859",
         "waived_reason_hash": "1f2a48b894211156df411c83c4bbe4cf31abb69e7f07bca6c239b02f19b07788"
       },
       "obligation_id": {
@@ -1411,7 +643,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Failure to construct a complete rustdoc execution identity from a resolved absolute target path, contained expected output, and non-empty profile.",
+        "citation": "Rustdoc execution identity error vocabulary (IN-03, IN-06).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1425,8 +657,8 @@
         "entry_key": "RustdocExecutionIdentityError"
       },
       "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "aabbf6fd3487df1c2bf9ce22741869b51293ec6a5c2ce03e46e19ce70f73c4e9",
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "43dd726966f11c41da3c5ec8f0298e5848d14691a6c8d9cb605313f7d684c7f6",
         "waived_reason_hash": "67ca6b8a8da5ef5c7cbcbc0b78d6973e50d46d637058e03951d398cbed0dae89"
       },
       "obligation_id": {
@@ -1435,7 +667,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Trusted-root admission failures belong to RustdocCratePortError because only RustdocCrateAdapter performs that check.",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1449,8 +681,8 @@
         "entry_key": "RustdocExecutionIdentityError"
       },
       "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "506787905801021ace0522df24c7ebd99a12c47cc55856994d36ce0e8f731d43",
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "b965a18cbc57b60d93664ee37c5edde52f5a9cf0570fa007c9ffb77b591a2521",
         "waived_reason_hash": "8bd6d95b188d9c3365347848a6fdb98418765c046e6240f1b2cb5d48bd09a7df"
       },
       "obligation_id": {
@@ -1459,7 +691,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Trusted-root admission failures belong to RustdocCratePortError because only RustdocCrateAdapter performs that check.",
+        "citation": "Rustdoc execution identity error vocabulary (IN-03, IN-06).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1473,9 +705,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "5d4ebf3d6eedd496cf74f7592d1c9d7245859681521e4d0022b5f5bd8f8bead4",
-        "waived_reason_hash": "d41ceaf71ff2fe5e0704d084b5a7cdb5b8c5847c2dd42f0683009803aa0d41bd"
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
+        "declaration_hash": "ac4421da5157773fe27255833bc9819ec474eefe6b4ceaf00bff9c1e03d0eb09",
+        "waived_reason_hash": "c772dc7ef2da9f96e6af99e7dec0c20c5b8e2b6dce5d0765da36a1a0def30128"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1497,9 +729,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "da4b2f20d41f5d996606255246e5be6ce25fc2f4eed352a3304ba0a4982c8bda",
-        "waived_reason_hash": "4bc45317d858c7df3d30a7553e5d80f9b47f45286217198bc27bc1060e6cf14d"
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "9e6d1945d4e1a504870482441d38434cd6f5e83ff4d403cde59f422651668812",
+        "waived_reason_hash": "3ed06a9986b3f37dd15e7e34b963e8a7f0b14e66afc5319d1e0c5b07e705585f"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1507,7 +739,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "解決済み入力を immutable な content-addressed snapshot に固定し、同じ lock を期待出力 path の決定、export、出力 path の確認、及び JSON bytes の snapshot 読み取りまで保持して",
+        "citation": "Type-signals cache identity (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1521,9 +753,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "f521672db6db574e50a25383d7aabf70a3318b43c8ae3e58a1149269bac7d733",
-        "waived_reason_hash": "c93d42c803da2ae3e6984b35c22c8e2181b9e8e15d19b0b318f3e388447a85e3"
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "8d21cb76dffb77865fae9e50c76d5c0b7f4497f1970ce90b45626dad12270325",
+        "waived_reason_hash": "d1767ef78e2ae23053bd5eb9946fd09585bbfadf4c92367005534e76c991c25a"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1531,7 +763,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "role: ValueObject { invariants: [] }",
+        "citation": "Type-signals cache identity (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1545,9 +777,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "bff664641f6a3aa8f65fd72195b089ffc18513ec54633b14d8cc1ae3e980de9a",
-        "waived_reason_hash": "2f97278f7c944e912300ff3f775623c21c36ec71678dda7f052c0688a075d977"
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "010b5f57f796421906576df36439835013186f48dc1ad2ff324f04e045edec61",
+        "waived_reason_hash": "fd9304c5aa06ff56c17d8a33d1ca7ce0be03b6998b5dc0ed09909449fca3f706"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1555,7 +787,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Complete reuse identity binding declaration, baseline, HEAD, implementation and resolution fingerprints, and the exact Cargo/rustdoc execution selection; every component must match on a clean worktree.",
+        "citation": "role: ValueObject; docs: Some(DocString(\"Type-signals cache identity (IN-03, IN-07).\"))",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1569,8 +801,8 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument"
       },
       "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "2325c0de85241496117f2c1c6d4c30315b76df220c1098a0332576e618b9a8dd",
+        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
+        "declaration_hash": "cfa24a12616b7f6511909e8ce16296b8a7ca889ef97beaabf2007f0ed22b7cf3",
         "waived_reason_hash": "9a49a181e821119f322ce869353989e66e95ab62fb3b6a7dce98d7e2a0e048ae"
       },
       "obligation_id": {
@@ -1579,7 +811,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Persisted type-signals result whose cache key carries the complete D3 execution and input identity and is replaced only after final fingerprint revalidation.",
+        "citation": "ParamDeclaration { name: ParamName(Identifier(\"cache_key\")), ty: TypeRef(\"TypeSignalsCacheKey\") }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1593,8 +825,8 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "315856bc44e93a16a1970ada1ee25b9f53deb1513440470a4dae0314559df3c4",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "dcfff65a7a6f04e6558932888d084fe459752d7f34ca744b214fd6ef5874ed88",
         "waived_reason_hash": "e97f94a68fa4537fd15c7758beab500ea3b5879f7c67e4cdc53d4a8323ddd61d"
       },
       "obligation_id": {
@@ -1603,7 +835,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Persisted type-signals result whose cache key carries the complete D3 execution and input identity and is replaced only after final fingerprint revalidation.",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1617,8 +849,8 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "9d1684679758cb2e08cc99f606a43387a6dd78f105f387bb82f45326885cf5c8",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "3820fbfa938b73adcd65bf0e8042619b1e658e7e393b586c2366d249527cd287",
         "waived_reason_hash": "d6dee3253bf8f431ec743767554a08e53c62bddfc2eaed0a66e95d5762a78a58"
       },
       "obligation_id": {
@@ -1627,7 +859,31 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Closed reuse outcome: either every identity matches and evaluation is skipped, or rustdoc is re-extracted and evaluated without partial reuse.",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"SkipEvaluation\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ReextractAndEvaluate\")), payload: Unit }] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+      },
+      "key": {
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "daad5a1216d9d4ac24e3084eb6bae85104463428cf4cc7d4778c30d405665739",
+        "waived_reason_hash": "2cd8b857e4be261e2d86d4b81de1fc9b046bb873295960a9eea6241df8beb3f7"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"SkipEvaluation\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ReextractAndEvaluate\")), payload: Unit }] }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1641,7 +897,7 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
         "declaration_hash": "eec5baaa55f66a98018912e084a89aba9224fe9b2c2d172b151b1ba7b7781907",
         "waived_reason_hash": "e3afd59a2cbbce1320ee38238683fa1a796c4edbec662f4a8f93e59e807449ed"
       },
@@ -1665,7 +921,7 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
         "declaration_hash": "7e93ad62be57473d31cb2c9dc7106bbc9a4b20d4f844c8ac34e02513f65cefc4",
         "waived_reason_hash": "beeedc78ce3ce6f04b0b1d2a87df00e735e65a69986740cad9951ee686024616"
       },
@@ -1675,31 +931,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Opaque verified pair of recorded and current complete cache keys constructible only for a clean worktree and readable authority snapshot.\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "5efd940babe588342f663bf8d5f6f3aaddca07d2e52b06cf297097c2f8d75146",
-        "waived_reason_hash": "54faf7a6fb11bd9d758b3e91da37599f93015c6708893529343cd902a5718e7e"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "docs: Some(DocString(\"Fail-closed codec error for type-signal documents, including rejection of invalid persisted rustdoc execution identity values during typed decode (IN-03, CO-04, AC-04).\")), methods: []",
+        "citation": "params: [ParamDeclaration { name: ParamName(Identifier(\"recorded_key\")), ty: TypeRef(\"TypeSignalsCacheKey\") }, ParamDeclaration { name: ParamName(Identifier(\"current_key\")), ty: TypeRef(\"TypeSignalsCacheKey\") }, ParamDeclaration { name: ParamName(Identifier(\"worktree_status\")), ty: TypeRef(\"TypeSignalsWorktreeStatus\") }, ParamDeclaration { name: ParamName(Identifier(\"authority_status\")), ty: TypeRef(\"TypeSignalsAuthorityStatus\") }]",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1713,8 +945,8 @@
         "entry_key": "CapturedRustdocJson"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "02e2281809b817efccb961f6dd7c9e3742ec7aa579a373f9690aa0028d6469ca",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "310259a3eb00ca368ed2a837820a1b3d8005ae09b11288c5d09c87426c4976e8",
         "waived_reason_hash": "c7cf29ff8c23b2b746c9c5cd7cff6c2f61d9c7c4aa47c2f8ddba56050e9d917f"
       },
       "obligation_id": {
@@ -1723,7 +955,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "role: ValueObject { invariants: [] }",
+        "citation": "role: ValueObject { invariants: [] } ... docs: Some(DocString(\"Captured rustdoc JSON value (IN-03, IN-07).\"))",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1737,8 +969,8 @@
         "entry_key": "CapturedRustdocJson"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "b95829d301feb01ffb33a7fa642186da7aaf2d2e1d40d108f1d27fcf03f6b131",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "aca8a4e9ce291c62b11d3feb5439a4d949f147ace64a801cd773e37b39c03dec",
         "waived_reason_hash": "219ebe77beb9afa94cd8a71b6a6eceb55b974131f267b508f073707174dd3482"
       },
       "obligation_id": {
@@ -1761,8 +993,8 @@
         "entry_key": "CapturedRustdocJson"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "347972d018da9fca34e6bf69639772e17476884887b4b63b6dc0021401a655b4",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "06799725a5920fc1cce5103e5c45eecaaadb24bd3cba1acc42c6b839aa622a7c",
         "waived_reason_hash": "18a71569fb3fd598bba3e529bd25187a06b490d6e2dcc7271a7f15a14cf521c5"
       },
       "obligation_id": {
@@ -1771,7 +1003,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Opaque validated content-addressed value supplied only by the infrastructure RustdocCratePort boundary after one immutable rustdoc JSON byte vector has produced both its RustdocJsonHash and parsed rustdoc_types::Crate. The domain value exposes no byte-decoding constructor and never receives raw serialized input.",
+        "citation": "Captured rustdoc JSON value (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1785,8 +1017,8 @@
         "entry_key": "CapturedRustdocJson"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "001e2ab83e60fdefa4b0a55c39df062be21605281107ee0e04f8ed803cf748c7",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "d5f0cc46947a471bc36cbf85dd73e60a52eeec04888377b01b297a5eb9096529",
         "waived_reason_hash": "733fefd99a2a12d845200de0f1464e5531664e578cd6196a17b6cbd745c5392e"
       },
       "obligation_id": {
@@ -1795,7 +1027,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Opaque validated content-addressed value supplied only by the infrastructure RustdocCratePort boundary",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [],",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1809,8 +1041,8 @@
         "entry_key": "CapturedRustdocJson"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "f1730c655ac80d6bf9149b15799d85ac7e41c36654a9f215b72c01fe1f736ddc",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "9d3f093f8cdb7b8ec026835592d125a93ca53e390b93449532ed2098e5899237",
         "waived_reason_hash": "1e5a8ae344496c74d6df25d8caee2fd4bf019fb81860d70878c0664593e6d2d3"
       },
       "obligation_id": {
@@ -1819,7 +1051,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1833,8 +1065,8 @@
         "entry_key": "RustdocSnapshot"
       },
       "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "1587e86fa98fbe27c803c89305206562a6ad8ccfabd4386dd47b617a2594296c",
+        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "declaration_hash": "18cc64ff2a10d0188febaad759bf5e046ee7acd540c8ad03909357c9ee07f322",
         "waived_reason_hash": "697bc767eaa3c6f9961f5f22f638d9cb033388b74dfba44ccd44f440cbb68393"
       },
       "obligation_id": {
@@ -1843,7 +1075,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Opaque identity-bearing capture proof supplied only by RustdocCratePort::capture_current after RustdocCrateAdapter validates the identity's target root and derives the exact JSON-byte hash and parsed crate inside one lock interval.",
+        "citation": "Identity-bearing rustdoc snapshot (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1857,8 +1089,8 @@
         "entry_key": "RustdocSnapshot"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "4b1b51aba15e8c2f38f2c135e9d04f5b6b2cbc4cacdad0acec94a1dc9ea2c050",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "9fa9ce00c5613069e7c433971f3a24ca3eff42d7e9e57112ee9ff4dad7a6bcd1",
         "waived_reason_hash": "f22e85cdfa332aba99603b5201c0ada6c079c77dddc9bf8cf15d9732a5163251"
       },
       "obligation_id": {
@@ -1867,7 +1099,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Identity-bearing rustdoc snapshot (IN-03, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1881,8 +1113,8 @@
         "entry_key": "RustdocSnapshot"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "e8c63abecdb600b5824e86c9ff78e32894195fb1227ab983381f1c526c29bf14",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "5c409f04ebc39c459f9e9700004789c7beccf73093ab565f4732fd947328c9d9",
         "waived_reason_hash": "ddeb139f11c6fc50cedd40a567d1dd0c835dd8d4d15dfade85b32a0591769bc1"
       },
       "obligation_id": {
@@ -1891,7 +1123,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "It has no public constructor from separate RustdocExecutionIdentity and CapturedRustdocJson values, so mixed-generation assembly is not part of the contract and paths are never re-read for equality.",
+        "citation": "fields: [], methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1905,8 +1137,8 @@
         "entry_key": "RustdocSnapshot"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "d51a3fa1004fe701ea9def88d5d0ab6452f66c77b54f83083c3dd239fdca9903",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "0ff2a51bff0ea3da6f02a99e62013b677c01c7db91a341e226efe15380b43549",
         "waived_reason_hash": "3dd4262974b5612e1a279fba57151c900fb5c430f66e244f37d7c96344e4f16b"
       },
       "obligation_id": {
@@ -1915,7 +1147,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "invariants: []",
+        "citation": "\"Identity-bearing rustdoc snapshot (IN-03, IN-07).\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1929,8 +1161,8 @@
         "entry_key": "RustdocSnapshot"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "76225fbcbff6d13e3d4feeab77f7cbbf12fb0fdd6554af321d4cddd6e9df47c2",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "66da4605f52fc17e143406313c9578226cde50c46006c0bb3c9ec94f5883bf1e",
         "waived_reason_hash": "b1bbb6a9986eb47f990eedb0130ad766caa0d45425c3570010e8b0ba290f703e"
       },
       "obligation_id": {
@@ -1939,7 +1171,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Opaque identity-bearing capture proof supplied only by RustdocCratePort::capture_current after RustdocCrateAdapter validates the identity's target root and derives the exact JSON-byte hash and parsed crate inside one lock interval.\"",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1953,7 +1185,7 @@
         "entry_key": "RustdocJsonHash"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
         "declaration_hash": "fd4a3c353e0ad2c669f0e7ae23d0ec47d4bcfefaab9acec441055d65def5330c",
         "waived_reason_hash": "be5e23ca937d5072da3291d0d4603b515580db7b9976841d5c75527305b00b99"
       },
@@ -1963,7 +1195,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -1977,7 +1209,7 @@
         "entry_key": "RustdocJsonHash"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
         "declaration_hash": "1845082299ff5564b6a8c5b8a3f031186e125320d4482ca8d514545eb0d5d72d",
         "waived_reason_hash": "d6fb15738846380439f25185510e2779bd47ecdf693d72343b8f3a1ba5e9a4d2"
       },
@@ -1987,7 +1219,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "citation": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2001,7 +1233,7 @@
         "entry_key": "RustdocJsonHash"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
         "declaration_hash": "e1caecfcefb1e83d06652de8fa69ff1992becdb42565d23762d1add504915074",
         "waived_reason_hash": "eee00cd326bc43531041602f56077634d9c40d34fa19a9bf3db658072c00e24d"
       },
@@ -2025,7 +1257,7 @@
         "entry_key": "RustdocJsonHash"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
         "declaration_hash": "3a577bd98937cbca9c63bbcda9b49190730b442eefc0f22a90769e9e6e502390",
         "waived_reason_hash": "8bcc926a8edcfa26da174a03a91dd11fb69889566a57bb66b1ea93036625e67e"
       },
@@ -2035,127 +1267,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "0e6381808526077b2770f2fb815be11054fb16d65c218b6b5209977e4f1d1a02"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "unsupported platform ... fail without retry or fallback",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "8cc28c0eba3ecf9cdd5cd9ca3947cfea40438865c394331c82294120ee6b3467"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "8cc28c0eba3ecf9cdd5cd9ca3947cfea40438865c394331c82294120ee6b3467"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous blocking export and construction boundary: resolve and validate the complete execution identity",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "df63f5390d883ea5fe76d938ad3afd69cb10a6c064f7f30bb933905ca88a90f0"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter, and return the opaque CapturedRustdocJson value.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "df63f5390d883ea5fe76d938ad3afd69cb10a6c064f7f30bb933905ca88a90f0"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"capture_current constructs RustdocSnapshot as one identity-bearing capture proof inside the same trusted-root lock interval\"",
+        "citation": "\"Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2169,8 +1281,8 @@
         "entry_key": "AuthoritativeRustdocContext"
       },
       "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "7c54564f4fac4ff82bc8190fae5d770e2367114b857e371ae9539a1e55a30eed",
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "e8c00fa9fe5188496ae6032f320e106df04a7594e27539c244dfadb625c3c91c",
         "waived_reason_hash": "26b2bcc213bfa4cd419c68533dbf5a7c61d06665f3075db72a118cc055b527c6"
       },
       "obligation_id": {
@@ -2179,7 +1291,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "evaluation reads this captured generation only and never re-reads paths",
+        "citation": "fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2193,8 +1305,8 @@
         "entry_key": "AuthoritativeRustdocContext"
       },
       "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "42148d1afe388ff186c18db3a1fb9dc551466481dadd1106e42481b077390743",
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "20822cdbc456c755289ef76dcfb03d029b127b7c5e14a0cdefbc93c98ae9d5c5",
         "waived_reason_hash": "d847f58b2ffbe20eee9c521e44beace6930d209b4f07142491fd6fdc95090394"
       },
       "obligation_id": {
@@ -2203,7 +1315,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Authoritative per-layer rustdoc context (IN-02, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2217,8 +1329,8 @@
         "entry_key": "AuthoritativeRustdocContext"
       },
       "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "53d36d91214b95d34b49240f0432c6f53f8a05c0cfba506d31d981b29145c1d2",
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "4f4180d6ba327e44bab422c2845fa25a06aa5545f90279589a52f964050844ab",
         "waived_reason_hash": "a47c247f070ca7ee9d2b32394d7dbb2de01c2bc909a9f9cd19e027c1db36c4e4"
       },
       "obligation_id": {
@@ -2227,79 +1339,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "7a50f38b38568bd898c501346d4e26d9335434dec53ad5820cf31cacee75b88c",
-        "waived_reason_hash": "9e71decff17d75dbf32c6ed233634199ec003c97ebf20a9c1b3b8dd1126e8d5a"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Fail-closed evaluator error distinguishing unavailable authoritative inputs, rustdoc/lock/evaluation failure, and cache persistence failure; no branch permits stale snapshots or old results as success.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "557072f309cbaf69ee5735b8815253902dfbb0e083c5fe472f42dcd43ac87e83",
-        "waived_reason_hash": "71f483a0339a6e6c9849b9bdec46fd2fea354a5f8640761ace241c9f48d20ad5"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "e96db5c574e40a8bdc93d47775c7bb3b6080bcb9707a04817600ea39a53f0d8f",
-        "waived_reason_hash": "ca1071bc9dd95433f5ef80854453c4320cd67476959dc89fd3132c9c45c77364"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "methods: []",
+        "citation": "Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2314,7 +1354,7 @@
       },
       "key": {
         "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
-        "declaration_hash": "843774fe08d7973694bacd76ba44461c029694082caf5ce48652493c6ab4d713",
+        "declaration_hash": "36c1caaa85767721f5f98417312c59fd72ebb230bf6ef6399bd6fb817b4a47ef",
         "waived_reason_hash": "104e3a9dd7f1317147a46d8ad0af97d6068d020e59442d3245ecc258b11b6bb7"
       },
       "obligation_id": {
@@ -2323,7 +1363,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2338,7 +1378,7 @@
       },
       "key": {
         "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
-        "declaration_hash": "3ba8815c54b4dea02255da32e13200940274ed86fa4ef6e2cdd2f537f45e428e",
+        "declaration_hash": "20d7be939985fd54b5fa31c7896ca5dc6b395f6975976aba51d393bc4fe4d53c",
         "waived_reason_hash": "2f48056f95c97c0b040a70946c0c14972958da77861227d8ac55bb9b653dc3a7"
       },
       "obligation_id": {
@@ -2347,7 +1387,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"AuthoritativeInput\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"Evaluation\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"CacheWrite\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }] }, methods: [], generics: [], where_predicates: [],",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2362,7 +1402,7 @@
       },
       "key": {
         "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
-        "declaration_hash": "5406bc5e1cf82752e26ad60e6c87313deb36db944cb0556dabd27c02824cf33d",
+        "declaration_hash": "2044fd441de6a38507b7cb445c26752cf82be6f3bfb7a577994a7f5c53e3f267",
         "waived_reason_hash": "9ebff6d24e79dbd7ef6e9c66f0a38a5f80b94adb478e3146b05b801c0310e293"
       },
       "obligation_id": {
@@ -2371,7 +1411,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Type-signals evaluator error vocabulary (IN-03, IN-04, IN-05, IN-06, IN-07).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2385,8 +1425,8 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       },
       "key": {
-        "anchor_text_hash": "3a63b4ad632f6fd088229351295b594937ec96ccc45a314902223953ce252957",
-        "declaration_hash": "30add0817465228f07b8c75584c60846add4730c0230c191e7f38b441febb29f",
+        "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
+        "declaration_hash": "f33afdc25a689699708b8db5e565d8a9982b1f5ad6651bedc01759e2fcd653d2",
         "waived_reason_hash": "96c3ce861a2458cbcecfe02bb1a4df0f21e13d164bd18c6fb58729c81a766509"
       },
       "obligation_id": {
@@ -2409,8 +1449,8 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       },
       "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "a5fdd02bfc789114eb3a2a5dd59d62805a26396f8a50b50aec654ab01a64c644",
+        "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
+        "declaration_hash": "7eb11df55a9f6166c6c533cf11bbf6e5f85a4357c980adaa6f9a336ed7a6b205",
         "waived_reason_hash": "8a866e55a141977b67a93f9ff8f541bb989d99786463cd770635134e6f512636"
       },
       "obligation_id": {
@@ -2419,7 +1459,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: [], generics: [], where_predicates: [],",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2433,8 +1473,8 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       },
       "key": {
-        "anchor_text_hash": "7a7f92134156246d80b75199a80360c45cf7ef990f4760902721e7e6239d1162",
-        "declaration_hash": "5aa0e7bfad30be11a4c87db590e37d4b8270d504887a045595c6adfe7dc575ea",
+        "anchor_text_hash": "2b33c5753bacca9470ee03c51e459da56db19acd1317262f133e6c9405867c72",
+        "declaration_hash": "0ff6c9ae0da1eaed97b71536a03ba881e9db1d26b8952834284537f6da03def4",
         "waived_reason_hash": "e5dd19dea8e316c20c12213bc0044246032948fb9c4cda0cfb35ad0d60728a60"
       },
       "obligation_id": {
@@ -2457,8 +1497,8 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       },
       "key": {
-        "anchor_text_hash": "cd3957dbb7df899b49c8b034c14a7f784b37ffc0b05e1cb8fb58cd438f2bf98b",
-        "declaration_hash": "54b3b4e442cb7fc0eebc4f2848b702bdc746cb9991224428f03914de2b373ffe",
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "7785152c5350298ec2826e55e87265e4ef203ee146d674e23b9ad0cb9ffeb58d",
         "waived_reason_hash": "0f64f676217fda93c6f458a657226046ec427aa7963ba3a98d920ae6f349473b"
       },
       "obligation_id": {
@@ -2467,7 +1507,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"AuthoritativeInput\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"Evaluation\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"CacheWrite\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_evaluator\")]))",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2481,8 +1521,8 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       },
       "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "674a1e2a17a806244ebef030b73d78ed2b934a5d000b4418fb255a947de157ba",
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "a130b04f16b73eeef670c03fe729692e9e3518ad355553790f45ce0bbda593c9",
         "waived_reason_hash": "7ef13bbddd9584099b463e6cd92df156b8e28e755b8e6741936b997532175fc5"
       },
       "obligation_id": {
@@ -2491,367 +1531,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"AuthoritativeInput\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"Evaluation\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"CacheWrite\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_evaluator\")]))",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "2df8f1d0447d649da3da1694f9eef7d94145b1889c5327e16fa9aeaa29157ca5",
-        "waived_reason_hash": "284dbf7461ff7b0c4ac8fc97bd1dee6fddf4628020c4dad2cc1067c83d155276"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:IN-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "90b660e99188a5f5230dfbe4f5e5fa275f35f1b62b514cbd7f1b98df6a19a708",
-        "waived_reason_hash": "18c2968af8cee91f1ce952ed1b26759952d18b6b91f7147b41453700c77e2e4d"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:CO-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "methods: []",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "2841f1e00394df4258559bc780d19b51d0750ab38f2e91e2f95bda47ba456e6f",
-        "waived_reason_hash": "1a0d97c4446ec6c3c7ac7675b5ba79dce4d9a426ed1708de93d3b50d695886d3"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
-        "item_identifier": "voluntary:AC-06",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"AuthoritativeInput\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"Evaluation\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"CacheWrite\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_evaluator\")]))",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "03338f80d4400f33a6800bf47ad88b1488e85a8852a6028205b835306d82d54e"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"acquire the trusted-root lock\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "e088554d030799f9e6dd0c607ec0a2d1ff7cf7bb6523c6e34e4a7609e4b86485"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "e088554d030799f9e6dd0c607ec0a2d1ff7cf7bb6523c6e34e4a7609e4b86485"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "capture_current constructs RustdocSnapshot as one identity-bearing capture proof inside the same trusted-root lock interval",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "df1681e9a11f4cf8916329e1cc12a2f10a642c0b453d517865842d2659b20d60",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "fbaab1c27e914cc5ae13fe052bf4cf5043bf0869dfc79e36de4efb9ddeee2667"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "\"constructs RustdocSnapshot as one identity-bearing capture proof inside the same trusted-root lock interval\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "7434838a70c7f687b5acb32817d4300a40398ee0313686b860f6069223425fb6"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "Synchronous blocking export and construction boundary: resolve and validate the complete execution identity, acquire the trusted-root lock, wait for at most 120 seconds, run rustdoc export, verify the expected output, hash and typed-decode its immutable bytes, and construct one identity-bearing RustdocSnapshot before returning on the caller thread.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "9265f9e280d780ddf69aeba1fe502947d06e48f5f28b62429a8ca3c84a23f6ad",
-        "waived_reason_hash": "4318d1b75d6ff34172652b9363dc05d0c3dac6198b7ebad89be44afd7ac2a9b5"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
-        "obligation_kind": "contract_conformance"
-      },
-      "verdict": {
-        "citation": "Synchronous blocking-I/O secondary port and the sole public construction boundary for captured rustdoc values.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "99c00d108ff58d009d50e1a8727e44ae39ce57d80797c8d08bb688cb4566eefe",
-        "waived_reason_hash": "b6c7ebd737042f3ed7403d0f1ea7db98e874c6798b2648c1bac013b3b7b2ccbd"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:load_from_path",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter, and return the opaque CapturedRustdocJson value.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "b6c7ebd737042f3ed7403d0f1ea7db98e874c6798b2648c1bac013b3b7b2ccbd"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "Synchronous blocking export and construction boundary: resolve and validate the complete execution identity, acquire the trusted-root lock, wait for at most 120 seconds, run rustdoc export, verify the expected output, hash and typed-decode its immutable bytes, and construct one identity-bearing RustdocSnapshot before returning on the caller thread.",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "af65203b8ee4a30edf4a4583f4375f3e8b7917b0c31cad26498a326e5061ab2e",
-        "declaration_hash": "52bcea3f39dc484f614db6387a44244f11bddbad419798f1461ca6ad508f28ae",
-        "waived_reason_hash": "9dbe05bac70fa078749ef46f7b06e6efd396c21b765ef0071790e90c09cedf2c"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"timeout, unsupported platform, untrusted roots, and non-authoritative outputs fail without retry or fallback.\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "5832c5d7b4438bd9d2925e3cb6c3f7eea7235fe61af4a8665ff835ee0ab5e2e9",
-        "declaration_hash": "3ec23d7457b03cd2eb1c5ee4905626f0ca2b660c599ddd2447fe5097f972610f",
-        "waived_reason_hash": "f694235a38107c7763a28d68f54de751aaa52dad94c26ddad5b7e26054d6a761"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "全 writer（通常の Cargo rustdoc と別 exporter を含む）は同じ lock と所有境界を通らなければならない",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
-      },
-      "key": {
-        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
-        "declaration_hash": "a581688d2f9d5684a67442455241b7ab2caf0a217f9d2df7ce1078664cf4f7b2",
-        "waived_reason_hash": "ce1c9ba354b80d98bc8a4b1989951ac2d32996db302e69cdde18a1fda013c0fe"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
-        "item_identifier": "voluntary:IN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
-      },
-      "key": {
-        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
-        "declaration_hash": "b56071380cc565b01b5bb071674d12a4b5daa402124a3eb7df4daeb155803d1c",
-        "waived_reason_hash": "2373b704751db15b4affd51b2228a7896270f5312c2133263a03a593e378599f"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、rustdoc graph を変え得る入力を D3 の authoritative input set、すなわち workspace 内で Cargo rustdoc の入力となる通常ファイルの相対 path と内容 hash、および D3 が列挙する環境値に限定し",
+        "citation": "docs: Some(DocString(\"Type-signals evaluator error vocabulary (IN-03, IN-04, IN-05, IN-06, IN-07).\"))",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -2862,68 +1542,20 @@
           "element_id": "AC-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
       },
       "key": {
-        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
-        "declaration_hash": "a5cfa9bc4b76271202af1fcbc5f59b6370b19bcdca18534c71c9922db4e55deb",
-        "waived_reason_hash": "dbcb4a2e1d9fcbaeefcffa420335d31a325c0a0f59bbe79ac8aadf64c09a4d4f"
+        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "declaration_hash": "4a38665a3ae79ae82dc70a9677f2fc5cef4cae235e81d092c5564d9d91a34a46",
+        "waived_reason_hash": "fce673d08b4d1550be2ef83934f59b047eb153b574b7c2bc2f63b37a6c90edfe"
       },
       "obligation_id": {
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
         "item_identifier": "voluntary:AC-04",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
-      },
-      "key": {
-        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
-        "declaration_hash": "a2681978439103cf6ecc4b5a7b26e915e986c19d51fcf109b423333959d48150",
-        "waived_reason_hash": "0cf69c9a9c108e01809e9b28be892ab0e7ce0afb9fad49593b50ba797c19a493"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
-        "item_identifier": "voluntary:CO-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
-      },
-      "key": {
-        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
-        "declaration_hash": "5209f966ee0e1d5600fceb4e7d705edd4828f093d4c9eff6534b31e6ae6d492c",
-        "waived_reason_hash": "dbbd9643d84a350cbfd7519c0dbfe5e2331b1d310663244d3d40ec155be29708"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
-        "item_identifier": "voluntary:AC-06",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held; path-returning APIs are removed",
+        "citation": "Rustdoc port error vocabulary (AC-04, CO-04).",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

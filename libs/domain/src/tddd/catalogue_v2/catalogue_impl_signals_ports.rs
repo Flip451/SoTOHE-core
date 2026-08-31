@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
 use sha2::Digest as _;
 
 use crate::tddd::CargoFeatureName;
+use crate::tddd::catalogue_linter::FreeText;
 use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
 use crate::tddd::type_signals_doc::{
     CapturedRustdocJson, CatalogueDeclarationHash, RustdocSnapshot, Sha256Digest,
@@ -145,6 +146,8 @@ impl AttestedCatalogueDocument {
 ///
 /// `NotFound` / `Io` cover baseline file load failures;
 /// `ParseFailed` covers JSON parse failures (from `BaselineRustdocCodec::from_json`);
+/// `AuthoritativeInput` covers failures to acquire or verify the current
+/// rustdoc input;
 /// `CaptureFailed` covers `cargo rustdoc` invocation failures (from
 /// `RustdocSchemaExporter::export_rustdoc_json_path`).
 ///
@@ -161,21 +164,28 @@ pub enum RustdocCratePortError {
         /// Path that was being read.
         path: PathBuf,
         /// Human-readable reason from the underlying I/O error.
-        reason: String,
+        reason: FreeText,
     },
     /// JSON parse failure for the rustdoc output.
     ParseFailed {
         /// Crate name for which parsing failed.
-        crate_name: String,
+        crate_name: CrateName,
         /// Human-readable reason from the codec error.
-        reason: String,
+        reason: FreeText,
+    },
+    /// The current rustdoc input could not be acquired or verified as authoritative.
+    AuthoritativeInput {
+        /// Crate name for which authoritative input was requested.
+        crate_name: CrateName,
+        /// Human-readable reason the input could not be trusted.
+        reason: FreeText,
     },
     /// `cargo rustdoc` invocation failed during live capture.
     CaptureFailed {
         /// Crate name for which capture was attempted.
-        crate_name: String,
+        crate_name: CrateName,
         /// Human-readable reason from the exporter error.
-        reason: String,
+        reason: FreeText,
     },
 }
 
@@ -190,6 +200,9 @@ impl fmt::Display for RustdocCratePortError {
             }
             Self::ParseFailed { crate_name, reason } => {
                 write!(f, "failed to parse rustdoc JSON for '{crate_name}': {reason}")
+            }
+            Self::AuthoritativeInput { crate_name, reason } => {
+                write!(f, "authoritative rustdoc input unavailable for '{crate_name}': {reason}")
             }
             Self::CaptureFailed { crate_name, reason } => {
                 write!(f, "rustdoc capture failed for '{crate_name}': {reason}")
@@ -236,6 +249,9 @@ pub trait RustdocCratePort: Send + Sync {
     ///
     /// Returns [`RustdocCratePortError::ParseFailed`] if the generated JSON cannot
     /// be deserialized.
+    ///
+    /// Returns [`RustdocCratePortError::AuthoritativeInput`] if the current
+    /// rustdoc input cannot be acquired or verified.
     fn capture_current(
         &self,
         crate_name: &CrateName,

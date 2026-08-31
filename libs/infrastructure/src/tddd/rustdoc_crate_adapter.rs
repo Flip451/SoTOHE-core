@@ -11,6 +11,7 @@
 
 use std::path::{Path, PathBuf};
 
+use domain::FreeText;
 use domain::tddd::catalogue_v2::{RustdocCratePort, RustdocCratePortError};
 use domain::tddd::type_signals_doc::CapturedRustdocJson;
 #[cfg(test)]
@@ -23,7 +24,7 @@ use domain::tddd::type_signals_doc::{
 };
 use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 
-use crate::schema_export::RustdocSchemaExporter;
+use crate::schema_export::{RustdocCaptureError, RustdocSchemaExporter};
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 #[cfg(test)]
 use crate::tddd::rustdoc_output_lock::RustdocOutputLock;
@@ -71,13 +72,19 @@ impl RustdocCratePort for RustdocCrateAdapter {
     /// Returns [`RustdocCratePortError::ParseFailed`] if JSON deserialization or
     /// format-version validation fails.
     fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
-        let _crate_name =
-            path.file_stem().and_then(|s| s.to_str()).unwrap_or("<unknown>").to_owned();
+        let diagnostic_crate_name = match path
+            .file_stem()
+            .and_then(|value| value.to_str())
+            .and_then(|value| CrateName::new(value.to_owned()).ok())
+        {
+            Some(crate_name) => crate_name,
+            None => unknown_crate_name()?,
+        };
 
         reject_symlinks_up_to_root(&self.workspace_root).map_err(|error| {
             RustdocCratePortError::Io {
                 path: self.workspace_root.clone(),
-                reason: format!("symlink guard rejected workspace root: {error}"),
+                reason: FreeText::new(format!("symlink guard rejected workspace root: {error}")),
             }
         })?;
 
@@ -96,7 +103,7 @@ impl RustdocCratePort for RustdocCrateAdapter {
         reject_symlinks_below(path, &self.workspace_root).map_err(|e| {
             RustdocCratePortError::Io {
                 path: path.to_path_buf(),
-                reason: format!("symlink guard rejected baseline path: {e}"),
+                reason: FreeText::new(format!("symlink guard rejected baseline path: {e}")),
             }
         })?;
 
@@ -106,25 +113,33 @@ impl RustdocCratePort for RustdocCrateAdapter {
         let canonical_root =
             self.workspace_root.canonicalize().map_err(|error| RustdocCratePortError::Io {
                 path: self.workspace_root.clone(),
-                reason: format!("cannot canonicalize trusted workspace root: {error}"),
+                reason: FreeText::new(format!(
+                    "cannot canonicalize trusted workspace root: {error}"
+                )),
             })?;
+        if !canonical_root.is_dir() {
+            return Err(RustdocCratePortError::Io {
+                path: self.workspace_root.clone(),
+                reason: FreeText::new("trusted workspace root is not a directory"),
+            });
+        }
         let canonical_path = path.canonicalize().map_err(|error| {
             if error.kind() == std::io::ErrorKind::NotFound {
                 RustdocCratePortError::NotFound { path: path.to_path_buf() }
             } else {
                 RustdocCratePortError::Io {
                     path: path.to_path_buf(),
-                    reason: format!("cannot canonicalize baseline path: {error}"),
+                    reason: FreeText::new(format!("cannot canonicalize baseline path: {error}")),
                 }
             }
         })?;
         if !canonical_path.starts_with(&canonical_root) {
             return Err(RustdocCratePortError::Io {
                 path: path.to_path_buf(),
-                reason: format!(
+                reason: FreeText::new(format!(
                     "baseline path resolves outside trusted workspace root: {}",
                     path.display()
-                ),
+                )),
             });
         }
 
@@ -137,19 +152,23 @@ impl RustdocCratePort for RustdocCrateAdapter {
             if error.kind() == std::io::ErrorKind::NotFound {
                 RustdocCratePortError::NotFound { path: path.to_path_buf() }
             } else {
-                RustdocCratePortError::Io { path: path.to_path_buf(), reason: error.to_string() }
+                RustdocCratePortError::Io {
+                    path: path.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                }
             }
         })?
         .ok_or_else(|| RustdocCratePortError::NotFound { path: path.to_path_buf() })?;
         construct_captured_rustdoc_json(&bytes, decode_rustdoc_bytes).map_err(|error| match error {
-            RustdocCratePortError::ParseFailed { .. } => error,
+            RustdocCratePortError::ParseFailed { reason, .. } => {
+                RustdocCratePortError::ParseFailed {
+                    crate_name: diagnostic_crate_name.clone(),
+                    reason,
+                }
+            }
             other => RustdocCratePortError::ParseFailed {
-                crate_name: path
-                    .file_stem()
-                    .and_then(|value| value.to_str())
-                    .unwrap_or("<unknown>")
-                    .to_owned(),
-                reason: other.to_string(),
+                crate_name: diagnostic_crate_name.clone(),
+                reason: FreeText::new(other.to_string()),
             },
         })
     }
@@ -165,18 +184,7 @@ impl RustdocCratePort for RustdocCrateAdapter {
         let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
         let snapshot = exporter
             .capture_rustdoc_snapshot(crate_name, features, decode_rustdoc_bytes)
-            .map_err(|error| match error {
-                domain::schema::SchemaExportError::ParseFailed(reason) => {
-                    RustdocCratePortError::ParseFailed {
-                        crate_name: crate_name.as_str().to_owned(),
-                        reason,
-                    }
-                }
-                other => RustdocCratePortError::CaptureFailed {
-                    crate_name: crate_name.as_str().to_owned(),
-                    reason: other.to_string(),
-                },
-            })?;
+            .map_err(|error| map_capture_error(crate_name, error))?;
         require_exclusive_snapshot_target(crate_name, &snapshot)?;
         let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
         reject_changed_workspace_fingerprint(crate_name, &start_fingerprint, &end_fingerprint)?;
@@ -194,30 +202,62 @@ impl RustdocProvider for RustdocCrateAdapter {
         let identity = RustdocSchemaExporter::new(self.workspace_root.clone())
             .rustdoc_execution_identity(crate_name, features)
             .map(|(identity, _)| identity)
-            .map_err(|error| RustdocCratePortError::CaptureFailed {
-                crate_name: crate_name.as_str().to_owned(),
-                reason: error.to_string(),
+            .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(error.to_string()),
             })?;
         crate::schema_export::require_exclusive_rustdoc_target(
             identity.target_directory().as_path(),
         )
-        .map_err(|error| RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         })?;
         Ok(identity)
     }
 }
 
 fn decode_rustdoc_bytes(bytes: &[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError> {
+    let crate_name = unknown_crate_name()?;
     let text = std::str::from_utf8(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
-        crate_name: "<unknown>".to_owned(),
-        reason: format!("rustdoc JSON is not UTF-8: {error}"),
+        crate_name: crate_name.clone(),
+        reason: FreeText::new(format!("rustdoc JSON is not UTF-8: {error}")),
     })?;
     BaselineRustdocCodec::from_json(text).map_err(|error| RustdocCratePortError::ParseFailed {
-        crate_name: "<unknown>".to_owned(),
-        reason: error.to_string(),
+        crate_name,
+        reason: FreeText::new(error.to_string()),
     })
+}
+
+fn unknown_crate_name() -> Result<CrateName, RustdocCratePortError> {
+    CrateName::new("unknown").map_err(|error| RustdocCratePortError::Io {
+        path: PathBuf::from("<unknown-rustdoc-crate>"),
+        reason: FreeText::new(format!("cannot construct diagnostic crate name: {error}")),
+    })
+}
+
+fn map_capture_error(crate_name: &CrateName, error: RustdocCaptureError) -> RustdocCratePortError {
+    match error {
+        RustdocCaptureError::AuthoritativeInput(error) => {
+            RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(error.to_string()),
+            }
+        }
+        RustdocCaptureError::CaptureFailed(error) => RustdocCratePortError::CaptureFailed {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
+        },
+        RustdocCaptureError::ParseFailed(error) => match error {
+            RustdocCratePortError::ParseFailed { reason, .. } => {
+                RustdocCratePortError::ParseFailed { crate_name: crate_name.clone(), reason }
+            }
+            other => RustdocCratePortError::ParseFailed {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(other.to_string()),
+            },
+        },
+    }
 }
 
 fn workspace_input_fingerprint(
@@ -225,9 +265,9 @@ fn workspace_input_fingerprint(
     crate_name: &CrateName,
 ) -> Result<String, RustdocCratePortError> {
     freshness::rustdoc_input_fingerprint(workspace_root).map_err(|error| {
-        RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: format!("authoritative-input: cannot fingerprint rustdoc inputs: {error}"),
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(format!("cannot fingerprint rustdoc inputs: {error}")),
         }
     })
 }
@@ -240,9 +280,9 @@ fn reject_changed_workspace_fingerprint(
     if start == end {
         Ok(())
     } else {
-        Err(RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: "workspace input fingerprint changed during rustdoc capture".to_owned(),
+        Err(RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new("workspace input fingerprint changed during rustdoc capture"),
         })
     }
 }
@@ -251,28 +291,55 @@ fn require_exclusive_snapshot_target(
     crate_name: &CrateName,
     snapshot: &RustdocSnapshot,
 ) -> Result<(), RustdocCratePortError> {
-    crate::schema_export::require_exclusive_rustdoc_target(
-        snapshot.execution_identity().target_directory().as_path(),
-    )
-    .map_err(|error| RustdocCratePortError::CaptureFailed {
-        crate_name: crate_name.as_str().to_owned(),
-        reason: error.to_string(),
-    })
+    require_exclusive_target(crate_name, snapshot.execution_identity().target_directory().as_path())
 }
 
 fn reject_workspace_root(
     workspace_root: &Path,
     crate_name: &CrateName,
 ) -> Result<(), RustdocCratePortError> {
-    crate::track::symlink_guard::reject_symlinks_up_to_root(workspace_root).map_err(|error| {
-        RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: format!(
-                "symlink guard: refusing to use workspace root '{}': {error}",
+    #[cfg(not(unix))]
+    {
+        return Err(RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(format!(
+                "descriptor-relative no-follow rustdoc locks are supported only on Unix (workspace root '{}')",
                 workspace_root.display()
-            ),
+            )),
+        });
+    }
+
+    #[cfg(unix)]
+    {
+        crate::track::symlink_guard::reject_symlinks_up_to_root(workspace_root).map_err(
+            |error| RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(format!(
+                    "symlink guard: refusing to use workspace root '{}': {error}",
+                    workspace_root.display()
+                )),
+            },
+        )?;
+        let metadata = workspace_root.symlink_metadata().map_err(|error| {
+            RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(format!(
+                    "cannot inspect trusted workspace root '{}': {error}",
+                    workspace_root.display()
+                )),
+            }
+        })?;
+        if !metadata.is_dir() {
+            return Err(RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: FreeText::new(format!(
+                    "trusted workspace root '{}' is not a directory",
+                    workspace_root.display()
+                )),
+            });
         }
-    })
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -289,40 +356,41 @@ where
 {
     let json_path =
         export(crate_name, features).map_err(|e| RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: e.to_string(),
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(e.to_string()),
         })?;
     let target_directory =
         json_path.parent().and_then(Path::parent).ok_or_else(|| RustdocCratePortError::Io {
             path: json_path.clone(),
-            reason: "rustdoc JSON path has no target directory".to_owned(),
+            reason: FreeText::new("rustdoc JSON path has no target directory"),
         })?;
+    require_exclusive_target(crate_name, target_directory)?;
     let lock = RustdocOutputLock::acquire(target_directory).map_err(|error| {
-        RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         }
     })?;
     let target_directory = ResolvedCargoTargetDirectory::try_new(target_directory.to_path_buf())
-        .map_err(|error| RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         })?;
     let expected_json_path = ExpectedRustdocJsonPath::try_new(json_path.clone(), &target_directory)
-        .map_err(|error| RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         })?;
     let bytes = lock.read_bytes(&json_path, MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
-        RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         }
     })?;
     let profile = CargoProfileName::try_new("dev".to_owned()).map_err(|error| {
-        RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         }
     })?;
     let identity = RustdocExecutionIdentity::new(
@@ -332,14 +400,26 @@ where
         profile,
         expected_json_path,
     )
-    .map_err(|error| RustdocCratePortError::CaptureFailed {
-        crate_name: crate_name.as_str().to_owned(),
-        reason: error.to_string(),
+    .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+        crate_name: crate_name.clone(),
+        reason: FreeText::new(error.to_string()),
     })?;
     construct_rustdoc_snapshot(identity, &bytes, decode_rustdoc_bytes).map_err(|error| {
         RustdocCratePortError::ParseFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: error.to_string(),
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
+        }
+    })
+}
+
+fn require_exclusive_target(
+    crate_name: &CrateName,
+    target_directory: &Path,
+) -> Result<(), RustdocCratePortError> {
+    crate::schema_export::require_exclusive_rustdoc_target(target_directory).map_err(|error| {
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(error.to_string()),
         }
     })
 }
@@ -354,6 +434,7 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
+    #[cfg(unix)]
     use temp_env;
 
     #[test]
@@ -414,15 +495,80 @@ mod tests {
     fn test_load_from_path_outside_workspace_root_returns_io_error() {
         let workspace = tempfile::tempdir().unwrap();
         let outside = tempfile::tempdir().unwrap();
-        let path = outside.path().join("domain-types-baseline.json");
+        let workspace_root = workspace.path().canonicalize().unwrap();
+        let outside_root = outside.path().canonicalize().unwrap();
+        let path = outside_root.join("domain-types-baseline.json");
         std::fs::write(&path, "{}").unwrap();
 
-        let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+        let adapter = RustdocCrateAdapter::new(workspace_root);
         let err = adapter.load_from_path(&path).unwrap_err();
 
         assert!(
             matches!(err, RustdocCratePortError::Io { .. }),
             "expected Io for a baseline outside the trusted workspace root, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_from_path_relative_escape_returns_io_error() {
+        let parent = tempfile::tempdir().unwrap();
+        let parent_root = parent.path().canonicalize().unwrap();
+        let workspace = parent_root.join("workspace");
+        std::fs::create_dir(&workspace).unwrap();
+        let outside = parent_root.join("outside-baseline.json");
+        std::fs::write(&outside, "{}").unwrap();
+
+        let escaped_path = workspace.join("../outside-baseline.json");
+        let adapter = RustdocCrateAdapter::new(workspace);
+        let err = adapter.load_from_path(&escaped_path).unwrap_err();
+
+        assert!(
+            matches!(err, RustdocCratePortError::Io { .. }),
+            "a relative path escaping the trusted root must fail closed: {err}"
+        );
+        assert!(
+            err.to_string().contains("outside trusted workspace root"),
+            "the failure must identify the containment rejection: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_from_path_unverifiable_workspace_root_returns_io_error() {
+        let parent = tempfile::tempdir().unwrap();
+        let parent_root = parent.path().canonicalize().unwrap();
+        let workspace = parent_root.join("missing-workspace");
+        let path = workspace.join("domain-types-baseline.json");
+        let adapter = RustdocCrateAdapter::new(workspace);
+
+        let err = adapter.load_from_path(&path).unwrap_err();
+
+        assert!(
+            matches!(err, RustdocCratePortError::Io { .. }),
+            "an unverifiable trusted root must fail closed: {err}"
+        );
+        assert!(
+            err.to_string().contains("canonicalize trusted workspace root"),
+            "the failure must identify the unavailable trusted root: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_from_path_non_directory_workspace_root_returns_io_error() {
+        let parent = tempfile::tempdir().unwrap();
+        let parent_root = parent.path().canonicalize().unwrap();
+        let workspace = parent_root.join("workspace-file");
+        std::fs::write(&workspace, b"not a directory").unwrap();
+        let adapter = RustdocCrateAdapter::new(workspace.clone());
+
+        let err = adapter.load_from_path(&workspace).unwrap_err();
+
+        assert!(
+            matches!(err, RustdocCratePortError::Io { .. }),
+            "a non-directory trusted root must fail closed: {err}"
+        );
+        assert!(
+            err.to_string().contains("not a directory"),
+            "the failure must identify the invalid trusted root: {err}"
         );
     }
 
@@ -469,7 +615,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_capture_current_symlinked_workspace_root_returns_capture_failed() {
+    fn test_capture_current_symlinked_workspace_root_returns_authoritative_input() {
         // Security: a symlinked workspace root must be rejected before invoking the exporter.
         let dir = tempfile::tempdir().unwrap();
         let real_ws = dir.path().join("real-workspace");
@@ -482,8 +628,53 @@ mod tests {
         let crate_name = CrateName::new("some_crate".to_owned()).unwrap();
         let err = adapter.capture_current(&crate_name, &[]).unwrap_err();
         assert!(
-            matches!(err, RustdocCratePortError::CaptureFailed { .. }),
-            "expected CaptureFailed (symlink workspace_root rejection), got: {err}"
+            matches!(err, RustdocCratePortError::AuthoritativeInput { .. }),
+            "expected AuthoritativeInput (symlink workspace_root rejection), got: {err}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execution_identity_unverifiable_workspace_root_returns_authoritative_input() {
+        let parent = tempfile::tempdir().unwrap();
+        let parent_root = parent.path().canonicalize().unwrap();
+        let workspace = parent_root.join("missing-workspace");
+        let target = parent_root.join("cargo-target");
+        let adapter = RustdocCrateAdapter::new(workspace);
+        let crate_name = CrateName::new("some_crate").unwrap();
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars([("CARGO_TARGET_DIR", Some(target.as_os_str()))], || {
+                let err = adapter.execution_identity(&crate_name, &[]).unwrap_err();
+                assert!(
+                    matches!(err, RustdocCratePortError::AuthoritativeInput { .. }),
+                    "an unverifiable trusted root must reject identity admission: {err}"
+                );
+                assert!(
+                    err.to_string().contains("cannot inspect trusted workspace root"),
+                    "the failure must identify the unavailable trusted root: {err}"
+                );
+            });
+        });
+    }
+
+    #[cfg(not(unix))]
+    #[test]
+    fn test_execution_identity_non_unix_returns_authoritative_input() {
+        let workspace = tempfile::tempdir().unwrap();
+        let workspace_root = workspace.path().canonicalize().unwrap();
+        let adapter = RustdocCrateAdapter::new(workspace_root);
+        let crate_name = CrateName::new("some_crate").unwrap();
+
+        let err = adapter.execution_identity(&crate_name, &[]).unwrap_err();
+
+        assert!(
+            matches!(err, RustdocCratePortError::AuthoritativeInput { .. }),
+            "non-Unix rustdoc identity admission must fail closed: {err}"
+        );
+        assert!(
+            err.to_string().contains("supported only on Unix"),
+            "the failure must identify the unsupported platform: {err}"
         );
     }
 
@@ -554,7 +745,7 @@ mod tests {
 
                     let error = adapter.capture_current(&crate_name, &[]).unwrap_err();
                     assert!(
-                        matches!(error, RustdocCratePortError::CaptureFailed { .. }),
+                        matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
                         "lock-operation failure must fail closed: {error}"
                     );
                     assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes());
@@ -563,6 +754,7 @@ mod tests {
         });
     }
 
+    #[cfg(unix)]
     #[test]
     fn test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes() {
         let workspace = tempfile::tempdir().unwrap();
@@ -585,6 +777,148 @@ mod tests {
         assert_eq!(snapshot.execution_identity().crate_name(), &crate_name);
         assert_eq!(snapshot.crate_data().format_version, rustdoc_types::FORMAT_VERSION);
         assert_eq!(snapshot.json_hash().as_digest().as_str().len(), 64);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_current_pairs_execution_identity_components() {
+        let workspace = tempfile::tempdir().unwrap();
+        let output = workspace.path().join(".sotp-rustdoc/fixture/doc/domain.json");
+        std::fs::create_dir_all(output.parent().unwrap()).unwrap();
+        let json = format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        std::fs::write(&output, json.as_bytes()).unwrap();
+        let crate_name = CrateName::new("domain").unwrap();
+        let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
+        let expected_features = features.clone();
+        let expected_path = output.clone();
+
+        let snapshot = capture_current_with_exporter(&crate_name, &features, move |_, selected| {
+            assert_eq!(selected, expected_features.as_slice());
+            Ok(expected_path)
+        })
+        .unwrap();
+        let identity = snapshot.execution_identity();
+
+        assert_eq!(identity.crate_name(), &crate_name);
+        assert_eq!(identity.features(), features.as_slice());
+        assert_eq!(identity.profile().as_str(), "dev");
+        assert_eq!(
+            identity.target_directory().as_path(),
+            output.parent().unwrap().parent().unwrap()
+        );
+        assert_eq!(identity.expected_json_path().as_path(), output);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_current_rejects_oversized_json_without_fallback() {
+        let workspace = tempfile::tempdir().unwrap();
+        let output = workspace.path().join(".sotp-rustdoc/fixture/doc/domain.json");
+        std::fs::create_dir_all(output.parent().unwrap()).unwrap();
+        std::fs::File::create(&output).unwrap().set_len(MAX_RUSTDOC_JSON_BYTES + 1).unwrap();
+        let crate_name = CrateName::new("domain").unwrap();
+
+        let error =
+            capture_current_with_exporter(&crate_name, &[], move |_, _| Ok(output)).unwrap_err();
+
+        assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }));
+        assert!(
+            error.to_string().contains("exceeds"),
+            "an oversized rustdoc capture must fail at the bounded read: {error}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_current_rejects_non_immediate_private_or_shared_target() {
+        let workspace = tempfile::tempdir().unwrap();
+        let crate_name = CrateName::new("domain").unwrap();
+        let json = format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        let outputs = [
+            workspace.path().join(".sotp-rustdoc/selection/nested/doc/domain.json"),
+            workspace.path().join("cargo-target/doc/domain.json"),
+        ];
+
+        for output in outputs {
+            std::fs::create_dir_all(output.parent().unwrap()).unwrap();
+            std::fs::write(&output, &json).unwrap();
+            let selected_output = output.clone();
+            let result =
+                capture_current_with_exporter(&crate_name, &[], move |_target, _features| {
+                    Ok(selected_output)
+                });
+            assert!(result.is_err(), "non-exclusive rustdoc targets must fail closed");
+            let error = result.unwrap_err();
+
+            assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }));
+            assert!(
+                error.to_string().contains("not an exclusive .sotp-rustdoc area"),
+                "the target ownership failure must be explicit: {error}"
+            );
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_current_rejects_symlinked_selection_directory() {
+        let (workspace, adapter, crate_name) = lockfail_workspace();
+        let cargo_target = workspace.path().join("cargo-target");
+        let commands = workspace.path().join("commands");
+        std::fs::create_dir_all(&commands).unwrap();
+        let rustup = commands.join("rustup");
+        std::fs::write(&rustup, b"#!/bin/sh\nexit 0\n").unwrap();
+        use std::os::unix::fs::PermissionsExt as _;
+        std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let valid_identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let selection = valid_identity.target_directory().as_path().to_path_buf();
+                    let exclusive_parent = selection.parent().unwrap();
+                    assert_eq!(
+                        exclusive_parent.file_name(),
+                        Some(std::ffi::OsStr::new(".sotp-rustdoc")),
+                        "the selection must be directly below the private rustdoc parent"
+                    );
+
+                    let redirected = workspace.path().join("redirected-selection");
+                    std::fs::create_dir_all(&redirected).unwrap();
+                    std::fs::create_dir_all(exclusive_parent).unwrap();
+                    std::os::unix::fs::symlink(&redirected, &selection).unwrap();
+
+                    let capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err();
+                    assert!(
+                        matches!(capture_error, RustdocCratePortError::AuthoritativeInput { .. }),
+                        "a symlinked selection directory must reject capture admission: {capture_error}"
+                    );
+                    assert!(
+                        capture_error.to_string().contains("symlink"),
+                        "the capture rejection must identify the symlink guard: {capture_error}"
+                    );
+
+                    let identity_error = adapter.execution_identity(&crate_name, &[]).unwrap_err();
+                    assert!(
+                        matches!(identity_error, RustdocCratePortError::AuthoritativeInput { .. }),
+                        "a symlinked selection directory must reject identity admission: {identity_error}"
+                    );
+                },
+            );
+        });
     }
 
     #[cfg(unix)]
@@ -621,7 +955,7 @@ mod tests {
         let end = "end";
         let error = reject_changed_workspace_fingerprint(&crate_name, start, end).unwrap_err();
         assert!(
-            matches!(error, RustdocCratePortError::CaptureFailed { .. }),
+            matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
             "changed input fingerprint must discard the capture: {error}"
         );
         reject_changed_workspace_fingerprint(&crate_name, start, start).unwrap();
@@ -633,6 +967,7 @@ mod tests {
         assert_send_sync::<RustdocCrateAdapter>();
     }
 
+    #[cfg(unix)]
     fn lockfail_workspace() -> (tempfile::TempDir, RustdocCrateAdapter, CrateName) {
         let workspace = tempfile::tempdir().unwrap();
         std::fs::write(
@@ -648,6 +983,7 @@ mod tests {
         (workspace, adapter, crate_name)
     }
 
+    #[cfg(unix)]
     #[test]
     fn test_execution_identity_owns_exclusive_sotp_rustdoc_target() {
         let (workspace, adapter, crate_name) = lockfail_workspace();
@@ -673,6 +1009,7 @@ mod tests {
         });
     }
 
+    #[cfg(unix)]
     #[test]
     fn test_non_cooperative_parent_cargo_target_json_is_not_authoritative() {
         let (workspace, adapter, crate_name) = lockfail_workspace();

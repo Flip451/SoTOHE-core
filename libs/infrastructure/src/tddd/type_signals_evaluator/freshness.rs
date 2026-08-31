@@ -60,6 +60,7 @@ const MAX_RUSTDOC_INPUT_FILES: usize = 32_768;
 const MAX_RUSTDOC_INPUT_FILE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_PATH_BYTES: usize = 16 * 1024;
+const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v3\0";
 
 /// A bounded fingerprint failure. No partial digest is returned for any case.
@@ -121,9 +122,11 @@ impl std::fmt::Display for RustdocInputFingerprintError {
 pub(crate) fn rustdoc_input_fingerprint(
     workspace_root: &Path,
 ) -> Result<String, RustdocInputFingerprintError> {
-    let cargo_target_dir = validate_authoritative_cargo_inputs(workspace_root)?;
-    let paths = collect_rustdoc_input_paths(workspace_root, &cargo_target_dir)?;
+    let cargo_inputs = validate_authoritative_cargo_inputs(workspace_root)?;
+    let paths = collect_rustdoc_input_paths(workspace_root, &cargo_inputs.target_directory)?;
     let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
+    append_len_prefixed_bytes(&mut canonical, b"cargo-metadata-no-deps-locked");
+    append_len_prefixed_bytes(&mut canonical, &cargo_inputs.metadata_bytes);
     let mut total_bytes = 0_u64;
     for path in paths {
         let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
@@ -140,6 +143,17 @@ pub(crate) fn rustdoc_input_fingerprint(
         .map_err(|error| io_error(&path, error))?
         .ok_or_else(|| io_error(&path, Error::new(ErrorKind::NotFound, "input disappeared")))?;
         check_file_size(&path, bytes.len() as u64)?;
+        let after = std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
+        if after.file_type().is_symlink()
+            || !after.is_file()
+            || metadata_generation(&metadata) != metadata_generation(&after)
+            || after.len() != bytes.len() as u64
+        {
+            return Err(io_error(
+                &path,
+                Error::other("rustdoc input changed while fingerprinting"),
+            ));
+        }
         total_bytes = total_bytes.checked_add(bytes.len() as u64).ok_or(
             RustdocInputFingerprintError::TotalBytes {
                 bytes: u64::MAX,
@@ -153,19 +167,25 @@ pub(crate) fn rustdoc_input_fingerprint(
             });
         }
         append_len_prefixed_bytes(&mut canonical, &path_bytes(relative));
-        append_len_prefixed_bytes(&mut canonical, &metadata_generation(&metadata));
         append_len_prefixed_bytes(&mut canonical, &sha256_bytes(&bytes));
     }
     environment_fingerprint::append_environment_identity(&mut canonical, workspace_root)?;
     Ok(hex_digest(&sha256_bytes(&canonical)))
 }
 
-/// Checks Cargo's resolved graph before fingerprinting. An external path
-/// dependency or build-script target has inputs the bounded workspace walk
-/// cannot prove complete, so the operation fails before export or reuse.
+struct AuthoritativeCargoInputs {
+    target_directory: PathBuf,
+    metadata_bytes: Vec<u8>,
+}
+
+/// Captures Cargo's ordered metadata result and the target directory used by
+/// the bounded workspace walk. The metadata bytes are part of the resulting
+/// implementation fingerprint; the walk intentionally does not claim to be a
+/// complete Cargo semantic-input model for external path dependencies or
+/// build-script I/O.
 fn validate_authoritative_cargo_inputs(
     workspace_root: &Path,
-) -> Result<PathBuf, RustdocInputFingerprintError> {
+) -> Result<AuthoritativeCargoInputs, RustdocInputFingerprintError> {
     let manifest = workspace_root.join("Cargo.toml");
     let manifest_metadata =
         std::fs::symlink_metadata(&manifest).map_err(|error| io_error(&manifest, error))?;
@@ -178,7 +198,7 @@ fn validate_authoritative_cargo_inputs(
         .current_dir(workspace_root);
     let output = crate::capability_exec::process::run_command_with_bounded_output(
         &mut command,
-        16 * 1024 * 1024,
+        MAX_CARGO_METADATA_OUTPUT_BYTES,
         Duration::from_secs(120),
         "cargo metadata for rustdoc input validation",
     )
@@ -197,10 +217,6 @@ fn validate_authoritative_cargo_inputs(
     let metadata: serde_json::Value = serde_json::from_slice(&output.stdout).map_err(|error| {
         io_error(workspace_root, Error::other(format!("cargo metadata JSON is invalid: {error}")))
     })?;
-    let packages = metadata
-        .get("packages")
-        .and_then(serde_json::Value::as_array)
-        .ok_or_else(|| io_error(workspace_root, Error::other("cargo metadata has no packages")))?;
     let target_directory = metadata
         .get("target_directory")
         .and_then(serde_json::Value::as_str)
@@ -219,141 +235,7 @@ fn validate_authoritative_cargo_inputs(
     let target_directory = crate::verify::path_safety::lexical_normalize(&target_directory);
     crate::track::symlink_guard::reject_symlinks_up_to_root(&target_directory)
         .map_err(|error| io_error(&target_directory, error))?;
-    let root = workspace_root.canonicalize().map_err(|error| io_error(workspace_root, error))?;
-    for package in packages {
-        let manifest = package
-            .get("manifest_path")
-            .and_then(serde_json::Value::as_str)
-            .map(PathBuf::from)
-            .ok_or_else(|| io_error(&root, Error::other("Cargo package has no manifest")))?;
-        let inside = manifest.canonicalize().map(|path| path.starts_with(&root)).unwrap_or(false);
-        if !inside && package.get("source").is_none_or(serde_json::Value::is_null) {
-            return Err(io_error(
-                &manifest,
-                Error::other(
-                    "external path dependency is not in the authoritative workspace snapshot",
-                ),
-            ));
-        }
-        validate_manifest_dependency_paths(&manifest, &root)?;
-        if let Some(dependencies) =
-            package.get("dependencies").and_then(serde_json::Value::as_array)
-        {
-            for dependency in dependencies {
-                let Some(path) =
-                    dependency.get("path").and_then(serde_json::Value::as_str).map(PathBuf::from)
-                else {
-                    continue;
-                };
-                let path = if path.is_absolute() {
-                    path
-                } else {
-                    manifest.parent().unwrap_or_else(|| Path::new(".")).join(path)
-                };
-                let path_inside = path
-                    .canonicalize()
-                    .map(|resolved| resolved.starts_with(&root))
-                    .unwrap_or(false);
-                if !path_inside {
-                    return Err(io_error(
-                        &path,
-                        Error::other(
-                            "external path dependency is not in the authoritative workspace snapshot",
-                        ),
-                    ));
-                }
-            }
-        }
-        let has_build_script =
-            package.get("targets").and_then(serde_json::Value::as_array).is_some_and(|targets| {
-                targets.iter().any(|target| {
-                    target
-                        .get("kind")
-                        .and_then(serde_json::Value::as_array)
-                        .is_some_and(|kinds| kinds.iter().any(|kind| kind == "custom-build"))
-                })
-            });
-        // Workspace-member build.rs is itself a regular source file in the
-        // fingerprint walk; generated outputs stay under the excluded target
-        // directory. Fail closed only for an out-of-workspace path package
-        // whose build script cannot be snapshotted. Registry crates carry a
-        // `source` and are not path packages.
-        if has_build_script
-            && !inside
-            && package.get("source").is_none_or(serde_json::Value::is_null)
-        {
-            return Err(io_error(
-                &manifest,
-                Error::other(
-                    "Cargo build-script inputs and generated outputs are not authoritative",
-                ),
-            ));
-        }
-    }
-    Ok(target_directory)
-}
-
-fn validate_manifest_dependency_paths(
-    manifest_path: &Path,
-    workspace_root: &Path,
-) -> Result<(), RustdocInputFingerprintError> {
-    let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
-        manifest_path,
-        Some(workspace_root),
-        MAX_RUSTDOC_INPUT_FILE_BYTES,
-    )
-    .map_err(|error| io_error(manifest_path, error))?
-    .ok_or_else(|| {
-        io_error(manifest_path, Error::new(ErrorKind::NotFound, "manifest disappeared"))
-    })?;
-    let document: toml::Value = toml::from_slice(&bytes).map_err(|error| {
-        io_error(workspace_root, Error::other(format!("Cargo manifest is invalid: {error}")))
-    })?;
-    let base = manifest_path.parent().unwrap_or_else(|| Path::new("."));
-    reject_external_manifest_paths(&document, base, workspace_root, manifest_path)
-}
-
-fn reject_external_manifest_paths(
-    value: &toml::Value,
-    base: &Path,
-    workspace_root: &Path,
-    manifest_path: &Path,
-) -> Result<(), RustdocInputFingerprintError> {
-    match value {
-        toml::Value::Table(table) => {
-            for (key, value) in table {
-                if key == "path" {
-                    let Some(path) = value.as_str() else {
-                        return Err(io_error(
-                            manifest_path,
-                            Error::other("Cargo dependency path is not a string"),
-                        ));
-                    };
-                    let dependency = base.join(path);
-                    let inside = dependency
-                        .canonicalize()
-                        .map(|path| path.starts_with(workspace_root))
-                        .unwrap_or(false);
-                    if !inside {
-                        return Err(io_error(
-                            &dependency,
-                            Error::other(
-                                "external path dependency is not in the authoritative workspace snapshot",
-                            ),
-                        ));
-                    }
-                }
-                reject_external_manifest_paths(value, base, workspace_root, manifest_path)?;
-            }
-        }
-        toml::Value::Array(values) => {
-            for value in values {
-                reject_external_manifest_paths(value, base, workspace_root, manifest_path)?;
-            }
-        }
-        _ => {}
-    }
-    Ok(())
+    Ok(AuthoritativeCargoInputs { target_directory, metadata_bytes: output.stdout })
 }
 
 fn collect_rustdoc_input_paths(

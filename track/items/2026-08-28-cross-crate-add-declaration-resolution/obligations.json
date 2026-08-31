@@ -2,7 +2,7 @@
   "obligations": [
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
-      "declaration_hash": "6500e05699f36c4b272c0758a362d54b63b8d61e3aca8b216bc974d97b98f96c",
+      "declaration_hash": "5f774b3280f016bd42dec0237db2eef08b5481dd86ec4aa474def5a31f39d2c1",
       "id": {
         "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
         "item_identifier": "entry",
@@ -42,7 +42,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
-      "declaration_hash": "78d3bf78202371601c41aee47b5ac2b3f39d3ad44373bb18057f7cccea6bd833",
+      "declaration_hash": "084f23b077ddf4ef04c5db8a2cda2950b6f4bc80e0e54f7cb5bb5d988cb7eeab",
       "id": {
         "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
         "item_identifier": "entry",
@@ -82,7 +82,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
-      "declaration_hash": "3b4a4ade472945527a867dd53f447aa565fa1bfc7b1034fe092cde9e56dfc04a",
+      "declaration_hash": "f1853103254211ee084b2b6787cc14a92469d22cb3b26a22beecfa70cf259ba6",
       "id": {
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
         "item_identifier": "entry",
@@ -114,17 +114,13 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:encode' of CatalogueToExtendedCratePort",
-      "declaration_hash": "a4a3f4c5e668cd722e8dbdd6af6852b71150f8f18657c92189441a0d6eaab476",
+      "declaration_hash": "852baefdc24729981933e61ea25e75200ec5ebd3306f0a5f00aae759e93a048e",
       "id": {
         "entry_key": "CatalogueToExtendedCratePort",
         "item_identifier": "trait_method:encode",
         "obligation_kind": "contract"
       },
       "spec_refs": [
-        {
-          "element_id": "GO-01",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         {
           "element_id": "IN-01",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
@@ -135,10 +131,6 @@
         },
         {
           "element_id": "CO-01",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-02",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -170,7 +162,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:load_from_path' of RustdocCratePort",
-      "declaration_hash": "bfc839b5bc43364f0bdf83b28ba59e6a22468d70479fdcdbd0effbb05b4085de",
+      "declaration_hash": "5ade43158f4ac290591ad1d66e44e6d952c629f69105cd9f9d387fa58eba7564",
       "id": {
         "entry_key": "RustdocCratePort",
         "item_identifier": "trait_method:load_from_path",
@@ -178,27 +170,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
@@ -214,25 +186,13 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:capture_current' of RustdocCratePort",
-      "declaration_hash": "bfc839b5bc43364f0bdf83b28ba59e6a22468d70479fdcdbd0effbb05b4085de",
+      "declaration_hash": "5ade43158f4ac290591ad1d66e44e6d952c629f69105cd9f9d387fa58eba7564",
       "id": {
         "entry_key": "RustdocCratePort",
         "item_identifier": "trait_method:capture_current",
         "obligation_kind": "contract"
       },
       "spec_refs": [
-        {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         {
           "element_id": "IN-05",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
@@ -242,27 +202,11 @@
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "element_id": "IN-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
           "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
@@ -278,7 +222,7 @@
     },
     {
       "brief": "Author a result test covering 'entry' of usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
-      "declaration_hash": "89f037886b1e51b0956ca36c46df2ac43c0a30e885c132aa873c1e2d5c35b30a",
+      "declaration_hash": "e8d82ff0a4686d5cd7a6852ae2b93e13aaa2db7bdb4ec1b208068dbb339c3d19",
       "id": {
         "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
         "item_identifier": "entry",
@@ -316,62 +260,6 @@
         {
           "element_id": "AC-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
       "target_entry": {
@@ -386,7 +274,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-      "declaration_hash": "e7a1235b7b05df63d0e0070404ea128ff08c4d7faf96342a5404bfb7c0d8ef25",
+      "declaration_hash": "679cdc72ee4ac530991b49fa3c0ff741477dba30f0fcdff04d0c8ed0f12d58cf",
       "id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
         "item_identifier": "entry",
@@ -430,18 +318,6 @@
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "element_id": "IN-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -454,35 +330,15 @@
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "IN-05",
+          "element_id": "IN-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "CO-06",
+          "element_id": "CO-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-06",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
@@ -498,17 +354,13 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort' of infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
-      "declaration_hash": "ee42eaeabf5e32807365586d7cd8ee6187e6288e9bb6281262a7dfa49cdbadb3",
+      "declaration_hash": "d3c290a736328dd00cf62978573154285add366b01c972e6a998b285f701f198",
       "id": {
         "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
         "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
-        {
-          "element_id": "GO-01",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         {
           "element_id": "IN-01",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
@@ -519,10 +371,6 @@
         },
         {
           "element_id": "CO-01",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-02",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -554,7 +402,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
-      "declaration_hash": "9ac9b0e301c244440c0350bdf4a54132839b13ba94ffcf77489dd2d3b57cb8c1",
+      "declaration_hash": "384f1742e3a7723fcea965d99fd2513b2e9d1bb47dedda3d658a4c7aa65fd87d",
       "id": {
         "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
         "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
@@ -606,25 +454,13 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort' of infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-      "declaration_hash": "545642bd4e06ec95b7e29709f92cbdb9d1080b453217d363c0932205e0e2d875",
+      "declaration_hash": "0e6be9e81825a50e89f8c19467bc98a2eaaf46935ff0963a163a68cbeb910687",
       "id": {
         "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
         "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
-        {
-          "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         {
           "element_id": "IN-05",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
@@ -634,27 +470,11 @@
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "element_id": "IN-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
           "element_id": "AC-08",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "IN-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-07",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "AC-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],

@@ -130,28 +130,9 @@ pub(crate) fn encode_snapshot_bytes(
             }
             input.push(1);
             input.extend_from_slice(&metadata.len().to_be_bytes());
-            input.extend_from_slice(&file_generation(&metadata));
             input.extend_from_slice(&(bytes.len() as u64).to_be_bytes());
             input.extend_from_slice(bytes);
         }
     }
     Ok(())
-}
-
-fn file_generation(metadata: &std::fs::Metadata) -> Vec<u8> {
-    let modified = metadata
-        .modified()
-        .ok()
-        .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
-        .map_or(0_u128, |duration| duration.as_nanos());
-    let mut generation = modified.to_be_bytes().to_vec();
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt as _;
-        generation.extend_from_slice(&metadata.dev().to_be_bytes());
-        generation.extend_from_slice(&metadata.ino().to_be_bytes());
-        generation.extend_from_slice(&metadata.ctime().to_be_bytes());
-        generation.extend_from_slice(&metadata.ctime_nsec().to_be_bytes());
-    }
-    generation
 }

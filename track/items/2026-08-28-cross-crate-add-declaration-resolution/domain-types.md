@@ -29,6 +29,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | RustdocExecutionIdentityError | error_type | add | TargetDirectoryNotAbsolute, ExpectedJsonOutsideTargetDirectory, EmptyProfile | 🔵 | 🔵 |
+| domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError | error_type | modify | NotFound, Io, ParseFailed, CaptureFailed, AuthoritativeInput | 🔵 | 🔵 |
 
 ## Secondary Ports
 

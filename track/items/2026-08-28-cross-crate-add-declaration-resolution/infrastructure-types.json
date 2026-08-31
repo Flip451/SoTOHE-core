@@ -3,7 +3,7 @@
   "functions": {
     "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
       "action": "modify",
-      "docs": "Load authoritative baseline/current rustdoc for every configured TDDD layer and pass the LayerId-keyed contexts into catalogue encoding, allowing omitted external-add placement to resolve from the declaring layer (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "docs": "Per-layer type-signals evaluator entrypoint (IN-01, IN-02).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -68,18 +68,6 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -92,35 +80,15 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "IN-05",
+          "anchor": "IN-03",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "CO-06",
+          "anchor": "CO-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "AC-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-08",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
+          "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
@@ -214,7 +182,7 @@
   "types": {
     "infrastructure::schema_export::RustdocSchemaExporter": {
       "action": "modify",
-      "docs": "Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held; path-returning APIs are removed so callers cannot re-read mutable Cargo output, while snapshot construction binds execution identity and decoded bytes inside the same lock interval.",
+      "docs": "Lock-held rustdoc byte exporter (IN-07, CO-07, AC-06).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -303,15 +271,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
+          "anchor": "AC-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -321,16 +281,12 @@
         {
           "anchor": "CO-07",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec": {
       "action": "modify",
-      "docs": "Resolve each external add against its declaring layer's authoritative baseline/current rustdoc context, while preserving target-layer evaluation and rustdoc-wins precedence (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "docs": "Catalogue-to-extended-crate codec adapter (IN-01, IN-02).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -366,10 +322,6 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "CO-02",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "CO-03",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -384,32 +336,12 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter": {
       "action": "modify",
-      "docs": "Driven adapter and sole construction boundary for captured rustdoc domain values. It accepts the domain's absolute-path-only target value, performs Unix descriptor-relative no-follow trusted-root admission itself, serializes all exports with one 120-second lock, hashes and typed-decodes immutable bytes into CapturedRustdocJson, and returns RustdocSnapshot only after binding the resolved execution identity and captured bytes within the same lock interval. It rejects non-Unix or symlinked roots and never retries or falls back.",
+      "docs": "Trusted-root rustdoc capture adapter (IN-05, CO-06, IN-06, AC-08).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -440,18 +372,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-05",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -469,18 +389,6 @@
         },
         {
           "anchor": "AC-08",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
@@ -580,14 +488,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
@@ -595,7 +495,7 @@
     },
     "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError": {
       "action": "modify",
-      "docs": "Fail-closed evaluator error distinguishing unavailable authoritative inputs, rustdoc/lock/evaluation failure, and cache persistence failure; no branch permits stale snapshots or old results as success.",
+      "docs": "Type-signals evaluator error vocabulary (IN-03, IN-04, IN-05, IN-06, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -636,18 +536,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -678,24 +566,12 @@
         {
           "anchor": "AC-08",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter": {
       "action": "modify",
-      "docs": "Delegate the unchanged per-layer execution boundary to the evaluator path that assembles complete LayerId-keyed authoritative rustdoc contexts before catalogue encoding (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "docs": "Type-signals execution adapter (IN-01, IN-02).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

@@ -131,8 +131,8 @@ mod tests {
 
         fn decode(bytes: &[u8]) -> Result<Crate, RustdocCratePortError> {
             serde_json::from_slice(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
-                crate_name: "test".to_owned(),
-                reason: error.to_string(),
+                crate_name: CrateName::new("test").unwrap(),
+                reason: crate::FreeText::new(error.to_string()),
             })
         }
 

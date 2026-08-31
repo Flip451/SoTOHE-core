@@ -255,18 +255,22 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         }
 
         // Preserve the selected-layer contract: a requested layer still needs
-        // its catalogue, while an unselected configured layer may be absent.
-        for binding in &bindings {
-            let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
-                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
-                    "invalid layer binding: {error}"
-                )))
-            })?;
-            if !track_catalogues.contains_key(&typed_layer_id) {
-                return Err(CatalogueImplSignalsError::CatalogueLoad(
-                    typed_layer_id,
-                    diagnostic("layer catalogue was not loaded into the track catalogue set"),
-                ));
+        // its catalogue, while an unfiltered run treats an absent configured
+        // layer as contributing no declarations.
+        if layer.is_some() {
+            for binding in &bindings {
+                let typed_layer_id =
+                    LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+                        CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                            "invalid layer binding: {error}"
+                        )))
+                    })?;
+                if !track_catalogues.contains_key(&typed_layer_id) {
+                    return Err(CatalogueImplSignalsError::CatalogueLoad(
+                        typed_layer_id,
+                        diagnostic("layer catalogue was not loaded into the track catalogue set"),
+                    ));
+                }
             }
         }
 

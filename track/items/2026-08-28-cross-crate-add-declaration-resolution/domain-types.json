@@ -3,7 +3,7 @@
   "functions": {
     "domain::tddd::type_signals_doc::construct_captured_rustdoc_json": {
       "action": "add",
-      "docs": "Domain-owned construction seam that passes one immutable rustdoc JSON byte slice to the adapter-supplied decoder and derives the content hash from that same slice, yielding CapturedRustdocJson without placing JSON parsing behavior on the value object.",
+      "docs": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -43,7 +43,7 @@
     },
     "domain::tddd::type_signals_doc::construct_rustdoc_snapshot": {
       "action": "add",
-      "docs": "Domain-owned identity-bearing construction seam that binds one RustdocExecutionIdentity to the content hash and typed decode produced from the exact same immutable byte slice in a single call; RustdocCrateAdapter supplies the decoder and calls this function inside the trusted-root lock interval rather than pairing an identity with an independently constructed capture.",
+      "docs": "Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -87,7 +87,7 @@
     },
     "domain::tddd::type_signals_doc::decide_type_signals_reuse": {
       "action": "modify",
-      "docs": "Returns SkipEvaluation only when the verified complete cache keys are equal; every mismatch requires fresh rustdoc extraction and evaluation, with no partial-snapshot reuse.",
+      "docs": "Type-signals reuse decision function (AC-04).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -316,26 +316,6 @@
             {
               "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "IN-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-06",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -350,26 +330,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "IN-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-06",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -475,14 +435,6 @@
             {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "IN-06",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-08",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -505,14 +457,6 @@
             },
             {
               "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "IN-06",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-08",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -697,10 +641,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -710,10 +650,6 @@
             },
             {
               "anchor": "CO-06",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-07",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -752,10 +688,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -783,10 +715,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -803,10 +731,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -829,10 +753,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -849,10 +769,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -1318,12 +1234,27 @@
     {
       "for_type": "CapturedRustdocJson",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
     "CatalogueToExtendedCratePort": {
       "action": "modify",
-      "docs": "Accept the complete same-track catalogue set and a LayerId-keyed authoritative rustdoc context for every TDDD layer so external add placement follows the declaring layer (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "docs": "Catalogue-to-extended-crate encoding port (IN-01, IN-02).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1349,10 +1280,6 @@
           "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
           "spec_refs": [
             {
-              "anchor": "GO-01",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "IN-01",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -1362,10 +1289,6 @@
             },
             {
               "anchor": "CO-01",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-02",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -1393,10 +1316,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-01",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -1406,10 +1325,6 @@
         },
         {
           "anchor": "CO-01",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-02",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -1436,12 +1351,12 @@
     },
     "RustdocCratePort": {
       "action": "modify",
-      "docs": "Synchronous blocking-I/O secondary port and the sole public construction boundary for captured rustdoc values. Baseline loading decodes and hashes one immutable byte vector into CapturedRustdocJson without claiming a current execution identity. capture_current constructs RustdocSnapshot as one identity-bearing capture proof inside the same trusted-root lock interval; callers cannot assemble a snapshot from independently constructed identity and JSON values. Both complete on the caller thread; timeout, unsupported platform, untrusted roots, and non-authoritative outputs fail without retry or fallback.",
+      "docs": "Synchronous trusted-root rustdoc capture port (IN-05, CO-06, IN-06, AC-08).",
       "informal_grounds": [],
       "methods": [
         {
           "action": "modify",
-          "docs": "Synchronous baseline-only filesystem and decoding boundary: read one frozen baseline path on the caller thread, hash and typed-decode the same immutable bytes inside the infrastructure adapter, and return the opaque CapturedRustdocJson value. It deliberately carries no RustdocExecutionIdentity because baseline loading does not claim a current Cargo export identity; no internal async scheduling is provided.",
+      "docs": "Immutable baseline rustdoc capture (IN-07).",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_from_path",
@@ -1455,34 +1370,14 @@
           "returns": "Result<CapturedRustdocJson, RustdocCratePortError>",
           "spec_refs": [
             {
-              "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "IN-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-06",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
         {
           "action": "modify",
-          "docs": "Synchronous blocking export and construction boundary: resolve and validate the complete execution identity, acquire the trusted-root lock, wait for at most 120 seconds, run rustdoc export, verify the expected output, hash and typed-decode its immutable bytes, and construct one identity-bearing RustdocSnapshot before returning on the caller thread. No independently supplied identity/capture pair, internal async scheduling, retry, or lockless fallback is accepted.",
+          "docs": "Captures current rustdoc under trusted-root locking and reports authoritative fingerprint-stability failures (IN-05, CO-06, IN-06, AC-08).",
           "has_default_impl": false,
           "is_async": false,
           "name": "capture_current",
@@ -1500,18 +1395,6 @@
           "returns": "Result<RustdocSnapshot, RustdocCratePortError>",
           "spec_refs": [
             {
-              "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "IN-05",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -1520,27 +1403,11 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "AC-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "IN-06",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
               "anchor": "AC-08",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "IN-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-07",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-06",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -1552,18 +1419,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-05",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -1572,27 +1427,11 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "AC-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
           "anchor": "AC-08",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
@@ -1656,7 +1495,7 @@
   "types": {
     "AuthoritativeRustdocContext": {
       "action": "add",
-      "docs": "Value-equatable authoritative context carrying its validated LayerId, baseline crate, and immutable locked current rustdoc snapshot; evaluation reads this captured generation only and never re-reads paths.",
+      "docs": "Authoritative per-layer rustdoc context (IN-02, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1700,7 +1539,7 @@
     },
     "CapturedRustdocJson": {
       "action": "add",
-      "docs": "Opaque validated content-addressed value supplied only by the infrastructure RustdocCratePort boundary after one immutable rustdoc JSON byte vector has produced both its RustdocJsonHash and parsed rustdoc_types::Crate. The domain value exposes no byte-decoding constructor and never receives raw serialized input.",
+      "docs": "Captured rustdoc JSON value (IN-03, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1812,7 +1651,7 @@
     },
     "ImplementationFingerprint": {
       "action": "add",
-      "docs": "Content identity of the complete bounded workspace rustdoc input set and the exact D3 environment allowlist; unavailable external inputs, symlinks, I/O races, or any D4 limit violation produce no value.",
+      "docs": "Implementation input fingerprint (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1844,7 +1683,7 @@
     },
     "ResolutionFingerprint": {
       "action": "add",
-      "docs": "Content identity of architecture rules and the complete configured catalogue and rustdoc-baseline byte sets captured from one authoritative resolution snapshot.",
+      "docs": "Resolution-input digest (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1862,33 +1701,13 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "ResolvedCargoTargetDirectory": {
       "action": "add",
-      "docs": "Resolved absolute Cargo target directory value. It validates only absoluteness and deliberately carries no trusted-root or no-follow admission claim; RustdocCrateAdapter solely enforces Unix descriptor-relative no-follow validation, including every parent of an explicitly external target, before capture.",
+      "docs": "Resolved Cargo target directory value (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1914,21 +1733,13 @@
         },
         {
           "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-08",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "RustdocExecutionIdentity": {
       "action": "add",
-      "docs": "Value-equatable selection of the resolved absolute Cargo target directory, crate, validated feature set, profile, and expected rustdoc JSON path used for one export. Construction validates that the expected JSON path is contained by the selected target directory; trusted-root admission remains solely owned by RustdocCrateAdapter when it creates the capture proof.",
+      "docs": "Rustdoc execution identity (IN-03, IN-05, IN-06).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1946,14 +1757,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -1980,7 +1783,7 @@
     },
     "RustdocExecutionIdentityError": {
       "action": "add",
-      "docs": "Failure to construct a complete rustdoc execution identity from a resolved absolute target path, contained expected output, and non-empty profile. Trusted-root admission failures belong to RustdocCratePortError because only RustdocCrateAdapter performs that check.",
+      "docs": "Rustdoc execution identity error vocabulary (IN-03, IN-06).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2075,7 +1878,7 @@
     },
     "RustdocSnapshot": {
       "action": "add",
-      "docs": "Opaque identity-bearing capture proof supplied only by RustdocCratePort::capture_current after RustdocCrateAdapter validates the identity's target root and derives the exact JSON-byte hash and parsed crate inside one lock interval. It has no public constructor from separate RustdocExecutionIdentity and CapturedRustdocJson values, so mixed-generation assembly is not part of the contract and paths are never re-read for equality.",
+      "docs": "Identity-bearing rustdoc snapshot (IN-03, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2113,9 +1916,110 @@
         }
       ]
     },
+    "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError": {
+      "action": "modify",
+      "docs": "Rustdoc port error vocabulary (AC-04, CO-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ParseFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CaptureFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
     "domain::tddd::type_signals_doc::TypeSignalsCacheKey": {
       "action": "modify",
-      "docs": "Complete reuse identity binding declaration, baseline, HEAD, implementation and resolution fingerprints, and the exact Cargo/rustdoc execution selection; every component must match on a clean worktree.",
+      "docs": "Type-signals cache identity (IN-03, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2381,7 +2285,7 @@
     },
     "domain::tddd::type_signals_doc::TypeSignalsDocument": {
       "action": "modify",
-      "docs": "Persisted type-signals result whose cache key carries the complete D3 execution and input identity and is replaced only after final fingerprint revalidation.",
+      "docs": "Persisted type-signals document (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2580,7 +2484,7 @@
     },
     "domain::tddd::type_signals_doc::TypeSignalsReuseDecision": {
       "action": "modify",
-      "docs": "Closed reuse outcome: either every identity matches and evaluation is skipped, or rustdoc is re-extracted and evaluated without partial reuse.",
+      "docs": "Type-signals reuse outcome (AC-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

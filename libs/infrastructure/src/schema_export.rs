@@ -57,6 +57,12 @@ use path_resolution::{
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
     workspace_root: PathBuf,
+    #[cfg(test)]
+    before_read: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
+    #[cfg(test)]
+    before_expected_path_selection: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
+    #[cfg(test)]
+    output_path_rewriter: Option<std::sync::Arc<dyn Fn(PathBuf) -> PathBuf + Send + Sync>>,
 }
 
 #[derive(Clone, Copy)]
@@ -65,10 +71,84 @@ enum RustdocRunMode {
     Declared,
 }
 
+/// Classifies the failures that matter at the `RustdocCratePort` boundary.
+///
+/// `SchemaExportError` is the shared schema-exporter error surface and
+/// intentionally does not distinguish admission failures from exporter
+/// invocation failures.  The crate-port adapter does need that distinction so
+/// it can fail closed when the rustdoc input or output ownership cannot be
+/// established.  Keep the classification here, at the infrastructure I/O
+/// boundary, without changing the shared domain exporter contract.
+#[derive(Debug)]
+pub(crate) enum RustdocCaptureError {
+    /// The target, lock, or output bytes could not be established as authoritative.
+    AuthoritativeInput(SchemaExportError),
+    /// The rustdoc tool invocation failed.
+    CaptureFailed(SchemaExportError),
+    /// The copied bytes could not be decoded into a rustdoc graph.
+    ParseFailed(RustdocCratePortError),
+}
+
+impl RustdocCaptureError {
+    fn into_schema_export_error(self) -> SchemaExportError {
+        match self {
+            Self::AuthoritativeInput(error) | Self::CaptureFailed(error) => error,
+            Self::ParseFailed(error) => SchemaExportError::ParseFailed(error.to_string()),
+        }
+    }
+}
+
 impl RustdocSchemaExporter {
     /// Creates a new exporter for the given workspace root.
     pub fn new(workspace_root: PathBuf) -> Self {
-        Self { workspace_root }
+        Self {
+            workspace_root,
+            #[cfg(test)]
+            before_read: None,
+            #[cfg(test)]
+            before_expected_path_selection: None,
+            #[cfg(test)]
+            output_path_rewriter: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn with_before_read(
+        workspace_root: PathBuf,
+        before_read: std::sync::Arc<dyn Fn() + Send + Sync>,
+    ) -> Self {
+        Self {
+            workspace_root,
+            before_read: Some(before_read),
+            before_expected_path_selection: None,
+            output_path_rewriter: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn with_before_expected_path_selection(
+        workspace_root: PathBuf,
+        before_expected_path_selection: std::sync::Arc<dyn Fn() + Send + Sync>,
+    ) -> Self {
+        Self {
+            workspace_root,
+            before_read: None,
+            before_expected_path_selection: Some(before_expected_path_selection),
+            output_path_rewriter: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn with_output_path_rewriter(
+        workspace_root: PathBuf,
+        output_path_rewriter: std::sync::Arc<dyn Fn(PathBuf) -> PathBuf + Send + Sync>,
+    ) -> Self {
+        Self {
+            workspace_root,
+            before_read: None,
+            before_expected_path_selection: None,
+            output_path_rewriter: Some(output_path_rewriter),
+        }
     }
 
     /// Runs `cargo +nightly rustdoc --output-format json` for `crate_name` and
@@ -132,16 +212,33 @@ impl RustdocSchemaExporter {
         features: &[CargoFeatureName],
         mode: RustdocRunMode,
     ) -> Result<(RustdocExecutionIdentity, Vec<u8>), SchemaExportError> {
-        check_nightly_available()?;
+        self.capture_rustdoc_json_with_mode_classified(crate_name, features, mode)
+            .map_err(RustdocCaptureError::into_schema_export_error)
+    }
+
+    fn capture_rustdoc_json_with_mode_classified(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        mode: RustdocRunMode,
+    ) -> Result<(RustdocExecutionIdentity, Vec<u8>), RustdocCaptureError> {
+        check_nightly_available().map_err(RustdocCaptureError::CaptureFailed)?;
         let target_directory = resolve_exclusive_target_dir(
             &self.workspace_root,
             crate_name,
             features,
             matches!(mode, RustdocRunMode::Legacy),
-        )?;
-        let lock = RustdocOutputLock::acquire(&target_directory)?;
-        let (identity, expected_path) =
-            self.rustdoc_execution_identity_for_target(crate_name, features, &target_directory)?;
+        )
+        .map_err(RustdocCaptureError::AuthoritativeInput)?;
+        let lock = RustdocOutputLock::acquire(&target_directory)
+            .map_err(RustdocCaptureError::AuthoritativeInput)?;
+        #[cfg(test)]
+        if let Some(before_expected_path_selection) = &self.before_expected_path_selection {
+            before_expected_path_selection();
+        }
+        let (identity, expected_path) = self
+            .rustdoc_execution_identity_for_target(crate_name, features, &target_directory)
+            .map_err(RustdocCaptureError::AuthoritativeInput)?;
         let output_path = match mode {
             RustdocRunMode::Legacy => bin_target::run_rustdoc(
                 &self.workspace_root,
@@ -155,14 +252,27 @@ impl RustdocSchemaExporter {
                 &target_directory,
             )?,
         };
+        #[cfg(test)]
+        let output_path = match &self.output_path_rewriter {
+            Some(output_path_rewriter) => output_path_rewriter(output_path),
+            None => output_path,
+        };
         if output_path != expected_path {
-            return Err(SchemaExportError::RustdocFailed(format!(
-                "rustdoc JSON output path changed during export: expected '{}', got '{}'",
-                expected_path.display(),
-                output_path.display()
+            return Err(RustdocCaptureError::AuthoritativeInput(SchemaExportError::RustdocFailed(
+                format!(
+                    "rustdoc JSON output path changed during export: expected '{}', got '{}'",
+                    expected_path.display(),
+                    output_path.display()
+                ),
             )));
         }
-        let bytes = lock.read_bytes(&expected_path, 64 * 1024 * 1024)?;
+        #[cfg(test)]
+        if let Some(before_read) = &self.before_read {
+            before_read();
+        }
+        let bytes = lock
+            .read_bytes(&expected_path, 64 * 1024 * 1024)
+            .map_err(RustdocCaptureError::AuthoritativeInput)?;
         Ok((identity, bytes))
     }
 
@@ -173,10 +283,14 @@ impl RustdocSchemaExporter {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
         decode: fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>,
-    ) -> Result<RustdocSnapshot, SchemaExportError> {
-        let (identity, bytes) = self.capture_rustdoc_json(crate_name, features)?;
+    ) -> Result<RustdocSnapshot, RustdocCaptureError> {
+        let (identity, bytes) = self.capture_rustdoc_json_with_mode_classified(
+            crate_name,
+            features,
+            RustdocRunMode::Declared,
+        )?;
         construct_rustdoc_snapshot(identity, &bytes, decode)
-            .map_err(|error| SchemaExportError::ParseFailed(error.to_string()))
+            .map_err(RustdocCaptureError::ParseFailed)
     }
 
     /// Resolves the cache-key selection without reading the generated output.
@@ -484,7 +598,7 @@ mod tests {
 
     use super::extract::{extract_enum_variants, extract_params, extract_receiver, format_return};
     use super::format_helpers::{collect_type_names, format_type};
-    use super::path_resolution::resolve_configured_target_dir;
+    use super::path_resolution::{resolve_configured_target_dir, resolve_exclusive_target_dir};
     use super::trait_origins::{build_trait_origins, resolve_trait_origin};
     use super::*;
 
@@ -572,6 +686,40 @@ mod tests {
 
         assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
         assert!(err.to_string().contains("symlink guard"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_exclusive_target_dir_symlinked_private_component_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let workspace_root = workspace.path().canonicalize().unwrap();
+        let outside_root = outside.path().canonicalize().unwrap();
+        let target = workspace_root.join("cargo-target");
+        std::fs::create_dir(&target).unwrap();
+        std::os::unix::fs::symlink(
+            outside_root,
+            target.join(super::path_resolution::EXCLUSIVE_RUSTDOC_TARGET_COMPONENT),
+        )
+        .unwrap();
+        let crate_name = domain::tddd::catalogue_v2::CrateName::new("fixture").unwrap();
+
+        let err = crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars([("CARGO_TARGET_DIR", Some(target.as_os_str()))], || {
+                resolve_exclusive_target_dir(&workspace_root, &crate_name, &[], false)
+            })
+        })
+        .unwrap_err();
+
+        assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
+        assert!(
+            err.to_string().contains("symlink guard"),
+            "the private rustdoc target component must be rejected: {err}"
+        );
+        assert!(
+            err.to_string().contains(super::path_resolution::EXCLUSIVE_RUSTDOC_TARGET_COMPONENT),
+            "the failure must identify the symlinked private component: {err}"
+        );
     }
 
     #[cfg(unix)]

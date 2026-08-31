@@ -1,10 +1,10 @@
 {
   "baseline_hash": "cd7d618ea66ae2d66d3453d79d83345fd21c6f4645feecdcd1fe1a34bed5686d",
-  "declaration_hash": "1d036cf36d4a7bfbaa27f6920314a1c5166b1251bebbcb1e5cd3ae1539ddac67",
-  "generated_at": "2026-08-31T01:26:13Z",
-  "head_commit": "e7f8355bd40d8d6b74cddb2d42deac164422ee8e",
-  "implementation_fingerprint": "1063a50c0791a2b21dd7729aedbe2b4832de96c97edcdd30632ba3672e73e8b4",
-  "resolution_fingerprint": "5efd9992b190d74313f9bc769e6fc134a1ca648b81bc65f99338eb258594ff6a",
+  "declaration_hash": "4a9e4c60812ee8a01ad0662ae006a6777f614fdfc2647f781af19bf5acf09a6e",
+  "generated_at": "2026-08-31T18:21:59Z",
+  "head_commit": "d605b8c1411d79a521a1806fffb8675b0c9a765f",
+  "implementation_fingerprint": "9486e8f8225674867b63a45fa253fcfa65bd99451f56e38af52bd25c7fac757c",
+  "resolution_fingerprint": "494733262bb7e72bd684237c2d7284b4b61c773f808d5e119c7f49e3b68d4741",
   "rustdoc_execution_identity": {
     "crate_name": "domain",
     "expected_json_path": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5/doc/domain.json",
@@ -40,6 +40,18 @@
       "namespace": "trait",
       "signal": "blue",
       "type_name": "RustdocCratePort"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
     },
     {
       "found_items": [

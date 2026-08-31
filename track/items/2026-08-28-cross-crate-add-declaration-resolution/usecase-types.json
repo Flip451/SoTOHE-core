@@ -157,12 +157,12 @@
     },
     "TypeSignalsExecutorPort": {
       "action": "reference",
-      "docs": "Reference the unchanged synchronous per-layer execution boundary whose infrastructure implementation loads LayerId-keyed authoritative rustdoc contexts for the complete TDDD layer set before catalogue encoding (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03). evaluate_layer is intentionally blocking: catalogue and rustdoc filesystem work, export/snapshot capture, evaluation, and result persistence complete on the caller thread before it returns, with no internal async scheduling; async callers must explicitly isolate this boundary.",
+      "docs": "Synchronous per-layer type-signals execution port (IN-01, IN-02).",
       "informal_grounds": [],
       "methods": [
         {
           "action": "reference",
-          "docs": "Synchronous blocking boundary: complete authoritative catalogue/rustdoc filesystem loading, export and immutable snapshot capture, evaluation, and result persistence on the caller thread before returning; no internal async scheduling is provided.",
+          "docs": "Blocking per-layer evaluation boundary with no internal async scheduling (IN-01, IN-02).",
           "has_default_impl": false,
           "is_async": false,
           "name": "evaluate_layer",
@@ -239,7 +239,7 @@
   "types": {
     "RustdocExportPlan": {
       "action": "add",
-      "docs": "Validated immutable export plan containing at most 64 TDDD layer bindings; construction rejects the 65th required rustdoc export before export, evaluation, or cache reuse begins.",
+      "docs": "Bounded rustdoc export plan (IN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -271,7 +271,7 @@
     },
     "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor": {
       "action": "modify",
-      "docs": "Load every TDDD layer catalogue plus its authoritative baseline/current rustdoc pair before any codec handoff, so declaring-layer placement is available to cross-crate add resolution (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "docs": "Catalogue implementation-signals interactor (IN-01, IN-02).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -356,68 +356,12 @@
         {
           "anchor": "AC-03",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-05",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-08",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError": {
       "action": "modify",
-      "docs": "Application failure vocabulary for fail-closed catalogue/implementation evaluation, including rejection of any export plan requiring more than 64 TDDD layers.",
+      "docs": "Catalogue implementation-signals error vocabulary (IN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

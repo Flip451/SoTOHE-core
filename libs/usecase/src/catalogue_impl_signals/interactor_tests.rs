@@ -74,8 +74,8 @@ pub(super) fn empty_rustdoc_crate() -> Crate {
 
 fn decode_test_rustdoc(bytes: &[u8]) -> Result<Crate, RustdocCratePortError> {
     serde_json::from_slice(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
-        crate_name: "test".to_owned(),
-        reason: error.to_string(),
+        crate_name: CrateName::new("test").unwrap(),
+        reason: FreeText::new(error.to_string()),
     })
 }
 
@@ -386,8 +386,29 @@ impl RustdocCratePort for FailingRustdocPort {
         _features: &[CargoFeatureName],
     ) -> Result<RustdocSnapshot, RustdocCratePortError> {
         Err(RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.as_str().to_owned(),
-            reason: "stub capture failure".to_owned(),
+            crate_name: crate_name.clone(),
+            reason: FreeText::new("stub capture failure"),
+        })
+    }
+}
+
+/// `RustdocCratePort` whose current capture reports the authoritative lock
+/// failure unchanged after a readable baseline has been supplied.
+struct CaptureFailureRustdocPort;
+
+impl RustdocCratePort for CaptureFailureRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(empty_rustdoc_crate()))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        Err(RustdocCratePortError::CaptureFailed {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new("exclusive rustdoc lock sentinel failure"),
         })
     }
 }
@@ -599,8 +620,8 @@ impl RustdocCratePort for FeatureGatedRustdocPort {
             .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
         if !features.iter().any(|feature| feature.as_str() == "semantic-dup") {
             return Err(RustdocCratePortError::CaptureFailed {
-                crate_name: "domain".to_owned(),
-                reason: "feature-gated public item requires semantic-dup".to_owned(),
+                crate_name: CrateName::new("domain").unwrap(),
+                reason: FreeText::new("feature-gated public item requires semantic-dup"),
             });
         }
         Ok(current_rustdoc(_crate_name, rustdoc_crate_with_gated_public_item()))
@@ -1387,6 +1408,89 @@ fn test_run_codec_receives_all_track_catalogues_for_each_target_layer() {
 }
 
 #[test]
+fn test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate() {
+    use domain::tddd::catalogue_v2::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::entries::TraitEntry;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, ItemAction};
+    use domain::tddd::catalogue_v2::{CatalogueEntryKey, ModulePath};
+
+    let domain_layer = LayerId::try_new("domain").unwrap();
+    let usecase_layer = LayerId::try_new("usecase").unwrap();
+    let trait_key = CatalogueEntryKey::try_new("domain::ports::Repository".to_owned()).unwrap();
+    let mut domain_doc = minimal_catalogue_doc("domain");
+    domain_doc.insert_trait(
+        trait_key.clone(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["ports".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut usecase_doc = minimal_catalogue_doc("usecase");
+    usecase_doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::ports::Repository").unwrap(),
+        TypeRef::new("Handler").unwrap(),
+    ));
+
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), domain_doc),
+                ("usecase-types.json".to_owned(), usecase_doc),
+            ]),
+        }),
+        Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(LayerAwareRustdocPort),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    let observations = observed.lock().unwrap();
+    assert_eq!(observations.len(), 2);
+    for (_, catalogues, _) in observations.iter() {
+        let declaring = catalogues
+            .get(&domain_layer)
+            .expect("the codec handoff must include the declaring layer");
+        let repository = declaring
+            .traits()
+            .get(&trait_key)
+            .expect("the declaring-layer trait add must reach the codec");
+        assert_eq!(repository.action(), ItemAction::Add);
+        assert_eq!(repository.module_path().map(ToString::to_string), Some("ports".to_owned()));
+
+        let referring = catalogues
+            .get(&usecase_layer)
+            .expect("the codec handoff must include the referring layer");
+        assert!(
+            referring
+                .trait_impls()
+                .iter()
+                .any(|decl| decl.trait_ref().as_str() == "domain::ports::Repository"),
+            "the referring layer must retain its cross-layer trait reference"
+        );
+        assert!(
+            !referring.traits().contains_key(&trait_key),
+            "the referring catalogue must not duplicate the declaring-layer trait add"
+        );
+    }
+}
+
+#[test]
 fn test_run_codec_handoff_observes_synthesized_item_identity_and_module_placement() {
     use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::TypeEntry;
@@ -1651,6 +1755,38 @@ fn test_run_skips_missing_non_target_catalogue_when_layer_is_selected() {
     assert_eq!(binding_calls.lock().unwrap().as_slice(), &[None]);
 }
 
+#[test]
+fn test_run_unfiltered_missing_enabled_catalogue_is_empty_declaration_set() {
+    let domain_binding = stub_binding("domain");
+    let usecase_binding = stub_binding("usecase");
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([(
+                domain_binding.catalogue_file.clone(),
+                minimal_catalogue_doc("domain"),
+            )]),
+        }),
+        Arc::new(RecordingExtendedCrateCodec { observed: Arc::clone(&observed) }),
+        Arc::new(EmptyEvaluator),
+        Arc::new(LayerAwareRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![domain_binding, usecase_binding] }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    let observations = observed.lock().unwrap();
+    assert_eq!(observations.len(), 2, "unfiltered execution must still evaluate both layers");
+    assert_eq!(observations[0].0, LayerId::try_new("domain").unwrap());
+    assert_eq!(observations[1].0, LayerId::try_new("usecase").unwrap());
+    for (_, catalogues, _) in observations.iter() {
+        assert_eq!(catalogues.len(), 1);
+        assert!(catalogues.contains_key(&LayerId::try_new("domain").unwrap()));
+        assert!(!catalogues.contains_key(&LayerId::try_new("usecase").unwrap()));
+    }
+}
+
 // -------------------------------------------------------------------------
 // Happy-path / report-format tests (in sibling file to keep this file short)
 // -------------------------------------------------------------------------
@@ -1740,8 +1876,9 @@ fn test_run_catalogue_load_failure_returns_catalogue_load_error() {
         Arc::new(NeverCalledRustdocPort),
         Arc::new(StubLayerBindings { bindings: vec![binding] }),
     );
-    let err =
-        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+    let err = interactor
+        .run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), Some("domain".to_owned()))
+        .unwrap_err();
     assert!(
         matches!(err, CatalogueImplSignalsError::CatalogueLoad(_, _)),
         "expected CatalogueLoad, got: {err:?}"
@@ -1880,6 +2017,28 @@ fn test_run_symlink_guard_io_preserves_path_and_reason() {
         err,
         CatalogueImplSignalsError::SymlinkGuardIo(path, reason)
             if path.as_path() == Path::new("/tmp") && reason.as_str() == "permission denied"
+    ));
+}
+
+#[test]
+fn test_run_forwards_current_capture_failure_without_fallback() {
+    let interactor = build_interactor(
+        Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(CaptureFailureRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        error,
+        CatalogueImplSignalsError::SchemaExport(layer, reason)
+            if layer.as_ref() == "domain"
+                && reason.as_str().contains("exclusive rustdoc lock sentinel failure")
     ));
 }
 

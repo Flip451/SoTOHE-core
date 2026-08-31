@@ -54,7 +54,7 @@
         }
       ],
       "id": "AC-04",
-      "text": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、workspace 内で Cargo rustdoc の入力となる通常ファイルの相対 path と内容 hash、および D3 が列挙する環境値を含める。Cargo rustdoc が workspace 外の path dependency、build script の入力・生成物、又は D3 の環境値で識別できない toolchain・CARGO_HOME の内容を入力として必要とし、それを authoritative input set に完全に含められない場合は、export 前に authoritative-input error として失敗させる。同じ path の内容変更を fingerprint 一致として扱わず、完全な authoritative 入力の確定又は fingerprint 作成が失敗・上限超過した場合は、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+      "text": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
     },
     {
       "adr_refs": [
@@ -74,7 +74,7 @@
         }
       ],
       "id": "AC-07",
-      "text": "同じ解決済み Cargo target directory の共有出力 lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合は評価を fail-closed で停止し、lockless export、既存 JSON の再利用、又は待機超過後の retry を行わない。"
+      "text": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合では、その directory 内の単一 advisory exclusive lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合、評価を fail-closed で停止する。lockless export、既存 JSON の再利用、又は待機超過後の retry は行わない。"
     },
     {
       "adr_refs": [
@@ -84,7 +84,7 @@
         }
       ],
       "id": "AC-08",
-      "text": "rustdoc export と snapshot の再利用は、descriptor-relative かつ no-follow の trusted-root lock を提供できる Unix でだけ許可し、それ以外の platform、symlink を経る target directory、又は trusted-root を検証できない target directory では fail-closed で拒否する。"
+      "text": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。これは任意の shared Cargo target writer に対する OS mandatory-access 境界を主張しない。"
     },
     {
       "adr_refs": [
@@ -94,7 +94,7 @@
         }
       ],
       "id": "AC-06",
-      "text": "評価は解決済み入力と rustdoc JSON の immutable な内容 snapshot だけを用い、排他的に所有でき、期待 JSON を更新する全 writer が同じ lock に参加する target directory の lock を export から期待出力の確認・読み取りまで保持する。非協調 writer を排除又は検出できない場合は結果を受理せず失敗させる。開始後に入力 fingerprint 又は解決 fingerprint が変われば結果を破棄して失敗させ、path の再読による変化なし判定又は ABA を許さない。"
+      "text": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
     }
   ],
   "constraints": [
@@ -152,7 +152,7 @@
         }
       ],
       "id": "CO-04",
-      "text": "実装 fingerprint は、rustdoc graph を変え得る入力を D3 の authoritative input set、すなわち workspace 内で Cargo rustdoc の入力となる通常ファイルの相対 path と内容 hash、および D3 が列挙する環境値に限定し、除外 directory を走査しない。workspace 外の path dependency、build script の入力・生成物、toolchain・CARGO_HOME の内容など、この集合に含められない入力を検出した場合は、外部境界を暗黙に許可せず authoritative-input error として export と再利用を fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。I/O の各定量上限、symlink、I/O error、又は入力の途中変更では partial fingerprint を作らず、古い結果へ fallback しない。"
+      "text": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
     },
     {
       "adr_refs": [
@@ -176,7 +176,7 @@
         }
       ],
       "id": "CO-06",
-      "text": "同じ解決済み Cargo target directory の export は 120 秒上限の単一排他 lock で直列化する。評価に使う target directory はこの機能が所有する専用領域として確保し、期待 rustdoc JSON を作成又は置換する全 writer（通常の Cargo rustdoc と別 exporter を含む）は同じ lock と所有境界を通らなければならない。非協調 writer を排除できない、又は専用領域の排他的所有を検証できない target directory は使用せず fail-closed にする。lock は descriptor-relative・no-follow の trusted-root 検証を提供する Unix だけで扱い、絶対 CARGO_TARGET_DIR は明示設定時でも全親 component の symlink 不在を検証する。"
+      "text": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。この directory を使う閉じた協調 expected-output writer 集合の export は、directory 内の単一 advisory exclusive lock で最大 120 秒直列化する。非専用 target は fail-closed で拒否し、任意の shared Cargo target writer を排除又は検出できる OS mandatory-access 境界は主張しない。lock は descriptor-relative・no-follow の trusted-root 検証を提供する Unix だけで扱い、絶対 CARGO_TARGET_DIR は明示設定時でも全親 component と selection directory の symlink 不在を検証する。"
     },
     {
       "adr_refs": [
@@ -186,7 +186,7 @@
         }
       ],
       "id": "CO-07",
-      "text": "解決済み入力は content-addressed の in-memory snapshot に固定し、出力は同一 lock の臨界区間で期待 path の確認と JSON bytes の snapshot 読み取りまで完了する。target directory の専用所有と全 writer の同一 lock 参加を確認できない場合は出力を authoritative として扱わない。結果を書き出す前に開始時 snapshot との fingerprint 一致を確認する。"
+      "text": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
     }
   ],
   "goal": [
@@ -210,7 +210,7 @@
         }
       ],
       "id": "GO-01",
-      "text": "同じ track の層をまたぐ宣言先行の型・trait 参照を、完全修飾 identity と入力・出力 snapshot の同一性を保った fail-closed な解決集合で実現する。"
+      "text": "同じ track の層をまたぐ宣言先行の型・trait 参照を、完全修飾 identity、保守的 implementation fingerprint、及び開始時 immutable snapshot に束縛した fail-closed な解決集合で実現する。"
     }
   ],
   "related_conventions": [
@@ -258,7 +258,7 @@
           }
         ],
         "id": "IN-03",
-        "text": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の完全な同一性に束縛し、入力確定又は fingerprint 作成に失敗した場合は fail-closed にすること。"
+        "text": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
       },
       {
         "adr_refs": [
@@ -278,7 +278,7 @@
           }
         ],
         "id": "IN-05",
-        "text": "同じ解決済み Cargo target directory の rustdoc export を 120 秒上限の単一排他 lock で直列化し、lock を取得できない又は lock 操作が失敗した場合は lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止すること。"
+        "text": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。lock を取得できない又は lock 操作が失敗した場合は、lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止する。"
       },
       {
         "adr_refs": [
@@ -288,7 +288,7 @@
           }
         ],
         "id": "IN-06",
-        "text": "rustdoc の共有出力 lock を、descriptor-relative かつ no-follow の trusted-root 検証を提供する Unix だけで扱い、それ以外の platform、symlink を経る target directory、又は検証不能な target directory を fail-closed で拒否すること。"
+        "text": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否し、任意の shared Cargo target writer に対する OS mandatory-access 境界は主張しない。"
       },
       {
         "adr_refs": [
@@ -298,7 +298,7 @@
           }
         ],
         "id": "IN-07",
-        "text": "解決済み入力を immutable な content-addressed snapshot に固定し、同じ lock を期待出力 path の決定、export、出力 path の確認、及び JSON bytes の snapshot 読み取りまで保持して、入力又は出力の世代混在と ABA を fail-closed に防ぐこと。"
+        "text": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
       }
     ],
     "out_of_scope": [
@@ -344,7 +344,7 @@
           }
         ],
         "id": "OS-04",
-        "text": "catalogue の宣言 hash だけ、partial fingerprint、又は任意 target 出力の走査により型シグナルを再利用する方式。"
+        "text": "catalogue の宣言 hash だけ、partial fingerprint、D3 の保守的 over-approximation を Cargo の完全意味入力集合として扱うこと、又は任意 target 出力の走査により型シグナルを再利用する方式。"
       },
       {
         "adr_refs": [
@@ -366,7 +366,7 @@
           }
         ],
         "id": "OS-05",
-        "text": "64 層超過時の分割継続、lockless export、lock 待機超過後の retry、既存 JSON への fallback、又は Unix 以外で path-based fallback を許す方式。"
+        "text": "64 層超過時の分割継続、lockless export、lock 待機超過後の retry、既存 JSON への fallback、非専用 target の受容、又は Unix 以外で path-based fallback を許す方式。任意の shared Cargo target writer を OS mandatory-access で排除できるという主張も範囲外とする。"
       }
     ]
   },

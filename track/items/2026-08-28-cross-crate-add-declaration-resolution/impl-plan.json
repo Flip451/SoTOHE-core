@@ -236,11 +236,12 @@
       "depends_on": [
         "T014"
       ],
-      "description": "After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to require exclusive target ownership and common-lock participation by every expected-output writer; add focused cooperative-writer and non-cooperative-writer rejection tests (CO-06, CO-07, AC-06).",
+      "description": "After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to enforce the .sotp-rustdoc selection-directory writer boundary and cooperative expected-output handling; add focused writer-boundary and non-exclusive-target validation tests (CO-06, CO-07, AC-06).",
       "id": "T015",
       "status": "done"
     },
     {
+      "commit_hash": "d605b8c1411d79a521a1806fffb8675b0c9a765f",
       "depends_on": [
         "T015"
       ],
@@ -252,15 +253,16 @@
       "depends_on": [
         "T016"
       ],
-      "description": "After T016, continue modifying the same infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter write target for trusted-root admission and failure propagation; keep this work in a later batch to avoid overlapping T016 ownership, and add focused non-Unix, relative escape, unverifiable root, and symlinked target-component rejection tests (IN-06, OS-05, CO-06, AC-08).",
+      "description": "After T016, modify domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError for authoritative-input failure vocabulary and continue modifying infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter for trusted-root admission and failure propagation; keep this work in a later batch to avoid overlapping T016 ownership, and add focused non-Unix, relative escape, unverifiable root, symlinked target-component rejection, and authoritative-input error propagation tests (IN-06, OS-05, CO-06, AC-08).",
       "id": "T017",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "d605b8c1411d79a521a1806fffb8675b0c9a765f",
       "depends_on": [
         "T016"
       ],
-      "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture authoritative implementation/resolution fingerprints and integrate complete reuse keys and fail-closed reuse decisions; add focused mutation, exclusion, limit, and stale-reuse tests (IN-03, OS-04, CO-04, AC-04).",
+      "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the conservative implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04).",
       "id": "T018",
       "status": "done"
     },
@@ -268,9 +270,9 @@
       "depends_on": [
         "T018"
       ],
-      "description": "After T018, continue modifying infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to revalidate start/end generations before persisting; add focused changed-generation, discard-before-persist, path-reread, and ABA tests (IN-07, CO-07, AC-06).",
+      "description": "After T018, continue modifying infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to use start-snapshot evaluation and end-fingerprint revalidation; add focused snapshot and reuse validation tests (IN-07, CO-07, AC-06).",
       "id": "T019",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

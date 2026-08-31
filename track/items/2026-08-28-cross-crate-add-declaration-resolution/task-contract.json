@@ -180,6 +180,10 @@
     ],
     "T017": [
       {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+      },
+      {
         "layer": "infrastructure",
         "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
       },

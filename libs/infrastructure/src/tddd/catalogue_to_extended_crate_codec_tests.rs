@@ -2,6 +2,7 @@
 
 use std::collections::BTreeMap;
 
+use domain::FreeText;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
 use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl, TraitEntry, TypeEntry};
@@ -41,8 +42,8 @@ fn snapshot_for_test(crate_name: &str, crate_data: &rustdoc_types::Crate) -> Rus
     ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
         serde_json::from_slice(bytes).map_err(|error| {
             domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
-                crate_name: "test".to_owned(),
-                reason: error.to_string(),
+                crate_name: CrateName::new("test").unwrap(),
+                reason: FreeText::new(error.to_string()),
             }
         })
     }
@@ -132,6 +133,23 @@ fn test_encode_rejects_rustdoc_context_stored_under_different_layer_key() {
     assert!(message.contains("authoritative rustdoc context"));
     assert!(message.contains("usecase"));
     assert!(message.contains("domain"));
+}
+
+#[test]
+fn test_encode_missing_target_catalogue_returns_empty_declarations() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let catalogues = BTreeMap::new();
+    let empty = rustdoc_crate_with_paths([]);
+    let contexts = target_rustdoc_contexts(&target_layer, &empty, &empty);
+
+    let encoded = CatalogueToExtendedCrateCodec::new()
+        .encode(&target_layer, &catalogues, &contexts)
+        .expect("a missing target catalogue is an empty declaration set");
+
+    assert!(encoded.krate().index.is_empty());
+    assert!(encoded.krate().paths.is_empty());
+    assert!(encoded.krate().external_crates.is_empty());
+    assert!(encoded.item_actions().is_empty());
 }
 
 fn insert_empty_enum_type(doc: &mut CatalogueDocument, name: &str) {

@@ -57,7 +57,6 @@ pub(super) fn append_environment_identity(
         if TOOL_ENVIRONMENT_INPUTS.contains(name) {
             let resolved = resolve_tool_path(workspace_root, &trusted_root, name, &value)?;
             super::append_len_prefixed_bytes(canonical, &super::path_bytes(&resolved.path));
-            super::append_len_prefixed_bytes(canonical, &resolved.generation);
             super::append_len_prefixed_bytes(canonical, &super::sha256_bytes(&resolved.bytes));
         }
     }
@@ -69,7 +68,6 @@ pub(super) fn append_environment_identity(
 struct ResolvedTool {
     path: PathBuf,
     bytes: Vec<u8>,
-    generation: Vec<u8>,
 }
 
 fn resolve_tool_path(
@@ -172,13 +170,12 @@ fn snapshot_tool_file(
             Error::other(format!("{label} changed while it was being fingerprinted")),
         ));
     }
-    Ok(ResolvedTool { path: resolved, bytes, generation: super::metadata_generation(&metadata) })
+    Ok(ResolvedTool { path: resolved, bytes })
 }
 
 fn append_tool_snapshot(canonical: &mut Vec<u8>, label: &str, tool: &ResolvedTool) {
     super::append_len_prefixed_bytes(canonical, label.as_bytes());
     super::append_len_prefixed_bytes(canonical, &super::path_bytes(&tool.path));
-    super::append_len_prefixed_bytes(canonical, &tool.generation);
     super::append_len_prefixed_bytes(canonical, &super::sha256_bytes(&tool.bytes));
 }
 
@@ -397,7 +394,6 @@ fn append_config_file_snapshot(
         return Err(io_error(path, Error::other("Cargo config changed while fingerprinting")));
     }
     canonical.push(1);
-    super::append_len_prefixed_bytes(canonical, &super::metadata_generation(&metadata));
     super::append_len_prefixed_bytes(canonical, &super::sha256_bytes(&bytes));
     Ok(())
 }

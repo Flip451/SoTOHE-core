@@ -8,6 +8,7 @@
 mod tests {
     use std::collections::BTreeSet;
 
+    use domain::FreeText;
     use domain::schema::{SchemaExporter, TypeKind};
     use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
     use serde_json::Value;
@@ -168,8 +169,8 @@ mod tests {
     ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
         serde_json::from_slice(bytes).map_err(|error| {
             domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
-                crate_name: "fixture".to_owned(),
-                reason: error.to_string(),
+                crate_name: CrateName::new("fixture").unwrap(),
+                reason: FreeText::new(error.to_string()),
             }
         })
     }
@@ -312,6 +313,272 @@ printf '%s\n' '{json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
                     let snapshot = contender.join().unwrap().unwrap();
                     assert_eq!(
                         snapshot.crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_exporter_holds_lock_before_expected_path_selection() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::sync::{Arc, Barrier};
+        use std::time::Duration;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let first_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{first_json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let crate_name = CrateName::new("fixture").unwrap();
+                    let identity_exporter =
+                        RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let (identity, _) =
+                        identity_exporter.rustdoc_execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path().to_path_buf();
+                    let before_selection = Arc::new(Barrier::new(2));
+                    let release_selection = Arc::new(Barrier::new(2));
+                    let before_selection_for_hook = Arc::clone(&before_selection);
+                    let release_selection_for_hook = Arc::clone(&release_selection);
+                    let first_exporter = RustdocSchemaExporter::with_before_expected_path_selection(
+                        workspace.path().to_path_buf(),
+                        Arc::new(move || {
+                            before_selection_for_hook.wait();
+                            release_selection_for_hook.wait();
+                        }),
+                    );
+                    let first_crate = crate_name.clone();
+                    let first = std::thread::spawn(move || {
+                        first_exporter.capture_rustdoc_snapshot(
+                            &first_crate,
+                            &[],
+                            decode_fixture_rustdoc,
+                        )
+                    });
+
+                    before_selection.wait();
+                    let contender = std::thread::spawn(move || {
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
+                            &exclusive,
+                            Duration::from_millis(100),
+                        )
+                    });
+                    let contention = contender.join().unwrap();
+                    release_selection.wait();
+                    let first_snapshot = first.join().unwrap().unwrap();
+                    assert!(
+                        contention.is_err(),
+                        "a contender must be blocked before expected path selection"
+                    );
+                    let contention_error = contention.unwrap_err();
+                    assert!(
+                        contention_error.to_string().contains("timed out"),
+                        "the pre-selection lock must reject a competing acquisition: {contention_error}"
+                    );
+                    assert_eq!(
+                        first_snapshot.crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_exporter_rejects_output_path_differing_from_expected() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::sync::Arc;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let rustdoc_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{rustdoc_json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#,
+                    rustdoc_json = rustdoc_json
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let crate_name = CrateName::new("fixture").unwrap();
+                    let exporter = RustdocSchemaExporter::with_output_path_rewriter(
+                        workspace.path().to_path_buf(),
+                        Arc::new(|path: std::path::PathBuf| path.with_file_name("unexpected.json")),
+                    );
+                    let result = exporter.capture_rustdoc_json(&crate_name, &[]);
+                    assert!(result.is_err(), "a changed rustdoc output path must be rejected");
+                    if let Err(error) = result {
+                        assert!(
+                            error
+                                .to_string()
+                                .contains("rustdoc JSON output path changed during export"),
+                            "unexpected path mismatch error: {error}"
+                        );
+                    }
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_exporter_holds_lock_at_post_export_before_byte_copy() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::sync::{Arc, Barrier};
+        use std::time::Duration;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let first_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{first_json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let crate_name = CrateName::new("fixture").unwrap();
+                    let identity_exporter =
+                        RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let (identity, _) =
+                        identity_exporter.rustdoc_execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path().to_path_buf();
+                    let post_export = Arc::new(Barrier::new(2));
+                    let release_read = Arc::new(Barrier::new(2));
+                    let post_export_for_hook = Arc::clone(&post_export);
+                    let release_read_for_hook = Arc::clone(&release_read);
+                    let first_exporter = RustdocSchemaExporter::with_before_read(
+                        workspace.path().to_path_buf(),
+                        Arc::new(move || {
+                            post_export_for_hook.wait();
+                            release_read_for_hook.wait();
+                        }),
+                    );
+                    let first_crate = crate_name.clone();
+                    let first = std::thread::spawn(move || {
+                        first_exporter.capture_rustdoc_snapshot(
+                            &first_crate,
+                            &[],
+                            decode_fixture_rustdoc,
+                        )
+                    });
+
+                    post_export.wait();
+                    let contender = std::thread::spawn(move || {
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
+                            &exclusive,
+                            Duration::from_millis(100),
+                        )
+                    });
+                    let contention = contender.join().unwrap();
+                    release_read.wait();
+                    let first_snapshot = first.join().unwrap().unwrap();
+                    assert!(
+                        contention.is_err(),
+                        "a contender must be blocked before the first byte read"
+                    );
+                    let contention_error = contention.unwrap_err();
+                    assert!(
+                        contention_error.to_string().contains("timed out"),
+                        "the post-export lock must reject a competing acquisition: {contention_error}"
+                    );
+                    assert_eq!(
+                        first_snapshot.crate_data().crate_version.as_deref(),
                         Some("generation-a")
                     );
                 },

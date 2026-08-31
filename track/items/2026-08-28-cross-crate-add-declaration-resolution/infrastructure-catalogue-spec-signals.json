@@ -1,39 +1,39 @@
 {
-  "catalogue_declaration_hash": "8ed77b89f0e484d36d98c9a0e32dab283b2a5d894f3696ab848db202248949f4",
+  "catalogue_declaration_hash": "4b82e324dffd3177728631f45aab30905c1b2953481c85092f59e94dd9ebe64a",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "8ccabb0db8960c1d2b540592d069dad5ba37ee5b362bd21ccc5a5d275007f2fe",
+      "entry_hash": "014236bbf9ff2cd68d3bd497a77def5056afb0454d95decc641ea28dee312012",
       "signal": "blue",
       "type_name": "infrastructure::schema_export::RustdocSchemaExporter"
     },
     {
-      "entry_hash": "a7705b84d524aea98d0bf6b2bc4119b88a20318edfcbd5359c42371c38aea1ac",
+      "entry_hash": "84e3b08ec767079399473f4e673eb388c1136db82ea610214f1fd2552caadd64",
       "signal": "blue",
       "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
     },
     {
-      "entry_hash": "b7b6b5c83f1a21218dc01752208beaaf9ec94a2af7de5d8d6115f501030c6e06",
+      "entry_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
       "signal": "blue",
       "type_name": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
     },
     {
-      "entry_hash": "7a47f8657ad4f7e03246159e394bdecd14021c9609475e99351ae28260f41f6a",
+      "entry_hash": "0510aeb0e84e86b483a85c37e1f433fb93d157c17e4422c697ebb38509fdf6b8",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
     },
     {
-      "entry_hash": "28a351d963efe34e9dbfadfd18e1aca7d29a193b13ba8f49f7a1fe3d4fe720bf",
+      "entry_hash": "0516c54e5df76c193b68ff59aa3c295c106f835cc472fb168049a8bfd102c6d7",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
     },
     {
-      "entry_hash": "3fce0a89f6d5b99d2bd8837ee6a9833f836d0c5e22cca5bdc9827bad766cdd09",
+      "entry_hash": "3c9035367032bd6aedc4d88e2c260dc5c0c64b546e0e66f106b6c0820c376a07",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
     },
     {
-      "entry_hash": "bb88776a8f2ecac7f71352dabd6dcc104b983eec3ac8c49d2b0c3d3cb46a1a37",
+      "entry_hash": "f26d09c7e94ea861410a5411f1ad95f798f80bfd16a9df89d70dd92577770c0e",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
     }

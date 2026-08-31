@@ -655,6 +655,10 @@ mod tests {
     fn digest(value: &str) -> Sha256Digest {
         Sha256Digest::try_new(value.to_owned()).unwrap()
     }
+    fn resolution_fingerprint(bytes: &[u8]) -> ResolutionFingerprint {
+        let digest: [u8; 32] = sha2::Sha256::digest(bytes).into();
+        ResolutionFingerprint::new(Sha256Digest::from_content_hash(ContentHash::from_bytes(digest)))
+    }
     fn declaration(value: &str) -> CatalogueDeclarationHash {
         CatalogueDeclarationHash::new(digest(value))
     }
@@ -766,8 +770,8 @@ mod tests {
 
     fn decode_rustdoc(bytes: &[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError> {
         serde_json::from_slice(bytes).map_err(|error| RustdocCratePortError::ParseFailed {
-            crate_name: "test".to_owned(),
-            reason: error.to_string(),
+            crate_name: CrateName::new("test").unwrap(),
+            reason: FreeText::new(error.to_string()),
         })
     }
 
@@ -873,6 +877,33 @@ mod tests {
         );
         assert_eq!(first.execution_identity(), second.execution_identity());
         assert_ne!(first.crate_data(), second.crate_data());
+    }
+
+    #[test]
+    fn test_resolution_fingerprint_with_same_snapshot_content_is_equal() {
+        let first = resolution_fingerprint(b"resolution-generation-a");
+        let same_generation = resolution_fingerprint(b"resolution-generation-a");
+
+        assert_eq!(first, same_generation);
+    }
+
+    #[test]
+    fn test_resolution_fingerprint_with_changed_snapshot_content_is_not_equal() {
+        let first = resolution_fingerprint(b"resolution-generation-a");
+        let changed_generation = resolution_fingerprint(b"resolution-generation-b");
+
+        assert_ne!(first, changed_generation);
+    }
+
+    #[test]
+    fn test_resolved_cargo_target_directory_with_absolute_path_preserves_identity() {
+        let path = PathBuf::from("/tmp/sotohe-resolved-cargo-target");
+        let first = ResolvedCargoTargetDirectory::try_new(path.clone()).unwrap();
+        let same_path = ResolvedCargoTargetDirectory::try_new(path).unwrap();
+
+        assert!(first.as_path().is_absolute());
+        assert!(!first.as_path().as_os_str().is_empty());
+        assert_eq!(first, same_path);
     }
 
     #[test]
