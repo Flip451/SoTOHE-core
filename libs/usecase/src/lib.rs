@@ -44,6 +44,7 @@ pub mod export_schema;
 pub mod file;
 pub mod fixpoint_resolve;
 pub mod fixpoint_resolve_driver;
+pub mod gate_output;
 pub mod git_stash;
 pub mod git_workflow;
 pub mod guard;

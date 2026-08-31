@@ -1,5 +1,15 @@
 # Environment Assumptions Convention
 
+## この source tree における位置付け
+
+このファイルは SoTOHE-core source repository 自身が consumer として使用する環境前提宣言であり、
+以下の具体的な値はこの repository の実際の実行環境を記録する。`.harness/config/template-boundary.json`
+では source 側の `knowledge/conventions/` を `overlay` として扱うため、template export はこの
+source 側の文書を reusable scaffold の共通既定値として出荷しない。exported scaffold に供給される
+初期文書は consumer-neutral な別の overlay 内容であり、そこでは各 consumer が値を記入する。
+
+> **強制先**: review 観点 — harness-policy scope
+
 ## Purpose
 
 実行環境に依存する前提を、consumer が自分のプロジェクトの仕様として宣言するための枠を
@@ -24,11 +34,11 @@
 
 ### 対応プラットフォーム (Supported Platforms)
 
-- 対応する platform、architecture、runtime: `TODO: consumer が記入`
+- 対応する platform、architecture、runtime: Linux (x86_64), the Docker `tools` container used by `cargo make`
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- 対応外または条件付きの範囲: `TODO: consumer が記入`
+- 対応外または条件付きの範囲: macOS/Windows for descriptor-relative gate-log persistence (`FsGateLogPersistence::reserve` returns `CreateFile` with a Linux-only reason)
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: `TODO: consumer が記入`
+- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: exclusive create and nofollow directory opens use Unix descriptor-relative APIs; `RenameFlags::EXCHANGE` publish is Linux-only, and the explicit platform gate makes non-Linux fail before creating a log file
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 入力エンコーディング方針 (Input-Encoding Policy)

@@ -199,7 +199,7 @@ jobs:
         # recompiled. These must match the build-time values for fingerprints to hit:
         # CARGO_HOME=/usr/local/cargo (baked registry), CARGO_TARGET_DIR=/cargo-target
         # (baked compiled deps, set via IMAGE_CARGO_TARGET_DIR at build time).
-        run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo make ci-container
+        run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo run --locked --quiet -p cli -- gate-output --name ci-container -- cargo make --allow-private ci-local-steps
 
       - name: Run CI suite (track-aware gates)
         # track-aware gates (spec/catalogue/impl signal chains) require a

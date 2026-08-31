@@ -1,0 +1,473 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a result test covering 'entry' of GateRunInteractor",
+      "declaration_hash": "81fc05401ff5626ae105a0120a3840e90c4c642266c779eadae14e6cb300e572",
+      "id": {
+        "entry_key": "GateRunInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GateRunInteractor",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:reserve' of GateLogPersistencePort",
+      "declaration_hash": "eeef11bbc8b7b14bf7f90130433ffbf0842fc682897292e941f66830374a2f4f",
+      "id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "trait_method:reserve",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GateLogPersistencePort",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:persist' of GateLogPersistencePort",
+      "declaration_hash": "eeef11bbc8b7b14bf7f90130433ffbf0842fc682897292e941f66830374a2f4f",
+      "id": {
+        "entry_key": "GateLogPersistencePort",
+        "item_identifier": "trait_method:persist",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GateLogPersistencePort",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:run' of GateProcessPort",
+      "declaration_hash": "a16624fb554d2f9a8fef9099ba6d14ab67e8a04740c3c238fe42355ff4ecf63c",
+      "id": {
+        "entry_key": "GateProcessPort",
+        "item_identifier": "trait_method:run",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GateProcessPort",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of GateRunService",
+      "declaration_hash": "0c3698944bffdbdc866af6775f1ca91d259c4cf4db4311d795e415f56d597e96",
+      "id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GateRunService",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::gate_output::GateProcessPort' of ProcessGateRunner",
+      "declaration_hash": "8976833630c54f8736c964c61578b82dec069bb99ca603e53d1dba5ff16881ad",
+      "id": {
+        "entry_key": "ProcessGateRunner",
+        "item_identifier": "trait_impl:usecase::gate_output::GateProcessPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "ProcessGateRunner",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::gate_output::GateLogPersistencePort' of FsGateLogPersistence",
+      "declaration_hash": "a7cf8cebb3ceef38bacfd7db066e46541f89930fbfae842744351cd7ac9c008b",
+      "id": {
+        "entry_key": "FsGateLogPersistence",
+        "item_identifier": "trait_impl:usecase::gate_output::GateLogPersistencePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "FsGateLogPersistence",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli_driver::gate_output::failure_excerpts",
+      "declaration_hash": "eb437064fe12b175f190f8bfb77839468e9e17124c5e5232f723cbf74e406488",
+      "id": {
+        "entry_key": "cli_driver::gate_output::failure_excerpts",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli_driver::gate_output::failure_excerpts",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli_driver::gate_output::is_failure_line",
+      "declaration_hash": "4384ccec4ea5bed20bd3325d7b23d877fa803a2e65217b7298c0b8941393b4e7",
+      "id": {
+        "entry_key": "cli_driver::gate_output::is_failure_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli_driver::gate_output::is_failure_line",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli_driver::gate_output::render_summary",
+      "declaration_hash": "c53670e54f6439761d986eb652e74712646f661e85c05d1ac90d91eda5e68962",
+      "id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli_driver::gate_output::truncate_line",
+      "declaration_hash": "64388c5c6ccf6c20bb5b81d869a5a53bbd442b7207f3f9ec77f98bb6f7578b8c",
+      "id": {
+        "entry_key": "cli_driver::gate_output::truncate_line",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli_driver::gate_output::truncate_line",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_driver-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli::commands::gate_output::execute",
+      "declaration_hash": "459b7fad075c76ad6c97034b5fc6ad3d8a7bf317e5d95f267d2596855dddce02",
+      "id": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli::commands::gate_output::execute",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli::commands::gate_output::exit_code_from_u8",
+      "declaration_hash": "d8b7186c62650ebc9ad3cfb4f2f6a8fd4e89020653594fe206097403044b561f",
+      "id": {
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+        "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
+  "track_id": "2026-08-25-gate-output-summary-contract"
+}

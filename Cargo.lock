@@ -872,6 +872,7 @@ dependencies = [
  "temp-env",
  "tempfile",
  "thiserror",
+ "toml",
  "usecase",
  "windows-sys 0.59.0",
 ]
