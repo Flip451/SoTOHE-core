@@ -125,7 +125,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -148,7 +148,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -157,7 +157,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "予約後に親ディレクトリが移動または置換され、この publish を trusted root 内で完了できなくなった場合は、trusted root 外へ書き込んだ inode を指す語彙上のパスを返さず、`Unavailable` または書込みエラーとして失敗させる。",
+        "citation": "`persist` は内容を一時領域へ書き、trusted root 配下であることを最終段階として再検証したパスへの publish を最後に行う。予約後に親ディレクトリが移動または置換され、この publish を trusted root 内で完了できなくなった場合は、trusted root 外へ書き込んだ inode を指す語彙上のパスを返さず、`Unavailable` または書込みエラーとして失敗させる。",
         "kind": "pass"
       }
     },
@@ -286,7 +286,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -309,7 +309,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -318,7 +318,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「ファイル名レイアウトとファイルシステムのコンポーネント長制限の実現可能性は、`GateLogPersistencePort` とそのアダプターが所有する。」および「ポートが一意なログパスを選択して作成する予約・準備操作を公開する。」",
+        "citation": "ファイル名レイアウトとファイルシステムのコンポーネント長制限の実現可能性は、`GateLogPersistencePort` とそのアダプターが所有する。",
         "kind": "pass"
       }
     },
@@ -332,7 +332,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -355,7 +355,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -364,7 +364,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`persist` は `GateLogReservation` を消費する。cancel API は設けない。persist せずに token を drop することは呼出し側の欠陥であり、アダプターは予約済み名前を TOCTOU に unlink してはならない。」「アダプターは数値による pending-reservation 上限を新設せず、adapter shutdown 時にも未消費 reservation を暗黙に reclaim する契約を設けない。",
+        "citation": "`persist` は `GateLogReservation` を消費する。cancel API は設けない。persist せずに token を drop することは呼出し側の欠陥であり、アダプターは予約済み名前を TOCTOU に unlink してはならない。",
         "kind": "pass"
       }
     },
@@ -470,7 +470,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -493,7 +493,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -516,7 +516,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -539,7 +539,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7297afefe22b28463620885dffc8bea27c2fdc1cf8674de2719354f48516dd90",
+      "evidence_hash": "c64a7a4e93884e0283858f867e109883fbb39e5ba1be6ee982faa2b879dc0ce2",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -548,7 +548,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`persist` は `GateLogReservation` を消費する。」「一つの `GateRunInteractor::execute` が保持できる live reservation は最大一つとする。",
+        "citation": "一つの `GateRunInteractor::execute` が保持できる live reservation は最大一つとする。",
         "kind": "pass"
       }
     }
