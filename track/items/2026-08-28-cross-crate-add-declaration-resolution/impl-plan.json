@@ -232,6 +232,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "e7f8355bd40d8d6b74cddb2d42deac164422ee8e",
       "depends_on": [
         "T014"
       ],
@@ -245,7 +246,7 @@
       ],
       "description": "After T015, modify infrastructure::schema_export::RustdocSchemaExporter to expose immutable Vec<u8> export data, and modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter to determine, verify, read, hash, decode, and construct the current rustdoc snapshot from that one immutable byte capture while the common lock remains held; add focused same-bytes and output-replacement tests (IN-07, CO-07, AC-06).",
       "id": "T016",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -261,7 +262,7 @@
       ],
       "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture authoritative implementation/resolution fingerprints and integrate complete reuse keys and fail-closed reuse decisions; add focused mutation, exclusion, limit, and stale-reuse tests (IN-03, OS-04, CO-04, AC-04).",
       "id": "T018",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

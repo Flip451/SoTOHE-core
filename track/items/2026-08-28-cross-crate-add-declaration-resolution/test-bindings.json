@@ -2653,6 +2653,108 @@
         }
       },
       "reason": "This evaluator requires exclusive .sotp-rustdoc target ownership on resolved execution identities and fail-closes when a shared Cargo target is supplied. It does not acquire the 120-second rustdoc output lock, serialize concurrent exporters, or route writers through RustdocOutputLock; those lock-participation mechanics are performed by RustdocSchemaExporter during capture_current, not by this orchestration function."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This exporter copies rustdoc JSON bytes under a target-directory lock. It does not assemble TypeSignalsCacheKey, walk hermetic workspace inputs, or decide type-signal reuse from implementation fingerprints."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "CO-04's complete authoritative-input admission and cache-identity policy are not operations of rustdoc JSON export. This adapter neither fingerprints the Cargo/rustc/rustdoc environment set nor compares cache keys."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This exporter has no type-signal document cache, worktree cleanliness check, or reuse skip path. AC-04's complete reuse gate is not local behavior of export_rustdoc_json."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_rustdoc_exporter_expected_path_and_snapshot_capture_succeeds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_locked_byte_capture_is_immutable_after_output_replacement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_capture_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_export_source_holds_lock_from_path_selection_through_byte_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_distinct_byte_generations_yield_distinct_hashes"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This exporter verifies the expected JSON path and copies bytes inside the exclusive-target lock, then returns those bytes. It does not recheck implementation/resolution fingerprints before a type-signal persist step, because it has no type-signal writer."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "Lock-held byte copy and expected-path verification are this exporter's AC-06 slice. It cannot observe ABA of TypeSignalsCacheKey fingerprints or uncooperative writers after persist, because it does not persist type-signal results."
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"

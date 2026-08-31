@@ -161,4 +161,183 @@ mod tests {
         sorted.sort();
         assert_eq!(names, sorted, "types should be sorted by name");
     }
+
+    #[cfg(unix)]
+    fn decode_fixture_rustdoc(
+        bytes: &[u8],
+    ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
+        serde_json::from_slice(bytes).map_err(|error| {
+            domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                crate_name: "fixture".to_owned(),
+                reason: error.to_string(),
+            }
+        })
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_rustdoc_exporter_expected_path_and_snapshot_capture_succeeds() {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let rustdoc_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{rustdoc_json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let exporter = RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let crate_name = CrateName::new("fixture".to_owned()).unwrap();
+                    let snapshot = exporter
+                        .capture_rustdoc_snapshot(&crate_name, &[], decode_fixture_rustdoc)
+                        .unwrap();
+                    assert_eq!(snapshot.execution_identity().crate_name(), &crate_name);
+                    assert_eq!(
+                        snapshot.crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_exporter_capture_waits_on_held_exclusive_lock() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::time::Duration;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            std::fs::write(
+                workspace.path().join("Cargo.toml"),
+                "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+            )
+            .unwrap();
+            std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+            std::fs::create_dir_all(workspace.path().join("src")).unwrap();
+            std::fs::write(workspace.path().join("src/lib.rs"), "pub struct Fixture;\n").unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let rustdoc_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#,
+                    json = rustdoc_json
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let cargo_target = workspace.path().join("cargo-target");
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                ],
+                || {
+                    let exporter = RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let crate_name = CrateName::new("fixture".to_owned()).unwrap();
+                    let (identity, _) =
+                        exporter.rustdoc_execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path().to_path_buf();
+                    let held =
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire(&exclusive)
+                            .unwrap();
+                    let exporter_for_contender =
+                        RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let crate_for_contender = crate_name.clone();
+                    let contender = std::thread::spawn(move || {
+                        exporter_for_contender.capture_rustdoc_snapshot(
+                            &crate_for_contender,
+                            &[],
+                            decode_fixture_rustdoc,
+                        )
+                    });
+                    std::thread::sleep(Duration::from_millis(80));
+                    assert!(
+                        !contender.is_finished(),
+                        "RustdocSchemaExporter must wait on the exclusive lock through capture"
+                    );
+                    drop(held);
+                    let snapshot = contender.join().unwrap().unwrap();
+                    assert_eq!(
+                        snapshot.crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_exporter_locked_byte_capture_is_immutable_after_output_replacement() {
+        let workspace = tempfile::tempdir().unwrap();
+        let exclusive = workspace.path().join(".sotp-rustdoc").join("selection");
+        let output = exclusive.join("doc/domain.json");
+        std::fs::create_dir_all(output.parent().unwrap()).unwrap();
+        let first = format!(
+            r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        std::fs::write(&output, first.as_bytes()).unwrap();
+        let lock =
+            crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire(&exclusive).unwrap();
+        let bytes = lock.read_bytes(&output, 64 * 1024 * 1024).unwrap();
+        drop(lock);
+        std::fs::write(&output, b"generation-b").unwrap();
+        assert_eq!(bytes, first.as_bytes());
+        let decoded: rustdoc_types::Crate = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(decoded.crate_version.as_deref(), Some("generation-a"));
+    }
 }

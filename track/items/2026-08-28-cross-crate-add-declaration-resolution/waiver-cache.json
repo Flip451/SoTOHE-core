@@ -2807,6 +2807,126 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      "key": {
+        "anchor_text_hash": "09f5f19f286273f715e26e9fd8e9a1f9f461dda629cfcf1eb5ad36ce7dee56d8",
+        "declaration_hash": "a581688d2f9d5684a67442455241b7ab2caf0a217f9d2df7ce1078664cf4f7b2",
+        "waived_reason_hash": "ce1c9ba354b80d98bc8a4b1989951ac2d32996db302e69cdde18a1fda013c0fe"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      "key": {
+        "anchor_text_hash": "6e86d5f3902c2addcc1151a48049a45f6a042171c12083b91e236097095a9e28",
+        "declaration_hash": "b56071380cc565b01b5bb071674d12a4b5daa402124a3eb7df4daeb155803d1c",
+        "waived_reason_hash": "2373b704751db15b4affd51b2228a7896270f5312c2133263a03a593e378599f"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "item_identifier": "voluntary:CO-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint は、rustdoc graph を変え得る入力を D3 の authoritative input set、すなわち workspace 内で Cargo rustdoc の入力となる通常ファイルの相対 path と内容 hash、および D3 が列挙する環境値に限定し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      "key": {
+        "anchor_text_hash": "50b24e54bbfc0b9aeda2d73ec84853d3baa595c39dfae58a467464be6e5af5b0",
+        "declaration_hash": "a5cfa9bc4b76271202af1fcbc5f59b6370b19bcdca18534c71c9922db4e55deb",
+        "waived_reason_hash": "dbcb4a2e1d9fcbaeefcffa420335d31a325c0a0f59bbe79ac8aadf64c09a4d4f"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      "key": {
+        "anchor_text_hash": "3cf83e8c879be69f365b8796d4ecae25dc041ddc1ed76c3dcddc56d63e057f34",
+        "declaration_hash": "a2681978439103cf6ecc4b5a7b26e915e986c19d51fcf109b423333959d48150",
+        "waived_reason_hash": "0cf69c9a9c108e01809e9b28be892ab0e7ce0afb9fad49593b50ba797c19a493"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      "key": {
+        "anchor_text_hash": "55572d3b402dd9f2f61d322afb5261e13147dacdd181a53d7136d7b9be69b845",
+        "declaration_hash": "5209f966ee0e1d5600fceb4e7d705edd4828f093d4c9eff6534b31e6ae6d492c",
+        "waived_reason_hash": "dbbd9643d84a350cbfd7519c0dbfe5e2331b1d310663244d3d40ec155be29708"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Driven adapter whose public export APIs return immutable rustdoc JSON bytes copied while the shared target-directory lock remains held; path-returning APIs are removed",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution"

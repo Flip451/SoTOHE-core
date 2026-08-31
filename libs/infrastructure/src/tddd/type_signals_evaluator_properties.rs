@@ -489,6 +489,13 @@ fn property_export_source_holds_lock_from_path_selection_through_byte_read() {
         acquire < identity && identity < export && export < read,
         "lock must remain held from expected-path selection through export and JSON-byte read"
     );
+    let path_check = source
+        .find("if output_path != expected_path")
+        .expect("export verifies the expected JSON path before reading");
+    assert!(
+        export < path_check && path_check < read,
+        "expected-path validation must stay inside the lock interval before byte copy"
+    );
 }
 
 #[cfg(unix)]

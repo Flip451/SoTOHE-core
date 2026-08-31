@@ -1237,6 +1237,20 @@
           "hash": "rvw1:sha256:22c0d1b10ec4c9c05289c554ff6d9279cf6020cbf6b7134807115d65e37b49ae",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:03:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d52f2807a5c18d27f217b5d02df7b85836b5f0be5d34c3a1a1b7a0c08097778",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:29:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d52f2807a5c18d27f217b5d02df7b85836b5f0be5d34c3a1a1b7a0c08097778",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3088,6 +3102,100 @@
           "hash": "rvw1:sha256:1603e5e0a42a7bed4e44ea209f119d2096b07f0a8d1046a647de5a37b6f7a804",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:05:23Z",
+          "findings": [
+            {
+              "category": "invalid-test-evidence",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 496,
+              "message": "This test uses `include_str!` plus substring/order assertions against `schema_export.rs` as behavioral evidence. The testing convention explicitly forbids source-text assertions; replace it with a recording/fake exporter or another runtime behavioral test.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-convention",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 495,
+              "message": "The newly added property test name does not follow the required `test_{target}_{condition}_{expected_result}` convention.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:335b61598b764c9c218b79c944e20a409d4180159de145aea6cf6fd3b52b2b7d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T00:13:36Z",
+          "findings": [
+            {
+              "category": "invalid-test-evidence",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 496,
+              "message": "The added test uses `include_str!` and substring/order assertions against `schema_export.rs` as behavioral evidence. The testing convention explicitly forbids source-text assertions; use a runtime behavioral test instead.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-convention",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator_properties.rs",
+              "line": 495,
+              "message": "The added test name does not follow the required `test_{target}_{condition}_{expected_result}` convention.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:26cb3e51a74c0725b8fb1853211fd5364899af78dc00704c8818d703e1a01d8c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T00:24:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5ab0acf1c95382a960053cde8b5a3e0bd66b3476344ce16c6fcaf85dfac08b2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:32:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5ab0acf1c95382a960053cde8b5a3e0bd66b3476344ce16c6fcaf85dfac08b2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:53:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77f5d61d03317cdc70024f5a47b4df8e17e3169051369d259be1bedbd727799a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T01:10:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:81546ccbc9412d2c97d093775021726c1c62260479f60b6e4a7fc49c3db707ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T01:17:38Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/schema_export_tests.rs",
+              "line": 17,
+              "message": "`rustdoc_types` is imported unconditionally, but every reference to it is inside a `#[cfg(unix)]` item. On non-Unix test builds this becomes an unused import, and the workspace's `warnings = \"deny\"` turns it into a hard compilation error, preventing the explicit non-Unix fail-closed tests from running. Remove this redundant import or guard it with `#[cfg(unix)]`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:81546ccbc9412d2c97d093775021726c1c62260479f60b6e4a7fc49c3db707ba",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T01:24:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6a920a6cf191dc0d013d5a926913236ea5374b306c54ff1b693192483433e76",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3530,6 +3638,49 @@
           "at": "2026-08-30T23:21:24Z",
           "findings": [],
           "hash": "rvw1:sha256:1c6cd7ddf24d7c0dadf2ea60c2a5e65c5ac6303a831be81de8e570f54723d904",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:05:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:918c105fbaf9c7715d099d9328b02c47ada233a80ec900b862df1f5140cd1a5d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T00:31:35Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2713,
+              "message": "The IN-07 binding relies on `property_export_source_holds_lock_from_path_selection_through_byte_read`, which reads `schema_export.rs` with `include_str!` and asserts substring ordering. The testing convention explicitly forbids source-string assertions as behavioral evidence, and this check can still pass if the lock is dropped between those statements. The other bound tests cover a successful export and `RustdocOutputLock` in isolation, but do not behaviorally prove that `RustdocSchemaExporter` holds the lock from path selection through export and byte capture. Bind a behavioral contention/lifecycle test through the exporter instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b17c4d09eca1a804ad25293e38ce8317ef17a1a09d5e70a42ea9a199d12a92f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T00:50:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:779f661c5b16822e4c02bbcac6ca0134500ef9a6fb2f9390435238aa70b29816",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T01:07:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ba0ded6b6800b88d53f0b815471590dbf0b3ceb2f2161748c15d6c216b13d5e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T01:14:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ba0ded6b6800b88d53f0b815471590dbf0b3ceb2f2161748c15d6c216b13d5e5",
           "type": "final",
           "verdict": "zero_findings"
         }
