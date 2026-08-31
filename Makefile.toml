@@ -99,7 +99,7 @@ chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
 # 6. CI
 echo ""
 echo "--- Step 6/7: Run CI ---"
-docker compose run --rm tools cargo make --allow-private ci-local
+bin/sotp gate-output --name ci -- docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
 
 # 7. Git notes fetch refspec

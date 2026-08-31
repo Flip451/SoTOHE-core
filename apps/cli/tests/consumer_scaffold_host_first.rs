@@ -1193,6 +1193,33 @@ fn test_root_aggregate_gate_wrappers_use_shared_summary_surface() {
 }
 
 #[test]
+fn test_repo_wide_ci_entry_points_wrap_dependency_aggregators() {
+    let makefile = fs::read_to_string(workspace_root().join("Makefile.toml")).unwrap();
+    let bootstrap_script = task_toml_string_array(&makefile, "bootstrap", "script").join("\n");
+    let expected_bootstrap_ci = "bin/sotp gate-output --name ci -- docker compose run --rm tools cargo make --allow-private ci-local";
+    assert!(
+        bootstrap_script.lines().any(|line| line.trim() == expected_bootstrap_ci),
+        "bootstrap Step 6 must persist the compose CI result through the shared summary surface"
+    );
+    assert!(
+        !bootstrap_script.lines().any(|line| line.trim()
+            == "docker compose run --rm tools cargo make --allow-private ci-local"),
+        "bootstrap must not invoke the compose CI aggregator without gate-output"
+    );
+
+    let workflow = fs::read_to_string(workspace_root().join(".github/workflows/ci.yml")).unwrap();
+    let expected_repo_wide_ci = "run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo run --locked --quiet -p cli -- gate-output --name ci-container -- cargo make --allow-private ci-local-steps";
+    assert!(
+        workflow.lines().any(|line| line.trim() == expected_repo_wide_ci),
+        "GitHub repo-wide CI must persist the in-container result through gate-output"
+    );
+    assert!(
+        !workflow.contains("ci-runner cargo make --allow-private ci-container"),
+        "GitHub repo-wide CI must not invoke the raw ci-container aggregator"
+    );
+}
+
+#[test]
 fn test_exported_toolchain_and_gitignore_have_contract_values() {
     let toolchain = exported_file("rust-toolchain.toml");
     let gitignore = exported_file(".gitignore");
