@@ -282,6 +282,38 @@ mod tests {
         );
     }
 
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn test_fs_gate_log_persistence_reserves_with_legacy_probe_leaves_for_reused_pid() {
+        let root = tempfile::tempdir().expect("temporary root should be created");
+        let log_directory = root.path().join(LOG_DIRECTORY);
+        std::fs::create_dir_all(&log_directory).expect("log directory should be created");
+        let process_id = std::process::id();
+        for sequence in 0..64 {
+            let legacy_probe =
+                log_directory.join(format!(".gate-log-stage-probe-{process_id}-{sequence}"));
+            std::fs::write(legacy_probe, b"").expect("legacy probe leaf should be created");
+        }
+
+        let persistence = FsGateLogPersistence::new(root.path().to_path_buf());
+
+        let reservation = persistence
+            .reserve(&command("reused-pid-probe-leaves", "true"))
+            .expect("legacy PID-only probe leaves must not exhaust reservation attempts");
+
+        let stage_prefix = format!(".gate-log-stage-probe-{process_id}-");
+        let has_timestamped_probe = std::fs::read_dir(&log_directory)
+            .expect("log directory should remain readable")
+            .map(|entry| entry.expect("log entry should be readable").file_name())
+            .filter_map(|name| name.into_string().ok())
+            .any(|name| {
+                name.strip_prefix(&stage_prefix).is_some_and(|suffix| suffix.contains('-'))
+            });
+        assert!(has_timestamped_probe, "reservation should create a timestamped probe leaf");
+
+        drop(reservation);
+    }
+
     #[test]
     fn test_fs_gate_log_persistence_allows_sixteen_live_reservations_without_pending_cap() {
         let root = tempfile::tempdir().expect("temporary root should be created");

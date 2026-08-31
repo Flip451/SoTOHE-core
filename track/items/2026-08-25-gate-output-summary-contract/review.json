@@ -2283,6 +2283,65 @@
           "hash": "rvw1:sha256:e8ca324d11ea34ebfd274143507ab1cc8a119ed590e903ef2673bb0bc8fddcd8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T01:44:29Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output/fs_persistence.rs",
+              "line": 367,
+              "message": "The new uniqueness guarantee still depends on `SystemTime::now()` returning a distinct nanosecond value across process lifetimes. On platforms with coarser clock resolution, a reused PID and restarted `LOG_SEQUENCE` can reproduce all 64 stale names and exhaust reservation attempts. This clock-resolution/uniqueness assumption is not declared in the environment assumptions; use a stronger kernel/random nonce or otherwise guarantee uniqueness.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:919ba58327d183113b3ea233e2d7765c87f870416c487434a3900adcdb30450a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T01:56:42Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output/fs_persistence.rs",
+              "line": 397,
+              "message": "`reserve` and `persist` now require opening the hard-coded `/dev/urandom` device. The project’s environment declaration does not declare this device as available, so a Linux container without it makes all gate-log reservation/persistence fail even though the platform is otherwise supported. Use a declared/portable kernel randomness API or document and enforce this environment requirement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e8bf869e753b0c1a87278ea6d911382483e09e738e2d5b29c744a4f656c840b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T02:06:01Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output/fs_persistence.rs",
+              "line": 338,
+              "message": "`random_staging_nonce` is defined only under `#[cfg(target_os = \"linux\")]`, but both `stage_probe_file` and `stage_log_contents` call it from code compiled on every target. Consequently the infrastructure crate fails to compile on macOS/Windows, even though those targets are intentionally supported far enough for `reserve` to return a typed unsupported-platform error. Add a non-Linux implementation or gate the callers consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ef493a14a615d03afb6df489b6481f70964823f7b51cde15c7ce7ae154778aaa",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T02:12:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f341014c6aef8a3b0497af6a60d4f75eef912c0e0257288f1275b55758f48f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T02:22:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f341014c6aef8a3b0497af6a60d4f75eef912c0e0257288f1275b55758f48f6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

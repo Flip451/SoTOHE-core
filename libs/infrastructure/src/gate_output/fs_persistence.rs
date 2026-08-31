@@ -2,11 +2,12 @@
 
 use std::collections::HashMap;
 use std::fs::File;
+use std::hash::{BuildHasher, RandomState};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, SystemTimeError, UNIX_EPOCH};
 
 use super::fs_paths;
 use usecase::gate_output::{
@@ -83,10 +84,8 @@ impl GateLogPersistencePort for FsGateLogPersistence {
                     error.to_string(),
                 ))
             })?;
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(GateLogReservationError::Clock)?
-            .as_nanos();
+        let timestamp = timestamp_nanos().map_err(GateLogReservationError::Clock)?;
+        let staging_nonce = random_staging_nonce();
         let encoded_name = encode_name(command.name());
         let mut reserved_files = self.reserved_files.files.lock().map_err(|_| {
             GateLogReservationError::CreateFile(GateAdapterFailureReason::new(
@@ -117,7 +116,12 @@ impl GateLogPersistencePort for FsGateLogPersistence {
                     ));
                 }
             };
-            let staged = match stage_probe_file(&mut staged_logs, &log_directory_handle) {
+            let staged = match stage_probe_file(
+                &mut staged_logs,
+                &log_directory_handle,
+                timestamp,
+                staging_nonce,
+            ) {
                 Ok(staged) => staged,
                 Err(error) => {
                     return Err(GateLogReservationError::CreateFile(
@@ -240,7 +244,12 @@ fn ensure_platform_support() -> Result<(), GateLogReservationError> {
     )))
 }
 
-fn stage_probe_file(state: &mut StagedLogState, directory: &File) -> io::Result<StagedLogFile> {
+fn stage_probe_file(
+    state: &mut StagedLogState,
+    directory: &File,
+    timestamp: u128,
+    staging_nonce: u128,
+) -> io::Result<StagedLogFile> {
     if let Some(mut staged) = state.reusable.take() {
         let reusable_is_current = fs_paths::verify_directory_identity(&staged.directory, directory)
             .and_then(|()| {
@@ -260,7 +269,10 @@ fn stage_probe_file(state: &mut StagedLogState, directory: &File) -> io::Result<
 
     for _ in 0..MAX_LOG_CREATE_ATTEMPTS {
         let sequence = LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let name = format!("{STAGED_LOG_PREFIX}-probe-{}-{sequence}", std::process::id());
+        let name = format!(
+            "{STAGED_LOG_PREFIX}-probe-{}-{timestamp}-{staging_nonce}-{sequence}",
+            std::process::id()
+        );
         let staged_directory = directory.try_clone()?;
         let file = match fs_paths::open_staged_log_file(directory, &name) {
             Ok(file) => file,
@@ -320,9 +332,16 @@ fn stage_log_contents(
         // below use the current verified directory instead.
     }
 
+    let timestamp = timestamp_nanos().map_err(|error| {
+        GateLogWriteError::Write(GateAdapterFailureReason::new(error.to_string()))
+    })?;
+    let staging_nonce = random_staging_nonce();
     for _ in 0..MAX_LOG_CREATE_ATTEMPTS {
         let sequence = LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let staged_name = format!("{STAGED_LOG_PREFIX}-{}-{sequence}", std::process::id());
+        let staged_name = format!(
+            "{STAGED_LOG_PREFIX}-{}-{timestamp}-{staging_nonce}-{sequence}",
+            std::process::id()
+        );
         let staged_directory = directory.try_clone().map_err(|error| {
             GateLogWriteError::Write(GateAdapterFailureReason::new(error.to_string()))
         })?;
@@ -362,6 +381,19 @@ fn stage_log_contents(
     Err(GateLogWriteError::Write(GateAdapterFailureReason::new(
         "could not allocate a unique staged gate-log filename".to_owned(),
     )))
+}
+
+fn timestamp_nanos() -> Result<u128, SystemTimeError> {
+    SystemTime::now().duration_since(UNIX_EPOCH).map(|duration| duration.as_nanos())
+}
+
+fn random_staging_nonce() -> u128 {
+    // `RandomState` uses the standard library's platform randomness source, so
+    // the nonce does not depend on a hard-coded random-device path.
+    let random_state = RandomState::new();
+    let high = random_state.hash_one(0_u64);
+    let low = random_state.hash_one(1_u64);
+    (u128::from(high) << 64) | u128::from(low)
 }
 
 /// Rolls back the exchange only while both names still identify this
