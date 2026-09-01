@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "7a90284e76ad220e64a7b4befd5a891a8b235983a6e18e1008ef018f6453066f",
+  "catalogue_declaration_hash": "221177fe20b2692b2abf4e021b23629b95f0837a34bb71f15added5da976fbcf",
   "schema_version": 1,
   "signals": [
     {
@@ -18,7 +18,7 @@
       "type_name": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
     },
     {
-      "entry_hash": "f30be589f1d3da56dac36629b17eb44ea4fa47814a0da774f863f1377b1b564f",
+      "entry_hash": "4db9d754e00de5a6e3ed0de9410c83409e08b7294f463d425b8fea1e50931ea9",
       "signal": "blue",
       "type_name": "SchemaExporterPort"
     },

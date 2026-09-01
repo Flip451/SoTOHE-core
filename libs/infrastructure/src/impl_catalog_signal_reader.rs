@@ -538,7 +538,7 @@ mod tests {
 
     fn sample_signals_json() -> String {
         let mut document = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-06-27T00:00:00Z",
             "declaration_hash": "a".repeat(64),
             "head_commit": "a".repeat(40),

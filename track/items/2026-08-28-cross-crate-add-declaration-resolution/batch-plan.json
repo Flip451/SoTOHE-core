@@ -3,155 +3,23 @@
   "track_id": "2026-08-28-cross-crate-add-declaration-resolution",
   "task_estimates": [
     {
-      "task_id": "T006",
-      "scope_estimates": [
-        {
-          "scope": "domain",
-          "production_lines": 45,
-          "test_lines": 35
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T007",
+      "task_id": "T020",
       "scope_estimates": [
         {
           "scope": "infrastructure",
-          "production_lines": 90,
-          "test_lines": 90
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T008",
-      "scope_estimates": [
-        {
-          "scope": "usecase",
           "production_lines": 65,
-          "test_lines": 50
+          "test_lines": 80
         }
       ],
       "oversize_justification": null
     },
     {
-      "task_id": "T009",
+      "task_id": "T021",
       "scope_estimates": [
         {
           "scope": "infrastructure",
-          "production_lines": 95,
-          "test_lines": 60
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T010",
-      "scope_estimates": [
-        {
-          "scope": "domain",
-          "production_lines": 220,
-          "test_lines": 220
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T011",
-      "scope_estimates": [
-        {
-          "scope": "domain",
-          "production_lines": 180,
-          "test_lines": 190
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T012",
-      "scope_estimates": [
-        {
-          "scope": "usecase",
-          "production_lines": 90,
-          "test_lines": 100
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T013",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 225,
-          "test_lines": 245
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T014",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 55,
-          "test_lines": 55
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T015",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 45,
-          "test_lines": 50
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T016",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 55,
-          "test_lines": 60
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T017",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 45,
-          "test_lines": 45
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T018",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 25,
-          "test_lines": 30
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T019",
-      "scope_estimates": [
-        {
-          "scope": "infrastructure",
-          "production_lines": 15,
-          "test_lines": 20
+          "production_lines": 30,
+          "test_lines": 40
         }
       ],
       "oversize_justification": null
@@ -161,45 +29,8 @@
     {
       "id": "BATCH-001",
       "task_ids": [
-        "T006",
-        "T007",
-        "T008",
-        "T009",
-        "T012"
-      ]
-    },
-    {
-      "id": "BATCH-002",
-      "task_ids": [
-        "T010",
-        "T013"
-      ]
-    },
-    {
-      "id": "BATCH-003",
-      "task_ids": [
-        "T011",
-        "T014"
-      ]
-    },
-    {
-      "id": "BATCH-004",
-      "task_ids": [
-        "T015"
-      ]
-    },
-    {
-      "id": "BATCH-005",
-      "task_ids": [
-        "T016",
-        "T018"
-      ]
-    },
-    {
-      "id": "BATCH-006",
-      "task_ids": [
-        "T017",
-        "T019"
+        "T020",
+        "T021"
       ]
     }
   ]

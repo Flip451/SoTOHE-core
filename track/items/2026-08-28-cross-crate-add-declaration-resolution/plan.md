@@ -3,9 +3,9 @@
 
 ## Summary
 
-GO-01 original implementation and authoritative-context completion remain T001-T009; D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work is decomposed into T010-T019.
+GO-01 original implementation and authoritative-context completion remain T001-T009; completed D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021.
 
-## Tasks (19/19 resolved)
+## Tasks (21/21 resolved)
 
 ### SECTION-001 — Original resolution boundary
 
@@ -78,5 +78,12 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 - [x] **T015**: After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to enforce the .sotp-rustdoc selection-directory writer boundary and cooperative expected-output handling; add focused writer-boundary and non-exclusive-target validation tests (CO-06, CO-07, AC-06). (`e7f8355bd40d8d6b74cddb2d42deac164422ee8e`)
 - [x] **T016**: After T015, modify infrastructure::schema_export::RustdocSchemaExporter to expose immutable Vec<u8> export data, and modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter to determine, verify, read, hash, decode, and construct the current rustdoc snapshot from that one immutable byte capture while the common lock remains held; add focused same-bytes and output-replacement tests (IN-07, CO-07, AC-06). (`d605b8c1411d79a521a1806fffb8675b0c9a765f`)
 - [x] **T017**: After T016, modify domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError for authoritative-input failure vocabulary and continue modifying infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter for trusted-root admission and failure propagation; keep this work in a later batch to avoid overlapping T016 ownership, and add focused non-Unix, relative escape, unverifiable root, symlinked target-component rejection, and authoritative-input error propagation tests (IN-06, OS-05, CO-06, AC-08). (`cd4d4dc68472735f902a2422819fb3821b1b133c`)
-- [x] **T018**: After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the conservative implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04). (`d605b8c1411d79a521a1806fffb8675b0c9a765f`)
+- [x] **T018**: After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04). (`d605b8c1411d79a521a1806fffb8675b0c9a765f`)
 - [x] **T019**: After T018, continue modifying infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to use start-snapshot evaluation and end-fingerprint revalidation; add focused snapshot and reuse validation tests (IN-07, CO-07, AC-06). (`cd4d4dc68472735f902a2422819fb3821b1b133c`)
+
+### SECTION-012 — Nightly-selected fingerprint and schema v6
+
+> Complete the nightly-selected implementation-fingerprint provenance and persisted type-signals schema v6 admission work as independently verifiable evaluator and codec changes without reopening the completed D3-D8 tasks (IN-03, OS-04, CO-04, AC-04).
+
+- [x] **T020**: After T019, modify libs/infrastructure/src/tddd/type_signals_evaluator.rs::execute_type_signals_for_layer, libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs::rustdoc_input_fingerprint, and libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs::append_actual_rustdoc_tool_identity to capture nightly-selected cargo, rustc, and rustdoc fingerprints and propagate resolution or snapshot failures as AuthoritativeInput; add focused selected-tool and failure tests (IN-03, OS-04, CO-04, AC-04).
+- [x] **T021**: After T019, modify libs/domain/src/tddd/type_signals_doc.rs::TYPE_SIGNALS_SCHEMA_VERSION from 5 to 6 and libs/infrastructure/src/tddd/type_signals_codec.rs::decode_with_identity_root to reject persisted legacy-v5 documents during typed decode; add focused legacy-schema rejection tests in libs/infrastructure/src/tddd/type_signals_codec_tests.rs (AC-04).

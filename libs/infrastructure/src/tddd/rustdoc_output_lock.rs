@@ -32,7 +32,15 @@ pub(crate) struct RustdocOutputLock {
 impl RustdocOutputLock {
     /// Acquires the target-directory lock, failing closed after 120 seconds.
     pub(crate) fn acquire(target_dir: &Path) -> Result<Self, SchemaExportError> {
-        Self::acquire_with_timeout(target_dir, RUSTDOC_OUTPUT_LOCK_TIMEOUT)
+        #[cfg(test)]
+        let timeout = std::env::var("SOTOHE_TEST_RUSTDOC_OUTPUT_LOCK_TIMEOUT_MS")
+            .ok()
+            .and_then(|value| value.parse::<u64>().ok())
+            .map(Duration::from_millis)
+            .unwrap_or(RUSTDOC_OUTPUT_LOCK_TIMEOUT);
+        #[cfg(not(test))]
+        let timeout = RUSTDOC_OUTPUT_LOCK_TIMEOUT;
+        Self::acquire_with_timeout(target_dir, timeout)
     }
 
     fn acquire_with_timeout(

@@ -99,58 +99,102 @@ fn property_evaluator_reuses_only_when_every_cache_key_component_matches() {
 #[test]
 fn property_evaluator_allows_external_path_and_build_script_inputs() {
     super::with_process_environment_lock(|| {
-        let outer = tempfile::tempdir().expect("outer tempdir");
-        let root = outer.path().join("workspace");
-        let outside = outer.path().join("outside-dependency");
-        fs::create_dir_all(root.join("crate/src")).expect("crate directory");
-        fs::write(
-            root.join("Cargo.toml"),
-            "[workspace]\nmembers = [\"crate\"]\nresolver = \"2\"\n",
-        )
-        .expect("workspace manifest");
-        fs::write(
-            root.join("crate/Cargo.toml"),
-            "[package]\nname = \"property-crate\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[dependencies]\noutside = { path = \"../../outside-dependency\" }\n",
-        )
-        .expect("crate manifest");
-        fs::write(root.join("crate/src/lib.rs"), "pub struct Fixture;\n").expect("crate source");
-        fs::write(
-            root.join("Cargo.lock"),
-            "version = 4\n\n[[package]]\nname = \"property-crate\"\nversion = \"0.1.0\"\ndependencies = [\"outside-dependency\"]\n\n[[package]]\nname = \"outside-dependency\"\nversion = \"0.1.0\"\n",
-        )
-        .expect("workspace lockfile");
-        fs::create_dir_all(outside.join("src")).expect("outside dependency directory");
-        fs::write(
-            outside.join("Cargo.toml"),
-            "[package]\nname = \"outside-dependency\"\nversion = \"0.1.0\"\nedition = \"2024\"\nbuild = \"build.rs\"\n",
-        )
-        .expect("outside manifest");
-        fs::write(outside.join("src/lib.rs"), "pub struct Outside;\n").expect("outside source");
-        fs::write(outside.join("build.rs"), "fn main() {}\n").expect("outside build script");
-        let first = freshness::rustdoc_input_fingerprint(&root)
-            .expect("the bounded walk does not claim external Cargo path inputs");
-        fs::write(outside.join("build.rs"), "fn main() { println!(\"changed\"); }\n")
-            .expect("changed outside build script");
-        let second = freshness::rustdoc_input_fingerprint(&root)
-            .expect("external build-script changes remain outside this walk");
-        assert_eq!(
-            first, second,
-            "an external path dependency and its build script are not claimed as complete inputs"
-        );
+        with_fingerprint_test_toolchain(|| {
+            let outer = tempfile::tempdir().expect("outer tempdir");
+            let root = outer.path().join("workspace");
+            let outside = outer.path().join("outside-dependency");
+            fs::create_dir_all(root.join("crate/src")).expect("crate directory");
+            fs::write(
+                root.join("Cargo.toml"),
+                "[workspace]\nmembers = [\"crate\"]\nresolver = \"2\"\n",
+            )
+            .expect("workspace manifest");
+            fs::write(
+                root.join("crate/Cargo.toml"),
+                "[package]\nname = \"property-crate\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[dependencies]\noutside = { path = \"../../outside-dependency\" }\n",
+            )
+            .expect("crate manifest");
+            fs::write(root.join("crate/src/lib.rs"), "pub struct Fixture;\n")
+                .expect("crate source");
+            fs::write(
+                root.join("Cargo.lock"),
+                "version = 4\n\n[[package]]\nname = \"property-crate\"\nversion = \"0.1.0\"\ndependencies = [\"outside-dependency\"]\n\n[[package]]\nname = \"outside-dependency\"\nversion = \"0.1.0\"\n",
+            )
+            .expect("workspace lockfile");
+            fs::create_dir_all(outside.join("src")).expect("outside dependency directory");
+            fs::write(
+                outside.join("Cargo.toml"),
+                "[package]\nname = \"outside-dependency\"\nversion = \"0.1.0\"\nedition = \"2024\"\nbuild = \"build.rs\"\n",
+            )
+            .expect("outside manifest");
+            fs::write(outside.join("src/lib.rs"), "pub struct Outside;\n").expect("outside source");
+            fs::write(outside.join("build.rs"), "fn main() {}\n").expect("outside build script");
+            let first = freshness::rustdoc_input_fingerprint(&root)
+                .expect("the bounded walk does not claim external Cargo path inputs");
+            fs::write(outside.join("build.rs"), "fn main() { println!(\"changed\"); }\n")
+                .expect("changed outside build script");
+            let second = freshness::rustdoc_input_fingerprint(&root)
+                .expect("external build-script changes remain outside this walk");
+            assert_eq!(
+                first, second,
+                "an external path dependency and its build script are not claimed as complete inputs"
+            );
 
-        let member = tempfile::tempdir().expect("workspace-member build script");
-        let member_root = member.path();
-        write_fingerprint_fixture(member_root);
-        let without_build_script = freshness::rustdoc_input_fingerprint(member_root)
-            .expect("workspace-member fixture must fingerprint before build.rs");
-        fs::write(member_root.join("build.rs"), "fn main() {}\n").expect("member build script");
-        let with_build_script = freshness::rustdoc_input_fingerprint(member_root)
-            .expect("workspace-member build.rs is source in the fingerprint walk");
-        assert_ne!(
-            without_build_script, with_build_script,
-            "a workspace build.rs must remain a walked source input"
-        );
+            let member = tempfile::tempdir().expect("workspace-member build script");
+            let member_root = member.path();
+            write_fingerprint_fixture(member_root);
+            let without_build_script = freshness::rustdoc_input_fingerprint(member_root)
+                .expect("workspace-member fixture must fingerprint before build.rs");
+            fs::write(member_root.join("build.rs"), "fn main() {}\n").expect("member build script");
+            let with_build_script = freshness::rustdoc_input_fingerprint(member_root)
+                .expect("workspace-member build.rs is source in the fingerprint walk");
+            assert_ne!(
+                without_build_script, with_build_script,
+                "a workspace build.rs must remain a walked source input"
+            );
+        });
     });
+}
+
+fn with_fingerprint_test_toolchain<T>(action: impl FnOnce() -> T) -> T {
+    #[cfg(unix)]
+    {
+        let commands = tempfile::tempdir().expect("fingerprint command tempdir");
+        let nightly = commands.path().join("nightly");
+        fs::create_dir_all(&nightly).expect("fingerprint nightly directory");
+        for tool in ["cargo", "rustc", "rustdoc"] {
+            fs::write(nightly.join(tool), format!("fixture nightly {tool}\n"))
+                .expect("fingerprint nightly tool");
+        }
+        super::write_test_rustup(commands.path());
+        super::write_test_executable(
+            &commands.path().join("cargo"),
+            r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+    target="${CARGO_TARGET_DIR:-target}"
+    printf '{"packages":[],"target_directory":"%s"}\n' "$target"
+    exit 0
+fi
+exit 0
+"#,
+        );
+        super::write_test_executable(&commands.path().join("rustc"), "#!/bin/sh\nexit 0\n");
+        super::write_test_executable(&commands.path().join("rustdoc"), "#!/bin/sh\nexit 0\n");
+        let mut path_entries = vec![commands.path().to_path_buf()];
+        path_entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        let path = std::env::join_paths(path_entries).expect("fingerprint test PATH");
+        temp_env::with_vars(
+            [
+                ("PATH", Some(path.as_os_str())),
+                ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.as_os_str())),
+            ],
+            action,
+        )
+    }
+    #[cfg(not(unix))]
+    {
+        action()
+    }
 }
 
 fn write_fingerprint_fixture(root: &std::path::Path) {
@@ -167,120 +211,137 @@ fn write_fingerprint_fixture(root: &std::path::Path) {
 #[test]
 fn property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools() {
     super::with_process_environment_lock(|| {
-        let outer = tempfile::tempdir().expect("outer tempdir");
-        let workspace = outer.path().join("workspace");
-        fs::create_dir_all(&workspace).expect("workspace directory");
-        write_fingerprint_fixture(&workspace);
-        let tool = workspace.join("target/tools/rustc");
-        fs::create_dir_all(tool.parent().expect("tool directory")).expect("tool directory");
-        fs::write(&tool, b"compiler-generation-a").expect("tool bytes");
+        with_fingerprint_test_toolchain(|| {
+            let outer = tempfile::tempdir().expect("outer tempdir");
+            let workspace = outer.path().join("workspace");
+            fs::create_dir_all(&workspace).expect("workspace directory");
+            write_fingerprint_fixture(&workspace);
+            let tool = workspace.join("target/tools/rustc");
+            fs::create_dir_all(tool.parent().expect("tool directory")).expect("tool directory");
+            fs::write(&tool, b"compiler-generation-a").expect("tool bytes");
 
-        temp_env::with_vars(
-            [("RUSTC", Some(tool.as_os_str())), ("RUSTDOC", Some(tool.as_os_str()))],
-            || {
-                let first = freshness::rustdoc_input_fingerprint(&workspace)
-                    .expect("trusted tool paths must fingerprint");
-                fs::write(&tool, b"compiler-generation-b").expect("changed tool bytes");
-                let second = freshness::rustdoc_input_fingerprint(&workspace)
-                    .expect("changed trusted tool must fingerprint");
-                assert_ne!(first, second, "tool contents are part of implementation identity");
+            temp_env::with_vars(
+                [("RUSTC", Some(tool.as_os_str())), ("RUSTDOC", Some(tool.as_os_str()))],
+                || {
+                    let first = freshness::rustdoc_input_fingerprint(&workspace)
+                        .expect("trusted tool paths must fingerprint");
+                    fs::write(&tool, b"compiler-generation-b").expect("changed tool bytes");
+                    let second = freshness::rustdoc_input_fingerprint(&workspace)
+                        .expect("changed trusted tool must fingerprint");
+                    assert_ne!(first, second, "tool contents are part of implementation identity");
 
-                let outside = tempfile::tempdir().expect("outside tempdir");
-                let outside_tool = outside.path().join("rustc");
-                fs::write(&outside_tool, b"untrusted compiler").expect("outside tool bytes");
-                let outside_hash = temp_env::with_var(
-                    "RUSTC",
-                    Some(outside_tool.as_os_str()),
-                    || {
+                    let outside = tempfile::tempdir().expect("outside tempdir");
+                    let outside_tool = outside.path().join("rustc");
+                    fs::write(&outside_tool, b"untrusted compiler").expect("outside tool bytes");
+                    let outside_hash = temp_env::with_var(
+                        "RUSTC",
+                        Some(outside_tool.as_os_str()),
+                        || {
+                            freshness::rustdoc_input_fingerprint(&workspace).expect(
+                                "absolute tool bytes are identity even when they live outside the workspace",
+                            )
+                        },
+                    );
+                    assert_ne!(
+                        second, outside_hash,
+                        "absolute tool contents remain part of identity"
+                    );
+
+                    let escaped = outer.path().join("escaped-rustc");
+                    fs::write(&escaped, b"escaped compiler").expect("escaped tool bytes");
+                    let error = temp_env::with_var("RUSTC", Some("../escaped-rustc"), || {
                         freshness::rustdoc_input_fingerprint(&workspace)
-                        .expect("absolute tool bytes are identity even when they live outside the workspace")
-                    },
-                );
-                assert_ne!(second, outside_hash, "absolute tool contents remain part of identity");
-
-                let escaped = outer.path().join("escaped-rustc");
-                fs::write(&escaped, b"escaped compiler").expect("escaped tool bytes");
-                let error = temp_env::with_var("RUSTC", Some("../escaped-rustc"), || {
-                    freshness::rustdoc_input_fingerprint(&workspace)
-                        .expect_err("relative tools that escape the workspace must fail closed")
-                });
-                assert!(
-                    error.to_string().contains("outside the trusted workspace"),
-                    "got: {error}"
-                );
-            },
-        );
+                            .expect_err("relative tools that escape the workspace must fail closed")
+                    });
+                    assert!(
+                        error.to_string().contains("outside the trusted workspace"),
+                        "got: {error}"
+                    );
+                },
+            );
+        });
     });
 }
 
 #[test]
-fn property_evaluator_fingerprints_parent_cargo_config_and_resolved_home() {
+fn property_evaluator_ignores_parent_cargo_config_and_resolved_home() {
     super::with_process_environment_lock(|| {
-        let outer = tempfile::tempdir().expect("outer tempdir");
-        let workspace = outer.path().join("workspace");
-        let home = outer.path().join("home");
-        fs::create_dir_all(&workspace).expect("workspace directory");
-        write_fingerprint_fixture(&workspace);
-        fs::create_dir_all(outer.path().join(".cargo")).expect("parent Cargo config directory");
-        fs::create_dir_all(home.join(".cargo")).expect("Cargo home config directory");
-        let parent_config = outer.path().join(".cargo/config.toml");
-        let home_config = home.join(".cargo/config.toml");
-        fs::write(&parent_config, "[build]\nrustflags = []\n").expect("parent config");
-        fs::write(&home_config, "[term]\nverbose = false\n").expect("home config");
+        with_fingerprint_test_toolchain(|| {
+            let outer = tempfile::tempdir().expect("outer tempdir");
+            let workspace = outer.path().join("workspace");
+            let home = outer.path().join("home");
+            fs::create_dir_all(&workspace).expect("workspace directory");
+            write_fingerprint_fixture(&workspace);
+            fs::create_dir_all(outer.path().join(".cargo")).expect("parent Cargo config directory");
+            fs::create_dir_all(home.join(".cargo")).expect("Cargo home config directory");
+            let parent_config = outer.path().join(".cargo/config.toml");
+            let home_config = home.join(".cargo/config.toml");
+            fs::write(&parent_config, "[term]\nverbose = false\n").expect("parent config");
+            fs::write(&home_config, "[term]\nverbose = false\n").expect("home config");
 
-        let prior_rustup_home = std::env::var_os("RUSTUP_HOME").or_else(|| {
-            std::env::var_os("HOME")
-                .map(|value| std::path::PathBuf::from(value).join(".rustup").into_os_string())
+            let prior_rustup_home = std::env::var_os("RUSTUP_HOME").or_else(|| {
+                std::env::var_os("HOME")
+                    .map(|value| std::path::PathBuf::from(value).join(".rustup").into_os_string())
+            });
+            temp_env::with_vars(
+                [
+                    ("HOME", Some(home.as_os_str())),
+                    ("CARGO_HOME", None::<&std::ffi::OsStr>),
+                    ("CARGO_TARGET_DIR", None::<&std::ffi::OsStr>),
+                    ("RUSTUP_HOME", prior_rustup_home.as_deref()),
+                ],
+                || {
+                    let first = freshness::rustdoc_input_fingerprint(&workspace)
+                        .expect("outside-workspace Cargo config is not required");
+                    fs::write(&parent_config, "[term]\nverbose = true\n")
+                        .expect("changed parent config");
+                    let second = freshness::rustdoc_input_fingerprint(&workspace)
+                        .expect("changed outside-workspace Cargo config is not required");
+                    assert_eq!(
+                        first, second,
+                        "a parent Cargo config outside the workspace is not an identity member"
+                    );
+                    fs::write(&home_config, "[term]\nverbose = true\n")
+                        .expect("changed home config");
+                    let third = freshness::rustdoc_input_fingerprint(&workspace)
+                        .expect("changed Cargo home config is not required");
+                    assert_eq!(
+                        second, third,
+                        "the resolved Cargo home config outside the workspace is not an identity member"
+                    );
+                },
+            );
         });
-        temp_env::with_vars(
-            [
-                ("HOME", Some(home.as_os_str())),
-                ("CARGO_HOME", None::<&std::ffi::OsStr>),
-                ("CARGO_TARGET_DIR", None::<&std::ffi::OsStr>),
-                ("RUSTUP_HOME", prior_rustup_home.as_deref()),
-            ],
-            || {
-                let first = freshness::rustdoc_input_fingerprint(&workspace)
-                    .expect("Cargo config hierarchy must fingerprint");
-                fs::write(&parent_config, "[build]\nrustflags = [\"--cfg=parent_b\"]\n")
-                    .expect("changed parent config");
-                let second = freshness::rustdoc_input_fingerprint(&workspace)
-                    .expect("changed parent config must fingerprint");
-                assert_ne!(first, second, "Cargo parent config is a rustdoc input");
-                fs::write(&home_config, "[term]\nverbose = true\n").expect("changed home config");
-                let third = freshness::rustdoc_input_fingerprint(&workspace)
-                    .expect("changed Cargo home config must fingerprint");
-                assert_ne!(second, third, "resolved Cargo home config is a rustdoc input");
-            },
-        );
     });
 }
 
 #[test]
 fn property_evaluator_excludes_only_the_resolved_target_directory() {
     super::with_process_environment_lock(|| {
-        let workspace = tempfile::tempdir().expect("workspace tempdir");
-        write_fingerprint_fixture(workspace.path());
-        let target_dir = workspace.path().join("build-cache");
-        let generated = target_dir.join("generated.json");
-        fs::create_dir_all(&target_dir).expect("custom target directory");
-        fs::write(&generated, b"cargo output a").expect("generated output");
-        let nested_source = workspace.path().join("src/target/semantic.rs");
-        fs::create_dir_all(nested_source.parent().expect("nested source directory"))
-            .expect("nested source directory");
-        fs::write(&nested_source, b"semantic input a").expect("nested source");
+        with_fingerprint_test_toolchain(|| {
+            let workspace = tempfile::tempdir().expect("workspace tempdir");
+            write_fingerprint_fixture(workspace.path());
+            let target_dir = workspace.path().join("build-cache");
+            let generated = target_dir.join("generated.json");
+            fs::create_dir_all(&target_dir).expect("custom target directory");
+            fs::write(&generated, b"cargo output a").expect("generated output");
+            let nested_source = workspace.path().join("src/target/semantic.rs");
+            fs::create_dir_all(nested_source.parent().expect("nested source directory"))
+                .expect("nested source directory");
+            fs::write(&nested_source, b"semantic input a").expect("nested source");
 
-        temp_env::with_var("CARGO_TARGET_DIR", Some(target_dir.as_os_str()), || {
-            let first = freshness::rustdoc_input_fingerprint(workspace.path())
-                .expect("custom target directory must be excluded");
-            fs::write(&generated, b"cargo output b").expect("changed generated output");
-            let second = freshness::rustdoc_input_fingerprint(workspace.path())
-                .expect("generated output remains excluded");
-            assert_eq!(first, second, "only the exact Cargo target directory is excluded");
-            fs::write(&nested_source, b"semantic input b").expect("changed nested source");
-            let third = freshness::rustdoc_input_fingerprint(workspace.path())
-                .expect("nested source remains authoritative");
-            assert_ne!(second, third, "a nested source directory named target is not excluded");
+            temp_env::with_var("CARGO_TARGET_DIR", Some(target_dir.as_os_str()), || {
+                let first = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("custom target directory must be excluded");
+                fs::write(&generated, b"cargo output b").expect("changed generated output");
+                let second = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("generated output remains excluded");
+                assert_eq!(first, second, "only the exact Cargo target directory is excluded");
+                fs::write(&nested_source, b"semantic input b").expect("changed nested source");
+                let third = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("nested source remains authoritative");
+                assert_ne!(second, third, "a nested source directory named target is not excluded");
+            });
         });
     });
 }
@@ -457,38 +518,41 @@ fn property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback()
 #[test]
 fn property_evaluator_accepts_an_io_aba_generation() {
     super::with_process_environment_lock(|| {
-        let workspace = tempfile::tempdir().expect("workspace tempdir");
-        fs::write(
-            workspace.path().join("Cargo.toml"),
-            "[package]\nname = \"fingerprint-fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
-        )
-        .expect("fixture manifest");
-        fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").expect("fixture lockfile");
-        fs::create_dir_all(workspace.path().join("src")).expect("fixture source directory");
-        fs::write(workspace.path().join("src/lib.rs"), "pub struct Fixture;\n")
-            .expect("fixture source");
-        let source = workspace.path().join("source.rs");
-        fs::write(&source, b"generation-a").expect("initial source");
-        let first =
-            freshness::rustdoc_input_fingerprint(workspace.path()).expect("first fingerprint");
+        with_fingerprint_test_toolchain(|| {
+            let workspace = tempfile::tempdir().expect("workspace tempdir");
+            fs::write(
+                workspace.path().join("Cargo.toml"),
+                "[package]\nname = \"fingerprint-fixture\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+            )
+            .expect("fixture manifest");
+            fs::write(workspace.path().join("Cargo.lock"), "version = 4\n")
+                .expect("fixture lockfile");
+            fs::create_dir_all(workspace.path().join("src")).expect("fixture source directory");
+            fs::write(workspace.path().join("src/lib.rs"), "pub struct Fixture;\n")
+                .expect("fixture source");
+            let source = workspace.path().join("source.rs");
+            fs::write(&source, b"generation-a").expect("initial source");
+            let first =
+                freshness::rustdoc_input_fingerprint(workspace.path()).expect("first fingerprint");
 
-        let replacement = workspace.path().join("replacement.rs");
-        fs::write(&replacement, b"generation-b").expect("replacement source");
-        fs::rename(&replacement, &source).expect("replace source");
-        let middle_generation =
-            freshness::rustdoc_input_fingerprint(workspace.path()).expect("changed fingerprint");
-        assert_ne!(
-            first, middle_generation,
-            "the intermediate generation must invalidate the input identity"
-        );
+            let replacement = workspace.path().join("replacement.rs");
+            fs::write(&replacement, b"generation-b").expect("replacement source");
+            fs::rename(&replacement, &source).expect("replace source");
+            let middle_generation = freshness::rustdoc_input_fingerprint(workspace.path())
+                .expect("changed fingerprint");
+            assert_ne!(
+                first, middle_generation,
+                "the intermediate generation must invalidate the input identity"
+            );
 
-        fs::write(&replacement, b"generation-a").expect("restored source");
-        fs::rename(&replacement, &source).expect("restore source");
-        let final_generation =
-            freshness::rustdoc_input_fingerprint(workspace.path()).expect("restored fingerprint");
-        assert_eq!(
-            first, final_generation,
-            "an A-B-A replacement returning to the start bytes is the same content generation"
-        );
+            fs::write(&replacement, b"generation-a").expect("restored source");
+            fs::rename(&replacement, &source).expect("restore source");
+            let final_generation = freshness::rustdoc_input_fingerprint(workspace.path())
+                .expect("restored fingerprint");
+            assert_eq!(
+                first, final_generation,
+                "an A-B-A replacement returning to the start bytes is the same content generation"
+            );
+        });
     });
 }

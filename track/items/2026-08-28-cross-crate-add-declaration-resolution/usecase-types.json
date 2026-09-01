@@ -102,7 +102,7 @@
   "traits": {
     "SchemaExporterPort": {
       "action": "reference",
-      "docs": "Baseline-identical driven port for serialized schema export; the String return is an opaque JSON boundary representation rather than a domain concept, and the entry is carried so RustdocSchemaExporter trait-implementation edges remain explicit.",
+      "docs": "Schema export secondary port (IN-03).",
       "informal_grounds": [],
       "methods": [
         {
@@ -127,14 +127,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {

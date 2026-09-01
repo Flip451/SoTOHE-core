@@ -53,22 +53,103 @@ pub use crate::tddd::type_signals_executor_adapter::RustdocLaunchObserver;
 #[cfg(test)]
 static PROCESS_ENVIRONMENT_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
+#[cfg(all(test, unix))]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+fn write_test_executable(path: &Path, contents: &str) {
+    use std::os::unix::fs::PermissionsExt as _;
+
+    std::fs::write(path, contents).unwrap();
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+}
+
+#[cfg(all(test, unix))]
+fn write_test_rustup(commands: &Path) {
+    write_test_executable(
+        &commands.join("rustup"),
+        r#"#!/bin/sh
+if [ "$1" = "run" ] && [ "$2" = "nightly" ] && [ "$3" = "rustc" ]; then
+    exit 0
+fi
+if [ "$1" = "which" ] && [ "$2" = "--toolchain" ] && [ "$3" = "nightly" ]; then
+    case "$4" in
+        cargo|rustc|rustdoc)
+            toolchain="${SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR:-$(dirname "$0")}"
+            printf '%s/%s\n' "$toolchain" "$4"
+            exit 0
+            ;;
+    esac
+fi
+exit 1
+"#,
+    );
+}
+
+#[cfg(all(test, unix))]
+fn write_metadata_test_toolchain(commands: &Path) {
+    write_test_executable(
+        &commands.join("cargo"),
+        r#"#!/bin/sh
+if [ -n "$SOTOHE_TEST_CARGO_METADATA" ]; then
+    exec /bin/cat "$SOTOHE_TEST_CARGO_METADATA"
+fi
+target_directory="${CARGO_TARGET_DIR:-$PWD/target}"
+printf '{"packages":[],"target_directory":"%s"}\n' "$target_directory"
+"#,
+    );
+    write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
+    write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
+    write_test_rustup(commands);
+}
+
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::indexing_slicing, clippy::panic, clippy::unwrap_used)]
 pub(crate) fn with_process_environment_lock<T>(action: impl FnOnce() -> T) -> T {
     let _environment_guard = match PROCESS_ENVIRONMENT_LOCK.lock() {
         Ok(guard) => guard,
         Err(poisoned) => poisoned.into_inner(),
     };
-    temp_env::with_vars(
-        [
-            ("CARGO_HOME", None::<&str>),
-            ("RUSTC", None::<&str>),
-            ("RUSTDOC", None::<&str>),
-            ("RUSTC_WRAPPER", None::<&str>),
-            ("RUSTC_WORKSPACE_WRAPPER", None::<&str>),
-        ],
-        action,
-    )
+    #[cfg(unix)]
+    {
+        let commands = tempfile::tempdir().unwrap();
+        let nightly = commands.path().join("nightly");
+        std::fs::create_dir_all(&nightly).unwrap();
+        for tool in ["cargo", "rustc", "rustdoc"] {
+            std::fs::write(nightly.join(tool), format!("fixture nightly {tool}\n")).unwrap();
+        }
+        write_metadata_test_toolchain(commands.path());
+        let mut path_entries = vec![commands.path().to_path_buf()];
+        path_entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        let path = std::env::join_paths(path_entries).unwrap();
+        temp_env::with_vars(
+            [
+                ("CARGO_HOME", None::<&std::ffi::OsStr>),
+                ("RUSTC", None::<&std::ffi::OsStr>),
+                ("RUSTDOC", None::<&std::ffi::OsStr>),
+                ("RUSTC_WRAPPER", None::<&std::ffi::OsStr>),
+                ("RUSTC_WORKSPACE_WRAPPER", None::<&std::ffi::OsStr>),
+                ("RUSTUP_HOME", None::<&std::ffi::OsStr>),
+                ("RUSTUP_TOOLCHAIN", None::<&std::ffi::OsStr>),
+                ("SOTOHE_TEST_CARGO_METADATA", None::<&std::ffi::OsStr>),
+                ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.as_os_str())),
+                ("PATH", Some(path.as_os_str())),
+            ],
+            action,
+        )
+    }
+    #[cfg(not(unix))]
+    {
+        temp_env::with_vars(
+            [
+                ("CARGO_HOME", None::<&str>),
+                ("RUSTC", None::<&str>),
+                ("RUSTDOC", None::<&str>),
+                ("RUSTC_WRAPPER", None::<&str>),
+                ("RUSTC_WORKSPACE_WRAPPER", None::<&str>),
+                ("RUSTUP_TOOLCHAIN", None::<&str>),
+            ],
+            action,
+        )
+    }
 }
 
 #[cfg(all(test, feature = "test-helpers"))]
@@ -181,97 +262,109 @@ mod evaluator_test_support {
         baseline_json: &str,
         baseline_hash: BaselineHash,
     ) -> Result<ExitCode, EvaluateSignalsError> {
-        let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!("cannot decode baseline: {error}"))
-        })?;
-        let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
-            EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
-        })?;
-        let target_layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
-        })?;
-        let configured_layers = crate::verify::tddd_layers::load_tddd_layers_from_workspace(
-            workspace_root,
-        )
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot load TDDD layer bindings: {error}"
-            ))
-        })?;
-        let mut rustdoc_contexts = std::collections::BTreeMap::new();
-        let mut baseline_snapshots = std::collections::BTreeMap::new();
-        for configured_binding in &configured_layers {
-            let layer =
-                LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
+        super::with_process_environment_lock(|| {
+            let baseline = BaselineRustdocCodec::from_json(baseline_json).map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!(
+                    "cannot decode baseline: {error}"
+                ))
+            })?;
+            let current = BaselineRustdocCodec::from_json(&rustdoc_json).map_err(|error| {
+                EvaluateSignalsError::evaluation(format!("cannot decode rustdoc JSON: {error}"))
+            })?;
+            let target_layer =
+                LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
                     EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
                 })?;
-            if layer == target_layer {
-                rustdoc_contexts.insert(
-                    layer.clone(),
-                    AuthoritativeRustdocContext::new(
-                        layer.clone(),
-                        baseline.clone(),
-                        snapshot_for_context_test(binding.layer_id(), &current),
-                    ),
-                );
-                baseline_snapshots.insert(
-                    layer,
-                    BaselineSnapshot {
-                        path: baseline_path.to_path_buf(),
-                        hash: baseline_hash.clone(),
+            let configured_layers =
+                crate::verify::tddd_layers::load_tddd_layers_from_workspace(workspace_root)
+                    .map_err(|error| {
+                        EvaluateSignalsError::authoritative_input(format!(
+                            "cannot load TDDD layer bindings: {error}"
+                        ))
+                    })?;
+            let mut rustdoc_contexts = std::collections::BTreeMap::new();
+            let mut baseline_snapshots = std::collections::BTreeMap::new();
+            for configured_binding in &configured_layers {
+                let layer = LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(
+                    |error| {
+                        EvaluateSignalsError::authoritative_input(format!(
+                            "invalid layer id: {error}"
+                        ))
                     },
-                );
-                continue;
-            }
-            let configured_baseline_path = track_dir.join(configured_binding.baseline_file());
-            let (configured_baseline_json, configured_baseline_hash) =
-                read_actual_baseline(&configured_baseline_path, trusted_items_root)?;
-            let configured_baseline = BaselineRustdocCodec::from_json(&configured_baseline_json)
+                )?;
+                if layer == target_layer {
+                    rustdoc_contexts.insert(
+                        layer.clone(),
+                        AuthoritativeRustdocContext::new(
+                            layer.clone(),
+                            baseline.clone(),
+                            snapshot_for_context_test(binding.layer_id(), &current),
+                        ),
+                    );
+                    baseline_snapshots.insert(
+                        layer,
+                        BaselineSnapshot {
+                            path: baseline_path.to_path_buf(),
+                            hash: baseline_hash.clone(),
+                        },
+                    );
+                    continue;
+                }
+                let configured_baseline_path = track_dir.join(configured_binding.baseline_file());
+                let (configured_baseline_json, configured_baseline_hash) =
+                    read_actual_baseline(&configured_baseline_path, trusted_items_root)?;
+                let configured_baseline = BaselineRustdocCodec::from_json(
+                    &configured_baseline_json,
+                )
                 .map_err(|error| {
                     EvaluateSignalsError::authoritative_input(format!(
                         "cannot decode baseline for layer '{layer}': {error}"
                     ))
                 })?;
-            rustdoc_contexts.insert(
-                layer.clone(),
-                AuthoritativeRustdocContext::new(
+                rustdoc_contexts.insert(
                     layer.clone(),
-                    configured_baseline.clone(),
-                    snapshot_for_context_test(layer.as_ref(), &configured_baseline),
+                    AuthoritativeRustdocContext::new(
+                        layer.clone(),
+                        configured_baseline.clone(),
+                        snapshot_for_context_test(layer.as_ref(), &configured_baseline),
+                    ),
+                );
+                baseline_snapshots.insert(
+                    layer,
+                    BaselineSnapshot {
+                        path: configured_baseline_path,
+                        hash: configured_baseline_hash,
+                    },
+                );
+            }
+            let start_resolution =
+                resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
+            let start_implementation = current_implementation_fingerprint(workspace_root)?;
+            let loaded_catalogues =
+                load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
+            evaluate_and_write_with_contexts(
+                catalogue_bytes,
+                catalogue_path,
+                track_dir,
+                workspace_root,
+                trusted_items_root,
+                binding,
+                &rustdoc_contexts,
+                &baseline_snapshots,
+                &loaded_catalogues,
+                start_resolution,
+                start_implementation,
+                head_commit,
+                baseline_path,
+                baseline_hash,
+                legacy_cache_key(
+                    type_signals_codec::declaration_hash(catalogue_bytes),
+                    read_head_commit(workspace_root)?,
+                    type_signals_codec::baseline_hash(baseline_json.as_bytes()),
                 ),
-            );
-            baseline_snapshots.insert(
-                layer,
-                BaselineSnapshot { path: configured_baseline_path, hash: configured_baseline_hash },
-            );
-        }
-        let start_resolution =
-            resolution_input_fingerprint(workspace_root, track_dir, trusted_items_root)?;
-        let start_implementation = current_implementation_fingerprint(workspace_root)?;
-        let loaded_catalogues =
-            load_track_catalogues(workspace_root, track_dir, trusted_items_root)?;
-        evaluate_and_write_with_contexts(
-            catalogue_bytes,
-            catalogue_path,
-            track_dir,
-            workspace_root,
-            trusted_items_root,
-            binding,
-            &rustdoc_contexts,
-            &baseline_snapshots,
-            &loaded_catalogues,
-            start_resolution,
-            start_implementation,
-            head_commit,
-            baseline_path,
-            baseline_hash,
-            legacy_cache_key(
-                type_signals_codec::declaration_hash(catalogue_bytes),
-                read_head_commit(workspace_root)?,
-                type_signals_codec::baseline_hash(baseline_json.as_bytes()),
-            ),
-            EvaluationObservers::none(),
-        )
+                EvaluationObservers::none(),
+            )
+        })
     }
 }
 
@@ -1686,77 +1779,81 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_rejects_65th_configured_layer_before_export() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let recorded =
-            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
-        let layers = (0..65)
-            .map(|index| {
-                serde_json::json!({
-                    "crate": format!("layer_{index}"),
-                    "path": format!("libs/layer_{index}"),
-                    "may_depend_on": [],
-                    "tddd": {
-                        "enabled": true,
-                        "catalogue_file": format!("layer_{index}-types.json"),
-                        "schema_export": {
-                            "method": "rustdoc",
-                            "targets": [format!("layer_{index}")]
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let recorded =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let layers = (0..65)
+                .map(|index| {
+                    serde_json::json!({
+                        "crate": format!("layer_{index}"),
+                        "path": format!("libs/layer_{index}"),
+                        "may_depend_on": [],
+                        "tddd": {
+                            "enabled": true,
+                            "catalogue_file": format!("layer_{index}-types.json"),
+                            "schema_export": {
+                                "method": "rustdoc",
+                                "targets": [format!("layer_{index}")]
+                            }
                         }
-                    }
+                    })
                 })
-            })
-            .collect::<Vec<_>>();
-        std::fs::write(
-            workspace.path().join("architecture-rules.json"),
-            serde_json::json!({ "version": 2, "layers": layers }).to_string(),
-        )
-        .unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+                .collect::<Vec<_>>();
+            std::fs::write(
+                workspace.path().join("architecture-rules.json"),
+                serde_json::json!({ "version": 2, "layers": layers }).to_string(),
+            )
+            .unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        let error = execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        )
-        .expect_err("the 65th configured layer must fail before rustdoc export");
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("the 65th configured layer must fail before rustdoc export");
 
-        assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
-        assert!(
-            error.to_string().contains("64"),
-            "the error must identify the layer budget: {error}"
-        );
-        assert_eq!(observer.launches(), 0, "the layer-budget failure must precede export");
-        assert_eq!(
-            std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
-            recorded,
-            "a 65th required layer must not reuse or rewrite a recorded type-signals result"
-        );
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("64"),
+                "the error must identify the layer budget: {error}"
+            );
+            assert_eq!(observer.launches(), 0, "the layer-budget failure must precede export");
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                recorded,
+                "a 65th required layer must not reuse or rewrite a recorded type-signals result"
+            );
+        });
     }
 
     #[test]
     fn test_execute_type_signals_rejects_non_exclusive_target_directory() {
-        let (workspace, items_dir, track_id, binding, exclusive_path) = setup_workspace();
-        let shared_path = workspace.path().join("infrastructure-rustdoc.json");
-        std::fs::copy(&exclusive_path, &shared_path).unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(shared_path);
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, exclusive_path) = setup_workspace();
+            let shared_path = workspace.path().join("infrastructure-rustdoc.json");
+            std::fs::copy(&exclusive_path, &shared_path).unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(shared_path);
 
-        let error = execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        )
-        .expect_err("a shared Cargo target must not be treated as authoritative");
-        assert!(
-            error.to_string().contains(".sotp-rustdoc"),
-            "non-exclusive target ownership must fail closed: {error}"
-        );
-        assert_eq!(observer.launches(), 0, "export must not run without exclusive ownership");
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("a shared Cargo target must not be treated as authoritative");
+            assert!(
+                error.to_string().contains(".sotp-rustdoc"),
+                "non-exclusive target ownership must fail closed: {error}"
+            );
+            assert_eq!(observer.launches(), 0, "export must not run without exclusive ownership");
+        });
     }
 
     #[cfg(unix)]
@@ -2886,14 +2983,6 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn write_test_executable(path: &Path, contents: &str) {
-        use std::os::unix::fs::PermissionsExt as _;
-
-        std::fs::write(path, contents).unwrap();
-        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
-
-    #[cfg(unix)]
     fn prepend_test_command_path(directory: &Path) -> std::ffi::OsString {
         let mut entries = vec![directory.to_path_buf()];
         entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
@@ -2906,18 +2995,8 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn write_metadata_test_toolchain(commands: &Path) {
-        write_test_executable(
-            &commands.join("cargo"),
-            "#!/bin/sh\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
-        );
-        write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
-        write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
-    }
-
-    #[cfg(unix)]
     fn write_evaluator_test_toolchain(commands: &Path, metadata: &str, rustdoc_command: &str) {
-        write_test_executable(&commands.join("rustup"), "#!/bin/sh\nexit 0\n");
+        write_test_rustup(commands);
         write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
         write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
         let cargo = format!(
@@ -3103,25 +3182,30 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original =
-            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        assert_eq!(
-            execute_type_signals_for_layer_with_launch_observer(
-                &items_dir,
-                &track_id,
-                workspace.path(),
-                &binding,
-                &[],
-                &observer,
-            )
-            .unwrap(),
-            ExitCode::SUCCESS
-        );
-        assert_eq!(observer.launches(), 0);
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
+            assert_eq!(
+                execute_type_signals_for_layer_with_launch_observer(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &observer,
+                )
+                .unwrap(),
+                ExitCode::SUCCESS
+            );
+            assert_eq!(observer.launches(), 0);
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original
+            );
+        });
     }
 
     #[cfg(unix)]
@@ -3273,6 +3357,183 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
+    fn test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies() {
+        with_process_environment_lock(|| {
+            let (workspace, _items_dir, _track_id, _binding, _rustdoc_path) = setup_workspace();
+            let commands = tempfile::tempdir().unwrap();
+            let nightly = tempfile::tempdir().unwrap();
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            std::fs::write(
+                &metadata_path,
+                metadata_test_output(&target_directory, "nightly-tool-selection"),
+            )
+            .unwrap();
+
+            write_test_executable(
+                &commands.path().join("cargo"),
+                "#!/bin/sh\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
+            );
+            write_test_executable(&commands.path().join("rustc"), "proxy rustc generation-a\n");
+            write_test_executable(&commands.path().join("rustdoc"), "proxy rustdoc generation-a\n");
+            write_test_rustup(commands.path());
+            for tool in ["cargo", "rustc", "rustdoc"] {
+                write_test_executable(
+                    &nightly.path().join(tool),
+                    &format!("nightly {tool} generation-a\n"),
+                );
+            }
+
+            let path = minimal_test_command_path(commands.path());
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.path().as_os_str())),
+                    ("CARGO_TARGET_DIR", None::<&std::ffi::OsStr>),
+                ],
+                || {
+                    let baseline = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+                    for tool in ["cargo", "rustc", "rustdoc"] {
+                        write_test_executable(
+                            &nightly.path().join(tool),
+                            &format!("nightly {tool} generation-b\n"),
+                        );
+                        let selected_changed =
+                            freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+                        assert_ne!(
+                            baseline, selected_changed,
+                            "nightly-selected {tool} content must be part of the fingerprint"
+                        );
+
+                        write_test_executable(
+                            &nightly.path().join(tool),
+                            &format!("nightly {tool} generation-a\n"),
+                        );
+                        let restored =
+                            freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+                        assert_eq!(
+                            baseline, restored,
+                            "restoring nightly-selected {tool} must restore the baseline fingerprint"
+                        );
+                    }
+
+                    write_test_executable(
+                        &commands.path().join("cargo"),
+                        "#!/bin/sh\n# proxy generation-b\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
+                    );
+                    write_test_executable(
+                        &commands.path().join("rustc"),
+                        "proxy rustc generation-b\n",
+                    );
+                    write_test_executable(
+                        &commands.path().join("rustdoc"),
+                        "proxy rustdoc generation-b\n",
+                    );
+                    let proxy_changed =
+                        freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+                    assert_eq!(
+                        proxy_changed, baseline,
+                        "changing PATH proxy contents must not change the nightly tool fingerprint"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let commands = tempfile::tempdir().unwrap();
+            let nightly = tempfile::tempdir().unwrap();
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            std::fs::write(
+                &metadata_path,
+                metadata_test_output(&target_directory, "nightly-tool-failure"),
+            )
+            .unwrap();
+
+            write_test_executable(
+                &commands.path().join("cargo"),
+                "#!/bin/sh\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
+            );
+            write_test_executable(&commands.path().join("rustc"), "proxy rustc\n");
+            write_test_executable(&commands.path().join("rustdoc"), "proxy rustdoc\n");
+            write_test_executable(&nightly.path().join("cargo"), "nightly cargo\n");
+            write_test_executable(&nightly.path().join("rustc"), "nightly rustc\n");
+            let missing_rustdoc = nightly.path().join("rustdoc-missing");
+            write_test_executable(
+                &commands.path().join("rustup"),
+                r#"#!/bin/sh
+if [ "$1" = "which" ] && [ "$2" = "--toolchain" ] && [ "$3" = "nightly" ]; then
+    case "$4" in
+        rustdoc)
+            printf '%s\n' "$SOTOHE_TEST_MISSING_NIGHTLY_RUSTDOC"
+            ;;
+        cargo|rustc)
+            printf '%s/%s\n' "$SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR" "$4"
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
+    exit 0
+fi
+if [ "$1" = "run" ] && [ "$2" = "nightly" ] && [ "$3" = "rustc" ]; then
+    exit 0
+fi
+exit 1
+"#,
+            );
+
+            let path = minimal_test_command_path(commands.path());
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let error = temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.path().as_os_str())),
+                    ("SOTOHE_TEST_MISSING_NIGHTLY_RUSTDOC", Some(missing_rustdoc.as_os_str())),
+                    ("CARGO_TARGET_DIR", None::<&std::ffi::OsStr>),
+                ],
+                || {
+                    execute_type_signals_for_layer_with_launch_observer(
+                        &items_dir,
+                        &track_id,
+                        workspace.path(),
+                        &binding,
+                        &[],
+                        &observer,
+                    )
+                    .expect_err("a missing nightly-selected tool must fail before cache reuse")
+                },
+            );
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("rustdoc"),
+                "the selected-tool failure must identify the missing tool: {error}"
+            );
+            assert_eq!(observer.launches(), 0, "tool resolution failure must not launch rustdoc");
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original,
+                "tool resolution failure must not replace the old cache"
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_execute_type_signals_accepts_aba_generation_before_cache_reuse() {
         with_process_environment_lock(|| {
             let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
@@ -3417,36 +3678,38 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let head_commit = read_head_commit(workspace.path()).unwrap();
-        write_cache(&items_dir, &track_id, head_commit);
-        std::fs::write(
-            workspace.path().join("libs/infrastructure/src/lib.rs"),
-            "pub struct ChangedFixture;\n",
-        )
-        .unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let head_commit = read_head_commit(workspace.path()).unwrap();
+            write_cache(&items_dir, &track_id, head_commit);
+            std::fs::write(
+                workspace.path().join("libs/infrastructure/src/lib.rs"),
+                "pub struct ChangedFixture;\n",
+            )
+            .unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        )
-        .unwrap();
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .unwrap();
 
-        assert_eq!(observer.launches(), 1);
-        let persisted = type_signals_codec::decode_with_workspace(
-            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
-            workspace.path(),
-        )
-        .unwrap();
-        assert_eq!(
-            persisted.cache_key(),
-            current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
-        );
+            assert_eq!(observer.launches(), 1);
+            let persisted = type_signals_codec::decode_with_workspace(
+                &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                workspace.path(),
+            )
+            .unwrap();
+            assert_eq!(
+                persisted.cache_key(),
+                current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
+            );
+        });
     }
 
     #[test]
@@ -3752,101 +4015,31 @@ mod tests {
 
     #[test]
     fn test_rustdoc_input_fingerprint_includes_nested_track_source_directory() {
-        let (workspace, _items_dir, _track_id, _binding, _rustdoc_path) = setup_workspace();
-        let nested_track = workspace.path().join("libs/infrastructure/src/track");
-        std::fs::create_dir_all(&nested_track).unwrap();
+        with_process_environment_lock(|| {
+            let (workspace, _items_dir, _track_id, _binding, _rustdoc_path) = setup_workspace();
+            let nested_track = workspace.path().join("libs/infrastructure/src/track");
+            std::fs::create_dir_all(&nested_track).unwrap();
 
-        let before = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
-        std::fs::write(nested_track.join("generated.rs"), "pub struct Generated;\n").unwrap();
-        let after = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+            let before = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
+            std::fs::write(nested_track.join("generated.rs"), "pub struct Generated;\n").unwrap();
+            let after = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap();
 
-        assert_ne!(
-            before, after,
-            "a nested production track directory must not be treated as operational state"
-        );
+            assert_ne!(
+                before, after,
+                "a nested production track directory must not be treated as operational state"
+            );
+        });
     }
 
     #[test]
     fn test_execute_type_signals_clean_worktree_with_different_head_recalculates() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        write_cache(&items_dir, &track_id, domain::CommitHash::try_new("b".repeat(40)).unwrap());
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-        execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        )
-        .unwrap();
-
-        assert_eq!(observer.launches(), 1);
-        let persisted = type_signals_codec::decode_with_workspace(
-            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
-            workspace.path(),
-        )
-        .unwrap();
-        assert_eq!(
-            persisted.cache_key(),
-            current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
-        );
-    }
-
-    #[test]
-    fn test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically() {
-        let invalid_cache_variants = [
-            ("missing", None),
-            ("malformed", Some("not-json".to_owned())),
-            (
-                "schema-mismatch",
-                Some(
-                    serde_json::json!({
-                        "schema_version": 999,
-                        "generated_at": "2026-07-31T00:00:00Z",
-                        "declaration_hash": "a".repeat(64),
-                        "head_commit": "b".repeat(40),
-                        "baseline_hash": "a".repeat(64),
-                        "signals": []
-                    })
-                    .to_string(),
-                ),
-            ),
-            (
-                "missing-required-field",
-                Some(
-                    serde_json::json!({
-                        "schema_version": 4,
-                        "generated_at": "2026-07-31T00:00:00Z",
-                        "declaration_hash": "a".repeat(64),
-                        "baseline_hash": "a".repeat(64),
-                        "signals": []
-                    })
-                    .to_string(),
-                ),
-            ),
-            (
-                "invalid-value",
-                Some(
-                    serde_json::json!({
-                        "schema_version": 4,
-                        "generated_at": "2026-07-31T00:00:00Z",
-                        "declaration_hash": "a".repeat(64),
-                        "head_commit": "not-a-commit",
-                        "baseline_hash": "a".repeat(64),
-                        "signals": []
-                    })
-                    .to_string(),
-                ),
-            ),
-        ];
-
-        for (label, invalid_cache) in invalid_cache_variants {
+        with_process_environment_lock(|| {
             let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-            if let Some(invalid_cache) = invalid_cache {
-                std::fs::write(signal_path(&items_dir, &track_id), invalid_cache).unwrap();
-            }
+            write_cache(
+                &items_dir,
+                &track_id,
+                domain::CommitHash::try_new("b".repeat(40)).unwrap(),
+            );
             let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
             execute_type_signals_for_layer_with_launch_observer(
@@ -3857,9 +4050,9 @@ mod tests {
                 &[],
                 &observer,
             )
-            .unwrap_or_else(|error| panic!("{label} cache must be treated as a miss: {error}"));
+            .unwrap();
 
-            assert_eq!(observer.launches(), 1, "{label} cache must trigger evaluation");
+            assert_eq!(observer.launches(), 1);
             let persisted = type_signals_codec::decode_with_workspace(
                 &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
                 workspace.path(),
@@ -3867,191 +4060,287 @@ mod tests {
             .unwrap();
             assert_eq!(
                 persisted.cache_key(),
-                current_cache_document(workspace.path(), &items_dir, &track_id).cache_key(),
-                "{label} cache must be atomically replaced with current identities"
+                current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
             );
-        }
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically() {
+        with_process_environment_lock(|| {
+            let invalid_cache_variants = [
+                ("missing", None),
+                ("malformed", Some("not-json".to_owned())),
+                (
+                    "schema-mismatch",
+                    Some(
+                        serde_json::json!({
+                            "schema_version": 999,
+                            "generated_at": "2026-07-31T00:00:00Z",
+                            "declaration_hash": "a".repeat(64),
+                            "head_commit": "b".repeat(40),
+                            "baseline_hash": "a".repeat(64),
+                            "signals": []
+                        })
+                        .to_string(),
+                    ),
+                ),
+                (
+                    "missing-required-field",
+                    Some(
+                        serde_json::json!({
+                            "schema_version": 4,
+                            "generated_at": "2026-07-31T00:00:00Z",
+                            "declaration_hash": "a".repeat(64),
+                            "baseline_hash": "a".repeat(64),
+                            "signals": []
+                        })
+                        .to_string(),
+                    ),
+                ),
+                (
+                    "invalid-value",
+                    Some(
+                        serde_json::json!({
+                            "schema_version": 4,
+                            "generated_at": "2026-07-31T00:00:00Z",
+                            "declaration_hash": "a".repeat(64),
+                            "head_commit": "not-a-commit",
+                            "baseline_hash": "a".repeat(64),
+                            "signals": []
+                        })
+                        .to_string(),
+                    ),
+                ),
+            ];
+
+            for (label, invalid_cache) in invalid_cache_variants {
+                let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+                if let Some(invalid_cache) = invalid_cache {
+                    std::fs::write(signal_path(&items_dir, &track_id), invalid_cache).unwrap();
+                }
+                let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+                execute_type_signals_for_layer_with_launch_observer(
+                    &items_dir,
+                    &track_id,
+                    workspace.path(),
+                    &binding,
+                    &[],
+                    &observer,
+                )
+                .unwrap_or_else(|error| panic!("{label} cache must be treated as a miss: {error}"));
+
+                assert_eq!(observer.launches(), 1, "{label} cache must trigger evaluation");
+                let persisted = type_signals_codec::decode_with_workspace(
+                    &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                    workspace.path(),
+                )
+                .unwrap();
+                assert_eq!(
+                    persisted.cache_key(),
+                    current_cache_document(workspace.path(), &items_dir, &track_id).cache_key(),
+                    "{label} cache must be atomically replaced with current identities"
+                );
+            }
+        });
     }
 
     #[test]
     fn test_execute_type_signals_cache_write_failure_preserves_prior_cache() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original = write_cache(
-            &items_dir,
-            &track_id,
-            domain::CommitHash::try_new("b".repeat(40)).unwrap(),
-        );
-        let signal_path = signal_path(&items_dir, &track_id);
-        let temporary_path = signal_path.parent().unwrap().join(format!(
-            ".tmp-{}-{}",
-            signal_path.file_name().unwrap().to_string_lossy(),
-            std::process::id()
-        ));
-        std::fs::create_dir(&temporary_path).unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original = write_cache(
+                &items_dir,
+                &track_id,
+                domain::CommitHash::try_new("b".repeat(40)).unwrap(),
+            );
+            let signal_path = signal_path(&items_dir, &track_id);
+            let temporary_path = signal_path.parent().unwrap().join(format!(
+                ".tmp-{}-{}",
+                signal_path.file_name().unwrap().to_string_lossy(),
+                std::process::id()
+            ));
+            std::fs::create_dir(&temporary_path).unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        let error = match execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        ) {
-            Ok(status) => panic!("a failed atomic cache write returned {status:?}"),
-            Err(error) => error,
-        };
+            let error = match execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            ) {
+                Ok(status) => panic!("a failed atomic cache write returned {status:?}"),
+                Err(error) => error,
+            };
 
-        assert!(
-            matches!(&error, EvaluateSignalsError::CacheWrite(_)),
-            "signal write failure must be reported as a cache-write error: {error:?}"
-        );
-        assert_eq!(
-            std::fs::read(&signal_path).unwrap(),
-            original.as_bytes(),
-            "failed replacement must preserve the prior cache bytes"
-        );
+            assert!(
+                matches!(&error, EvaluateSignalsError::CacheWrite(_)),
+                "signal write failure must be reported as a cache-write error: {error:?}"
+            );
+            assert_eq!(
+                std::fs::read(&signal_path).unwrap(),
+                original.as_bytes(),
+                "failed replacement must preserve the prior cache bytes"
+            );
+        });
     }
 
     #[test]
     fn test_execute_type_signals_cache_replacement_is_read_by_track_blob_reader() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        )
-        .unwrap();
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .unwrap();
 
-        assert_eq!(observer.launches(), 1, "a missing cache must trigger evaluation");
-        let persisted = type_signals_codec::decode_with_workspace(
-            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
-            workspace.path(),
-        )
-        .unwrap();
+            assert_eq!(observer.launches(), 1, "a missing cache must trigger evaluation");
+            let persisted = type_signals_codec::decode_with_workspace(
+                &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                workspace.path(),
+            )
+            .unwrap();
 
-        let root = workspace.path();
-        crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
-        crate::verify::test_support::run_git(
-            root,
-            &["remote", "add", "origin", root.to_str().unwrap()],
-        );
-        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
-        crate::verify::test_support::run_git(
-            root,
-            &["add", "-f", "track/items/feature-input-track/infrastructure-type-signals.json"],
-        );
-        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "replace cache"]);
-        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+            let root = workspace.path();
+            crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
+            crate::verify::test_support::run_git(
+                root,
+                &["remote", "add", "origin", root.to_str().unwrap()],
+            );
+            crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+            crate::verify::test_support::run_git(
+                root,
+                &["add", "-f", "track/items/feature-input-track/infrastructure-type-signals.json"],
+            );
+            crate::verify::test_support::run_git(
+                root,
+                &["commit", "--quiet", "-m", "replace cache"],
+            );
+            crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
 
-        let reader =
-            crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
-        match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
-            BlobFetchResult::Found(document) => {
-                assert_eq!(document.cache_key(), persisted.cache_key());
-                assert_eq!(document.signals(), persisted.signals());
+            let reader =
+                crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
+            match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
+                BlobFetchResult::Found(document) => {
+                    assert_eq!(document.cache_key(), persisted.cache_key());
+                    assert_eq!(document.signals(), persisted.signals());
+                }
+                other => {
+                    panic!("the replaced cache must be readable through TrackBlobReader: {other:?}")
+                }
             }
-            other => {
-                panic!("the replaced cache must be readable through TrackBlobReader: {other:?}")
-            }
-        }
+        });
     }
 
     #[test]
     fn test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let root = workspace.path();
-        let signal_file = signal_path(&items_dir, &track_id);
-        let relative_signal_file =
-            "track/items/feature-input-track/infrastructure-type-signals.json";
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let root = workspace.path();
+            let signal_file = signal_path(&items_dir, &track_id);
+            let relative_signal_file =
+                "track/items/feature-input-track/infrastructure-type-signals.json";
 
-        // Start with a cache that would otherwise be eligible for reuse, then
-        // publish an unreadable replacement to the branch the blob reader sees.
-        write_cache(&items_dir, &track_id, read_head_commit(root).unwrap());
-        crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
-        crate::verify::test_support::run_git(
-            root,
-            &["remote", "add", "origin", root.to_str().unwrap()],
-        );
-        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
-        std::fs::write(&signal_file, b"not valid json").unwrap();
-        crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
-        crate::verify::test_support::run_git(
-            root,
-            &["commit", "--quiet", "-m", "unreadable cache"],
-        );
-        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+            // Start with a cache that would otherwise be eligible for reuse, then
+            // publish an unreadable replacement to the branch the blob reader sees.
+            write_cache(&items_dir, &track_id, read_head_commit(root).unwrap());
+            crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
+            crate::verify::test_support::run_git(
+                root,
+                &["remote", "add", "origin", root.to_str().unwrap()],
+            );
+            crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+            std::fs::write(&signal_file, b"not valid json").unwrap();
+            crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
+            crate::verify::test_support::run_git(
+                root,
+                &["commit", "--quiet", "-m", "unreadable cache"],
+            );
+            crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
 
-        let reader =
-            crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
-        match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
-            BlobFetchResult::FetchError(message) => {
-                assert!(message.contains("decode error"), "reader diagnostic: {message}");
+            let reader =
+                crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
+            match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
+                BlobFetchResult::FetchError(message) => {
+                    assert!(message.contains("decode error"), "reader diagnostic: {message}");
+                }
+                other => {
+                    panic!("an existing malformed cache must be reported as unreadable: {other:?}")
+                }
             }
-            other => {
-                panic!("an existing malformed cache must be reported as unreadable: {other:?}")
-            }
-        }
 
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-        execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            root,
-            &binding,
-            &[],
-            &observer,
-        )
-        .unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                root,
+                &binding,
+                &[],
+                &observer,
+            )
+            .unwrap();
 
-        assert_eq!(observer.launches(), 1, "unreadable cache must force reevaluation");
-        let replacement = type_signals_codec::decode_with_workspace(
-            &std::fs::read_to_string(&signal_file).unwrap(),
-            root,
-        )
-        .unwrap();
-        assert_eq!(
-            replacement.cache_key(),
-            current_cache_document(root, &items_dir, &track_id).cache_key()
-        );
+            assert_eq!(observer.launches(), 1, "unreadable cache must force reevaluation");
+            let replacement = type_signals_codec::decode_with_workspace(
+                &std::fs::read_to_string(&signal_file).unwrap(),
+                root,
+            )
+            .unwrap();
+            assert_eq!(
+                replacement.cache_key(),
+                current_cache_document(root, &items_dir, &track_id).cache_key()
+            );
 
-        crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
-        crate::verify::test_support::run_git(
-            root,
-            &["commit", "--quiet", "-m", "replace unreadable cache"],
-        );
-        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
-        assert!(matches!(
-            reader.read_type_signals("main", track_id.as_ref(), "infrastructure"),
-            BlobFetchResult::Found(_)
-        ));
+            crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
+            crate::verify::test_support::run_git(
+                root,
+                &["commit", "--quiet", "-m", "replace unreadable cache"],
+            );
+            crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+            assert!(matches!(
+                reader.read_type_signals("main", track_id.as_ref(), "infrastructure"),
+                BlobFetchResult::Found(_)
+            ));
+        });
     }
 
     #[test]
     fn test_execute_type_signals_unreadable_authority_does_not_reuse_cache() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original =
-            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
-        std::fs::remove_file(items_dir.join(track_id.as_ref()).join("infrastructure-types.json"))
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let original =
+                write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            std::fs::remove_file(
+                items_dir.join(track_id.as_ref()).join("infrastructure-types.json"),
+            )
             .unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        let result = execute_type_signals_for_layer_with_launch_observer(
-            &items_dir,
-            &track_id,
-            workspace.path(),
-            &binding,
-            &[],
-            &observer,
-        );
+            let result = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            );
 
-        assert!(matches!(result, Err(EvaluateSignalsError::AuthoritativeInput(_))));
-        assert_eq!(observer.launches(), 0, "unreadable authority must not reuse the cache");
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
+            assert!(matches!(result, Err(EvaluateSignalsError::AuthoritativeInput(_))));
+            assert_eq!(observer.launches(), 0, "unreadable authority must not reuse the cache");
+            assert_eq!(
+                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+                original
+            );
+        });
     }
 }

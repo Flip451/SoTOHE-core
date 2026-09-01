@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "4a9e4c60812ee8a01ad0662ae006a6777f614fdfc2647f781af19bf5acf09a6e",
+  "catalogue_declaration_hash": "af975073a9dc68e28c44a1cb9beb0f528921066a9d2e3e6f76a8c3bb47b476dc",
   "schema_version": 1,
   "signals": [
     {
@@ -18,12 +18,12 @@
       "type_name": "CargoProfileName"
     },
     {
-      "entry_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "entry_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "signal": "blue",
       "type_name": "ExpectedRustdocJsonPath"
     },
     {
-      "entry_hash": "064d2c1e16367383994dd7e128b7e45e6cf2c0e3d3a21655322acb2e080b5954",
+      "entry_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
       "signal": "blue",
       "type_name": "ImplementationFingerprint"
     },
@@ -33,7 +33,7 @@
       "type_name": "ResolutionFingerprint"
     },
     {
-      "entry_hash": "e59a949457bcb9b4da2b986c3d5669d42d3d6e90a1150b6ce9955e07bfff30de",
+      "entry_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
       "signal": "blue",
       "type_name": "ResolvedCargoTargetDirectory"
     },
@@ -43,7 +43,7 @@
       "type_name": "RustdocExecutionIdentity"
     },
     {
-      "entry_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
+      "entry_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
       "signal": "blue",
       "type_name": "RustdocExecutionIdentityError"
     },
@@ -58,17 +58,17 @@
       "type_name": "RustdocSnapshot"
     },
     {
-      "entry_hash": "8e298b4f72c588544343b49e4e3ba1bff392692f2fa9764c136d766b51ab358c",
+      "entry_hash": "5fbfce206a6f2892d2eebc44ddbbe97e29c8493a5c89c1750786bfcd48425f00",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
     },
     {
-      "entry_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "entry_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "signal": "blue",
       "type_name": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
     },
     {
-      "entry_hash": "d691eee93d76e9eea64a6d662799f42357bc8aed14dbff37b6d50a745599b0c7",
+      "entry_hash": "b83aa54376d10cb61e3b9416bf997f7784b0a5e2dfe1418257bd36a9cc39a55c",
       "signal": "blue",
       "type_name": "domain::tddd::type_signals_doc::TypeSignalsDocument"
     },
@@ -78,7 +78,7 @@
       "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
     },
     {
-      "entry_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
+      "entry_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
       "signal": "blue",
       "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
     },
@@ -93,7 +93,7 @@
       "type_name": "RustdocCratePort"
     },
     {
-      "entry_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "entry_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "signal": "blue",
       "type_name": "SchemaExporter"
     },
@@ -108,7 +108,7 @@
       "type_name": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
     },
     {
-      "entry_hash": "c2aac93302471683510180954b458f82083212d1d0d1424cebeee7bb5618068a",
+      "entry_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
       "signal": "blue",
       "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
     }

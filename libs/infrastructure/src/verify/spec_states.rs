@@ -700,7 +700,7 @@ mod tests {
             value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
         for signal in &mut signals_array {
             if let Some(signal) = signal.as_object_mut() {
-                // Legacy declaration fixtures describe type rows; the v5
+                // Legacy declaration fixtures describe type rows; the v6
                 // persisted document must make that namespace explicit.
                 signal.insert("namespace".to_owned(), serde_json::Value::String("type".to_owned()));
             }
@@ -1557,7 +1557,7 @@ mod tests {
 
     fn domain_type_signals_stale_hash() -> String {
         let mut document = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": "0".repeat(64),
             "head_commit": "0".repeat(40),

@@ -41,6 +41,11 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
           "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
         },
         {
@@ -521,6 +526,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -552,11 +567,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -1222,17 +1232,6 @@
         "entry_key": "ExpectedRustdocJsonPath",
         "anchor_id": {
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "reason": "This newtype only confines an expected rustdoc JSON path to a resolved target directory. It does not walk workspace inputs, compute fingerprints, or fail-close on excluded/external rustdoc graph inputs."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "ExpectedRustdocJsonPath",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
           "element_id": "IN-07"
         }
       },
@@ -1269,7 +1268,7 @@
           "element_id": "IN-03"
         }
       },
-      "reason": "The ImplementationFingerprint declaration is a digest wrapper that stores an already computed Sha256Digest. It does not discover workspace, environment, PATH-tool, or cargo-metadata inputs and does not bind declaration, resolution, and execution identity into one cache key."
+      "reason": "ImplementationFingerprint stores only a precomputed Sha256Digest; collection and tool-identity snapshot behavior is owned by rustdoc_input_fingerprint and append_actual_rustdoc_tool_identity, so this value object has no independently testable collection behavior and does not claim collection here."
     },
     {
       "kind": "waiver",
@@ -1280,7 +1279,7 @@
           "element_id": "CO-04"
         }
       },
-      "reason": "The ImplementationFingerprint declaration stores only an already computed Sha256Digest. It does not walk workspace files, apply exclusions, resolve tools, include cargo-metadata bytes, or produce authoritative-input errors for symlink and limit failures."
+      "reason": "ImplementationFingerprint stores only a precomputed Sha256Digest; collection and tool-identity snapshot behavior is owned by rustdoc_input_fingerprint and append_actual_rustdoc_tool_identity, so this value object has no independently testable collection behavior and does not claim collection here."
     },
     {
       "kind": "waiver",
@@ -1331,17 +1330,6 @@
           "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
         }
       ]
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "ResolvedCargoTargetDirectory",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "reason": "This newtype stores a resolved target directory. It does not detect non-authoritative rustdoc inputs or produce authoritative-input errors."
     },
     {
       "kind": "voluntary_binding",
@@ -1431,45 +1419,6 @@
         "entry_key": "RustdocExecutionIdentityError",
         "anchor_id": {
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "reason": "The declaration is a constructor-error enum with only TargetDirectoryNotAbsolute, ExpectedJsonOutsideTargetDirectory, and EmptyProfile classifications. It does not walk Cargo or workspace inputs, compute fingerprints, or decide reuse, so IN-03's fingerprint behavior is not local to this error type."
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "RustdocExecutionIdentityError",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
-        }
-      ]
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "RustdocExecutionIdentityError",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "reason": "This error type reports identity construction failure. It does not encode fingerprint input sets or partial-fingerprint rejection."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "RustdocExecutionIdentityError",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
           "element_id": "IN-06"
         }
       },
@@ -1536,17 +1485,6 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
         "anchor_id": {
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "reason": "The TypeSignalsCacheKey declaration stores already computed declaration, HEAD, baseline, implementation, resolution, and rustdoc-selection values. It does not construct the implementation fingerprint from D3 workspace inputs."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
           "element_id": "IN-07"
         }
       },
@@ -1590,28 +1528,6 @@
           "test_name": "test_document_retains_only_required_freshness_inputs"
         }
       ]
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "reason": "This document retains caller-supplied cache-key fields. It does not walk workspace inputs or derive implementation fingerprints from the D3 authoritative set."
-    },
-    {
-      "kind": "waiver",
-      "edge_id": {
-        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "reason": "This document type retains a cache key and signals. It does not itself reject reuse on a dirty worktree or incomplete fingerprint construction; that decision lives on decide_type_signals_reuse."
     },
     {
       "kind": "waiver",
@@ -1709,7 +1625,7 @@
           "element_id": "AC-06"
         }
       },
-      "reason": "Constructing a reuse input does not acquire exclusive target-directory ownership, require writer participation, or detect ABA replacements of rustdoc output."
+      "reason": "TypeSignalsReuseInput::verify only packages caller-supplied cache keys after clean-worktree and readable-authority observations; it does not acquire the rustdoc output-directory lock or detect output ABA. AC-06 lock-held export and end-of-evaluation checks are owned by execute_type_signals_for_layer and RustdocSchemaExporter, so this value object has no independently testable lock behavior."
     },
     {
       "kind": "voluntary_binding",
@@ -1730,6 +1646,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_v5_document_without_new_fields_returns_unsupported_schema_error"
         }
       ]
     },
@@ -1789,7 +1710,7 @@
       "reason": "This value object has no exporter, writer-participation check, or fingerprint revalidation. Exclusive target ownership and ABA rejection are not observable on the captured-json type."
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "RustdocSnapshot",
         "anchor_id": {
@@ -1797,7 +1718,13 @@
           "element_id": "IN-03"
         }
       },
-      "reason": "This snapshot type stores an already resolved execution identity with a captured hash and graph. It does not discover authoritative inputs or decide cache reuse."
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_carries_execution_identity_and_json_hash"
+        }
+      ]
     },
     {
       "kind": "waiver",
@@ -2199,29 +2126,22 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
-          "element_id": "CO-04"
-        }
-      },
-      "tests": [
+          "test_name": "test_rustdoc_crate_adapter_lock_timeout_is_fail_closed_without_retry"
+        },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
         }
       ]
     },

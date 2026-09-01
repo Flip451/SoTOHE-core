@@ -5,6 +5,11 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
           "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
         },
         {
@@ -26,9 +31,9 @@
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
-        "bound_tests_set_hash": "0c1a4b24fea11ad614a0f2fa0ae6438492173301296749f08062320680abfb11",
-        "declaration_hash": "5143a9072030baad3aab9531245efb5b627bc16e7bfa341dab6bc1fccdd45837"
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "bound_tests_set_hash": "b79d869dd1f31989038ef1e55383172c2abebaffb6d18831633a5695e6df6210",
+        "declaration_hash": "8038b3988f28eb57bb2de75fb5e6ec1dea868fd149bc586c045029833425e264"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -36,7 +41,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n...\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -46,44 +51,8 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
         },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
-      },
-      "key": {
-        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
-        "bound_tests_set_hash": "0c1a4b24fea11ad614a0f2fa0ae6438492173301296749f08062320680abfb11",
-        "declaration_hash": "5143a9072030baad3aab9531245efb5b627bc16e7bfa341dab6bc1fccdd45837"
-      },
-      "obligation_id": {
-        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "// Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
         {
           "layer": "domain",
           "module_path": "domain::tddd::type_signals_doc::tests",
@@ -108,9 +77,9 @@
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
-        "bound_tests_set_hash": "0c1a4b24fea11ad614a0f2fa0ae6438492173301296749f08062320680abfb11",
-        "declaration_hash": "5143a9072030baad3aab9531245efb5b627bc16e7bfa341dab6bc1fccdd45837"
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "bound_tests_set_hash": "b79d869dd1f31989038ef1e55383172c2abebaffb6d18831633a5695e6df6210",
+        "declaration_hash": "8038b3988f28eb57bb2de75fb5e6ec1dea868fd149bc586c045029833425e264"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -118,7 +87,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "// Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -296,7 +265,7 @@
       },
       "key": {
         "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
-        "bound_tests_set_hash": "0c18c7e89b321f3a4d331457d591443228e61a02ca3566902cf12a0d590d05b7",
+        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -305,7 +274,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... retry.expect_err(\"a failed lock operation must not retry into lockless success\"); ... assert!(exclusive.starts_with(cargo_target.join(\".sotp-rustdoc\")), \"cooperative writers must own a private .sotp-rustdoc subtree: {}\", exclusive.display()); ... assert!(identity.expected_json_path().as_path().starts_with(exclusive), \"expected rustdoc JSON must stay inside the exclusive target\");",
+        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... let contention_error = contention.expect_err(\"second writer must not enter the lock\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... let error = adapter.capture_current(&crate_name, &[]).unwrap_err(); assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }), \"lock-operation failure must fail closed: {error}\"); assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -412,7 +381,7 @@
       },
       "key": {
         "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
-        "bound_tests_set_hash": "0c18c7e89b321f3a4d331457d591443228e61a02ca3566902cf12a0d590d05b7",
+        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -421,7 +390,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(\n        RUSTDOC_OUTPUT_LOCK_TIMEOUT,\n        Duration::from_secs(120),\n        \"the lock timeout is part of the rustdoc execution contract\"\n    );\nassert_eq!(\n                        exclusive_parent.file_name(),\n                        Some(std::ffi::OsStr::new(\".sotp-rustdoc\")),\n                        \"the selection must be directly below the private rustdoc parent\"\n                    );\nassert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\");\nlet contention_error = contention.expect_err(\"second writer must not enter the lock\");\nassert!(\n            contention_error.to_string().contains(\"timed out\"),\n            \"second writer must fail closed at its bounded wait: {contention_error}\"\n        );\nlet generation_error = pinned\n            .read_bytes(&output, 1024)\n            .expect_err(\"target ancestor replacement must be detected\");\nassert!(error.to_string().contains(\"symlink guard rejected\"));\nlet capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err();\n                    assert!(\n                        matches!(capture_error, RustdocCratePortError::AuthoritativeInput { .. }),\n                        \"a symlinked selection directory must reject capture admission: {capture_error}\"\n                    );\nerror.to_string().contains(\"supported only on Unix\")",
+        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(exclusive.starts_with(cargo_target.join(\".sotp-rustdoc\")), \"cooperative writers must own a private .sotp-rustdoc subtree: {}\", exclusive.display()); ... assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\"); ... std::os::unix::fs::symlink(&redirected, &selection).unwrap(); ... assert!(capture_error.to_string().contains(\"symlink\"), \"the capture rejection must identify the symlink guard: {capture_error}\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -528,7 +497,7 @@
       },
       "key": {
         "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
-        "bound_tests_set_hash": "0c18c7e89b321f3a4d331457d591443228e61a02ca3566902cf12a0d590d05b7",
+        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -537,7 +506,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"the selection must be directly below the private rustdoc parent\" ... \"a symlinked selection directory must reject capture admission\" ... \"non-exclusive rustdoc targets must fail closed\" ... \"descriptor-relative rustdoc locks must be unsupported on non-Unix\"",
+        "citation": "assert_eq!(\n                        exclusive_parent.file_name(),\n                        Some(std::ffi::OsStr::new(\".sotp-rustdoc\")),\n                        \"the selection must be directly below the private rustdoc parent\"\n                    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -644,7 +613,7 @@
       },
       "key": {
         "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
-        "bound_tests_set_hash": "0c18c7e89b321f3a4d331457d591443228e61a02ca3566902cf12a0d590d05b7",
+        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -653,7 +622,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"assert!(error.to_string().contains(\\\"supported only on Unix\\\"),\\n        \\\"non-Unix lock acquisition must fail closed: {error}\\\")\"; \"assert!(result.is_err(), \\\"non-exclusive rustdoc targets must fail closed\\\")\"; \"assert!(\\n                error.to_string().contains(\\\"not an exclusive .sotp-rustdoc area\\\"),\\n                \\\"the target ownership failure must be explicit: {error}\\\"\\n            )\"; \"assert!(\\n                        capture_error.to_string().contains(\\\"symlink\\\"),\\n                        \\\"the capture rejection must identify the symlink guard: {capture_error}\\\"\\n                    )\"; \"assert_eq!(\\n                        exclusive_parent.file_name(),\\n                        Some(std::ffi::OsStr::new(\\\".sotp-rustdoc\\\")),\\n                        \\\"the selection must be directly below the private rustdoc parent\\\"\\n                    )\"",
+        "citation": "\"the selection must be directly below the private rustdoc parent\"; \"a symlinked selection directory must reject capture admission\"; \"descriptor-relative rustdoc locks must be unsupported on non-Unix\"; \"non-exclusive rustdoc targets must fail closed\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -780,7 +749,7 @@
       },
       "key": {
         "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
-        "bound_tests_set_hash": "508cd99e52639e3d95f6036fd0b02920823b9119141791c0178998b4ae5f2c92",
+        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -789,7 +758,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"RUSTDOC_OUTPUT_LOCK_TIMEOUT,\\n        Duration::from_secs(120)\" ... \"second writer must fail closed at its bounded wait\" ... \"lock-operation failure must be reported\" ... \"a failed lock operation must not retry into lockless success\"",
+        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(exclusive.starts_with(cargo_target.join(\".sotp-rustdoc\")), \"cooperative writers must own a private .sotp-rustdoc subtree: {}\", exclusive.display()); ... let contention_error = contention.expect_err(\"second writer must not enter the lock\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }), \"lock-operation failure must fail closed: {error}\"); assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes()); ... retry.expect_err(\"a failed lock operation must not retry into lockless success\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -916,7 +885,7 @@
       },
       "key": {
         "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
-        "bound_tests_set_hash": "508cd99e52639e3d95f6036fd0b02920823b9119141791c0178998b4ae5f2c92",
+        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -925,7 +894,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(\n                        exclusive_parent.file_name(),\n                        Some(std::ffi::OsStr::new(\".sotp-rustdoc\")),\n                        \"the selection must be directly below the private rustdoc parent\"\n                    );",
+        "citation": "\"assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \\\"the lock timeout is part of the rustdoc execution contract\\\")\"; \"assert!(contention_error.to_string().contains(\\\"timed out\\\"), \\\"second writer must fail closed at its bounded wait: {contention_error}\\\")\"; \"assert!(result.is_err(), \\\"non-exclusive rustdoc targets must fail closed\\\")\"; \"assert_eq!(exclusive_parent.file_name(), Some(std::ffi::OsStr::new(\\\".sotp-rustdoc\\\")), \\\"the selection must be directly below the private rustdoc parent\\\")\"; \"assert!(error.to_string().contains(\\\"symlink guard rejected\\\"))\"; \"assert!(error.to_string().contains(\\\"supported only on Unix\\\"), \\\"non-Unix lock acquisition must fail closed\\\")\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1052,7 +1021,7 @@
       },
       "key": {
         "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
-        "bound_tests_set_hash": "508cd99e52639e3d95f6036fd0b02920823b9119141791c0178998b4ae5f2c92",
+        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -1061,7 +1030,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"descriptor-relative rustdoc locks must be unsupported on non-Unix\"; \"a symlinked selection directory must reject capture admission\"; \"the selection must be directly below the private rustdoc parent\"; \"non-exclusive rustdoc targets must fail closed\"; \"cooperative writers must serialize through the exclusive lock\"",
+        "citation": "assert_eq!(\n                        exclusive_parent.file_name(),\n                        Some(std::ffi::OsStr::new(\".sotp-rustdoc\")),\n                        \"the selection must be directly below the private rustdoc parent\"\n                    );\n\n                    let capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err();\n                    assert!(\n                        matches!(capture_error, RustdocCratePortError::AuthoritativeInput { .. }),\n                        \"a symlinked selection directory must reject capture admission: {capture_error}\"\n                    );\n\n    let target = tempfile::tempdir().expect(\"target tempdir\");\n    let error =\n        RustdocOutputLock::acquire_for_test(target.path(), std::time::Duration::from_millis(25))\n            .expect_err(\"descriptor-relative rustdoc locks must be unsupported on non-Unix\");\n    assert!(\n        error.to_string().contains(\"supported only on Unix\"),\n        \"non-Unix lock acquisition must fail closed: {error}\"\n    );\n\n            assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1188,7 +1157,7 @@
       },
       "key": {
         "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
-        "bound_tests_set_hash": "508cd99e52639e3d95f6036fd0b02920823b9119141791c0178998b4ae5f2c92",
+        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -1197,7 +1166,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\"); ... assert!(error.to_string().contains(\"not an exclusive .sotp-rustdoc area\"), \"the target ownership failure must be explicit: {error}\"); ... let capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err(); ... assert!(capture_error.to_string().contains(\"symlink\"), \"the capture rejection must identify the symlink guard: {capture_error}\"); ... .expect_err(\"descriptor-relative rustdoc locks must be unsupported on non-Unix\");",
+        "citation": "\"assert_eq!(\\n                        exclusive_parent.file_name(),\\n                        Some(std::ffi::OsStr::new(\\\".sotp-rustdoc\\\")),\\n                        \\\"the selection must be directly below the private rustdoc parent\\\"\\n                    );\"; \"assert!(\\n        error.to_string().contains(\\\"supported only on Unix\\\"),\\n        \\\"non-Unix lock acquisition must fail closed: {error}\\\"\\n    );\"; \"assert!(\\n                error.to_string().contains(\\\"not an exclusive .sotp-rustdoc area\\\"),\\n                \\\"the target ownership failure must be explicit: {error}\\\"\\n            );\"; \"assert!(\\n                        capture_error.to_string().contains(\\\"symlink\\\"),\\n                        \\\"the capture rejection must identify the symlink guard: {capture_error}\\\"\\n                    );\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2689,6 +2658,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -2720,11 +2699,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -2920,9 +2894,9 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       },
       "key": {
-        "anchor_text_hash": "0a9faf0ea9467beca2cd06a89805e7ae4b387b595f810d95fbba701bea131b3d",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "anchor_text_hash": "63eff5938709b5e300ff4321fe8086abdca28b8aeabbf37448ec70d0172e58a7",
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -2930,7 +2904,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n                error.to_string().contains(\"domain::model::Name\"),\n                \"the diagnostic must retain the fully-qualified unresolved identity: {error}\"\n            );\n\nassert_ne!(\n                        persisted.cache_key().implementation_fingerprint(),\n                        type_signals_codec::decode(&original)\n                            .unwrap()\n                            .cache_key()\n                            .implementation_fingerprint(),\n                        \"metadata output must change the implementation cache identity\"\n                    );\n\nassert!(\n                error.to_string().contains(\"changed during type-signal evaluation\"),\n                \"the error must identify the changed implementation: {error}\"\n            );\nassert!(\n                !signal_path(&items_dir, &track_id).exists(),\n                \"a changed implementation must not publish a signal artifact\"\n            );",
+        "citation": "\"assert_ne!(first, selected_changed,\\n                            \\\"nightly-selected {tool} content must be part of the fingerprint\\\"\\n                        );\" ... \"assert_ne!(\\n                        second, outside_hash,\\n                        \\\"absolute tool contents remain part of identity\\\"\\n                    );\" ... \"assert_ne!(\\n                first, second,\\n                \\\"an external path dependency and its build script are not claimed as complete inputs\\\"\\n            );\" ... \"assert_ne!(\\n                        persisted.cache_key().implementation_fingerprint(),\\n                        type_signals_codec::decode(&original)\\n                            .unwrap()\\n                            .cache_key()\\n                            .implementation_fingerprint(),\\n                        \\\"metadata output must change the implementation cache identity\\\"\\n                    );\" ... \"assert!(\\n                error.to_string().contains(\\\"changed during type-signal evaluation\\\"),\\n                \\\"the error must identify the changed implementation: {error}\\\"\\n            );\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -2970,6 +2944,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -3001,11 +2985,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -3202,8 +3181,8 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -3211,7 +3190,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");",
+        "citation": "            execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3251,6 +3230,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -3282,11 +3271,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -3483,8 +3467,8 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -3492,7 +3476,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\"); ... assert!(!resolved_paths.values().any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]), \"the bin target root must be canonicalized before the add is synthesized\"); ... assert_eq!(*matching[0].0, Id(1)); assert_eq!(matching[0].1.crate_id, 7);",
+        "citation": "\"the evaluator must place the external add through the bin-target alias\" ... \"the synthesized add must use the declaring crate root\" ... \"the bin target root must be canonicalized before the add is synthesized\" ... \"the referring-side rustdoc identity must win over the other-layer add\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3532,6 +3516,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -3563,11 +3557,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -3764,8 +3753,8 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -3773,7 +3762,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the identity must not be synthesized twice\"; \"the rustdoc identity must remain in the resolution set\"",
+        "citation": "assert_eq!(resolution_snapshots.len(), 1); ... \"the evaluator must place the external add through the bin-target alias\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3813,6 +3802,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -3844,11 +3843,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -4045,8 +4039,8 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -4054,7 +4048,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"missing enabled catalogues are empty, not errors\"; \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
+        "citation": "\"missing enabled catalogues are empty, not errors\" ... \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4094,6 +4088,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -4125,11 +4129,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -4326,8 +4325,8 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -4335,7 +4334,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(resolved_name.1.crate_id, u32::MAX - 1); assert!(!resolved_paths.values().any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]), \"the bin target root must be canonicalized before the add is synthesized\");",
+        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );\n\n            let declaring = cross_layer_declaring_catalogue(\n                \"domain::model::Name\",\n                Some(\n                    domain::tddd::catalogue_v2::ModulePath::from_segments(vec![\"model\".to_owned()])\n                        .unwrap(),\n                ),\n                Some(\"domain::ports::Repository\"),\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4375,6 +4374,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -4406,11 +4415,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -4607,8 +4611,8 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -4616,7 +4620,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "expect(\"type and trait declarations from the other layer must resolve\"); assert!(signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"), \"the target type must survive evaluation after both external declarations resolve\"); assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");",
+        "citation": "\"the target Handler must be encoded\"; assert!(matches!(&encoded.krate().index[&fields[0]].inner, ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id)); assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4656,6 +4660,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -4687,11 +4701,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -4888,8 +4897,8 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -4897,7 +4906,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");\n\nassert!(\n    !resolved_paths\n        .values()\n        .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n    \"the bin target root must be canonicalized before the add is synthesized\"\n);",
+        "citation": "assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4937,6 +4946,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -4968,11 +4987,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -5169,8 +5183,8 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -5178,7 +5192,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\"); assert_eq!(*matching[0].0, Id(1)); ... .expect_err(\"an ungrounded cross-crate reference must not use short-name fallback\");",
+        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");\nassert_eq!(*matching[0].0, Id(1));\nassert_eq!(matching[0].1.crate_id, 7);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5218,6 +5232,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -5249,11 +5273,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -5450,8 +5469,8 @@
       },
       "key": {
         "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -5459,7 +5478,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = execute_type_signals_for_layer_with_launch_observer(\n            &items_dir,\n            &track_id,\n            workspace.path(),\n            &binding,\n            &[],\n            &observer,\n        )\n        .expect_err(\"the 65th configured layer must fail before rustdoc export\");\n\n        assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n        assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n        assert_eq!(\n            std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n            recorded,\n            \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n        );",
+        "citation": "\"the 65th configured layer must fail before rustdoc export\" ... assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\"); ... \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5499,6 +5518,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -5530,11 +5559,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -5731,8 +5755,8 @@
       },
       "key": {
         "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -5740,7 +5764,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = super::rustdoc_contexts::load_authoritative_inputs(\n        workspace.path(),\n        &items,\n        &items,\n        &observer,\n    )\n    .expect_err(\"the 65th configured context must fail before export\");\nassert!(error.to_string().contains(\"64\"));\n\nlet error = execute_type_signals_for_layer_with_launch_observer(\n            &items_dir,\n            &track_id,\n            workspace.path(),\n            &binding,\n            &[],\n            &observer,\n        )\n        .expect_err(\"the 65th configured layer must fail before rustdoc export\");\nassert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\nassert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\nassert_eq!(\n    std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n    recorded,\n    \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n);",
+        "citation": "assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_))); ... assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\"); ... \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5780,6 +5804,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -5811,11 +5845,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -6012,8 +6041,8 @@
       },
       "key": {
         "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -6021,7 +6050,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n        assert_eq!(\n            std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n            recorded,\n            \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n        );",
+        "citation": "let error = super::rustdoc_contexts::load_authoritative_inputs(\n        workspace.path(),\n        &items,\n        &items,\n        &observer,\n    )\n    .expect_err(\"the 65th configured context must fail before export\");\nassert!(error.to_string().contains(\"64\"));\n\nlet error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th configured layer must fail before rustdoc export\");\n\nassert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\nassert_eq!(\n    std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n    recorded,\n    \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6061,6 +6090,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
         },
         {
@@ -6092,11 +6131,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -6292,9 +6326,9 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -6302,7 +6336,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"), true)",
+        "citation": "assert_ne!(baseline, selected_changed, \"nightly-selected {tool} content must be part of the fingerprint\"); ... assert_eq!(proxy_changed, baseline, \"changing PATH proxy contents must not change the nightly tool fingerprint\"); ... assert_eq!(first, second, \"only the exact Cargo target directory is excluded\"); ... assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6342,283 +6376,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_allows_external_path_and_build_script_inputs"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_dirty_worktree_before_cache_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_changed_generation_before_persist"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_discards_result_before_persist_when_resolution_changes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_path_reread_generation_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_accepts_aba_generation_before_cache_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_non_exclusive_target_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_accepts_aba_generation_after_path_restoration"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_metadata_output_change_invalidates_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_metadata_failure_does_not_reuse_existing_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_path_tool_resolution_failure_does_not_reuse_existing_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_lock_failure_does_not_reuse_or_retry"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_waits_on_held_exclusive_lock"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_symlinked_output_on_no_follow_read"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_non_unix_rustdoc_target_before_export"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_ne!(first, second, \"tool contents are part of implementation identity\"); ... assert_ne!(persisted.cache_key().implementation_fingerprint(), type_signals_codec::decode(&original).unwrap().cache_key().implementation_fingerprint(), \"metadata output must change the implementation cache identity\"); ... assert_ne!(first, second, \"only the exact Cargo target directory is excluded\"); ... assert_ne!(before, after, \"a nested production track directory must not be treated as operational state\"); ... assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_mismatched_cross_layer_candidate_fail_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_resolves_cross_layer_type_and_trait_adds"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_canonicalizes_bin_target_for_synthesized_external_add"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_ungrounded_cross_layer_reference"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_fingerprint_failure_between_snapshots_is_authoritative_input"
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
         },
         {
           "layer": "infrastructure",
@@ -6654,11 +6417,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
           "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_parent_cargo_config_and_resolved_home"
         },
         {
           "layer": "infrastructure",
@@ -6854,9 +6612,9 @@
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
-        "bound_tests_set_hash": "716937f7db8e3e163e06c19cc29299c35290cdc56397ae5b14bf756df2f4a8e5",
-        "declaration_hash": "eb55db624f5ea9c5238d8977592a18f52d946708dcd3e5c516fe6ff225017d58"
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "bound_tests_set_hash": "bea01346565f10e66158d79afdfdf1bef9737cd6a8b193f3a12fc0725ff4d72b",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
@@ -7707,7 +7465,7 @@
         "entry_key": "CargoProfileName"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "37ca9dd73b58be19432c6e3178f7f5e22e2b39c7c714fed5c55956e753665f3c",
         "declaration_hash": "fcc2d98282992446c2697d59b1903b421fe0d3df76069bc1ae2e37bfdc2bc8ab"
       },
@@ -7717,7 +7475,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7738,7 +7496,7 @@
         "entry_key": "CargoProfileName"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
         "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
         "declaration_hash": "02c1f624fba6ac9eb23882a28a5644da8503b3c2bf3ddea3c0b366cb30c5e04a"
       },
@@ -7774,9 +7532,9 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "3c1e6afa6264733b19e571295da7924901595715fa16bdb3e5d1ba6b38187cd9",
-        "declaration_hash": "f40b61de5b460b479f27596af25dde3717750796aae889f0200d56d2e61f8a50"
+        "declaration_hash": "dceba5a12384d13fca61d3fdf5a5b9ee0b1151550f344e394159e8b6f22e4144"
       },
       "obligation_id": {
         "entry_key": "ExpectedRustdocJsonPath",
@@ -7784,7 +7542,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            ExpectedRustdocJsonPath::try_new(escaped_path, &target),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );\n\nassert_eq!(\n            RustdocExecutionIdentity::new(\n                target,\n                CrateName::new(\"domain\").unwrap(),\n                vec![],\n                CargoProfileName::try_new(\"dev\".to_owned()).unwrap(),\n                expected,\n            ),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );",
+        "citation": "assert_eq!(\n            RustdocExecutionIdentity::new(\n                target,\n                CrateName::new(\"domain\").unwrap(),\n                vec![],\n                CargoProfileName::try_new(\"dev\".to_owned()).unwrap(),\n                expected,\n            ),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7805,9 +7563,9 @@
         "entry_key": "ExpectedRustdocJsonPath"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
         "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
-        "declaration_hash": "12ac2008b01518031d73b4352953090a2b71695230af1083491441cd3cc4e4a4"
+        "declaration_hash": "086b6ca3280a8eef5746c41d4b0076ea6b7b3c8086ea16653f023484832a0e99"
       },
       "obligation_id": {
         "entry_key": "ExpectedRustdocJsonPath",
@@ -7815,7 +7573,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7836,9 +7594,9 @@
         "entry_key": "ResolvedCargoTargetDirectory"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
         "bound_tests_set_hash": "9522f14b44aee42c9c6e0964566216c81681f3dea3afa628b39985dbc49e28e2",
-        "declaration_hash": "01abc116bb04385816c78be8471ee3185dda2921bc7203f4e8ba133d476129d4"
+        "declaration_hash": "25a25bcc49a47fbeb1d2423435887f7a54b08c60f019d5f5eaf70797d2f90e90"
       },
       "obligation_id": {
         "entry_key": "ResolvedCargoTargetDirectory",
@@ -7846,7 +7604,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),",
+        "citation": "execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7877,7 +7635,7 @@
         "entry_key": "RustdocExecutionIdentity"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "ce353153a9036100e8f7b6064499ded01023ac5da1ffb73cb3ad21d3065b5a0c",
         "declaration_hash": "322a1bdcb0167c43d4f9361fe26a74522c63bde149bd5c33b1a1e1ab440d5aff"
       },
@@ -7888,37 +7646,6 @@
       },
       "verdict": {
         "citation": "let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocExecutionIdentityError"
-      },
-      "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
-        "bound_tests_set_hash": "89e9ae2be19df8f005fc3547e05797ff7517d2c03970777e280a8a7386936e03",
-        "declaration_hash": "4cc96d4118f60d52281e0bb1ae39288767ad5d835cb48094432878590b152b35"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocExecutionIdentityError",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_eq!(\n            RustdocExecutionIdentity::new(\n                target,\n                CrateName::new(\"domain\").unwrap(),\n                vec![],\n                CargoProfileName::try_new(\"dev\".to_owned()).unwrap(),\n                expected,\n            ),\n            Err(RustdocExecutionIdentityError::ExpectedJsonOutsideTargetDirectory)\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7944,9 +7671,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "6500e78d6a2a70b31eba5e00b6ab8bfc1a3847db4663f57a91fd869037988194",
-        "declaration_hash": "98aeacfca21b80b7d132b91716bad1410369f472a0c0178f8fd12989acbfc6ff"
+        "declaration_hash": "75c60f4bf594ab0d4b1d30054527834d8c02da79801fc9016cbcd13d80eb5315"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -7954,7 +7681,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "citation": "// Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7980,9 +7707,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
         "bound_tests_set_hash": "6500e78d6a2a70b31eba5e00b6ab8bfc1a3847db4663f57a91fd869037988194",
-        "declaration_hash": "70941d8a38de5c12859067eaa89dc2654bb8f599a40a5b766a9bcd9125d021d9"
+        "declaration_hash": "1b17abb5644871f52d007c0bf96d6c6e87c8df295efca322a565b4e9387caf52"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -7990,7 +7717,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let recorded_key = cache_key(A, 'a', A);\n\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n    }\n{\n        let recorded_key = cache_key(A, 'a', A);\n        let changed_identities = [\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target/doc\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"other_crate\",\n                vec![],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![CargoFeatureName::try_new(\"serde\".to_owned()).unwrap()],\n                \"dev\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"release\",\n                \"doc/domain.json\",\n            ),\n            execution_identity_with_selection(\n                \"/tmp/sotohe-type-signals-target\",\n                \"domain\",\n                vec![],\n                \"dev\",\n                \"doc/other.json\",\n            ),\n        ];\n\n        for identity in changed_identities {\n            assert_eq!(\n                decide_type_signals_reuse(&verified_input(\n                    recorded_key.clone(),\n                    cache_key_with_rustdoc_inputs(\n                        A,\n                        'a',\n                        A,\n                        ImplementationFingerprint::new(digest(A)),\n                        ResolutionFingerprint::new(digest(B)),\n                        identity,\n                    ),\n                )),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'b', A),)),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(recorded_key.clone(), cache_key(A, 'a', B))),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Keep every other cache-key component equal to the recorded key: an\n        // implementation-input change alone invalidates reuse.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(B)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // A resolution-input change is independently sufficient to invalidate\n        // an otherwise matching cache entry.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key.clone(),\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(A)),\n                    execution_identity(),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        // Changing the rustdoc execution selection alone must also re-extract.\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(\n                recorded_key,\n                cache_key_with_rustdoc_inputs(\n                    A,\n                    'a',\n                    A,\n                    ImplementationFingerprint::new(digest(A)),\n                    ResolutionFingerprint::new(digest(B)),\n                    execution_identity_with_profile(\"release\"),\n                ),\n            )),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8011,9 +7738,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "e3ced130186f3185446166774b46f3cb25160e43587492c6519d7910fc2c05e5",
-        "declaration_hash": "0b3f946a39868d9730f2623475ce0a9adc0ed389158a2bf06b298d1c09a155da"
+        "declaration_hash": "700794874dff9883295093860d9bbef2a8d5756921e0d0f8f6894564148ff022"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
@@ -8021,7 +7748,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().head_commit().as_ref(), &B[..40]);\n        assert_eq!(document.cache_key().baseline_hash().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().implementation_fingerprint().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().resolution_fingerprint().as_digest().as_str(), B);\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().target_directory().as_path(),\n            Path::new(\"/tmp/sotohe-type-signals-target\")\n        );\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().crate_name().as_str(),\n            \"domain\"\n        );\n        assert!(document.cache_key().rustdoc_execution_identity().features().is_empty());\n        assert_eq!(document.cache_key().rustdoc_execution_identity().profile().as_str(), \"dev\");\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().expected_json_path().as_path(),\n            Path::new(\"/tmp/sotohe-type-signals-target/doc/domain.json\")\n        );",
+        "citation": "assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().implementation_fingerprint().as_digest().as_str(), A);\n        assert_eq!(document.cache_key().resolution_fingerprint().as_digest().as_str(), B);\n        assert_eq!(\n            document.cache_key().rustdoc_execution_identity().target_directory().as_path(),\n            Path::new(\"/tmp/sotohe-type-signals-target\")\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8052,9 +7779,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "195e4a9b644dfdd098f402d4b456c6042c4a4e5018af1b38d31f5a44282e51b5",
-        "declaration_hash": "78731ba1dc5a87b2312bf6be184963c2b071ae8f87d88c5dde42b7f21d365b07"
+        "declaration_hash": "93d83b462fd7d2637275e514a4ec491d45ac31fc1b2b328a76445bda2448347b"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
@@ -8093,9 +7820,9 @@
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
         "bound_tests_set_hash": "5f191d068792e7b1fcef58bdfa57f53bd4484efbe5f457a931a28a5aff66ddfb",
-        "declaration_hash": "24d9bebe356bd7f0b2225dc00758f911a746cec0bd01f4d8696782d43087a442"
+        "declaration_hash": "928d12e577bded9bbc289bdae9f412a388f6323511c234e0229beb62d1364c91"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
@@ -8103,7 +7830,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                worktree_status,\n                authority_status,\n            )\n            .as_ref()\n            .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse)",
+        "citation": "let decide_after_verification = |worktree_status, authority_status| {\n            TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                worktree_status,\n                authority_status,\n            )\n            .as_ref()\n            .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse)\n        };\n\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8119,6 +7846,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_codec_tests",
           "test_name": "test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec_tests",
+          "test_name": "test_decode_v5_document_without_new_fields_returns_unsupported_schema_error"
         }
       ],
       "edge_id": {
@@ -8129,9 +7861,9 @@
         "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
       },
       "key": {
-        "anchor_text_hash": "13a38960d2df03d76889a5106256fbbd31fd0af99f76c00dafc8d1eec2283334",
-        "bound_tests_set_hash": "f7e584e18cc3d4eac3f1fe1993aa2ff3ebfdbac46529452562672758493a1f29",
-        "declaration_hash": "fb6ad6adea058df90d8491ce978b8628452e3d102d2ee7ffacfab39b296bd071"
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "bound_tests_set_hash": "b26c33a95b9b77081249157622b24cbdb2f2d23d0f39f4236350df0715d2b184",
+        "declaration_hash": "f03f696ce84249573ecf1d7388c81d87e35d5e6bafb4e4ad6d723476c8229afc"
       },
       "obligation_id": {
         "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
@@ -8139,7 +7871,38 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        decode(&outside_target.to_string()),\n        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n    ));\n\n    assert!(matches!(\n        decode(&empty_profile.to_string()),\n        Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n    ));",
+        "citation": "assert!(\n            matches!(\n                decode(&payload.to_string()),\n                Err(TypeSignalsCodecError::InvalidExecutionIdentity(_))\n            ),\n            \"generated invalid {component:?} case {case} was accepted\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_carries_execution_identity_and_json_hash"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "bound_tests_set_hash": "4a038f890ee7c6576cfa2d29ae47d97a5d3ae8a6aa873bc206a23eae18d83a7a",
+        "declaration_hash": "18cc64ff2a10d0188febaad759bf5e046ee7acd540c8ad03909357c9ee07f322"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSnapshot",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let snapshot =\n            construct_rustdoc_snapshot(identity.clone(), &bytes, decode_rustdoc).unwrap();\n\n        assert_eq!(snapshot.execution_identity(), &identity);\n        assert_eq!(snapshot.json_hash(), &expected_hash);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8165,7 +7928,7 @@
         "entry_key": "RustdocJsonHash"
       },
       "key": {
-        "anchor_text_hash": "374de22953de09fee9744adad5f6bc07de77d5aef8b1abd6dc7634c951248c61",
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "bound_tests_set_hash": "3f8a77bbf710a33eaf7aa7fffe2507af5cf682e157b13bf015f7d08fe36e5a8a",
         "declaration_hash": "0cf402ada4797b8b78d2ec6ab3e8c8484121d9c0b73fbd507e908efa85339803"
       },
@@ -8248,7 +8011,7 @@
       "key": {
         "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
         "bound_tests_set_hash": "c018d19c93328299180a6f627e3a8d0031acf4ba6a23d2f2f5ba7de5b6b8b63d",
-        "declaration_hash": "6a7ba026f076042993d688aa424f10802d0e9f73202f74e9b2db81a7366e7f46"
+        "declaration_hash": "89692f2ee40bac8398bcbca780f29830a575bc349673c998348cb3905ce36021"
       },
       "obligation_id": {
         "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -8256,7 +8019,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before expected path selection\"\n                    );\n\nassert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before the first byte read\"\n                    );\n\nassert!(result.is_err(), \"a changed rustdoc output path must be rejected\");\n\nstd::fs::write(&output, b\"generation-b\").unwrap();\n        assert_eq!(snapshot.json_hash(), &original_hash);\n        assert_eq!(snapshot.crate_data().crate_version.as_deref(), Some(\"generation-a\"));\n        assert_ne!(std::fs::read(&output).unwrap(), first.as_bytes());",
+        "citation": "std::fs::write(&output, b\"generation-b\").unwrap();\n        assert_eq!(snapshot.json_hash(), &original_hash);\n        assert_eq!(snapshot.crate_data().crate_version.as_deref(), Some(\"generation-a\"));\n        assert_ne!(std::fs::read(&output).unwrap(), first.as_bytes());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8304,7 +8067,7 @@
       "key": {
         "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
         "bound_tests_set_hash": "a92549109bd0e1a6de332a95dbc245534581cd00691752d68876d31339e6f493",
-        "declaration_hash": "0100a60b5297d816c1957db05427b27a8e89cfec7df203a183dbe5d9829372ac"
+        "declaration_hash": "631110f2a012cd84de0afed449e3e24eac6ca370489372f8bf955ebb0538a883"
       },
       "obligation_id": {
         "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -8312,7 +8075,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(bytes, first.as_bytes());\nlet decoded: rustdoc_types::Crate = serde_json::from_slice(&bytes).unwrap();\nassert_eq!(decoded.crate_version.as_deref(), Some(\"generation-a\"));",
+        "citation": "assert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before expected path selection\"\n                    );\n\nassert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before the first byte read\"\n                    );\n\nassert_eq!(bytes, first.as_bytes());\n\nassert!(result.is_err(), \"a changed rustdoc output path must be rejected\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8360,7 +8123,7 @@
       "key": {
         "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
         "bound_tests_set_hash": "a92549109bd0e1a6de332a95dbc245534581cd00691752d68876d31339e6f493",
-        "declaration_hash": "fd0a51c3c5dd989e11d53e1544643abc5c39926252d6bc05d40f2e7f3e8f079a"
+        "declaration_hash": "8188d0312bcaf41b9a8e59f54db1d4c3b446afa1b20ccee55ba411c16ee08648"
       },
       "obligation_id": {
         "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -8368,7 +8131,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before expected path selection\"\n                    );\n\nassert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before the first byte read\"\n                    );\n\nassert!(result.is_err(), \"a changed rustdoc output path must be rejected\");\n\nassert_eq!(bytes, first.as_bytes());\nlet decoded: rustdoc_types::Crate = serde_json::from_slice(&bytes).unwrap();\nassert_eq!(decoded.crate_version.as_deref(), Some(\"generation-a\"));",
+        "citation": "assert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before expected path selection\"\n                    );\n\nassert!(\n                        contention.is_err(),\n                        \"a contender must be blocked before the first byte read\"\n                    );\n\nassert_eq!(bytes, first.as_bytes());\n\nassert!(result.is_err(), \"a changed rustdoc output path must be rejected\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8379,6 +8142,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
           "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_rustdoc_crate_adapter_lock_timeout_is_fail_closed_without_retry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
         },
         {
           "layer": "infrastructure",
@@ -8395,7 +8173,7 @@
       },
       "key": {
         "anchor_text_hash": "2b33c5753bacca9470ee03c51e459da56db19acd1317262f133e6c9405867c72",
-        "bound_tests_set_hash": "2ee9d955fa0c5092726717d0f3bd13a06cae03a67b80df2ffd6fe9c2938c550d",
+        "bound_tests_set_hash": "4c097bb3a91bd61acdf66c96a75464ec33acea90725e5386ac42322f1dda2f12",
         "declaration_hash": "492f92ac7db63c2b60c0f08eb81d67f47b8c4f84877c447afee5a77c53febe3b"
       },
       "obligation_id": {
@@ -8404,43 +8182,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n                        matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),\n                        \"lock-operation failure must fail closed: {error}\"\n                    );\n                    assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes());",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CO-04",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
-      },
-      "key": {
-        "anchor_text_hash": "4217634ea4cf456112ffc4d432e974427a25669ca2831daa547fa52b254b813e",
-        "bound_tests_set_hash": "ca99c0088d3f677d8fd0b760f603101734d3de26a4c40768fdbe780fdbf61aec",
-        "declaration_hash": "933919d9736e9b8c6f31a600087c94179960bff735c80f9fa6cadaf63a636c10"
-      },
-      "obligation_id": {
-        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
-        "item_identifier": "voluntary:CO-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert!(\n            matches!(err, RustdocCratePortError::AuthoritativeInput { .. }),\n            \"expected AuthoritativeInput (symlink workspace_root rejection), got: {err}\"\n        );",
+        "citation": "assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }), \"a lock timeout must fail closed at the adapter boundary: {error}\");\n                    assert!(\n                        error.to_string().contains(\"timed out\"),\n                        \"the adapter must preserve the bounded lock timeout: {error}\"\n                    );\n                    assert!(\n                        !invocations.exists(),\n                        \"a timed-out lock must not retry into rustdoc export\"\n                    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

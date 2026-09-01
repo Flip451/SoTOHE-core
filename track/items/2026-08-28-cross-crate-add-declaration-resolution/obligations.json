@@ -82,7 +82,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
-      "declaration_hash": "f1853103254211ee084b2b6787cc14a92469d22cb3b26a22beecfa70cf259ba6",
+      "declaration_hash": "df159f497c2c0be9276ac319b6058f791cc2ef9c2ce525a2e5e4cefd0f2c82b5",
       "id": {
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
         "item_identifier": "entry",
@@ -91,10 +91,6 @@
       "spec_refs": [
         {
           "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -274,7 +270,7 @@
     },
     {
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-      "declaration_hash": "679cdc72ee4ac530991b49fa3c0ff741477dba30f0fcdff04d0c8ed0f12d58cf",
+      "declaration_hash": "06c52880238d5cdfec568184b9c32f7eb3f47b52b7cfffd763c88aa54d032735",
       "id": {
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
         "item_identifier": "entry",
@@ -331,10 +327,6 @@
         },
         {
           "element_id": "IN-03",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "element_id": "CO-04",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {

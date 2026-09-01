@@ -80,6 +80,35 @@
           "hash": "rvw1:sha256:bbd9bcc4f5da805ca8f8bc6bbe4cbd60cf542f45601f378208c150c78a985eef",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T19:27:00Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md",
+              "line": 39,
+              "message": "D3 は実装 fingerprint を「保守的 over-approximation」と位置付けていますが、同じ段落で build-script の出力と proc-macro expansion を fingerprint から除外しています。これらは rustdoc JSON に影響し得るため、tracked workspace files・toolchain・metadata が同じでも生成結果が変わり、古い型シグナルを再利用できます。除外を維持するなら over-approximation／安全な再利用という決定を修正する必要があります。",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:125e98e52688290700a39507817649022c6cd4ff069700b658d7d9380cfeb645",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T19:33:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f0a56039eccbb28881a8fe18b0e47a477891a92dc79ebfb1b9bb5f373790a91",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T19:37:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f0a56039eccbb28881a8fe18b0e47a477891a92dc79ebfb1b9bb5f373790a91",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -554,6 +583,20 @@
           "at": "2026-08-31T16:03:09Z",
           "findings": [],
           "hash": "rvw1:sha256:14518e8ddf55f897a6386a5a416545b0ce563b2fb390c1f2dfec8287c4dfe3f1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:25:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22408acd99bf32f10ad194e4a945935bdd1494700b4238358e92cc69eeb76df9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:30:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22408acd99bf32f10ad194e4a945935bdd1494700b4238358e92cc69eeb76df9",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1474,6 +1517,85 @@
           "at": "2026-08-31T18:31:13Z",
           "findings": [],
           "hash": "rvw1:sha256:debc79ceb758dc16c0808379f89a7d490b8f5c3f93635655ee2b3014c9719d1c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T22:27:18Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 294,
+              "message": "T020 bundles two independently verifiable behavior units: nightly-selected cargo/rustc/rustdoc fingerprint capture and persisted schema-v6 admission/legacy-schema rejection. Split these into separate pre-implementation tasks, covering the fingerprint unit with IN-03/OS-04/CO-04/AC-04 and the schema-version unit with AC-04.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cebd140ae4ede8da5706433a099fbda06aa4a0c9edec9674f2b2ef08c64e0fc2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T22:32:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd1033c07f6dcb5f7227371e07d9f866eddf7aac7c5e2a4034c88c9454fa0ba6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T22:39:18Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 295,
+              "message": "T020 の変更対象は `libs/infrastructure/src/tddd/type_signals_evaluator.rs` だけですが、nightly-selected tool の解決・fingerprint 生成は `type_signals_evaluator/freshness.rs::rustdoc_input_fingerprint` と `type_signals_evaluator/environment_fingerprint.rs::append_actual_rustdoc_tool_identity` が所有しています。記載された対象だけでは操作を実行できないため、実際の対象ファイル／symbol を明記してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 304,
+              "message": "T021 は `libs/infrastructure/src/tddd/type_signals_codec.rs` で `TYPE_SIGNALS_SCHEMA_VERSION` を 5→6 にするとしていますが、定数の定義は `libs/domain/src/tddd/type_signals_doc.rs` にあり、codec はその値を参照するだけです。domain の定数と infrastructure の decode／test 境界をそれぞれ対象として明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dd1033c07f6dcb5f7227371e07d9f866eddf7aac7c5e2a4034c88c9454fa0ba6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T22:45:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:99fadd3a8b7614eee04aab91bb30184fb471047024daed510cc7a6d780cc5e23",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:23:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0e6e3021c0cf9dacb3deab02f63ce759e1867ff7e6f50950ca7dc729a4f159f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:28:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0e6e3021c0cf9dacb3deab02f63ce759e1867ff7e6f50950ca7dc729a4f159f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T05:13:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4cb54d792431bd1d4ad7b14bcce04463a182228c3323dfc8480311c87cdf788d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T05:15:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4cb54d792431bd1d4ad7b14bcce04463a182228c3323dfc8480311c87cdf788d",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3675,6 +3797,120 @@
           "hash": "rvw1:sha256:2f283954c8e9192abad43c8ca0469b4585fbfb0473b9e55329e09a3729797984",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:25:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0d1e527f705e6bb1d4fb89fa592aabd8ee64fd733f65551ef795000d6f2b6fb9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:37:33Z",
+          "findings": [
+            {
+              "category": "resource_limits",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 129,
+              "message": "`run_command_with_bounded_output` continues draining both pipes after `MAX_RUSTUP_WHICH_OUTPUT_BYTES` is exceeded and reports the excess only after the child exits. A chatty or hostile PATH-selected `rustup` can therefore cause unbounded I/O for up to 120 seconds, violating the briefing's bounded-resolution requirement and D4's fail-at-the-limit contract. Terminate the process group as soon as the byte budget is exceeded.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource_limits",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 116,
+              "message": "The nightly tool snapshots are not charged against the fingerprint's shared 512 MiB total-byte/file-count budget. A workspace already at the limit can still read three additional tool files of up to 64 MiB each, plus resolution output, even though D4 explicitly applies the aggregate limits to nightly tool resolution and content snapshots. Pass the shared budget through this path and fail closed before exceeding it.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 3051,
+              "message": "The common evaluator test fixtures still call `rustdoc_input_fingerprint` through the host PATH without installing the new fake `rustup`. Consequently, tests such as the clean-cache reuse test fail at this `unwrap()` on a stable-only machine where nightly is not installed. The standard all-features test suite must not require nightly; install the shim in the common fixture or inject the resolver.",
+              "severity": "P1"
+            },
+            {
+              "category": "undeclared_environment_assumption",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 132,
+              "message": "未宣言の前提への依存: nightly resolution now assumes each `rustup which` invocation completes within 120 seconds. The spec declares 120 seconds for rustdoc execution/locking, not tool resolution, while the consumer-owned environment-assumption resource-limit declaration remains TODO. Declare this cutoff, its per-invocation/aggregate scope, and failure behavior before relying on it.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:0d1e527f705e6bb1d4fb89fa592aabd8ee64fd733f65551ef795000d6f2b6fb9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T04:19:48Z",
+          "findings": [
+            {
+              "category": "resource_limits",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 233,
+              "message": "`MAX_CARGO_METADATA_OUTPUT_BYTES` does not bound actual I/O on this path. `run_command_with_bounded_output` retains only the first 16 MiB per stream but continues draining until EOF and reports the overflow only after the child exits. A PATH-selected `cargo` can therefore stream unbounded data for up to 120 seconds, contrary to D4's requirement to fail when the limit is reached. Use an early-terminating bounded runner for metadata.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource_limits",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 362,
+              "message": "Workspace bytes are charged during directory discovery, but the later file read never reconciles that reservation with the fresh metadata or actual byte length. A file can grow after line 362 and remain stable during lines 174–191; the fingerprint then reads and accepts the larger content while charging only its old size, allowing actual I/O to exceed the 512 MiB aggregate limit. Charge the immediate pre-read size or reject any discovery-to-read generation/length change.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource_limits",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 350,
+              "message": "Nightly-resolution output is charged to `FingerprintBudget` only after both collectors have read up to 16 MiB each. When earlier inputs leave less than 32 MiB in the aggregate budget, this invocation can consume bytes beyond the 512 MiB cap before `reserve_bytes` rejects it. Pass the remaining shared budget into the collectors and enforce it across stdout and stderr while reading.",
+              "severity": "P1"
+            },
+            {
+              "category": "panic_able_adapter",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 260,
+              "message": "`thread::spawn` panics when the OS cannot create an output-reader thread. That turns process-resource exhaustion at this production adapter boundary into a panic instead of the required typed AuthoritativeInput failure, and may leave the already-started child running. Use `thread::Builder::spawn`, propagate its error, and terminate/reap the child if either reader cannot start.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b16a85e70735f0c6211c15bfb769bbe9932a18b2e1a2394e278da1db6d4a68b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T04:51:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9fbe97d89c0ab98101ad361346073c691bff706e0dee3d66d1cba05fa2c75e24",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T05:11:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12e2e90d740640a90250b93b083970d65dc3b2c240837436e114bafa3116eac4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T05:43:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:305899fc71b4bf2456300011ce065c3e0603fe3a16a8da3957a3adea680957be",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T06:08:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ecb5f7edf7f6d2bd960d0d6ab859d2b1a0d54d378818ce54ccfee4d0ced93d09",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T06:30:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4551e7e5c9c0ee824fbd5e45b00a4642f6bf1f684457967f8a78f61fc9a6a008",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4388,6 +4624,65 @@
           "hash": "rvw1:sha256:b45e897e390b6403be52475eefcc7367a8bfa6b8027c1e81322f2d9420d2e517",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:24:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:661e5d34531f229b4bdb0e88a422545af06b678a9b38878dc53982e7aed56b6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:31:55Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2082,
+              "message": "The newly cited test can pass without checking lock ownership during export. If its export-started barrier is not observed within two seconds, the test releases the exporter, verifies only eventual startup/success, and returns before attempting the competing lock acquisition. Slow scheduling can therefore let the IN-07, CO-07, and AC-06 bindings pass without proving that the same lock remains held through export. Make that timeout path fail after cleanup or use deterministic synchronization before citing this test for these edges.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:661e5d34531f229b4bdb0e88a422545af06b678a9b38878dc53982e7aed56b6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T01:47:56Z",
+          "findings": [
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2064,
+              "message": "The current bindings no longer satisfy the claimed green obligation gate. `bin/sotp test-obligation check` fails with `TestChanged` drift for the RustdocSchemaExporter IN-07, CO-07, and AC-06 edges because their bound test sets no longer match the frozen verdicts. Re-evaluate/regenerate those verdicts, or restore matching bindings, before approval.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d53563b3aaad17aef193ec74e70f43ce5aa0bfe3f2c4b5f1a8a217e5e3b4c693",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T04:14:48Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 529,
+              "message": "This bound test does not actually prove that all three nightly-selected tool contents participate in the fingerprint. It changes `cargo`, then `rustc`, then `rustdoc` cumulatively and compares every result with the original fingerprint; after `cargo` changes, the later assertions still pass even if `rustc` and `rustdoc` contents are ignored. Because IN-03/AC-04 explicitly require content fingerprints for each selected tool, reset the prior tool after each case or compare independent single-tool mutations against a fresh baseline before using this as fulfillment evidence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:43a57a27ebd1de6c58e6db3b47ac6725e68f6729707220bd492816fe64422f72",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T05:10:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:43a57a27ebd1de6c58e6db3b47ac6725e68f6729707220bd492816fe64422f72",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4490,6 +4785,42 @@
           "at": "2026-08-31T03:46:16Z",
           "findings": [],
           "hash": "rvw1:sha256:5948ea6477a381041f3b3643e1abc04dac1db702ed17bf7cb4cbf66be992d64e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T19:41:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e7ca8842afdee44a7d8325c2ab450e88cc661ff653e0bf9bdc77f5f960db2a4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T19:48:15Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+              "line": 213,
+              "message": "GO-01 は「保守的 implementation fingerprint」を目標として残していますが、引用先 D3 は今回その位置付けを削除し、fingerprint を列挙済みの記録 identity に限定したうえで include graph、build-script 入出力、proc-macro expansion を範囲外と明記しています。したがって「保守的」が Cargo の意味入力に対して何を保証するのかを支える決定がなく、goal が ADR の決定空間を越えています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e7ca8842afdee44a7d8325c2ab450e88cc661ff653e0bf9bdc77f5f960db2a4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T19:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca4b466a96c9cffcdaace56ac1268e5dbbaafced6f417621deea4efc8de366b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T20:01:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca4b466a96c9cffcdaace56ac1268e5dbbaafced6f417621deea4efc8de366b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -5366,6 +5697,218 @@
           "at": "2026-08-31T16:15:01Z",
           "findings": [],
           "hash": "rvw1:sha256:68664df143fcb2609b59af0ae1ef7eed723facd22b3bbbdd902035d9693eb13e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T20:39:02Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1654,
+              "message": "`ImplementationFingerprint` の `docs` が spec/ADR の fingerprint 範囲・除外対象・fail-closed 挙動を散文で再記述しています。`IN-03`/`CO-04`/`AC-04` への anchor cite と変更対象の簡潔な説明だけにしてください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2026,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsCacheKey` の `docs` が cache 再利用条件と fingerprint の意味を上流契約として再記述しています。anchor cite を残し、挙動契約の本文を削除してください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2296,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsDocument` の `docs` が fail-closed reuse の上流挙動を再記述しています。変更対象と `IN-03`/`AC-04` 等の anchor cite に縮約してください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2536,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsReuseInput` の `docs` が authority snapshot 不足時の禁止事項と stale/partial fallback の契約を再記述しています。上流 anchor の参照だけにしてください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 6,
+              "message": "`infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer` の `docs` が fingerprint 構成、除外範囲、入力失敗時の fail-closed 挙動を spec/ADR から再記述しています。変更対象と anchor cite のみに縮約してください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 498,
+              "message": "`infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError` の `docs` が `AuthoritativeInput` の構築責務と失敗時の禁止事項を上流契約として再記述しています。挙動本文ではなく anchor cite で参照してください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 185,
+              "message": "`infrastructure::schema_export::RustdocSchemaExporter` の `docs` が legacy compatibility surface と typed path の設計理由を catalogue docs に散文で追加しています。上流で定義された契約は anchor cite で参照し、docs は変更対象の簡潔な記述にしてください。",
+              "severity": "medium"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 105,
+              "message": "`SchemaExporterPort` の `docs` が legacy `crate_name` と typed `CrateName` の使い分け・設計理由を下流 catalogue に再記述しています。上流契約の再説明を削除し、anchor cite に縮約してください。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:96735ab33090e2ed3596c2eff16e75ecce02134cc7f37fb767114a3083a54834",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T21:05:57Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1654,
+              "message": "`ImplementationFingerprint` の `docs` が D3/D4 の fingerprint 範囲、除外対象、失敗時の fail-closed 契約を散文で再記述しています。変更対象と anchor cite のみに縮約してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2026,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsCacheKey` の `docs` が完全な cache identity と clean-worktree reuse 条件を AC-04 から再記述しています。upstream 挙動は anchor cite で参照してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2296,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsDocument` の `docs` が implementation identity と rustdoc execution selection を含む fail-closed reuse 契約を再記述しています。変更対象と anchor cite に縮約してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 2536,
+              "message": "`domain::tddd::type_signals_doc::TypeSignalsReuseInput` の `docs` が authority snapshot 不足時の partial/stale fallback 禁止を再記述しています。upstream 契約の本文ではなく anchor cite を残してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 6,
+              "message": "`infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer` の `docs` が fingerprint 構成、除外範囲、入力失敗時の fail-closed 挙動を spec/ADR から再記述しています。変更対象と anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 498,
+              "message": "`infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError` の `docs` が `AuthoritativeInput` の enforcement owner と失敗時の fallback 禁止を再記述しています。短い error 識別句と anchor cite に縮約してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f4e0db6bd3939d2d3efd93e85456c793eb70b2c8e005801ac34bcd3301e87b3c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-31T21:08:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4e0db6bd3939d2d3efd93e85456c793eb70b2c8e005801ac34bcd3301e87b3c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T21:18:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4e0db6bd3939d2d3efd93e85456c793eb70b2c8e005801ac34bcd3301e87b3c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T21:34:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18edb008df40d90708b19b941ed61fcb545e6b852b55c74921bc18b299538a2b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T21:41:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18edb008df40d90708b19b941ed61fcb545e6b852b55c74921bc18b299538a2b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T22:08:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1306356cde2f8c9d1bf85b62bec8e971886a13d953a847f462643c083e3aa622",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-31T22:14:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1306356cde2f8c9d1bf85b62bec8e971886a13d953a847f462643c083e3aa622",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T00:33:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56cab0186e6e95e8886d44ee1f01418a2ed8f4ad1d423ea33fc92887a675d8ea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T00:37:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56cab0186e6e95e8886d44ee1f01418a2ed8f4ad1d423ea33fc92887a675d8ea",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T00:57:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d360b165475bbd56f7c2a0442b38bf6920627190600dc93dbc6e667443c77af",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T01:00:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d360b165475bbd56f7c2a0442b38bf6920627190600dc93dbc6e667443c77af",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T03:36:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af2df94b7926a0706e9b1cb1c42193ac5df6d774d39ddb9cc0bce33a4252f85c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T03:39:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af2df94b7926a0706e9b1cb1c42193ac5df6d774d39ddb9cc0bce33a4252f85c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T03:58:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a41425853c400093c84f0920cbf07e17b60cea882a42acae7fcad8d68591b2b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T04:02:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a41425853c400093c84f0920cbf07e17b60cea882a42acae7fcad8d68591b2b9",
           "type": "final",
           "verdict": "zero_findings"
         }

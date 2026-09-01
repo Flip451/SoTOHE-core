@@ -4,7 +4,6 @@ use std::ffi::OsStr;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::time::Duration;
 
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, RustdocCratePortError};
@@ -62,6 +61,55 @@ const MAX_RUSTDOC_INPUT_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_RUSTDOC_INPUT_PATH_BYTES: usize = 16 * 1024;
 const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const RUSTDOC_INPUT_FINGERPRINT_VERSION: &[u8] = b"sotohe-rustdoc-input-fingerprint-v3\0";
+
+#[derive(Default)]
+struct FingerprintBudget {
+    files: usize,
+    total_bytes: u64,
+}
+
+impl FingerprintBudget {
+    fn reserve_file_count(&mut self) -> Result<(), RustdocInputFingerprintError> {
+        let files = self
+            .files
+            .checked_add(1)
+            .ok_or(RustdocInputFingerprintError::FileCount { maximum: MAX_RUSTDOC_INPUT_FILES })?;
+        if files > MAX_RUSTDOC_INPUT_FILES {
+            return Err(RustdocInputFingerprintError::FileCount {
+                maximum: MAX_RUSTDOC_INPUT_FILES,
+            });
+        }
+        self.files = files;
+        Ok(())
+    }
+
+    fn reserve_file(&mut self, bytes: u64) -> Result<(), RustdocInputFingerprintError> {
+        self.reserve_file_count()?;
+        self.reserve_bytes(bytes)?;
+        Ok(())
+    }
+
+    fn remaining_bytes(&self) -> u64 {
+        MAX_RUSTDOC_INPUT_TOTAL_BYTES.saturating_sub(self.total_bytes)
+    }
+
+    fn reserve_bytes(&mut self, bytes: u64) -> Result<(), RustdocInputFingerprintError> {
+        let total_bytes = self.total_bytes.checked_add(bytes).ok_or(
+            RustdocInputFingerprintError::TotalBytes {
+                bytes: u64::MAX,
+                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+            },
+        )?;
+        if total_bytes > MAX_RUSTDOC_INPUT_TOTAL_BYTES {
+            return Err(RustdocInputFingerprintError::TotalBytes {
+                bytes: total_bytes,
+                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+            });
+        }
+        self.total_bytes = total_bytes;
+        Ok(())
+    }
+}
 
 /// A bounded fingerprint failure. No partial digest is returned for any case.
 #[derive(Debug)]
@@ -122,23 +170,34 @@ impl std::fmt::Display for RustdocInputFingerprintError {
 pub(crate) fn rustdoc_input_fingerprint(
     workspace_root: &Path,
 ) -> Result<String, RustdocInputFingerprintError> {
-    let cargo_inputs = validate_authoritative_cargo_inputs(workspace_root)?;
-    let paths = collect_rustdoc_input_paths(workspace_root, &cargo_inputs.target_directory)?;
+    let mut budget = FingerprintBudget::default();
+    let cargo_inputs = validate_authoritative_cargo_inputs(workspace_root, &mut budget)?;
+    let paths =
+        collect_rustdoc_input_paths(workspace_root, &cargo_inputs.target_directory, &mut budget)?;
     let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
     append_len_prefixed_bytes(&mut canonical, b"cargo-metadata-no-deps-locked");
     append_len_prefixed_bytes(&mut canonical, &cargo_inputs.metadata_bytes);
-    let mut total_bytes = 0_u64;
-    for path in paths {
+    for input in paths {
+        let path = input.path;
         let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
         let metadata = std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
         if metadata.file_type().is_symlink() || !metadata.is_file() {
             return Err(RustdocInputFingerprintError::Symlink { path });
         }
         check_file_size(&path, metadata.len())?;
+        if metadata.len() != input.discovered_bytes
+            || metadata_generation(&metadata) != input.discovered_generation
+        {
+            return Err(io_error(
+                &path,
+                Error::other("rustdoc input changed between discovery and fingerprint read"),
+            ));
+        }
+        budget.reserve_bytes(metadata.len())?;
         let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
             &path,
             Some(workspace_root),
-            MAX_RUSTDOC_INPUT_FILE_BYTES,
+            metadata.len(),
         )
         .map_err(|error| io_error(&path, error))?
         .ok_or_else(|| io_error(&path, Error::new(ErrorKind::NotFound, "input disappeared")))?;
@@ -154,28 +213,26 @@ pub(crate) fn rustdoc_input_fingerprint(
                 Error::other("rustdoc input changed while fingerprinting"),
             ));
         }
-        total_bytes = total_bytes.checked_add(bytes.len() as u64).ok_or(
-            RustdocInputFingerprintError::TotalBytes {
-                bytes: u64::MAX,
-                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
-            },
-        )?;
-        if total_bytes > MAX_RUSTDOC_INPUT_TOTAL_BYTES {
-            return Err(RustdocInputFingerprintError::TotalBytes {
-                bytes: total_bytes,
-                maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
-            });
-        }
         append_len_prefixed_bytes(&mut canonical, &path_bytes(relative));
         append_len_prefixed_bytes(&mut canonical, &sha256_bytes(&bytes));
     }
-    environment_fingerprint::append_environment_identity(&mut canonical, workspace_root)?;
+    environment_fingerprint::append_environment_identity(
+        &mut canonical,
+        workspace_root,
+        &mut budget,
+    )?;
     Ok(hex_digest(&sha256_bytes(&canonical)))
 }
 
 struct AuthoritativeCargoInputs {
     target_directory: PathBuf,
     metadata_bytes: Vec<u8>,
+}
+
+struct RustdocInputPath {
+    path: PathBuf,
+    discovered_generation: Vec<u8>,
+    discovered_bytes: u64,
 }
 
 /// Captures Cargo's ordered metadata result and the target directory used by
@@ -185,6 +242,7 @@ struct AuthoritativeCargoInputs {
 /// build-script I/O.
 fn validate_authoritative_cargo_inputs(
     workspace_root: &Path,
+    budget: &mut FingerprintBudget,
 ) -> Result<AuthoritativeCargoInputs, RustdocInputFingerprintError> {
     let manifest = workspace_root.join("Cargo.toml");
     let manifest_metadata =
@@ -196,13 +254,19 @@ fn validate_authoritative_cargo_inputs(
     command
         .args(["metadata", "--format-version", "1", "--no-deps", "--locked"])
         .current_dir(workspace_root);
-    let output = crate::capability_exec::process::run_command_with_bounded_output(
+    let output = environment_fingerprint::run_cargo_metadata_with_early_bounded_output(
         &mut command,
         MAX_CARGO_METADATA_OUTPUT_BYTES,
-        Duration::from_secs(120),
-        "cargo metadata for rustdoc input validation",
+        budget.remaining_bytes(),
     )
     .map_err(|error| io_error(workspace_root, Error::other(error.to_string())))?;
+    let output_bytes = output.stdout.len().checked_add(output.stderr.len()).ok_or(
+        RustdocInputFingerprintError::TotalBytes {
+            bytes: u64::MAX,
+            maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
+        },
+    )?;
+    budget.reserve_bytes(output_bytes as u64)?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(io_error(
@@ -241,7 +305,8 @@ fn validate_authoritative_cargo_inputs(
 fn collect_rustdoc_input_paths(
     workspace_root: &Path,
     cargo_target_dir: &Path,
-) -> Result<Vec<PathBuf>, RustdocInputFingerprintError> {
+    budget: &mut FingerprintBudget,
+) -> Result<Vec<RustdocInputPath>, RustdocInputFingerprintError> {
     let mut paths = Vec::new();
     walk_rustdoc_inputs(
         workspace_root,
@@ -249,17 +314,18 @@ fn collect_rustdoc_input_paths(
         workspace_root,
         0,
         &mut WalkState::default(),
+        budget,
         &mut paths,
     )?;
-    paths.sort_by_key(|path| path_bytes(path.strip_prefix(workspace_root).unwrap_or(path)));
+    paths.sort_by_key(|input| {
+        path_bytes(input.path.strip_prefix(workspace_root).unwrap_or(&input.path))
+    });
     Ok(paths)
 }
 
 #[derive(Default)]
 struct WalkState {
     entries: usize,
-    files: usize,
-    total_bytes: u64,
 }
 
 fn walk_rustdoc_inputs(
@@ -268,7 +334,8 @@ fn walk_rustdoc_inputs(
     directory: &Path,
     depth: usize,
     state: &mut WalkState,
-    paths: &mut Vec<PathBuf>,
+    budget: &mut FingerprintBudget,
+    paths: &mut Vec<RustdocInputPath>,
 ) -> Result<(), RustdocInputFingerprintError> {
     let entries = std::fs::read_dir(directory).map_err(|error| io_error(directory, error))?;
     for entry in entries {
@@ -291,7 +358,15 @@ fn walk_rustdoc_inputs(
                     maximum: MAX_RUSTDOC_INPUT_DEPTH,
                 });
             }
-            walk_rustdoc_inputs(workspace_root, cargo_target_dir, &path, depth + 1, state, paths)?;
+            walk_rustdoc_inputs(
+                workspace_root,
+                cargo_target_dir,
+                &path,
+                depth + 1,
+                state,
+                budget,
+                paths,
+            )?;
         } else if file_type.is_symlink() {
             if !is_excluded_rustdoc_directory(workspace_root, cargo_target_dir, &path) {
                 return Err(RustdocInputFingerprintError::Symlink { path });
@@ -309,25 +384,12 @@ fn walk_rustdoc_inputs(
                 });
             }
             check_file_size(&path, metadata.len())?;
-            state.files = state.files.saturating_add(1);
-            if state.files > MAX_RUSTDOC_INPUT_FILES {
-                return Err(RustdocInputFingerprintError::FileCount {
-                    maximum: MAX_RUSTDOC_INPUT_FILES,
-                });
-            }
-            state.total_bytes = state.total_bytes.checked_add(metadata.len()).ok_or(
-                RustdocInputFingerprintError::TotalBytes {
-                    bytes: u64::MAX,
-                    maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
-                },
-            )?;
-            if state.total_bytes > MAX_RUSTDOC_INPUT_TOTAL_BYTES {
-                return Err(RustdocInputFingerprintError::TotalBytes {
-                    bytes: state.total_bytes,
-                    maximum: MAX_RUSTDOC_INPUT_TOTAL_BYTES,
-                });
-            }
-            paths.push(path);
+            budget.reserve_file_count()?;
+            paths.push(RustdocInputPath {
+                discovered_generation: metadata_generation(&metadata),
+                discovered_bytes: metadata.len(),
+                path,
+            });
         } else {
             return Err(io_error(&path, Error::other("rustdoc input is not a regular file")));
         }

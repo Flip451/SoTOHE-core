@@ -437,6 +437,70 @@ mod tests {
     #[cfg(unix)]
     use temp_env;
 
+    #[cfg(unix)]
+    fn write_test_executable(path: &Path, contents: &str) {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        std::fs::write(path, contents).unwrap();
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn write_test_rustup(commands: &Path) {
+        write_test_executable(
+            &commands.join("rustup"),
+            r#"#!/bin/sh
+if [ "$1" = "run" ] && [ "$2" = "nightly" ] && [ "$3" = "rustc" ]; then
+    exit 0
+fi
+if [ "$1" = "which" ] && [ "$2" = "--toolchain" ] && [ "$3" = "nightly" ]; then
+    case "$4" in
+        cargo|rustc|rustdoc)
+            toolchain="${SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR:-$(dirname "$0")}"
+            printf '%s/%s\n' "$toolchain" "$4"
+            exit 0
+            ;;
+    esac
+fi
+exit 1
+"#,
+        );
+    }
+
+    #[cfg(unix)]
+    fn write_metadata_test_toolchain(commands: &Path) {
+        write_test_executable(
+            &commands.join("cargo"),
+            "#!/bin/sh\nexec /bin/cat \"$SOTOHE_TEST_CARGO_METADATA\"\n",
+        );
+        write_test_executable(&commands.join("rustc"), "#!/bin/sh\nexit 0\n");
+        write_test_executable(&commands.join("rustdoc"), "#!/bin/sh\nexit 0\n");
+        write_test_rustup(commands);
+    }
+
+    #[cfg(unix)]
+    fn prepend_test_command_path(commands: &Path) -> std::ffi::OsString {
+        let mut entries = vec![commands.to_path_buf()];
+        entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        std::env::join_paths(entries).unwrap()
+    }
+
+    #[cfg(unix)]
+    fn write_metadata_fixture(metadata_path: &Path, target_directory: &Path) {
+        std::fs::write(
+            metadata_path,
+            serde_json::json!({
+                "packages": [{
+                    "name": "lockfail",
+                    "targets": [{"kind": ["lib"], "name": "lockfail"}]
+                }],
+                "target_directory": target_directory,
+            })
+            .to_string(),
+        )
+        .unwrap();
+    }
+
     #[test]
     fn test_load_from_path_nonexistent_file_returns_not_found() {
         let adapter = RustdocCrateAdapter::new(PathBuf::from("."));
@@ -715,21 +779,22 @@ mod tests {
         let target = workspace.path().join("target-area");
         let commands = workspace.path().join("commands");
         std::fs::create_dir_all(&commands).unwrap();
-        let rustup = commands.join("rustup");
-        std::fs::write(&rustup, b"#!/bin/sh\nexit 0\n").unwrap();
-        use std::os::unix::fs::PermissionsExt as _;
-        std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &target);
 
         let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
         let crate_name = CrateName::new("lockfail").unwrap();
 
         crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            let mut path_entries = vec![commands];
-            path_entries
-                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
-            let path = std::env::join_paths(path_entries).unwrap();
+            let path = prepend_test_command_path(&commands);
             temp_env::with_vars(
-                [("CARGO_TARGET_DIR", Some(target.as_os_str())), ("PATH", Some(path.as_os_str()))],
+                [
+                    ("CARGO_TARGET_DIR", Some(target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
                 || {
                     let exporter = RustdocSchemaExporter::new(workspace.path().to_path_buf());
                     let (identity, expected_path) =
@@ -749,6 +814,84 @@ mod tests {
                         "lock-operation failure must fail closed: {error}"
                     );
                     assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes());
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_rustdoc_crate_adapter_lock_timeout_is_fail_closed_without_retry() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::time::Duration;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, adapter, crate_name) = lockfail_workspace();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            write_metadata_test_toolchain(&commands);
+
+            let target_directory = workspace.path().join("cargo-target");
+            let metadata_path = workspace.path().join("metadata.json");
+            std::fs::write(
+                &metadata_path,
+                serde_json::json!({
+                    "packages": [{
+                        "name": "lockfail",
+                        "targets": [{"kind": ["lib"], "name": "lockfail"}]
+                    }],
+                    "target_directory": target_directory,
+                })
+                .to_string(),
+            )
+            .unwrap();
+            let invocations = workspace.path().join("rustdoc-invocations");
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                b"#!/bin/sh\nif [ \"$1\" = \"metadata\" ]; then cat \"$SOTOHE_TEST_CARGO_METADATA\"; exit 0; fi\n: > \"$SOTOHE_TEST_ADAPTER_INVOCATIONS\"\nexit 1\n",
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                    ("SOTOHE_TEST_ADAPTER_INVOCATIONS", Some(invocations.as_os_str())),
+                    (
+                        "SOTOHE_TEST_RUSTDOC_OUTPUT_LOCK_TIMEOUT_MS",
+                        Some(std::ffi::OsStr::new("25")),
+                    ),
+                ],
+                || {
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let selection = identity.target_directory().as_path().to_path_buf();
+                    let held = RustdocOutputLock::acquire(&selection).unwrap();
+
+                    assert_eq!(
+                        crate::tddd::rustdoc_output_lock::RUSTDOC_OUTPUT_LOCK_TIMEOUT,
+                        Duration::from_secs(120),
+                        "the adapter lock policy must remain bounded at 120 seconds"
+                    );
+
+                    let error = adapter.capture_current(&crate_name, &[]).unwrap_err();
+                    assert!(
+                        matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
+                        "a lock timeout must fail closed at the adapter boundary: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("timed out"),
+                        "the adapter must preserve the bounded lock timeout: {error}"
+                    );
+                    assert!(
+                        !invocations.exists(),
+                        "a timed-out lock must not retry into rustdoc export"
+                    );
+                    drop(held);
                 },
             );
         });
@@ -871,20 +1014,18 @@ mod tests {
         let cargo_target = workspace.path().join("cargo-target");
         let commands = workspace.path().join("commands");
         std::fs::create_dir_all(&commands).unwrap();
-        let rustup = commands.join("rustup");
-        std::fs::write(&rustup, b"#!/bin/sh\nexit 0\n").unwrap();
-        use std::os::unix::fs::PermissionsExt as _;
-        std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &cargo_target);
 
         crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            let mut path_entries = vec![commands];
-            path_entries
-                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
-            let path = std::env::join_paths(path_entries).unwrap();
+            let path = prepend_test_command_path(&commands);
             temp_env::with_vars(
                 [
                     ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
                     ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
                 ],
                 || {
                     let valid_identity = adapter.execution_identity(&crate_name, &[]).unwrap();
@@ -988,24 +1129,41 @@ mod tests {
     fn test_execution_identity_owns_exclusive_sotp_rustdoc_target() {
         let (workspace, adapter, crate_name) = lockfail_workspace();
         let cargo_target = workspace.path().join("cargo-target");
+        let commands = workspace.path().join("commands");
+        std::fs::create_dir_all(&commands).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &cargo_target);
         crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
-                let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
-                let exclusive = identity.target_directory().as_path();
-                assert!(
-                    exclusive.starts_with(cargo_target.join(".sotp-rustdoc")),
-                    "cooperative writers must own a private .sotp-rustdoc subtree: {}",
-                    exclusive.display()
-                );
-                assert!(
-                    identity.expected_json_path().as_path().starts_with(exclusive),
-                    "expected rustdoc JSON must stay inside the exclusive target"
-                );
-                assert!(
-                    !identity.expected_json_path().as_path().starts_with(cargo_target.join("doc")),
-                    "the shared Cargo rustdoc directory must not be authoritative"
-                );
-            });
+            let path = prepend_test_command_path(&commands);
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path();
+                    assert!(
+                        exclusive.starts_with(cargo_target.join(".sotp-rustdoc")),
+                        "cooperative writers must own a private .sotp-rustdoc subtree: {}",
+                        exclusive.display()
+                    );
+                    assert!(
+                        identity.expected_json_path().as_path().starts_with(exclusive),
+                        "expected rustdoc JSON must stay inside the exclusive target"
+                    );
+                    assert!(
+                        !identity
+                            .expected_json_path()
+                            .as_path()
+                            .starts_with(cargo_target.join("doc")),
+                        "the shared Cargo rustdoc directory must not be authoritative"
+                    );
+                },
+            );
         });
     }
 
@@ -1014,22 +1172,36 @@ mod tests {
     fn test_non_cooperative_parent_cargo_target_json_is_not_authoritative() {
         let (workspace, adapter, crate_name) = lockfail_workspace();
         let cargo_target = workspace.path().join("cargo-target");
+        let commands = workspace.path().join("commands");
+        std::fs::create_dir_all(&commands).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &cargo_target);
         crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
-                let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
-                let shared_json = cargo_target.join("doc").join("lockfail.json");
-                std::fs::create_dir_all(shared_json.parent().unwrap()).unwrap();
-                std::fs::write(&shared_json, b"non-cooperative-writer").unwrap();
-                assert_ne!(
-                    identity.expected_json_path().as_path(),
-                    shared_json.as_path(),
-                    "JSON written outside the exclusive lock boundary must not be the expected output"
-                );
-                crate::schema_export::require_exclusive_rustdoc_target(
-                    identity.target_directory().as_path(),
-                )
-                .unwrap();
-            });
+            let path = prepend_test_command_path(&commands);
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let shared_json = cargo_target.join("doc").join("lockfail.json");
+                    std::fs::create_dir_all(shared_json.parent().unwrap()).unwrap();
+                    std::fs::write(&shared_json, b"non-cooperative-writer").unwrap();
+                    assert_ne!(
+                        identity.expected_json_path().as_path(),
+                        shared_json.as_path(),
+                        "JSON written outside the exclusive lock boundary must not be the expected output"
+                    );
+                    crate::schema_export::require_exclusive_rustdoc_target(
+                        identity.target_directory().as_path(),
+                    )
+                    .unwrap();
+                },
+            );
         });
     }
 
@@ -1040,33 +1212,47 @@ mod tests {
 
         let (workspace, adapter, crate_name) = lockfail_workspace();
         let cargo_target = workspace.path().join("cargo-target");
+        let commands = workspace.path().join("commands");
+        std::fs::create_dir_all(&commands).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &cargo_target);
         crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            temp_env::with_vars([("CARGO_TARGET_DIR", Some(cargo_target.as_os_str()))], || {
-                let first = adapter.execution_identity(&crate_name, &[]).unwrap();
-                let second = adapter.execution_identity(&crate_name, &[]).unwrap();
-                assert_eq!(
-                    first.target_directory(),
-                    second.target_directory(),
-                    "cooperative writers for one selection must share the exclusive target"
-                );
-                let exclusive = first.target_directory().as_path().to_path_buf();
-                let held = RustdocOutputLock::acquire(&exclusive).unwrap();
-                let contender = exclusive.clone();
-                let contention = std::thread::spawn(move || {
-                    crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
-                        &contender,
-                        Duration::from_millis(25),
-                    )
-                })
-                .join()
-                .unwrap()
-                .unwrap_err();
-                assert!(
-                    contention.to_string().contains("timed out"),
-                    "cooperative writers must serialize through the exclusive lock: {contention}"
-                );
-                drop(held);
-            });
+            let path = prepend_test_command_path(&commands);
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let first = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let second = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    assert_eq!(
+                        first.target_directory(),
+                        second.target_directory(),
+                        "cooperative writers for one selection must share the exclusive target"
+                    );
+                    let exclusive = first.target_directory().as_path().to_path_buf();
+                    let held = RustdocOutputLock::acquire(&exclusive).unwrap();
+                    let contender = exclusive.clone();
+                    let contention = std::thread::spawn(move || {
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
+                            &contender,
+                            Duration::from_millis(25),
+                        )
+                    })
+                    .join()
+                    .unwrap()
+                    .unwrap_err();
+                    assert!(
+                        contention.to_string().contains("timed out"),
+                        "cooperative writers must serialize through the exclusive lock: {contention}"
+                    );
+                    drop(held);
+                },
+            );
         });
     }
 }

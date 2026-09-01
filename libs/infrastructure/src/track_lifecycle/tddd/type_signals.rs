@@ -399,7 +399,11 @@ mod tests {
 
             let commands = tempfile::tempdir().expect("command shim directory exists");
             let rustup = commands.path().join("rustup");
-            fs::write(&rustup, "#!/bin/sh\nexit 0\n").expect("rustup shim is written");
+            fs::write(
+                &rustup,
+                "#!/bin/sh\nif [ \"$1\" = \"which\" ]; then printf '%s\\n' /bin/true; exit 0; fi\nexit 0\n",
+            )
+            .expect("rustup shim is written");
             make_executable(&rustup);
             let cargo = commands.path().join("cargo");
             fs::write(

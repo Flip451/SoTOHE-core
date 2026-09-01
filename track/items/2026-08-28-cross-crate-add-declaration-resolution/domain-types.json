@@ -104,10 +104,6 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
@@ -429,10 +425,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -449,10 +441,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -485,10 +473,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -505,10 +489,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -545,10 +525,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -577,10 +553,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -1356,7 +1328,7 @@
       "methods": [
         {
           "action": "modify",
-      "docs": "Immutable baseline rustdoc capture (IN-07).",
+          "docs": "Immutable baseline rustdoc capture (IN-07).",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_from_path",
@@ -1442,7 +1414,7 @@
     },
     "SchemaExporter": {
       "action": "reference",
-      "docs": "Baseline-identical secondary port for extracting a crate's public API schema; carried so RustdocSchemaExporter trait-implementation edges remain explicit.",
+      "docs": "Baseline-identical secondary port for extracting a crate's public API schema; carried so RustdocSchemaExporter trait-implementation edges remain explicit. Its crate_name: &str parameter is an unchanged legacy compatibility surface, not a newly introduced concept representation; the typed feature-aware capture path uses CrateName.",
       "informal_grounds": [],
       "methods": [
         {
@@ -1467,10 +1439,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -1607,7 +1575,7 @@
     },
     "ExpectedRustdocJsonPath": {
       "action": "add",
-      "docs": "Validated expected rustdoc JSON path confined to the resolved Cargo target directory and bound into the cache identity.",
+      "docs": "Expected rustdoc JSON path (IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1625,10 +1593,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -1651,7 +1615,7 @@
     },
     "ImplementationFingerprint": {
       "action": "add",
-      "docs": "Implementation input fingerprint (IN-03).",
+      "docs": "Implementation fingerprint value (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1725,10 +1689,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -1814,18 +1774,6 @@
         "ErrorType": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
         {
           "anchor": "IN-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
@@ -1918,7 +1866,7 @@
     },
     "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError": {
       "action": "modify",
-      "docs": "Rustdoc port error vocabulary (AC-04, CO-04).",
+      "docs": "Rustdoc port error vocabulary (AC-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2008,10 +1956,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
@@ -2019,7 +1963,7 @@
     },
     "domain::tddd::type_signals_doc::TypeSignalsCacheKey": {
       "action": "modify",
-      "docs": "Type-signals cache identity (IN-03, IN-07).",
+      "docs": "Type-signals cache identity (IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2068,10 +2012,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -2103,10 +2043,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -2123,10 +2059,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -2149,10 +2081,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -2172,10 +2100,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
@@ -2192,10 +2116,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
@@ -2230,10 +2150,6 @@
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
             {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
               "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             },
@@ -2259,10 +2175,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -2320,14 +2232,6 @@
             {
               "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -2359,14 +2263,6 @@
             {
               "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -2381,14 +2277,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -2405,14 +2293,6 @@
             {
               "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -2427,14 +2307,6 @@
           "spec_refs": [
             {
               "anchor": "IN-03",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -2451,14 +2323,6 @@
             {
               "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "CO-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-            },
-            {
-              "anchor": "AC-04",
-              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         }
@@ -2470,14 +2334,6 @@
       "spec_refs": [
         {
           "anchor": "IN-03",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
@@ -2521,7 +2377,7 @@
     },
     "domain::tddd::type_signals_doc::TypeSignalsReuseInput": {
       "action": "modify",
-      "docs": "Opaque verified pair of recorded and current complete cache keys constructible only for a clean worktree and readable authority snapshot.",
+      "docs": "Verified type-signals reuse input (IN-03, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

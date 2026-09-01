@@ -211,6 +211,22 @@
         "layer": "infrastructure",
         "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
       }
+    ],
+    "T020": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T021": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      }
     ]
   }
 }

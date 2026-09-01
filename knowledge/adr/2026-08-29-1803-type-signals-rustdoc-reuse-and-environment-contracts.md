@@ -34,17 +34,17 @@ decisions:
 
 型シグナルの記録済み結果を再利用するキーは、対象 catalogue の宣言 hash、baseline hash、評価開始時の commit 識別子、実装 fingerprint、解決 fingerprint、解決済み Cargo target directory、選択済み crate・feature・profile、及び期待 rustdoc JSON path をすべて含める。いずれかが異なる、記録を復号できない、又は worktree が clean でない場合は再利用せず、rustdoc を再抽出して評価する。
 
-実装 fingerprint は、`.git`、`.harness`、`.codex`、`.claude`、`.agents`、`target`、`track`、`tmp` を除く workspace 内の全 regular file の相対 path と内容 hash、次の環境値、`PATH` から解決する `cargo`、`rustc`、`rustdoc` の各 content fingerprint、及び `cargo metadata --no-deps --locked` の結果 bytes を順序付きで含める。環境値は `CARGO_BUILD_TARGET`、`CARGO_ENCODED_RUSTFLAGS`、`CARGO_HOME`、`CARGO_TARGET_DIR`、`CARGO_NET_OFFLINE`、`PATH`、`RUSTC`、`RUSTC_WRAPPER`、`RUSTC_WORKSPACE_WRAPPER`、`RUSTDOC`、`RUSTDOCFLAGS`、`RUSTFLAGS`、`RUSTUP_TOOLCHAIN` とする。
+実装 fingerprint は、`.git`、`.harness`、`.codex`、`.claude`、`.agents`、`target`、`track`、`tmp` を除く workspace 内の全 regular file の相対 path と内容 hash、次の環境値、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の各 content fingerprint、及び `cargo metadata --no-deps --locked` の結果 bytes を順序付きで含める。`PATH` 上の rustup proxy 自体の fingerprint をこれらの tool fingerprint として用いてはならない。環境値は `CARGO_BUILD_TARGET`、`CARGO_ENCODED_RUSTFLAGS`、`CARGO_HOME`、`CARGO_TARGET_DIR`、`CARGO_NET_OFFLINE`、`PATH`、`RUSTC`、`RUSTC_WRAPPER`、`RUSTC_WORKSPACE_WRAPPER`、`RUSTDOC`、`RUSTDOCFLAGS`、`RUSTFLAGS`、`RUSTUP_TOOLCHAIN` とする。
 
-これは Cargo rustdoc の意味的な完全入力集合ではない。include graph、build-script の入力及び出力、proc-macro expansion はこの fingerprint に含めない。この明示的な保守的 over-approximation の完全性は、D4 の I/O 上限を満たして全対象を取得できる場合に限って成立し、部分走査又は不確定な tool 解決を成功として扱わない。
+この実装 fingerprint は、上記で列挙した非除外 workspace regular file、環境値、nightly 選択済み tool の content fingerprint、及び Cargo metadata の bytes からなる記録済み identity に対する再利用だけを定める。include graph、build-script の入力及び出力、proc-macro expansion はこの identity の対象外とする。これは Cargo rustdoc の意味的な完全入力集合でも、rustdoc JSON のあらゆる変更を検出する fingerprint でもない。D4 の I/O 上限内でこの記録対象を取得できない、nightly 選択済み tool を確定できない、又はその content snapshot に失敗する場合は、partial fingerprint を成功として扱わない。
 
 解決 fingerprint は architecture rules、設定済み catalogue の各 bytes、及び設定済み rustdoc baseline の各 bytes を含める。対象 catalogue と baseline の完全集合は、`architecture-rules.json` が列挙する TDDD 有効層と、その catalogue・baseline 解決規則に委ねる。独自の filesystem 発見で補完したり、解決規則が返さない任意の入力を取り込んだりしない。規則により完全集合を確定できない場合は authoritative-input error として失敗させる。Cargo 出力先は `CARGO_TARGET_DIR` 又は Cargo metadata で厳密に解決し、推測した既定値で snapshot を再利用してはならない。出力側で fingerprint 又は snapshot として読むことを許すのは、解決済み target directory の下で、選択済み crate・feature・profile に対応する期待 rustdoc JSON path とその bytes のみとする。任意の `target` 配下の走査又は別 crate の出力の混入を許さない。
 
 ### D4: 実装 fingerprint の I/O は定量上限を超えた時点で fail-closed にする
 
-D3 の workspace 入力走査には、directory depth 64、directory entry 65,536 件、regular file 32,768 件、1 file 64 MiB、総 bytes 512 MiB、相対 path 16 KiB、allowlist の各環境値 64 KiB の上限を適用する。これらの上限は `PATH` 解決した `cargo`、`rustc`、`rustdoc` の content fingerprint と `cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。
+D3 の workspace 入力走査には、directory depth 64、directory entry 65,536 件、regular file 32,768 件、1 file 64 MiB、総 bytes 512 MiB、相対 path 16 KiB、allowlist の各環境値 64 KiB の上限を適用する。これらの上限は、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の解決及び content snapshot と、`cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。
 
-symlink、I/O error、tool 解決又は metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。
+symlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。
 
 ### D5: 一回の context 組立てで rustdoc export は 64 層までとする
 

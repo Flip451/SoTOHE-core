@@ -242,6 +242,8 @@ fn decode_with_identity_root(
     let schema_version = u32::try_from(schema_version).unwrap_or(0);
     let schema_version = TypeSignalsSchemaVersion::try_new(schema_version)
         .map_err(TypeSignalsCodecError::InvalidSchemaVersion)?;
+    // Gate the persisted version before decoding the v6 DTO. Legacy v5
+    // documents lack the current identity fields and must be cache misses.
     if schema_version.value() != domain::TYPE_SIGNALS_SCHEMA_VERSION {
         return Err(TypeSignalsCodecError::UnsupportedSchemaVersion(schema_version));
     }

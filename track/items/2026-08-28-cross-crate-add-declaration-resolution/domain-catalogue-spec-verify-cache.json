@@ -154,12 +154,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -178,17 +178,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "citation": "期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
         "kind": "pass"
       }
     },
@@ -274,17 +274,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "選択した Cargo 実行条件",
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
         "kind": "pass"
       }
     },
@@ -298,22 +298,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "citation": "crate/feature/profile・期待 rustdoc JSON path がすべて一致し",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "claim_origin": {
         "data": {
           "entry_key": "ExpectedRustdocJsonPath",
@@ -322,22 +322,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "citation": "期待 rustdoc 出力の同一性に束縛すること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "claim_origin": {
         "data": {
           "entry_key": "ExpectedRustdocJsonPath",
@@ -346,46 +346,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
-      "claim_origin": {
-        "data": {
-          "entry_key": "ExpectedRustdocJsonPath",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "citation": "期待 rustdoc JSON path がすべて一致し",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "claim_origin": {
         "data": {
           "entry_key": "ExpectedRustdocJsonPath",
@@ -409,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "claim_origin": {
         "data": {
           "entry_key": "ExpectedRustdocJsonPath",
@@ -428,12 +404,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。",
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ab45a5892cc10b42fd4a03420ec48cf53fc9c5de9046bd9edc146d3b031f4fef",
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
       "claim_origin": {
         "data": {
           "entry_key": "ExpectedRustdocJsonPath",
@@ -457,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "064d2c1e16367383994dd7e128b7e45e6cf2c0e3d3a21655322acb2e080b5954",
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
       "claim_origin": {
         "data": {
           "entry_key": "ImplementationFingerprint",
@@ -466,22 +442,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。",
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "064d2c1e16367383994dd7e128b7e45e6cf2c0e3d3a21655322acb2e080b5954",
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
       "claim_origin": {
         "data": {
           "entry_key": "ImplementationFingerprint",
@@ -490,22 +466,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
+      "evidence_hash": "e31c3a53905a2a8a4f7c6cc3efa2772fd1122946b4a41b9d3cf6c2c1f4bb3607",
       "evidence_origin": {
         "data": {
           "element_id": "CO-04",
           "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
+          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・nightly 選択済み tool の解決又は content snapshot・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
+        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "064d2c1e16367383994dd7e128b7e45e6cf2c0e3d3a21655322acb2e080b5954",
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
       "claim_origin": {
         "data": {
           "entry_key": "ImplementationFingerprint",
@@ -514,17 +490,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
+        "citation": "実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。",
         "kind": "pass"
       }
     },
@@ -538,22 +514,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。",
+        "citation": "実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e59a949457bcb9b4da2b986c3d5669d42d3d6e90a1150b6ce9955e07bfff30de",
+      "claim_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
       "claim_origin": {
         "data": {
           "entry_key": "ResolvedCargoTargetDirectory",
@@ -562,22 +538,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。",
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e59a949457bcb9b4da2b986c3d5669d42d3d6e90a1150b6ce9955e07bfff30de",
+      "claim_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
       "claim_origin": {
         "data": {
           "entry_key": "ResolvedCargoTargetDirectory",
@@ -586,36 +562,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "e59a949457bcb9b4da2b986c3d5669d42d3d6e90a1150b6ce9955e07bfff30de",
-      "claim_origin": {
-        "data": {
-          "entry_key": "ResolvedCargoTargetDirectory",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
@@ -634,12 +586,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -769,79 +721,7 @@
       }
     },
     {
-      "claim_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "RustdocExecutionIdentityError",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "RustdocExecutionIdentityError",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "RustdocExecutionIdentityError",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
+      "claim_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocExecutionIdentityError",
@@ -860,12 +740,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否し",
+        "citation": "Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5f72136dc5636d23b43981ff5894a591add7f20d76df3acf92fabd8da5421df7",
+      "claim_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocExecutionIdentityError",
@@ -884,7 +764,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。",
+        "citation": "解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。",
         "kind": "pass"
       }
     },
@@ -898,12 +778,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -922,12 +802,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
@@ -1018,12 +898,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -1042,17 +922,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "citation": "期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
         "kind": "pass"
       }
     },
@@ -1129,7 +1009,7 @@
       }
     },
     {
-      "claim_hash": "8e298b4f72c588544343b49e4e3ba1bff392692f2fa9764c136d766b51ab358c",
+      "claim_hash": "5fbfce206a6f2892d2eebc44ddbbe97e29c8493a5c89c1750786bfcd48425f00",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
@@ -1138,46 +1018,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "8e298b4f72c588544343b49e4e3ba1bff392692f2fa9764c136d766b51ab358c",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
+        "citation": "D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1186,22 +1042,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。",
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1210,36 +1066,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
@@ -1249,7 +1081,7 @@
       }
     },
     {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1268,12 +1100,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。",
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1297,7 +1129,7 @@
       }
     },
     {
-      "claim_hash": "b4e24af0d8a2d472cee3d551f5616597c43228847eab4d80d877dc29b6f75783",
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
@@ -1321,7 +1153,7 @@
       }
     },
     {
-      "claim_hash": "d691eee93d76e9eea64a6d662799f42357bc8aed14dbff37b6d50a745599b0c7",
+      "claim_hash": "b83aa54376d10cb61e3b9416bf997f7784b0a5e2dfe1418257bd36a9cc39a55c",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
@@ -1330,84 +1162,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d691eee93d76e9eea64a6d662799f42357bc8aed14dbff37b6d50a745599b0c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "d691eee93d76e9eea64a6d662799f42357bc8aed14dbff37b6d50a745599b0c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "35a05b40e88603d832afb909f4e5a092a44d236bc39a8009884acdc9cd6e18f1",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -1426,36 +1186,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -1465,21 +1201,21 @@
       }
     },
     {
-      "claim_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
+      "claim_hash": "35a05b40e88603d832afb909f4e5a092a44d236bc39a8009884acdc9cd6e18f1",
       "claim_origin": {
         "data": {
-          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
           "section_key": "types"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
@@ -1489,7 +1225,55 @@
       }
     },
     {
-      "claim_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
@@ -1508,12 +1292,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "citation": "SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ab5cb77e1c1b88c9ce26ecaa7043a199f7e604f9a4b0373f35efa20fa64b8229",
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
@@ -1801,7 +1585,7 @@
       }
     },
     {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "claim_origin": {
         "data": {
           "entry_key": "SchemaExporter",
@@ -1810,12 +1594,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -1825,7 +1609,7 @@
       }
     },
     {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "claim_origin": {
         "data": {
           "entry_key": "SchemaExporter",
@@ -1834,36 +1618,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
-      "claim_origin": {
-        "data": {
-          "entry_key": "SchemaExporter",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
@@ -1873,7 +1633,7 @@
       }
     },
     {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "claim_origin": {
         "data": {
           "entry_key": "SchemaExporter",
@@ -1897,7 +1657,7 @@
       }
     },
     {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "claim_origin": {
         "data": {
           "entry_key": "SchemaExporter",
@@ -1921,7 +1681,7 @@
       }
     },
     {
-      "claim_hash": "fdd8553fb345f3894e6a4fcefff53e76859452a5464d5a8bf83c26bbbbd00cea",
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "claim_origin": {
         "data": {
           "entry_key": "SchemaExporter",
@@ -1954,17 +1714,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "citation": "cargo metadata の content fingerprint 又は結果 bytes を含め",
         "kind": "pass"
       }
     },
@@ -1978,17 +1738,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "「型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。」",
+        "citation": "crate/feature/profile・期待 rustdoc JSON path がすべて一致し",
         "kind": "pass"
       }
     },
@@ -2074,12 +1834,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -2098,17 +1858,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
+        "citation": "D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
         "kind": "pass"
       }
     },
@@ -2185,7 +1945,7 @@
       }
     },
     {
-      "claim_hash": "c2aac93302471683510180954b458f82083212d1d0d1424cebeee7bb5618068a",
+      "claim_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -2194,12 +1954,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "01332fa08b6263c40b08e3aeb8780a95c4121a7fea0845ce33ae57b4e6e00030",
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
       "evidence_origin": {
         "data": {
           "element_id": "IN-03",
           "section": "in_scope",
-          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、PATH 解決 tool、及び cargo metadata を含む保守的 over-approximation とし、Cargo の完全意味入力集合を暗黙に主張しない。D4 の I/O 上限内で全対象を取得できない場合は fail-closed にする。"
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
         },
         "kind": "spec_element"
       },
@@ -2209,7 +1969,7 @@
       }
     },
     {
-      "claim_hash": "c2aac93302471683510180954b458f82083212d1d0d1424cebeee7bb5618068a",
+      "claim_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -2218,36 +1978,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "4e4e9aa65b33c23c4bfab6136e33a6ed9e3e2d279e570f6c57fba9576761a2fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-04",
-          "section": "constraint",
-          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion を完全意味入力として含めることはこの機能の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・tool 解決・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c2aac93302471683510180954b458f82083212d1d0d1424cebeee7bb5618068a",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "8d2bed1cb7c9510160b4aee92aee1bd74da244cc036a15e8d3cad98a89fce512",
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、PATH から解決する cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める保守的 over-approximation とする。Cargo の include graph、build-script 入出力、proc-macro expansion は完全意味入力集合として含めることを主張しない。D4 の I/O 上限内で全対象を取得できない、tool 解決又は metadata 実行が失敗する、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
         },
         "kind": "spec_element"
       },

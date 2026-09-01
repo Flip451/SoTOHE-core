@@ -322,6 +322,111 @@ printf '%s\n' '{json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
 
     #[cfg(unix)]
     #[test]
+    fn test_exporter_holds_selection_lock_during_rustdoc_export() {
+        use std::os::unix::fs::PermissionsExt as _;
+        use std::time::{Duration, Instant};
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let rustup = commands.join("rustup");
+            std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let export_started = workspace.path().join("export-started");
+            let release_export = workspace.path().join("release-export");
+            let rustdoc_json = format!(
+                r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+                rustdoc_types::FORMAT_VERSION
+            );
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                format!(
+                    r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{{"packages":[{{"name":"fixture","targets":[{{"kind":["lib"],"name":"fixture"}}]}}]}}'
+  exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+: > "$SOTOHE_TEST_EXPORT_STARTED"
+while [ ! -f "$SOTOHE_TEST_RELEASE_EXPORT" ]; do sleep 0.01; done
+printf '%s\n' '{rustdoc_json}' > "$CARGO_TARGET_DIR/doc/fixture.json"
+"#
+                ),
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+            let target_directory = workspace.path().join("cargo-target");
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_EXPORT_STARTED", Some(export_started.as_os_str())),
+                    ("SOTOHE_TEST_RELEASE_EXPORT", Some(release_export.as_os_str())),
+                ],
+                || {
+                    let exporter = RustdocSchemaExporter::new(workspace.path().to_path_buf());
+                    let crate_name = CrateName::new("fixture".to_owned()).unwrap();
+                    let (identity, _) =
+                        exporter.rustdoc_execution_identity(&crate_name, &[]).unwrap();
+                    let exclusive = identity.target_directory().as_path().to_path_buf();
+                    let first = std::thread::spawn(move || {
+                        exporter.capture_rustdoc_snapshot(&crate_name, &[], decode_fixture_rustdoc)
+                    });
+
+                    let deadline = Instant::now() + Duration::from_secs(2);
+                    while !export_started.exists() && Instant::now() < deadline {
+                        std::thread::sleep(Duration::from_millis(10));
+                    }
+                    if !export_started.exists() {
+                        std::fs::write(&release_export, b"release").unwrap();
+                        let export_result = first.join().unwrap();
+                        assert!(
+                            export_started.exists(),
+                            "the fake rustdoc process must reach its export barrier"
+                        );
+                        assert!(
+                            export_result.is_ok(),
+                            "the fake rustdoc process must complete after the barrier"
+                        );
+                        return;
+                    }
+
+                    let contender = std::thread::spawn(move || {
+                        crate::tddd::rustdoc_output_lock::RustdocOutputLock::acquire_for_test(
+                            &exclusive,
+                            Duration::from_millis(100),
+                        )
+                    });
+                    let contention = contender.join().unwrap();
+                    assert!(
+                        contention.is_err(),
+                        "a competing writer must not acquire the selection lock during export"
+                    );
+                    assert!(
+                        contention.unwrap_err().to_string().contains("timed out"),
+                        "the competing writer must observe the bounded lock timeout"
+                    );
+
+                    std::fs::write(&release_export, b"release").unwrap();
+                    let snapshot = first.join().unwrap().unwrap();
+                    assert_eq!(
+                        snapshot.crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_exporter_holds_lock_before_expected_path_selection() {
         use std::os::unix::fs::PermissionsExt as _;
         use std::sync::{Arc, Barrier};

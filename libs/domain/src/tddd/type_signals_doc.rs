@@ -14,7 +14,7 @@ use crate::tddd::catalogue_v2::{CrateName, RustdocCratePortError};
 use crate::{CommitHash, ContentHash, Timestamp};
 
 /// Schema version for `<layer>-type-signals.json` documents.
-pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 5;
+pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 6;
 
 /// A validated lowercase SHA-256 hexadecimal digest.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -849,6 +849,23 @@ mod tests {
         assert_eq!(snapshot.execution_identity(), &identity);
         assert_eq!(snapshot.crate_data(), &crate_data);
         assert_eq!(snapshot.json_hash(), snapshot.captured.json_hash());
+    }
+
+    #[test]
+    fn test_construct_rustdoc_snapshot_carries_execution_identity_and_json_hash() {
+        let identity = execution_identity();
+        let crate_data = empty_rustdoc();
+        let bytes = serde_json::to_vec(&crate_data).unwrap();
+        let expected_digest: [u8; 32] = sha2::Sha256::digest(&bytes).into();
+        let expected_hash = RustdocJsonHash::new(Sha256Digest::from_content_hash(
+            ContentHash::from_bytes(expected_digest),
+        ));
+
+        let snapshot =
+            construct_rustdoc_snapshot(identity.clone(), &bytes, decode_rustdoc).unwrap();
+
+        assert_eq!(snapshot.execution_identity(), &identity);
+        assert_eq!(snapshot.json_hash(), &expected_hash);
     }
 
     #[test]

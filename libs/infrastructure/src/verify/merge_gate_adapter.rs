@@ -1619,7 +1619,7 @@ decisions:
     /// readable while still exercising the branch-tip freshness checks.
     fn type_signals_minimal() -> String {
         let mut document = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": "0".repeat(64),
             "head_commit": "0".repeat(40),

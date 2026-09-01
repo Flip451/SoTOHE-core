@@ -84,10 +84,6 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "CO-04",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "AC-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
@@ -182,7 +178,7 @@
   "types": {
     "infrastructure::schema_export::RustdocSchemaExporter": {
       "action": "modify",
-      "docs": "Lock-held rustdoc byte exporter (IN-07, CO-07, AC-06).",
+      "docs": "Rustdoc schema exporter adapter (IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -395,7 +391,7 @@
     },
     "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError": {
       "action": "modify",
-      "docs": "Fail-closed codec error for type-signal documents, including rejection of invalid persisted rustdoc execution identity values during typed decode (IN-03, CO-04, AC-04).",
+      "docs": "Fail-closed type-signal document decode errors (AC-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -495,7 +491,7 @@
     },
     "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError": {
       "action": "modify",
-      "docs": "Type-signals evaluator error vocabulary (IN-03, IN-04, IN-05, IN-06, IN-07).",
+      "docs": "Type-signals evaluator error vocabulary.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

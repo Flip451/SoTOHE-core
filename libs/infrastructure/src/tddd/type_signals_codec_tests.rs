@@ -583,7 +583,7 @@ fn test_decode_rejects_unknown_catalogue_item_namespace() {
 }
 
 #[test]
-fn test_decode_rejects_v5_signal_without_explicit_identity() {
+fn test_decode_rejects_current_signal_without_explicit_identity() {
     let payload = serde_json::json!({
         "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
         "generated_at": "2026-04-18T12:00:00Z",
@@ -604,7 +604,28 @@ fn test_decode_rejects_v5_signal_without_explicit_identity() {
     let result = decode(&payload.to_string());
     assert!(
         matches!(result, Err(TypeSignalsCodecError::InvalidNamespace(_))),
-        "v5 must not infer a label from an omitted catalogue identity discriminator: {result:?}"
+        "the current schema must not infer a label from an omitted catalogue identity discriminator: {result:?}"
+    );
+}
+
+#[test]
+fn test_decode_v5_document_without_new_fields_returns_unsupported_schema_error() {
+    let payload = serde_json::json!({
+        "schema_version": 5,
+        "generated_at": "2026-04-18T12:00:00Z",
+        "declaration_hash": DIGEST,
+        "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "baseline_hash": DIGEST,
+        "signals": []
+    });
+
+    let result = decode(&payload.to_string());
+    assert!(
+        matches!(
+            result,
+            Err(TypeSignalsCodecError::UnsupportedSchemaVersion(version)) if version.value() == 5
+        ),
+        "a v5 document must be a cache miss before v6 DTO decoding: {result:?}"
     );
 }
 

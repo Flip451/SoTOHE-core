@@ -118,10 +118,21 @@
           "T019"
         ],
         "title": "Locked rustdoc export and snapshot integration"
+      },
+      {
+        "description": [
+          "Complete the nightly-selected implementation-fingerprint provenance and persisted type-signals schema v6 admission work as independently verifiable evaluator and codec changes without reopening the completed D3-D8 tasks (IN-03, OS-04, CO-04, AC-04)."
+        ],
+        "id": "SECTION-012",
+        "task_ids": [
+          "T020",
+          "T021"
+        ],
+        "title": "Nightly-selected fingerprint and schema v6"
       }
     ],
     "summary": [
-      "GO-01 original implementation and authoritative-context completion remain T001-T009; D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work is decomposed into T010-T019."
+      "GO-01 original implementation and authoritative-context completion remain T001-T009; completed D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021."
     ]
   },
   "schema_version": 2,
@@ -263,7 +274,7 @@
       "depends_on": [
         "T016"
       ],
-      "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the conservative implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04).",
+      "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04).",
       "id": "T018",
       "status": "done"
     },
@@ -274,6 +285,22 @@
       ],
       "description": "After T018, continue modifying infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to use start-snapshot evaluation and end-fingerprint revalidation; add focused snapshot and reuse validation tests (IN-07, CO-07, AC-06).",
       "id": "T019",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T019"
+      ],
+      "description": "After T019, modify libs/infrastructure/src/tddd/type_signals_evaluator.rs::execute_type_signals_for_layer, libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs::rustdoc_input_fingerprint, and libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs::append_actual_rustdoc_tool_identity to capture nightly-selected cargo, rustc, and rustdoc fingerprints and propagate resolution or snapshot failures as AuthoritativeInput; add focused selected-tool and failure tests (IN-03, OS-04, CO-04, AC-04).",
+      "id": "T020",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T019"
+      ],
+      "description": "After T019, modify libs/domain/src/tddd/type_signals_doc.rs::TYPE_SIGNALS_SCHEMA_VERSION from 5 to 6 and libs/infrastructure/src/tddd/type_signals_codec.rs::decode_with_identity_root to reject persisted legacy-v5 documents during typed decode; add focused legacy-schema rejection tests in libs/infrastructure/src/tddd/type_signals_codec_tests.rs (AC-04).",
+      "id": "T021",
       "status": "done"
     }
   ]
