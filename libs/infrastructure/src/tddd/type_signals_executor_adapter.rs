@@ -23,9 +23,9 @@ use domain::tddd::catalogue_v2::{RustdocCratePort, RustdocCratePortError};
 use domain::tddd::type_signals_doc::CapturedRustdocJson;
 #[cfg(feature = "test-helpers")]
 use domain::tddd::type_signals_doc::{
-    CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
-    RustdocExecutionIdentity, RustdocSnapshot, construct_captured_rustdoc_json,
-    construct_rustdoc_snapshot,
+    CargoProfileName, ExpectedRustdocJsonPath, ImplementationFingerprint,
+    ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocSnapshot,
+    construct_captured_rustdoc_json, construct_rustdoc_snapshot,
 };
 #[cfg(feature = "test-helpers")]
 use domain::tddd::{ExtendedCrate, catalogue_v2::CrateName};
@@ -53,6 +53,7 @@ pub struct RustdocLaunchObserver {
     encoded_crates: Arc<Mutex<Vec<ExtendedCrate>>>,
     resolution_paths: Arc<Mutex<Vec<HashMap<rustdoc_types::Id, rustdoc_types::ItemSummary>>>>,
     before_export: Option<Arc<dyn Fn() + Send + Sync>>,
+    after_export: Option<Arc<dyn Fn() + Send + Sync>>,
 }
 
 #[cfg(feature = "test-helpers")]
@@ -78,6 +79,7 @@ impl RustdocLaunchObserver {
             encoded_crates: Arc::new(Mutex::new(Vec::new())),
             resolution_paths: Arc::new(Mutex::new(Vec::new())),
             before_export: None,
+            after_export: None,
         }
     }
 
@@ -94,6 +96,7 @@ impl RustdocLaunchObserver {
             encoded_crates: Arc::new(Mutex::new(Vec::new())),
             resolution_paths: Arc::new(Mutex::new(Vec::new())),
             before_export: None,
+            after_export: None,
         }
     }
 
@@ -113,6 +116,28 @@ impl RustdocLaunchObserver {
             encoded_crates: Arc::new(Mutex::new(Vec::new())),
             resolution_paths: Arc::new(Mutex::new(Vec::new())),
             before_export: Some(before_export),
+            after_export: None,
+        }
+    }
+
+    /// Creates an observer with hooks around every simulated rustdoc export.
+    /// The hooks let evaluator tests model a source generation that is changed
+    /// between layer exports and restored before the enclosing evaluation ends.
+    #[must_use]
+    pub fn using_json_paths_with_before_and_after_export(
+        json_paths: BTreeMap<String, PathBuf>,
+        before_export: Arc<dyn Fn() + Send + Sync>,
+        after_export: Arc<dyn Fn() + Send + Sync>,
+    ) -> Self {
+        Self {
+            json_paths,
+            fallback_json_path: None,
+            launches: Arc::new(Mutex::new(BTreeMap::new())),
+            feature_selections: Arc::new(Mutex::new(BTreeMap::new())),
+            encoded_crates: Arc::new(Mutex::new(Vec::new())),
+            resolution_paths: Arc::new(Mutex::new(Vec::new())),
+            before_export: Some(before_export),
+            after_export: Some(after_export),
         }
     }
 
@@ -175,6 +200,74 @@ impl RustdocLaunchObserver {
                 reason: domain::FreeText::new("test rustdoc path was not configured"),
             })
     }
+
+    fn workspace_root_for_fingerprint(
+        &self,
+        crate_name: &CrateName,
+    ) -> Result<PathBuf, RustdocCratePortError> {
+        let path =
+            self.json_paths.values().next().or(self.fallback_json_path.as_ref()).ok_or_else(
+                || RustdocCratePortError::AuthoritativeInput {
+                    crate_name: crate_name.clone(),
+                    reason: domain::FreeText::new("test rustdoc path was not configured"),
+                },
+            )?;
+        let mut candidate = path.as_path();
+        while let Some(parent) = candidate.parent() {
+            if candidate.file_name() == Some(std::ffi::OsStr::new(".sotp-rustdoc")) {
+                return parent.canonicalize().map_err(|error| {
+                    RustdocCratePortError::AuthoritativeInput {
+                        crate_name: crate_name.clone(),
+                        reason: domain::FreeText::new(format!(
+                            "cannot canonicalize test rustdoc workspace root: {error}"
+                        )),
+                    }
+                });
+            }
+            candidate = parent;
+        }
+        Err(RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: domain::FreeText::new(
+                "test rustdoc path is not below a .sotp-rustdoc selection directory",
+            ),
+        })
+    }
+
+    fn run_before_export(&self) {
+        if let Some(before_export) = &self.before_export {
+            before_export();
+        }
+    }
+
+    fn run_after_export(&self) {
+        if let Some(after_export) = &self.after_export {
+            after_export();
+        }
+    }
+
+    fn capture_current_inner(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        if let Ok(mut launches) = self.launches.lock() {
+            *launches.entry(crate_name.as_str().to_owned()).or_default() += 1;
+        }
+        if let Ok(mut selections) = self.feature_selections.lock() {
+            selections
+                .entry(crate_name.as_str().to_owned())
+                .or_default()
+                .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
+        }
+        let path = self.json_path_for(crate_name)?;
+        let bytes = std::fs::read(&path).map_err(|error| RustdocCratePortError::Io {
+            path: path.clone(),
+            reason: domain::FreeText::new(error.to_string()),
+        })?;
+        let identity = observed_execution_identity(&path, crate_name, features)?;
+        construct_rustdoc_snapshot(identity, &bytes, decode_observed_rustdoc)
+    }
 }
 
 #[cfg(feature = "test-helpers")]
@@ -198,30 +291,65 @@ impl RustdocCratePort for RustdocLaunchObserver {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
     ) -> Result<RustdocSnapshot, RustdocCratePortError> {
-        if let Some(before_export) = &self.before_export {
-            before_export();
-        }
-        if let Ok(mut launches) = self.launches.lock() {
-            *launches.entry(crate_name.as_str().to_owned()).or_default() += 1;
-        }
-        if let Ok(mut selections) = self.feature_selections.lock() {
-            selections
-                .entry(crate_name.as_str().to_owned())
-                .or_default()
-                .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
-        }
-        let path = self.json_path_for(crate_name)?;
-        let bytes = std::fs::read(&path).map_err(|error| RustdocCratePortError::Io {
-            path: path.clone(),
-            reason: domain::FreeText::new(error.to_string()),
-        })?;
-        let identity = observed_execution_identity(&path, crate_name, features)?;
-        construct_rustdoc_snapshot(identity, &bytes, decode_observed_rustdoc)
+        self.run_before_export();
+        let result = self.capture_current_inner(crate_name, features);
+        self.run_after_export();
+        result
     }
 }
 
 #[cfg(feature = "test-helpers")]
 impl RustdocProvider for RustdocLaunchObserver {
+    fn capture_current_with_implementation_fingerprint(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        let workspace_root = self.workspace_root_for_fingerprint(crate_name)?;
+        self.run_before_export();
+        let before =
+            crate::tddd::type_signals_evaluator::freshness::rustdoc_implementation_fingerprint(
+                &workspace_root,
+            )
+            .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: domain::FreeText::new(format!(
+                    "cannot fingerprint test rustdoc workspace before export: {error}"
+                )),
+            })?;
+        let result = self.capture_current_inner(crate_name, features);
+        self.run_after_export();
+        let after =
+            crate::tddd::type_signals_evaluator::freshness::rustdoc_implementation_fingerprint(
+                &workspace_root,
+            )
+            .map_err(|error| RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: domain::FreeText::new(format!(
+                    "cannot fingerprint test rustdoc workspace after export: {error}"
+                )),
+            })?;
+        let snapshot = result?;
+        if before != *evaluation_start {
+            return Err(RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: domain::FreeText::new(
+                    "workspace implementation changed during type-signal evaluation: fingerprint before rustdoc export disagrees with evaluation-start snapshot",
+                ),
+            });
+        }
+        if after != *evaluation_start {
+            return Err(RustdocCratePortError::AuthoritativeInput {
+                crate_name: crate_name.clone(),
+                reason: domain::FreeText::new(
+                    "workspace implementation changed during type-signal evaluation: fingerprint after rustdoc export disagrees with evaluation-start snapshot",
+                ),
+            });
+        }
+        Ok(snapshot)
+    }
+
     fn execution_identity(
         &self,
         crate_name: &CrateName,

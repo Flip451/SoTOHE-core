@@ -8,9 +8,9 @@ use std::process::Command;
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, RustdocCratePortError};
 use domain::tddd::type_signals_doc::{
-    RustdocExecutionIdentity, TypeSignalsAuthorityStatus, TypeSignalsCacheKey, TypeSignalsDocument,
-    TypeSignalsReuseDecision, TypeSignalsReuseInput, TypeSignalsWorktreeStatus,
-    decide_type_signals_reuse,
+    ImplementationFingerprint, RustdocExecutionIdentity, Sha256Digest, TypeSignalsAuthorityStatus,
+    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision, TypeSignalsReuseInput,
+    TypeSignalsWorktreeStatus, decide_type_signals_reuse,
 };
 
 use sha2::Digest as _;
@@ -23,6 +23,19 @@ mod environment_fingerprint;
 /// Rustdoc I/O remains owned by [`RustdocCratePort`]. The identity resolver is
 /// only the cache-key side channel and does not read or construct a snapshot.
 pub(crate) trait RustdocProvider: RustdocCratePort {
+    /// Captures one current rustdoc graph against the immutable fingerprint
+    /// taken when the enclosing evaluation started.
+    ///
+    /// The provider must reject the export as authoritative input when either
+    /// the pre-export or post-export implementation fingerprint differs from
+    /// `evaluation_start`.
+    fn capture_current_with_implementation_fingerprint(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<domain::tddd::type_signals_doc::RustdocSnapshot, RustdocCratePortError>;
+
     fn execution_identity(
         &self,
         crate_name: &CrateName,
@@ -166,10 +179,9 @@ impl std::fmt::Display for RustdocInputFingerprintError {
     }
 }
 
-/// Computes a complete, bounded implementation fingerprint.
-pub(crate) fn rustdoc_input_fingerprint(
+fn rustdoc_input_digest(
     workspace_root: &Path,
-) -> Result<String, RustdocInputFingerprintError> {
+) -> Result<Sha256Digest, RustdocInputFingerprintError> {
     let mut budget = FingerprintBudget::default();
     let cargo_inputs = validate_authoritative_cargo_inputs(workspace_root, &mut budget)?;
     let paths =
@@ -221,7 +233,27 @@ pub(crate) fn rustdoc_input_fingerprint(
         workspace_root,
         &mut budget,
     )?;
-    Ok(hex_digest(&sha256_bytes(&canonical)))
+    Sha256Digest::try_new(hex_digest(&sha256_bytes(&canonical))).map_err(|error| {
+        io_error(workspace_root, Error::other(format!("invalid fingerprint: {error}")))
+    })
+}
+
+/// Computes a complete, bounded implementation fingerprint.
+#[cfg(test)]
+pub(crate) fn rustdoc_input_fingerprint(
+    workspace_root: &Path,
+) -> Result<String, RustdocInputFingerprintError> {
+    rustdoc_input_digest(workspace_root).map(|digest| digest.as_str().to_owned())
+}
+
+/// Computes the typed implementation identity used by evaluation-start and
+/// per-export snapshot admission.
+pub(crate) fn rustdoc_implementation_fingerprint(
+    workspace_root: &Path,
+) -> Result<ImplementationFingerprint, String> {
+    rustdoc_input_digest(workspace_root)
+        .map(ImplementationFingerprint::new)
+        .map_err(|error| error.to_string())
 }
 
 struct AuthoritativeCargoInputs {

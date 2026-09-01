@@ -265,7 +265,7 @@
       },
       "key": {
         "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
-        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
+        "bound_tests_set_hash": "c0250fef2738c4dbb7ad1a0dc8433b28501770aa6b905d513e6d9f49b93b6776",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -274,7 +274,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... let contention_error = contention.expect_err(\"second writer must not enter the lock\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... let error = adapter.capture_current(&crate_name, &[]).unwrap_err(); assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }), \"lock-operation failure must fail closed: {error}\"); assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes());",
+        "citation": "\"assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120))\"; \"second writer must not enter the lock\"; \"lock-operation failure must fail closed\"; \"retry.expect_err(\\\"a failed lock operation must not retry into lockless success\\\")\"; \"the selection must be directly below the private rustdoc parent\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -381,123 +381,7 @@
       },
       "key": {
         "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
-        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
-        "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
-      },
-      "obligation_id": {
-        "entry_key": "RustdocCratePort",
-        "item_identifier": "trait_method:capture_current",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(exclusive.starts_with(cargo_target.join(\".sotp-rustdoc\")), \"cooperative writers must own a private .sotp-rustdoc subtree: {}\", exclusive.display()); ... assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\"); ... std::os::unix::fs::symlink(&redirected, &selection).unwrap(); ... assert!(capture_error.to_string().contains(\"symlink\"), \"the capture rejection must identify the symlink guard: {capture_error}\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "test_non_unix_lock_acquisition_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_rejects_symlinked_selection_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_pairs_execution_identity_components"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
-          "test_name": "test_capture_current_rejects_oversized_json_without_fallback"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-06",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "RustdocCratePort"
-      },
-      "key": {
-        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
-        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
+        "bound_tests_set_hash": "c0250fef2738c4dbb7ad1a0dc8433b28501770aa6b905d513e6d9f49b93b6776",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -606,14 +490,14 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-08",
+          "element_id": "IN-06",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         "entry_key": "RustdocCratePort"
       },
       "key": {
-        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
-        "bound_tests_set_hash": "033409c4d269574e731d7290059c357b7565248a515b24936eeab3d0264d9149",
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "bound_tests_set_hash": "c0250fef2738c4dbb7ad1a0dc8433b28501770aa6b905d513e6d9f49b93b6776",
         "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
       },
       "obligation_id": {
@@ -623,6 +507,122 @@
       },
       "verdict": {
         "citation": "\"the selection must be directly below the private rustdoc parent\"; \"a symlinked selection directory must reject capture admission\"; \"descriptor-relative rustdoc locks must be unsupported on non-Unix\"; \"non-exclusive rustdoc targets must fail closed\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "test_non_unix_lock_acquisition_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_symlinked_selection_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_pairs_execution_identity_components"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_oversized_json_without_fallback"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocCratePort"
+      },
+      "key": {
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "bound_tests_set_hash": "c0250fef2738c4dbb7ad1a0dc8433b28501770aa6b905d513e6d9f49b93b6776",
+        "declaration_hash": "8c2cfba8d64e92b6d35a0243424dd0c1f244d1d66d882b723d9ae4978febf8be"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "item_identifier": "trait_method:capture_current",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            pinned.read_bytes(&output, 1024).expect(\"descriptor-relative read\"),\n            format!(\"generation-a-{case}\").as_bytes()\n        );\n...\nassert!(\n            generation_error.to_string().contains(\"generation\")\n                || generation_error.to_string().contains(\"replaced\"),\n            \"target replacement must fail closed: {generation_error}\"\n        );\n...\nassert!(\n            capture_error.to_string().contains(\"symlink\"),\n            \"the capture rejection must identify the symlink guard: {capture_error}\"\n        );\n...\nassert!(\n        error.to_string().contains(\"supported only on Unix\"),\n        \"non-Unix lock acquisition must fail closed: {error}\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -749,7 +749,7 @@
       },
       "key": {
         "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
-        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
+        "bound_tests_set_hash": "2ff65016db10c8b790080b8d1bf01f09989d727250631d566953bf4576081411",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -758,7 +758,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(exclusive.starts_with(cargo_target.join(\".sotp-rustdoc\")), \"cooperative writers must own a private .sotp-rustdoc subtree: {}\", exclusive.display()); ... let contention_error = contention.expect_err(\"second writer must not enter the lock\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... assert!(matches!(error, RustdocCratePortError::AuthoritativeInput { .. }), \"lock-operation failure must fail closed: {error}\"); assert_eq!(std::fs::read(&expected_path).unwrap(), stale_json.as_bytes()); ... retry.expect_err(\"a failed lock operation must not retry into lockless success\");",
+        "citation": "\"the selection must be directly below the private rustdoc parent\" ... \"cooperative writers must serialize through the exclusive lock\" ... \"second writer must fail closed at its bounded wait\" ... \"a failed lock operation must not retry into lockless success\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -885,7 +885,7 @@
       },
       "key": {
         "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
-        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
+        "bound_tests_set_hash": "2ff65016db10c8b790080b8d1bf01f09989d727250631d566953bf4576081411",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -894,7 +894,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \\\"the lock timeout is part of the rustdoc execution contract\\\")\"; \"assert!(contention_error.to_string().contains(\\\"timed out\\\"), \\\"second writer must fail closed at its bounded wait: {contention_error}\\\")\"; \"assert!(result.is_err(), \\\"non-exclusive rustdoc targets must fail closed\\\")\"; \"assert_eq!(exclusive_parent.file_name(), Some(std::ffi::OsStr::new(\\\".sotp-rustdoc\\\")), \\\"the selection must be directly below the private rustdoc parent\\\")\"; \"assert!(error.to_string().contains(\\\"symlink guard rejected\\\"))\"; \"assert!(error.to_string().contains(\\\"supported only on Unix\\\"), \\\"non-Unix lock acquisition must fail closed\\\")\"",
+        "citation": "assert_eq!(RUSTDOC_OUTPUT_LOCK_TIMEOUT, Duration::from_secs(120), \"the lock timeout is part of the rustdoc execution contract\"); ... assert!(contention_error.to_string().contains(\"timed out\"), \"second writer must fail closed at its bounded wait: {contention_error}\"); ... assert_eq!(exclusive_parent.file_name(), Some(std::ffi::OsStr::new(\".sotp-rustdoc\")), \"the selection must be directly below the private rustdoc parent\"); ... assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\"); ... assert!(capture_error.to_string().contains(\"symlink\"), \"the capture rejection must identify the symlink guard: {capture_error}\"); ... assert!(error.to_string().contains(\"regular file\"), \"uncooperative output must fail closed: {error}\"); ... assert!(error.to_string().contains(\"supported only on Unix\"), \"non-Unix lock acquisition must fail closed: {error}\")",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1021,7 +1021,7 @@
       },
       "key": {
         "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
-        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
+        "bound_tests_set_hash": "2ff65016db10c8b790080b8d1bf01f09989d727250631d566953bf4576081411",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -1030,7 +1030,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(\n                        exclusive_parent.file_name(),\n                        Some(std::ffi::OsStr::new(\".sotp-rustdoc\")),\n                        \"the selection must be directly below the private rustdoc parent\"\n                    );\n\n                    let capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err();\n                    assert!(\n                        matches!(capture_error, RustdocCratePortError::AuthoritativeInput { .. }),\n                        \"a symlinked selection directory must reject capture admission: {capture_error}\"\n                    );\n\n    let target = tempfile::tempdir().expect(\"target tempdir\");\n    let error =\n        RustdocOutputLock::acquire_for_test(target.path(), std::time::Duration::from_millis(25))\n            .expect_err(\"descriptor-relative rustdoc locks must be unsupported on non-Unix\");\n    assert!(\n        error.to_string().contains(\"supported only on Unix\"),\n        \"non-Unix lock acquisition must fail closed: {error}\"\n    );\n\n            assert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\");",
+        "citation": "assert_eq!(exclusive_parent.file_name(), Some(std::ffi::OsStr::new(\".sotp-rustdoc\")), \"the selection must be directly below the private rustdoc parent\");\n\nassert!(capture_error.to_string().contains(\"symlink\"), \"the capture rejection must identify the symlink guard: {capture_error}\");\n\nassert!(error.to_string().contains(\"supported only on Unix\"), \"non-Unix lock acquisition must fail closed: {error}\");\n\nassert!(result.is_err(), \"non-exclusive rustdoc targets must fail closed\");\n\nassert_eq!(pinned.read_bytes(&output, 1024).expect(\"descriptor-relative read\"), format!(\"generation-a-{case}\").as_bytes());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1157,7 +1157,7 @@
       },
       "key": {
         "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
-        "bound_tests_set_hash": "8725d5a3804aaff5623ada9828be2e4dfbdd013ca1c13a4565671b7d2c54eee4",
+        "bound_tests_set_hash": "2ff65016db10c8b790080b8d1bf01f09989d727250631d566953bf4576081411",
         "declaration_hash": "d08e31dfa4456fee3b55063121cb47ea3a3dfc85776b39a9cc251f4d57dba0b7"
       },
       "obligation_id": {
@@ -1166,7 +1166,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"assert_eq!(\\n                        exclusive_parent.file_name(),\\n                        Some(std::ffi::OsStr::new(\\\".sotp-rustdoc\\\")),\\n                        \\\"the selection must be directly below the private rustdoc parent\\\"\\n                    );\"; \"assert!(\\n        error.to_string().contains(\\\"supported only on Unix\\\"),\\n        \\\"non-Unix lock acquisition must fail closed: {error}\\\"\\n    );\"; \"assert!(\\n                error.to_string().contains(\\\"not an exclusive .sotp-rustdoc area\\\"),\\n                \\\"the target ownership failure must be explicit: {error}\\\"\\n            );\"; \"assert!(\\n                        capture_error.to_string().contains(\\\"symlink\\\"),\\n                        \\\"the capture rejection must identify the symlink guard: {capture_error}\\\"\\n                    );\"",
+        "citation": "\"descriptor-relative read\"; \"non-Unix lock acquisition must fail closed\"; \"non-exclusive rustdoc targets must fail closed\"; \"a symlinked selection directory must reject capture admission\"; \"cooperative writers must serialize through the exclusive lock\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

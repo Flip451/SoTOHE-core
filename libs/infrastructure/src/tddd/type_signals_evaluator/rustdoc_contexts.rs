@@ -7,8 +7,8 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName, RustdocCratePortError};
 use domain::tddd::type_signals_doc::{
-    BaselineHash, CapturedRustdocJson, RustdocExecutionIdentity, RustdocSnapshot,
-    TypeSignalsCacheKey, TypeSignalsDocument,
+    BaselineHash, CapturedRustdocJson, ImplementationFingerprint, RustdocExecutionIdentity,
+    RustdocSnapshot, TypeSignalsCacheKey, TypeSignalsDocument,
 };
 use domain::tddd::{AuthoritativeRustdocContext, CargoFeatureName, LayerId};
 use domain::{CatalogueDeclarationHash, CommitHash, Timestamp};
@@ -102,7 +102,7 @@ pub(super) struct RustdocContextCacheKey {
     pub(super) workspace_root: PathBuf,
     pub(super) track_dir: PathBuf,
     pub(super) resolution_fingerprint: CatalogueDeclarationHash,
-    pub(super) current_implementation_fingerprint: String,
+    pub(super) current_implementation_fingerprint: ImplementationFingerprint,
     pub(super) head_commit: CommitHash,
     pub(super) feature_selections: BTreeMap<LayerId, Vec<CargoFeatureName>>,
     pub(super) rustdoc_execution_identities: BTreeMap<LayerId, RustdocExecutionIdentity>,
@@ -402,6 +402,7 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
     target_layer: &LayerId,
     loaded: &LoadedTrackCatalogues,
     target_current: &RustdocSnapshot,
+    evaluation_start_implementation: &ImplementationFingerprint,
     feature_selections: &BTreeMap<LayerId, Vec<CargoFeatureName>>,
     rustdoc: &impl RustdocProvider,
 ) -> Result<AssembledRustdocContexts, EvaluateSignalsError> {
@@ -445,8 +446,13 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
                     "invalid rustdoc target crate '{target}' for layer '{layer}': {error}"
                 ))
             })?;
-            let snapshot =
-                rustdoc.capture_current(&target_crate, selected_features).map_err(|error| {
+            let snapshot = rustdoc
+                .capture_current_with_implementation_fingerprint(
+                    &target_crate,
+                    selected_features,
+                    evaluation_start_implementation,
+                )
+                .map_err(|error| {
                     map_rustdoc_capture_error(
                         error,
                         format!("rustdoc export failed for layer '{layer}' ('{target}')"),
@@ -492,8 +498,8 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
 /// fail-closed snapshot rather than relying on timestamps or path-only status.
 pub(super) fn current_implementation_fingerprint(
     workspace_root: &Path,
-) -> Result<String, EvaluateSignalsError> {
-    super::freshness::rustdoc_input_fingerprint(workspace_root).map_err(|error| {
+) -> Result<ImplementationFingerprint, EvaluateSignalsError> {
+    super::freshness::rustdoc_implementation_fingerprint(workspace_root).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
             "cannot fingerprint semantic rustdoc inputs: {error}"
         ))
@@ -504,10 +510,10 @@ pub(super) fn current_implementation_fingerprint(
 /// source files changed during rustdoc extraction or signal evaluation.
 pub(super) fn verify_current_implementation_unchanged(
     workspace_root: &Path,
-    initial_fingerprint: &str,
+    initial_fingerprint: &ImplementationFingerprint,
 ) -> Result<(), EvaluateSignalsError> {
     let current = current_implementation_fingerprint(workspace_root)?;
-    if current != initial_fingerprint {
+    if current != *initial_fingerprint {
         return Err(EvaluateSignalsError::authoritative_input(
             "workspace Rust implementation changed during type-signal evaluation",
         ));
@@ -527,7 +533,7 @@ pub(super) fn evaluate_and_write_with_contexts(
     _baseline_snapshots: &BTreeMap<LayerId, BaselineSnapshot>,
     loaded_catalogues: &LoadedTrackCatalogues,
     start_resolution: CatalogueDeclarationHash,
-    start_implementation: String,
+    start_implementation: ImplementationFingerprint,
     head_commit: CommitHash,
     baseline_path: &Path,
     baseline_hash: BaselineHash,

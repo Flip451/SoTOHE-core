@@ -28,9 +28,7 @@ use domain::tddd::type_signals_doc::{
     CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
     RustdocExecutionIdentity, RustdocSnapshot, construct_rustdoc_snapshot,
 };
-use domain::tddd::type_signals_doc::{
-    ImplementationFingerprint, ResolutionFingerprint, Sha256Digest, TypeSignalsCacheKey,
-};
+use domain::tddd::type_signals_doc::{ResolutionFingerprint, TypeSignalsCacheKey};
 use domain::tddd::{CargoFeatureName, LayerId};
 use domain::{FreeText, TrackId};
 use feature_selection::{load_layer_feature_selections, resolve_execution_identities};
@@ -177,6 +175,7 @@ type ReuseObserver<'a> = &'a dyn Fn();
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::too_many_arguments)]
 mod evaluator_test_support {
     use super::*;
+    use domain::tddd::type_signals_doc::{ImplementationFingerprint, Sha256Digest};
 
     pub(super) fn snapshot_for_context_test(
         crate_name: &str,
@@ -664,18 +663,12 @@ fn execute_with_dependencies(
             "rustdoc execution identity for target layer '{target_layer}' is unavailable"
         ))
     })?;
-    let implementation_digest = Sha256Digest::try_new(cache_decision_start_implementation.clone())
-        .map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "implementation fingerprint is invalid: {error}"
-            ))
-        })?;
     let resolution_digest = cache_decision_start_resolution.as_digest().clone();
     let current_key = TypeSignalsCacheKey::new(
         declaration_hash.clone(),
         head_commit.clone(),
         baseline_hash.clone(),
-        ImplementationFingerprint::new(implementation_digest),
+        cache_decision_start_implementation.clone(),
         ResolutionFingerprint::new(resolution_digest),
         execution_identity,
     );
@@ -735,8 +728,13 @@ fn execute_with_dependencies(
     let assembled_contexts = if let Some(cached) = context_cache.get(&context_cache_key)? {
         cached
     } else {
-        let target_current =
-            rustdoc.capture_current(&target_crate_name, target_features).map_err(|error| {
+        let target_current = rustdoc
+            .capture_current_with_implementation_fingerprint(
+                &target_crate_name,
+                target_features,
+                &cache_decision_start_implementation,
+            )
+            .map_err(|error| {
                 map_rustdoc_capture_error(
                     error,
                     format!("rustdoc export failed for '{target_crate}'"),
@@ -752,6 +750,7 @@ fn execute_with_dependencies(
             &target_layer,
             &loaded_catalogues,
             &target_current,
+            &cache_decision_start_implementation,
             &feature_selections,
             rustdoc,
         )?;
@@ -845,6 +844,7 @@ mod tests {
     use domain::tddd::CatalogueToExtendedCratePort;
     use domain::tddd::catalogue_v2::{CatalogueDocument, RustdocCratePortError};
     use domain::tddd::type_signals_doc::TypeSignalsDocument;
+    use domain::tddd::type_signals_doc::{ImplementationFingerprint, Sha256Digest};
     use rustdoc_contexts::verify_baseline_snapshots_unchanged;
     use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
@@ -1683,6 +1683,70 @@ mod tests {
                 signals.signals().iter().any(|signal| signal.type_name() == "Handler"),
                 "the target type must survive evaluation after both external declarations resolve"
             );
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        with_process_environment_lock(|| {
+            let target = cross_layer_handler_catalogue(None, None);
+            let declaring = cross_layer_declaring_catalogue("Name", None, None);
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(&target, Some(&declaring), &empty, &empty);
+            let signal_path = signal_path(&items_dir, &track_id);
+            let prior = b"prior-cache-generation";
+            std::fs::write(&signal_path, prior).unwrap();
+
+            let source_path = workspace.path().join("src/lib.rs");
+            let original_source = std::fs::read(&source_path).unwrap();
+            let before_count = std::sync::Arc::new(AtomicUsize::new(0));
+            let before_count_for_hook = std::sync::Arc::clone(&before_count);
+            let source_for_before = source_path.clone();
+            let before_export = std::sync::Arc::new(move || {
+                if before_count_for_hook.fetch_add(1, Ordering::SeqCst) == 1 {
+                    std::fs::write(&source_for_before, b"pub struct FixtureB;\n").unwrap();
+                }
+            });
+            let after_count = std::sync::Arc::new(AtomicUsize::new(0));
+            let after_count_for_hook = std::sync::Arc::clone(&after_count);
+            let source_for_after = source_path.clone();
+            let original_for_after = original_source.clone();
+            let after_export = std::sync::Arc::new(move || {
+                if after_count_for_hook.fetch_add(1, Ordering::SeqCst) == 1 {
+                    std::fs::write(&source_for_after, &original_for_after).unwrap();
+                }
+            });
+            let observer = RustdocLaunchObserver::using_json_paths_with_before_and_after_export(
+                BTreeMap::from([
+                    ("domain".to_owned(), domain_path),
+                    ("infrastructure".to_owned(), infrastructure_path),
+                ]),
+                before_export,
+                after_export,
+            );
+
+            let error = execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect_err("a mixed A/B layer snapshot must not be persisted");
+
+            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
+            assert!(
+                error.to_string().contains("evaluation-start snapshot"),
+                "the export must report the evaluation-start mismatch: {error}"
+            );
+            assert_eq!(std::fs::read(&source_path).unwrap(), original_source);
+            assert_eq!(std::fs::read(&signal_path).unwrap(), prior);
+            assert_eq!(observer.launches_for("infrastructure"), 1);
+            assert_eq!(observer.launches_for("domain"), 1);
         });
     }
 

@@ -20,7 +20,8 @@ use domain::tddd::type_signals_doc::{
     construct_rustdoc_snapshot,
 };
 use domain::tddd::type_signals_doc::{
-    RustdocExecutionIdentity, RustdocSnapshot, construct_captured_rustdoc_json,
+    ImplementationFingerprint, RustdocExecutionIdentity, RustdocSnapshot,
+    construct_captured_rustdoc_json,
 };
 use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 
@@ -193,6 +194,35 @@ impl RustdocCratePort for RustdocCrateAdapter {
 }
 
 impl RustdocProvider for RustdocCrateAdapter {
+    fn capture_current_with_implementation_fingerprint(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        reject_workspace_root(&self.workspace_root, crate_name)?;
+        let start_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
+        reject_unexpected_workspace_fingerprint(
+            crate_name,
+            evaluation_start,
+            &start_fingerprint,
+            "before",
+        )?;
+        let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
+        let snapshot = exporter
+            .capture_rustdoc_snapshot(crate_name, features, decode_rustdoc_bytes)
+            .map_err(|error| map_capture_error(crate_name, error))?;
+        require_exclusive_snapshot_target(crate_name, &snapshot)?;
+        let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
+        reject_unexpected_workspace_fingerprint(
+            crate_name,
+            evaluation_start,
+            &end_fingerprint,
+            "after",
+        )?;
+        Ok(snapshot)
+    }
+
     fn execution_identity(
         &self,
         crate_name: &CrateName,
@@ -263,8 +293,8 @@ fn map_capture_error(crate_name: &CrateName, error: RustdocCaptureError) -> Rust
 fn workspace_input_fingerprint(
     workspace_root: &Path,
     crate_name: &CrateName,
-) -> Result<String, RustdocCratePortError> {
-    freshness::rustdoc_input_fingerprint(workspace_root).map_err(|error| {
+) -> Result<ImplementationFingerprint, RustdocCratePortError> {
+    freshness::rustdoc_implementation_fingerprint(workspace_root).map_err(|error| {
         RustdocCratePortError::AuthoritativeInput {
             crate_name: crate_name.clone(),
             reason: FreeText::new(format!("cannot fingerprint rustdoc inputs: {error}")),
@@ -274,8 +304,8 @@ fn workspace_input_fingerprint(
 
 fn reject_changed_workspace_fingerprint(
     crate_name: &CrateName,
-    start: &str,
-    end: &str,
+    start: &ImplementationFingerprint,
+    end: &ImplementationFingerprint,
 ) -> Result<(), RustdocCratePortError> {
     if start == end {
         Ok(())
@@ -283,6 +313,24 @@ fn reject_changed_workspace_fingerprint(
         Err(RustdocCratePortError::AuthoritativeInput {
             crate_name: crate_name.clone(),
             reason: FreeText::new("workspace input fingerprint changed during rustdoc capture"),
+        })
+    }
+}
+
+fn reject_unexpected_workspace_fingerprint(
+    crate_name: &CrateName,
+    evaluation_start: &ImplementationFingerprint,
+    observed: &ImplementationFingerprint,
+    phase: &str,
+) -> Result<(), RustdocCratePortError> {
+    if evaluation_start == observed {
+        Ok(())
+    } else {
+        Err(RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(format!(
+                "workspace implementation changed during type-signal evaluation: fingerprint {phase} rustdoc export disagrees with evaluation-start snapshot"
+            )),
         })
     }
 }
@@ -434,6 +482,7 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
+    use domain::tddd::type_signals_doc::Sha256Digest;
     #[cfg(unix)]
     use temp_env;
 
@@ -1092,14 +1141,14 @@ exit 1
     #[test]
     fn test_capture_current_discards_result_when_workspace_fingerprint_changes() {
         let crate_name = CrateName::new("domain").unwrap();
-        let start = "start";
-        let end = "end";
-        let error = reject_changed_workspace_fingerprint(&crate_name, start, end).unwrap_err();
+        let start = ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap());
+        let end = ImplementationFingerprint::new(Sha256Digest::try_new("b".repeat(64)).unwrap());
+        let error = reject_changed_workspace_fingerprint(&crate_name, &start, &end).unwrap_err();
         assert!(
             matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
             "changed input fingerprint must discard the capture: {error}"
         );
-        reject_changed_workspace_fingerprint(&crate_name, start, start).unwrap();
+        reject_changed_workspace_fingerprint(&crate_name, &start, &start).unwrap();
     }
 
     #[test]

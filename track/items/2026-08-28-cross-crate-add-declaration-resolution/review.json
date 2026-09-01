@@ -3911,6 +3911,114 @@
           "hash": "rvw1:sha256:4551e7e5c9c0ee824fbd5e45b00a4642f6bf1f684457967f8a78f61fc9a6a008",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T07:30:26Z",
+          "findings": [
+            {
+              "category": "ABA snapshot consistency",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 80,
+              "message": "The new checks still bracket a live-workspace export rather than binding rustdoc to the evaluation-start snapshot. After the pre-export comparison succeeds, another writer can change an input A→B, let rustdoc capture B, and restore A before the post-export fingerprint; both comparisons and the final persistence check then pass, so a B-derived snapshot is stored under fingerprint A. The added observer test changes the source before the pre-check and reads fixed JSON, so it does not cover this window. Export from an immutable start snapshot or enforce synchronization covering every live input read during export.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:56eb907db0b54f9b7a29dbeee563e1c129faa70e1d873b74a8eddec02d29e805",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T08:04:35Z",
+          "findings": [
+            {
+              "category": "execution identity integrity",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 117,
+              "message": "`exported_snapshot` carries the exact temporary target directory/path used for export, but that identity is discarded and its bytes are rewrapped with `expected_identity` from the live workspace. Because target selection hashes the workspace root, these identities differ on every capture. The returned `RustdocSnapshot` therefore claims an execution selection that never produced its bytes, defeating the port's identity proof and cache-key integrity. Preserve the actual identity or model and verify physical versus logical identities separately.",
+              "severity": "P1"
+            },
+            {
+              "category": "ABA snapshot consistency",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 188,
+              "message": "`RustdocInputSnapshot` retains workspace file bytes but discards the captured environment values and nightly cargo/rustc/rustdoc snapshots that contributed to its fingerprint. The temporary exporter subsequently inherits the live environment and executes the live tool paths. An environment or selected-tool A→B→A change during export can therefore produce B-derived JSON while the original A fingerprint passes. Pin and apply every enumerated captured input during export.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 111,
+              "message": "Running Cargo from a newly allocated temporary workspace changes path-sensitive Cargo inputs such as `CARGO_MANIFEST_DIR` and metadata absolute paths, and rebinds relative dependencies outside the workspace. The temporary path is not part of the recorded implementation identity, so identical cache keys can produce different rustdoc graphs—or valid workspaces with external relative path dependencies can stop exporting. Use a path-preserving immutable view or fail closed for path-sensitive configurations.",
+              "severity": "P1"
+            },
+            {
+              "category": "snapshot materialization correctness",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 223,
+              "message": "The materialized tree is neither faithful nor immutable: files are recreated with default non-executable permissions and remain writable while the same tree is reused for later layer exports. A workspace-relative `RUSTC_WRAPPER` that was executable in the captured workspace becomes unlaunchable, while an invoked build tool can mutate copied source without changing the cached fingerprint or the final live-workspace check. Preserve required execution modes and seal the snapshot against writes before invoking Cargo.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource limits",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 111,
+              "message": "With a supported absolute `CARGO_TARGET_DIR`, the temporary exporter writes outside the temporary root. Its selection directory name incorporates the new snapshot-root path, so every evaluation creates fresh build/rustdoc directories, while `WorkspaceSnapshot::drop` removes only the temporary workspace. Successful repeated evaluations therefore accumulate unbounded external target artifacts. Place physical snapshot outputs under the disposable root or explicitly remove the actual selection under its lock.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:739f93d0516cb133b4f925bcea8734c3898770de6e1382bac9ba81e99dcd4a13",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T08:10:08Z",
+          "findings": [
+            {
+              "category": "execution identity integrity",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 117,
+              "message": "`exported_snapshot` carries the exact temporary target directory/path used for export, but that identity is discarded and its bytes are rewrapped with `expected_identity` from the live workspace. Because target selection hashes the workspace root, these identities differ on every capture. The returned `RustdocSnapshot` therefore claims an execution selection that never produced its bytes, defeating the port's identity proof and cache-key integrity. Preserve the actual identity or model and verify physical versus logical identities separately.",
+              "severity": "P1"
+            },
+            {
+              "category": "ABA snapshot consistency",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 188,
+              "message": "`RustdocInputSnapshot` retains workspace file bytes but discards the captured environment values and nightly cargo/rustc/rustdoc snapshots that contributed to its fingerprint. The temporary exporter subsequently inherits the live environment and executes the live tool paths. An environment or selected-tool A→B→A change during export can therefore produce B-derived JSON while the original A fingerprint passes. Pin and apply every enumerated captured input during export.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 111,
+              "message": "Running Cargo from a newly allocated temporary workspace changes path-sensitive Cargo inputs such as `CARGO_MANIFEST_DIR` and metadata absolute paths, and rebinds relative dependencies outside the workspace. The temporary path is not part of the recorded implementation identity, so identical cache keys can produce different rustdoc graphs—or valid workspaces with external relative path dependencies can stop exporting. Use a path-preserving immutable view or fail closed for path-sensitive configurations.",
+              "severity": "P1"
+            },
+            {
+              "category": "snapshot materialization correctness",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 223,
+              "message": "The materialized tree is neither faithful nor immutable: files are recreated with default non-executable permissions and remain writable while the same tree is reused for later layer exports. A workspace-relative `RUSTC_WRAPPER` that was executable in the captured workspace becomes unlaunchable, while an invoked build tool can mutate copied source without changing the cached fingerprint or the final live-workspace check. Preserve required execution modes and seal the snapshot against writes before invoking Cargo.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource limits",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 111,
+              "message": "With a supported absolute `CARGO_TARGET_DIR`, the temporary exporter writes outside the temporary root. Its selection directory name incorporates the new snapshot-root path, so every evaluation creates fresh build/rustdoc directories, while `WorkspaceSnapshot::drop` removes only the temporary workspace. Successful repeated evaluations therefore accumulate unbounded external target artifacts. Place physical snapshot outputs under the disposable root or explicitly remove the actual selection under its lock.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:739f93d0516cb133b4f925bcea8734c3898770de6e1382bac9ba81e99dcd4a13",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T08:33:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a37143d5a8605ba5434d887ea5ae9ebb404326daa80798311118d81d7dc02ead",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
