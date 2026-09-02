@@ -56,7 +56,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -79,7 +79,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D8",
@@ -88,7 +88,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。」",
+        "citation": "評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。",
         "kind": "pass"
       }
     },
@@ -148,7 +148,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -157,7 +157,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "この実装 fingerprint は、上記で列挙した非除外 workspace regular file、環境値、nightly 選択済み tool の content fingerprint、及び Cargo metadata の bytes からなる記録済み identity に対する再利用だけを定める。include graph、build-script の入力及び出力、proc-macro expansion はこの identity の対象外とする。D4 の I/O 上限内でこの記録対象を取得できない、nightly 選択済み tool を確定できない、又はその content snapshot に失敗する場合は、partial fingerprint を成功として扱わない。",
+        "citation": "この実装 fingerprint は、上記で列挙した非除外 workspace regular file、環境値、nightly 選択済み tool の content fingerprint、及び Cargo metadata の bytes からなる記録済み identity に対する再利用だけを定める。",
         "kind": "pass"
       }
     },
@@ -171,7 +171,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -180,7 +180,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "これらの上限は、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の解決及び content snapshot と、`cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。",
+        "citation": "これらの上限は、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の解決及び content snapshot と、`cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。\n\nsymlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。",
         "kind": "pass"
       }
     },
@@ -194,7 +194,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D5",
@@ -217,7 +217,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -240,7 +240,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_hash": "000be7e14233b242f72bf5264b41f231b093bd9eba02637cd0a4852044b210f6",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -249,7 +249,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`EvaluationStartCapturePort` による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、`cargo metadata --no-deps --locked`、及びこれらに伴う出力 drain に、実行時間 120 秒と drain 時間 1 秒の上限を適用する。\n\nいずれかの上限を超えた場合は `EvaluationStartCaptureError::AuthoritativeInput` として fail-closed で失敗させる。fallback、partial fingerprint、又は生成した層帰属によって処理を続行してはならない。\n\nこの決定は、rustdoc export 又は専用出力 directory の lock に適用しない。",
+        "citation": "`EvaluationStartCapturePort` による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、`cargo metadata --no-deps --locked`、及びこれらに伴う出力 drain に、実行時間 120 秒と drain 時間 1 秒の上限を適用する。",
         "kind": "pass"
       }
     },
@@ -263,7 +263,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D6",
@@ -286,7 +286,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D7",
@@ -295,7 +295,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "共有出力を安全に扱う対応 platform は、解決済み target root から descriptor-relative に専用 selection directory と lock file を開き、親を含む path を no-follow で検証できる Unix とする。selection directory の immediate parent が `.sotp-rustdoc` でない場合、親 Cargo `target/` 又は他の非専用 directory を authoritative rustdoc output home として受け入れてはならず、identity resolution を fail-closed にする。Windows と、それ以外の platform はこの保証を満たす実装が提供されるまで unsupported とし、rustdoc snapshot の再利用及び export を fail-closed で拒否する。... この契約は任意の shared Cargo target の writer に対する unforgeable な OS mandatory-access 境界を主張しない。",
+        "citation": "共有出力を安全に扱う対応 platform は、解決済み target root から descriptor-relative に専用 selection directory と lock file を開き、親を含む path を no-follow で検証できる Unix とする。",
         "kind": "pass"
       }
     },
@@ -309,7 +309,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D8",
@@ -318,7 +318,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。\n\nrustdoc JSON では、同一の専用 selection directory の lock を、期待出力 path の選択、export、出力 path の一致確認、及び lock 内で copy する JSON bytes まで保持する。`SkipEvaluation` の成功を永続化する場合及び cache を再利用する場合は、評価区間の終端で snapshotted input の fingerprint が開始 snapshot と一致することを確認する。終端確認のための path 読み取りは評価入力ではない。不一致なら結果を破棄して失敗させる。disk 上で A から B を経て開始時と同じ bytes の A に戻る場合は、その snapshot と同じ generation として扱う。",
+        "citation": "評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。\n\nrustdoc JSON では、同一の専用 selection directory の lock を、期待出力 path の選択、export、出力 path の一致確認、及び lock 内で copy する JSON bytes まで保持する。`SkipEvaluation` の成功を永続化する場合及び cache を再利用する場合は、評価区間の終端で snapshotted input の fingerprint が開始 snapshot と一致することを確認する。不一致なら結果を破棄して失敗させる。disk 上で A から B を経て開始時と同じ bytes の A に戻る場合は、その snapshot と同じ generation として扱う。",
         "kind": "pass"
       }
     },
@@ -401,7 +401,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -410,7 +410,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "これは Cargo rustdoc の意味的な完全入力集合でも、rustdoc JSON のあらゆる変更を検出する fingerprint でもない。",
+        "citation": "これは Cargo rustdoc の意味的な完全入力集合でも、rustdoc JSON のあらゆる変更を検出する fingerprint でもない。」「partial fingerprint を成功として扱わない。」「任意の `target` 配下の走査又は別 crate の出力の混入を許さない。",
         "kind": "pass"
       }
     },
@@ -424,7 +424,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -433,7 +433,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "\"失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。\"",
+        "citation": "\"partial fingerprint を作らず\"、\"失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。\"",
         "kind": "pass"
       }
     },
@@ -447,7 +447,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D5",
@@ -470,7 +470,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D6",
@@ -479,7 +479,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "120 秒以内に lock を取得できない、lock file を安全に開けない、又は lock 操作が失敗した場合は、その評価を `RustdocFailed` として停止する。lock なしの export、以前の JSON の再利用、又は待機超過後の retry は許さない。",
+        "citation": "lock なしの export、以前の JSON の再利用、又は待機超過後の retry は許さない。",
         "kind": "pass"
       }
     },
@@ -493,7 +493,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D7",
@@ -502,7 +502,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "Windows と、それ以外の platform はこの保証を満たす実装が提供されるまで unsupported とし、rustdoc snapshot の再利用及び export を fail-closed で拒否する。",
+        "citation": "Windows と、それ以外の platform はこの保証を満たす実装が提供されるまで unsupported とし、rustdoc snapshot の再利用及び export を fail-closed で拒否する。この契約は任意の shared Cargo target の writer に対する unforgeable な OS mandatory-access 境界を主張しない。非協調 writer を全て検出するのではなく、非専用 target を拒否して expected-output writer 集合から除外する。",
         "kind": "pass"
       }
     },
@@ -516,7 +516,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D8",
@@ -677,7 +677,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -686,7 +686,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "実装 fingerprint は、`.git`、`.harness`、`.codex`、`.claude`、`.agents`、`target`、`track`、`tmp` を除く workspace 内の全 regular file の相対 path と内容 hash、次の環境値、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の各 content fingerprint、及び `cargo metadata --no-deps --locked` の結果 bytes を順序付きで含める。",
+        "citation": "実装 fingerprint は、`.git`、`.harness`、`.codex`、`.claude`、`.agents`、`target`、`track`、`tmp` を除く workspace 内の全 regular file の相対 path と内容 hash、次の環境値、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の各 content fingerprint、及び `cargo metadata --no-deps --locked` の結果 bytes を順序付きで含める。`PATH` 上の rustup proxy 自体の fingerprint をこれらの tool fingerprint として用いてはならない。",
         "kind": "pass"
       }
     },
@@ -700,7 +700,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -709,7 +709,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「これらの上限は、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の解決及び content snapshot と、`cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。」また、「partial fingerprint を作らず、結果を authoritative-input error として失敗させる。」",
+        "citation": "これらの上限は、`cargo +nightly rustdoc` が実際に使用する nightly 選択済み `cargo`、`rustc`、`rustdoc` の解決及び content snapshot と、`cargo metadata --no-deps --locked` の取得を含む、D3 の実装 fingerprint 作成全体にも適用する。\n\nsymlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。",
         "kind": "pass"
       }
     },
@@ -723,7 +723,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D5",
@@ -746,7 +746,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -769,7 +769,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_hash": "000be7e14233b242f72bf5264b41f231b093bd9eba02637cd0a4852044b210f6",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -792,7 +792,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D6",
@@ -815,7 +815,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D7",
@@ -838,7 +838,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D8",
@@ -999,7 +999,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -1008,7 +1008,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "この実装 fingerprint は、上記で列挙した非除外 workspace regular file、環境値、nightly 選択済み tool の content fingerprint、及び Cargo metadata の bytes からなる記録済み identity に対する再利用だけを定める。include graph、build-script の入力及び出力、proc-macro expansion はこの identity の対象外とする。D4 の I/O 上限内でこの記録対象を取得できない、nightly 選択済み tool を確定できない、又はその content snapshot に失敗する場合は、partial fingerprint を成功として扱わない。",
+        "citation": "この実装 fingerprint は、上記で列挙した非除外 workspace regular file、環境値、nightly 選択済み tool の content fingerprint、及び Cargo metadata の bytes からなる記録済み identity に対する再利用だけを定める。include graph、build-script の入力及び出力、proc-macro expansion はこの identity の対象外とする。これは Cargo rustdoc の意味的な完全入力集合でも、rustdoc JSON のあらゆる変更を検出する fingerprint でもない。D4 の I/O 上限内でこの記録対象を取得できない、nightly 選択済み tool を確定できない、又はその content snapshot に失敗する場合は、partial fingerprint を成功として扱わない。",
         "kind": "pass"
       }
     },
@@ -1022,7 +1022,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -1045,7 +1045,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D5",
@@ -1068,7 +1068,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D4",
@@ -1091,7 +1091,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_hash": "000be7e14233b242f72bf5264b41f231b093bd9eba02637cd0a4852044b210f6",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1114,7 +1114,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D6",
@@ -1137,7 +1137,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D7",
@@ -1160,7 +1160,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_hash": "494ea8bb4e9519b9e2fd51bfc6250de70de5d01e23324c453f38f1ddc7a9ca6c",
       "evidence_origin": {
         "data": {
           "decision_id": "D8",
@@ -1169,7 +1169,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。",
+        "citation": "評価は source、catalogue、architecture rules、及び D3 が定める関連入力を、評価開始時の内容 address された in-memory snapshot として捕捉してから行う。後続の解決・比較・評価はその snapshot だけを読み、snapshot 後の path 再読を評価入力にしてはならない。\n\nrustdoc JSON では、同一の専用 selection directory の lock を、期待出力 path の選択、export、出力 path の一致確認、及び lock 内で copy する JSON bytes まで保持する。`SkipEvaluation` の成功を永続化する場合及び cache を再利用する場合は、評価区間の終端で snapshotted input の fingerprint が開始 snapshot と一致することを確認する。不一致なら結果を破棄して失敗させる。disk 上で A から B を経て開始時と同じ bytes の A に戻る場合は、その snapshot と同じ generation として扱う。",
         "kind": "pass"
       }
     }

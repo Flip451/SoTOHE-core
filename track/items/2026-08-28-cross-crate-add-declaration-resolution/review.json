@@ -123,6 +123,20 @@
           "hash": "rvw1:sha256:12a53fce6524d9db31966917605a4e3da22187a6b9bc276df1d9a17492ebd1b7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:12:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9c8f6ca0de32926d0c65431bb65d7e55cfbe3f9037ef22794f08aa7193a58cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:21:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9c8f6ca0de32926d0c65431bb65d7e55cfbe3f9037ef22794f08aa7193a58cc",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -662,6 +676,54 @@
           "at": "2026-09-01T22:47:07Z",
           "findings": [],
           "hash": "rvw1:sha256:6ce389c49fe509c2811d4b970dffbba6591e54d8e6b76f8ea81745f1eaa28c6b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-09-02T08:11:46Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 14,
+              "message": "`environment-assumptions.md` explicitly says the template must not provide a default platform, but the new Supported Platforms declaration hard-codes Unix/Linux as the template-wide default. This contradicts the convention's consumer-ownership rule; document the shipped evaluator requirement outside the consumer declaration, or revise the ownership contract consistently.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:9b053ef83de456281cb99f8a39fbaabbefdccd0c4c927e9d814181b76696c252",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T08:15:10Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 29,
+              "message": "The Supported Platforms declaration fills in only the OS family (`Unix`, including Linux), while the field explicitly requires platform, architecture, and runtime. State the supported architecture(s) and runtime (or explicitly declare them architecture/runtime-independent) so consumers do not have to infer part of the evaluator contract.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:50f3d7b2e1f7931671afbfa14c04968efaa1d007be3cfd37f36005c1858c5c9e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T08:17:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ce8d1d812243c721009b3d36e543e8bdedb526c03b45732eb3e6e0617d51b01",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:24:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ce8d1d812243c721009b3d36e543e8bdedb526c03b45732eb3e6e0617d51b01",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1928,6 +1990,20 @@
           "at": "2026-09-02T05:57:06Z",
           "findings": [],
           "hash": "rvw1:sha256:8e52d805ed9a82666ceded898efbb17b9a5be1d57eb8ab7ed47d8909e326ecf4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:11:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4236210abf3449a38a0dc4de6418967fe55fbbf5fb3a3989cdb72dcc43e2509f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:23:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4236210abf3449a38a0dc4de6418967fe55fbbf5fb3a3989cdb72dcc43e2509f",
           "type": "final",
           "verdict": "zero_findings"
         }

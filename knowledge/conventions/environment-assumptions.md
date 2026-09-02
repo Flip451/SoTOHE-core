@@ -11,24 +11,28 @@
 
 - 新しく追加するコードと、環境との境界に関わる振る舞いを変更するコードに適用する。既存コードや既存の抽象の組を、この規約に合わせて遡及修正するためには使わない。
   > **強制先**: review 観点 — harness-policy scope
-- この文書の宣言欄は consumer が所有する。テンプレートは欄と記入指針だけを提供し、特定の platform、protocol、encoding、resource limit、concurrency model を既定値として記入しない。
+- この文書の宣言欄は原則として consumer が所有する。テンプレートは consumer 固有の platform、protocol、encoding、resource limit、concurrency model を既定値として記入しない。ただし、`対応プラットフォーム (Supported Platforms)` 欄に記載する出荷済み type-signals rustdoc 評価器の platform bound は consumer アプリの OS 選択ではなく、SoTOHE が出荷する評価器の固定実行契約であるため、テンプレートが共通に文書化する。
   > **強制先**: review 観点 — harness-policy scope
 
 ## Environment Declaration
 
-この節を consumer の環境前提宣言として使う。4 つの欄を実際の前提で埋め、適用外の欄には
-「適用外」とその理由を記入する。空欄や、判断を先送りする `TODO` を残したまま、前提に
-依存する設計や実装を追加してはならない。
+この節を consumer の環境前提宣言として使う。`対応プラットフォーム (Supported Platforms)` 欄の
+type-signals rustdoc 評価器に関する記載は、consumer アプリの OS 選択ではなく、SoTOHE が出荷する
+評価器の固定実行契約である。consumer 固有の前提は、4 つの分類の該当する欄を実際の前提で埋め、
+適用外の欄には「適用外」とその理由を記入する。空欄や、判断を先送りする `TODO` を残したまま、
+前提に依存する設計や実装を追加してはならない。
 
 > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 対応プラットフォーム (Supported Platforms)
 
-- 対応する platform、architecture、runtime: `TODO: consumer が記入`
+出荷する type-signals rustdoc 評価器の platform 前提。consumer プロジェクト固有の OS 選択ではなく、評価器が trusted-root を検証できる範囲を宣言する。
+
+- 対応する platform、architecture、runtime: platform は Unix（Linux を含む）。architecture は特定の CPU に依存しない。runtime は、解決済み target root から専用 selection directory と lock file を descriptor-relative に開き、親を含む path を no-follow で検証できる Unix runtime に限る。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- 対応外または条件付きの範囲: `TODO: consumer が記入`
+- 対応外または条件付きの範囲: Windows、および descriptor-relative open と no-follow 検証を提供しない platform は unsupported。そのような環境では rustdoc snapshot の再利用および export を fail-closed で拒否する。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: `TODO: consumer が記入`
+- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: 専用 selection directory の immediate parent の file name は正確に `.sotp-rustdoc` であること。親 Cargo `target/` や他の非専用 directory を authoritative rustdoc output home として受け入れない。条件を満たせない場合は identity resolution を開始せず失敗する。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 入力エンコーディング方針 (Input-Encoding Policy)
@@ -115,3 +119,4 @@ Concurrency Model: <execution unit, sharing, ordering, and cancellation>
 
 - [Project Conventions](README.md)
 - [Enforce by Mechanism Convention](enforce-by-mechanism.md)
+- [型シグナルの rustdoc 再利用と実行環境を拘束する](../adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md) D7
