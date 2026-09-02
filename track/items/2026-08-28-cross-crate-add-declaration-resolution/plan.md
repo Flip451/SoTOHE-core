@@ -5,7 +5,7 @@
 
 GO-01 original implementation and authoritative-context completion remain T001-T009; completed reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021; completed evaluation-start port separation and catalogue-bearing export planning remain T022-T023; remaining snapshot-bound export orchestration and time-bounded evaluation-start capture are T024-T025.
 
-## Tasks (24/25 resolved)
+## Tasks (25/25 resolved)
 
 ### SECTION-001 — Original resolution boundary
 
@@ -104,7 +104,7 @@ GO-01 original implementation and authoritative-context completion remain T001-T
 
 > Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06).
 
-- [~] **T024**: After T022 and T023, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06).
+- [x] **T024**: After T022 and T023, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06). (`eb1d057bc870944c91951d98649ed1313b0c43fd`)
 
 ### SECTION-016 — Time-bounded evaluation-start capture
 

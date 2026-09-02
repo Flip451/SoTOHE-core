@@ -361,13 +361,14 @@
       "status": "done"
     },
     {
+      "commit_hash": "eb1d057bc870944c91951d98649ed1313b0c43fd",
       "depends_on": [
         "T022",
         "T023"
       ],
       "description": "After T022 and T023, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06).",
       "id": "T024",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "commit_hash": "7f32ad41078a452d8490a4e1e13d4abf8bebd01d",
