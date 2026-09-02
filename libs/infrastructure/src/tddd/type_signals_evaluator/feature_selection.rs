@@ -12,7 +12,14 @@ use domain::tddd::{CargoFeatureName, LayerId};
 use super::EvaluateSignalsError;
 use super::freshness::RustdocProvider;
 use crate::verify::tddd_layers::TdddLayerBinding;
-use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
+#[cfg(test)]
+use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPortError;
+
+#[derive(Debug, Default)]
+pub(super) struct FeatureDeclarationSnapshot {
+    pub(super) declaration_bytes: Option<Vec<u8>>,
+    pub(super) baseline_bytes: Option<Vec<u8>>,
+}
 
 pub(super) fn resolve_execution_identities(
     configured_layers: &[TdddLayerBinding],
@@ -58,17 +65,18 @@ pub(super) fn resolve_execution_identities(
     Ok(identities)
 }
 
-/// Loads the complete frozen feature declaration so every rustdoc export uses
-/// the feature selection belonging to its own declaring layer. The usecase
-/// already validates the target selection before entering this evaluator; the
-/// equality check below keeps the evaluator's authoritative snapshot aligned
-/// with that port input as well.
+/// Decodes the captured feature declaration so every rustdoc export uses the
+/// feature selection belonging to its own declaring layer. The usecase already
+/// validates the target selection before entering this evaluator; the equality
+/// check below keeps the evaluator's authoritative snapshot aligned with that
+/// port input as well.
 pub(super) fn load_layer_feature_selections(
     track_dir: &Path,
     workspace_root: &Path,
     configured_layers: &[TdddLayerBinding],
     target_layer: &LayerId,
     target_features: &[CargoFeatureName],
+    captured: &FeatureDeclarationSnapshot,
 ) -> Result<BTreeMap<LayerId, Vec<CargoFeatureName>>, EvaluateSignalsError> {
     let domain_bindings = configured_layers
         .iter()
@@ -79,17 +87,21 @@ pub(super) fn load_layer_feature_selections(
             targets: binding.targets().to_vec(),
         })
         .collect::<Vec<_>>();
-    let adapter = crate::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter::new();
-    let declaration = match adapter.load_for_actual(track_dir, workspace_root, &domain_bindings) {
-        Ok(declaration) => declaration,
-        Err(error) => {
-            #[cfg(test)]
+    let declaration =
+        match crate::tddd::feature_declaration_adapter::load_actual_from_captured_bytes(
+            track_dir,
+            workspace_root,
+            &domain_bindings,
+            captured.declaration_bytes.as_deref(),
+            captured.baseline_bytes.as_deref(),
+        ) {
+            Ok(declaration) => declaration,
+            Err(error) => {
+                #[cfg(test)]
             if matches!(
                 &error,
-                usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPortError::Read(
-                    usecase::tddd_feature_declaration::TdddFeatureDeclarationReadError::MissingDeclaration {
-                        ..
-                    }
+                TdddActualFeatureDeclarationPortError::Read(
+                    usecase::tddd_feature_declaration::TdddFeatureDeclarationReadError::MissingDeclaration { .. }
                 )
             ) {
                 return fallback_layer_feature_selections(
@@ -98,11 +110,11 @@ pub(super) fn load_layer_feature_selections(
                     target_features,
                 );
             }
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "cannot load frozen TDDD feature declaration: {error}"
-            )));
-        }
-    };
+                return Err(EvaluateSignalsError::authoritative_input(format!(
+                    "cannot load frozen TDDD feature declaration: {error}"
+                )));
+            }
+        };
     let selections = declaration.layers().clone();
     let declared_target = selections.get(target_layer).ok_or_else(|| {
         EvaluateSignalsError::authoritative_input(format!(

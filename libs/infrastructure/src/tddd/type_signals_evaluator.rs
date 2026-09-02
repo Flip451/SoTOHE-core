@@ -654,6 +654,7 @@ fn execute_with_dependencies(
         configured_layers,
         &target_layer,
         features,
+        &loaded_catalogues.feature_declaration_snapshot,
     )?;
     let target_features = feature_selections.get(&target_layer).ok_or_else(|| {
         EvaluateSignalsError::authoritative_input(format!(
@@ -886,6 +887,123 @@ mod tests {
             error.to_string().contains("fingerprint changed"),
             "the fingerprint failure reason must be preserved: {error}"
         );
+    }
+
+    struct FeatureDeclarationGenerationRustdoc {
+        observer: RustdocLaunchObserver,
+        declaration_path: PathBuf,
+        baseline_path: PathBuf,
+        initial_bytes: Vec<u8>,
+        changed_bytes: Vec<u8>,
+    }
+
+    impl FeatureDeclarationGenerationRustdoc {
+        fn write_generation(&self, bytes: &[u8]) {
+            std::fs::write(&self.declaration_path, bytes).unwrap();
+            std::fs::write(&self.baseline_path, bytes).unwrap();
+        }
+    }
+
+    impl RustdocCratePort for FeatureDeclarationGenerationRustdoc {
+        fn load_from_path(
+            &self,
+            path: &Path,
+        ) -> Result<domain::tddd::type_signals_doc::CapturedRustdocJson, RustdocCratePortError>
+        {
+            let result = RustdocCratePort::load_from_path(&self.observer, path);
+            self.write_generation(&self.changed_bytes);
+            result
+        }
+
+        fn capture_current(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+            evaluation_start: &ImplementationFingerprint,
+        ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+            self.write_generation(&self.initial_bytes);
+            RustdocCratePort::capture_current(
+                &self.observer,
+                crate_name,
+                features,
+                evaluation_start,
+            )
+        }
+    }
+
+    impl RustdocProvider for FeatureDeclarationGenerationRustdoc {
+        fn capture_current_with_implementation_fingerprint(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+            evaluation_start: &ImplementationFingerprint,
+        ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+            self.write_generation(&self.initial_bytes);
+            RustdocProvider::capture_current_with_implementation_fingerprint(
+                &self.observer,
+                crate_name,
+                features,
+                evaluation_start,
+            )
+        }
+
+        fn execution_identity(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+        ) -> Result<RustdocExecutionIdentity, RustdocCratePortError> {
+            RustdocProvider::execution_identity(&self.observer, crate_name, features)
+        }
+    }
+
+    #[test]
+    fn test_execute_type_signals_uses_authoritative_feature_snapshot_after_generation_changes() {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            let track_dir = items_dir.join(track_id.as_ref());
+            let declaration_path = track_dir.join(TDDD_FEATURE_DECLARATION_FILE);
+            let baseline_path = track_dir.join(TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE);
+            let initial_bytes =
+                br#"{"schema_version":1,"layers":{"infrastructure":["initial"]}}"#.to_vec();
+            let changed_bytes =
+                br#"{"schema_version":1,"layers":{"infrastructure":["changed"]}}"#.to_vec();
+            std::fs::write(&declaration_path, &initial_bytes).unwrap();
+            std::fs::write(&baseline_path, &initial_bytes).unwrap();
+            std::fs::write(
+                workspace.path().join("libs/infrastructure/Cargo.toml"),
+                "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\ninitial = []\nchanged = []\n",
+            )
+            .unwrap();
+            let observer = FeatureDeclarationGenerationRustdoc {
+                observer: RustdocLaunchObserver::using_json_path(rustdoc_path),
+                declaration_path,
+                baseline_path,
+                initial_bytes: initial_bytes.clone(),
+                changed_bytes,
+            };
+            let target_features = vec![CargoFeatureName::try_new("initial".to_owned()).unwrap()];
+
+            let result = execute_with_dependencies(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &target_features,
+                &observer,
+                &RustdocContextCache::default(),
+                EvaluationObservers::none(),
+            )
+            .expect("the evaluator must use the captured feature generation");
+
+            assert_eq!(result, ExitCode::SUCCESS);
+            assert_eq!(
+                observer.observer.feature_selections_for("infrastructure"),
+                vec![vec!["initial".to_owned()]],
+                "rustdoc must receive the feature selection captured before the replacement"
+            );
+            assert_eq!(std::fs::read(&observer.declaration_path).unwrap(), initial_bytes);
+            assert_eq!(std::fs::read(&observer.baseline_path).unwrap(), observer.initial_bytes);
+        });
     }
 
     fn rustdoc_json() -> String {

@@ -13,6 +13,7 @@ use domain::tddd::type_signals_doc::{
 use domain::tddd::{AuthoritativeRustdocContext, CargoFeatureName, LayerId};
 use domain::{CatalogueDeclarationHash, CommitHash, Timestamp};
 
+use super::feature_selection::FeatureDeclarationSnapshot;
 use super::freshness::RustdocProvider;
 use super::{
     EvaluateSignalsError, EvaluationObservers, MAX_RUSTDOC_JSON_BYTES, TdddLayerBinding,
@@ -73,6 +74,7 @@ pub(super) struct LoadedTrackCatalogues {
     pub(super) catalogues: BTreeMap<LayerId, AttestedCatalogueDocument>,
     pub(super) baselines: BTreeMap<LayerId, CapturedRustdocJson>,
     pub(super) baseline_paths: BTreeMap<LayerId, PathBuf>,
+    pub(super) feature_declaration_snapshot: FeatureDeclarationSnapshot,
     pub(super) resolution_fingerprint: Option<CatalogueDeclarationHash>,
 }
 
@@ -205,6 +207,7 @@ pub(super) fn load_track_catalogues(
         catalogues,
         baselines: BTreeMap::new(),
         baseline_paths: BTreeMap::new(),
+        feature_declaration_snapshot: FeatureDeclarationSnapshot::default(),
         resolution_fingerprint: None,
     })
 }
@@ -237,16 +240,12 @@ pub(super) fn load_authoritative_inputs(
     })?;
     let mut fingerprint_input = Vec::new();
     encode_snapshot_bytes(&mut fingerprint_input, &rules_path, Some(&rules))?;
-    for file_name in
-        [super::TDDD_FEATURE_DECLARATION_FILE, super::TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE]
-    {
-        let path = track_dir.join(file_name);
-        super::reject_type_signals_path(&path, trusted_items_root, file_name)?;
-        match read_workspace_file(&path, trusted_items_root, file_name)? {
-            Some(bytes) => encode_snapshot_bytes(&mut fingerprint_input, &path, Some(&bytes))?,
-            None => encode_snapshot_bytes(&mut fingerprint_input, &path, None)?,
-        }
-    }
+    let feature_declaration_snapshot =
+        resolution_fingerprint::capture_feature_declaration_snapshot(
+            track_dir,
+            trusted_items_root,
+            &mut fingerprint_input,
+        )?;
 
     let mut catalogues = BTreeMap::new();
     let mut baselines = BTreeMap::new();
@@ -320,6 +319,7 @@ pub(super) fn load_authoritative_inputs(
         catalogues,
         baselines,
         baseline_paths,
+        feature_declaration_snapshot,
         resolution_fingerprint: Some(type_signals_codec::declaration_hash(&fingerprint_input)),
     })
 }

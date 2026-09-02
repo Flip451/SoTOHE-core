@@ -586,6 +586,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_uses_authoritative_feature_snapshot_after_generation_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
         },
         {

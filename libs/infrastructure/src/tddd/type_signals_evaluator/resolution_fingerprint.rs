@@ -4,7 +4,35 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use super::super::EvaluateSignalsError;
+use super::super::feature_selection::FeatureDeclarationSnapshot;
 use super::{LoadedTrackCatalogues, MAX_RUSTDOC_CONTEXT_EXPORTS, TdddLayerBinding};
+
+pub(super) fn capture_feature_declaration_snapshot(
+    track_dir: &Path,
+    trusted_items_root: &Path,
+    fingerprint_input: &mut Vec<u8>,
+) -> Result<FeatureDeclarationSnapshot, EvaluateSignalsError> {
+    let mut snapshot = FeatureDeclarationSnapshot::default();
+    for file_name in [
+        super::super::TDDD_FEATURE_DECLARATION_FILE,
+        super::super::TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE,
+    ] {
+        let path = track_dir.join(file_name);
+        super::reject_type_signals_path(&path, trusted_items_root, file_name)?;
+        match super::read_workspace_file(&path, trusted_items_root, file_name)? {
+            Some(bytes) => {
+                super::encode_snapshot_bytes(fingerprint_input, &path, Some(&bytes))?;
+                if file_name == super::super::TDDD_FEATURE_DECLARATION_FILE {
+                    snapshot.declaration_bytes = Some(bytes);
+                } else {
+                    snapshot.baseline_bytes = Some(bytes);
+                }
+            }
+            None => super::encode_snapshot_bytes(fingerprint_input, &path, None)?,
+        }
+    }
+    Ok(snapshot)
+}
 
 /// Returns the distinct layers that will receive a rustdoc context for this
 /// target. A selected target is always required; other layers participate only
