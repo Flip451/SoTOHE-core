@@ -4060,7 +4060,7 @@
       },
       "key": {
         "anchor_text_hash": "63eff5938709b5e300ff4321fe8086abdca28b8aeabbf37448ec70d0172e58a7",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4069,7 +4069,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"assert_ne!(first, second, \\\"tool contents are part of implementation identity\\\");\" ... \"assert_eq!(proxy_changed, baseline, \\\"changing PATH proxy contents must not change the nightly tool fingerprint\\\");\" ... \"assert_ne!(without_build_script, with_build_script, \\\"a workspace build.rs must remain a walked source input\\\");\" ... \"assert!(error.to_string().contains(\\\"evaluation-start snapshot\\\"), \\\"the export must report the evaluation-start mismatch: {error}\\\");\"",
+        "citation": "assert_ne!(proxy_changed, baseline,\n                        \"changing PATH proxy contents must not change the nightly tool fingerprint\"\n                    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4356,7 +4356,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4365,7 +4365,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);",
+        "citation": "            execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4652,7 +4652,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4661,7 +4661,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the synthesized add must use the declaring crate root\"; \"the bin target root must be canonicalized before the add is synthesized\"; \"the identity must not be synthesized twice\"; \"the rustdoc identity must remain in the resolution set\"",
+        "citation": "\"the synthesized add must use the declaring crate root\"; \"the bin target root must be canonicalized before the add is synthesized\"; \"the encoded synthesized item must retain its resolved placement\"; \"a referring-side rustdoc identity must win over the other-layer add\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4948,7 +4948,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4957,7 +4957,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the identity must not be synthesized twice\"; \"rustdoc must win when it supplies the same resolved identity\"; \"the rustdoc identity must remain in the resolution set\"",
+        "citation": "\"the target type must survive evaluation after both external declarations resolve\"; \"the synthesized add must use the declaring crate root\"; \"the identity must not be synthesized twice\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5244,7 +5244,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5253,7 +5253,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"an enabled layer without a catalogue must contribute no declarations\");\n\n            let signals = type_signals_codec::decode(\n                &std::fs::read_to_string(\n                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),\n                )\n                .unwrap(),\n            )\n            .unwrap();\n            assert!(signals.signals().is_empty());\n            assert_eq!(observer.launches_for(\"domain\"), 1);\n            assert_eq!(observer.launches_for(\"infrastructure\"), 1);",
+        "citation": "\"missing enabled catalogues are empty, not errors\"; ... \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5540,7 +5540,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5549,7 +5549,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the evaluator must place the external add through the bin-target alias\" ... \"the synthesized add must use the declaring crate root\" ... \"the bin target root must be canonicalized before the add is synthesized\" ... \"the encoded synthesized item must retain its resolved placement\"",
+        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5836,7 +5836,7 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5845,7 +5845,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");",
+        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");\n\n            let signals = type_signals_codec::decode(\n                &std::fs::read_to_string(\n                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),\n                )\n                .unwrap(),\n            )\n            .unwrap();\n            assert!(\n                signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"),\n                \"the target type must survive evaluation after both external declarations resolve\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6132,7 +6132,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6141,7 +6141,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
+        "citation": "assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6428,7 +6428,7 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6437,7 +6437,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");\nassert_eq!(*matching[0].0, Id(1));\nassert_eq!(matching[0].1.crate_id, 7);",
+        "citation": "\"assert_eq!(matching.len(), 1, \\\"the identity must not be synthesized twice\\\");\"; \"expect_err(\\\"an ungrounded cross-layer reference must not use short-name fallback\\\")\"; \"expect_err(\\\"a mismatched external candidate must fail closed\\\")\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6724,7 +6724,7 @@
       },
       "key": {
         "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6733,7 +6733,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let layers = (0..65)\n                .map(|index| { ... });\n            let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th configured layer must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
+        "citation": "\"the 65th configured layer must fail before rustdoc export\" ... \"assert_eq!(observer.launches(), 0, \\\"the layer-budget failure must precede export\\\");\" ... \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7020,7 +7020,7 @@
       },
       "key": {
         "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7316,7 +7316,7 @@
       },
       "key": {
         "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7325,7 +7325,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = super::rustdoc_contexts::load_authoritative_inputs(\n        workspace.path(),\n        &items,\n        &items,\n        &observer,\n    )\n    .expect_err(\"the 65th configured context must fail before export\");",
+        "citation": "assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7612,7 +7612,7 @@
       },
       "key": {
         "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7621,7 +7621,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(proxy_changed, baseline,\n                        \"changing PATH proxy contents must not change the nightly tool fingerprint\"\n                    );\n...\nassert_ne!(\n                            persisted.cache_key().implementation_fingerprint(),\n                            type_signals_codec::decode(&original)\n                                .unwrap()\n                                .cache_key()\n                                .implementation_fingerprint(),\n                            \"metadata output must change the implementation cache identity\"\n                        );\n...\nassert_ne!(\n                        first, second, \"tool contents are part of implementation identity\"\n                    );\n...\nassert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");\n...\nassert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n...\nassert!(matches!(error, freshness::RustdocInputFingerprintError::FileBytes { .. }));",
+        "citation": "assert_ne!(baseline, selected_changed, \"nightly-selected {tool} content must be part of the fingerprint\");\n...\nassert_eq!(proxy_changed, baseline, \"changing PATH proxy contents must not change the nightly tool fingerprint\");\n...\nassert_ne!(persisted.cache_key().implementation_fingerprint(), type_signals_codec::decode(&original).unwrap().cache_key().implementation_fingerprint(), \"metadata output must change the implementation cache identity\");\n...\nassert_eq!(persisted.cache_key(), current_cache_document(workspace.path(), &items_dir, &track_id).cache_key());\n...\nassert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7908,7 +7908,7 @@
       },
       "key": {
         "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
-        "bound_tests_set_hash": "006c258fe72f4192dbba1064804b26222ec907b131275eb77b8c5e09a415f698",
+        "bound_tests_set_hash": "4babdd54a94879d9a5dae6c61eebb0ad5f7ddedf402497a8d75a85ab63b85b3c",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7917,7 +7917,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n        decide_reuse_for_recorded_document(Some(&recorded), &cache_key(0), true),\n        TypeSignalsReuseDecision::SkipEvaluation\n    );\n    for changed_component in 1..=6 {\n        assert_eq!(\n            decide_reuse_for_recorded_document(\n                Some(&recorded),\n                &cache_key(changed_component),\n                true,\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate,\n            \"component {changed_component} must invalidate reuse\"\n        );\n    }\n\nassert_ne!(\n                            baseline, selected_changed,\n                            \"nightly-selected {tool} content must be part of the fingerprint\"\n                        );\n\nassert_eq!(\n                        proxy_changed, baseline,\n                        \"changing PATH proxy contents must not change the nightly tool fingerprint\"\n                    );\n\nassert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n\nassert_ne!(\n                        persisted.cache_key().implementation_fingerprint(),\n                        type_signals_codec::decode(&original)\n                            .unwrap()\n                            .cache_key()\n                            .implementation_fingerprint(),\n                        \"metadata output must change the implementation cache identity\"\n                    );\n\nlet error = freshness::rustdoc_input_fingerprint(workspace.path())\n            .expect_err(\"an oversized rustdoc input must fail closed\");\n        assert!(matches!(error, freshness::RustdocInputFingerprintError::FileBytes { .. }));",
+        "citation": "assert_eq!(decide_reuse_for_recorded_document(Some(&recorded), &cache_key(0), true), TypeSignalsReuseDecision::SkipEvaluation); ... assert_eq!(decide_reuse_for_recorded_document(Some(&recorded), &cache_key(changed_component), true), TypeSignalsReuseDecision::ReextractAndEvaluate, \"component {changed_component} must invalidate reuse\"); ... assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_))); ... assert_eq!(observer.launches(), 0, \"metadata failure must not launch rustdoc\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

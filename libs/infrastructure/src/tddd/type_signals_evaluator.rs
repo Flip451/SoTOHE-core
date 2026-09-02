@@ -1128,7 +1128,9 @@ mod tests {
             .unwrap();
         }
         let baseline = rustdoc_json();
-        std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline).unwrap();
+        if declaring.is_some() {
+            std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline).unwrap();
+        }
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), &baseline).unwrap();
         let domain_current_path = exclusive_observer_json_path(root, "domain-current.json");
         let infrastructure_current_path =
@@ -2198,7 +2200,7 @@ mod tests {
             )
             .unwrap();
             assert!(signals.signals().is_empty());
-            assert_eq!(observer.launches_for("domain"), 1);
+            assert_eq!(observer.launches_for("domain"), 0);
             assert_eq!(observer.launches_for("infrastructure"), 1);
         });
     }

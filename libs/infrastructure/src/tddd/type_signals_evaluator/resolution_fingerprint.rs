@@ -66,9 +66,18 @@ pub(crate) fn resolution_input_fingerprint(
         input.extend_from_slice(binding.layer_id().as_bytes());
         let path = track_dir.join(binding.catalogue_file());
         super::reject_type_signals_path(&path, trusted_items_root, "catalogue")?;
-        match read_configured_catalogue(&path, trusted_items_root)? {
-            Some(bytes) => encode_snapshot_bytes(&mut input, &path, Some(&bytes))?,
-            None => encode_snapshot_bytes(&mut input, &path, None)?,
+        let catalogue_present = match read_configured_catalogue(&path, trusted_items_root)? {
+            Some(bytes) => {
+                encode_snapshot_bytes(&mut input, &path, Some(&bytes))?;
+                true
+            }
+            None => {
+                encode_snapshot_bytes(&mut input, &path, None)?;
+                false
+            }
+        };
+        if !catalogue_present {
+            continue;
         }
         let baseline_path = track_dir.join(binding.baseline_file());
         super::reject_type_signals_path(&baseline_path, trusted_items_root, "baseline")?;

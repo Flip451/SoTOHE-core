@@ -270,35 +270,34 @@ pub(super) fn load_authoritative_inputs(
 
         let catalogue_path = track_dir.join(binding.catalogue_file());
         super::reject_type_signals_path(&catalogue_path, trusted_items_root, "catalogue")?;
-        match read_configured_catalogue(&catalogue_path, trusted_items_root)? {
-            Some(bytes) => {
-                encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, Some(&bytes))?;
-                let name = derive_filename_stem(&catalogue_path);
-                let document = AttestedCatalogueDocument::attest(&bytes, |source| {
-                    let text = std::str::from_utf8(source).map_err(|error| error.to_string())?;
-                    CatalogueDocumentCodec::decode(text, &name).map_err(|error| error.to_string())
-                })
-                .map_err(|error| {
-                    EvaluateSignalsError::authoritative_input(format!(
-                        "cannot decode catalogue '{}': {error}",
-                        catalogue_path.display()
-                    ))
-                })?;
-                if document.document().layer() != &layer {
-                    return Err(EvaluateSignalsError::authoritative_input(format!(
-                        "catalogue '{}' declares layer '{}' but architecture binding selects '{}'",
-                        catalogue_path.display(),
-                        document.document().layer(),
-                        layer
-                    )));
-                }
-                if catalogues.insert(layer.clone(), document).is_some() {
-                    return Err(EvaluateSignalsError::authoritative_input(format!(
-                        "duplicate effective TDDD catalogue layer '{layer}'"
-                    )));
-                }
-            }
-            None => encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, None)?,
+        let Some(bytes) = read_configured_catalogue(&catalogue_path, trusted_items_root)? else {
+            encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, None)?;
+            continue;
+        };
+        encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, Some(&bytes))?;
+        let name = derive_filename_stem(&catalogue_path);
+        let document = AttestedCatalogueDocument::attest(&bytes, |source| {
+            let text = std::str::from_utf8(source).map_err(|error| error.to_string())?;
+            CatalogueDocumentCodec::decode(text, &name).map_err(|error| error.to_string())
+        })
+        .map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot decode catalogue '{}': {error}",
+                catalogue_path.display()
+            ))
+        })?;
+        if document.document().layer() != &layer {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "catalogue '{}' declares layer '{}' but architecture binding selects '{}'",
+                catalogue_path.display(),
+                document.document().layer(),
+                layer
+            )));
+        }
+        if catalogues.insert(layer.clone(), document).is_some() {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "duplicate effective TDDD catalogue layer '{layer}'"
+            )));
         }
 
         let baseline_path = track_dir.join(binding.baseline_file());
@@ -420,6 +419,9 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
             LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
                 EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
             })?;
+        if &layer != target_layer && !loaded.catalogues.contains_key(&layer) {
+            continue;
+        }
         let baseline = loaded.baselines.get(&layer).ok_or_else(|| {
             EvaluateSignalsError::authoritative_input(format!(
                 "baseline snapshot for configured layer '{layer}' is unavailable"

@@ -4554,6 +4554,35 @@
           "hash": "rvw1:sha256:67e5ae946bab7612b04e17654f6e96e4e565758cd05a6ffd5a0feb860f462361",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T06:37:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6495374e08ca0367f357be420ef9b3af679b2a51987b48b2f07ecbe355c9114c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T06:48:00Z",
+          "findings": [
+            {
+              "category": "module-size-gate",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 311,
+              "message": "`bin/sotp verify module-size` fails because this production module is now 707 lines, exceeding `architecture-rules.json`'s 700-line maximum (HEAD was 693 lines). Split or extract code until the file is at most 700 lines; otherwise the required verification gate remains red.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6495374e08ca0367f357be420ef9b3af679b2a51987b48b2f07ecbe355c9114c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T06:59:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc8d299e1f550d5b5101bd700818704d2f72ef857b8d2e0ff54f2504c188c765",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
