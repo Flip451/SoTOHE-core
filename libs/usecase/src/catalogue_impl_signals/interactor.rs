@@ -7,7 +7,7 @@
 
 use std::collections::BTreeMap;
 use std::fmt::Write as FmtWrite;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use domain::SymlinkGuardPort;
@@ -88,6 +88,69 @@ impl CatalogueImplSignalsInteractor {
             feature_declaration_port,
             symlink_guard,
         }
+    }
+
+    fn validate_catalogue_set(
+        &self,
+        track_dir: &Path,
+        items_dir: &Path,
+        declaration_bindings: &[domain::tddd::catalogue_v2::TdddLayerBinding],
+        attested_catalogues: &BTreeMap<LayerId, AttestedCatalogueDocument>,
+    ) -> Result<(), CatalogueImplSignalsError> {
+        for catalogue_binding in declaration_bindings {
+            let catalogue_layer =
+                LayerId::try_new(catalogue_binding.layer_id.clone()).map_err(|error| {
+                    CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                        "invalid layer binding: {error}"
+                    )))
+                })?;
+            validate_binding_filename(&catalogue_binding.catalogue_file, "catalogue_file")?;
+            let catalogue_path = track_dir.join(&catalogue_binding.catalogue_file);
+            self.symlink_guard
+                .reject_symlinks_below(&catalogue_path, items_dir)
+                .map_err(map_symlink_guard_error)?;
+
+            match self.catalogue_loader.load(&catalogue_path) {
+                Ok(current) => {
+                    let Some(expected) = attested_catalogues.get(&catalogue_layer) else {
+                        return Err(CatalogueImplSignalsError::CatalogueLoad(
+                            catalogue_layer,
+                            diagnostic(format!(
+                                "catalogue presence changed while validating the stable set at '{}'",
+                                catalogue_path.display()
+                            )),
+                        ));
+                    };
+                    if current.declaration_hash() != expected.declaration_hash() {
+                        return Err(CatalogueImplSignalsError::CatalogueLoad(
+                            catalogue_layer,
+                            diagnostic(format!(
+                                "catalogue declaration hash changed while validating the stable set at '{}'",
+                                catalogue_path.display()
+                            )),
+                        ));
+                    }
+                }
+                Err(CatalogueDocumentLoaderError::NotFound { .. }) => {
+                    if attested_catalogues.contains_key(&catalogue_layer) {
+                        return Err(CatalogueImplSignalsError::CatalogueLoad(
+                            catalogue_layer,
+                            diagnostic(format!(
+                                "catalogue presence changed while validating the stable set at '{}'",
+                                catalogue_path.display()
+                            )),
+                        ));
+                    }
+                }
+                Err(error) => {
+                    return Err(CatalogueImplSignalsError::CatalogueLoad(
+                        catalogue_layer,
+                        diagnostic(error.to_string()),
+                    ));
+                }
+            }
+        }
+        Ok(())
     }
 }
 
@@ -241,6 +304,13 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 }
             }
         }
+
+        self.validate_catalogue_set(
+            &track_dir,
+            &items_dir,
+            &declaration_bindings,
+            &attested_catalogues,
+        )?;
 
         let mut track_catalogues = BTreeMap::<LayerId, CatalogueDocument>::new();
         for (catalogue_layer, attested_catalogue) in &attested_catalogues {
@@ -452,6 +522,12 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             }
         }
 
+        self.validate_catalogue_set(
+            &track_dir,
+            &items_dir,
+            &declaration_bindings,
+            &attested_catalogues,
+        )?;
         Ok(CatalogueImplSignalsReport { text: report, any_red: total_red > 0 })
     }
 }

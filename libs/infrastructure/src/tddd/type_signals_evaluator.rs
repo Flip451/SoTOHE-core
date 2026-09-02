@@ -662,8 +662,13 @@ fn execute_with_dependencies(
             "invalid rustdoc target crate '{target_crate}': {error}"
         ))
     })?;
-    let execution_identities =
-        resolve_execution_identities(configured_layers, &feature_selections, rustdoc)?;
+    let execution_identities = resolve_execution_identities(
+        configured_layers,
+        &target_layer,
+        &loaded_catalogues.catalogues,
+        &feature_selections,
+        rustdoc,
+    )?;
     let execution_identity = execution_identities.get(&target_layer).cloned().ok_or_else(|| {
         EvaluateSignalsError::authoritative_input(format!(
             "rustdoc execution identity for target layer '{target_layer}' is unavailable"
@@ -850,7 +855,7 @@ mod tests {
     use domain::FreeText;
     use domain::Timestamp;
     use domain::tddd::CatalogueToExtendedCratePort;
-    use domain::tddd::catalogue_v2::{CatalogueDocument, RustdocCratePortError};
+    use domain::tddd::catalogue_v2::{CatalogueDocument, RustdocCratePort, RustdocCratePortError};
     use domain::tddd::type_signals_doc::TypeSignalsDocument;
     use domain::tddd::type_signals_doc::{ImplementationFingerprint, Sha256Digest};
     use rustdoc_contexts::verify_baseline_snapshots_unchanged;
@@ -1152,6 +1157,65 @@ mod tests {
             .unwrap();
 
         (workspace, items_dir, track_id, binding, domain_current_path, infrastructure_current_path)
+    }
+
+    struct MissingCatalogueIdentityRustdoc {
+        observer: RustdocLaunchObserver,
+    }
+
+    impl RustdocCratePort for MissingCatalogueIdentityRustdoc {
+        fn load_from_path(
+            &self,
+            path: &Path,
+        ) -> Result<domain::tddd::type_signals_doc::CapturedRustdocJson, RustdocCratePortError>
+        {
+            RustdocCratePort::load_from_path(&self.observer, path)
+        }
+
+        fn capture_current(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+            evaluation_start: &ImplementationFingerprint,
+        ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+            RustdocCratePort::capture_current(
+                &self.observer,
+                crate_name,
+                features,
+                evaluation_start,
+            )
+        }
+    }
+
+    impl RustdocProvider for MissingCatalogueIdentityRustdoc {
+        fn capture_current_with_implementation_fingerprint(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+            evaluation_start: &ImplementationFingerprint,
+        ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+            RustdocProvider::capture_current_with_implementation_fingerprint(
+                &self.observer,
+                crate_name,
+                features,
+                evaluation_start,
+            )
+        }
+
+        fn execution_identity(
+            &self,
+            crate_name: &CrateName,
+            features: &[CargoFeatureName],
+        ) -> Result<domain::tddd::type_signals_doc::RustdocExecutionIdentity, RustdocCratePortError>
+        {
+            if crate_name.as_str() == "domain" {
+                return Err(RustdocCratePortError::AuthoritativeInput {
+                    crate_name: crate_name.clone(),
+                    reason: FreeText::new("package `domain` was not found in cargo metadata"),
+                });
+            }
+            RustdocProvider::execution_identity(&self.observer, crate_name, features)
+        }
     }
 
     #[test]
@@ -2200,6 +2264,42 @@ mod tests {
             )
             .unwrap();
             assert!(signals.signals().is_empty());
+            assert_eq!(observer.launches_for("domain"), 0);
+            assert_eq!(observer.launches_for("infrastructure"), 1);
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_skips_missing_catalogue_before_resolving_package_identity() {
+        with_process_environment_lock(|| {
+            let target = CatalogueDocument::new(
+                5,
+                CrateName::new("infrastructure").unwrap(),
+                LayerId::try_new("infrastructure").unwrap(),
+            );
+            let empty = rustdoc_crate_with_paths(HashMap::new());
+            let (workspace, items_dir, track_id, binding, domain_path, infrastructure_path) =
+                setup_cross_layer_execute_workspace(&target, None, &empty, &empty);
+            let observer = RustdocLaunchObserver::using_json_paths(BTreeMap::from([
+                ("domain".to_owned(), domain_path),
+                ("infrastructure".to_owned(), infrastructure_path),
+            ]));
+            let rustdoc = MissingCatalogueIdentityRustdoc { observer: observer.clone() };
+
+            execute_with_dependencies(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &rustdoc,
+                &RustdocContextCache::default(),
+                EvaluationObservers::none(),
+            )
+            .expect(
+                "a missing enabled catalogue must be skipped before its unavailable package identity is resolved",
+            );
+
             assert_eq!(observer.launches_for("domain"), 0);
             assert_eq!(observer.launches_for("infrastructure"), 1);
         });

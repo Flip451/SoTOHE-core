@@ -521,6 +521,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate"
         },
         {
@@ -557,6 +562,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_skips_missing_catalogue_before_resolving_package_identity"
         },
         {
           "layer": "infrastructure",

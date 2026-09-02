@@ -3,7 +3,9 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use domain::tddd::catalogue_v2::{CrateName, TdddLayerBinding as DomainTdddLayerBinding};
+use domain::tddd::catalogue_v2::{
+    AttestedCatalogueDocument, CrateName, TdddLayerBinding as DomainTdddLayerBinding,
+};
 use domain::tddd::type_signals_doc::RustdocExecutionIdentity;
 use domain::tddd::{CargoFeatureName, LayerId};
 
@@ -14,42 +16,46 @@ use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 pub(super) fn resolve_execution_identities(
     configured_layers: &[TdddLayerBinding],
+    target_layer: &LayerId,
+    loaded_catalogues: &BTreeMap<LayerId, AttestedCatalogueDocument>,
     feature_selections: &BTreeMap<LayerId, Vec<CargoFeatureName>>,
     rustdoc: &impl RustdocProvider,
 ) -> Result<BTreeMap<LayerId, RustdocExecutionIdentity>, EvaluateSignalsError> {
-    configured_layers
-        .iter()
-        .map(|binding| {
-            let layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
-            })?;
-            let [target] = binding.targets() else {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "type-signal layer '{layer}' requires exactly one rustdoc target"
-                )));
-            };
-            let target = CrateName::new(target.to_owned()).map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!(
-                    "invalid rustdoc target crate '{target}' for layer '{layer}': {error}"
-                ))
-            })?;
-            let features = feature_selections.get(&layer).ok_or_else(|| {
-                EvaluateSignalsError::authoritative_input(format!(
-                    "feature declaration has no selection for configured layer '{layer}'"
-                ))
-            })?;
-            let identity = rustdoc.execution_identity(&target, features).map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!(
-                    "cannot resolve rustdoc execution identity for layer '{layer}': {error}"
-                ))
-            })?;
-            crate::schema_export::require_exclusive_rustdoc_target(
-                identity.target_directory().as_path(),
-            )
-            .map_err(|error| EvaluateSignalsError::authoritative_input(error.to_string()))?;
-            Ok((layer, identity))
-        })
-        .collect()
+    let mut identities = BTreeMap::new();
+    for binding in configured_layers {
+        let layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+        })?;
+        if &layer != target_layer && !loaded_catalogues.contains_key(&layer) {
+            continue;
+        }
+        let [target] = binding.targets() else {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "type-signal layer '{layer}' requires exactly one rustdoc target"
+            )));
+        };
+        let target = CrateName::new(target.to_owned()).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "invalid rustdoc target crate '{target}' for layer '{layer}': {error}"
+            ))
+        })?;
+        let features = feature_selections.get(&layer).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "feature declaration has no selection for configured layer '{layer}'"
+            ))
+        })?;
+        let identity = rustdoc.execution_identity(&target, features).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot resolve rustdoc execution identity for layer '{layer}': {error}"
+            ))
+        })?;
+        crate::schema_export::require_exclusive_rustdoc_target(
+            identity.target_directory().as_path(),
+        )
+        .map_err(|error| EvaluateSignalsError::authoritative_input(error.to_string()))?;
+        identities.insert(layer, identity);
+    }
+    Ok(identities)
 }
 
 /// Loads the complete frozen feature declaration so every rustdoc export uses

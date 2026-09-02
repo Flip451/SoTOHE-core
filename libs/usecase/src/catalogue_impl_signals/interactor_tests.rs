@@ -1057,6 +1057,34 @@ impl AttestedCatalogueDocumentLoaderPort for TrackCatalogueLoader {
     }
 }
 
+struct ChangingHashCatalogueLoader {
+    document: CatalogueDocument,
+    calls: Arc<Mutex<usize>>,
+}
+
+impl AttestedCatalogueDocumentLoaderPort for ChangingHashCatalogueLoader {
+    fn load(
+        &self,
+        _path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::AttestedCatalogueDocument, CatalogueDocumentLoaderError>
+    {
+        let call = {
+            let mut calls = self.calls.lock().unwrap();
+            *calls += 1;
+            *calls
+        };
+        let source: &[u8] = if call == 1 {
+            b"T014 initial catalogue generation"
+        } else {
+            b"T014 changed catalogue generation"
+        };
+        Ok(domain::tddd::catalogue_v2::AttestedCatalogueDocument::attest(source, |_| {
+            Ok::<_, std::convert::Infallible>(self.document.clone())
+        })
+        .unwrap())
+    }
+}
+
 struct DistinguishableRustdocPort {
     baseline: Crate,
     current: Crate,
@@ -2306,6 +2334,39 @@ fn test_run_catalogue_load_failure_returns_catalogue_load_error() {
     assert!(
         matches!(err, CatalogueImplSignalsError::CatalogueLoad(_, _)),
         "expected CatalogueLoad, got: {err:?}"
+    );
+}
+
+#[test]
+fn test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread() {
+    let calls = Arc::new(Mutex::new(0));
+    let interactor = build_interactor(
+        Arc::new(ChangingHashCatalogueLoader {
+            document: minimal_catalogue_doc("domain"),
+            calls: Arc::clone(&calls),
+        }),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+    );
+
+    let error =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+
+    assert!(
+        matches!(
+            &error,
+            CatalogueImplSignalsError::CatalogueLoad(layer, reason)
+                if layer.as_ref() == "domain"
+                    && reason.as_str().contains("declaration hash changed")
+        ),
+        "a changed catalogue generation must fail closed: {error:?}"
+    );
+    assert_eq!(
+        *calls.lock().unwrap(),
+        2,
+        "the first set-level validation must reject the changed re-read before later I/O"
     );
 }
 
