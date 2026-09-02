@@ -4165,7 +4165,7 @@
       },
       "key": {
         "anchor_text_hash": "63eff5938709b5e300ff4321fe8086abdca28b8aeabbf37448ec70d0172e58a7",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4174,7 +4174,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(error.to_string().contains(\"domain::model::Name\"), \"the diagnostic must retain the fully-qualified unresolved identity: {error}\"); ... assert_ne!(baseline, selected_changed, \"nightly-selected {tool} content must be part of the fingerprint\"); ... assert_ne!(first, second, \"metadata output must change the implementation cache identity\"); ... assert!(error.to_string().contains(\"evaluation-start snapshot\"), \"the export must report the evaluation-start mismatch: {error}\");",
+        "citation": "\"a mismatched external candidate must fail closed\"; \"the diagnostic must retain the fully-qualified unresolved identity\"; \"nightly-selected {tool} content must be part of the fingerprint\"; \"metadata output must change the implementation cache identity\"; \"a mixed A/B layer snapshot must not be persisted\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4476,7 +4476,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4485,7 +4485,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the evaluator must place the external add through the bin-target alias\"; \"the target Handler must be encoded\"; \"the encoded synthesized item must retain its resolved placement\"",
+        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_ne!(name_summary.crate_id, 0);\n            assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4787,7 +4787,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4796,7 +4796,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the evaluator must place the external add through the bin-target alias\" ... \"the synthesized add must use the declaring crate root\" ... \"the bin target root must be canonicalized before the add is synthesized\" ... \"the referring-side rustdoc identity must win over the other-layer add\"",
+        "citation": "assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );\n...\n            assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");\n...\n            assert!(\n                error.to_string().contains(\"domain::model::Name\"),\n                \"the diagnostic must retain the fully-qualified unresolved identity: {error}\"\n            );\n...\n            assert_eq!(*matching[0].0, Id(1));\n            assert_eq!(matching[0].1.crate_id, 7);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5098,7 +5098,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5107,7 +5107,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the identity must not be synthesized twice\"",
+        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5409,7 +5409,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5418,7 +5418,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"missing enabled catalogues are empty, not errors\"; ... \"a TDDD-enabled layer without a catalogue file must contribute no declarations\"",
+        "citation": "\"missing enabled catalogues are empty, not errors\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5720,7 +5720,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5729,7 +5729,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
+        "citation": "let declaring = cross_layer_declaring_catalogue(\"Name\", None, None);\n            let domain_current = rustdoc_crate_with_root_and_paths(\n                \"sotp\",\n                HashMap::from([(\n                    rustdoc_types::Id(1),\n                    rustdoc_types::ItemSummary {\n                        crate_id: 0,\n                        path: vec![\"sotp\".to_owned(), \"generated\".to_owned(), \"Name\".to_owned()],\n                        kind: rustdoc_types::ItemKind::Struct,\n                    },\n                )]),\n            );\n            let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6031,7 +6031,7 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6040,7 +6040,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");\n\n            let signals = type_signals_codec::decode(\n                &std::fs::read_to_string(\n                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),\n                )\n                .unwrap(),\n            )\n            .unwrap();\n            assert!(\n                signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"),\n                \"the target type must survive evaluation after both external declarations resolve\"\n            );\n\nassert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");",
+        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");\nassert_eq!(*matching[0].0, Id(1));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6342,7 +6342,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6351,7 +6351,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );\n\n            let encoded_crates = observer.encoded_crates();\n            assert_eq!(encoded_crates.len(), 1);\n            let encoded = &encoded_crates[0];\n            let name_id = encoded\n                .krate()\n                .paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .map(|(id, _)| *id)\n                .expect(\"the encoded synthesized item must retain its resolved placement\");\n            let name_summary = &encoded.krate().paths[&name_id];\n            assert_ne!(name_summary.crate_id, 0);\n            assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");",
+        "citation": "assert!(error.to_string().contains(\"domain::model::Name\"), \"the diagnostic must retain the fully-qualified unresolved identity: {error}\"); ... let resolved_name = resolved_paths.iter().find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"]).expect(\"the synthesized add must use the declaring crate root\"); ... assert!(!resolved_paths.values().any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]), \"the bin target root must be canonicalized before the add is synthesized\"); ... assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6653,7 +6653,7 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6662,7 +6662,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\"); assert_eq!(*matching[0].0, Id(1)); ... .expect_err(\"a cross-layer short name must not use an external fallback\");",
+        "citation": "\"rustdoc must win when it supplies the same resolved identity\"; assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\"); assert_eq!(*matching[0].0, Id(1)); ... \"a cross-layer short name must not use an external fallback\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6964,7 +6964,7 @@
       },
       "key": {
         "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7275,318 +7275,7 @@
       },
       "key": {
         "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
-        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
-      },
-      "obligation_id": {
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-        "item_identifier": "entry",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th actual export must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_mismatched_cross_layer_candidate_fail_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_resolves_cross_layer_type_and_trait_adds"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_canonicalizes_bin_target_for_synthesized_external_add"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_skips_missing_catalogue_before_resolving_package_identity"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_ungrounded_cross_layer_reference"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_fingerprint_failure_between_snapshots_is_authoritative_input"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_uses_authoritative_feature_snapshot_after_generation_changes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
-          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_allows_external_path_and_build_script_inputs"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_ignores_parent_cargo_config_and_resolved_home"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_dirty_worktree_before_cache_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_changed_generation_before_persist"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_discards_result_before_persist_when_resolution_changes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_path_reread_generation_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_accepts_aba_generation_before_cache_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::tests",
-          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_non_exclusive_target_directory"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_accepts_aba_generation_after_path_restoration"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_metadata_output_change_invalidates_reuse"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_metadata_failure_does_not_reuse_existing_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_path_tool_resolution_failure_does_not_reuse_existing_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_lock_failure_does_not_reuse_or_retry"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_waits_on_held_exclusive_lock"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_symlinked_output_on_no_follow_read"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_non_unix_rustdoc_target_before_export"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-05",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
-      },
-      "key": {
-        "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7890,14 +7579,14 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "IN-03",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       },
       "key": {
-        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7906,7 +7595,318 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let baseline = freshness::rustdoc_input_fingerprint(workspace.path()).unwrap(); ... assert_ne!(baseline, selected_changed, \"nightly-selected {tool} content must be part of the fingerprint\"); ... assert_eq!(proxy_changed, baseline, \"changing PATH proxy contents must not change the nightly tool fingerprint\"); ... let second = freshness::rustdoc_input_fingerprint(&workspace).expect(\"changed tool must fingerprint\"); assert_ne!(first, second, \"tool contents are part of implementation identity\"); ... assert_eq!(persisted.cache_key(), current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()); ... assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));",
+        "citation": "let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th actual export must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_mismatched_cross_layer_candidate_fail_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_cross_layer_type_and_trait_adds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_canonicalizes_bin_target_for_synthesized_external_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_skips_missing_catalogue_before_resolving_package_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_ungrounded_cross_layer_reference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_fingerprint_failure_between_snapshots_is_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_uses_authoritative_feature_snapshot_after_generation_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_allows_external_path_and_build_script_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_ignores_parent_cargo_config_and_resolved_home"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_dirty_worktree_before_cache_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_changed_generation_before_persist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_discards_result_before_persist_when_resolution_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_path_reread_generation_change"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_aba_generation_before_cache_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_non_exclusive_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_aba_generation_after_path_restoration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_metadata_output_change_invalidates_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_metadata_failure_does_not_reuse_existing_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_path_tool_resolution_failure_does_not_reuse_existing_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_lock_failure_does_not_reuse_or_retry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_symlinked_output_on_no_follow_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_non_unix_rustdoc_target_before_export"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
+        "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n        decide_reuse_for_recorded_document(Some(&recorded), &cache_key(0), true),\n        TypeSignalsReuseDecision::SkipEvaluation\n    );\n    for changed_component in 1..=6 {\n        assert_eq!(\n            decide_reuse_for_recorded_document(\n                Some(&recorded),\n                &cache_key(changed_component),\n                true,\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate,\n            \"component {changed_component} must invalidate reuse\"\n        );\n    }",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -8208,7 +8208,7 @@
       },
       "key": {
         "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
-        "bound_tests_set_hash": "8072513c8d6b7934b0ffa15b2c33f7c38420a41786c86cd0f0ce0e32f7d2279f",
+        "bound_tests_set_hash": "504e6db404eb607bb869959f7032ef6928739fac6c733e792be9fb09eab9f3dd",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -8217,7 +8217,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n        decide_reuse_for_recorded_document(Some(&recorded), &cache_key(0), true),\n        TypeSignalsReuseDecision::SkipEvaluation\n    );\n    for changed_component in 1..=6 {\n        assert_eq!(\n            decide_reuse_for_recorded_document(\n                Some(&recorded),\n                &cache_key(changed_component),\n                true,\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate,\n            \"component {changed_component} must invalidate reuse\"\n        );\n    }",
+        "citation": "assert_eq!(decide_reuse_for_recorded_document(Some(&recorded), &cache_key(0), true), TypeSignalsReuseDecision::SkipEvaluation); ... assert_eq!(proxy_changed, baseline, \"changing PATH proxy contents must not change the nightly tool fingerprint\"); ... assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_))); ... assert_eq!(observer.launches(), 0, \"cache reuse must not launch rustdoc\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

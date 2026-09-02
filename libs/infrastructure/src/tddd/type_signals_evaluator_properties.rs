@@ -325,6 +325,10 @@ fn property_evaluator_excludes_only_the_resolved_target_directory() {
             let generated = target_dir.join("generated.json");
             fs::create_dir_all(&target_dir).expect("custom target directory");
             fs::write(&generated, b"cargo output a").expect("generated output");
+            let cache_source = workspace.path().join(".cache/semantic.rs");
+            fs::create_dir_all(cache_source.parent().expect("cache source directory"))
+                .expect("cache source directory");
+            fs::write(&cache_source, b"cache semantic input a").expect("cache source");
             let nested_source = workspace.path().join("src/target/semantic.rs");
             fs::create_dir_all(nested_source.parent().expect("nested source directory"))
                 .expect("nested source directory");
@@ -337,10 +341,17 @@ fn property_evaluator_excludes_only_the_resolved_target_directory() {
                 let second = freshness::rustdoc_input_fingerprint(workspace.path())
                     .expect("generated output remains excluded");
                 assert_eq!(first, second, "only the exact Cargo target directory is excluded");
-                fs::write(&nested_source, b"semantic input b").expect("changed nested source");
+                fs::write(&cache_source, b"cache semantic input b").expect("changed cache source");
                 let third = freshness::rustdoc_input_fingerprint(workspace.path())
+                    .expect("root .cache source remains authoritative");
+                assert_ne!(
+                    second, third,
+                    "a root .cache directory is an implementation-fingerprint input"
+                );
+                fs::write(&nested_source, b"semantic input b").expect("changed nested source");
+                let fourth = freshness::rustdoc_input_fingerprint(workspace.path())
                     .expect("nested source remains authoritative");
-                assert_ne!(second, third, "a nested source directory named target is not excluded");
+                assert_ne!(third, fourth, "a nested source directory named target is not excluded");
             });
         });
     });
