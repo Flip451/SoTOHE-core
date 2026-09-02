@@ -1,10 +1,10 @@
 {
   "baseline_hash": "cd7d618ea66ae2d66d3453d79d83345fd21c6f4645feecdcd1fe1a34bed5686d",
-  "declaration_hash": "af975073a9dc68e28c44a1cb9beb0f528921066a9d2e3e6f76a8c3bb47b476dc",
-  "generated_at": "2026-09-01T08:35:45Z",
-  "head_commit": "909395159e068c34cf6d22c5313bad95135d1334",
-  "implementation_fingerprint": "d54496cb6dc446d324e99c05ef4c9bdc6246c0424d6d2e868f83c35cfb23dc7b",
-  "resolution_fingerprint": "0e746974224784f9be7b9448ab2cffeeabcb0a247876ce032a95b410002ea4de",
+  "declaration_hash": "81ab26ed22feb9326fc01f09db2447ecf89d80de54a2bf52fcaa2d63e0d7c46b",
+  "generated_at": "2026-09-02T05:00:56Z",
+  "head_commit": "1815623c0609205772aaf002035ec10d556b5ded",
+  "implementation_fingerprint": "a11de8fbfd562bd581e6587a06a33ffd51eb8e0b4814c8e059cc7e7cd1de88c5",
+  "resolution_fingerprint": "daf4ec482d00d183e6a24114256a26483e7c47281bc99e4039845206d872258d",
   "rustdoc_execution_identity": {
     "crate_name": "domain",
     "expected_json_path": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5/doc/domain.json",
@@ -52,6 +52,19 @@
       "namespace": "type",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "AttestedRustdocSnapshot"
     },
     {
       "found_items": [
@@ -246,6 +259,13 @@
       "namespace": "type",
       "signal": "blue",
       "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
     },
     {
       "found_type": true,

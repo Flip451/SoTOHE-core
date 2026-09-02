@@ -3,6 +3,30 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "f03f696ce84249573ecf1d7388c81d87e35d5e6bafb4e4ad6d723476c8229afc",
+        "waived_reason_hash": "e74f6422f343afb3f66cf98caf52b0720714a14012365bbac55746923a9172fe"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Fail-closed type-signal document decode errors (AC-04).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "IN-03",
           "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
@@ -323,7 +347,7 @@
       "key": {
         "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
         "declaration_hash": "85d6688b1cb715dd6cb867cd7e3c7aeccbb3d052aa7d5c573459ecde7ed34516",
-        "waived_reason_hash": "0dfc839a009983476c79ad2a49f0b56b58423b05191098769c78d8c7a69a980c"
+        "waived_reason_hash": "6c6ee85524732052bd6e43834769bcf3d5c1211d1e32a04ebc9696f41f89ec0b"
       },
       "obligation_id": {
         "entry_key": "ImplementationFingerprint",
@@ -331,7 +355,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "Implementation fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -347,7 +371,7 @@
       "key": {
         "anchor_text_hash": "489b61bd7f6e508701f1c3cca37ea00e95ca83252fc28119526efe3fcbb79913",
         "declaration_hash": "672b2c0105fff33aceaad289298f9c27b72e73c9ec1e2d4f1d28001a42ff764d",
-        "waived_reason_hash": "0dfc839a009983476c79ad2a49f0b56b58423b05191098769c78d8c7a69a980c"
+        "waived_reason_hash": "4c11548d6c836f2e28277a0b5b5309e0b45571dcecf0dedc7510496b8134d950"
       },
       "obligation_id": {
         "entry_key": "ImplementationFingerprint",
@@ -355,7 +379,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "docs: Some(DocString(\"Implementation fingerprint value (IN-03).\")), methods: []",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -755,7 +779,7 @@
       "key": {
         "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
         "declaration_hash": "a641bbae2a9442ee252b18de796699ba45c41567e08fcda9f516c185fce840b2",
-        "waived_reason_hash": "7ec55073ebb03eada68ddeeb920ad1c7a954ab2b1ccbedce5fe0a5bde6c62424"
+        "waived_reason_hash": "beeedc78ce3ce6f04b0b1d2a87df00e735e65a69986740cad9951ee686024616"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
@@ -763,7 +787,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "DocString(\"Verified type-signals reuse input (IN-03, IN-07).\")",
+        "citation": "\"Verified type-signals reuse input (IN-03, IN-07).\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

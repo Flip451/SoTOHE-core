@@ -1,7 +1,12 @@
 {
-  "catalogue_declaration_hash": "af975073a9dc68e28c44a1cb9beb0f528921066a9d2e3e6f76a8c3bb47b476dc",
+  "catalogue_declaration_hash": "81ab26ed22feb9326fc01f09db2447ecf89d80de54a2bf52fcaa2d63e0d7c46b",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "signal": "blue",
+      "type_name": "AttestedRustdocSnapshot"
+    },
     {
       "entry_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
       "signal": "blue",
@@ -88,7 +93,7 @@
       "type_name": "CatalogueToExtendedCratePort"
     },
     {
-      "entry_hash": "f75e7f52bde0fa2823c583331305f565c21f73905a0e8011f921119c4835870f",
+      "entry_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
       "signal": "blue",
       "type_name": "RustdocCratePort"
     },
@@ -96,6 +101,11 @@
       "entry_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
       "signal": "blue",
       "type_name": "SchemaExporter"
+    },
+    {
+      "entry_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
     },
     {
       "entry_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",

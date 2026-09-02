@@ -25,8 +25,8 @@ use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::BaselineHash;
 #[cfg(all(test, feature = "test-helpers"))]
 use domain::tddd::type_signals_doc::{
-    CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
-    RustdocExecutionIdentity, RustdocSnapshot, construct_rustdoc_snapshot,
+    AttestedRustdocSnapshot, CargoProfileName, ExpectedRustdocJsonPath,
+    ResolvedCargoTargetDirectory, RustdocExecutionIdentity, construct_attested_rustdoc_snapshot,
 };
 use domain::tddd::type_signals_doc::{ResolutionFingerprint, TypeSignalsCacheKey};
 use domain::tddd::{CargoFeatureName, LayerId};
@@ -180,7 +180,7 @@ mod evaluator_test_support {
     pub(super) fn snapshot_for_context_test(
         crate_name: &str,
         crate_data: &rustdoc_types::Crate,
-    ) -> RustdocSnapshot {
+    ) -> AttestedRustdocSnapshot {
         fn decode(
             bytes: &[u8],
         ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError>
@@ -210,7 +210,13 @@ mod evaluator_test_support {
         )
         .unwrap();
         let bytes = serde_json::to_vec(crate_data).unwrap();
-        construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+        construct_attested_rustdoc_snapshot(
+            ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+            identity,
+            &bytes,
+            decode,
+        )
+        .unwrap()
     }
 
     #[cfg(all(test, feature = "test-helpers"))]
@@ -740,7 +746,9 @@ fn execute_with_dependencies(
                     format!("rustdoc export failed for '{target_crate}'"),
                 )
             })?;
-        if target_current.execution_identity() != current_key.rustdoc_execution_identity() {
+        if target_current.snapshot().execution_identity()
+            != current_key.rustdoc_execution_identity()
+        {
             return Err(EvaluateSignalsError::authoritative_input(
                 "rustdoc execution identity changed between cache-key resolution and snapshot capture",
             ));
@@ -762,7 +770,7 @@ fn execute_with_dependencies(
                 "rustdoc execution identity for configured layer '{layer}' is unavailable"
             ))
         })?;
-        if context.current_snapshot().execution_identity() != expected {
+        if context.current_snapshot().snapshot().execution_identity() != expected {
             return Err(EvaluateSignalsError::authoritative_input(format!(
                 "rustdoc snapshot identity does not match configured layer '{layer}'"
             )));

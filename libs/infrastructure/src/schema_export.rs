@@ -62,6 +62,8 @@ pub struct RustdocSchemaExporter {
     #[cfg(test)]
     before_expected_path_selection: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
     #[cfg(test)]
+    after_read: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
+    #[cfg(test)]
     output_path_rewriter: Option<std::sync::Arc<dyn Fn(PathBuf) -> PathBuf + Send + Sync>>,
 }
 
@@ -79,6 +81,7 @@ enum RustdocRunMode {
 /// it can fail closed when the rustdoc input or output ownership cannot be
 /// established.  Keep the classification here, at the infrastructure I/O
 /// boundary, without changing the shared domain exporter contract.
+#[allow(dead_code)]
 #[derive(Debug)]
 pub(crate) enum RustdocCaptureError {
     /// The target, lock, or output bytes could not be established as authoritative.
@@ -108,6 +111,8 @@ impl RustdocSchemaExporter {
             #[cfg(test)]
             before_expected_path_selection: None,
             #[cfg(test)]
+            after_read: None,
+            #[cfg(test)]
             output_path_rewriter: None,
         }
     }
@@ -121,6 +126,7 @@ impl RustdocSchemaExporter {
             workspace_root,
             before_read: Some(before_read),
             before_expected_path_selection: None,
+            after_read: None,
             output_path_rewriter: None,
         }
     }
@@ -134,6 +140,22 @@ impl RustdocSchemaExporter {
             workspace_root,
             before_read: None,
             before_expected_path_selection: Some(before_expected_path_selection),
+            after_read: None,
+            output_path_rewriter: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn with_capture_hooks(
+        workspace_root: PathBuf,
+        before_expected_path_selection: std::sync::Arc<dyn Fn() + Send + Sync>,
+        after_read: std::sync::Arc<dyn Fn() + Send + Sync>,
+    ) -> Self {
+        Self {
+            workspace_root,
+            before_read: None,
+            before_expected_path_selection: Some(before_expected_path_selection),
+            after_read: Some(after_read),
             output_path_rewriter: None,
         }
     }
@@ -147,6 +169,7 @@ impl RustdocSchemaExporter {
             workspace_root,
             before_read: None,
             before_expected_path_selection: None,
+            after_read: None,
             output_path_rewriter: Some(output_path_rewriter),
         }
     }
@@ -273,11 +296,16 @@ impl RustdocSchemaExporter {
         let bytes = lock
             .read_bytes(&expected_path, 64 * 1024 * 1024)
             .map_err(RustdocCaptureError::AuthoritativeInput)?;
+        #[cfg(test)]
+        if let Some(after_read) = &self.after_read {
+            after_read();
+        }
         Ok((identity, bytes))
     }
 
     /// Runs rustdoc and constructs an identity-bearing snapshot from bytes
     /// copied while the shared output lock was held.
+    #[allow(dead_code)]
     pub(crate) fn capture_rustdoc_snapshot(
         &self,
         crate_name: &CrateName,
@@ -291,6 +319,20 @@ impl RustdocSchemaExporter {
         )?;
         construct_rustdoc_snapshot(identity, &bytes, decode)
             .map_err(RustdocCaptureError::ParseFailed)
+    }
+
+    /// Runs rustdoc and returns the identity plus the immutable bytes copied
+    /// while the shared output lock was held.
+    pub(crate) fn capture_rustdoc_json_classified(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<(RustdocExecutionIdentity, Vec<u8>), RustdocCaptureError> {
+        self.capture_rustdoc_json_with_mode_classified(
+            crate_name,
+            features,
+            RustdocRunMode::Declared,
+        )
     }
 
     /// Resolves the cache-key selection without reading the generated output.

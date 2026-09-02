@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
 
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, RustdocCratePortError};
@@ -17,14 +18,41 @@ use sha2::Digest as _;
 
 #[path = "environment_fingerprint.rs"]
 mod environment_fingerprint;
+#[path = "freshness/fingerprint_io.rs"]
+mod fingerprint_io;
+#[path = "freshness/workspace_root.rs"]
+mod workspace_root;
+
+use fingerprint_io::FingerprintDeadline;
+
+pub(crate) const EVALUATION_START_EXECUTION_TIMEOUT: Duration = Duration::from_secs(120);
+pub(crate) const EVALUATION_START_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
+
+#[derive(Clone, Copy)]
+pub(crate) struct EvaluationStartTimeouts {
+    pub(crate) execution: Duration,
+    pub(crate) drain: Duration,
+}
+
+impl EvaluationStartTimeouts {
+    pub(crate) const fn new(execution: Duration, drain: Duration) -> Self {
+        Self { execution, drain }
+    }
+}
+
+impl Default for EvaluationStartTimeouts {
+    fn default() -> Self {
+        Self::new(EVALUATION_START_EXECUTION_TIMEOUT, EVALUATION_START_DRAIN_TIMEOUT)
+    }
+}
 
 /// Port-backed rustdoc provider used by the evaluator.
 ///
 /// Rustdoc I/O remains owned by [`RustdocCratePort`]. The identity resolver is
 /// only the cache-key side channel and does not read or construct a snapshot.
 pub(crate) trait RustdocProvider: RustdocCratePort {
-    /// Captures one current rustdoc graph against the immutable fingerprint
-    /// taken when the enclosing evaluation started.
+    /// Captures one current rustdoc graph as an attested snapshot against the
+    /// immutable fingerprint taken when the enclosing evaluation started.
     ///
     /// The provider must reject the export as authoritative input when either
     /// the pre-export or post-export implementation fingerprint differs from
@@ -34,7 +62,7 @@ pub(crate) trait RustdocProvider: RustdocCratePort {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
         evaluation_start: &ImplementationFingerprint,
-    ) -> Result<domain::tddd::type_signals_doc::RustdocSnapshot, RustdocCratePortError>;
+    ) -> Result<domain::tddd::type_signals_doc::AttestedRustdocSnapshot, RustdocCratePortError>;
 
     fn execution_identity(
         &self,
@@ -136,6 +164,7 @@ pub(crate) enum RustdocInputFingerprintError {
     TotalBytes { bytes: u64, maximum: u64 },
     PathBytes { path: PathBuf, bytes: usize, maximum: usize },
     EnvironmentBytes { name: String, bytes: usize, maximum: usize },
+    TimedOut { operation: &'static str, maximum: Duration },
 }
 
 impl std::fmt::Display for RustdocInputFingerprintError {
@@ -175,24 +204,45 @@ impl std::fmt::Display for RustdocInputFingerprintError {
                 formatter,
                 "rustdoc environment input '{name}' is {bytes} bytes; maximum is {maximum}"
             ),
+            Self::TimedOut { operation, maximum } => {
+                write!(formatter, "evaluation-start {operation} timed out after {maximum:?}")
+            }
         }
     }
 }
 
 fn rustdoc_input_digest(
     workspace_root: &Path,
+    timeouts: EvaluationStartTimeouts,
 ) -> Result<Sha256Digest, RustdocInputFingerprintError> {
+    let deadline = FingerprintDeadline::new(timeouts.execution);
+    deadline.check("authoritative input capture")?;
+    workspace_root::validate_workspace_root_for_fingerprint(workspace_root, &deadline)?;
     let mut budget = FingerprintBudget::default();
-    let cargo_inputs = validate_authoritative_cargo_inputs(workspace_root, &mut budget)?;
-    let paths =
-        collect_rustdoc_input_paths(workspace_root, &cargo_inputs.target_directory, &mut budget)?;
+    let cargo_inputs = validate_authoritative_cargo_inputs(
+        workspace_root,
+        &mut budget,
+        &deadline,
+        timeouts.drain,
+    )?;
+    let paths = collect_rustdoc_input_paths(
+        workspace_root,
+        &cargo_inputs.target_directory,
+        &mut budget,
+        &deadline,
+    )?;
     let mut canonical = Vec::from(RUSTDOC_INPUT_FINGERPRINT_VERSION);
     append_len_prefixed_bytes(&mut canonical, b"cargo-metadata-no-deps-locked");
     append_len_prefixed_bytes(&mut canonical, &cargo_inputs.metadata_bytes);
     for input in paths {
+        deadline.check("workspace walk")?;
         let path = input.path;
         let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
-        let metadata = std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
+        let metadata_path = path.clone();
+        let metadata = deadline.run_io("workspace walk", path.clone(), move || {
+            std::fs::symlink_metadata(&metadata_path)
+        })?;
+        deadline.check("workspace walk")?;
         if metadata.file_type().is_symlink() || !metadata.is_file() {
             return Err(RustdocInputFingerprintError::Symlink { path });
         }
@@ -206,15 +256,26 @@ fn rustdoc_input_digest(
             ));
         }
         budget.reserve_bytes(metadata.len())?;
-        let bytes = crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
-            &path,
-            Some(workspace_root),
-            metadata.len(),
-        )
-        .map_err(|error| io_error(&path, error))?
-        .ok_or_else(|| io_error(&path, Error::new(ErrorKind::NotFound, "input disappeared")))?;
+        deadline.check("workspace walk")?;
+        let read_path = path.clone();
+        let trusted_root = workspace_root.to_owned();
+        let maximum_bytes = metadata.len();
+        let bytes = deadline
+            .run_io("workspace walk", path.clone(), move || {
+                crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes(
+                    &read_path,
+                    Some(&trusted_root),
+                    maximum_bytes,
+                )
+            })?
+            .ok_or_else(|| io_error(&path, Error::new(ErrorKind::NotFound, "input disappeared")))?;
+        deadline.check("workspace walk")?;
         check_file_size(&path, bytes.len() as u64)?;
-        let after = std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
+        let after_path = path.clone();
+        let after = deadline.run_io("workspace walk", path.clone(), move || {
+            std::fs::symlink_metadata(&after_path)
+        })?;
+        deadline.check("workspace walk")?;
         if after.file_type().is_symlink()
             || !after.is_file()
             || metadata_generation(&metadata) != metadata_generation(&after)
@@ -232,7 +293,10 @@ fn rustdoc_input_digest(
         &mut canonical,
         workspace_root,
         &mut budget,
+        &deadline,
+        timeouts.drain,
     )?;
+    deadline.check("fingerprint assembly")?;
     Sha256Digest::try_new(hex_digest(&sha256_bytes(&canonical))).map_err(|error| {
         io_error(workspace_root, Error::other(format!("invalid fingerprint: {error}")))
     })
@@ -243,7 +307,8 @@ fn rustdoc_input_digest(
 pub(crate) fn rustdoc_input_fingerprint(
     workspace_root: &Path,
 ) -> Result<String, RustdocInputFingerprintError> {
-    rustdoc_input_digest(workspace_root).map(|digest| digest.as_str().to_owned())
+    rustdoc_input_digest(workspace_root, EvaluationStartTimeouts::default())
+        .map(|digest| digest.as_str().to_owned())
 }
 
 /// Computes the typed implementation identity used by evaluation-start and
@@ -251,7 +316,17 @@ pub(crate) fn rustdoc_input_fingerprint(
 pub(crate) fn rustdoc_implementation_fingerprint(
     workspace_root: &Path,
 ) -> Result<ImplementationFingerprint, String> {
-    rustdoc_input_digest(workspace_root)
+    rustdoc_implementation_fingerprint_with_timeouts(
+        workspace_root,
+        EvaluationStartTimeouts::default(),
+    )
+}
+
+pub(crate) fn rustdoc_implementation_fingerprint_with_timeouts(
+    workspace_root: &Path,
+    timeouts: EvaluationStartTimeouts,
+) -> Result<ImplementationFingerprint, String> {
+    rustdoc_input_digest(workspace_root, timeouts)
         .map(ImplementationFingerprint::new)
         .map_err(|error| error.to_string())
 }
@@ -275,10 +350,16 @@ struct RustdocInputPath {
 fn validate_authoritative_cargo_inputs(
     workspace_root: &Path,
     budget: &mut FingerprintBudget,
+    deadline: &FingerprintDeadline,
+    drain_timeout: Duration,
 ) -> Result<AuthoritativeCargoInputs, RustdocInputFingerprintError> {
     let manifest = workspace_root.join("Cargo.toml");
-    let manifest_metadata =
-        std::fs::symlink_metadata(&manifest).map_err(|error| io_error(&manifest, error))?;
+    deadline.check("cargo metadata")?;
+    let manifest_metadata_path = manifest.clone();
+    let manifest_metadata = deadline.run_io("cargo metadata", manifest.clone(), move || {
+        std::fs::symlink_metadata(&manifest_metadata_path)
+    })?;
+    deadline.check("cargo metadata")?;
     if manifest_metadata.file_type().is_symlink() || !manifest_metadata.is_file() {
         return Err(RustdocInputFingerprintError::Symlink { path: manifest });
     }
@@ -286,12 +367,16 @@ fn validate_authoritative_cargo_inputs(
     command
         .args(["metadata", "--format-version", "1", "--no-deps", "--locked"])
         .current_dir(workspace_root);
+    let execution_timeout = deadline.remaining("cargo metadata")?;
     let output = environment_fingerprint::run_cargo_metadata_with_early_bounded_output(
-        &mut command,
+        command,
         MAX_CARGO_METADATA_OUTPUT_BYTES,
         budget.remaining_bytes(),
+        execution_timeout,
+        drain_timeout,
     )
     .map_err(|error| io_error(workspace_root, Error::other(error.to_string())))?;
+    deadline.check("cargo metadata")?;
     let output_bytes = output.stdout.len().checked_add(output.stderr.len()).ok_or(
         RustdocInputFingerprintError::TotalBytes {
             bytes: u64::MAX,
@@ -310,9 +395,11 @@ fn validate_authoritative_cargo_inputs(
             )),
         ));
     }
+    deadline.check("cargo metadata")?;
     let metadata: serde_json::Value = serde_json::from_slice(&output.stdout).map_err(|error| {
         io_error(workspace_root, Error::other(format!("cargo metadata JSON is invalid: {error}")))
     })?;
+    deadline.check("cargo metadata")?;
     let target_directory = metadata
         .get("target_directory")
         .and_then(serde_json::Value::as_str)
@@ -329,8 +416,12 @@ fn validate_authoritative_cargo_inputs(
         workspace_root.join(target_directory)
     };
     let target_directory = crate::verify::path_safety::lexical_normalize(&target_directory);
-    crate::track::symlink_guard::reject_symlinks_up_to_root(&target_directory)
-        .map_err(|error| io_error(&target_directory, error))?;
+    deadline.check("cargo metadata")?;
+    let target_directory_for_guard = target_directory.clone();
+    deadline.run_io("cargo metadata", target_directory.clone(), move || {
+        crate::track::symlink_guard::reject_symlinks_up_to_root(&target_directory_for_guard)
+    })?;
+    deadline.check("cargo metadata")?;
     Ok(AuthoritativeCargoInputs { target_directory, metadata_bytes: output.stdout })
 }
 
@@ -338,17 +429,20 @@ fn collect_rustdoc_input_paths(
     workspace_root: &Path,
     cargo_target_dir: &Path,
     budget: &mut FingerprintBudget,
+    deadline: &FingerprintDeadline,
 ) -> Result<Vec<RustdocInputPath>, RustdocInputFingerprintError> {
     let mut paths = Vec::new();
-    walk_rustdoc_inputs(
+    let mut state = WalkState::default();
+    let mut context = WalkContext {
         workspace_root,
         cargo_target_dir,
-        workspace_root,
-        0,
-        &mut WalkState::default(),
+        state: &mut state,
         budget,
-        &mut paths,
-    )?;
+        paths: &mut paths,
+        deadline,
+    };
+    walk_rustdoc_inputs(workspace_root, 0, &mut context)?;
+    deadline.check("workspace walk")?;
     paths.sort_by_key(|input| {
         path_bytes(input.path.strip_prefix(workspace_root).unwrap_or(&input.path))
     });
@@ -360,28 +454,51 @@ struct WalkState {
     entries: usize,
 }
 
+struct WalkContext<'a> {
+    workspace_root: &'a Path,
+    cargo_target_dir: &'a Path,
+    state: &'a mut WalkState,
+    budget: &'a mut FingerprintBudget,
+    paths: &'a mut Vec<RustdocInputPath>,
+    deadline: &'a FingerprintDeadline,
+}
+
 fn walk_rustdoc_inputs(
-    workspace_root: &Path,
-    cargo_target_dir: &Path,
     directory: &Path,
     depth: usize,
-    state: &mut WalkState,
-    budget: &mut FingerprintBudget,
-    paths: &mut Vec<RustdocInputPath>,
+    context: &mut WalkContext<'_>,
 ) -> Result<(), RustdocInputFingerprintError> {
-    let entries = std::fs::read_dir(directory).map_err(|error| io_error(directory, error))?;
+    context.deadline.check("workspace walk")?;
+    let directory_path = directory.to_owned();
+    let entries = context.deadline.run_io("workspace walk", directory_path.clone(), move || {
+        let mut entries = std::fs::read_dir(&directory_path)?;
+        let mut collected = Vec::new();
+        while collected.len() <= MAX_RUSTDOC_INPUT_ENTRIES {
+            let Some(entry) = entries.next() else {
+                break;
+            };
+            collected.push(entry?);
+        }
+        Ok(collected)
+    })?;
     for entry in entries {
-        state.entries = state.entries.saturating_add(1);
-        if state.entries > MAX_RUSTDOC_INPUT_ENTRIES {
+        context.deadline.check("workspace walk")?;
+        context.state.entries = context.state.entries.saturating_add(1);
+        if context.state.entries > MAX_RUSTDOC_INPUT_ENTRIES {
             return Err(RustdocInputFingerprintError::EntryCount {
                 maximum: MAX_RUSTDOC_INPUT_ENTRIES,
             });
         }
-        let entry = entry.map_err(|error| io_error(directory, error))?;
         let path = entry.path();
-        let file_type = entry.file_type().map_err(|error| io_error(&path, error))?;
+        let file_type =
+            context.deadline.run_io("workspace walk", path.clone(), move || entry.file_type())?;
+        context.deadline.check("workspace walk")?;
         if file_type.is_dir() {
-            if is_excluded_rustdoc_directory(workspace_root, cargo_target_dir, &path) {
+            if is_excluded_rustdoc_directory(
+                context.workspace_root,
+                context.cargo_target_dir,
+                &path,
+            ) {
                 continue;
             }
             if depth >= MAX_RUSTDOC_INPUT_DEPTH {
@@ -390,23 +507,22 @@ fn walk_rustdoc_inputs(
                     maximum: MAX_RUSTDOC_INPUT_DEPTH,
                 });
             }
-            walk_rustdoc_inputs(
-                workspace_root,
-                cargo_target_dir,
-                &path,
-                depth + 1,
-                state,
-                budget,
-                paths,
-            )?;
+            walk_rustdoc_inputs(&path, depth + 1, context)?;
         } else if file_type.is_symlink() {
-            if !is_excluded_rustdoc_directory(workspace_root, cargo_target_dir, &path) {
+            if !is_excluded_rustdoc_directory(
+                context.workspace_root,
+                context.cargo_target_dir,
+                &path,
+            ) {
                 return Err(RustdocInputFingerprintError::Symlink { path });
             }
         } else if file_type.is_file() {
-            let metadata =
-                std::fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
-            let relative = path.strip_prefix(workspace_root).unwrap_or(&path);
+            let metadata_path = path.clone();
+            let metadata = context.deadline.run_io("workspace walk", path.clone(), move || {
+                std::fs::symlink_metadata(&metadata_path)
+            })?;
+            context.deadline.check("workspace walk")?;
+            let relative = path.strip_prefix(context.workspace_root).unwrap_or(&path);
             let length = path_bytes(relative).len();
             if length > MAX_RUSTDOC_INPUT_PATH_BYTES {
                 return Err(RustdocInputFingerprintError::PathBytes {
@@ -416,8 +532,8 @@ fn walk_rustdoc_inputs(
                 });
             }
             check_file_size(&path, metadata.len())?;
-            budget.reserve_file_count()?;
-            paths.push(RustdocInputPath {
+            context.budget.reserve_file_count()?;
+            context.paths.push(RustdocInputPath {
                 discovered_generation: metadata_generation(&metadata),
                 discovered_bytes: metadata.len(),
                 path,

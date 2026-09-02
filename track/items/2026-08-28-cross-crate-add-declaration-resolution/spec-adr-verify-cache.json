@@ -208,6 +208,52 @@
       }
     },
     {
+      "claim_hash": "9b47e7e79dc74e410d7c0dad84b832e30cca007f17530f13219fcd408a6205f1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "symlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bc6f0a7ca100c399927107e214214c4bc1f3238598b2b35d3223f1b5b89c4de1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。いずれかの超過は EvaluationStartCaptureError::AuthoritativeInput で fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution を用いない。rustdoc export と専用 selection directory の lock は含めない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`EvaluationStartCapturePort` による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、`cargo metadata --no-deps --locked`、及びこれらに伴う出力 drain に、実行時間 120 秒と drain 時間 1 秒の上限を適用する。\n\nいずれかの上限を超えた場合は `EvaluationStartCaptureError::AuthoritativeInput` として fail-closed で失敗させる。fallback、partial fingerprint、又は生成した層帰属によって処理を続行してはならない。\n\nこの決定は、rustdoc export 又は専用出力 directory の lock に適用しない。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "f4d68b925fc457abcfb903876580c7add73b593600d5ec3d31dcaa7a6f8aeec3",
       "claim_origin": {
         "data": {
@@ -691,6 +737,52 @@
       }
     },
     {
+      "claim_hash": "a3a44318202b901993c26119084eeec5a0c3470efed443fb996d3666f4de703b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-08",
+          "section": "constraint",
+          "text_label": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "symlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "42f77c872d13d16ae526c6546bc99ab4511affe8bbf91dbf8effab61a62d0c29",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-09",
+          "section": "constraint",
+          "text_label": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。超過時は EvaluationStartCaptureError::AuthoritativeInput として fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution で継続しない。rustdoc export と専用 selection directory の lock はこの上限の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`EvaluationStartCapturePort` による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、`cargo metadata --no-deps --locked`、及びこれらに伴う出力 drain に、実行時間 120 秒と drain 時間 1 秒の上限を適用する。\n\nいずれかの上限を超えた場合は `EvaluationStartCaptureError::AuthoritativeInput` として fail-closed で失敗させる。fallback、partial fingerprint、又は生成した層帰属によって処理を続行してはならない。\n\nこの決定は、rustdoc export 又は専用出力 directory の lock に適用しない。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "5cf312467c070bde55da5c1d20c639a59895cf9767408a51fdc482c37f35ed56",
       "claim_origin": {
         "data": {
@@ -963,6 +1055,52 @@
       },
       "verdict": {
         "citation": "65 層目が必要なら export、評価、及び結果の再利用を fail-closed で停止する。層数を分割して黙って続行したり、上限外の層を既存 snapshot で補ったりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "03a0d136c401574c80d25c1e086c7eef8968f9d8940e60079caa9e2fdf46ca7f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69d2a1e520bd749f300354ba11454659c4bba8e6ff6ebb3ba223ad55ad60d60d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "symlink、I/O error、nightly 選択済み tool の解決又は content snapshot の失敗、metadata 実行の失敗、型の途中変更、又はいずれかの上限超過では partial fingerprint を作らず、結果を authoritative-input error として失敗させる。失敗時は古い型シグナル又は snapshot へ fallback せず、再利用も成功扱いもしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f4e5c7dd2ca0cf11f9bebe26657fdbc2602e3aecdc36f290db08b0228bfcd37",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。rustdoc export と専用 selection directory の lock はこの基準の対象外であり、D6 の上限に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6f4b3adf68dc7082f379cacf50944ccd6b5e3be1fa5b94d18b31998e685825c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`EvaluationStartCapturePort` による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、`cargo metadata --no-deps --locked`、及びこれらに伴う出力 drain に、実行時間 120 秒と drain 時間 1 秒の上限を適用する。\n\nいずれかの上限を超えた場合は `EvaluationStartCaptureError::AuthoritativeInput` として fail-closed で失敗させる。fallback、partial fingerprint、又は生成した層帰属によって処理を続行してはならない。\n\nこの決定は、rustdoc export 又は専用出力 directory の lock に適用しない。それらは `2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md` D6 の 120 秒上限に従う。",
         "kind": "pass"
       }
     },

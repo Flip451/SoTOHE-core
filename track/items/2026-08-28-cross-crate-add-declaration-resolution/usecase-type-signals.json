@@ -1,10 +1,10 @@
 {
   "baseline_hash": "4dc435027817f66afb5ee00ba1049062f43036c579bffbea51bad324c3b840d9",
-  "declaration_hash": "221177fe20b2692b2abf4e021b23629b95f0837a34bb71f15added5da976fbcf",
-  "generated_at": "2026-09-01T08:36:13Z",
-  "head_commit": "909395159e068c34cf6d22c5313bad95135d1334",
-  "implementation_fingerprint": "d54496cb6dc446d324e99c05ef4c9bdc6246c0424d6d2e868f83c35cfb23dc7b",
-  "resolution_fingerprint": "0e746974224784f9be7b9448ab2cffeeabcb0a247876ce032a95b410002ea4de",
+  "declaration_hash": "9f7b4f38cf62f227496949dc82762cf921ecea1230588e9e80af408f228c928a",
+  "generated_at": "2026-09-02T05:01:25Z",
+  "head_commit": "1815623c0609205772aaf002035ec10d556b5ded",
+  "implementation_fingerprint": "a11de8fbfd562bd581e6587a06a33ffd51eb8e0b4814c8e059cc7e7cd1de88c5",
+  "resolution_fingerprint": "daf4ec482d00d183e6a24114256a26483e7c47281bc99e4039845206d872258d",
   "rustdoc_execution_identity": {
     "crate_name": "usecase",
     "expected_json_path": "target/.sotp-rustdoc/caa4404e1ff1453d558bafe4c64059fc13f3ae29253aac820fd2c6cc2ea0139b/doc/usecase.json",
@@ -34,6 +34,26 @@
       "kind_tag": "error_type",
       "namespace": "type",
       "signal": "blue",
+      "type_name": "EvaluationStartCaptureError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "EvaluationStartCapturePort"
+    },
+    {
+      "found_items": [
+        "core::convert::From<usecase::catalogue_impl_signals::service::RustdocExportPlanValidationError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
       "type_name": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
     },
     {
@@ -48,6 +68,22 @@
       "namespace": "type",
       "signal": "blue",
       "type_name": "RustdocExportPlan"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExportPlanValidationError"
     },
     {
       "found_type": true,

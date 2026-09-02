@@ -29,9 +29,10 @@ use domain::tddd::extended_crate::ExtendedCrate;
 use domain::tddd::signal_evaluator::phase1_error::Phase1Error;
 use domain::tddd::signal_evaluator::port::SignalEvaluatorPort;
 use domain::tddd::{
-    AuthoritativeRustdocContext, CapturedRustdocJson, CargoFeatureName, ExpectedRustdocJsonPath,
-    LayerId, ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocSnapshot,
-    TdddFeatureDeclaration, construct_captured_rustdoc_json, construct_rustdoc_snapshot,
+    AttestedRustdocSnapshot, AuthoritativeRustdocContext, CapturedRustdocJson, CargoFeatureName,
+    ExpectedRustdocJsonPath, ImplementationFingerprint, LayerId, ResolvedCargoTargetDirectory,
+    RustdocExecutionIdentity, Sha256Digest, TdddFeatureDeclaration,
+    construct_attested_rustdoc_snapshot, construct_captured_rustdoc_json,
 };
 // ThreeWaySignal is not pub-re-exported from the parent module, so it cannot be
 // reached via `use super::*` and must be imported explicitly here.
@@ -43,6 +44,7 @@ use rustdoc_types::{
     Module, Struct, Visibility,
 };
 
+use super::super::ports::{EvaluationStartCaptureError, EvaluationStartCapturePort};
 use super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
 use super::CatalogueImplSignalsInteractor;
 use crate::baseline_capture::{
@@ -84,7 +86,11 @@ fn captured_rustdoc(crate_data: Crate) -> CapturedRustdocJson {
     construct_captured_rustdoc_json(&bytes, decode_test_rustdoc).unwrap()
 }
 
-fn current_rustdoc(crate_name: &CrateName, crate_data: Crate) -> RustdocSnapshot {
+fn current_rustdoc(
+    crate_name: &CrateName,
+    crate_data: Crate,
+    evaluation_start: &ImplementationFingerprint,
+) -> AttestedRustdocSnapshot {
     let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
         "/tmp/usecase-rustdoc-test-target",
     ))
@@ -103,7 +109,17 @@ fn current_rustdoc(crate_name: &CrateName, crate_data: Crate) -> RustdocSnapshot
     )
     .unwrap();
     let bytes = serde_json::to_vec(&crate_data).unwrap();
-    construct_rustdoc_snapshot(identity, &bytes, decode_test_rustdoc).unwrap()
+    construct_attested_rustdoc_snapshot(
+        evaluation_start.clone(),
+        identity,
+        &bytes,
+        decode_test_rustdoc,
+    )
+    .unwrap()
+}
+
+fn evaluation_start_fingerprint() -> ImplementationFingerprint {
+    ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap())
 }
 
 fn rustdoc_crate_with_gated_public_item() -> Crate {
@@ -350,7 +366,8 @@ impl RustdocCratePort for NeverCalledRustdocPort {
         &self,
         _crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        _evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         panic!("NeverCalledRustdocPort::capture_current must not be called in these tests")
     }
 }
@@ -367,8 +384,9 @@ impl RustdocCratePort for EmptyRustdocPort {
         &self,
         _crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
-        Ok(current_rustdoc(_crate_name, empty_rustdoc_crate()))
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(_crate_name, empty_rustdoc_crate(), evaluation_start))
     }
 }
 
@@ -384,7 +402,8 @@ impl RustdocCratePort for FailingRustdocPort {
         &self,
         crate_name: &domain::tddd::catalogue_v2::CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        _evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         Err(RustdocCratePortError::CaptureFailed {
             crate_name: crate_name.clone(),
             reason: FreeText::new("stub capture failure"),
@@ -405,11 +424,72 @@ impl RustdocCratePort for CaptureFailureRustdocPort {
         &self,
         crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        _evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         Err(RustdocCratePortError::CaptureFailed {
             crate_name: crate_name.clone(),
             reason: FreeText::new("exclusive rustdoc lock sentinel failure"),
         })
+    }
+}
+
+struct StartCaptureFailureRustdocPort {
+    current_calls: Arc<Mutex<usize>>,
+}
+
+impl RustdocCratePort for StartCaptureFailureRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        panic!("a failed evaluation-start capture must stop before baseline loading")
+    }
+
+    fn capture_current(
+        &self,
+        _crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+        _evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        *self.current_calls.lock().unwrap() += 1;
+        panic!("a failed evaluation-start capture must stop before current capture")
+    }
+}
+
+struct RecordingStartBindingRustdocPort {
+    start_calls: Arc<Mutex<usize>>,
+    captures: Arc<Mutex<Vec<ImplementationFingerprint>>>,
+}
+
+impl RustdocCratePort for RecordingStartBindingRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(empty_rustdoc_crate()))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        self.captures.lock().unwrap().push(evaluation_start.clone());
+        Ok(current_rustdoc(crate_name, empty_rustdoc_crate(), evaluation_start))
+    }
+}
+
+impl EvaluationStartCapturePort for StartCaptureFailureRustdocPort {
+    fn capture_evaluation_start(
+        &self,
+    ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+        Err(EvaluationStartCaptureError::AuthoritativeInput {
+            reason: FreeText::new("stub evaluation-start fingerprint failure"),
+        })
+    }
+}
+
+impl EvaluationStartCapturePort for RecordingStartBindingRustdocPort {
+    fn capture_evaluation_start(
+        &self,
+    ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+        *self.start_calls.lock().unwrap() += 1;
+        Ok(evaluation_start_fingerprint())
     }
 }
 
@@ -613,7 +693,8 @@ impl RustdocCratePort for FeatureGatedRustdocPort {
         &self,
         _crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         self.observed_actual_features
             .lock()
             .unwrap()
@@ -624,7 +705,7 @@ impl RustdocCratePort for FeatureGatedRustdocPort {
                 reason: FreeText::new("feature-gated public item requires semantic-dup"),
             });
         }
-        Ok(current_rustdoc(_crate_name, rustdoc_crate_with_gated_public_item()))
+        Ok(current_rustdoc(_crate_name, rustdoc_crate_with_gated_public_item(), evaluation_start))
     }
 }
 
@@ -678,9 +759,14 @@ impl RustdocCratePort for UndeclaredFeatureRustdocPort {
         &self,
         _crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         assert!(features.is_empty(), "the track declares no feature for the gated catalogue item");
-        Ok(current_rustdoc(_crate_name, rustdoc_crate_without_gated_public_item()))
+        Ok(current_rustdoc(
+            _crate_name,
+            rustdoc_crate_without_gated_public_item(),
+            evaluation_start,
+        ))
     }
 }
 
@@ -815,6 +901,102 @@ impl domain::tddd::CatalogueToExtendedCratePort for RecordingExtendedCrateCodec 
     }
 }
 
+struct TraitResolutionHandoffCodec {
+    observed: Arc<Mutex<Vec<ExtendedCrate>>>,
+}
+
+fn external_trait_resolution_set() -> ExtendedCrate {
+    let external_crate_id = 7;
+    let trait_id = Id(1);
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.external_crates.insert(
+        external_crate_id,
+        ExternalCrate {
+            name: "domain".to_owned(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+    crate_.index.insert(
+        trait_id,
+        Item {
+            id: trait_id,
+            crate_id: external_crate_id,
+            name: Some("Repository".to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        },
+    );
+    crate_.paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: external_crate_id,
+            path: vec!["domain".to_owned(), "ports".to_owned(), "Repository".to_owned()],
+            kind: ItemKind::Trait,
+        },
+    );
+    ExtendedCrate::new(crate_, BTreeMap::new())
+}
+
+impl domain::tddd::CatalogueToExtendedCratePort for TraitResolutionHandoffCodec {
+    fn encode(
+        &self,
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        _rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        assert_eq!(target_layer.as_ref(), "usecase");
+
+        let domain_layer = LayerId::try_new("domain").unwrap();
+        let usecase_layer = LayerId::try_new("usecase").unwrap();
+        let trait_key = domain::tddd::catalogue_v2::CatalogueEntryKey::try_new(
+            "domain::ports::Repository".to_owned(),
+        )
+        .unwrap();
+        let declaring = track_catalogues
+            .get(&domain_layer)
+            .expect("the declaring catalogue must reach the codec");
+        let repository = declaring
+            .traits()
+            .get(&trait_key)
+            .expect("the declaring trait add must reach the codec resolution input");
+        assert_eq!(repository.action(), domain::tddd::catalogue_v2::ItemAction::Add);
+        assert_eq!(repository.module_path().map(ToString::to_string), Some("ports".to_owned()));
+
+        let referring = track_catalogues
+            .get(&usecase_layer)
+            .expect("the referring catalogue must reach the codec");
+        assert!(
+            referring
+                .trait_impls()
+                .iter()
+                .any(|decl| decl.trait_ref().as_str() == "domain::ports::Repository"),
+            "the referring layer must retain the trait reference used for resolution"
+        );
+        assert!(
+            !referring.traits().contains_key(&trait_key),
+            "the referring catalogue must not duplicate the declaring trait add"
+        );
+
+        let resolution_set = external_trait_resolution_set();
+        self.observed.lock().unwrap().push(resolution_set.clone());
+        Ok(resolution_set)
+    }
+}
+
 struct TrackCatalogueLoader {
     documents: BTreeMap<String, CatalogueDocument>,
 }
@@ -853,10 +1035,11 @@ impl RustdocCratePort for DistinguishableRustdocPort {
 
     fn capture_current(
         &self,
-        _crate_name: &CrateName,
+        crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
-        Ok(current_rustdoc(_crate_name, self.current.clone()))
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        Ok(current_rustdoc(crate_name, self.current.clone(), evaluation_start))
     }
 }
 
@@ -890,10 +1073,12 @@ impl RustdocCratePort for LayerAwareRustdocPort {
         &self,
         crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         Ok(current_rustdoc(
             crate_name,
             rustdoc_crate_with_layer_marker(crate_name.as_str(), "current"),
+            evaluation_start,
         ))
     }
 }
@@ -932,10 +1117,12 @@ impl RustdocCratePort for CrossLayerHandoffRustdocPort {
         &self,
         crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         Ok(current_rustdoc(
             crate_name,
             rustdoc_crate_with_cross_layer_handoff_items(crate_name.as_str(), "current"),
+            evaluation_start,
         ))
     }
 }
@@ -1007,15 +1194,47 @@ impl RustdocCratePort for BinAliasHandoffRustdocPort {
         &self,
         crate_name: &CrateName,
         _features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
         self.requested_targets.lock().unwrap().push(crate_name.as_str().to_owned());
         match crate_name.as_str() {
-            "domain_bin" => Ok(current_rustdoc(crate_name, bin_alias_domain_current())),
-            "usecase" => Ok(current_rustdoc(crate_name, referring_side_current())),
+            "domain_bin" => {
+                Ok(current_rustdoc(crate_name, bin_alias_domain_current(), evaluation_start))
+            }
+            "usecase" => {
+                Ok(current_rustdoc(crate_name, referring_side_current(), evaluation_start))
+            }
             target => panic!("unexpected test rustdoc target: {target}"),
         }
     }
 }
+
+macro_rules! impl_fixed_evaluation_start_capture {
+    ($($port:ty),+ $(,)?) => {
+        $(
+            impl EvaluationStartCapturePort for $port {
+                fn capture_evaluation_start(
+                    &self,
+                ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+                    Ok(evaluation_start_fingerprint())
+                }
+            }
+        )+
+    };
+}
+
+impl_fixed_evaluation_start_capture!(
+    NeverCalledRustdocPort,
+    EmptyRustdocPort,
+    FailingRustdocPort,
+    CaptureFailureRustdocPort,
+    FeatureGatedRustdocPort,
+    UndeclaredFeatureRustdocPort,
+    DistinguishableRustdocPort,
+    LayerAwareRustdocPort,
+    CrossLayerHandoffRustdocPort,
+    BinAliasHandoffRustdocPort,
+);
 
 struct RustdocWinsAndAliasCodec {
     observed: Arc<Mutex<Vec<ExtendedCrate>>>,
@@ -1218,13 +1437,16 @@ impl SymlinkGuardPort for AlwaysIoSymlinkGuard {
 // Interactor builder helper — also re-used by `happy_tests`
 // -------------------------------------------------------------------------
 
-pub(super) fn build_interactor(
+pub(super) fn build_interactor<R>(
     loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
-    rustdoc: Arc<dyn RustdocCratePort>,
+    rustdoc: Arc<R>,
     bindings: Arc<dyn TdddLayerBindingsPort>,
-) -> CatalogueImplSignalsInteractor {
+) -> CatalogueImplSignalsInteractor
+where
+    R: RustdocCratePort + EvaluationStartCapturePort + 'static,
+{
     build_interactor_with_guard(
         loader,
         codec,
@@ -1236,24 +1458,88 @@ pub(super) fn build_interactor(
     )
 }
 
-pub(super) fn build_interactor_with_guard(
+pub(super) fn build_interactor_with_guard<R>(
     loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     codec: Arc<dyn domain::tddd::CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
-    rustdoc: Arc<dyn RustdocCratePort>,
+    rustdoc: Arc<R>,
     bindings: Arc<dyn TdddLayerBindingsPort>,
     feature_declaration: Arc<dyn TdddActualFeatureDeclarationPort>,
     symlink_guard: Arc<dyn SymlinkGuardPort>,
-) -> CatalogueImplSignalsInteractor {
+) -> CatalogueImplSignalsInteractor
+where
+    R: RustdocCratePort + EvaluationStartCapturePort + 'static,
+{
+    let evaluation_start_capture_port: Arc<dyn EvaluationStartCapturePort> = rustdoc.clone();
+    let rustdoc_crate_port: Arc<dyn RustdocCratePort> = rustdoc;
     CatalogueImplSignalsInteractor::new(
         loader,
         codec,
         evaluator,
-        rustdoc,
+        evaluation_start_capture_port,
+        rustdoc_crate_port,
         bindings,
         feature_declaration,
         symlink_guard,
     )
+}
+
+#[test]
+fn test_run_binds_one_evaluation_start_to_every_current_capture() {
+    let start_calls = Arc::new(Mutex::new(0));
+    let captures = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), minimal_catalogue_doc("domain")),
+                ("usecase-types.json".to_owned(), minimal_catalogue_doc("usecase")),
+            ]),
+        }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(RecordingStartBindingRustdocPort {
+            start_calls: Arc::clone(&start_calls),
+            captures: Arc::clone(&captures),
+        }),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    assert_eq!(*start_calls.lock().unwrap(), 1);
+    let expected_start = evaluation_start_fingerprint();
+    assert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);
+}
+
+#[test]
+fn test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access() {
+    let current_calls = Arc::new(Mutex::new(0));
+    let interactor = build_interactor(
+        Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(StartCaptureFailureRustdocPort { current_calls: Arc::clone(&current_calls) }),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        &error,
+        CatalogueImplSignalsError::EvaluationStartCapture(
+            EvaluationStartCaptureError::AuthoritativeInput { .. }
+        )
+    ));
+    assert!(
+        error.to_string().contains("stub evaluation-start fingerprint failure"),
+        "the evaluation-start diagnostic must cross the usecase boundary: {error}"
+    );
+    assert_eq!(*current_calls.lock().unwrap(), 0);
 }
 
 #[test]
@@ -1488,6 +1774,76 @@ fn test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate() {
             "the referring catalogue must not duplicate the declaring-layer trait add"
         );
     }
+}
+
+#[test]
+fn test_run_codec_resolution_set_adds_referenced_trait_as_declaring_crate_external_item() {
+    use domain::tddd::catalogue_v2::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::entries::TraitEntry;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, ItemAction};
+    use domain::tddd::catalogue_v2::{CatalogueEntryKey, ModulePath};
+
+    let trait_key = CatalogueEntryKey::try_new("domain::ports::Repository".to_owned()).unwrap();
+    let mut domain_doc = minimal_catalogue_doc("domain");
+    domain_doc.insert_trait(
+        trait_key.clone(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["ports".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut usecase_doc = minimal_catalogue_doc("usecase");
+    usecase_doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::ports::Repository").unwrap(),
+        TypeRef::new("Handler").unwrap(),
+    ));
+
+    let observed = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), domain_doc),
+                ("usecase-types.json".to_owned(), usecase_doc),
+            ]),
+        }),
+        Arc::new(TraitResolutionHandoffCodec { observed: Arc::clone(&observed) }),
+        Arc::new(RecordingExtendedCrateEvaluator { observed: Arc::clone(&observed) }),
+        Arc::new(LayerAwareRustdocPort),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    interactor
+        .run("my-track".to_owned(), workspace.path().to_path_buf(), Some("usecase".to_owned()))
+        .unwrap();
+
+    let encoded = observed
+        .lock()
+        .unwrap()
+        .pop()
+        .expect("the evaluator must observe the codec resolution set");
+    let repository = encoded
+        .krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "ports", "Repository"])
+        .expect("the referenced trait must be present in the resolution set");
+    assert_eq!(repository.1.kind, ItemKind::Trait);
+    assert_ne!(repository.1.crate_id, 0, "the declaring trait must be external to usecase");
+    assert_eq!(encoded.krate().external_crates[&repository.1.crate_id].name, "domain");
+    assert!(matches!(&encoded.krate().index[repository.0].inner, ItemEnum::Trait(_)));
 }
 
 #[test]

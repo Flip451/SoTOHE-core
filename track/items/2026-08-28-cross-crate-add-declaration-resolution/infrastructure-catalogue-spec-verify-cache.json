@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "e6739268c5390a28025885e34943ecbf34a2a5e473346c709136a604a06a6647",
+      "claim_hash": "5d54ac083760dea7e33e78540e65d104b18aef2d51f554f21f76fc0f23fa2a4a",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "e6739268c5390a28025885e34943ecbf34a2a5e473346c709136a604a06a6647",
+      "claim_hash": "5d54ac083760dea7e33e78540e65d104b18aef2d51f554f21f76fc0f23fa2a4a",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -44,12 +44,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e6739268c5390a28025885e34943ecbf34a2a5e473346c709136a604a06a6647",
+      "claim_hash": "5d54ac083760dea7e33e78540e65d104b18aef2d51f554f21f76fc0f23fa2a4a",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
@@ -68,7 +68,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
         "kind": "pass"
       }
     },
@@ -241,79 +241,7 @@
       }
     },
     {
-      "claim_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
-      "claim_origin": {
-        "data": {
-          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "f4d68b925fc457abcfb903876580c7add73b593600d5ec3d31dcaa7a6f8aeec3",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-05",
-          "section": "in_scope",
-          "text_label": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。lock を取得できない又は lock 操作が失敗した場合は、lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
-      "claim_origin": {
-        "data": {
-          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "5cf312467c070bde55da5c1d20c639a59895cf9767408a51fdc482c37f35ed56",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CO-06",
-          "section": "constraint",
-          "text_label": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。この directory を使う閉じた協調 expected-output writer 集合の export は、directory 内の単一 advisory exclusive lock で最大 120 秒直列化する。非専用 target は fail-closed で拒否し、任意の shared Cargo target writer を排除又は検出できる OS mandatory-access 境界は主張しない。lock は descriptor-relative・no-follow の trusted-root 検証を提供する Unix だけで扱い、絶対 CARGO_TARGET_DIR は明示設定時でも全親 component と selection directory の symlink 不在を検証する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
-      "claim_origin": {
-        "data": {
-          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
-          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "42f7bef4a42340116a59c2afe8bc83b9d26e82922e1d0dbd5b240cb0c740f3d1",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合では、その directory 内の単一 advisory exclusive lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合、評価を fail-closed で停止する。lockless export、既存 JSON の再利用、又は待機超過後の retry は行わない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合では、その directory 内の単一 advisory exclusive lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合、評価を fail-closed で停止する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
+      "claim_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
@@ -337,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
+      "claim_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
       "claim_origin": {
         "data": {
           "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
@@ -357,6 +285,78 @@
       },
       "verdict": {
         "citation": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bc6f0a7ca100c399927107e214214c4bc1f3238598b2b35d3223f1b5b89c4de1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。いずれかの超過は EvaluationStartCaptureError::AuthoritativeInput で fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution を用いない。rustdoc export と専用 selection directory の lock は含めない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "42f77c872d13d16ae526c6546bc99ab4511affe8bbf91dbf8effab61a62d0c29",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-09",
+          "section": "constraint",
+          "text_label": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。超過時は EvaluationStartCaptureError::AuthoritativeInput として fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution で継続しない。rustdoc export と専用 selection directory の lock はこの上限の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0f4e5c7dd2ca0cf11f9bebe26657fdbc2602e3aecdc36f290db08b0228bfcd37",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。rustdoc export と専用 selection directory の lock はこの基準の対象外であり、D6 の上限に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
         "kind": "pass"
       }
     },

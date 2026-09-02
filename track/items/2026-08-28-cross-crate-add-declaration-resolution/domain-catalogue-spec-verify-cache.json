@@ -1,6 +1,78 @@
 {
   "entries": [
     {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
       "claim_origin": {
         "data": {
@@ -1489,7 +1561,7 @@
       }
     },
     {
-      "claim_hash": "f75e7f52bde0fa2823c583331305f565c21f73905a0e8011f921119c4835870f",
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocCratePort",
@@ -1508,12 +1580,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。lock を取得できない又は lock 操作が失敗した場合は、lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止する。",
+        "citation": "専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f75e7f52bde0fa2823c583331305f565c21f73905a0e8011f921119c4835870f",
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocCratePort",
@@ -1532,12 +1604,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。この directory を使う閉じた協調 expected-output writer 集合の export は、directory 内の単一 advisory exclusive lock で最大 120 秒直列化する。",
+        "citation": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f75e7f52bde0fa2823c583331305f565c21f73905a0e8011f921119c4835870f",
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocCratePort",
@@ -1561,7 +1633,7 @@
       }
     },
     {
-      "claim_hash": "f75e7f52bde0fa2823c583331305f565c21f73905a0e8011f921119c4835870f",
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
       "claim_origin": {
         "data": {
           "entry_key": "RustdocCratePort",
@@ -1580,7 +1652,79 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。",
+        "citation": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluationの永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。",
         "kind": "pass"
       }
     },
@@ -1701,6 +1845,78 @@
       },
       "verdict": {
         "citation": "期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
         "kind": "pass"
       }
     },

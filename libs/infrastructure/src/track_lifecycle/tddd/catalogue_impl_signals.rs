@@ -106,9 +106,14 @@ impl TrackCatalogueImplSignalsPort for SystemTrackCatalogueImplSignalsAdapter {
             delegate: evaluator,
             identities: Arc::clone(&captured_identities),
         });
-        let rustdoc_crate_port = Arc::new(
+        let rustdoc_adapter = Arc::new(
             crate::tddd::rustdoc_crate_adapter::RustdocCrateAdapter::new(workspace_root.clone()),
         );
+        let evaluation_start_capture_port: Arc<
+            dyn usecase::catalogue_impl_signals::ports::EvaluationStartCapturePort,
+        > = rustdoc_adapter.clone();
+        let rustdoc_crate_port: Arc<dyn domain::tddd::catalogue_v2::RustdocCratePort> =
+            rustdoc_adapter;
         let layer_bindings_port =
             Arc::new(crate::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter::new());
         let feature_declaration_port = Arc::new(
@@ -120,6 +125,7 @@ impl TrackCatalogueImplSignalsPort for SystemTrackCatalogueImplSignalsAdapter {
             catalogue_loader,
             ext_crate_codec,
             capturing_evaluator,
+            evaluation_start_capture_port,
             rustdoc_crate_port,
             layer_bindings_port,
             feature_declaration_port,

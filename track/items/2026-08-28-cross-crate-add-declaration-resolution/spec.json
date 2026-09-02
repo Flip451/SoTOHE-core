@@ -69,6 +69,26 @@
     {
       "adr_refs": [
         {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+        }
+      ],
+      "id": "AC-09",
+      "text": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+        }
+      ],
+      "id": "AC-10",
+      "text": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。rustdoc export と専用 selection directory の lock はこの基準の対象外であり、D6 の上限に従う。"
+    },
+    {
+      "adr_refs": [
+        {
           "anchor": "D6",
           "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
         }
@@ -163,6 +183,26 @@
       ],
       "id": "CO-05",
       "text": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D4",
+          "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+        }
+      ],
+      "id": "CO-08",
+      "text": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+        }
+      ],
+      "id": "CO-09",
+      "text": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。超過時は EvaluationStartCaptureError::AuthoritativeInput として fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution で継続しない。rustdoc export と専用 selection directory の lock はこの上限の対象外とする。"
     },
     {
       "adr_refs": [
@@ -273,6 +313,26 @@
       {
         "adr_refs": [
           {
+            "anchor": "D4",
+            "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
+          }
+        ],
+        "id": "IN-08",
+        "text": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-09-02-0000-evaluation-start-capture-time-bounds.md"
+          }
+        ],
+        "id": "IN-09",
+        "text": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。いずれかの超過は EvaluationStartCaptureError::AuthoritativeInput で fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution を用いない。rustdoc export と専用 selection directory の lock は含めない。"
+      },
+      {
+        "adr_refs": [
+          {
             "anchor": "D6",
             "file": "knowledge/adr/2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md"
           }
@@ -371,7 +431,7 @@
     ]
   },
   "signals": {
-    "blue": 28,
+    "blue": 34,
     "red": 0,
     "yellow": 0
   },

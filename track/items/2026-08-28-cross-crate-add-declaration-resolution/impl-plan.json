@@ -129,10 +129,50 @@
           "T021"
         ],
         "title": "Nightly-selected fingerprint and schema v6"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/ports.rs::EvaluationStartCapturePort and EvaluationStartCaptureError, libs/domain/src/tddd/type_signals_doc.rs::AttestedRustdocSnapshot and construct_attested_rustdoc_snapshot, libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort::capture_current, libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor plus CatalogueImplSignalsError; add focused validation (IN-07, IN-08, CO-07, CO-08, AC-06, AC-09)."
+        ],
+        "id": "SECTION-013",
+        "task_ids": [
+          "T022"
+        ],
+        "title": "Evaluation-start port split and attested capture"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan, RustdocExportPlanValidationError, and CatalogueImplSignalsError plus libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor, and replace the RustdocSnapshot boundary in libs/domain/src/tddd/catalogue_to_extended_crate_port.rs::AuthoritativeRustdocContext::new and current_snapshot with AttestedRustdocSnapshot; add focused validation (CO-02, IN-04, IN-07, CO-05, CO-07, AC-05, AC-06)."
+        ],
+        "id": "SECTION-014",
+        "task_ids": [
+          "T023"
+        ],
+        "title": "Catalogue-bearing export plan"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06)."
+        ],
+        "id": "SECTION-015",
+        "task_ids": [
+          "T024"
+        ],
+        "title": "Snapshot-bound catalogue exports"
+      },
+      {
+        "description": [
+          "Modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter's EvaluationStartCapturePort implementation and add focused timeout and fail-closed validation (IN-09, CO-09, AC-10)."
+        ],
+        "id": "SECTION-016",
+        "task_ids": [
+          "T025"
+        ],
+        "title": "Time-bounded evaluation-start capture"
       }
     ],
     "summary": [
-      "GO-01 original implementation and authoritative-context completion remain T001-T009; completed D3-D8 reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021."
+      "GO-01 original implementation and authoritative-context completion remain T001-T009; completed reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021; completed evaluation-start port separation and catalogue-bearing export planning remain T022-T023; remaining snapshot-bound export orchestration and time-bounded evaluation-start capture are T024-T025."
     ]
   },
   "schema_version": 2,
@@ -288,6 +328,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "909395159e068c34cf6d22c5313bad95135d1334",
       "depends_on": [
         "T019"
       ],
@@ -296,12 +337,43 @@
       "status": "done"
     },
     {
+      "commit_hash": "909395159e068c34cf6d22c5313bad95135d1334",
       "depends_on": [
         "T019"
       ],
       "description": "After T019, modify libs/domain/src/tddd/type_signals_doc.rs::TYPE_SIGNALS_SCHEMA_VERSION from 5 to 6 and libs/infrastructure/src/tddd/type_signals_codec.rs::decode_with_identity_root to reject persisted legacy-v5 documents during typed decode; add focused legacy-schema rejection tests in libs/infrastructure/src/tddd/type_signals_codec_tests.rs (AC-04).",
       "id": "T021",
       "status": "done"
+    },
+    {
+      "description": "Modify libs/usecase/src/catalogue_impl_signals/ports.rs::EvaluationStartCapturePort and EvaluationStartCaptureError, libs/domain/src/tddd/type_signals_doc.rs::AttestedRustdocSnapshot and construct_attested_rustdoc_snapshot, libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort::capture_current, libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor plus CatalogueImplSignalsError; add focused validation (IN-07, IN-08, CO-07, CO-08, AC-06, AC-09).",
+      "id": "T022",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T022"
+      ],
+      "description": "After T022, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan, RustdocExportPlanValidationError, and CatalogueImplSignalsError plus libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor, and replace the RustdocSnapshot boundary in libs/domain/src/tddd/catalogue_to_extended_crate_port.rs::AuthoritativeRustdocContext::new and current_snapshot with AttestedRustdocSnapshot; add focused validation (CO-02, IN-04, IN-07, CO-05, CO-07, AC-05, AC-06).",
+      "id": "T023",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T022",
+        "T023"
+      ],
+      "description": "After T022 and T023, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06).",
+      "id": "T024",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T022"
+      ],
+      "description": "After T022, modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter::capture_evaluation_start and the evaluation-start fingerprint helpers libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs::{rustdoc_implementation_fingerprint, rustdoc_input_digest, validate_authoritative_cargo_inputs, collect_rustdoc_input_paths, walk_rustdoc_inputs} and libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs::{run_cargo_metadata_with_early_bounded_output, run_bounded_command_with_total, resolve_nightly_tool, terminate_nightly_process} to enforce bounded execution and output draining for the locked cargo metadata call, workspace walk, and nightly tool resolution, delegating process-group termination to capability_exec::process::terminate_bounded_process_group; add focused timeout and fail-closed validation, anchored to ADR 2026-09-02-0000-evaluation-start-capture-time-bounds.md D1 and IN-09/CO-09/AC-10.",
+      "id": "T025",
+      "status": "todo"
     }
   ]
 }

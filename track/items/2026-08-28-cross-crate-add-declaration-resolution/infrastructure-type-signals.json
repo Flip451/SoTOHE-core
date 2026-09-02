@@ -1,10 +1,10 @@
 {
   "baseline_hash": "037b291232dc713a13d816e996a358fc9c2193d3c9fd2dea5fae9b71fc291d62",
-  "declaration_hash": "646383be25e45c51c2d9982c4980c2a969e61d1e18222e640165b53df552afbf",
-  "generated_at": "2026-09-01T08:36:29Z",
-  "head_commit": "909395159e068c34cf6d22c5313bad95135d1334",
-  "implementation_fingerprint": "d54496cb6dc446d324e99c05ef4c9bdc6246c0424d6d2e868f83c35cfb23dc7b",
-  "resolution_fingerprint": "0e746974224784f9be7b9448ab2cffeeabcb0a247876ce032a95b410002ea4de",
+  "declaration_hash": "41b51b979d5d9fa3fc9cf8fce4f4296f86b8a75d41f8b64e48bf7b23e34bebbb",
+  "generated_at": "2026-09-02T05:01:41Z",
+  "head_commit": "1815623c0609205772aaf002035ec10d556b5ded",
+  "implementation_fingerprint": "a11de8fbfd562bd581e6587a06a33ffd51eb8e0b4814c8e059cc7e7cd1de88c5",
+  "resolution_fingerprint": "daf4ec482d00d183e6a24114256a26483e7c47281bc99e4039845206d872258d",
   "rustdoc_execution_identity": {
     "crate_name": "infrastructure",
     "expected_json_path": "target/.sotp-rustdoc/4225fd0e0ab3e3b5382ac303795f8d5460081d934f46dc14c26a6c3b5fefdedb/doc/infrastructure.json",
@@ -33,7 +33,8 @@
     },
     {
       "found_items": [
-        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
+        "usecase::catalogue_impl_signals::ports::EvaluationStartCapturePort"
       ],
       "found_type": true,
       "kind_tag": "secondary_adapter",

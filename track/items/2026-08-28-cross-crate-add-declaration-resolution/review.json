@@ -109,6 +109,20 @@
           "hash": "rvw1:sha256:1f0a56039eccbb28881a8fe18b0e47a477891a92dc79ebfb1b9bb5f373790a91",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:59:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12a53fce6524d9db31966917605a4e3da22187a6b9bc276df1d9a17492ebd1b7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T23:02:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12a53fce6524d9db31966917605a4e3da22187a6b9bc276df1d9a17492ebd1b7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -597,6 +611,57 @@
           "at": "2026-09-01T01:30:48Z",
           "findings": [],
           "hash": "rvw1:sha256:22408acd99bf32f10ad194e4a945935bdd1494700b4238358e92cc69eeb76df9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T15:11:40Z",
+          "findings": [
+            {
+              "category": "port misplaced",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 281,
+              "message": "`capture_evaluation_start` abstracts runtime acquisition of the workspace, environment, selected tool binaries, and `cargo metadata`. This is an infrastructure capability and its secondary port belongs in usecase; adding it to the domain-owned `RustdocCratePort` makes the innermost layer own an external-boundary operation. Keep the fingerprint value object in domain, but relocate the acquisition port.",
+              "severity": "P1"
+            },
+            {
+              "category": "typestate / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs",
+              "line": 302,
+              "message": "`capture_current` validates the supplied evaluation-start fingerprint but returns a `RustdocSnapshot` that contains no fingerprint. A caller can therefore pair a successfully captured snapshot with a different `ImplementationFingerprint` when constructing the cache key, despite the API claiming the snapshot is bound to that fingerprint. Return a value object carrying both the validated fingerprint and snapshot, or otherwise encode that relationship in the successful type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a69843faf10fdd3c07c254e669d78e401deaca2cbdb3e7a78a2a3eeef341e76",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T22:19:10Z",
+          "findings": [
+            {
+              "category": "public API documentation gap",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 415,
+              "message": "`construct_attested_rustdoc_snapshot` is a public `Result`-returning API but lacks the required `# Errors` documentation section describing decode failures.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:cd8e6620c8fd390da8278c6938d4cd426d010824c72a35cfee42a8860268f225",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T22:26:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce389c49fe509c2811d4b970dffbba6591e54d8e6b76f8ea81745f1eaa28c6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:47:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce389c49fe509c2811d4b970dffbba6591e54d8e6b76f8ea81745f1eaa28c6b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1596,6 +1661,245 @@
           "at": "2026-09-01T05:15:55Z",
           "findings": [],
           "hash": "rvw1:sha256:4cb54d792431bd1d4ad7b14bcce04463a182228c3323dfc8480311c87cdf788d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T10:01:15Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-coverage.json",
+              "line": 31,
+              "message": "T023 は説明内で IN-04 を明示し、`RustdocExportPlan` の対象層集合と export 数を変更しますが、IN-04 の mapping は完了済み T012 のみです。この関係は load-bearing なので、T023（分割する場合は export-plan 側タスク）を IN-04 に追加してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 337,
+              "message": "todo の T023 は、独立に検証できる二つの挙動単位を束ねています。(1) selected/catalogue-bearing layer の export-plan 構築と 64/65-layer 境界（CO-02、IN-04、CO-05、AC-05）、(2) evaluation-start identity への export 束縛と mixed-generation 非永続化（IN-07、CO-07、AC-06）です。実装前に依存順の別タスクへ分割し、前者に focused 64/65 validation を持たせ、coverage・contract attribution・estimate・batch membership を再配分してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:178af743b027c453c07209c94c738347ed78633c665099d274aa85ecd24530e2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T10:16:51Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 338,
+              "message": "T022 changes `RustdocCratePort` by adding the required `capture_evaluation_start` method and requiring an evaluation-start argument for `capture_current`, but its target list names only `RustdocCrateAdapter`. Other existing implementers such as `type_signals_executor_adapter::RustdocLaunchObserver`, the usecase interactor call site, and its test fakes must also change for the task to compile; the interactor transition is deferred to T024. Add the complete compile-closure targets/operation to an atomic task or explicitly define a source-compatible staging boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-contract.json",
+              "line": 247,
+              "message": "T023 is attributed to `RustdocExportPlan`, although T023 covers only catalogue selection and the 64-layer bound while the catalogue’s final shape includes the evaluation-start constructor input and `implementation_fingerprint` accessor assigned to T024. At T023 completion this entry therefore cannot yet conform to its declared shape. Remove the T023 attribution and retain T024 as the converging owner; merely modifying the plan during T023 does not require attribution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:be6f0ec52eee1d4be22fc2d3a261ae054d829d895744c16bae433c3aee7c4081",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T10:25:36Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/batch-plan.json",
+              "line": 75,
+              "message": "BATCH-002 groups todo tasks T022 and T023 without a dependency edge even though both explicitly modify `libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor`. This creates concurrent ownership of the same production target; additionally, T022’s estimate omits the usecase scope it now changes. Repartition the call-site closure or serialize the tasks with explicit dependency/ordered ownership, and include T022’s usecase estimate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:824834f708a54c05187ab0407d72970248e77947bdec80869c985c809d5e4b37",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T10:33:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:321cbbe0daf2aee0a8f477909bf4c9d63e1061486cecaf17743963a937875a9b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T12:53:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10fe2d0f076eee6a6a97123e85e144d0a423796e862b97d3e76b5aca10097404",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T15:07:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6f6d12e03194751f6ffc09c8d9455cb7f9eac751335aaff9c8667ee0b96d08c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T17:43:55Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 339,
+              "message": "T022 description restates upstream behavior contract: “capture one authoritative evaluation-start identity through its dedicated port before exports, construct crate captures through the attestation factory, and propagate capture failure.” Keep only target + operation + anchor cite per no-upstream-restatement policy.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 347,
+              "message": "T023 description restates upstream behavior contract: “skip absent non-target catalogues without BaselineLoad, and enforce the 64-layer bound.” Keep only target + operation + anchor cite per no-upstream-restatement policy.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 356,
+              "message": "T024 description restates upstream behavior contract: “bind every catalogue implementation-signals export to the evaluation-start identity and discard mixed-generation results before persistence.” Keep only target + operation + anchor cite per no-upstream-restatement policy.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 135,
+              "message": "SECTION-013 description restates the evaluation-start and attested-capture behavior contract instead of containing only target + operation + anchor cite.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 145,
+              "message": "SECTION-014 description restates the export-plan behavior contract, including absent-catalogue skipping and the 64-layer boundary, instead of containing only target + operation + anchor cite.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 155,
+              "message": "SECTION-015 description restates the mixed-generation persistence behavior contract instead of containing only target + operation + anchor cite.",
+              "severity": "P2"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/batch-plan.json",
+              "line": 80,
+              "message": "BATCH-002 groups T022 and T023 despite both having a concrete overlapping write target, libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor. T023 depends on T022, but same-batch membership cannot safely provide concurrent ownership of that file/symbol; move T023 to a later batch or split ownership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:980da790d0f5cbbbc7bd3172788260c663459566e056bd86f098b91d4a624f46",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T17:51:04Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/task-coverage.json",
+              "line": 23,
+              "message": "task-coverage.json incorrectly maps T022 to IN-03, CO-04, and AC-04, but T022’s description and anchors cover only evaluation-start capture/attested snapshot work (IN-07, IN-08, CO-07, CO-08, AC-06, AC-09); reuse-identity/fingerprint coverage belongs to other tasks.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dae683219a75593dab83e40c20e921ee2846ac040fced5c7310ab76449337a40",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T17:53:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:68320ff58baa67f6a3d6accd2e773d3cf7e92c9ee28d01338a7a2c8194ccdcfe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T17:56:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:68320ff58baa67f6a3d6accd2e773d3cf7e92c9ee28d01338a7a2c8194ccdcfe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T21:42:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4dbfd105c88d0f227f9c8afa08c432cf667e803fe97fb3e6ce74edb3055e895",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T21:45:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4dbfd105c88d0f227f9c8afa08c432cf667e803fe97fb3e6ce74edb3055e895",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:28:58Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 374,
+              "message": "T025’s description restates the upstream behavior contract: “bound workspace walk, nightly-selected tool resolution, cargo metadata --no-deps --locked, and their output drain to 120-second execution and 1-second drain, propagate every timeout as EvaluationStartCaptureError::AuthoritativeInput without partial fingerprint, fallback, or generated layer attribution.” Keep the task text to target + operation + anchor cite per no-upstream-restatement policy.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:4311b869bfdb7c30e9ccb1306956210c00029500364b544275b043051130d776",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:31:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d258408afe0c5eeee1b1dbd673be2f143f53c2f1358b3a82c64926660e5abe2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:35:15Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 374,
+              "message": "T025 は `RustdocCrateAdapter` の port 実装だけを対象にしていますが、IN-09/CO-09/AC-10 が時間制限する workspace walk・`cargo metadata`・nightly tool 解決・output drain は `type_signals_evaluator/freshness.rs` と `environment_fingerprint.rs` の fingerprint／process helpers が所有しています。adapter の外側から待つだけでは同期 walk の中断や child output の 1 秒 drain を実装できないため、この記述では executor が必須の変更境界を発明する必要があります。実際の helper/process symbols と操作、またはそれらへ委譲する既存 authority を T025 に明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d258408afe0c5eeee1b1dbd673be2f143f53c2f1358b3a82c64926660e5abe2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:39:44Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/impl-plan.json",
+              "line": 374,
+              "message": "T025 の「thread one 120-second capture deadline … one-second post-exit drain bound … map every bound … to EvaluationStartCaptureError::AuthoritativeInput」は、IN-09/CO-09/AC-10 と ADR D1 の時間値・対象処理・失敗挙動を散文で再記述しています。実行可能性に必要な helper/process symbols と `capability_exec::process::terminate_bounded_process_group` への委譲は残しつつ、操作を bounded execution/drain の実装と focused validation に縮約し、挙動本文は anchor cite に委ねてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:8a39167db8576d1949d1cf9b2613fd777f837a77068774f37bb1b59bc14e17a1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:43:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5af0525fa73fe20865f1f12bee06acb9d0ac68c269bee6fa7b614fc4434c6de2",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4019,6 +4323,209 @@
           "hash": "rvw1:sha256:a37143d5a8605ba5434d887ea5ae9ebb404326daa80798311118d81d7dc02ead",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T15:13:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8b4199da70235460c8d37f319f08ccbe8094b6cc5e5f9af9c95ddfbac8ec9708",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:19:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8f2c31a725d9ce4b294dd4e45f0419de6b107730992f387b2a92742eb9c60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:32:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16a8f2c31a725d9ce4b294dd4e45f0419de6b107730992f387b2a92742eb9c60",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:49:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bfa360cc3113b90acc68e9b45576ae51abfd93086c93efe81227d5d87a5b30c8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:56:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bfa360cc3113b90acc68e9b45576ae51abfd93086c93efe81227d5d87a5b30c8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T02:37:01Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 477,
+              "message": "The new 120-second evaluation-start deadline is only checked before and after filesystem operations; `read_dir` itself can block indefinitely, so a hung filesystem/FUSE/NFS mount can prevent the fingerprint from failing closed within the promised bound. The same issue applies to file reads and canonicalization in this fingerprint path. Use a deadline-aware/nonblocking I/O strategy or explicitly enforce the bound around all blocking filesystem operations.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:3753eaf8e22d79190d80c0d12ba1cc7fba7598f144b47dd5efd9a5d09fe3e21a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T02:52:12Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 102,
+              "message": "`FingerprintDeadline::run_io` spawns a worker for each blocking filesystem operation, but on timeout it drops the receiver and returns without joining or otherwise bounding the worker. A hung filesystem call therefore leaves a thread and potentially an open file descriptor running indefinitely; repeated evaluations can exhaust resources even though the fingerprint call fails closed. Use cancellable I/O or a bounded/reusable worker strategy.",
+              "severity": "high"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 282,
+              "message": "The subprocess timeout and output-drain timeout paths terminate the child and return without joining `stdout_reader` and `stderr_reader`. If a descendant or inherited process keeps either pipe open, those reader threads remain blocked indefinitely, so repeated timeout-triggering evaluations leak threads/file descriptors despite the advertised 120s/1s bounds. Ensure readers are synchronously drained/joined with a bounded cleanup path, or otherwise bound the retained resources.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:b2e5d3913572b475228056fbe30fabbfad4c091052d061ac4ba9483f5d88ac51",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T03:06:29Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 54,
+              "message": "The global single-thread fingerprint I/O worker has no cancellation or recovery path. If one detached filesystem job blocks indefinitely, it permanently occupies the worker; the next call can enqueue only one job and subsequent calls fail with `WouldBlock` at `try_send`, making all later evaluation-start fingerprints fail until the original OS operation returns. A bounded queue limits retained jobs but does not provide availability under a hung filesystem boundary.",
+              "severity": "high"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 183,
+              "message": "The global stdout/stderr reader workers likewise execute blocking pipe reads without cancellation. A timed-out subprocess whose descendant retains a pipe can permanently occupy one reader worker, after which later subprocess captures fail when their reader jobs encounter the one-slot queue; the 120s/1s timeout therefore leaves a process-wide denial-of-service condition. The reader worker needs a recoverable/cancellable ownership strategy or an explicitly bounded failure/restart mechanism.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:99064b6ba076f4901b5c6330c1151b0467497c7c126bc976109d41e66b933829",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T03:20:53Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 184,
+              "message": "`run_io` uses a single worker with a one-slot queue, but treats ordinary concurrent queue contention (`TrySendError::Full`) as a worker failure and retires the generation. Concurrent evaluation-start fingerprinting can therefore cause spurious authoritative failures and consume the finite 16-generation restart budget; after 16 such contentions, all subsequent fingerprints fail permanently with `worker restart budget exhausted`. Queue contention should be bounded/waited on independently of worker retirement.",
+              "severity": "high"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 530,
+              "message": "The nightly stdout/stderr reader pools have the same one-worker/one-slot design, and a normal concurrent capture that finds a full queue retires the worker generation. Repeated concurrent captures can exhaust the finite 16-generation budget even without a hung subprocess, after which every nightly resolution fails closed. Reader scheduling contention must not be treated as an unrecoverable worker hang.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:0a006175927dd1945eb4122ee2454e03cc1a7f1f117275762c5034b16e07e6ac",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T03:32:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7296d37ad1f706a478dada4a4786a89c1698a8d2d5c0f0cc0825614c1adb9d6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T03:41:07Z",
+          "findings": [
+            {
+              "category": "timeout-contract",
+              "file": "libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs",
+              "line": 252,
+              "message": "`capture_evaluation_start` performs `reject_workspace_root_for_evaluation_start` before the 120-second fingerprint deadline is created. That validation calls synchronous symlink and metadata I/O, so a stalled workspace mount can block indefinitely instead of returning `EvaluationStartCaptureError::AuthoritativeInput`. Put this preflight under the same bounded I/O deadline.",
+              "severity": "P1"
+            },
+            {
+              "category": "timeout-contract",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 219,
+              "message": "`run_io` records `remaining` before waiting to enqueue the job, then uses that stale duration in `recv_timeout`. When concurrent captures fill the global worker and queue, this call can spend most of its deadline waiting to enqueue and then wait the original duration again, exceeding the 120-second global bound. Recompute the remaining time immediately before receiving, or wait against an absolute deadline.",
+              "severity": "P1"
+            },
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 312,
+              "message": "The subprocess timeout cannot bound `command.spawn()` itself because spawning is performed synchronously before the polling loop. Executable resolution or launch on a stalled filesystem can therefore block past 120 seconds—or indefinitely—without producing the required fail-closed timeout. Run process launch through a bounded supervisor or otherwise include spawn in the enforceable deadline; assuming spawn cannot block is an undeclared external-boundary assumption.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7296d37ad1f706a478dada4a4786a89c1698a8d2d5c0f0cc0825614c1adb9d6b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T03:58:39Z",
+          "findings": [
+            {
+              "category": "resource-limit",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs",
+              "line": 480,
+              "message": "`spawn_command_with_deadline` creates a new detached supervisor thread for every subprocess launch. If the `Command::spawn` call actually stalls—the boundary this wrapper is intended to contain—the supervisor never terminates; each subsequent capture can leak another permanently blocked thread. Unlike the filesystem and pipe-reader workers, this path has no queue or generation cap, so repeated timeouts can exhaust process resources. Use a bounded reusable spawn executor or another killable/bounded launch mechanism.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a39d29ea565ffed2803bb202cac5a1befe2588e1af73099036b6de604ad50f9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T04:09:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:967acfefa2c11668bfc4695e94af5da27aa8c6f250cbad9305b86fa4e18b29da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T04:43:31Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint/command_spawn.rs",
+              "line": 371,
+              "message": "The spawn deadline is not fail-closed if `Command::spawn()` itself blocks. The worker calls `command.spawn()` before acquiring `handoff.lock`, while every timeout path calls `cancel_command_spawn`, which blocks acquiring that same mutex. A hung OS spawn therefore prevents the timeout handler from returning or retiring the worker, defeating the advertised execution deadline. Set cancellation atomically without waiting on the handoff mutex, or use a cleanup path that cannot block behind the spawn operation.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:0224c30bf6bd390b394ac189d6d2bf651ab53e32fb02b314d8ab203f681ee0cb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T04:54:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67e5ae946bab7612b04e17654f6e96e4e565758cd05a6ffd5a0feb860f462361",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T04:59:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67e5ae946bab7612b04e17654f6e96e4e565758cd05a6ffd5a0feb860f462361",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4791,6 +5298,166 @@
           "hash": "rvw1:sha256:43a57a27ebd1de6c58e6db3b47ac6725e68f6729707220bd492816fe64422f72",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T15:14:16Z",
+          "findings": [
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 819,
+              "message": "This fulfillment has no success-path evidence for the real `RustdocCratePort::capture_evaluation_start`. The infrastructure test covers only an unverifiable-root failure, while both usecase tests use fakes returning a fixed fingerprint. Consequently, a real implementation returning a constant or omitting authoritative inputs could still satisfy every cited test despite IN-08/CO-08/AC-09 requiring a complete authoritative fingerprint. Bind a real-adapter success/content-sensitivity test that independently varies the authoritative inputs and verifies the returned fingerprint.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:75f43b3d59713fc59c4035498f46d940e3bda4476780cc55cf339432db5cd8dc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T15:22:35Z",
+          "findings": [
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 824,
+              "message": "The required gate is not currently green. `bin/sotp test-obligation check --track-id 2026-08-28-cross-crate-add-declaration-resolution` exits 1 with `TestChanged` drift for the `RustdocCratePort` IN-08, CO-08, and AC-09 edges after this fulfillment’s evidence changed. Refresh the orchestrator-owned obligation evaluation and confirm the check passes before approval.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:913d86d132e471c3c1ac5a034f31f8e4a75adbde7c9f9f5df1068ba62edabf54",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T21:28:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89ec9f92194151b878dc39ffaaab1f08b90a0c19db6783bc0179ef2f04f44746",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:15:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89ec9f92194151b878dc39ffaaab1f08b90a0c19db6783bc0179ef2f04f44746",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:30:12Z",
+          "findings": [
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 874,
+              "message": "The new evaluation-start contract/conformance evidence does not cover the complete enumerated environment identity. `test_capture_evaluation_start_fingerprint_tracks_each_authoritative_input` varies a workspace file, each nightly-selected tool, and metadata bytes, but never varies required inputs such as `RUSTFLAGS`, `RUSTDOCFLAGS`, or `CARGO_ENCODED_RUSTFLAGS`. An implementation that ignores those values would satisfy every cited test despite IN-08/CO-08/AC-09 requiring a complete authoritative fingerprint. Add and bind direct adapter evidence for the enumerated environment inputs.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 334,
+              "message": "`test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore` runs the evaluator with the test-only `RustdocLaunchObserver`; it never invokes `RustdocCrateAdapter`. It therefore cannot establish the adapter contract-conformance obligation to which it is bound here. Keep it on the evaluator obligation, but remove it from the `RustdocCrateAdapter` conformance evidence or replace it with an adapter-level test.",
+              "severity": "P2"
+            },
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 1753,
+              "message": "The AC-04 `TypeSignalsCodecError` binding now cites only `InvalidExecutionIdentity` cases and removes `test_decode_v5_document_without_new_fields_returns_unsupported_schema_error`, the focused evidence for the newly introduced legacy-v5 rejection and `UnsupportedSchemaVersion` variant. A decoder that accepts v5 documents would still satisfy the current binding. Restore the legacy-schema test to this edge.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2207,
+              "message": "The AC-07 binding no longer cites `test_rustdoc_crate_adapter_lock_timeout_is_fail_closed_without_retry`. The two remaining tests cover a lock-operation failure and invalid selection-directory admission, but neither exercises contention timeout, the fixed 120-second policy, or absence of retry after timeout. Rebind the existing timeout test so this explicit AC-07 behavior remains protected.",
+              "severity": "P1"
+            },
+            {
+              "category": "invalid waiver",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 2512,
+              "message": "This waiver incorrectly dismisses behavior that `RustdocSnapshot` directly owns. The type catalogue describes it as an identity-bearing snapshot for IN-03, and the value stores the `RustdocExecutionIdentity` plus the exact JSON hash; `test_construct_rustdoc_snapshot_carries_execution_identity_and_json_hash` directly verifies that slice. Restore the voluntary binding instead of waiving the edge merely because this value does not assemble the entire cache key by itself.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:89ec9f92194151b878dc39ffaaab1f08b90a0c19db6783bc0179ef2f04f44746",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T22:39:53Z",
+          "findings": [
+            {
+              "category": "test-obligation binding",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 869,
+              "message": "The evaluation-start contract/conformance evidence still does not cover the complete enumerated environment identity. `test_capture_evaluation_start_fingerprint_tracks_each_authoritative_input` varies a workspace file, nightly-selected tools, and metadata bytes, but never varies required inputs such as `RUSTFLAGS`, `RUSTDOCFLAGS`, or `CARGO_ENCODED_RUSTFLAGS`. An implementation ignoring those values would satisfy every cited test despite the complete-authoritative requirement. Add and bind direct adapter evidence for the enumerated environment inputs.",
+              "severity": "P1"
+            },
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 1753,
+              "message": "The required obligation gate is not currently green after the binding repairs. `bin/sotp test-obligation results` reports `status:done stale=9 verdict_absent=1`, and `check` exits 1 with `TestChanged` drift across the restored RustdocCrateAdapter and TypeSignalsCodecError edges; the restored RustdocSnapshot/IN-03 binding also lacks a verdict. Refresh the orchestrator-owned evaluation and confirm `check` passes before approval.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:780f541c8709f064a431547231774842f86cf5324f25917e9410105af0568a6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:47:55Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 1743,
+              "message": "The voluntary `TypeSignalsCodecError` × `AC-04` binding still includes `test_decode_with_invalid_rustdoc_execution_identity_returns_invalid_execution_identity` and `test_decode_generated_invalid_execution_identity_components_returns_invalid_execution_identity`. These are not v5-decode evidence and should be removed per the briefing; retain only the v5-document test if intended.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:780f541c8709f064a431547231774842f86cf5324f25917e9410105af0568a6f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:50:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:204650d14e5c49052d99617c3b1a68b42f464434408e93fb0c7bd0d47f8214c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:55:33Z",
+          "findings": [
+            {
+              "category": "verification",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/test-bindings.json",
+              "line": 856,
+              "message": "The required obligation gate is not currently green. `bin/sotp test-obligation check` exits 1 because `obligations.json` is stale for `EvaluationStartCapturePort::capture_evaluation_start` and the RustdocCrateAdapter conformance obligation—their declaration hashes/spec refs changed. The informational results also report one failed fulfillment plus six missing and seven stale done-edge verdicts. Re-run derive, reconcile this binding set with the regenerated obligations, refresh the orchestrator-owned evaluation, and confirm `check` passes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:204650d14e5c49052d99617c3b1a68b42f464434408e93fb0c7bd0d47f8214c9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T02:34:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:78239bee3ad51185b39f6c0a66f3f112495bdb477b785a488b3b7e6c57e043fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T02:42:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:78239bee3ad51185b39f6c0a66f3f112495bdb477b785a488b3b7e6c57e043fa",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4929,6 +5596,27 @@
           "at": "2026-08-31T20:01:24Z",
           "findings": [],
           "hash": "rvw1:sha256:4ca4b466a96c9cffcdaace56ac1268e5dbbaafced6f417621deea4efc8de366b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T12:20:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c44041f8165dd266779653850b551d1ff1cd01d5ea37de68e1cbabe5b1696065",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T23:10:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:708b9a05ff0a26939404952a3d1c0f1f1a3fd899e7676ee9e57ab84561cb6390",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T23:13:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:708b9a05ff0a26939404952a3d1c0f1f1a3fd899e7676ee9e57ab84561cb6390",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -6019,6 +6707,279 @@
           "hash": "rvw1:sha256:a41425853c400093c84f0920cbf07e17b60cea882a42acae7fcad8d68591b2b9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T09:23:39Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1351,
+              "message": "`RustdocCratePort::capture_evaluation_start` は frozen baseline に存在しない新規メソッドですが、`action: modify` と宣言されています。既存の `capture_current` の変更とは別 identity であり、declaration-ahead の Yellow も action 分類を変えません。`action: add` にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "unconstructible error variant (dead vocabulary)",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1358,
+              "message": "`RustdocCratePort::capture_evaluation_start` は crate 引数を持たない run-wide fingerprint 取得ですが、失敗時に必要な `RustdocCratePortError::AuthoritativeInput` は必須の `crate_name: CrateName` payload を持ちます。評価開始時には port/adapter が真の crate 名を所有しておらず、失敗を表すには値を捏造するしかありません。run-level の専用 error 型または crate 非依存 variant を宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1326,
+              "message": "`RustdocCratePort` は filesystem baseline load、workspace/tool fingerprint 取得、Cargo rustdoc capture という外部 I/O をすべて `is_async: false` で公開していますが、現在の entry/method docs は同期・blocking 境界を選ぶ理由を示していません。同期選択を明記するか、port を async shape にしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 31,
+              "message": "`RustdocExportPlan::try_new` は既に検証・ロード済みの in-memory bindings、catalogues、fingerprint だけを受ける一方、全体用の `CatalogueImplSignalsError` を返します。この constructor では `InvalidTrackId`、catalogue/baseline I/O、schema export、evaluation、symlink guard、feature-declaration など多数の variant を構造的に生成できず、docs も生成可能 subset を示していません。専用 validation error に狭めるか、生成可能 variant を明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0027fafa6fb6c0876c69fffda1638c8084b3c13e36ba8ab9cf5762d1bcb214ae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T09:44:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:100574bfc4189f5502838e0125cf880a2d6ea2de8102330a18d7052cd0364c57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T11:32:34Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 494,
+              "message": "`RustdocCratePort::capture_evaluation_start` は crate/layer 非依存の `EvaluationStartCaptureError::AuthoritativeInput` を返しますが、`usecase::catalogue_impl_signals::service::CatalogueImplSignalsError` に run-level authoritative-input failure を運ぶ variant がありません。既存の `SchemaExport` / `Evaluation` は `LayerId` を要求しますが、この失敗時点ではまだどの layer export も失敗していないため、caller は任意の layer を捏造するか別種の失敗へ誤分類することになります。`EvaluationStartCaptureError` を保持する companion variant（または layer 非依存の authoritative-input variant）と IN-03/CO-04/AC-04 refs を post-change shape に追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:be0868f3221dc99a1552101389333c6f2b7b6795f64aca1af587e1800260ae52",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T11:48:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f96667343854753fb25f10793c43ca66726c83f9185e6d6155bc6ec853e2cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T12:45:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f00fbc9c15e4842e6cf4d546c0c0f742f4045e6c26b1080e960e23b29b24ebd3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T14:21:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:221515ca58b90407c47297cfe52a86b280e7a9b2f35ba83ca7eeb94d7c463f8e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T14:57:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:409436747260204e7561ca0b6cfa5ef161093c176690c7808bcff226b0ec1ba2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T16:48:49Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 905,
+              "message": "`AttestedRustdocSnapshot::new` は任意の `ImplementationFingerprint` と任意の `RustdocSnapshot` を独立に受け取るため、fingerprint A に対して fingerprint B の下で取得された snapshot を結び付けた値も構築できます。`AttestedRustdocSnapshot` が IN-07/CO-07/AC-06 の capture-bound attestation を表すなら、この public constructor では不正な組合せを排除できません。capture boundary だけが生成できる proof/constructor にするか、同じ検証済み capture から両要素を不可分に構築してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 217,
+              "message": "`EvaluationStartCapturePort::capture_evaluation_start` は workspace files、toolchain、Cargo metadata を読む外部 I/O port ですが、`is_async: false` である一方、entry docs は同期・blocking 境界を選ぶことを明記していません。同期選択を docs で明示するか、port を async shape にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1b90cf8342b65bbef26499d2d72202ebf146e6098cd8158d7188305a7a012778",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T17:08:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98c470ce5a0faa459d337d2f993ffbf29965b67e9ee6cb3874b24ded707df08f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T17:11:25Z",
+          "findings": [
+            {
+              "category": "Liskov violation in trait design",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1436,
+              "message": "`RustdocCratePort::capture_current` requires the infrastructure adapter to return `AttestedRustdocSnapshot`, but that domain type has stripped/private fields and exposes only accessors—no public construction API. A cross-crate `RustdocCrateAdapter` therefore cannot implement this trait contract without bypassing privacy. Provide a domain-owned construction boundary that preserves the attestation invariant, or otherwise make the return type truthfully constructible by the declared adapter.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1559,
+              "message": "`AttestedRustdocSnapshot` の `docs` は、同一 capture による不可分な結合、`capture_current` の sole-production-boundary 性、独立 component を受ける public constructor の禁止を IN-07/CO-07/AC-06 から文章で再記述しています。変更対象を識別する短い名詞句と anchor cite に縮約してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 217,
+              "message": "`EvaluationStartCapturePort` と `capture_evaluation_start` の `docs` は、workspace・selected toolchain・Cargo metadata の取得と layer export より前という fingerprint recipe を文章で再記述しています。同期 blocking 選択は短い識別句で明示し、取得対象と順序は IN-08/CO-08/AC-09 の anchor cite に委ねてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:98c470ce5a0faa459d337d2f993ffbf29965b67e9ee6cb3874b24ded707df08f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T17:32:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f758bf45cb9661d4a3762aa8cdad7b8d0947c15cb6900d136960006ad2074586",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T17:35:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f758bf45cb9661d4a3762aa8cdad7b8d0947c15cb6900d136960006ad2074586",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T20:29:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a24093792950b0918fbf91489bb596ddbb91fb5b7b9908a15750cb59f038fe5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T20:34:35Z",
+          "findings": [
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+              "line": 1591,
+              "message": "`AttestedRustdocSnapshot` の `docs` と `spec_refs[]` は IN-07/CO-07 だけを参照し、final design intent がこの型に帰属させる AC-06 を欠いています。factory と `RustdocCratePort::capture_current` は AC-06 を引用している一方、生成物自身の公開型契約から acceptance trace が落ちています。短い名詞句の docs を維持したまま AC-06 を entry の docs/spec_refs（および同契約を露出する accessor refs）へ追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a24093792950b0918fbf91489bb596ddbb91fb5b7b9908a15750cb59f038fe5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T20:46:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:550a836fae8aab7e071e6c61694ebc962ca03c57d803189cbffe6fcb92b800be",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T20:47:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:550a836fae8aab7e071e6c61694ebc962ca03c57d803189cbffe6fcb92b800be",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T23:28:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd3baac0fd3b3306338435611f1567ed3156bc38b26444ad19c7b93040cf9189",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T23:31:12Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 185,
+              "message": "`EvaluationStartCapturePort::capture_evaluation_start` は workspace walk・toolchain 解決・Cargo metadata/output drain を行う外部 I/O port で、`is_async: false` ですが、現在の entry/method docs は 120 秒・1 秒の上限だけを記し、同期 blocking 境界を選ぶことを明示していません。時間上限の anchor cite を維持しつつ、同期 blocking 選択を短い識別句で明記してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dd3baac0fd3b3306338435611f1567ed3156bc38b26444ad19c7b93040cf9189",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-01T23:44:42Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 185,
+              "message": "`EvaluationStartCapturePort` の `docs` は、120秒実行・1秒 drain・run-wide capture という upstream の挙動契約を散文で再記述しています。短い変更対象・操作・anchor cite に置き換えてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+              "line": 189,
+              "message": "`EvaluationStartCapturePort::capture_evaluation_start` の `docs` は、同期実行、capture 回数、120秒/1秒の fail-closed 境界を upstream 契約として再記述しています。短い変更対象・操作・anchor cite にしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/infrastructure-types.json",
+              "line": 345,
+              "message": "`RustdocCrateAdapter` の `docs` は、120秒実行・1秒 drain、trusted-root export、lock handling の設計・挙動契約を downstream catalogue に再記述しています。変更対象・操作・anchor cite の短い記述にしてください（.harness/policies/no-upstream-restatement.md）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e559acadad432ce13243f881f29355f8c144bf3a4b1448c710a1c610b1df9081",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:00:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:311b018ce9d90e22394d224b60a530e3b18f1e398f5784258340f73e9c5d2afd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:03:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:311b018ce9d90e22394d224b60a530e3b18f1e398f5784258340f73e9c5d2afd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:19:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d45492aed0a8bbe0a9235db21fb29ba3e252add7a5e5411c66bff8c8355913c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:22:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d45492aed0a8bbe0a9235db21fb29ba3e252add7a5e5411c66bff8c8355913c6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -6259,6 +7220,49 @@
           "at": "2026-08-31T16:02:43Z",
           "findings": [],
           "hash": "rvw1:sha256:fdb6650a8d4b42886f85ce4bbedd9be6ad9cb8edf2218bb7105a4482db6e4ae1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T15:15:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55783a53fb69b85ee593f8b89015903e69fb1137b6cf9fd533bf11d5e467850a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:18:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8beca95309dc1f450dd7565d80573fd98a488b7d3b8d51ac0e15d2ef42a17ac4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-01T22:32:06Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/catalogue_impl_signals/ports.rs",
+              "line": 44,
+              "message": "`EvaluationStartCapturePort` は同期境界であることしか契約していませんが、直接到達する workspace walk、nightly tool 解決、`cargo metadata --no-deps --locked` 実行には現 adapter の 120 秒実行上限と 1 秒 drain 上限があります。spec の D4 は件数・bytes 上限だけを、D6 の 120 秒は rustdoc export/lock だけを定め、環境前提宣言も TODO のため、正当だが遅い環境が `AuthoritativeInput` になる時間前提が未宣言です。評価開始 capture の時間上限・適用範囲・超過時動作を spec または環境宣言に定め、port contract と adapter をその宣言に従わせてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8beca95309dc1f450dd7565d80573fd98a488b7d3b8d51ac0e15d2ef42a17ac4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T00:49:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8beca95309dc1f450dd7565d80573fd98a488b7d3b8d51ac0e15d2ef42a17ac4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T00:56:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8beca95309dc1f450dd7565d80573fd98a488b7d3b8d51ac0e15d2ef42a17ac4",
           "type": "final",
           "verdict": "zero_findings"
         }

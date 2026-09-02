@@ -23,6 +23,65 @@
         }
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T022",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 35,
+          "test_lines": 45
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 50,
+          "test_lines": 100
+        },
+        {
+          "scope": "usecase",
+          "production_lines": 35,
+          "test_lines": 70
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T023",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 15,
+          "test_lines": 20
+        },
+        {
+          "scope": "usecase",
+          "production_lines": 50,
+          "test_lines": 70
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T024",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 35,
+          "test_lines": 60
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T025",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 60,
+          "test_lines": 100
+        }
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
@@ -31,6 +90,25 @@
       "task_ids": [
         "T020",
         "T021"
+      ]
+    },
+    {
+      "id": "BATCH-002",
+      "task_ids": [
+        "T022"
+      ]
+    },
+    {
+      "id": "BATCH-003",
+      "task_ids": [
+        "T023",
+        "T025"
+      ]
+    },
+    {
+      "id": "BATCH-004",
+      "task_ids": [
+        "T024"
       ]
     }
   ]

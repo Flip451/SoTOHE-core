@@ -22,7 +22,7 @@ use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::extended_crate::ExtendedCrate;
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::new_typegraph_codec_error::NewTypeGraphCodecError;
-use crate::tddd::type_signals_doc::RustdocSnapshot;
+use crate::tddd::type_signals_doc::AttestedRustdocSnapshot;
 use rustdoc_types::Crate;
 
 /// Owns the authoritative baseline and current rustdoc graphs for one TDDD layer.
@@ -34,7 +34,7 @@ use rustdoc_types::Crate;
 pub struct AuthoritativeRustdocContext {
     layer: LayerId,
     baseline: Crate,
-    current: RustdocSnapshot,
+    current: AttestedRustdocSnapshot,
 }
 
 impl AuthoritativeRustdocContext {
@@ -45,7 +45,7 @@ impl AuthoritativeRustdocContext {
     ///
     /// This constructor is infallible; its inputs are already decoded rustdoc graphs.
     #[must_use]
-    pub fn new(layer: LayerId, baseline: Crate, current: RustdocSnapshot) -> Self {
+    pub fn new(layer: LayerId, baseline: Crate, current: AttestedRustdocSnapshot) -> Self {
         Self { layer, baseline, current }
     }
 
@@ -64,12 +64,12 @@ impl AuthoritativeRustdocContext {
     /// Returns the authoritative current rustdoc graph.
     #[must_use]
     pub fn current(&self) -> &Crate {
-        self.current.crate_data()
+        self.current.snapshot().crate_data()
     }
 
     /// Returns the immutable identity-bearing current rustdoc snapshot.
     #[must_use]
-    pub fn current_snapshot(&self) -> &RustdocSnapshot {
+    pub fn current_snapshot(&self) -> &AttestedRustdocSnapshot {
         &self.current
     }
 }
@@ -121,12 +121,13 @@ pub trait CatalogueToExtendedCratePort: Send + Sync {
 mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::{CrateName, RustdocCratePortError};
+    use crate::tddd::type_signals_doc::ImplementationFingerprint;
     use std::path::PathBuf;
 
-    fn rustdoc_snapshot(crate_data: Crate) -> RustdocSnapshot {
+    fn attested_rustdoc_snapshot(crate_data: Crate) -> AttestedRustdocSnapshot {
         use crate::tddd::type_signals_doc::{
             CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
-            RustdocExecutionIdentity, construct_rustdoc_snapshot,
+            RustdocExecutionIdentity, Sha256Digest, construct_attested_rustdoc_snapshot,
         };
 
         fn decode(bytes: &[u8]) -> Result<Crate, RustdocCratePortError> {
@@ -151,7 +152,13 @@ mod tests {
             expected,
         )
         .unwrap();
-        construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+        construct_attested_rustdoc_snapshot(
+            ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+            identity,
+            &bytes,
+            decode,
+        )
+        .unwrap()
     }
 
     fn rustdoc_crate(crate_version: &str) -> Crate {
@@ -175,12 +182,17 @@ mod tests {
         let context = AuthoritativeRustdocContext::new(
             layer.clone(),
             baseline.clone(),
-            rustdoc_snapshot(current.clone()),
+            attested_rustdoc_snapshot(current.clone()),
         );
 
         assert_eq!(context.layer(), &layer);
         assert_eq!(context.baseline(), &baseline);
         assert_eq!(context.current(), &current);
+        assert_eq!(
+            context.current_snapshot().implementation_fingerprint().as_digest().as_str(),
+            "a".repeat(64)
+        );
+        assert_eq!(context.current_snapshot().snapshot().crate_data(), &current);
         assert_ne!(context.baseline(), context.current());
     }
 
@@ -280,7 +292,7 @@ mod tests {
             AuthoritativeRustdocContext::new(
                 target_layer.clone(),
                 baseline.clone(),
-                rustdoc_snapshot(current.clone()),
+                attested_rustdoc_snapshot(current.clone()),
             ),
         )]);
         let port = RecordingPort { observed: std::sync::Mutex::new(None) };

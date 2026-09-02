@@ -227,6 +227,82 @@
         "layer": "infrastructure",
         "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
       }
+    ],
+    "T022": [
+      {
+        "layer": "domain",
+        "entry_key": "AttestedRustdocSnapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocCratePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCapturePort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCaptureError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T023": [
+      {
+        "layer": "domain",
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlan"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlanValidationError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+      }
+    ],
+    "T024": [
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlan"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T025": [
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCapturePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      }
     ]
   }
 }

@@ -343,6 +343,32 @@ impl RustdocSnapshot {
     }
 }
 
+/// A current rustdoc capture bound to the complete evaluation-start
+/// fingerprint that authorized the run.
+///
+/// The fields are private so callers cannot independently pair a snapshot and
+/// an evaluation fingerprint. Successful values are constructed only through
+/// [`construct_attested_rustdoc_snapshot`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AttestedRustdocSnapshot {
+    implementation_fingerprint: ImplementationFingerprint,
+    snapshot: RustdocSnapshot,
+}
+
+impl AttestedRustdocSnapshot {
+    /// Returns the evaluation-start fingerprint bound to this capture.
+    #[must_use]
+    pub fn implementation_fingerprint(&self) -> &ImplementationFingerprint {
+        &self.implementation_fingerprint
+    }
+
+    /// Returns the immutable rustdoc snapshot captured under that fingerprint.
+    #[must_use]
+    pub fn snapshot(&self) -> &RustdocSnapshot {
+        &self.snapshot
+    }
+}
+
 /// Constructs a content-addressed rustdoc value from one immutable byte slice.
 ///
 /// # Errors
@@ -378,6 +404,27 @@ pub fn construct_rustdoc_snapshot(
         execution_identity: identity,
         captured: construct_captured_rustdoc_json(bytes, decode)?,
     })
+}
+
+/// Constructs a rustdoc capture whose evaluation-start authorization and
+/// execution identity cannot be separated after construction.
+///
+/// The same `bytes` are decoded and hashed by the nested snapshot factory, so
+/// the returned proof covers both the run-wide fingerprint and the exact
+/// current rustdoc bytes.
+///
+/// # Errors
+///
+/// Returns the error produced by `decode` when the bytes are not a valid
+/// rustdoc graph.
+pub fn construct_attested_rustdoc_snapshot(
+    evaluation_start: ImplementationFingerprint,
+    identity: RustdocExecutionIdentity,
+    bytes: &[u8],
+    decode: fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>,
+) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+    let snapshot = construct_rustdoc_snapshot(identity, bytes, decode)?;
+    Ok(AttestedRustdocSnapshot { implementation_fingerprint: evaluation_start, snapshot })
 }
 
 /// Complete identity of the inputs that govern a type-signals cache entry.
@@ -894,6 +941,26 @@ mod tests {
         );
         assert_eq!(first.execution_identity(), second.execution_identity());
         assert_ne!(first.crate_data(), second.crate_data());
+    }
+
+    #[test]
+    fn test_construct_attested_rustdoc_snapshot_binds_start_and_snapshot_accessors() {
+        let evaluation_start = ImplementationFingerprint::new(digest(A));
+        let identity = execution_identity();
+        let crate_data = empty_rustdoc();
+        let bytes = serde_json::to_vec(&crate_data).unwrap();
+
+        let attested = construct_attested_rustdoc_snapshot(
+            evaluation_start.clone(),
+            identity.clone(),
+            &bytes,
+            decode_rustdoc,
+        )
+        .unwrap();
+
+        assert_eq!(attested.implementation_fingerprint(), &evaluation_start);
+        assert_eq!(attested.snapshot().execution_identity(), &identity);
+        assert_eq!(attested.snapshot().crate_data(), &crate_data);
     }
 
     #[test]

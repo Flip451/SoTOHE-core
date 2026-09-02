@@ -611,8 +611,9 @@ mod codec_test_support {
     use domain::tddd::extended_crate::ExtendedCrate;
     use domain::tddd::layer_id::LayerId;
     use domain::tddd::type_signals_doc::{
-        CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
-        RustdocExecutionIdentity, RustdocSnapshot, construct_rustdoc_snapshot,
+        AttestedRustdocSnapshot, CargoProfileName, ExpectedRustdocJsonPath,
+        ImplementationFingerprint, ResolvedCargoTargetDirectory, RustdocExecutionIdentity,
+        Sha256Digest, construct_attested_rustdoc_snapshot,
     };
     use domain::tddd::{
         AuthoritativeRustdocContext, CatalogueToExtendedCratePort, NewTypeGraphCodecError,
@@ -626,7 +627,7 @@ mod codec_test_support {
 
     /// Builds a test snapshot for a single catalogue's current rustdoc data.
     #[allow(clippy::expect_used, clippy::unwrap_used)]
-    fn legacy_snapshot(crate_name: &CrateName, crate_data: &Crate) -> RustdocSnapshot {
+    fn attested_snapshot(crate_name: &CrateName, crate_data: &Crate) -> AttestedRustdocSnapshot {
         fn decode(
             bytes: &[u8],
         ) -> Result<Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
@@ -655,7 +656,13 @@ mod codec_test_support {
         )
         .unwrap();
         let bytes = serde_json::to_vec(crate_data).unwrap();
-        construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+        construct_attested_rustdoc_snapshot(
+            ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+            identity,
+            &bytes,
+            decode,
+        )
+        .unwrap()
     }
 
     pub(crate) fn encode_document(
@@ -671,7 +678,7 @@ mod codec_test_support {
             AuthoritativeRustdocContext::new(
                 layer.clone(),
                 baseline.clone(),
-                legacy_snapshot(&crate_name, current),
+                attested_snapshot(&crate_name, current),
             ),
         )]);
         CatalogueToExtendedCrateCodec::new().encode(&layer, &catalogues, &rustdoc_contexts)
@@ -711,7 +718,7 @@ mod codec_test_support {
             AuthoritativeRustdocContext::new(
                 target_layer.clone(),
                 baseline.clone(),
-                legacy_snapshot(
+                attested_snapshot(
                     track_catalogues
                         .get(target_layer)
                         .expect("target catalogue exists")

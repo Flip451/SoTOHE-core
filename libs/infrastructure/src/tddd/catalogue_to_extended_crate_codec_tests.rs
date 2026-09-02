@@ -18,9 +18,10 @@ use domain::tddd::catalogue_v2::{
     ParamName, TypeName, TypeRef, VariantName, WherePredicateDecl,
 };
 use domain::tddd::{
-    AuthoritativeRustdocContext, CargoProfileName, CatalogueToExtendedCratePort,
-    ExpectedRustdocJsonPath, NewTypeGraphCodecError, ResolvedCargoTargetDirectory,
-    RustdocExecutionIdentity, RustdocSnapshot, SignalEvaluatorPort, construct_rustdoc_snapshot,
+    AttestedRustdocSnapshot, AuthoritativeRustdocContext, CargoProfileName,
+    CatalogueToExtendedCratePort, ExpectedRustdocJsonPath, ImplementationFingerprint,
+    NewTypeGraphCodecError, ResolvedCargoTargetDirectory, RustdocExecutionIdentity, Sha256Digest,
+    SignalEvaluatorPort, construct_attested_rustdoc_snapshot,
 };
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id, Item,
@@ -36,7 +37,10 @@ fn make_doc(crate_name: &str) -> CatalogueDocument {
     make_doc_with_layer(crate_name, "domain")
 }
 
-fn snapshot_for_test(crate_name: &str, crate_data: &rustdoc_types::Crate) -> RustdocSnapshot {
+fn snapshot_for_test(
+    crate_name: &str,
+    crate_data: &rustdoc_types::Crate,
+) -> AttestedRustdocSnapshot {
     fn decode(
         bytes: &[u8],
     ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
@@ -65,7 +69,13 @@ fn snapshot_for_test(crate_name: &str, crate_data: &rustdoc_types::Crate) -> Rus
     )
     .unwrap();
     let bytes = serde_json::to_vec(crate_data).unwrap();
-    construct_rustdoc_snapshot(identity, &bytes, decode).unwrap()
+    construct_attested_rustdoc_snapshot(
+        ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+        identity,
+        &bytes,
+        decode,
+    )
+    .unwrap()
 }
 
 fn make_doc_with_layer(crate_name: &str, layer_name: &str) -> CatalogueDocument {

@@ -7,8 +7,8 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use domain::tddd::catalogue_v2::{AttestedCatalogueDocument, CrateName, RustdocCratePortError};
 use domain::tddd::type_signals_doc::{
-    BaselineHash, CapturedRustdocJson, ImplementationFingerprint, RustdocExecutionIdentity,
-    RustdocSnapshot, TypeSignalsCacheKey, TypeSignalsDocument,
+    AttestedRustdocSnapshot, BaselineHash, CapturedRustdocJson, ImplementationFingerprint,
+    RustdocExecutionIdentity, TypeSignalsCacheKey, TypeSignalsDocument,
 };
 use domain::tddd::{AuthoritativeRustdocContext, CargoFeatureName, LayerId};
 use domain::{CatalogueDeclarationHash, CommitHash, Timestamp};
@@ -401,7 +401,7 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
     configured_layers: &[TdddLayerBinding],
     target_layer: &LayerId,
     loaded: &LoadedTrackCatalogues,
-    target_current: &RustdocSnapshot,
+    target_current: &AttestedRustdocSnapshot,
     evaluation_start_implementation: &ImplementationFingerprint,
     feature_selections: &BTreeMap<LayerId, Vec<CargoFeatureName>>,
     rustdoc: &impl RustdocProvider,
@@ -458,8 +458,8 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
                         format!("rustdoc export failed for layer '{layer}' ('{target}')"),
                     )
                 })?;
-            if snapshot.execution_identity().crate_name() != &target_crate
-                || snapshot.execution_identity().features() != selected_features
+            if snapshot.snapshot().execution_identity().crate_name() != &target_crate
+                || snapshot.snapshot().execution_identity().features() != selected_features
             {
                 return Err(EvaluateSignalsError::authoritative_input(format!(
                     "rustdoc snapshot identity does not match layer '{layer}' selection"

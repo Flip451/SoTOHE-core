@@ -14,16 +14,19 @@ use std::path::{Path, PathBuf};
 use domain::FreeText;
 use domain::tddd::catalogue_v2::{RustdocCratePort, RustdocCratePortError};
 use domain::tddd::type_signals_doc::CapturedRustdocJson;
+use domain::tddd::type_signals_doc::{
+    AttestedRustdocSnapshot, ImplementationFingerprint, RustdocExecutionIdentity,
+    construct_attested_rustdoc_snapshot, construct_captured_rustdoc_json,
+};
 #[cfg(test)]
 use domain::tddd::type_signals_doc::{
-    CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory,
+    CargoProfileName, ExpectedRustdocJsonPath, ResolvedCargoTargetDirectory, RustdocSnapshot,
     construct_rustdoc_snapshot,
 };
-use domain::tddd::type_signals_doc::{
-    ImplementationFingerprint, RustdocExecutionIdentity, RustdocSnapshot,
-    construct_captured_rustdoc_json,
-};
 use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
+use usecase::catalogue_impl_signals::ports::{
+    EvaluationStartCaptureError, EvaluationStartCapturePort,
+};
 
 use crate::schema_export::{RustdocCaptureError, RustdocSchemaExporter};
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
@@ -51,13 +54,68 @@ const MAX_RUSTDOC_JSON_BYTES: u64 = 64 * 1024 * 1024;
 /// [source: ADR 2026-05-11-2330 D2]
 pub struct RustdocCrateAdapter {
     workspace_root: PathBuf,
+    #[cfg(test)]
+    test_exporter: Option<RustdocSchemaExporter>,
+    #[cfg(test)]
+    test_capture_timeouts: Option<freshness::EvaluationStartTimeouts>,
 }
 
 impl RustdocCrateAdapter {
     /// Creates a new adapter for the given workspace root.
     #[must_use]
     pub fn new(workspace_root: PathBuf) -> Self {
-        Self { workspace_root }
+        Self {
+            workspace_root,
+            #[cfg(test)]
+            test_exporter: None,
+            #[cfg(test)]
+            test_capture_timeouts: None,
+        }
+    }
+
+    #[cfg(test)]
+    fn with_test_exporter(workspace_root: PathBuf, exporter: RustdocSchemaExporter) -> Self {
+        Self { workspace_root, test_exporter: Some(exporter), test_capture_timeouts: None }
+    }
+
+    #[cfg(test)]
+    fn with_test_capture_timeouts(
+        workspace_root: PathBuf,
+        execution: std::time::Duration,
+        drain: std::time::Duration,
+    ) -> Self {
+        Self {
+            workspace_root,
+            test_exporter: None,
+            test_capture_timeouts: Some(freshness::EvaluationStartTimeouts::new(execution, drain)),
+        }
+    }
+
+    fn capture_current_attested_with_start_fingerprint(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        #[cfg(test)]
+        if let Some(exporter) = &self.test_exporter {
+            return capture_current_attested_with_start_fingerprint(
+                &self.workspace_root,
+                crate_name,
+                features,
+                evaluation_start,
+                exporter,
+            );
+        }
+
+        let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
+        capture_current_attested_with_start_fingerprint(
+            &self.workspace_root,
+            crate_name,
+            features,
+            evaluation_start,
+            &exporter,
+        )
     }
 }
 
@@ -179,17 +237,32 @@ impl RustdocCratePort for RustdocCrateAdapter {
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
-        reject_workspace_root(&self.workspace_root, crate_name)?;
-        let start_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
-        let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
-        let snapshot = exporter
-            .capture_rustdoc_snapshot(crate_name, features, decode_rustdoc_bytes)
-            .map_err(|error| map_capture_error(crate_name, error))?;
-        require_exclusive_snapshot_target(crate_name, &snapshot)?;
-        let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
-        reject_changed_workspace_fingerprint(crate_name, &start_fingerprint, &end_fingerprint)?;
-        Ok(snapshot)
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        self.capture_current_attested_with_start_fingerprint(crate_name, features, evaluation_start)
+    }
+}
+
+impl EvaluationStartCapturePort for RustdocCrateAdapter {
+    /// Captures the run-wide implementation fingerprint before any current
+    /// rustdoc export is started.
+    fn capture_evaluation_start(
+        &self,
+    ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+        let fingerprint =
+            freshness::rustdoc_implementation_fingerprint_with_timeouts(&self.workspace_root, {
+                #[cfg(test)]
+                {
+                    self.test_capture_timeouts.unwrap_or_default()
+                }
+                #[cfg(not(test))]
+                {
+                    freshness::EvaluationStartTimeouts::default()
+                }
+            });
+        fingerprint.map_err(|error| EvaluationStartCaptureError::AuthoritativeInput {
+            reason: FreeText::new(format!("cannot fingerprint rustdoc inputs: {error}")),
+        })
     }
 }
 
@@ -199,28 +272,8 @@ impl RustdocProvider for RustdocCrateAdapter {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
         evaluation_start: &ImplementationFingerprint,
-    ) -> Result<RustdocSnapshot, RustdocCratePortError> {
-        reject_workspace_root(&self.workspace_root, crate_name)?;
-        let start_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
-        reject_unexpected_workspace_fingerprint(
-            crate_name,
-            evaluation_start,
-            &start_fingerprint,
-            "before",
-        )?;
-        let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
-        let snapshot = exporter
-            .capture_rustdoc_snapshot(crate_name, features, decode_rustdoc_bytes)
-            .map_err(|error| map_capture_error(crate_name, error))?;
-        require_exclusive_snapshot_target(crate_name, &snapshot)?;
-        let end_fingerprint = workspace_input_fingerprint(&self.workspace_root, crate_name)?;
-        reject_unexpected_workspace_fingerprint(
-            crate_name,
-            evaluation_start,
-            &end_fingerprint,
-            "after",
-        )?;
-        Ok(snapshot)
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        self.capture_current_attested_with_start_fingerprint(crate_name, features, evaluation_start)
     }
 
     fn execution_identity(
@@ -302,19 +355,42 @@ fn workspace_input_fingerprint(
     })
 }
 
-fn reject_changed_workspace_fingerprint(
+fn capture_current_attested_with_start_fingerprint(
+    workspace_root: &Path,
     crate_name: &CrateName,
-    start: &ImplementationFingerprint,
-    end: &ImplementationFingerprint,
-) -> Result<(), RustdocCratePortError> {
-    if start == end {
-        Ok(())
-    } else {
-        Err(RustdocCratePortError::AuthoritativeInput {
-            crate_name: crate_name.clone(),
-            reason: FreeText::new("workspace input fingerprint changed during rustdoc capture"),
-        })
-    }
+    features: &[CargoFeatureName],
+    evaluation_start: &ImplementationFingerprint,
+    exporter: &RustdocSchemaExporter,
+) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+    reject_workspace_root(workspace_root, crate_name)?;
+    let start_fingerprint = workspace_input_fingerprint(workspace_root, crate_name)?;
+    reject_unexpected_workspace_fingerprint(
+        crate_name,
+        evaluation_start,
+        &start_fingerprint,
+        "before",
+    )?;
+    let (identity, bytes) = exporter
+        .capture_rustdoc_json_classified(crate_name, features)
+        .map_err(|error| map_capture_error(crate_name, error))?;
+    require_exclusive_target(crate_name, identity.target_directory().as_path())?;
+    let end_fingerprint = workspace_input_fingerprint(workspace_root, crate_name)?;
+    reject_unexpected_workspace_fingerprint(
+        crate_name,
+        evaluation_start,
+        &end_fingerprint,
+        "after",
+    )?;
+    construct_attested_rustdoc_snapshot(
+        evaluation_start.clone(),
+        identity,
+        &bytes,
+        decode_rustdoc_bytes,
+    )
+    .map_err(|error| RustdocCratePortError::ParseFailed {
+        crate_name: crate_name.clone(),
+        reason: FreeText::new(error.to_string()),
+    })
 }
 
 fn reject_unexpected_workspace_fingerprint(
@@ -335,56 +411,43 @@ fn reject_unexpected_workspace_fingerprint(
     }
 }
 
-fn require_exclusive_snapshot_target(
-    crate_name: &CrateName,
-    snapshot: &RustdocSnapshot,
-) -> Result<(), RustdocCratePortError> {
-    require_exclusive_target(crate_name, snapshot.execution_identity().target_directory().as_path())
-}
-
 fn reject_workspace_root(
     workspace_root: &Path,
     crate_name: &CrateName,
 ) -> Result<(), RustdocCratePortError> {
+    validate_workspace_root(workspace_root).map_err(|reason| {
+        RustdocCratePortError::AuthoritativeInput {
+            crate_name: crate_name.clone(),
+            reason: FreeText::new(reason),
+        }
+    })
+}
+
+fn validate_workspace_root(workspace_root: &Path) -> Result<(), String> {
     #[cfg(not(unix))]
     {
-        return Err(RustdocCratePortError::AuthoritativeInput {
-            crate_name: crate_name.clone(),
-            reason: FreeText::new(format!(
-                "descriptor-relative no-follow rustdoc locks are supported only on Unix (workspace root '{}')",
-                workspace_root.display()
-            )),
-        });
+        return Err(format!(
+            "descriptor-relative no-follow rustdoc locks are supported only on Unix (workspace root '{}')",
+            workspace_root.display()
+        ));
     }
 
     #[cfg(unix)]
     {
-        crate::track::symlink_guard::reject_symlinks_up_to_root(workspace_root).map_err(
-            |error| RustdocCratePortError::AuthoritativeInput {
-                crate_name: crate_name.clone(),
-                reason: FreeText::new(format!(
-                    "symlink guard: refusing to use workspace root '{}': {error}",
-                    workspace_root.display()
-                )),
-            },
-        )?;
+        reject_symlinks_up_to_root(workspace_root).map_err(|error| {
+            format!(
+                "symlink guard: refusing to use workspace root '{}': {error}",
+                workspace_root.display()
+            )
+        })?;
         let metadata = workspace_root.symlink_metadata().map_err(|error| {
-            RustdocCratePortError::AuthoritativeInput {
-                crate_name: crate_name.clone(),
-                reason: FreeText::new(format!(
-                    "cannot inspect trusted workspace root '{}': {error}",
-                    workspace_root.display()
-                )),
-            }
+            format!("cannot inspect trusted workspace root '{}': {error}", workspace_root.display())
         })?;
         if !metadata.is_dir() {
-            return Err(RustdocCratePortError::AuthoritativeInput {
-                crate_name: crate_name.clone(),
-                reason: FreeText::new(format!(
-                    "trusted workspace root '{}' is not a directory",
-                    workspace_root.display()
-                )),
-            });
+            return Err(format!(
+                "trusted workspace root '{}' is not a directory",
+                workspace_root.display()
+            ));
         }
         Ok(())
     }
@@ -477,14 +540,21 @@ fn require_exclusive_target(
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::panic, clippy::unwrap_used)]
 mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
     use domain::tddd::type_signals_doc::Sha256Digest;
     #[cfg(unix)]
+    use std::time::{Duration, Instant};
+    #[cfg(unix)]
     use temp_env;
+
+    #[cfg(unix)]
+    fn fixed_evaluation_start_fingerprint() -> ImplementationFingerprint {
+        ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap())
+    }
 
     #[cfg(unix)]
     fn write_test_executable(path: &Path, contents: &str) {
@@ -739,7 +809,8 @@ exit 1
 
         let adapter = RustdocCrateAdapter::new(link_ws);
         let crate_name = CrateName::new("some_crate".to_owned()).unwrap();
-        let err = adapter.capture_current(&crate_name, &[]).unwrap_err();
+        let evaluation_start = fixed_evaluation_start_fingerprint();
+        let err = adapter.capture_current(&crate_name, &[], &evaluation_start).unwrap_err();
         assert!(
             matches!(err, RustdocCratePortError::AuthoritativeInput { .. }),
             "expected AuthoritativeInput (symlink workspace_root rejection), got: {err}"
@@ -768,6 +839,646 @@ exit 1
                     "the failure must identify the unavailable trusted root: {err}"
                 );
             });
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input() {
+        let parent = tempfile::tempdir().unwrap();
+        let workspace = parent.path().join("missing-workspace");
+        let adapter = RustdocCrateAdapter::new(workspace);
+
+        let error = adapter.capture_evaluation_start().unwrap_err();
+
+        assert!(
+            matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+            "an unverifiable workspace root must reject the evaluation-start fingerprint: {error}"
+        );
+        assert!(
+            error.to_string().contains("cannot inspect trusted workspace root"),
+            "the failure must identify the unavailable trusted root: {error}"
+        );
+        assert!(
+            !error.to_string().contains("crate"),
+            "the run-level error must not invent a crate identity: {error}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_once_returns_complete_crate_independent_fingerprint() {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            std::fs::create_dir_all(workspace.path().join("src")).unwrap();
+            std::fs::write(workspace.path().join("Cargo.toml"), "[workspace]\nmembers = []\n")
+                .unwrap();
+            std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+            std::fs::write(workspace.path().join("src/lib.rs"), b"pub struct Fixture;\n").unwrap();
+
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = tempfile::tempdir().unwrap();
+            let nightly = tempfile::tempdir().unwrap();
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            write_metadata_test_toolchain(commands.path());
+            for tool in ["cargo", "rustc", "rustdoc"] {
+                write_test_executable(
+                    &nightly.path().join(tool),
+                    &format!("nightly {tool} generation-a\n"),
+                );
+            }
+            std::fs::write(
+                &metadata_path,
+                serde_json::json!({
+                    "packages": [],
+                    "target_directory": target_directory,
+                })
+                .to_string(),
+            )
+            .unwrap();
+
+            let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+            let path = prepend_test_command_path(commands.path());
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.path().as_os_str())),
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                ],
+                || {
+                    let fingerprint = match adapter.capture_evaluation_start() {
+                        Ok(fingerprint) => fingerprint,
+                        Err(error) => {
+                            panic!(
+                                "one complete run-wide fingerprint must be authoritative: {error}"
+                            )
+                        }
+                    };
+                    assert_eq!(fingerprint.as_digest().as_str().len(), 64);
+                    assert!(
+                        fingerprint
+                            .as_digest()
+                            .as_str()
+                            .bytes()
+                            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)),
+                        "the run-wide fingerprint must be a complete lowercase SHA-256 digest"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_fingerprint_tracks_each_authoritative_input() {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let source_directory = workspace.path().join("src");
+            std::fs::create_dir_all(&source_directory).unwrap();
+            let source = source_directory.join("lib.rs");
+            let source_a = b"pub struct Fixture;\n";
+            let source_b = b"pub struct FixtureChanged;\n";
+            std::fs::write(workspace.path().join("Cargo.toml"), "[workspace]\nmembers = []\n")
+                .unwrap();
+            std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+            std::fs::write(&source, source_a).unwrap();
+
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = tempfile::tempdir().unwrap();
+            let nightly = tempfile::tempdir().unwrap();
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            write_metadata_test_toolchain(commands.path());
+            for tool in ["cargo", "rustc", "rustdoc"] {
+                write_test_executable(
+                    &nightly.path().join(tool),
+                    &format!("nightly {tool} generation-a\n"),
+                );
+            }
+            let metadata_a = serde_json::json!({
+                "packages": [],
+                "target_directory": target_directory,
+                "metadata_marker": "generation-a",
+            })
+            .to_string();
+            let metadata_b = serde_json::json!({
+                "packages": [],
+                "target_directory": target_directory,
+                "metadata_marker": "generation-b",
+            })
+            .to_string();
+            std::fs::write(&metadata_path, &metadata_a).unwrap();
+
+            let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+            let path = prepend_test_command_path(commands.path());
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(nightly.path().as_os_str())),
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("CARGO_ENCODED_RUSTFLAGS", None::<&std::ffi::OsStr>),
+                    ("RUSTDOCFLAGS", None::<&std::ffi::OsStr>),
+                    ("RUSTFLAGS", None::<&std::ffi::OsStr>),
+                ],
+                || {
+                    let baseline = adapter.capture_evaluation_start().unwrap();
+
+                    std::fs::write(&source, source_b).unwrap();
+                    let workspace_changed = adapter.capture_evaluation_start().unwrap();
+                    assert_ne!(
+                        baseline, workspace_changed,
+                        "changing a workspace file must change the real adapter fingerprint"
+                    );
+                    std::fs::write(&source, source_a).unwrap();
+                    assert_eq!(
+                        baseline,
+                        adapter.capture_evaluation_start().unwrap(),
+                        "restoring the workspace file must restore the real adapter fingerprint"
+                    );
+
+                    for tool in ["cargo", "rustc", "rustdoc"] {
+                        write_test_executable(
+                            &nightly.path().join(tool),
+                            &format!("nightly {tool} generation-b\n"),
+                        );
+                        let nightly_changed = adapter.capture_evaluation_start().unwrap();
+                        assert_ne!(
+                            baseline, nightly_changed,
+                            "changing nightly-selected {tool} must change the real adapter fingerprint"
+                        );
+                        write_test_executable(
+                            &nightly.path().join(tool),
+                            &format!("nightly {tool} generation-a\n"),
+                        );
+                        assert_eq!(
+                            baseline,
+                            adapter.capture_evaluation_start().unwrap(),
+                            "restoring nightly-selected {tool} must restore the real adapter fingerprint"
+                        );
+                    }
+
+                    std::fs::write(&metadata_path, &metadata_b).unwrap();
+                    let metadata_changed = adapter.capture_evaluation_start().unwrap();
+                    assert_ne!(
+                        baseline, metadata_changed,
+                        "changing cargo metadata bytes must change the real adapter fingerprint"
+                    );
+                    std::fs::write(&metadata_path, &metadata_a).unwrap();
+                    assert_eq!(
+                        baseline,
+                        adapter.capture_evaluation_start().unwrap(),
+                        "restoring cargo metadata bytes must restore the real adapter fingerprint"
+                    );
+
+                    for (name, changed_value) in [
+                        ("CARGO_ENCODED_RUSTFLAGS", "-C\x1fopt-level=1"),
+                        ("RUSTDOCFLAGS", "--cfg=env_identity_changed"),
+                        ("RUSTFLAGS", "-C opt-level=1"),
+                    ] {
+                        let environment_changed =
+                            temp_env::with_var(name, Some(changed_value), || {
+                                adapter.capture_evaluation_start().unwrap()
+                            });
+                        assert_ne!(
+                            baseline, environment_changed,
+                            "changing {name} must change the real adapter fingerprint"
+                        );
+                        assert_eq!(
+                            baseline,
+                            adapter.capture_evaluation_start().unwrap(),
+                            "restoring {name} must restore the real adapter fingerprint"
+                        );
+                    }
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_uses_production_bounds_and_locked_metadata_without_export() {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            write_metadata_test_toolchain(&commands);
+
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            write_metadata_fixture(&metadata_path, &target_directory);
+            let observations = tempfile::tempdir().unwrap();
+            let cargo_args = observations.path().join("cargo-args");
+            write_test_executable(
+                &commands.join("cargo"),
+                r#"#!/bin/sh
+printf '%s\n' "$@" >> "$SOTOHE_TEST_CARGO_ARGS"
+if [ "$1" = "metadata" ]; then
+    exec /bin/cat "$SOTOHE_TEST_CARGO_METADATA"
+fi
+exit 1
+"#,
+            );
+
+            let adapter = RustdocCrateAdapter::new(workspace.path().to_path_buf());
+            let path = prepend_test_command_path(&commands);
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_ARGS", Some(cargo_args.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                    ("SOTOHE_TEST_RUSTDOC_OUTPUT_LOCK_TIMEOUT_MS", Some(std::ffi::OsStr::new("0"))),
+                ],
+                || {
+                    let defaults = freshness::EvaluationStartTimeouts::default();
+                    assert_eq!(
+                        freshness::EVALUATION_START_EXECUTION_TIMEOUT,
+                        Duration::from_secs(120),
+                        "evaluation-start execution bound must remain the D1 120-second bound"
+                    );
+                    assert_eq!(
+                        freshness::EVALUATION_START_DRAIN_TIMEOUT,
+                        Duration::from_secs(1),
+                        "evaluation-start drain bound must remain the D1 one-second bound"
+                    );
+                    assert_eq!(defaults.execution, freshness::EVALUATION_START_EXECUTION_TIMEOUT);
+                    assert_eq!(defaults.drain, freshness::EVALUATION_START_DRAIN_TIMEOUT);
+
+                    let fingerprint = adapter.capture_evaluation_start().unwrap();
+                    assert_eq!(fingerprint.as_digest().as_str().len(), 64);
+
+                    let args = std::fs::read_to_string(&cargo_args)
+                        .unwrap()
+                        .lines()
+                        .map(str::to_owned)
+                        .collect::<Vec<_>>();
+                    assert_eq!(
+                        args,
+                        vec![
+                            "metadata".to_owned(),
+                            "--format-version".to_owned(),
+                            "1".to_owned(),
+                            "--no-deps".to_owned(),
+                            "--locked".to_owned(),
+                        ],
+                        "evaluation-start metadata must use the locked no-dependencies command"
+                    );
+                    assert!(
+                        !args.iter().any(|argument| argument == "rustdoc"),
+                        "evaluation-start capture must not invoke the D6 rustdoc export path"
+                    );
+                    assert!(
+                        !target_directory.join(".sotp-rustdoc").exists(),
+                        "evaluation-start capture must not acquire a D6 selection-directory lock"
+                    );
+                    assert_eq!(
+                        crate::tddd::rustdoc_output_lock::RUSTDOC_OUTPUT_LOCK_TIMEOUT,
+                        Duration::from_secs(120),
+                        "the separate D6 selection-directory lock bound must remain 120 seconds"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_metadata_execution_timeout_returns_authoritative_input_without_partial_fingerprint()
+     {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let started_marker = workspace.path().join("metadata-started");
+            write_test_executable(
+                &commands.join("cargo"),
+                r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+    printf '%s\n' '{"packages":[]}'
+    : > "$SOTOHE_TEST_METADATA_STARTED"
+    exec /bin/sleep 5
+fi
+exit 1
+"#,
+            );
+            let adapter = RustdocCrateAdapter::with_test_capture_timeouts(
+                workspace.path().to_path_buf(),
+                Duration::from_millis(75),
+                Duration::from_millis(250),
+            );
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_METADATA_STARTED", Some(started_marker.as_os_str())),
+                ],
+                || {
+                    let started = Instant::now();
+                    let error = adapter.capture_evaluation_start().unwrap_err();
+
+                    assert!(
+                        started.elapsed() < Duration::from_secs(2),
+                        "metadata execution timeout must not wait for the child: {:?}",
+                        started.elapsed()
+                    );
+                    assert!(
+                        matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+                        "metadata execution timeout must fail at the run-level port: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("timed out"),
+                        "the execution timeout must be preserved in the diagnostic: {error}"
+                    );
+                    assert!(
+                        !error.to_string().contains("layer")
+                            && !error.to_string().contains("crate"),
+                        "a run-wide timeout must not fabricate layer or crate attribution: {error}"
+                    );
+                    assert!(
+                        started_marker.exists(),
+                        "the timeout fixture must reach cargo metadata before it is stopped"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_metadata_drain_timeout_returns_authoritative_input_without_fallback()
+     {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let started_marker = workspace.path().join("metadata-started");
+            write_test_executable(
+                &commands.join("cargo"),
+                r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+    printf '%s\n' '{"packages":[]}'
+    : > "$SOTOHE_TEST_METADATA_STARTED"
+    (exec /bin/sleep 5) &
+    exit 0
+fi
+exit 1
+"#,
+            );
+            let adapter = RustdocCrateAdapter::with_test_capture_timeouts(
+                workspace.path().to_path_buf(),
+                Duration::from_secs(2),
+                Duration::from_millis(75),
+            );
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_METADATA_STARTED", Some(started_marker.as_os_str())),
+                ],
+                || {
+                    let started = Instant::now();
+                    let error = adapter.capture_evaluation_start().unwrap_err();
+
+                    assert!(
+                        started.elapsed() < Duration::from_secs(2),
+                        "metadata drain timeout must not wait for the inherited pipe: {:?}",
+                        started.elapsed()
+                    );
+                    assert!(
+                        matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+                        "metadata drain timeout must fail at the run-level port: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("timed out"),
+                        "the drain timeout must be preserved in the diagnostic: {error}"
+                    );
+                    assert!(
+                        !error.to_string().contains("layer")
+                            && !error.to_string().contains("crate"),
+                        "a run-wide drain timeout must not fabricate layer or crate attribution: {error}"
+                    );
+                    assert!(
+                        started_marker.exists(),
+                        "the timeout fixture must reach cargo metadata before its pipe is held"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_nightly_resolution_timeout_returns_authoritative_input_without_fallback()
+     {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            write_metadata_test_toolchain(&commands);
+            let metadata_path = workspace.path().join("metadata.json");
+            write_metadata_fixture(&metadata_path, &target_directory);
+            let started_marker = workspace.path().join("nightly-resolution-started");
+            write_test_executable(
+                &commands.join("rustup"),
+                r#"#!/bin/sh
+if [ "$1" = "which" ]; then
+    : > "$SOTOHE_TEST_NIGHTLY_STARTED"
+    exec /bin/sleep 5
+fi
+exit 1
+"#,
+            );
+            let adapter = RustdocCrateAdapter::with_test_capture_timeouts(
+                workspace.path().to_path_buf(),
+                Duration::from_millis(75),
+                Duration::from_millis(250),
+            );
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_STARTED", Some(started_marker.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let started = Instant::now();
+                    let error = adapter.capture_evaluation_start().unwrap_err();
+
+                    assert!(
+                        started.elapsed() < Duration::from_secs(2),
+                        "nightly resolution timeout must not wait for the child: {:?}",
+                        started.elapsed()
+                    );
+                    assert!(
+                        matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+                        "nightly resolution timeout must fail at the run-level port: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("timed out"),
+                        "the nightly execution timeout must be preserved in the diagnostic: {error}"
+                    );
+                    assert!(
+                        !error.to_string().contains("layer")
+                            && !error.to_string().contains("crate"),
+                        "a run-wide nightly timeout must not fabricate layer or crate attribution: {error}"
+                    );
+                    assert!(
+                        started_marker.exists(),
+                        "the timeout fixture must reach nightly tool resolution"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_workspace_walk_timeout_returns_authoritative_input_without_partial_fingerprint()
+     {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            write_metadata_test_toolchain(&commands);
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            write_metadata_fixture(&metadata_path, &target_directory);
+
+            let inputs = workspace.path().join("workspace-inputs");
+            std::fs::create_dir_all(&inputs).unwrap();
+            for index in 0..32_000 {
+                std::fs::write(inputs.join(format!("input-{index:05}.rs")), b"").unwrap();
+            }
+
+            let adapter = RustdocCrateAdapter::with_test_capture_timeouts(
+                workspace.path().to_path_buf(),
+                Duration::from_millis(250),
+                Duration::from_millis(250),
+            );
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let started = Instant::now();
+                    let error = adapter.capture_evaluation_start().unwrap_err();
+
+                    assert!(
+                        started.elapsed() < Duration::from_secs(2),
+                        "workspace-walk timeout must not wait beyond the test bound: {:?}",
+                        started.elapsed()
+                    );
+                    assert!(
+                        matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+                        "workspace-walk timeout must fail at the run-level port: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("workspace walk")
+                            && error.to_string().contains("timed out"),
+                        "the workspace-walk timeout must be preserved in the diagnostic: {error}"
+                    );
+                    assert!(
+                        !error.to_string().contains("layer")
+                            && !error.to_string().contains("crate"),
+                        "a run-wide timeout must not fabricate layer or crate attribution: {error}"
+                    );
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_evaluation_start_nightly_resolution_drain_timeout_returns_authoritative_input_without_fallback()
+     {
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let (workspace, _, _) = lockfail_workspace();
+            let target_directory = workspace.path().join("cargo-target");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            write_metadata_test_toolchain(&commands);
+            let metadata = tempfile::tempdir().unwrap();
+            let metadata_path = metadata.path().join("cargo-metadata.json");
+            write_metadata_fixture(&metadata_path, &target_directory);
+            let started_marker = workspace.path().join("nightly-resolution-started");
+            write_test_executable(
+                &commands.join("rustup"),
+                r#"#!/bin/sh
+if [ "$1" = "which" ]; then
+    : > "$SOTOHE_TEST_NIGHTLY_STARTED"
+    (exec /bin/sleep 5) &
+    exit 0
+fi
+exit 1
+"#,
+            );
+
+            let adapter = RustdocCrateAdapter::with_test_capture_timeouts(
+                workspace.path().to_path_buf(),
+                Duration::from_secs(2),
+                Duration::from_millis(75),
+            );
+            let path = prepend_test_command_path(&commands);
+
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(target_directory.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_STARTED", Some(started_marker.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                ],
+                || {
+                    let started = Instant::now();
+                    let error = adapter.capture_evaluation_start().unwrap_err();
+
+                    assert!(
+                        started.elapsed() < Duration::from_secs(2),
+                        "nightly output-drain timeout must not wait for the inherited pipe: {:?}",
+                        started.elapsed()
+                    );
+                    assert!(
+                        matches!(error, EvaluationStartCaptureError::AuthoritativeInput { .. }),
+                        "nightly output-drain timeout must fail at the run-level port: {error}"
+                    );
+                    assert!(
+                        error.to_string().contains("output drain timed out"),
+                        "the nightly drain timeout must be preserved in the diagnostic: {error}"
+                    );
+                    assert!(
+                        !error.to_string().contains("layer")
+                            && !error.to_string().contains("crate"),
+                        "a run-wide drain timeout must not fabricate layer or crate attribution: {error}"
+                    );
+                    assert!(
+                        started_marker.exists(),
+                        "the timeout fixture must reach nightly tool resolution"
+                    );
+                },
+            );
         });
     }
 
@@ -845,6 +1556,7 @@ exit 1
                     ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
                 ],
                 || {
+                    let evaluation_start = adapter.capture_evaluation_start().unwrap();
                     let exporter = RustdocSchemaExporter::new(workspace.path().to_path_buf());
                     let (identity, expected_path) =
                         exporter.rustdoc_execution_identity(&crate_name, &[]).unwrap();
@@ -857,7 +1569,8 @@ exit 1
                     std::fs::write(&expected_path, stale_json.as_bytes()).unwrap();
                     std::fs::create_dir(exclusive_target.join(".sotp-rustdoc-json.lock")).unwrap();
 
-                    let error = adapter.capture_current(&crate_name, &[]).unwrap_err();
+                    let error =
+                        adapter.capture_current(&crate_name, &[], &evaluation_start).unwrap_err();
                     assert!(
                         matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
                         "lock-operation failure must fail closed: {error}"
@@ -917,6 +1630,7 @@ exit 1
                     ),
                 ],
                 || {
+                    let evaluation_start = adapter.capture_evaluation_start().unwrap();
                     let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
                     let selection = identity.target_directory().as_path().to_path_buf();
                     let held = RustdocOutputLock::acquire(&selection).unwrap();
@@ -927,7 +1641,8 @@ exit 1
                         "the adapter lock policy must remain bounded at 120 seconds"
                     );
 
-                    let error = adapter.capture_current(&crate_name, &[]).unwrap_err();
+                    let error =
+                        adapter.capture_current(&crate_name, &[], &evaluation_start).unwrap_err();
                     assert!(
                         matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
                         "a lock timeout must fail closed at the adapter boundary: {error}"
@@ -941,6 +1656,153 @@ exit 1
                         "a timed-out lock must not retry into rustdoc export"
                     );
                     drop(held);
+                },
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capture_current_holds_one_selection_lock_through_path_check_and_byte_copy() {
+        use std::sync::mpsc::channel;
+        use std::time::{Duration, Instant};
+
+        let (workspace, _, crate_name) = lockfail_workspace();
+        let cargo_target = workspace.path().join("cargo-target");
+        std::fs::create_dir_all(&cargo_target).unwrap();
+        let commands = workspace.path().join("commands");
+        std::fs::create_dir_all(&commands).unwrap();
+        write_metadata_test_toolchain(&commands);
+        let metadata_path = workspace.path().join("cargo-metadata.json");
+        write_metadata_fixture(&metadata_path, &cargo_target);
+
+        let export_started = cargo_target.join("capture-export-started");
+        let release_export = cargo_target.join("capture-release-export");
+        let rustdoc_json = format!(
+            r#"{{"root":0,"crate_version":"generation-a","includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        write_test_executable(
+            &commands.join("cargo"),
+            &format!(
+                r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  exec /bin/cat "$SOTOHE_TEST_CARGO_METADATA"
+fi
+: > "$SOTOHE_TEST_EXPORT_STARTED"
+while [ ! -f "$SOTOHE_TEST_RELEASE_EXPORT" ]; do sleep 0.01; done
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s\n' '{rustdoc_json}' > "$CARGO_TARGET_DIR/doc/lockfail.json"
+"#
+            ),
+        );
+
+        let (selection_started_tx, selection_started_rx) = channel();
+        let (release_selection_tx, release_selection_rx) = channel();
+        let (copy_completed_tx, copy_completed_rx) = channel();
+        let (release_read_tx, release_read_rx) = channel();
+        let release_selection_rx = Arc::new(Mutex::new(release_selection_rx));
+        let release_read_rx = Arc::new(Mutex::new(release_read_rx));
+        let release_selection_rx_for_hook = Arc::clone(&release_selection_rx);
+        let release_read_rx_for_hook = Arc::clone(&release_read_rx);
+        let exporter = RustdocSchemaExporter::with_capture_hooks(
+            workspace.path().to_path_buf(),
+            std::sync::Arc::new(move || {
+                selection_started_tx.send(()).unwrap();
+                release_selection_rx_for_hook.lock().unwrap().recv().unwrap();
+            }),
+            std::sync::Arc::new(move || {
+                copy_completed_tx.send(()).unwrap();
+                release_read_rx_for_hook.lock().unwrap().recv().unwrap();
+            }),
+        );
+        let adapter =
+            RustdocCrateAdapter::with_test_exporter(workspace.path().to_path_buf(), exporter);
+        let path = prepend_test_command_path(&commands);
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            temp_env::with_vars(
+                [
+                    ("CARGO_TARGET_DIR", Some(cargo_target.as_os_str())),
+                    ("PATH", Some(path.as_os_str())),
+                    ("SOTOHE_TEST_CARGO_METADATA", Some(metadata_path.as_os_str())),
+                    ("SOTOHE_TEST_NIGHTLY_TOOLCHAIN_DIR", Some(commands.as_os_str())),
+                    ("SOTOHE_TEST_EXPORT_STARTED", Some(export_started.as_os_str())),
+                    ("SOTOHE_TEST_RELEASE_EXPORT", Some(release_export.as_os_str())),
+                ],
+                || {
+                    let evaluation_start = adapter.capture_evaluation_start().unwrap();
+                    let identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let selection_directory = identity.target_directory().as_path().to_path_buf();
+
+                    let first_crate_name = crate_name.clone();
+                    let first = std::thread::spawn(move || {
+                        adapter.capture_current(&first_crate_name, &[], &evaluation_start)
+                    });
+
+                    let cleanup = || {
+                        let _ = release_selection_tx.send(());
+                        let _ = std::fs::write(&release_export, b"release");
+                        let _ = release_read_tx.send(());
+                    };
+                    let wait_for_file = |path: &Path| {
+                        let deadline = Instant::now() + Duration::from_secs(2);
+                        while !path.exists() && Instant::now() < deadline {
+                            std::thread::sleep(Duration::from_millis(10));
+                        }
+                        path.exists()
+                    };
+
+                    if selection_started_rx.recv_timeout(Duration::from_secs(2)).is_err() {
+                        cleanup();
+                        panic!(
+                            "capture_current did not reach expected-path selection while its exporter lock was held"
+                        );
+                    }
+
+                    let (contender_started_tx, contender_started_rx) = channel();
+                    let (acquired_tx, acquired_rx) = channel();
+                    let contender_directory = selection_directory.clone();
+                    let contender = std::thread::spawn(move || {
+                        contender_started_tx.send(()).unwrap();
+                        let result = RustdocOutputLock::acquire_for_test(
+                            &contender_directory,
+                            Duration::from_secs(5),
+                        );
+                        if result.is_ok() {
+                            acquired_tx.send(()).unwrap();
+                        }
+                        result
+                    });
+                    contender_started_rx.recv_timeout(Duration::from_secs(1)).unwrap();
+                    let assert_contender_blocked = |stage: &str| {
+                        if acquired_rx.recv_timeout(Duration::from_millis(100)).is_ok() {
+                            cleanup();
+                            panic!("a competing writer acquired the selection lock during {stage}");
+                        }
+                    };
+
+                    assert_contender_blocked("expected-path selection");
+                    release_selection_tx.send(()).unwrap();
+
+                    assert!(
+                        wait_for_file(&export_started),
+                        "capture_current did not reach the fake rustdoc export barrier"
+                    );
+                    assert_contender_blocked("rustdoc export");
+                    std::fs::write(&release_export, b"release").unwrap();
+
+                    copy_completed_rx.recv_timeout(Duration::from_secs(2)).unwrap();
+                    assert_contender_blocked("returned-path validation and completed byte copy");
+                    release_read_tx.send(()).unwrap();
+
+                    let snapshot = first.join().unwrap().unwrap();
+                    let contender_lock = contender.join().unwrap().unwrap();
+                    drop(contender_lock);
+                    assert_eq!(
+                        snapshot.snapshot().crate_data().crate_version.as_deref(),
+                        Some("generation-a")
+                    );
                 },
             );
         });
@@ -1078,6 +1940,7 @@ exit 1
                 ],
                 || {
                     let valid_identity = adapter.execution_identity(&crate_name, &[]).unwrap();
+                    let evaluation_start = adapter.capture_evaluation_start().unwrap();
                     let selection = valid_identity.target_directory().as_path().to_path_buf();
                     let exclusive_parent = selection.parent().unwrap();
                     assert_eq!(
@@ -1091,7 +1954,8 @@ exit 1
                     std::fs::create_dir_all(exclusive_parent).unwrap();
                     std::os::unix::fs::symlink(&redirected, &selection).unwrap();
 
-                    let capture_error = adapter.capture_current(&crate_name, &[]).unwrap_err();
+                    let capture_error =
+                        adapter.capture_current(&crate_name, &[], &evaluation_start).unwrap_err();
                     assert!(
                         matches!(capture_error, RustdocCratePortError::AuthoritativeInput { .. }),
                         "a symlinked selection directory must reject capture admission: {capture_error}"
@@ -1143,18 +2007,22 @@ exit 1
         let crate_name = CrateName::new("domain").unwrap();
         let start = ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap());
         let end = ImplementationFingerprint::new(Sha256Digest::try_new("b".repeat(64)).unwrap());
-        let error = reject_changed_workspace_fingerprint(&crate_name, &start, &end).unwrap_err();
+        let error = reject_unexpected_workspace_fingerprint(&crate_name, &start, &end, "after")
+            .unwrap_err();
         assert!(
             matches!(error, RustdocCratePortError::AuthoritativeInput { .. }),
             "changed input fingerprint must discard the capture: {error}"
         );
-        reject_changed_workspace_fingerprint(&crate_name, &start, &start).unwrap();
+        reject_unexpected_workspace_fingerprint(&crate_name, &start, &start, "after").unwrap();
     }
 
     #[test]
     fn test_rustdoc_crate_adapter_is_send_sync() {
         fn assert_send_sync<T: Send + Sync>() {}
+        fn assert_capture_ports<T: RustdocCratePort + EvaluationStartCapturePort>() {}
+
         assert_send_sync::<RustdocCrateAdapter>();
+        assert_capture_ports::<RustdocCrateAdapter>();
     }
 
     #[cfg(unix)]

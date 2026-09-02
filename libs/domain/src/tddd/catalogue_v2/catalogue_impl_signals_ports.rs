@@ -26,7 +26,8 @@ use crate::tddd::CargoFeatureName;
 use crate::tddd::catalogue_linter::FreeText;
 use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
 use crate::tddd::type_signals_doc::{
-    CapturedRustdocJson, CatalogueDeclarationHash, RustdocSnapshot, Sha256Digest,
+    AttestedRustdocSnapshot, CapturedRustdocJson, CatalogueDeclarationHash,
+    ImplementationFingerprint, Sha256Digest,
 };
 use crate::{ContentHash, TrackId};
 
@@ -221,7 +222,7 @@ impl std::error::Error for RustdocCratePortError {}
 ///
 /// - `load_from_path`: loads a previously captured rustdoc JSON file (B-side baseline).
 /// - `capture_current`: captures the current crate's rustdoc JSON via the nightly
-///   toolchain (C-side).
+///   toolchain (C-side), bound to that fingerprint.
 ///
 /// Placed in the domain alongside `SignalEvaluatorPort` because `rustdoc_types::Crate`
 /// is already part of the domain's vocabulary (the domain depends on `rustdoc_types`).
@@ -240,8 +241,9 @@ pub trait RustdocCratePort: Send + Sync {
     /// format-version validation fails.
     fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError>;
 
-    /// Captures the current `RustdocSnapshot` via `cargo +nightly rustdoc`
-    /// (C-side live capture) with the validated layer feature selection.
+    /// Captures the current attested rustdoc snapshot via `cargo +nightly
+    /// rustdoc` (C-side live capture) with the validated layer feature
+    /// selection.
     ///
     /// # Errors
     ///
@@ -256,7 +258,8 @@ pub trait RustdocCratePort: Send + Sync {
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<RustdocSnapshot, RustdocCratePortError>;
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError>;
 }
 
 // ---------------------------------------------------------------------------

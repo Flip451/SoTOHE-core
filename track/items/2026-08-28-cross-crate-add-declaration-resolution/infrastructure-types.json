@@ -134,6 +134,11 @@
       "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
     },
     {
+      "action": "add",
+      "for_type": "RustdocCrateAdapter",
+      "trait_ref": "usecase::catalogue_impl_signals::ports::EvaluationStartCapturePort"
+    },
+    {
       "action": "reference",
       "for_type": "RustdocSchemaExporter",
       "trait_ref": "domain::schema::SchemaExporter"
@@ -178,7 +183,7 @@
   "types": {
     "infrastructure::schema_export::RustdocSchemaExporter": {
       "action": "modify",
-      "docs": "Rustdoc schema exporter adapter (IN-07).",
+      "docs": "RustdocSchemaExporter: preserve the legacy crate-name string input and carry rustdoc JSON as opaque bytes across schema-export ports (IN-07, CO-07, AC-06).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -337,7 +342,7 @@
     },
     "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter": {
       "action": "modify",
-      "docs": "Trusted-root rustdoc capture adapter (IN-05, CO-06, IN-06, AC-08).",
+      "docs": "RustdocCrateAdapter: implement authoritative evaluation-start capture for type-signal evaluation (IN-09, CO-09, AC-10).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -368,23 +373,23 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-05",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "CO-06",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
           "anchor": "IN-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-10",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]

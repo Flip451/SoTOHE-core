@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "646383be25e45c51c2d9982c4980c2a969e61d1e18222e640165b53df552afbf",
+  "catalogue_declaration_hash": "41b51b979d5d9fa3fc9cf8fce4f4296f86b8a75d41f8b64e48bf7b23e34bebbb",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "e6739268c5390a28025885e34943ecbf34a2a5e473346c709136a604a06a6647",
+      "entry_hash": "5d54ac083760dea7e33e78540e65d104b18aef2d51f554f21f76fc0f23fa2a4a",
       "signal": "blue",
       "type_name": "infrastructure::schema_export::RustdocSchemaExporter"
     },
@@ -13,7 +13,7 @@
       "type_name": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
     },
     {
-      "entry_hash": "c51e1575cc7f4bb4670398f121a3f1b2ce20e8c51ae6dd4330556f431dc1528d",
+      "entry_hash": "dcc480524fc1cc5a0e52ac900a9d565e18ebec76f21dab0470aedf3ba6d3e55a",
       "signal": "blue",
       "type_name": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
     },

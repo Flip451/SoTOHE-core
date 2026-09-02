@@ -20,6 +20,7 @@ use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeW
 use domain::tddd::{AuthoritativeRustdocContext, CatalogueToExtendedCratePort};
 
 use super::helpers::{map_symlink_guard_error, validate_binding_filename};
+use super::ports::EvaluationStartCapturePort;
 use super::service::{
     CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
     RustdocExportPlan, diagnostic,
@@ -40,6 +41,7 @@ use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 /// - `AttestedCatalogueDocumentLoaderPort` (A-side catalogue file load)
 /// - `CatalogueToExtendedCratePort` (A-side `CatalogueDocument` → `ExtendedCrate`)
 /// - `SignalEvaluatorPort` (Phase 1 + Phase 2 evaluation)
+/// - `EvaluationStartCapturePort` (run-wide implementation fingerprint)
 /// - `RustdocCratePort` (B-side baseline load via `load_from_path`;
 ///   C-side live capture via `capture_current`)
 /// - `TdddLayerBindingsPort` (reads `architecture-rules.json` to enumerate layers;
@@ -55,6 +57,7 @@ pub struct CatalogueImplSignalsInteractor {
     catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
     ext_crate_codec: Arc<dyn CatalogueToExtendedCratePort>,
     evaluator: Arc<dyn SignalEvaluatorPort>,
+    evaluation_start_capture_port: Arc<dyn EvaluationStartCapturePort>,
     rustdoc_crate_port: Arc<dyn RustdocCratePort>,
     layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
     feature_declaration_port: Arc<dyn TdddActualFeatureDeclarationPort>,
@@ -63,11 +66,13 @@ pub struct CatalogueImplSignalsInteractor {
 
 impl CatalogueImplSignalsInteractor {
     /// Creates a new interactor with the given injected ports.
+    #[allow(clippy::too_many_arguments)]
     #[must_use]
     pub fn new(
         catalogue_loader: Arc<dyn AttestedCatalogueDocumentLoaderPort>,
         ext_crate_codec: Arc<dyn CatalogueToExtendedCratePort>,
         evaluator: Arc<dyn SignalEvaluatorPort>,
+        evaluation_start_capture_port: Arc<dyn EvaluationStartCapturePort>,
         rustdoc_crate_port: Arc<dyn RustdocCratePort>,
         layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
         feature_declaration_port: Arc<dyn TdddActualFeatureDeclarationPort>,
@@ -77,6 +82,7 @@ impl CatalogueImplSignalsInteractor {
             catalogue_loader,
             ext_crate_codec,
             evaluator,
+            evaluation_start_capture_port,
             rustdoc_crate_port,
             layer_bindings_port,
             feature_declaration_port,
@@ -184,7 +190,6 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         if declaration_bindings.is_empty() {
             return Err(CatalogueImplSignalsError::NoLayers);
         }
-        let export_plan = RustdocExportPlan::try_new(declaration_bindings.clone())?;
 
         let bindings = if let Some(layer_id) = layer.as_deref() {
             let selected = declaration_bindings
@@ -210,7 +215,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         // Load every TDDD-enabled catalogue against one architecture-rules
         // binding snapshot before converting any document. The codec needs
         // declarations from other layers to resolve cross-crate add references.
-        let mut attested_catalogues: Vec<(LayerId, AttestedCatalogueDocument)> = Vec::new();
+        let mut attested_catalogues = BTreeMap::<LayerId, AttestedCatalogueDocument>::new();
         for catalogue_binding in &declaration_bindings {
             let catalogue_layer =
                 LayerId::try_new(catalogue_binding.layer_id.clone()).map_err(|error| {
@@ -225,7 +230,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 .map_err(map_symlink_guard_error)?;
             match self.catalogue_loader.load(&catalogue_path) {
                 Ok(attested_catalogue) => {
-                    attested_catalogues.push((catalogue_layer, attested_catalogue));
+                    attested_catalogues.insert(catalogue_layer, attested_catalogue);
                 }
                 Err(CatalogueDocumentLoaderError::NotFound { .. }) => continue,
                 Err(error) => {
@@ -238,9 +243,9 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         }
 
         let mut track_catalogues = BTreeMap::<LayerId, CatalogueDocument>::new();
-        for (catalogue_layer, attested_catalogue) in attested_catalogues {
-            let doc = attested_catalogue.into_document();
-            if doc.layer() != &catalogue_layer {
+        for (catalogue_layer, attested_catalogue) in &attested_catalogues {
+            let doc = attested_catalogue.document().clone();
+            if doc.layer() != catalogue_layer {
                 return Err(CatalogueImplSignalsError::CatalogueLoad(
                     catalogue_layer.clone(),
                     diagnostic(format!(
@@ -251,7 +256,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     )),
                 ));
             }
-            track_catalogues.insert(catalogue_layer, doc);
+            track_catalogues.insert(catalogue_layer.clone(), doc);
         }
 
         // Preserve the selected-layer contract: a requested layer still needs
@@ -274,11 +279,23 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             }
         }
 
+        let evaluation_start = self
+            .evaluation_start_capture_port
+            .capture_evaluation_start()
+            .map_err(CatalogueImplSignalsError::EvaluationStartCapture)?;
+
+        let export_plan = RustdocExportPlan::try_new(
+            evaluation_start,
+            &bindings,
+            &declaration_bindings,
+            &attested_catalogues,
+        )?;
+
         // Load every configured layer's authoritative rustdoc pair once before
         // any catalogue is encoded. The codec needs the declaring layer's
         // current paths when it places cross-layer add declarations.
         let mut rustdoc_contexts = BTreeMap::new();
-        for binding in export_plan.bindings() {
+        for binding in export_plan.export_bindings() {
             let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
                 CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
                     "invalid layer binding: {error}"
@@ -328,8 +345,10 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     diagnostic(format!("feature declaration omitted layer: {error}")),
                 )
             })?;
-            let current =
-                self.rustdoc_crate_port.capture_current(&target_crate, features).map_err(|e| {
+            let current = self
+                .rustdoc_crate_port
+                .capture_current(&target_crate, features, export_plan.implementation_fingerprint())
+                .map_err(|e| {
                     CatalogueImplSignalsError::SchemaExport(
                         typed_layer_id.clone(),
                         diagnostic(e.to_string()),

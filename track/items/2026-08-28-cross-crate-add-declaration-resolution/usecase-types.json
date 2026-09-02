@@ -6,17 +6,29 @@
       "methods": [
         {
           "action": "add",
-          "docs": "Validates only the 64-layer export-plan bound; the sole producible CatalogueImplSignalsError variant is LayerLimitExceeded.",
+          "docs": "try_new: validate and construct the catalogue-bearing export plan (CO-02, IN-04, CO-05, AC-05).",
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
           "params": [
             {
-              "name": "bindings",
-              "ty": "Vec<domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding>"
+              "name": "evaluation_start",
+              "ty": "domain::tddd::type_signals_doc::ImplementationFingerprint"
+            },
+            {
+              "name": "selected_bindings",
+              "ty": "&[domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding]"
+            },
+            {
+              "name": "declaration_bindings",
+              "ty": "&[domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding]"
+            },
+            {
+              "name": "catalogues",
+              "ty": "&std::collections::BTreeMap<domain::tddd::layer_id::LayerId, domain::tddd::catalogue_v2::catalogue_impl_signals_ports::AttestedCatalogueDocument>"
             }
           ],
-          "returns": "Result<Self, CatalogueImplSignalsError>",
+          "returns": "Result<Self, RustdocExportPlanValidationError>",
           "spec_refs": [
             {
               "anchor": "IN-04",
@@ -29,6 +41,10 @@
             {
               "anchor": "AC-05",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
         },
@@ -36,7 +52,7 @@
           "action": "add",
           "has_default_impl": false,
           "is_async": false,
-          "name": "bindings",
+          "name": "export_bindings",
           "params": [],
           "receiver": "&self",
           "returns": "&[domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBinding]",
@@ -51,6 +67,25 @@
             },
             {
               "anchor": "AC-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::type_signals_doc::ImplementationFingerprint",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -83,6 +118,11 @@
       "trait_ref": "core::error::Error"
     },
     {
+      "action": "add",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::convert::From<RustdocExportPlanValidationError>"
+    },
+    {
       "for_type": "RustdocExportPlan",
       "trait_ref": "core::fmt::Debug"
     },
@@ -97,16 +137,133 @@
     {
       "for_type": "RustdocExportPlan",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocExportPlanValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "EvaluationStartCaptureError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "EvaluationStartCaptureError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "EvaluationStartCaptureError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
+    "EvaluationStartCapturePort": {
+      "action": "add",
+      "docs": "EvaluationStartCapturePort: synchronous blocking authoritative evaluation-start capture boundary (IN-08, CO-08, AC-09, IN-09, CO-09, AC-10).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "capture_evaluation_start: perform synchronous blocking authoritative evaluation-start capture (IN-08, CO-08, AC-09, IN-09, CO-09, AC-10).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capture_evaluation_start",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<domain::tddd::type_signals_doc::ImplementationFingerprint, EvaluationStartCaptureError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-09",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-09",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-09",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-10",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "catalogue_impl_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
     "SchemaExporterPort": {
       "action": "reference",
-      "docs": "Schema export secondary port (IN-03).",
+      "docs": "SchemaExporterPort::export_as_json: preserve the baseline legacy crate-name string input and opaque JSON text output (IN-03, IN-07, CO-07, AC-06).",
       "informal_grounds": [],
       "methods": [
         {
           "action": "reference",
+          "docs": "export_as_json: preserve the baseline legacy crate-name string input and opaque JSON text output (IN-03, IN-07, CO-07, AC-06).",
           "has_default_impl": false,
           "is_async": false,
           "name": "export_as_json",
@@ -229,9 +386,50 @@
     }
   },
   "types": {
+    "EvaluationStartCaptureError": {
+      "action": "add",
+      "docs": "EvaluationStartCaptureError: reject incomplete authoritative evaluation-start acquisition (IN-08, CO-08, AC-09).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
     "RustdocExportPlan": {
       "action": "add",
-      "docs": "Bounded rustdoc export plan (IN-04).",
+      "docs": "Catalogue-bearing layer selection for rustdoc export (CO-02, IN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -258,12 +456,57 @@
         {
           "anchor": "AC-05",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "RustdocExportPlanValidationError": {
+      "action": "add",
+      "docs": "RustdocExportPlanValidationError: report export-plan validation failure (IN-04, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "LayerLimitExceeded",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor": {
       "action": "modify",
-      "docs": "Catalogue implementation-signals interactor (IN-01, IN-02).",
+      "docs": "CatalogueImplSignalsInteractor: inject run-wide evaluation-start acquisition before layer captures (IN-08, CO-08, AC-09).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -275,7 +518,7 @@
       },
       "methods": [
         {
-          "action": "reference",
+          "action": "modify",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -291,6 +534,10 @@
             {
               "name": "evaluator",
               "ty": "std::sync::Arc<dyn domain::tddd::signal_evaluator::port::SignalEvaluatorPort>"
+            },
+            {
+              "name": "evaluation_start_capture_port",
+              "ty": "std::sync::Arc<dyn EvaluationStartCapturePort>"
             },
             {
               "name": "rustdoc_crate_port",
@@ -309,7 +556,21 @@
               "ty": "std::sync::Arc<dyn domain::symlink_guard_port::SymlinkGuardPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-09",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "catalogue_impl_signals::interactor",
@@ -323,10 +584,6 @@
         },
         {
           "anchor": "CO-01",
-          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
-        },
-        {
-          "anchor": "AC-01",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
@@ -346,14 +603,22 @@
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         },
         {
-          "anchor": "AC-03",
+          "anchor": "IN-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-09",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ]
     },
     "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError": {
       "action": "modify",
-      "docs": "Catalogue implementation-signals error vocabulary (IN-04).",
+      "docs": "CatalogueImplSignalsError::EvaluationStartCapture: propagate evaluation-start capture failure (IN-08, CO-08, AC-09).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -402,6 +667,15 @@
               "fields": [
                 "domain::tddd::layer_id::LayerId",
                 "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EvaluationStartCapture",
+            "payload": {
+              "fields": [
+                "EvaluationStartCaptureError"
               ],
               "kind": "tuple"
             }
@@ -474,6 +748,18 @@
         "ErrorType": {}
       },
       "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
         {
           "anchor": "IN-04",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"

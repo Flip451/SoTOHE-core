@@ -1,6 +1,46 @@
 {
   "crate_name": "domain",
   "functions": {
+    "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot": {
+      "action": "add",
+      "docs": "Capture-attested rustdoc snapshot factory (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "evaluation_start",
+          "ty": "ImplementationFingerprint"
+        },
+        {
+          "name": "identity",
+          "ty": "RustdocExecutionIdentity"
+        },
+        {
+          "name": "bytes",
+          "ty": "&[u8]"
+        },
+        {
+          "name": "decode",
+          "ty": "fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>"
+        }
+      ],
+      "returns": "Result<AttestedRustdocSnapshot, RustdocCratePortError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
     "domain::tddd::type_signals_doc::construct_captured_rustdoc_json": {
       "action": "add",
       "docs": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
@@ -129,7 +169,7 @@
             },
             {
               "name": "current",
-              "ty": "RustdocSnapshot"
+              "ty": "AttestedRustdocSnapshot"
             }
           ],
           "returns": "Self",
@@ -220,7 +260,7 @@
           "name": "current_snapshot",
           "params": [],
           "receiver": "&self",
-          "returns": "&RustdocSnapshot",
+          "returns": "&AttestedRustdocSnapshot",
           "spec_refs": [
             {
               "anchor": "IN-07",
@@ -896,6 +936,55 @@
         }
       ],
       "type_name": "CapturedRustdocJson"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ImplementationFingerprint",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "snapshot",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocSnapshot",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "AttestedRustdocSnapshot"
     }
   ],
   "layer": "domain",
@@ -1221,6 +1310,22 @@
       "action": "modify",
       "for_type": "RustdocCratePortError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
@@ -1323,12 +1428,12 @@
     },
     "RustdocCratePort": {
       "action": "modify",
-      "docs": "Synchronous trusted-root rustdoc capture port (IN-05, CO-06, IN-06, AC-08).",
+      "docs": "RustdocCratePort: define the synchronous blocking rustdoc acquisition boundary (IN-07, CO-07, AC-06).",
       "informal_grounds": [],
       "methods": [
         {
           "action": "modify",
-          "docs": "Immutable baseline rustdoc capture (IN-07).",
+          "docs": "load_from_path: perform synchronous baseline rustdoc loading (IN-07).",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_from_path",
@@ -1349,7 +1454,7 @@
         },
         {
           "action": "modify",
-          "docs": "Captures current rustdoc under trusted-root locking and reports authoritative fingerprint-stability failures (IN-05, CO-06, IN-06, AC-08).",
+          "docs": "capture_current: return a fingerprint-bound rustdoc snapshot (IN-07, CO-07, AC-06).",
           "has_default_impl": false,
           "is_async": false,
           "name": "capture_current",
@@ -1361,10 +1466,14 @@
             {
               "name": "features",
               "ty": "&[CargoFeatureName]"
+            },
+            {
+              "name": "evaluation_start",
+              "ty": "&ImplementationFingerprint"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<RustdocSnapshot, RustdocCratePortError>",
+          "returns": "Result<AttestedRustdocSnapshot, RustdocCratePortError>",
           "spec_refs": [
             {
               "anchor": "IN-05",
@@ -1380,6 +1489,18 @@
             },
             {
               "anchor": "AC-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
               "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
             }
           ]
@@ -1404,6 +1525,18 @@
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
           "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
         }
       ],
@@ -1461,6 +1594,38 @@
     }
   },
   "types": {
+    "AttestedRustdocSnapshot": {
+      "action": "add",
+      "docs": "Capture-attested rustdoc snapshot (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
     "AuthoritativeRustdocContext": {
       "action": "add",
       "docs": "Authoritative per-layer rustdoc context (IN-02, IN-07).",

@@ -37,13 +37,14 @@ pub mod test_obligation;
 pub mod type_signals_doc;
 
 pub use type_signals_doc::{
-    BaselineHash, CapturedRustdocJson, CargoProfileName, CatalogueDeclarationHash,
-    ExpectedRustdocJsonPath, ImplementationFingerprint, ResolutionFingerprint,
-    ResolvedCargoTargetDirectory, RustdocExecutionIdentity, RustdocExecutionIdentityError,
-    RustdocJsonHash, RustdocSnapshot, Sha256Digest, Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION,
-    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsLoadResult, TypeSignalsReuseDecision,
-    TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError, construct_captured_rustdoc_json,
-    construct_rustdoc_snapshot,
+    AttestedRustdocSnapshot, BaselineHash, CapturedRustdocJson, CargoProfileName,
+    CatalogueDeclarationHash, ExpectedRustdocJsonPath, ImplementationFingerprint,
+    ResolutionFingerprint, ResolvedCargoTargetDirectory, RustdocExecutionIdentity,
+    RustdocExecutionIdentityError, RustdocJsonHash, RustdocSnapshot, Sha256Digest,
+    Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsCacheKey, TypeSignalsDocument,
+    TypeSignalsLoadResult, TypeSignalsReuseDecision, TypeSignalsSchemaVersion,
+    TypeSignalsSchemaVersionError, construct_attested_rustdoc_snapshot,
+    construct_captured_rustdoc_json, construct_rustdoc_snapshot,
 };
 
 pub use baseline_document::BaselineDocument;
