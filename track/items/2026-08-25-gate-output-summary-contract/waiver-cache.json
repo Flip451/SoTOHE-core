@@ -1,0 +1,893 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      "key": {
+        "anchor_text_hash": "8cbe1c338f5833dcb6d007118659e43cf9eedde6f4cbb5e7fedeb23d9f6cda03",
+        "declaration_hash": "1ece26409d611fc06c1f351752b430c20d3a1c1d9bdfbcaa934bc9751fbc0e8c",
+        "waived_reason_hash": "bdc7585e47b91b26f2396bdb1394b8e9a219f0389c49d8e8e17e19b0cb6468c6"
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::gate_output::render_summary",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Render a human-facing gate summary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "40f98340fbd3af65542546330db90bad4dafa78b017d0f8a5366244cd985531d",
+        "declaration_hash": "53b1798a30d3066ba39fca69f629d5f07e860c2758b49aa19aeba14d79bef3dc",
+        "waived_reason_hash": "ddec3dc8b3627bea6d795aa94e689b2fd0ba5608fde4ca1617759f05be74c9fe"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"DTO for a persisted gate-log path.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateAdapterFailureReason"
+      },
+      "key": {
+        "anchor_text_hash": "5c3603e50195d8ad5e9515a785937e0177a3b4049d30212b73b369f2eaf20689",
+        "declaration_hash": "30833818074e49643483aedf2ebdb2c84e415e807da23f1e02d62ce0cb7bc341",
+        "waived_reason_hash": "9f774ccb23f98d2bd1b565869cfb649ddf2cd3f8a3e68f83282cdfe53a239e0c"
+      },
+      "obligation_id": {
+        "entry_key": "GateAdapterFailureReason",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque adapter diagnostic text carried across the application boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateProcessError"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "declaration_hash": "73d4ed997418d0499243ede9609e6aabd54b0e0aeb16e14659d909a6dcb61d03",
+        "waived_reason_hash": "f72c4a48dec479af01a74d95d16598c61435cf670715c00a0d68bb7bd1fbb47d"
+      },
+      "obligation_id": {
+        "entry_key": "GateProcessError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Child-process adapter failure before output is available.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunCommand"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "d8312737d8c177161e597c673c5858f7c7701b560eb0299f8c3a11333659cfac",
+        "waived_reason_hash": "75e8a00a0db63e8bacb056dc5b1e4b76f067b8be56316b30668a765abb313997"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunCommand",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Validated input for one gate execution, with an opaque presentation label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunCommandError"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "78e2d86f35de1f1dfc5c96cc1ec708d127dc4e8b235ff07a3dee2ba666b9b7ad",
+        "waived_reason_hash": "67466c4ac6921aaf1fca64a4542f78ce2b0163a708bb3b6bb15f1c24c4f20d2d"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunCommandError",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "EmptyCommand",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "5b0efdacdebd6ec6f11089a7d640115d3d3ff27aed39c952606fda952514ce41",
+        "waived_reason_hash": "a0ec895037dbdc35df70ec6eea836023a88c8e20b93faa5b1c7e1cc62fbbe47d"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Closed application result enum for gate execution.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "b20ec8c4eb978f768b69fb8a3704ae974eb530372604af8a3626e2c133e73847",
+        "declaration_hash": "6855673376594b7d6ebda51c14785e07beab14aeec7328c4bef91a97f2d4f587",
+        "waived_reason_hash": "371d3cb4c383f1fa984588ebc30c47b0614db06a628fac62ef29615868c960f3"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "3ac0db8ba58a3a6d94068d677618d71a316bfdf909fad28bcddf44cfef6e9527",
+        "waived_reason_hash": "d8eeeace7490b94dfe3ab2478b1001354f2ce8f5adac95bd793bc9ba13973ae3"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunResult"
+      },
+      "key": {
+        "anchor_text_hash": "8cbe1c338f5833dcb6d007118659e43cf9eedde6f4cbb5e7fedeb23d9f6cda03",
+        "declaration_hash": "9020df1d4cee712e59c5a04869ab544caae0c3dd372361546b2535cb02919e3d",
+        "waived_reason_hash": "82968379ef2c71015a780be54e0cd07ab74d837a0132d5fd4a99a09d2ad2bf77"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunResult",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "ab77675e848c980a86dcc0dd162b7287aa5a80a4371e4d12058a2eb9a53d8d96",
+        "declaration_hash": "f0da673f635afc46e112ac06189d45e6780c8c45a1b51402a138feb00b4d5834",
+        "waived_reason_hash": "88c3adfea27ed3d9165bdb1f29cf42279cb5b584f31fa80e390e6493e1a6eef6"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunService"
+      },
+      "key": {
+        "anchor_text_hash": "2d1456173aa6c47200e190422f251ab17d7f7c5491ef8e9758995d9e2a04608a",
+        "declaration_hash": "23d543941fd2353841d3f141e2ac5ad480459b935ce25f9d6b0bf6fd9724277f",
+        "waived_reason_hash": "9eb0ebd7b97990cac6f0c2f27767930e54c0109aa93144e55403ac14d29801f1"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "returns: TypeRef(\"Result<GateRunResult, GateRunError>\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputInput"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "74114b85d6a02d0db0f787bc788bc345bf6bd68a61af61a45485412f1145e41a",
+        "waived_reason_hash": "2f94ce88ed565db485baf7fc23f3d570ad820c7521095168324f039a53b222f1"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputInput",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Driving-boundary input with an opaque presentation label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "CliCommand"
+      },
+      "key": {
+        "anchor_text_hash": "b20ec8c4eb978f768b69fb8a3704ae974eb530372604af8a3626e2c133e73847",
+        "declaration_hash": "ef6116494ed78ab107e78777b8dd1872ddb7b2df511c10d8ed575863281b4883",
+        "waived_reason_hash": "528a772487561e3695b37fb73b7a5eb7755244d941f4d07a1e7f3e4bee8628f2"
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Top-level clap command enum extended with the gate-output command.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateNameArg"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "3221e4eee2652f897e6d5c650e845f0764800bbe97643992d9dfdd62167f1821",
+        "waived_reason_hash": "02320116eea2a5b8431372cb35ca9abed04510e601af8d2abf25491878d102a4"
+      },
+      "obligation_id": {
+        "entry_key": "GateNameArg",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque presentation label for a CLI gate invocation.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateNameArg"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "d197fb323fd148e6831291538c406c169a0a55740c1ccfb06158a8a24fb6fabc",
+        "waived_reason_hash": "1ac0923bc792cda1ed2a9afcb1d2233185f946585db274896aa77aaf4bce331a"
+      },
+      "obligation_id": {
+        "entry_key": "GateNameArg",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque presentation label for a CLI gate invocation.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputArgs"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "b01faa4ac8368f8b60f3795b28c13b4befbd49cb7c94ae8fcca433c041ecb1ee",
+        "waived_reason_hash": "db5ee800718b4839688237e4b0df0bf65282e6d858cc0a6bd5842b73a08938ad"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputArgs",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Clap input carrying a typed gate label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputArgs"
+      },
+      "key": {
+        "anchor_text_hash": "5c3603e50195d8ad5e9515a785937e0177a3b4049d30212b73b369f2eaf20689",
+        "declaration_hash": "733a5d25d77315e9f29b197c6ae1c7d83029f7498697cf012c769d1b6b0d3d49",
+        "waived_reason_hash": "5111ef64ded90a5d0a20b0eff4a93674aad9bf7a34b0925e8824062f572795f6"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputArgs",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Clap input carrying a typed gate label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputArgs"
+      },
+      "key": {
+        "anchor_text_hash": "b20ec8c4eb978f768b69fb8a3704ae974eb530372604af8a3626e2c133e73847",
+        "declaration_hash": "a8dc16a9c38afe2cd34b28f449eb3b70102f1bee91b70f82bc5060103c77c47d",
+        "waived_reason_hash": "106da05af1192331aa1fdb9ea2ce2c8538897d4ae1326a628cb472894b3d3340"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputArgs",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Clap input carrying a typed gate label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputArgs"
+      },
+      "key": {
+        "anchor_text_hash": "ab77675e848c980a86dcc0dd162b7287aa5a80a4371e4d12058a2eb9a53d8d96",
+        "declaration_hash": "1cd6e9615625e781ac19d85f00735469705950cc746fd24ab2d89c18f374854b",
+        "waived_reason_hash": "221315548a1dbd57c5cf9dc6f87a516f9893a6f5273cf86e9e679d03d08f2d00"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputArgs",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Clap input carrying a typed gate label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputComposition"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "177e607a6486b3505e96d777a4c9827624372dd96562d4e4b6453e0c1d925684",
+        "waived_reason_hash": "4c4a4ed12e6eed649d0a0f0cad6aa88ede7ca322da4bf7c1d421ee749e8c66e7"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputComposition",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Composition root that wires the process adapter and the reservation-owning persistence adapter into GateRunInteractor and GateOutputDriver.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "6a2554b6927bcd7bfcd50fab7585ceb6050f4972bcfb264c46b4ab83bb457634",
+        "declaration_hash": "e91b3fb09ed3a637b1a6de7a9f53831ed9e81b2afdd009cd679d839af090a998",
+        "waived_reason_hash": "39c27e89221911e76b750a59ad8bc179b974e3cddf5b9f99614b61f435d515a3"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "DTO for a persisted gate-log path.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "b41001770544b063b79bcbb9ed67943531b567668b5e01ae83c7d999cace75de",
+        "declaration_hash": "9ea22a4127f0099cfd020b927ad6e83574a7a9b71812bc110527ab3ab2c393b8",
+        "waived_reason_hash": "08a2f766d59128f74654b8e06f88af5d16c000361ab0caa76b32cb56b34cc420"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:CN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "永続化は trusted root 内にあることを最終段階で再検証した保存先へ publish",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogPath"
+      },
+      "key": {
+        "anchor_text_hash": "21f22efe5d9b290b5fbbc93b73d013aa4d2f5656c1745c7978a2133dd337100c",
+        "declaration_hash": "53806c3ceecc91d38335477e8ca774c8af16a1318077943f9b8fda3061ea58dd",
+        "waived_reason_hash": "74a00b57703ef0b339930bc2bda58e093f59c716a6e2f1b6f6e59d7f9f1d8cbe"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogPath",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "DTO for a persisted gate-log path.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogReservation"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "8cf90369c908a95d8cf14394ab6450889d3909339357e53ff38ceaf3207e37b6",
+        "waived_reason_hash": "4f6765ad725de5d9cb8b16e97d8cec9a8d0286c8315a1ccca068ad855d521a93"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogReservation",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque DTO for a gate-log reservation.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogReservation"
+      },
+      "key": {
+        "anchor_text_hash": "0493318c258d61e72a4ed0a07b0d77218658ea28037e0d5e3691274b0f45b9fd",
+        "declaration_hash": "a1bce9abaea6378006b58496282fcb2aa656733c32fb70f6a155f55d1f0ea317",
+        "waived_reason_hash": "09d2f918e767166cdfe2ec676dde5ac81ba6c840577d4eb24e54e4f7ee773c0f"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogReservation",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "ログ保存先の選択、衝突回避、名前の実現可能性、および子プロセス起動前に必要な予約は、永続化ポートとそのアダプターが所有しなければならない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogReservationError"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "c35a924ba59958df772c9f1a095799e7355b2277dc01627687bf024647d5565f",
+        "waived_reason_hash": "0f3ea9ac4d7dacf2d94bda4dfb22d4cd1391e93bd790fc2d48a304971bc8ba48"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogReservationError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Failure while reserving a gate-log destination.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunCommandError"
+      },
+      "key": {
+        "anchor_text_hash": "9691f1a2595f1dbe631c38dc26608a5f9859f8d011a468e67c5b6a4635394aa5",
+        "declaration_hash": "b004867bfbd5364d371741e0e82db3eccb24867ff49e37148c2fdeec347e2ad8",
+        "waived_reason_hash": "85fa1a164c32c0f12ee30c96f346eeb0bd9e350a9c2f8a4df43b99174ccd4ee5"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunCommandError",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateRunError"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "c207518612b478d0d9d45f71eac724d0a23234bcbbd9a44dd9b7cfddbe57b829",
+        "waived_reason_hash": "9000d5872c25b4cdcc3a2722e7abd2b2dd6127286ddfcd4e2d512bab0bb03a1b"
+      },
+      "obligation_id": {
+        "entry_key": "GateRunError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Gate execution failure before child-process launch.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputInput"
+      },
+      "key": {
+        "anchor_text_hash": "9691f1a2595f1dbe631c38dc26608a5f9859f8d011a468e67c5b6a4635394aa5",
+        "declaration_hash": "2575fef273c3cdcf1cdf63319966b71db53910ad6873aef96ea25719d6eb6ea1",
+        "waived_reason_hash": "631bf9178c7a5eb8dbd8fa39a0f289308c245aaf40f5740e5418755e07625c66"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputInput",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Driving-boundary input with an opaque presentation label and OS-native argv.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputComposition"
+      },
+      "key": {
+        "anchor_text_hash": "28faf5a8cd1408fd6364369cb18bb97a48dc9384877137a62863f5f938d7e700",
+        "declaration_hash": "b5832bab16e35df7ba6a0892a55b26d940d6e80c2ea07733834f3ddd365e1218",
+        "waived_reason_hash": "263b0f2c8aedd98c5cdd719bc05dc170e4a8652663d5e8d941b985ca0803bbe5"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputComposition",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Composition root that wires the process adapter and the reservation-owning persistence adapter into GateRunInteractor and GateOutputDriver.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputComposition"
+      },
+      "key": {
+        "anchor_text_hash": "0493318c258d61e72a4ed0a07b0d77218658ea28037e0d5e3691274b0f45b9fd",
+        "declaration_hash": "4207af1fb0b2a6cd22e98a5f5f793ce45d28cfa7a597f78f2077f37cd4c3044e",
+        "waived_reason_hash": "21bfbff55f5e7e7ae7d8cb25474191a9651ebe4df0aad6d3a41699d996ab0606"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputComposition",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Composition root that wires the process adapter and the reservation-owning persistence adapter into GateRunInteractor and GateOutputDriver.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateNameArg"
+      },
+      "key": {
+        "anchor_text_hash": "9691f1a2595f1dbe631c38dc26608a5f9859f8d011a468e67c5b6a4635394aa5",
+        "declaration_hash": "0d6a69d37105bd4e514a08a57926cbd97fb5e7be7ec1b328f4233c62d38dece0",
+        "waived_reason_hash": "0aee57833b138175b4476af3d3fae74d1c26d6d95e02c8ce999bc1de35674a38"
+      },
+      "obligation_id": {
+        "entry_key": "GateNameArg",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateOutputArgs"
+      },
+      "key": {
+        "anchor_text_hash": "9691f1a2595f1dbe631c38dc26608a5f9859f8d011a468e67c5b6a4635394aa5",
+        "declaration_hash": "5634622af0098cd771043b76956fd1b0af7420b70074714f30b1d3087a34cee6",
+        "waived_reason_hash": "85164332fccf7d88c29eac07349ae9dcf15a5c25b35494eabbecd837f0fb608e"
+      },
+      "obligation_id": {
+        "entry_key": "GateOutputArgs",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "1c2ff72b8151798b9e34409d2e39f4bc0dfa87ccb4fc262360e860c483a84b3a",
+        "declaration_hash": "f3ad1eb2683029d1223523c0e2ea83f7ea514dff4a3ef0c7a3dfe240ed85af6e",
+        "waived_reason_hash": "e7970779cd4d489b9f265d7c5badbfe27e23eb21d2db194383ec900da1c81c90"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Error type for gate-log write and persistence operations.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteError"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "049b3cd39087e6d7a9119228def0e91b64353ab81c386253b1145acd2c614c71",
+        "waived_reason_hash": "e7970779cd4d489b9f265d7c5badbfe27e23eb21d2db194383ec900da1c81c90"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Error type for gate-log write and persistence operations.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        "entry_key": "GateLogWriteOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "939e907d11580fafedf12cfcebd4a5bc546d25f89417fbf7a9e0a6e119c304de",
+        "declaration_hash": "37a643f7db36fc2f3c829406e001f1270f14bf6e201c39b34b8e1576082a2ff5",
+        "waived_reason_hash": "52f81352c7780b6b842483ea1d46d89d2a33f4777cb6d350921f2e710d1a73e9"
+      },
+      "obligation_id": {
+        "entry_key": "GateLogWriteOutcome",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Closed result enum for gate-log persistence.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-08-25-gate-output-summary-contract"
+}

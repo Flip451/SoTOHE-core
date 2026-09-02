@@ -137,6 +137,20 @@
           "hash": "rvw1:sha256:d9c8f6ca0de32926d0c65431bb65d7e55cfbe3f9037ef22794f08aa7193a58cc",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:54:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d0de5e61d60d37b488205c289ac67a6a2120801c22c598944c819f82fa2cb05",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:09:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d0de5e61d60d37b488205c289ac67a6a2120801c22c598944c819f82fa2cb05",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -340,6 +354,20 @@
           "hash": "rvw1:sha256:9996b715eb49d6a0ae690736451e4d5c0383408533187b31830d41fc246454a7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:56:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa88debfa983a2a1e3b91c3a15596b56373e90e9f070d890ba434da448b91760",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:23:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa88debfa983a2a1e3b91c3a15596b56373e90e9f070d890ba434da448b91760",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -356,6 +384,38 @@
           "at": "2026-08-31T09:07:27Z",
           "findings": [],
           "hash": "rvw1:sha256:64ef6f2f585db171cf59cbbede96c9400cc56e94eaf135f2ecaceac99077bfc7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:19:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e7fba820c949289d0fd8bead0e41416b66f6b6dd4d354cf34fce10bbbf8eb34",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:31:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0e7fba820c949289d0fd8bead0e41416b66f6b6dd4d354cf34fce10bbbf8eb34",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-02T08:56:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a864f1f963553ce73631fd53cee6bc37323cbf89f2c11211e0fa775dd47a233f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:22:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a864f1f963553ce73631fd53cee6bc37323cbf89f2c11211e0fa775dd47a233f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -724,6 +784,123 @@
           "at": "2026-09-02T08:24:20Z",
           "findings": [],
           "hash": "rvw1:sha256:3ce8d1d812243c721009b3d36e543e8bdedb526c03b45732eb3e6e0617d51b01",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:54:09Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 574,
+              "message": "`ci-container` remains a dependency-only task, so `cargo make ci-container` bypasses the new `gate-output` full-log/compact-summary contract applied to the other CI entrypoints. Invoke `gate-output` around `cargo make --allow-private ci-local-steps` here, as done for `ci-rust-container` and `ci-track-container`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:20793617d5a33494a8f7d2c479c1725dd7e762dd8c788315f45fe8accf30915b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:07:40Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": "Makefile.toml",
+              "line": 574,
+              "message": "`ci-container` remains dependency-only, so `cargo make ci-container` bypasses the new `gate-output` full-log/compact-summary contract used by the other CI entrypoints. Wrap `cargo make --allow-private ci-local-steps` with `gate-output`, as done for the sibling container tasks.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:20793617d5a33494a8f7d2c479c1725dd7e762dd8c788315f45fe8accf30915b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:16:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20793617d5a33494a8f7d2c479c1725dd7e762dd8c788315f45fe8accf30915b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:32:16Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 41,
+              "message": "The conflict resolution drops the type-signals evaluator’s explicit architecture declaration. Here, `x86_64` qualifies only gate-log persistence; the type-signals clause specifies Unix and its runtime constraints but no architecture. Since this field requires platform, architecture, and runtime, readers must infer whether type-signals is CPU-independent or x86_64-only. Restore the prior architecture-independent wording while retaining the gate-log declaration.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:20793617d5a33494a8f7d2c479c1725dd7e762dd8c788315f45fe8accf30915b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:37:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:294ec1c7a8a4837c11976ca202d0db8c2ce082afaa1a48f9f0b2334d1ac8233a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:48:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9f93c27ee8253d12361c50264331bc367d3c1395cf16b586985f75803d34b99",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:57:56Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 24,
+              "message": "The ownership rules say declaration fields are consumer-owned and carve out only the type-signals Supported Platforms contract, but the document now places fixed gate-log platform behavior and the shipped `gate-output` resource contract in those fields. Extend the framework-owned exception to these shipped-component contracts or move them out of the consumer declaration.",
+              "severity": "medium"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 61,
+              "message": "The resource declaration omits the adapter's actual memory behavior. `ProcessGateRunner` uses `Command::output()` to buffer both streams in memory and then `combine_output` allocates a combined copy before persistence. With no byte cap, memory is unbounded and OOM can terminate the process before any full log or `GateLogWriteOutcome::Unavailable` is produced; the stated time/disk replacement boundaries do not cover this. Declare the in-memory bound and failure behavior or introduce bounded/streamed capture.",
+              "severity": "medium"
+            },
+            {
+              "category": "convention contradiction",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 61,
+              "message": "The statement that caller-side `cargo make` enforces the processing-time limit is false for the scoped Makefile entrypoints: they invoke `gate-output` directly without a timeout, and cargo-make itself supplies no deadline. Consequently a non-terminating child can wait indefinitely in local `cargo make` use, contrary to the claim that an upper boundary will terminate it. State that only callers which explicitly provide a timeout impose one, or add such a boundary.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:a9f93c27ee8253d12361c50264331bc367d3c1395cf16b586985f75803d34b99",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T10:05:49Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": "knowledge/conventions/environment-assumptions.md",
+              "line": 24,
+              "message": "This now says the template commonly documents the fixed gate-log and `gate-output` contracts, but the file’s own preamble and `template-boundary.json` establish that source `knowledge/conventions/` is replaced by the export overlay. The exported `environment-assumptions.md` still leaves both Supported Platforms and Resource Limits as consumer TODOs, and the included documentation only carries the type-signals Unix bound. Fresh consumers therefore do not receive the gate-log platform or `gate-output` resource contracts claimed here. Put those framework-owned contracts on an included distribution surface or seed them into the exported overlay consistently.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:bcef4b0c0895b5868ca8f209eb4f933b1e7fe7695ded9f5306d4823f00b33aaa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T10:11:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd092ea29bc4e230f3eb8ef99b51a370708aa85ddc4193219496d44129fb87e",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4659,6 +4836,57 @@
           "hash": "rvw1:sha256:bc8d299e1f550d5b5101bd700818704d2f72ef857b8d2e0ff54f2504c188c765",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:56:30Z",
+          "findings": [
+            {
+              "category": "external-boundary-assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 41,
+              "message": "`Command::output()` buffers the child’s entire stdout and stderr without any size limit. A gate can emit unbounded output and exhaust the runner’s memory before persistence, so this adapter needs a bounded capture policy and a typed overflow/error path.",
+              "severity": "high"
+            }
+          ],
+          "hash": "rvw1:sha256:03f74f2bdbed6a8739e207b2cb234c12b8ca400d9713e6b650d82304a3663c7b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:19:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03f74f2bdbed6a8739e207b2cb234c12b8ca400d9713e6b650d82304a3663c7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:40:42Z",
+          "findings": [
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 41,
+              "message": "未宣言の前提への依存: Known Accepted Deviation が認めているのは stdout/stderr のサイズ上限がない点だけです。`Command::output()` には実行期限や cancellation がなく、停止しない子プロセスや pipe を保持したまま残る descendant によって全ゲートが無期限に停止します。spec に timeout 時の動作はなく、environment declaration の処理時間上限も TODO です。process tree と pipe 回収を含む明示的な timeout を実装するか、上位層が強制する時間境界を正式に宣言してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/gate_output.rs",
+              "line": 41,
+              "message": "`map_err` が複合操作である `Command::output()` 全体に適用されているため、子プロセスの起動成功後に wait が失敗した場合も `GateProcessError::Spawn` になります。usecase はこれを `SpawnFailed` と表示するので、実際には副作用を伴って実行されたコマンドを「起動できなかった」と誤報し、安全でない再実行を誘発し得ます。spawn を独立して実行して起動エラーだけを `Spawn` に変換し、起動後の wait/capture failure は別の typed outcome として扱ってください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:03f74f2bdbed6a8739e207b2cb234c12b8ca400d9713e6b650d82304a3663c7b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:58:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03f74f2bdbed6a8739e207b2cb234c12b8ca400d9713e6b650d82304a3663c7b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5589,6 +5817,20 @@
           "at": "2026-09-02T02:42:40Z",
           "findings": [],
           "hash": "rvw1:sha256:78239bee3ad51185b39f6c0a66f3f112495bdb477b785a488b3b7e6c57e043fa",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:53:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ffb397117be24131cc0a266c2f51e38faa7b20f9a62dfbc73559216601b278c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:11:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4ffb397117be24131cc0a266c2f51e38faa7b20f9a62dfbc73559216601b278c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7410,6 +7652,42 @@
           "at": "2026-09-02T05:42:49Z",
           "findings": [],
           "hash": "rvw1:sha256:c79331545c922e3df129de20e89ba9599bea1f80e47ab16866355cfbc1d1aec0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T08:56:42Z",
+          "findings": [
+            {
+              "category": "error type confusion",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 155,
+              "message": "`GateLogReservationError::Clock` exposes `std::time::SystemTimeError` through the usecase API, leaking an infrastructure/runtime error type. Map it to the opaque adapter diagnostic type, consistent with the other persistence failures.",
+              "severity": "medium"
+            },
+            {
+              "category": "external-boundary assumptions",
+              "file": "libs/usecase/src/gate_output.rs",
+              "line": 195,
+              "message": "The new orchestration captures complete child output into an unbounded `Vec<u8>` and persists it without any declared memory/storage limit or overflow behavior. Declare the resource assumption in the spec/environment contract or add an explicit bounded failure policy.",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:c967a473039c147cfcdad9bcae1e670235b0c43264d475839bc2f663781c37d3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T09:19:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c967a473039c147cfcdad9bcae1e670235b0c43264d475839bc2f663781c37d3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T09:38:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c967a473039c147cfcdad9bcae1e670235b0c43264d475839bc2f663781c37d3",
           "type": "final",
           "verdict": "zero_findings"
         }

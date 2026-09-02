@@ -1,5 +1,15 @@
 # Environment Assumptions Convention
 
+## この source tree における位置付け
+
+このファイルは SoTOHE-core source repository 自身が consumer として使用する環境前提宣言であり、
+以下の具体的な値はこの repository の実際の実行環境を記録する。`.harness/config/template-boundary.json`
+では source 側の `knowledge/conventions/` を `overlay` として扱うため、template export はこの
+source 側の文書を reusable scaffold の共通既定値として出荷しない。exported scaffold に供給される
+初期文書は consumer-neutral な別の overlay 内容であり、そこでは各 consumer が値を記入する。
+
+> **強制先**: review 観点 — harness-policy scope
+
 ## Purpose
 
 実行環境に依存する前提を、consumer が自分のプロジェクトの仕様として宣言するための枠を
@@ -11,28 +21,31 @@
 
 - 新しく追加するコードと、環境との境界に関わる振る舞いを変更するコードに適用する。既存コードや既存の抽象の組を、この規約に合わせて遡及修正するためには使わない。
   > **強制先**: review 観点 — harness-policy scope
-- この文書の宣言欄は原則として consumer が所有する。テンプレートは consumer 固有の platform、protocol、encoding、resource limit、concurrency model を既定値として記入しない。ただし、`対応プラットフォーム (Supported Platforms)` 欄に記載する出荷済み type-signals rustdoc 評価器の platform bound は consumer アプリの OS 選択ではなく、SoTOHE が出荷する評価器の固定実行契約であるため、テンプレートが共通に文書化する。
+- この文書の宣言欄は原則として consumer が所有する。テンプレートは consumer 固有の platform、protocol、encoding、resource limit、concurrency model を既定値として記入しない。ただし、`対応プラットフォーム (Supported Platforms)` 欄の出荷済み type-signals rustdoc 評価器および gate-log persistence の platform bound と、`資源上限 (Resource Limits)` 欄の出荷済み `gate-output` 子プロセス捕捉契約は、consumer アプリの OS / limit 選択ではなく SoTOHE が出荷するコンポーネントの固定実行契約である。これらは **この source tree の consumer 宣言**（本ファイル）と source `README.md` の前提条件節に置く。template export は overlay の consumer-neutral 文書を出荷するため、exported scaffold へこれらの具体値を複製しない。
   > **強制先**: review 観点 — harness-policy scope
 
 ## Environment Declaration
 
 この節を consumer の環境前提宣言として使う。`対応プラットフォーム (Supported Platforms)` 欄の
-type-signals rustdoc 評価器に関する記載は、consumer アプリの OS 選択ではなく、SoTOHE が出荷する
-評価器の固定実行契約である。consumer 固有の前提は、4 つの分類の該当する欄を実際の前提で埋め、
-適用外の欄には「適用外」とその理由を記入する。空欄や、判断を先送りする `TODO` を残したまま、
-前提に依存する設計や実装を追加してはならない。
+type-signals rustdoc 評価器および gate-log persistence と、`資源上限 (Resource Limits)` 欄の
+`gate-output` 子プロセス捕捉に関する記載は、consumer アプリの OS / limit 選択ではなく、SoTOHE が
+出荷するコンポーネントの固定実行契約であり、この source tree が consumer として記録する。
+exported overlay はこれらの具体値を持たず、各 consumer が自分の宣言欄を記入する。
+consumer 固有の前提は、これらの出荷契約を除く欄を実際の前提で埋め、適用外の欄には「適用外」と
+その理由を記入する。空欄や、判断を先送りする `TODO` を残したまま、前提に依存する設計や実装を
+追加してはならない。
 
 > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 対応プラットフォーム (Supported Platforms)
 
-出荷する type-signals rustdoc 評価器の platform 前提。consumer プロジェクト固有の OS 選択ではなく、評価器が trusted-root を検証できる範囲を宣言する。
+出荷する type-signals rustdoc 評価器と gate-log persistence の platform 前提。consumer プロジェクト固有の OS 選択ではなく、出荷コンポーネントが trusted-root を検証できる範囲を宣言する。
 
-- 対応する platform、architecture、runtime: platform は Unix（Linux を含む）。architecture は特定の CPU に依存しない。runtime は、解決済み target root から専用 selection directory と lock file を descriptor-relative に開き、親を含む path を no-follow で検証できる Unix runtime に限る。
+- 対応する platform、architecture、runtime: type-signals rustdoc 評価器は Unix（Linux を含む）で、architecture は特定の CPU に依存しない。runtime は、解決済み target root から専用 selection directory と lock file を descriptor-relative に開き、親を含む path を no-follow で検証できる Unix runtime。gate-log persistence は Linux (x86_64) と `cargo make` が使う Docker `tools` container。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- 対応外または条件付きの範囲: Windows、および descriptor-relative open と no-follow 検証を提供しない platform は unsupported。そのような環境では rustdoc snapshot の再利用および export を fail-closed で拒否する。
+- 対応外または条件付きの範囲: Windows、および descriptor-relative open と no-follow 検証を提供しない platform は unsupported。そのような環境では rustdoc snapshot の再利用および export を fail-closed で拒否する。gate-log persistence は macOS/Windows で `FsGateLogPersistence::reserve` が Linux-only reason の `CreateFile` を返す。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: 専用 selection directory の immediate parent の file name は正確に `.sotp-rustdoc` であること。親 Cargo `target/` や他の非専用 directory を authoritative rustdoc output home として受け入れない。条件を満たせない場合は identity resolution を開始せず失敗する。
+- platform 差が入力、ファイル、時刻、プロセス、または終了処理に与える条件: 専用 selection directory の immediate parent の file name は正確に `.sotp-rustdoc` であること。親 Cargo `target/` や他の非専用 directory を authoritative rustdoc output home として受け入れない。条件を満たせない場合は identity resolution を開始せず失敗する。exclusive create と nofollow directory open は Unix descriptor-relative API を使う。`RenameFlags::EXCHANGE` publish は Linux-only で、explicit platform gate は非 Linux では log file を作る前に失敗する。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 入力エンコーディング方針 (Input-Encoding Policy)
@@ -46,11 +59,13 @@ type-signals rustdoc 評価器に関する記載は、consumer アプリの OS �
 
 ### 資源上限 (Resource Limits)
 
-- 入力サイズ、メモリ、保存領域、処理時間、同時実行数などの上限: `TODO: consumer が記入`
+出荷する `gate-output` 子プロセス捕捉の前提。consumer アプリ固有の入力サイズ上限ではない。
+
+- 入力サイズ、メモリ、保存領域、処理時間、同時実行数などの上限: 子プロセスの stdout/stderr に追加の byte cap は置かない。`ProcessGateRunner` は `Command::output()` で両 stream を全量メモリに保持し、`combine_output` が結合済みの追加コピーを作るため、設定されたメモリ上限はなく、必要メモリは子の出力サイズに比例し、捕捉中は複数の出力コピーが同時に存在する。メモリ枯渇時は allocation failure によりプロセスが abort / terminate し得て、完全な log や `GateLogWriteOutcome::Unavailable` は生成されない。捕捉結果は `tmp/gate/` に全量保存する。`ProcessGateRunner` は独自の実行期限・cancellation を持たない。処理時間の上限は、明示的に timeout を提供する呼び出し側だけが強制する。同時実行数の上限は呼び出し側のゲート直列化に従う。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- 上限の単位、適用範囲、超過時の失敗動作: `TODO: consumer が記入`
+- 上限の単位、適用範囲、超過時の失敗動作: byte 上限は適用しない。子が終了しない場合、この adapter は wait し続ける。呼び出し側が明示的に timeout を設定した場合に限り、その時間境界がプロセスを切る。scoped `cargo make` entrypoint 自体は timeout を設定しないため、local execution では無期限に待つことがある。保存領域の枯渇は OS の write 失敗として `GateLogWriteOutcome::Unavailable` になる。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
-- 上限を設けない項目がある場合の理由と、代わりに置く境界: `TODO: consumer が記入`
+- 上限を設けない項目がある場合の理由と、代わりに置く境界: ゲート失敗の診断はフルログを必要とし、compact stdout 契約は全文をファイルへ退避する。代わりの境界は、timeout を明示的に設定する呼び出し側の CI / オーケストレータとディスク容量である。scoped `cargo make` entrypoint は timeout を設定しない。
   > **強制先**: review 観点 — harness-policy scope（宣言欄の編集は `knowledge/conventions/**` として harness-policy scope が審査する）/ spec scope（宣言に依存する仕様変更）
 
 ### 並行モデル (Concurrency Model)

@@ -1,10 +1,10 @@
 {
-  "baseline_hash": "d7bb1f403e4424a80b790a58ba97172996c14375f67c6661694ce6e8c15b0a3a",
+  "baseline_hash": "3c24d241eebdce233ee2bf66e75e1763234e2346391f50292344ac01e444a83d",
   "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "generated_at": "2026-09-02T08:43:11Z",
-  "head_commit": "bd5bda6fcba965507fdf95018f49f697aaf0603a",
-  "implementation_fingerprint": "5018a5911f84afd0e3699eafb01ea409c897ffc7bed6740e54351255b80ce415",
-  "resolution_fingerprint": "9e8da01eb0099dd7cef194bae132166e251989a9adb2ea6a76ef95a2c0346d82",
+  "generated_at": "2026-09-02T10:14:41Z",
+  "head_commit": "70477b51023c24e680ad8ef0d3453927c7cb69dc",
+  "implementation_fingerprint": "c70bebb19362fbde1b995c6948f57b8d841bbaad3282f4cda61334a31092b632",
+  "resolution_fingerprint": "5a31bb99af3b80a0c6979b395b9dfa4dace08b5a9529b4133e597439fb028d00",
   "rustdoc_execution_identity": {
     "crate_name": "cli",
     "expected_json_path": "target/.sotp-rustdoc/aa542b99abb6395487e5fa287ad521adfe5b92ccd13030c60393fad98cd3b249/doc/sotp.json",

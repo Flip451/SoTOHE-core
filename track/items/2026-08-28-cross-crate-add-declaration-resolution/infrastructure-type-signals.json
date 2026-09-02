@@ -1,10 +1,10 @@
 {
-  "baseline_hash": "381b2670202c2f6ed2c22bfc0b661207221c6bd171a5f6607333eed8522e96ff",
+  "baseline_hash": "a88bb82bbd00999937b1b234cdd53ff0e326ff69bf2750f2ad6e43fb44d20f64",
   "declaration_hash": "41b51b979d5d9fa3fc9cf8fce4f4296f86b8a75d41f8b64e48bf7b23e34bebbb",
-  "generated_at": "2026-09-02T08:42:56Z",
-  "head_commit": "bd5bda6fcba965507fdf95018f49f697aaf0603a",
-  "implementation_fingerprint": "5018a5911f84afd0e3699eafb01ea409c897ffc7bed6740e54351255b80ce415",
-  "resolution_fingerprint": "9e8da01eb0099dd7cef194bae132166e251989a9adb2ea6a76ef95a2c0346d82",
+  "generated_at": "2026-09-02T10:14:18Z",
+  "head_commit": "70477b51023c24e680ad8ef0d3453927c7cb69dc",
+  "implementation_fingerprint": "c70bebb19362fbde1b995c6948f57b8d841bbaad3282f4cda61334a31092b632",
+  "resolution_fingerprint": "5a31bb99af3b80a0c6979b395b9dfa4dace08b5a9529b4133e597439fb028d00",
   "rustdoc_execution_identity": {
     "crate_name": "infrastructure",
     "expected_json_path": "target/.sotp-rustdoc/4225fd0e0ab3e3b5382ac303795f8d5460081d934f46dc14c26a6c3b5fefdedb/doc/infrastructure.json",

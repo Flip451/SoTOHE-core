@@ -1,0 +1,64 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "build",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "cli_driver::gate_output::GateOutputDriver",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "GateOutputComposition"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "GateOutputComposition": {
+      "action": "add",
+      "docs": "Composition root that wires the process adapter and the reservation-owning persistence adapter into GateRunInteractor and GateOutputDriver.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "gate_output",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-25-gate-output-summary-contract/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,510 @@
+{
+  "entries": [
+    {
+      "claim_hash": "500fc991ce01a59dcb083ad3433be6d568267a1a85150f029931360f1f422915",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "500fc991ce01a59dcb083ad3433be6d568267a1a85150f029931360f1f422915",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ed963fd82b304ea8a7a8d3daacfece2e406fadac9434ceed3cd48d9f99082da",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "500fc991ce01a59dcb083ad3433be6d568267a1a85150f029931360f1f422915",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CliCommand",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e97bcedcd01755266a16cdb6a8fa3a116a09f5cc6fc3d403b6a66e55bd311d0f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateNameArg",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e97bcedcd01755266a16cdb6a8fa3a116a09f5cc6fc3d403b6a66e55bd311d0f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateNameArg",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce5fbbfc718688318769ba91a3ba3aeee372a6df81f963c7c0194fbe31c0945a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。子プロセス起動前に予約・準備が失敗した場合は、FAIL の判定とログ未作成を示す短い理由に限り、存在しないフルログパスを出力してはならない。子プロセス起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する PASS または FAIL の判定とフルログ未作成または参照不能を示す短い理由に限り、完全でないログのパスをフルログパスとして出力してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ保存先の予約・準備に成功した対象タスクの stdout は、フルログの保存が完了した場合には PASS または FAIL の判定、フルログファイルのパス、ならびに失敗時だけの失敗項目と短い理由に限らなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e97bcedcd01755266a16cdb6a8fa3a116a09f5cc6fc3d403b6a66e55bd311d0f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateNameArg",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "013185711e3f353729714bfb1dddea3e11458517387be319aa0665e08f7d9dad",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f4ac2738be4b28e7a8b76fdb403e2d8bde4e86ff4cc32a7f06961a56681b294",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f4ac2738be4b28e7a8b76fdb403e2d8bde4e86ff4cc32a7f06961a56681b294",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f4ac2738be4b28e7a8b76fdb403e2d8bde4e86ff4cc32a7f06961a56681b294",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ed963fd82b304ea8a7a8d3daacfece2e406fadac9434ceed3cd48d9f99082da",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f4ac2738be4b28e7a8b76fdb403e2d8bde4e86ff4cc32a7f06961a56681b294",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f4ac2738be4b28e7a8b76fdb403e2d8bde4e86ff4cc32a7f06961a56681b294",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputArgs",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "013185711e3f353729714bfb1dddea3e11458517387be319aa0665e08f7d9dad",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンド構築は、エンコード後のログ名に対するファイルシステムのコンポーネント長予算を所有または判定してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "89a73c84c8bd339cb383a959dd50898d6499071a51fab4ad6bc0521fdc6e063b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの失敗時には、失敗した項目と短い理由だけを stdout の診断抜粋として表示する。起動前の予約・準備失敗時は、ログ未作成を示す短い理由を表示する。起動後にフルログの保存が失敗した場合は、子プロセスが返した状態に対応する判定と、フルログ未作成または参照不能を示す短い理由を表示し、完全でないログのパスを表示しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ed963fd82b304ea8a7a8d3daacfece2e406fadac9434ceed3cd48d9f99082da",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "フルログの保存が完了した対象タスクが成功すると、stdout は PASS の判定と tmp/gate/ 配下のフルログファイルのパスを示し、個別 PASS 行や内部レコードの Debug 表現を含まない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e981dbbb57f3d19ee12b63c1d3570338da06e84b7fc7346a3a8bfe3d7a467a5c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスが起動し、フルログの保存が完了した対象タスクが失敗すると、stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。子プロセス起動前に予約・準備が失敗する場合は、stdout は FAIL の判定とフルログ未作成を示す短い理由を示し、存在しないパスを示さない。子プロセス起動後にフルログの保存が失敗する場合は、stdout は子プロセスが返した状態に対応する PASS または FAIL の判定と、フルログ未作成または参照不能を示す短い理由を示し、完全でないログのパスを示さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "stdout は FAIL の判定、tmp/gate/ 配下のフルログファイルのパス、失敗した項目および各項目の短い理由を示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f6f169ad22562a24ba6cfb54417bcd0685d54b44b91418f631b171552a221600",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "子プロセスが起動し、フルログの保存が完了した対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。起動前の予約・準備失敗ではフルログは作成されず、stdout の短い理由でその状態を確認できる。起動後にフルログの保存が失敗する場合は、完全なフルログを参照できないことを stdout の短い理由で確認でき、完全でないログのパスは示されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスが起動し、フルログの保存が完了した対象タスクの詳細な診断情報は stdout ではなく tmp/gate/ 配下のフルログとして参照できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "26bc19a298afd72359433180d048dc912c8540e64c362f26159ddf33186b1254",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "ログ名を保存先で実現できない場合、永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき、対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ名を保存先で実現できない場合、永続化ポートは子プロセスを起動する前に予約・準備の不成立を報告でき、対象タスクは FAIL とログ未作成を示す短い理由を stdout に出力して子プロセスを起動しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6cc550cd235d5e04d3def3f37396925c1a99f0851e69aab8b837ab940ce65688",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::execute",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b12732d284290fec43a4f895cecbf0d7d5c3803600a2a4cda4b9d2f548a3efcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "子プロセスの起動後にフルログの保存失敗が報告されても、stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。フルログの保存が完了していない場合は、完全でないログのパスをフルログパスとして示さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "子プロセスの起動後にフルログの保存失敗が報告されても、stdout の PASS または FAIL の判定と exit code は子プロセスが実際に返した終了状態に対応し、永続化の問題は別の短い理由として stdout で確認できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2cf70c645e2ddc4c9b93ba11fb521b139526cf1283504b65d5d30c726c18a371",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b55b2cce2b45ccc9f9d4fbd852dc6633c5f80cd5badb1712b2b5f1381b56e3af",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "機械による合否は既存の exit code で、状態照会は既存の check 系コマンドで引き続き判定しなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "機械による合否は既存の exit code で",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2cf70c645e2ddc4c9b93ba11fb521b139526cf1283504b65d5d30c726c18a371",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::gate_output::exit_code_from_u8",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bac27444186a3d9343517a1baa79408f6748d25722586c86d309f507355346a7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "出力契約の変更後も、対象タスクの成功・失敗は従来どおり exit code で判断でき、既存の check 系コマンドで状態を照会できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "成功・失敗は従来どおり exit code で判断でき",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli",
+  "schema_version": 1
+}
