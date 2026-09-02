@@ -12,7 +12,7 @@ use super::ports::EvaluationStartCaptureError;
 use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPortError;
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::{
-    ImplementationFingerprint, LayerId,
+    AttestedRustdocSnapshot, ImplementationFingerprint, LayerId,
     catalogue_v2::{AttestedCatalogueDocument, TdddLayerBinding},
 };
 use thiserror::Error;
@@ -217,6 +217,15 @@ impl RustdocExportPlan {
     #[must_use]
     pub fn implementation_fingerprint(&self) -> &ImplementationFingerprint {
         &self.implementation_fingerprint
+    }
+
+    /// Reports whether a captured current snapshot belongs to this run.
+    #[must_use]
+    pub(super) fn snapshot_matches_evaluation_start(
+        &self,
+        snapshot: &AttestedRustdocSnapshot,
+    ) -> bool {
+        snapshot.implementation_fingerprint() == &self.implementation_fingerprint
     }
 }
 

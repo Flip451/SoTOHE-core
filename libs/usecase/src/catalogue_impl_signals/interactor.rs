@@ -354,6 +354,14 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                         diagnostic(e.to_string()),
                     )
                 })?;
+            if !export_plan.snapshot_matches_evaluation_start(&current) {
+                return Err(CatalogueImplSignalsError::SchemaExport(
+                    typed_layer_id,
+                    diagnostic(
+                        "current rustdoc snapshot fingerprint does not match the evaluation-start fingerprint",
+                    ),
+                ));
+            }
 
             rustdoc_contexts.insert(
                 typed_layer_id.clone(),

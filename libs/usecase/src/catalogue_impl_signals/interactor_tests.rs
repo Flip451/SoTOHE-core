@@ -493,6 +493,40 @@ impl EvaluationStartCapturePort for RecordingStartBindingRustdocPort {
     }
 }
 
+struct MixedGenerationRustdocPort {
+    captures: Arc<Mutex<Vec<ImplementationFingerprint>>>,
+}
+
+impl RustdocCratePort for MixedGenerationRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        Ok(captured_rustdoc(empty_rustdoc_crate()))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        let mut captures = self.captures.lock().unwrap();
+        captures.push(evaluation_start.clone());
+        let fingerprint = if captures.len() == 1 {
+            evaluation_start.clone()
+        } else {
+            ImplementationFingerprint::new(Sha256Digest::try_new("b".repeat(64)).unwrap())
+        };
+        Ok(current_rustdoc(crate_name, empty_rustdoc_crate(), &fingerprint))
+    }
+}
+
+impl EvaluationStartCapturePort for MixedGenerationRustdocPort {
+    fn capture_evaluation_start(
+        &self,
+    ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+        Ok(evaluation_start_fingerprint())
+    }
+}
+
 pub(super) struct StubLayerBindings {
     pub(super) bindings: Vec<TdddLayerBinding>,
 }
@@ -1512,6 +1546,40 @@ fn test_run_binds_one_evaluation_start_to_every_current_capture() {
     assert_eq!(*start_calls.lock().unwrap(), 1);
     let expected_start = evaluation_start_fingerprint();
     assert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);
+}
+
+#[test]
+fn test_run_rejects_a_later_generation_snapshot_before_evaluation() {
+    let captures = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(TrackCatalogueLoader {
+            documents: BTreeMap::from([
+                ("domain-types.json".to_owned(), minimal_catalogue_doc("domain")),
+                ("usecase-types.json".to_owned(), minimal_catalogue_doc("usecase")),
+            ]),
+        }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(MixedGenerationRustdocPort { captures: Arc::clone(&captures) }),
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        error,
+        CatalogueImplSignalsError::SchemaExport(layer, reason)
+            if layer.as_ref() == "usecase"
+                && reason.as_str().contains("evaluation-start fingerprint")
+    ));
+    assert_eq!(
+        captures.lock().unwrap().as_slice(),
+        &[evaluation_start_fingerprint(), evaluation_start_fingerprint()]
+    );
 }
 
 #[test]
