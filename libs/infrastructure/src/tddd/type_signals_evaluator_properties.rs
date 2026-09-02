@@ -347,7 +347,7 @@ fn property_evaluator_excludes_only_the_resolved_target_directory() {
 }
 
 #[test]
-fn property_evaluator_rejects_the_65th_required_layer_before_export() {
+fn property_evaluator_allows_more_than_64_configured_layers_without_catalogues() {
     let workspace = tempfile::tempdir().expect("workspace tempdir");
     let items = workspace.path().join("track/items");
     fs::create_dir_all(&items).expect("items directory");
@@ -377,14 +377,14 @@ fn property_evaluator_rejects_the_65th_required_layer_before_export() {
         crate::tddd::type_signals_executor_adapter::RustdocLaunchObserver::using_json_path(
             workspace.path().join("unused.json"),
         );
-    let error = super::rustdoc_contexts::load_authoritative_inputs(
+    let loaded = super::rustdoc_contexts::load_authoritative_inputs(
         workspace.path(),
         &items,
         &items,
         &observer,
     )
-    .expect_err("the 65th configured context must fail before export");
-    assert!(error.to_string().contains("64"));
+    .expect("unexported configured layers must not consume the context budget");
+    assert!(loaded.catalogues.is_empty());
 }
 
 #[cfg(unix)]

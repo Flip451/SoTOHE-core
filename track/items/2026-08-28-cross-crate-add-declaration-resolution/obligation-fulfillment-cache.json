@@ -3104,6 +3104,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate"
         },
         {
@@ -3121,7 +3126,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3130,7 +3135,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(summary.crate_id, 7);\n        assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\n        assert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));\n\nassert_eq!(repository.1.kind, ItemKind::Trait);\n    assert_ne!(repository.1.crate_id, 0, \"the declaring trait must be external to usecase\");\n    assert_eq!(encoded.krate().external_crates[&repository.1.crate_id].name, \"domain\");",
+        "citation": "\"assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \\\"domain\\\");\" ... \"assert_eq!(repository.1.kind, ItemKind::Trait);\" ... \"assert_eq!(encoded.krate().external_crates[&repository.1.crate_id].name, \\\"domain\\\");\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3186,6 +3191,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3207,7 +3217,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3216,7 +3226,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(catalogues.len(), 2);\nassert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));\nassert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));\nassert!(catalogues.get(&domain_layer).and_then(|doc| doc.types().get(&CatalogueEntryKey::try_new(\"domain::model::UserId\".to_owned()).unwrap())).is_some_and(|entry| entry.action() == ItemAction::Add), \"the codec must receive the declaring-layer add without a usecase duplicate\");\nassert!(catalogues.get(&usecase_layer).is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains(\"UserId\"))), \"the referencing catalogue must not duplicate the declaring-layer add\");",
+        "citation": "assert_eq!(catalogues.len(), 2);\n        assert_eq!(catalogues.get(&domain_layer), Some(&domain_doc));\n        assert_eq!(catalogues.get(&usecase_layer), Some(&usecase_doc));\n        assert!(\n            catalogues\n                .get(&domain_layer)\n                .and_then(|doc| doc\n                    .types()\n                    .get(&CatalogueEntryKey::try_new(\"domain::model::UserId\".to_owned()).unwrap()))\n                .is_some_and(|entry| entry.action() == ItemAction::Add),\n            \"the codec must receive the declaring-layer add without a usecase duplicate\"\n        );\n        assert!(\n            catalogues\n                .get(&usecase_layer)\n                .is_some_and(|doc| !doc.types().keys().any(|key| key.as_str().contains(\"UserId\"))),\n            \"the referencing catalogue must not duplicate the declaring-layer add\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3272,6 +3282,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3293,7 +3308,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3302,7 +3317,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(summary.crate_id, 7);\nassert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\nassert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));",
+        "citation": "for (name, expected_path) in\n        [(\"UserId\", [\"domain\", \"model\", \"UserId\"]), (\"PendingId\", [\"domain\", \"model\", \"PendingId\"])]\n    {\n        let (id, summary) = encoded\n            .krate()\n            .paths\n            .iter()\n            .find(|(_, summary)| summary.path == expected_path)\n            .unwrap_or_else(|| panic!(\"synthesized {name} must retain its resolved path\"));\n        assert_eq!(summary.crate_id, 7);\n        assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\n        assert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));\n    }\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path.first().map(String::as_str) == Some(\"usecase\")),\n        \"the synthesized items must not be rooted in the referencing crate\"\n    );\n\n    assert_eq!(identity.len(), 1, \"rustdoc-wins must avoid a synthesized duplicate\");\n    assert_eq!(identity[0].crate_id, 7, \"the reused item must remain external rustdoc\");\n    assert!(\n        !encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path.first().map(String::as_str) == Some(\"sotp\")),\n        \"the bin-target root must be canonicalized to the declaring package name\"\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3358,6 +3373,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3379,7 +3399,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3388,7 +3408,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(catalogues.len(), 1);\n        assert!(catalogues.contains_key(&LayerId::try_new(\"domain\").unwrap()));\n        assert!(!catalogues.contains_key(&LayerId::try_new(\"usecase\").unwrap()));",
+        "citation": "assert_eq!(observations[0].1.len(), 1);\nassert!(observations[0].1.contains_key(&LayerId::try_new(\"domain\").unwrap()));\nassert!(!observations[0].1.contains_key(&LayerId::try_new(\"usecase\").unwrap()));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3444,6 +3464,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3465,7 +3490,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3474,7 +3499,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(encoded\n            .krate()\n            .paths\n            .values()\n            .any(|summary| summary.path == expected_path)\n        )\n...\nassert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\n...\nassert_eq!(identity[0].crate_id, 7, \"the reused item must remain external rustdoc\");\n...\n\"the bin-target root must be canonicalized to the declaring package name\"",
+        "citation": "assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\"); ... assert!( !encoded .krate() .paths .values() .any(|summary| summary.path.first().map(String::as_str) == Some(\"usecase\")), \"the synthesized items must not be rooted in the referencing crate\" ); ... assert_eq!(requested_targets.lock().unwrap().clone(), vec![\"domain_bin\".to_owned(), \"usecase\".to_owned()]); ... assert!( !encoded .krate() .paths .values() .any(|summary| summary.path.first().map(String::as_str) == Some(\"sotp\")), \"the bin-target root must be canonicalized to the declaring package name\" );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3530,6 +3555,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3551,7 +3581,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3560,7 +3590,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(summary.crate_id, 7);\n        assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\n        assert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));",
+        "citation": "assert_eq!(summary.crate_id, 7);\n        assert_eq!(encoded.krate().external_crates[&summary.crate_id].name, \"domain\");\n        assert_eq!(encoded.krate().index[id].name.as_deref(), Some(name));\n...\nassert_eq!(identity[0].crate_id, 7, \"the reused item must remain external rustdoc\");\n...\n\"the bin-target root must be canonicalized to the declaring package name\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3616,6 +3646,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3637,7 +3672,7 @@
       },
       "key": {
         "anchor_text_hash": "55b4d2c526c550d10936bf2e90de853a6cc4b611dbe7a561e4a268fc16aeb6f9",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3646,7 +3681,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\n    let expected_start = evaluation_start_fingerprint();\n    assert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n\nassert!(matches!(\n        &error,\n        CatalogueImplSignalsError::EvaluationStartCapture(\n            EvaluationStartCaptureError::AuthoritativeInput { .. }\n        )\n    ));\n    assert_eq!(*current_calls.lock().unwrap(), 0);",
+        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\nlet expected_start = evaluation_start_fingerprint();\nassert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n...\nassert!(matches!(\n    &error,\n    CatalogueImplSignalsError::EvaluationStartCapture(\n        EvaluationStartCaptureError::AuthoritativeInput { .. }\n    )\n));\nassert_eq!(*current_calls.lock().unwrap(), 0);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3702,6 +3737,11 @@
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
         },
         {
           "layer": "usecase",
@@ -3723,7 +3763,7 @@
       },
       "key": {
         "anchor_text_hash": "b8e3e7f5872b7f25fe49e790ab4f2ef2a49253dc3a0987f67215c5987ba29a14",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3732,7 +3772,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\nlet expected_start = evaluation_start_fingerprint();\nassert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n\nassert!(matches!(\n    &error,\n    CatalogueImplSignalsError::EvaluationStartCapture(\n        EvaluationStartCaptureError::AuthoritativeInput { .. }\n    )\n));\nassert_eq!(*current_calls.lock().unwrap(), 0);",
+        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\n    let expected_start = evaluation_start_fingerprint();\n    assert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n\nassert!(matches!(\n        &error,\n        CatalogueImplSignalsError::EvaluationStartCapture(\n            EvaluationStartCaptureError::AuthoritativeInput { .. }\n        )\n    ));\n    assert_eq!(*current_calls.lock().unwrap(), 0);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3792,6 +3832,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate"
         },
         {
@@ -3809,7 +3854,7 @@
       },
       "key": {
         "anchor_text_hash": "67b092e299b4d8b9ab810a0594b7f4a30e4bcd4e7846ed9ca64ef4594d43c43c",
-        "bound_tests_set_hash": "f07681e630f830f64fa9931fc76704cc1d4b7fa5f03a6519411b4a785bd7b2ff",
+        "bound_tests_set_hash": "fdd6293a992b71baa2b6cfeae4dbf1718e82238bda2c07d56af5e7e2c02fb6bc",
         "declaration_hash": "aad71ca916b1d211041e0175f8648e37988b35f208218c29c173d4a0ead1b8ad"
       },
       "obligation_id": {
@@ -3818,7 +3863,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\n    let expected_start = evaluation_start_fingerprint();\n    assert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n\nassert!(matches!(\n        &error,\n        CatalogueImplSignalsError::EvaluationStartCapture(\n            EvaluationStartCaptureError::AuthoritativeInput { .. }\n        )\n    ));\n    assert_eq!(*current_calls.lock().unwrap(), 0);",
+        "citation": "assert_eq!(*start_calls.lock().unwrap(), 1);\nlet expected_start = evaluation_start_fingerprint();\nassert_eq!(captures.lock().unwrap().as_slice(), &[expected_start.clone(), expected_start]);\n\nassert!(matches!(\n    &error,\n    CatalogueImplSignalsError::EvaluationStartCapture(\n        EvaluationStartCaptureError::AuthoritativeInput { .. }\n    )\n));\nassert_eq!(*current_calls.lock().unwrap(), 0);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -3918,12 +3963,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -4110,7 +4160,7 @@
       },
       "key": {
         "anchor_text_hash": "63eff5938709b5e300ff4321fe8086abdca28b8aeabbf37448ec70d0172e58a7",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4119,7 +4169,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_ne!(first, second, \"tool contents are part of implementation identity\"); ... assert_ne!(first, second, \"metadata output must change the implementation cache identity\"); ... assert!(error.to_string().contains(\"evaluation-start snapshot\"), \"the export must report the evaluation-start mismatch: {error}\");",
+        "citation": "assert!(error.to_string().contains(\"domain::model::Name\"),\n                \"the diagnostic must retain the fully-qualified unresolved identity: {error}\");\n                    assert_ne!(\n                        baseline, selected_changed,\n                        \"nightly-selected {tool} content must be part of the fingerprint\"\n                    );\n                    assert_ne!(\n                        persisted.cache_key().implementation_fingerprint(),\n                        type_signals_codec::decode(&original)\n                            .unwrap()\n                            .cache_key()\n                            .implementation_fingerprint(),\n                        \"metadata output must change the implementation cache identity\"\n                    );\n            assert!(\n                error.to_string().contains(\"evaluation-start snapshot\"),\n                \"the export must report the evaluation-start mismatch: {error}\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4219,12 +4269,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -4411,7 +4466,7 @@
       },
       "key": {
         "anchor_text_hash": "70ab9ec518f3f324c3527d9c35d55fa02f4e2d1a0fe16100731d2ccea6f22649",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4420,7 +4475,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "            execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");\n\n            let signals = type_signals_codec::decode(\n                &std::fs::read_to_string(\n                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),\n                )\n                .unwrap(),\n            )\n            .unwrap();\n            assert!(\n                signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"),\n                \"the target type must survive evaluation after both external declarations resolve\"\n            );",
+        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4520,12 +4575,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -4712,7 +4772,7 @@
       },
       "key": {
         "anchor_text_hash": "1fda2a8a697b0c2917c6fa70c493722b0295ed371e9977b6edab3b0fd879124c",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -4721,7 +4781,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(*matching[0].0, rustdoc_id);\n    assert_eq!(matching[0].1.crate_id, 1); ... assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\"); ... assert_eq!(resolved_name.1.crate_id, u32::MAX - 1); ... assert!(matches!(\n                &encoded.krate().index[&fields[0]].inner,\n                ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id\n            ));",
+        "citation": "\"assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \\\"domain\\\");\"; \"assert!(!resolved_paths.values().any(|summary| summary.path == [\\\"sotp\\\", \\\"generated\\\", \\\"Name\\\"]), \\\"the bin target root must be canonicalized before the add is synthesized\\\");\"; \"assert_eq!(*matching[0].0, Id(1));\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -4821,12 +4881,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -5013,7 +5078,7 @@
       },
       "key": {
         "anchor_text_hash": "9e158f538cc5e52cfe5d57aa6cb570cafe5c4cf0514a3bfccc518d1d1497cc81",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5122,12 +5187,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -5314,7 +5384,7 @@
       },
       "key": {
         "anchor_text_hash": "2eef85d15c2fa9c4b69fd342bbfa4d426f0ce5612ef4d5e77f5ede669c1af4cf",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5423,12 +5493,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -5615,7 +5690,7 @@
       },
       "key": {
         "anchor_text_hash": "00a576c29fccb0342263855b929f4b8f15a290f428ac91bb1f33cf6f0cbeea77",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5624,7 +5699,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(resolved_name.1.crate_id, u32::MAX - 1);",
+        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -5724,12 +5799,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -5916,7 +5996,7 @@
       },
       "key": {
         "anchor_text_hash": "d20441f7fa0e41396290d2ae09681315dda964b29650a3f1314985f2de8d5580",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -5925,7 +6005,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect(\"type and trait declarations from the other layer must resolve\");\n\n            let signals = type_signals_codec::decode(\n                &std::fs::read_to_string(\n                    items_dir.join(track_id.as_ref()).join(binding.signal_file()),\n                )\n                .unwrap(),\n            )\n            .unwrap();\n            assert!(\n                signals.signals().iter().any(|signal| signal.type_name() == \"Handler\"),\n                \"the target type must survive evaluation after both external declarations resolve\"\n            );",
+        "citation": "\"expect(\\\"type and trait declarations from the other layer must resolve\\\");\" ... \"the target type must survive evaluation after both external declarations resolve\"; \"assert_eq!(matching.len(), 1, \\\"the identity must not be synthesized twice\\\");\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6025,12 +6105,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -6217,7 +6302,7 @@
       },
       "key": {
         "anchor_text_hash": "a89ffee98b1aa35fb0880562fafceed94a275da3350f97bbe1df29ab8d1b3cec",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6226,7 +6311,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, \"domain\");\n\n            let handler_id = encoded\n                .krate()\n                .paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"infrastructure\", \"Handler\"])\n                .map(|(id, _)| *id)\n                .expect(\"the target Handler must be encoded\");\n            let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {\n                panic!(\"expected Handler struct\");\n            };\n            let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {\n                panic!(\"expected Handler named fields\");\n            };\n            assert!(matches!(\n                &encoded.krate().index[&fields[0]].inner,\n                ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id\n            ));",
+        "citation": "let resolved_name = resolved_paths\n                .iter()\n                .find(|(_, summary)| summary.path == [\"domain\", \"generated\", \"Name\"])\n                .expect(\"the synthesized add must use the declaring crate root\");\n            assert_eq!(resolved_name.1.crate_id, u32::MAX - 1);\n            assert!(\n                !resolved_paths\n                    .values()\n                    .any(|summary| summary.path == [\"sotp\", \"generated\", \"Name\"]),\n                \"the bin target root must be canonicalized before the add is synthesized\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6326,12 +6411,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -6518,7 +6608,7 @@
       },
       "key": {
         "anchor_text_hash": "efc41b4365d97e62bf08fa12267ed19a6225c5e4d829c9681693b79b2dc09d21",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6527,7 +6617,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\");\n    assert_eq!(*matching[0].0, Id(1));\n    assert_eq!(matching[0].1.crate_id, 7); ... .expect_err(\"an ungrounded cross-crate reference must not use short-name fallback\"); ... .expect_err(\"a cross-layer short name must not use an external fallback\");",
+        "citation": "assert_eq!(matching.len(), 1, \"the identity must not be synthesized twice\"); ... assert_eq!(*matching[0].0, Id(1)); ... .expect_err(\"an ungrounded cross-crate reference must not use short-name fallback\"); ... .expect_err(\"a cross-layer short name must not use an external fallback\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6627,12 +6717,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -6819,7 +6914,7 @@
       },
       "key": {
         "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -6828,7 +6923,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "expect_err(\"the 65th configured layer must fail before rustdoc export\"); ... assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\"); ... \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"",
+        "citation": "let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th actual export must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -6928,12 +7023,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -7120,7 +7220,7 @@
       },
       "key": {
         "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7129,7 +7229,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
+        "citation": "let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th actual export must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7229,12 +7329,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -7421,7 +7526,7 @@
       },
       "key": {
         "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7430,7 +7535,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"the 65th configured layer must fail before rustdoc export\"; assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\"); \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"",
+        "citation": "            let error = execute_type_signals_for_layer_with_launch_observer(\n                &items_dir,\n                &track_id,\n                workspace.path(),\n                &binding,\n                &[],\n                &observer,\n            )\n            .expect_err(\"the 65th actual export must fail before rustdoc export\");\n\n            assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\n            assert!(\n                error.to_string().contains(\"64\"),\n                \"the error must identify the layer budget: {error}\"\n            );\n            assert_eq!(observer.launches(), 0, \"the layer-budget failure must precede export\");\n            assert_eq!(\n                std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n                recorded,\n                \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7530,12 +7635,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -7722,7 +7832,7 @@
       },
       "key": {
         "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -7731,7 +7841,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_ne!(\n                            baseline, selected_changed,\n                            \"nightly-selected {tool} content must be part of the fingerprint\"\n                        );\n...\nassert_eq!(\n                        proxy_changed, baseline,\n                        \"changing PATH proxy contents must not change the nightly tool fingerprint\"\n                    );",
+        "citation": "assert_eq!(persisted.cache_key(), current_cache_document(workspace.path(), &items_dir, &track_id).cache_key());\n\nassert_ne!(baseline, selected_changed, \"nightly-selected {tool} content must be part of the fingerprint\");\n\nassert_eq!(proxy_changed, baseline, \"changing PATH proxy contents must not change the nightly tool fingerprint\");\n\nassert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -7831,12 +7941,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",
@@ -8023,7 +8138,7 @@
       },
       "key": {
         "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
-        "bound_tests_set_hash": "8e8b1de852cd2b6a4ee77c11b1dc66c1c6f3250970f9dfebe1cf4836abacf530",
+        "bound_tests_set_hash": "295f7a2e0b4b600ab8cfe02b3a01f33bbc9cdfe8cf17e80e4794d4a73119d4cf",
         "declaration_hash": "f5db87a9618616369b274c538caf25f910cad9db9481ded699f1bf90de8609d1"
       },
       "obligation_id": {
@@ -8032,7 +8147,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"assert_eq!(observer.launches(), 0, \\\"cache reuse must not launch rustdoc\\\");\"; \"assert_ne!(baseline, selected_changed, \\\"nightly-selected {tool} content must be part of the fingerprint\\\");\"; \"assert_eq!(proxy_changed, baseline, \\\"changing PATH proxy contents must not change the nightly tool fingerprint\\\");\"; \"assert_ne!(second, third, \\\"nested source remains authoritative\\\");\"; \"assert_eq!(second, third, \\\"the resolved Cargo home config outside the workspace is not an identity member\\\");\"; \"assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));\"; \"assert_eq!(observer.launches(), 0, \\\"metadata failure must not launch rustdoc\\\");\"; \"assert!(error.to_string().contains(\\\"worktree changed\\\"), \\\"the cache-reuse path must report the dirty worktree: {error}\\\");\"; \"assert_ne!(first, second, \\\"feature selection changes must invalidate resolution input\\\");\"; \"assert!(error.to_string().contains(\\\"symlink guard\\\"));\"; \"assert!(error.to_string().contains(\\\"not a regular file\\\"), \\\"got: {error}\\\");\"",
+        "citation": "\"the cache-reuse path must report the dirty worktree\"; \"nightly-selected {tool} content must be part of the fingerprint\"; \"changing PATH proxy contents must not change the nightly tool fingerprint\"; \"metadata output must change the implementation cache identity\"; \"tool resolution failure must not launch rustdoc\"; \"a missing nightly-selected tool must fail before cache reuse\"; \"a changed implementation must not publish a signal artifact\"; \"a changed resolution generation must discard the result\"; \"a 65th required layer must not reuse or rewrite a recorded type-signals result\"; \"component {changed_component} must invalidate reuse\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

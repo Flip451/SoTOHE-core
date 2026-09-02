@@ -4915,6 +4915,35 @@
           "hash": "rvw1:sha256:4aa8e6a7210c207b651caeeff45fb31085980ea25c42f1d3eed0d296b85056fd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T17:02:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4abf553d745e18c35171ac9658214f9641f4c5028533f3bcffe40d21c2e31149",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T17:13:52Z",
+          "findings": [
+            {
+              "category": "resource-limit",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/rustdoc_contexts.rs",
+              "line": 254,
+              "message": "Fail on the 65th present catalogue during snapshot loading. After removing the configured-binding guard, this loop reads and retains every decoded catalogue and baseline before `execute_with_dependencies` validates the required-context count. A configuration with many catalogue-bearing layers can therefore consume effectively unbounded aggregate I/O and memory—and may fail from resource exhaustion before reaching the intended typed 64-export budget error. Incrementally count present catalogues here and reject before loading/storing the 65th baseline, while continuing to allow bindings whose catalogue is absent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4abf553d745e18c35171ac9658214f9641f4c5028533f3bcffe40d21c2e31149",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-02T17:26:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6d2f6bdc8d0b4a1dc5016fd23b522a8e9be6c0ce142757ec62e83206fe080bb",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5873,6 +5902,20 @@
           "at": "2026-09-02T15:50:22Z",
           "findings": [],
           "hash": "rvw1:sha256:7bd72b15d340ff95d700babbcbe6d18800385cd9a94046065969c5deab9dd75e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T16:59:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7d93f47f40c99bb73a48839a89007d019c1f1cef2aa4f24fd53bd7b9b909246",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T17:07:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7d93f47f40c99bb73a48839a89007d019c1f1cef2aa4f24fd53bd7b9b909246",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7744,6 +7787,20 @@
           "at": "2026-09-02T15:54:00Z",
           "findings": [],
           "hash": "rvw1:sha256:b746c81db7bdc3d60e9c014bfd1af598abd6e406888a2d5536177640110abc27",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T17:02:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a026b4b8e0fcf14fac49671834404fb0846dfac0b72a96f4f63a00acf1326a42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-02T17:12:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a026b4b8e0fcf14fac49671834404fb0846dfac0b72a96f4f63a00acf1326a42",
           "type": "final",
           "verdict": "zero_findings"
         }

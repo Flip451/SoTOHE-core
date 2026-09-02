@@ -526,6 +526,11 @@
         {
           "layer": "usecase",
           "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
           "test_name": "test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate"
         },
         {
@@ -636,12 +641,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
-          "test_name": "property_evaluator_rejects_the_65th_required_layer_before_export"
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_rejects_65th_configured_layer_before_export"
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
         },
         {
           "layer": "infrastructure",

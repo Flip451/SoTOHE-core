@@ -1,8 +1,48 @@
 //! Content and generation identity for the configured resolution inputs.
 
+use std::collections::BTreeSet;
 use std::path::Path;
 
 use super::super::EvaluateSignalsError;
+use super::{LoadedTrackCatalogues, MAX_RUSTDOC_CONTEXT_EXPORTS, TdddLayerBinding};
+
+/// Returns the distinct layers that will receive a rustdoc context for this
+/// target. A selected target is always required; other layers participate only
+/// when their catalogue was present in the authoritative resolution snapshot.
+pub(super) fn required_context_bindings<'a>(
+    configured_layers: &'a [TdddLayerBinding],
+    target_layer: &domain::tddd::LayerId,
+    loaded: &LoadedTrackCatalogues,
+) -> Result<Vec<(domain::tddd::LayerId, &'a TdddLayerBinding)>, EvaluateSignalsError> {
+    let mut required = Vec::new();
+    let mut seen = BTreeSet::new();
+    for configured_binding in configured_layers {
+        let layer = domain::tddd::LayerId::try_new(configured_binding.layer_id().to_owned())
+            .map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
+            })?;
+        if &layer != target_layer && !loaded.catalogues.contains_key(&layer) {
+            continue;
+        }
+        if seen.insert(layer.clone()) {
+            required.push((layer, configured_binding));
+        }
+    }
+    Ok(required)
+}
+
+pub(super) fn validate_context_export_count(
+    required: &[(domain::tddd::LayerId, &TdddLayerBinding)],
+) -> Result<(), EvaluateSignalsError> {
+    if required.len() > MAX_RUSTDOC_CONTEXT_EXPORTS {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "required rustdoc context export count {} exceeds the rustdoc context export budget of {}",
+            required.len(),
+            MAX_RUSTDOC_CONTEXT_EXPORTS
+        )));
+    }
+    Ok(())
+}
 
 /// Hashes the exact rules, feature declarations, catalogues, and baselines
 /// selected by the architecture configuration.
@@ -44,13 +84,6 @@ pub(crate) fn resolution_input_fingerprint(
             "cannot parse architecture-rules.json: {error}"
         ))
     })?;
-    if bindings.len() > super::MAX_RUSTDOC_CONTEXT_EXPORTS {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "configured TDDD layer count {} exceeds the rustdoc context export budget of {}",
-            bindings.len(),
-            super::MAX_RUSTDOC_CONTEXT_EXPORTS
-        )));
-    }
     for file_name in [
         super::super::TDDD_FEATURE_DECLARATION_FILE,
         super::super::TDDD_FEATURE_DECLARATION_SNAPSHOT_FILE,
@@ -62,6 +95,7 @@ pub(crate) fn resolution_input_fingerprint(
             None => encode_snapshot_bytes(&mut input, &path, None)?,
         }
     }
+    let mut catalogue_bearing_layers = 0;
     for binding in bindings {
         input.extend_from_slice(binding.layer_id().as_bytes());
         let path = track_dir.join(binding.catalogue_file());
@@ -78,6 +112,14 @@ pub(crate) fn resolution_input_fingerprint(
         };
         if !catalogue_present {
             continue;
+        }
+        catalogue_bearing_layers += 1;
+        if catalogue_bearing_layers > super::MAX_RUSTDOC_CONTEXT_EXPORTS {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "required rustdoc context export count {} exceeds the rustdoc context export budget of {}",
+                catalogue_bearing_layers,
+                super::MAX_RUSTDOC_CONTEXT_EXPORTS
+            )));
         }
         let baseline_path = track_dir.join(binding.baseline_file());
         super::reject_type_signals_path(&baseline_path, trusted_items_root, "baseline")?;

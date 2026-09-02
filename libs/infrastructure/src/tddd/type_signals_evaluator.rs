@@ -40,7 +40,7 @@ use rustdoc_contexts::{
     RustdocContextCacheKey, assemble_rustdoc_contexts_from_snapshot,
     current_implementation_fingerprint, evaluate_and_write_with_contexts,
     load_authoritative_inputs, map_rustdoc_capture_error, read_configured_catalogue,
-    reject_type_signals_path,
+    reject_type_signals_path, required_context_bindings, validate_context_export_count,
 };
 use signal_builder::{build_type_signal_identity_index, build_type_signals_from_report};
 use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag};
@@ -632,6 +632,9 @@ fn execute_with_dependencies(
                 .to_owned(),
         ));
     }
+    let required_context_bindings =
+        required_context_bindings(configured_layers, &target_layer, &loaded_catalogues)?;
+    validate_context_export_count(&required_context_bindings)?;
     let baseline_hash = loaded_catalogues
         .baselines
         .get(&target_layer)
@@ -1916,15 +1919,95 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_type_signals_rejects_65th_configured_layer_before_export() {
+    fn test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported()
+     {
+        with_process_environment_lock(|| {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+            let layers = std::iter::once(serde_json::json!({
+                "crate": "infrastructure",
+                "path": "libs/infrastructure",
+                "may_depend_on": [],
+                "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "infrastructure-types.json",
+                    "schema_export": {
+                        "method": "rustdoc",
+                        "targets": ["infrastructure"]
+                    }
+                }
+            }))
+            .chain((0..64).map(|index| {
+                serde_json::json!({
+                    "crate": format!("layer_{index}"),
+                    "path": format!("libs/layer_{index}"),
+                    "may_depend_on": [],
+                    "tddd": {
+                        "enabled": true,
+                        "catalogue_file": format!("layer_{index}-types.json"),
+                        "schema_export": {
+                            "method": "rustdoc",
+                            "targets": [format!("layer_{index}")]
+                        }
+                    }
+                })
+            }))
+            .collect::<Vec<_>>();
+            std::fs::write(
+                workspace.path().join("architecture-rules.json"),
+                serde_json::json!({ "version": 2, "layers": layers }).to_string(),
+            )
+            .unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .expect("unexported configured layers must not consume the context budget");
+
+            assert_eq!(observer.launches(), 1, "only the selected target should be exported");
+        });
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_65th_actual_export_before_export() {
         with_process_environment_lock(|| {
             let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
             let recorded =
                 write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
-            let layers = (0..65)
-                .map(|index| {
+            let layers = std::iter::once(serde_json::json!({
+                "crate": "infrastructure",
+                "path": "libs/infrastructure",
+                "may_depend_on": [],
+                "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "infrastructure-types.json",
+                    "schema_export": {
+                        "method": "rustdoc",
+                        "targets": ["infrastructure"]
+                    }
+                }
+            }))
+                .chain((0..64).map(|index| {
+                    let layer = format!("layer_{index}");
+                    let track_dir = items_dir.join(track_id.as_ref());
+                    let catalogue = format!(
+                        "{{\n  \"schema_version\": 5,\n  \"crate_name\": \"{layer}\",\n  \"layer\": \"{layer}\",\n  \"types\": {{}},\n  \"traits\": {{}},\n  \"functions\": {{}}\n}}\n"
+                    );
+                    std::fs::write(track_dir.join(format!("{layer}-types.json")), catalogue)
+                        .unwrap();
+                    std::fs::write(
+                        track_dir.join(format!("{layer}-types-baseline.json")),
+                        rustdoc_json(),
+                    )
+                    .unwrap();
                     serde_json::json!({
-                        "crate": format!("layer_{index}"),
+                        "crate": layer,
                         "path": format!("libs/layer_{index}"),
                         "may_depend_on": [],
                         "tddd": {
@@ -1936,7 +2019,7 @@ mod tests {
                             }
                         }
                     })
-                })
+                }))
                 .collect::<Vec<_>>();
             std::fs::write(
                 workspace.path().join("architecture-rules.json"),
@@ -1953,7 +2036,7 @@ mod tests {
                 &[],
                 &observer,
             )
-            .expect_err("the 65th configured layer must fail before rustdoc export");
+            .expect_err("the 65th actual export must fail before rustdoc export");
 
             assert!(matches!(error, EvaluateSignalsError::AuthoritativeInput(_)));
             assert!(

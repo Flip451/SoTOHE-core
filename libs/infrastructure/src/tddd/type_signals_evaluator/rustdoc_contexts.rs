@@ -235,14 +235,6 @@ pub(super) fn load_authoritative_inputs(
             "cannot parse architecture-rules.json: {error}"
         ))
     })?;
-    if bindings.len() > MAX_RUSTDOC_CONTEXT_EXPORTS {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "configured TDDD layer count {} exceeds the rustdoc context export budget of {}",
-            bindings.len(),
-            MAX_RUSTDOC_CONTEXT_EXPORTS
-        )));
-    }
-
     let mut fingerprint_input = Vec::new();
     encode_snapshot_bytes(&mut fingerprint_input, &rules_path, Some(&rules))?;
     for file_name in
@@ -259,6 +251,7 @@ pub(super) fn load_authoritative_inputs(
     let mut catalogues = BTreeMap::new();
     let mut baselines = BTreeMap::new();
     let mut baseline_paths = BTreeMap::new();
+    let mut catalogue_bearing_layers = 0;
     for binding in &bindings {
         let layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|error| {
             EvaluateSignalsError::authoritative_input(format!(
@@ -274,6 +267,13 @@ pub(super) fn load_authoritative_inputs(
             encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, None)?;
             continue;
         };
+        catalogue_bearing_layers += 1;
+        if catalogue_bearing_layers > MAX_RUSTDOC_CONTEXT_EXPORTS {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "required rustdoc context export count {} exceeds the rustdoc context export budget of {}",
+                catalogue_bearing_layers, MAX_RUSTDOC_CONTEXT_EXPORTS
+            )));
+        }
         encode_snapshot_bytes(&mut fingerprint_input, &catalogue_path, Some(&bytes))?;
         let name = derive_filename_stem(&catalogue_path);
         let document = AttestedCatalogueDocument::attest(&bytes, |source| {
@@ -394,6 +394,20 @@ pub(super) fn read_actual_baseline(
     Ok((baseline_json, hash))
 }
 
+pub(super) fn required_context_bindings<'a>(
+    configured_layers: &'a [TdddLayerBinding],
+    target_layer: &LayerId,
+    loaded: &LoadedTrackCatalogues,
+) -> Result<Vec<(LayerId, &'a TdddLayerBinding)>, EvaluateSignalsError> {
+    resolution_fingerprint::required_context_bindings(configured_layers, target_layer, loaded)
+}
+
+pub(super) fn validate_context_export_count(
+    required: &[(LayerId, &TdddLayerBinding)],
+) -> Result<(), EvaluateSignalsError> {
+    resolution_fingerprint::validate_context_export_count(required)
+}
+
 /// Assembles contexts from the already-captured authoritative input snapshot.
 /// No catalogue, baseline, or current rustdoc path is read by this function.
 pub(super) fn assemble_rustdoc_contexts_from_snapshot(
@@ -405,23 +419,11 @@ pub(super) fn assemble_rustdoc_contexts_from_snapshot(
     feature_selections: &BTreeMap<LayerId, Vec<CargoFeatureName>>,
     rustdoc: &impl RustdocProvider,
 ) -> Result<AssembledRustdocContexts, EvaluateSignalsError> {
-    if configured_layers.len() > MAX_RUSTDOC_CONTEXT_EXPORTS {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "configured TDDD layer count {} exceeds the rustdoc context export budget of {}",
-            configured_layers.len(),
-            MAX_RUSTDOC_CONTEXT_EXPORTS
-        )));
-    }
+    let required_bindings = required_context_bindings(configured_layers, target_layer, loaded)?;
+    validate_context_export_count(&required_bindings)?;
     let mut contexts = BTreeMap::new();
     let mut baseline_snapshots = BTreeMap::new();
-    for configured_binding in configured_layers {
-        let layer =
-            LayerId::try_new(configured_binding.layer_id().to_owned()).map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!("invalid layer id: {error}"))
-            })?;
-        if &layer != target_layer && !loaded.catalogues.contains_key(&layer) {
-            continue;
-        }
+    for (layer, configured_binding) in required_bindings {
         let baseline = loaded.baselines.get(&layer).ok_or_else(|| {
             EvaluateSignalsError::authoritative_input(format!(
                 "baseline snapshot for configured layer '{layer}' is unavailable"

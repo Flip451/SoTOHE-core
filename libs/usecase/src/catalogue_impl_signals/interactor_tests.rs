@@ -82,7 +82,11 @@ fn decode_test_rustdoc(bytes: &[u8]) -> Result<Crate, RustdocCratePortError> {
 }
 
 fn captured_rustdoc(crate_data: Crate) -> CapturedRustdocJson {
-    let bytes = serde_json::to_vec(&crate_data).unwrap();
+    // serde_json serializes the rustdoc graph's HashMaps in their iteration
+    // order. Canonicalize through its default ordered JSON object map so
+    // repeated loads of the same logical fixture have the same byte hash.
+    let value = serde_json::to_value(crate_data).unwrap();
+    let bytes = serde_json::to_vec(&value).unwrap();
     construct_captured_rustdoc_json(&bytes, decode_test_rustdoc).unwrap()
 }
 
@@ -1082,6 +1086,43 @@ impl AttestedCatalogueDocumentLoaderPort for ChangingHashCatalogueLoader {
             Ok::<_, std::convert::Infallible>(self.document.clone())
         })
         .unwrap())
+    }
+}
+
+struct ChangingBaselineRustdocPort {
+    load_calls: Arc<Mutex<usize>>,
+    current_calls: Arc<Mutex<usize>>,
+}
+
+impl RustdocCratePort for ChangingBaselineRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError> {
+        let call = {
+            let mut calls = self.load_calls.lock().unwrap();
+            *calls += 1;
+            *calls
+        };
+        let mut baseline = empty_rustdoc_crate();
+        baseline.crate_version =
+            Some(if call == 1 { "baseline-a" } else { "baseline-b" }.to_owned());
+        Ok(captured_rustdoc(baseline))
+    }
+
+    fn capture_current(
+        &self,
+        crate_name: &CrateName,
+        _features: &[CargoFeatureName],
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError> {
+        *self.current_calls.lock().unwrap() += 1;
+        Ok(current_rustdoc(crate_name, empty_rustdoc_crate(), evaluation_start))
+    }
+}
+
+impl EvaluationStartCapturePort for ChangingBaselineRustdocPort {
+    fn capture_evaluation_start(
+        &self,
+    ) -> Result<ImplementationFingerprint, EvaluationStartCaptureError> {
+        Ok(evaluation_start_fingerprint())
     }
 }
 
@@ -2367,6 +2408,44 @@ fn test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread() {
         *calls.lock().unwrap(),
         2,
         "the first set-level validation must reject the changed re-read before later I/O"
+    );
+}
+
+#[test]
+fn test_run_rejects_baseline_set_when_json_hash_changes_on_reread() {
+    let load_calls = Arc::new(Mutex::new(0));
+    let current_calls = Arc::new(Mutex::new(0));
+    let interactor = build_interactor(
+        Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(ChangingBaselineRustdocPort {
+            load_calls: Arc::clone(&load_calls),
+            current_calls: Arc::clone(&current_calls),
+        }),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+    );
+
+    let error =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+
+    assert!(
+        matches!(
+            &error,
+            CatalogueImplSignalsError::BaselineLoad(layer, reason)
+                if layer.as_ref() == "domain" && reason.as_str().contains("JSON hash changed")
+        ),
+        "a changed baseline generation must fail closed: {error:?}"
+    );
+    assert_eq!(
+        *load_calls.lock().unwrap(),
+        2,
+        "the first set-level baseline validation must reject the changed re-read"
+    );
+    assert_eq!(
+        *current_calls.lock().unwrap(),
+        0,
+        "current rustdoc capture must wait for a stable baseline set"
     );
 }
 

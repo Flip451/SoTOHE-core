@@ -17,7 +17,9 @@ use domain::tddd::catalogue_v2::{
     RustdocCratePort, TdddLayerBindingsPort,
 };
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
-use domain::tddd::{AuthoritativeRustdocContext, CatalogueToExtendedCratePort};
+use domain::tddd::{
+    AuthoritativeRustdocContext, CapturedRustdocJson, CatalogueToExtendedCratePort,
+};
 
 use super::helpers::{map_symlink_guard_error, validate_binding_filename};
 use super::ports::EvaluationStartCapturePort;
@@ -148,6 +150,35 @@ impl CatalogueImplSignalsInteractor {
                         diagnostic(error.to_string()),
                     ));
                 }
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_baseline_set(
+        &self,
+        items_dir: &Path,
+        loaded_baselines: &BTreeMap<LayerId, (PathBuf, CapturedRustdocJson)>,
+    ) -> Result<(), CatalogueImplSignalsError> {
+        for (layer, (baseline_path, expected)) in loaded_baselines {
+            self.symlink_guard
+                .reject_symlinks_below(baseline_path, items_dir)
+                .map_err(map_symlink_guard_error)?;
+            let current =
+                self.rustdoc_crate_port.load_from_path(baseline_path).map_err(|error| {
+                    CatalogueImplSignalsError::BaselineLoad(
+                        layer.clone(),
+                        diagnostic(error.to_string()),
+                    )
+                })?;
+            if current.json_hash() != expected.json_hash() {
+                return Err(CatalogueImplSignalsError::BaselineLoad(
+                    layer.clone(),
+                    diagnostic(format!(
+                        "baseline JSON hash changed while validating the stable set at '{}'",
+                        baseline_path.display()
+                    )),
+                ));
             }
         }
         Ok(())
@@ -364,7 +395,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         // Load every configured layer's authoritative rustdoc pair once before
         // any catalogue is encoded. The codec needs the declaring layer's
         // current paths when it places cross-layer add declarations.
-        let mut rustdoc_contexts = BTreeMap::new();
+        let mut loaded_baselines = BTreeMap::<LayerId, (PathBuf, CapturedRustdocJson)>::new();
         for binding in export_plan.export_bindings() {
             let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
                 CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
@@ -381,6 +412,23 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                 CatalogueImplSignalsError::BaselineLoad(
                     typed_layer_id.clone(),
                     diagnostic(e.to_string()),
+                )
+            })?;
+            loaded_baselines.insert(typed_layer_id, (baseline_path, baseline));
+        }
+        self.validate_baseline_set(&items_dir, &loaded_baselines)?;
+
+        let mut rustdoc_contexts = BTreeMap::new();
+        for binding in export_plan.export_bindings() {
+            let typed_layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                    "invalid layer binding: {error}"
+                )))
+            })?;
+            let (_, baseline) = loaded_baselines.get(&typed_layer_id).ok_or_else(|| {
+                CatalogueImplSignalsError::BaselineLoad(
+                    typed_layer_id.clone(),
+                    diagnostic("baseline was not retained in the authoritative baseline set"),
                 )
             })?;
 
@@ -528,6 +576,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             &declaration_bindings,
             &attested_catalogues,
         )?;
+        self.validate_baseline_set(&items_dir, &loaded_baselines)?;
         Ok(CatalogueImplSignalsReport { text: report, any_red: total_red > 0 })
     }
 }

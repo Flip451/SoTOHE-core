@@ -1,9 +1,9 @@
 {
   "baseline_hash": "a88bb82bbd00999937b1b234cdd53ff0e326ff69bf2750f2ad6e43fb44d20f64",
   "declaration_hash": "41b51b979d5d9fa3fc9cf8fce4f4296f86b8a75d41f8b64e48bf7b23e34bebbb",
-  "generated_at": "2026-09-02T15:57:13Z",
-  "head_commit": "96a162c0e694970c6b4bd69d7e05ed91aa0429b8",
-  "implementation_fingerprint": "50a0170e4a0a12c87881cb479388ad2c0b8c2e8bcadd4677785c407c74d6f1a8",
+  "generated_at": "2026-09-02T17:30:02Z",
+  "head_commit": "e871a8f65991d98c10b7b0bbb212dbeaa916ff85",
+  "implementation_fingerprint": "52b25da895e8b35966483a197187972245b7eb1a8182258f96e0380f300a370a",
   "resolution_fingerprint": "5a31bb99af3b80a0c6979b395b9dfa4dace08b5a9529b4133e597439fb028d00",
   "rustdoc_execution_identity": {
     "crate_name": "infrastructure",
