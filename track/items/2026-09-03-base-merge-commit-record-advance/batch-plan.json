@@ -31,9 +31,9 @@
       "task_id": "T2",
       "scope_estimates": [
         {
-          "scope": "usecase",
-          "production_lines": 20,
-          "test_lines": 60
+          "scope": "harness-policy",
+          "production_lines": 12,
+          "test_lines": 0
         }
       ]
     }
@@ -42,12 +42,7 @@
     {
       "id": "BATCH-001",
       "task_ids": [
-        "T1"
-      ]
-    },
-    {
-      "id": "BATCH-002",
-      "task_ids": [
+        "T1",
         "T2"
       ]
     }

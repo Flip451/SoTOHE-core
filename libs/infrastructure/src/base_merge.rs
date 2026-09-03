@@ -565,6 +565,18 @@ mod tests {
     use std::sync::Arc;
 
     use domain::{BranchStrategySnapshot, MergeMethod, NonEmptyString, TrackMetadata};
+    use usecase::track_lifecycle::TrackCommitHashPort;
+
+    struct NoopCommitRecord;
+
+    impl TrackCommitHashPort for NoopCommitRecord {
+        fn persist_current_for_track(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<CommitHash, DiagnosticText> {
+            Ok(CommitHash::try_new("0123456789abcdef").unwrap())
+        }
+    }
 
     fn copy_cleanup_inputs(
         source_workspace: &Path,
@@ -1805,6 +1817,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
                 FixtureBaselineCapture,
             ))),
+            Arc::new(NoopCommitRecord),
         );
 
         let result = usecase::base_merge::BaseMergeService::execute(
@@ -1842,6 +1855,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
                 Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
                     FixtureBaselineCapture,
                 ))),
+                Arc::new(NoopCommitRecord),
             );
             usecase::base_merge::BaseMergeService::execute(
                 &interactor,
@@ -1969,6 +1983,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
                 FixtureBaselineCapture,
             ))),
+            Arc::new(NoopCommitRecord),
         );
 
         let result = usecase::base_merge::BaseMergeService::execute(
@@ -2008,6 +2023,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             Arc::new(FixedCleanupContext),
             Arc::new(CleanCleanupGit),
             Arc::new(FsBaseMergeCleanupAdapter::new()),
+            Arc::new(NoopCommitRecord),
         );
 
         let result = usecase::base_merge::BaseMergeService::execute(
@@ -2046,6 +2062,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             Arc::new(FixedCleanupContext),
             Arc::new(ConflictedCleanupGit { base_commit: base_commit.clone() }),
             Arc::clone(&cleanup) as Arc<dyn BaseMergeCleanupPort>,
+            Arc::new(NoopCommitRecord),
         );
 
         let outcome = usecase::base_merge::BaseMergeService::execute(
@@ -2100,6 +2117,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
                 FixtureBaselineCapture,
             ))),
+            Arc::new(NoopCommitRecord),
         );
 
         assert_eq!(

@@ -1,4 +1,389 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "feb6b0ca0b473999cdaac321a242a8d602faa10b646a442ca87fbe09268da04b",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(recorded_hashes.lock().unwrap().as_slice(), &[CommitHash::try_new(\"0123456789abcdef\").unwrap()]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "4bb386735f32b89eb650b14eab3165855cbe42754269049e67d5b81f31f48046",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))\n                if detail.as_str() == \"commit record failed\"\n        ));\nassert_eq!(\n            cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>(),\n            vec![CleanupStage::Baseline, CleanupStage::Views]\n        );\nassert_eq!(\n            commit_record_calls.lock().unwrap().as_slice(),\n            &[TrackId::try_new(\"merge-track\").unwrap()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "ae1cf233ecd99e9fe9d8e443789d53799d2183a956d0505d988d89ab98326112",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))\n                if detail.as_str() == \"commit record failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "2067445151ae2ddfa8c0905a09746cc1c0302f1efc1ec0387a61847b703a6049",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(commit_record_calls.lock().unwrap().as_slice(),\n            &[TrackId::try_new(\"merge-track\").unwrap()]\n        );\n        assert_eq!(\n            recorded_hashes.lock().unwrap().as_slice(),\n            &[CommitHash::try_new(\"0123456789abcdef\").unwrap()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "dca9c25d67de6a572d78c043ed4f86ea7fcf0ece41edf93cb9b2a0903ddff658",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))\n                if detail.as_str() == \"commit record failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "b17e54d357fdde3149dc95d73282d74ed260a3c707d5368291d213b01a4e5ea0",
+        "bound_tests_set_hash": "3d103ac71087a1d225b76534aec92366915b596dc7b681db823896ff646a9a24",
+        "declaration_hash": "4a7680276332d495c1d0ef8ea395ac933334ff91ad0030befa701b710803c142"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            git_operations.as_slice(),\n            &[GitOperation::MergeBase, GitOperation::TrackStateRewrite]\n        );\n        assert!(\n            !git_operations.contains(&GitOperation::CreateCommit),\n            \"the commit-record update must not create a Git commit: {git_operations:?}\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::PostMergeCleanupError"
+      },
+      "key": {
+        "anchor_text_hash": "4bb386735f32b89eb650b14eab3165855cbe42754269049e67d5b81f31f48046",
+        "bound_tests_set_hash": "f64046c3e50797c17e6d327ac3b0babf3ced005a16e3ae98e066201519721d7a",
+        "declaration_hash": "29cccca88c63738c0a6ec34f7b687e978f071432b4481139d71123096cf4f35d"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>(),\n            vec![CleanupStage::Baseline, CleanupStage::Views]\n        );\n        assert_eq!(\n            commit_record_calls.lock().unwrap().as_slice(),\n            &[TrackId::try_new(\"merge-track\").unwrap()]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::PostMergeCleanupError"
+      },
+      "key": {
+        "anchor_text_hash": "ae1cf233ecd99e9fe9d8e443789d53799d2183a956d0505d988d89ab98326112",
+        "bound_tests_set_hash": "f64046c3e50797c17e6d327ac3b0babf3ced005a16e3ae98e066201519721d7a",
+        "declaration_hash": "d1ccf603f22872973be131d456ea2b73b94155d0ceefa3dd278317ac2eae5c72"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))\n                if detail.as_str() == \"commit record failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::PostMergeCleanupError"
+      },
+      "key": {
+        "anchor_text_hash": "dca9c25d67de6a572d78c043ed4f86ea7fcf0ece41edf93cb9b2a0903ddff658",
+        "bound_tests_set_hash": "f64046c3e50797c17e6d327ac3b0babf3ced005a16e3ae98e066201519721d7a",
+        "declaration_hash": "8f4594896cba3e6232bcc7bf48101b1ef5e2b91559fd11f9aaf5e1c3eba1e34a"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))\n                if detail.as_str() == \"commit record failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
   "track_id": "2026-09-03-base-merge-commit-record-advance"
 }

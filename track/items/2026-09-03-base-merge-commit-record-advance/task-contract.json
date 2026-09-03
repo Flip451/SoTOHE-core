@@ -31,7 +31,23 @@
     "T2": [
       {
         "layer": "usecase",
-        "entry_key": "usecase::base_merge::BaseMergeInteractor"
+        "entry_key": "TrackSetCommitHashService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TrackCommitHashPort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::ids::TrackId"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::ids::CommitHash"
       }
     ]
   }

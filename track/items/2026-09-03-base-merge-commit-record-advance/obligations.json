@@ -2,7 +2,7 @@
   "obligations": [
     {
       "brief": "Author a result test covering 'entry' of usecase::base_merge::BaseMergeInteractor",
-      "declaration_hash": "fa3ae69fb031c703195e903bb8a246767ff81d2a377daf5af48301bbf6a69b7b",
+      "declaration_hash": "74cf36d6970ae52ef0b7348422630686c604e73c80cc90696bc1e8f784eef4a7",
       "id": {
         "entry_key": "usecase::base_merge::BaseMergeInteractor",
         "item_identifier": "entry",
@@ -11,14 +11,6 @@
       "spec_refs": [
         {
           "element_id": "IN-01",
-          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
-        },
-        {
-          "element_id": "IN-02",
-          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
-        },
-        {
-          "element_id": "CN-01",
           "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
         },
         {
@@ -31,10 +23,6 @@
         },
         {
           "element_id": "AC-01",
-          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
-        },
-        {
-          "element_id": "AC-02",
           "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
         },
         {

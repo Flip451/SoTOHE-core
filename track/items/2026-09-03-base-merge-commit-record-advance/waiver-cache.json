@@ -1,4 +1,53 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::PostMergeCleanupError"
+      },
+      "key": {
+        "anchor_text_hash": "2067445151ae2ddfa8c0905a09746cc1c0302f1efc1ec0387a61847b703a6049",
+        "declaration_hash": "a9a93aedb8ebb9afe885b1f7b05edfa5fbb846e6bab053faf65979553e6b1856",
+        "waived_reason_hash": "15fb4668815d958d4c4f3a80b6a6e790316a6f2ee66e3279ad6605509aa74e6e"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Failure union for the ordered post-merge cleanup stages.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        "entry_key": "usecase::base_merge::PostMergeCleanupError"
+      },
+      "key": {
+        "anchor_text_hash": "08f5beaab19ce4b28d4c363837e8a656be4cd576f0a1a54e16b4c13fcea74381",
+        "declaration_hash": "4a795e23725d5c3eeca08a8ef73ce71e4279509978447855902f3c432cca08ce",
+        "waived_reason_hash": "37d12dd927c5783fa4ac2e8623733dcde082986ca0b509fedf18376e3b1827b6"
+      },
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Failure union for the ordered post-merge cleanup stages.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
   "track_id": "2026-09-03-base-merge-commit-record-advance"
 }

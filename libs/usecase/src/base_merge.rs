@@ -11,6 +11,7 @@ use domain::{CommitHash, TrackBranch, TrackId};
 use thiserror::Error;
 
 use crate::git_workflow::DiagnosticText;
+use crate::track_lifecycle::TrackCommitHashPort;
 
 /// Pre-cleanup result returned by the git-process port.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -119,6 +120,9 @@ pub enum PostMergeCleanupError {
     /// Baseline replacement failed.
     #[error("baseline replacement failed: {0}")]
     Baseline(BaselineReplacementError),
+    /// Commit-record advancement failed.
+    #[error("commit-record update failed: {0}")]
+    CommitRecord(DiagnosticText),
 }
 
 /// Error returned by [`BaseMergeService::execute`].
@@ -229,6 +233,7 @@ pub struct BaseMergeInteractor {
     context: Arc<dyn BaseMergeContextPort>,
     git: Arc<dyn BaseMergeGitPort>,
     cleanup: Arc<dyn BaseMergeCleanupPort>,
+    commit_record: Arc<dyn TrackCommitHashPort>,
 }
 
 impl BaseMergeInteractor {
@@ -238,8 +243,9 @@ impl BaseMergeInteractor {
         context: Arc<dyn BaseMergeContextPort>,
         git: Arc<dyn BaseMergeGitPort>,
         cleanup: Arc<dyn BaseMergeCleanupPort>,
+        commit_record: Arc<dyn TrackCommitHashPort>,
     ) -> Self {
-        Self { context, git, cleanup }
+        Self { context, git, cleanup, commit_record }
     }
 }
 
@@ -279,6 +285,11 @@ impl BaseMergeService for BaseMergeInteractor {
                 self.cleanup.regenerate_views(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
                 })?;
+                self.commit_record.persist_current_for_track(&request.track_id).map_err(
+                    |error| {
+                        BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(error))
+                    },
+                )?;
                 Ok(BaseMergeOutcome::Completed)
             }
         }
@@ -429,6 +440,13 @@ mod tests {
         target: String,
     }
 
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    enum GitOperation {
+        MergeBase,
+        TrackStateRewrite,
+        CreateCommit,
+    }
+
     impl BaseMergeGitPort for RecordingGit {
         fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
             Ok(())
@@ -455,6 +473,36 @@ mod tests {
                     Err(BaseMergeGitError::Execution(DiagnosticText::new("git failed")))
                 }
             }
+        }
+    }
+
+    struct RecordingGitWithOperations {
+        git: RecordingGit,
+        operations: Arc<Mutex<Vec<GitOperation>>>,
+    }
+
+    impl RecordingGitWithOperations {
+        fn new(
+            response: GitResponse,
+            calls: Arc<Mutex<Vec<MergeCall>>>,
+            operations: Arc<Mutex<Vec<GitOperation>>>,
+        ) -> Self {
+            Self { git: RecordingGit { response, calls }, operations }
+        }
+    }
+
+    impl BaseMergeGitPort for RecordingGitWithOperations {
+        fn ensure_worktree_clean(&self, workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            self.git.ensure_worktree_clean(workspace_root)
+        }
+
+        fn merge_base(
+            &self,
+            workspace_root: &Path,
+            direction: &BaseMergeDirection,
+        ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
+            self.operations.lock().unwrap().push(GitOperation::MergeBase);
+            self.git.merge_base(workspace_root, direction)
         }
     }
 
@@ -584,6 +632,55 @@ mod tests {
         }
     }
 
+    struct NoopCommitRecord;
+
+    impl TrackCommitHashPort for NoopCommitRecord {
+        fn persist_current_for_track(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<CommitHash, DiagnosticText> {
+            Ok(CommitHash::try_new("0123456789abcdef").unwrap())
+        }
+    }
+
+    fn noop_commit_record() -> Arc<dyn TrackCommitHashPort> {
+        Arc::new(NoopCommitRecord)
+    }
+
+    struct RecordingCommitRecord {
+        cleanup_calls: Arc<Mutex<Vec<CleanupCall>>>,
+        operations: Arc<Mutex<Vec<GitOperation>>>,
+        calls: Arc<Mutex<Vec<TrackId>>>,
+        recorded_hashes: Arc<Mutex<Vec<CommitHash>>>,
+        result: Result<CommitHash, DiagnosticText>,
+    }
+
+    impl TrackCommitHashPort for RecordingCommitRecord {
+        fn persist_current_for_track(
+            &self,
+            track_id: &TrackId,
+        ) -> Result<CommitHash, DiagnosticText> {
+            assert_eq!(
+                self.cleanup_calls
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .map(|call| call.stage)
+                    .collect::<Vec<_>>(),
+                vec![CleanupStage::Baseline, CleanupStage::Views]
+            );
+            let result = self.result.clone();
+            if result.is_ok() {
+                self.operations.lock().unwrap().push(GitOperation::TrackStateRewrite);
+            }
+            self.calls.lock().unwrap().push(track_id.clone());
+            if let Ok(hash) = &result {
+                self.recorded_hashes.lock().unwrap().push(hash.clone());
+            }
+            result
+        }
+    }
+
     struct StatefulCleanup {
         state: Arc<Mutex<StatefulCleanupState>>,
         baseline_failure: Option<BaselineFailure>,
@@ -709,6 +806,7 @@ mod tests {
             )),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let outcome = interactor.execute(command()).unwrap();
@@ -733,6 +831,118 @@ mod tests {
     }
 
     #[test]
+    fn test_base_merge_execute_clean_persists_commit_record_after_views() {
+        let git_calls = Arc::new(Mutex::new(Vec::new()));
+        let git_operations = Arc::new(Mutex::new(Vec::new()));
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let commit_record_calls = Arc::new(Mutex::new(Vec::new()));
+        let recorded_hashes = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(RecordingGitWithOperations::new(
+                GitResponse::Clean,
+                Arc::clone(&git_calls),
+                Arc::clone(&git_operations),
+            )),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            Arc::new(RecordingCommitRecord {
+                cleanup_calls: Arc::clone(&cleanup_calls),
+                operations: Arc::clone(&git_operations),
+                calls: Arc::clone(&commit_record_calls),
+                recorded_hashes: Arc::clone(&recorded_hashes),
+                result: Ok(CommitHash::try_new("0123456789abcdef").unwrap()),
+            }),
+        );
+
+        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
+        assert_eq!(
+            git_calls.lock().unwrap().as_slice(),
+            &[MergeCall {
+                workspace_root: PathBuf::from("/workspace"),
+                source: "snapshot-base".to_owned(),
+                target: "track/merge-track".to_owned(),
+            }]
+        );
+        let git_operations = git_operations.lock().unwrap();
+        assert_eq!(
+            git_operations.as_slice(),
+            &[GitOperation::MergeBase, GitOperation::TrackStateRewrite]
+        );
+        assert!(
+            !git_operations.contains(&GitOperation::CreateCommit),
+            "the commit-record update must not create a Git commit: {git_operations:?}"
+        );
+        assert_eq!(
+            cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>(),
+            vec![CleanupStage::Baseline, CleanupStage::Views]
+        );
+        assert_eq!(
+            commit_record_calls.lock().unwrap().as_slice(),
+            &[TrackId::try_new("merge-track").unwrap()]
+        );
+        assert_eq!(
+            recorded_hashes.lock().unwrap().as_slice(),
+            &[CommitHash::try_new("0123456789abcdef").unwrap()]
+        );
+    }
+
+    #[test]
+    fn test_base_merge_execute_clean_commit_record_failure_is_fail_closed() {
+        let git_calls = Arc::new(Mutex::new(Vec::new()));
+        let git_operations = Arc::new(Mutex::new(Vec::new()));
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let commit_record_calls = Arc::new(Mutex::new(Vec::new()));
+        let recorded_hashes = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(RecordingGitWithOperations::new(
+                GitResponse::Clean,
+                Arc::clone(&git_calls),
+                Arc::clone(&git_operations),
+            )),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            Arc::new(RecordingCommitRecord {
+                cleanup_calls: Arc::clone(&cleanup_calls),
+                operations: Arc::clone(&git_operations),
+                calls: Arc::clone(&commit_record_calls),
+                recorded_hashes: Arc::clone(&recorded_hashes),
+                result: Err(DiagnosticText::new("commit record failed")),
+            }),
+        );
+
+        let result = interactor.execute(command());
+
+        assert!(matches!(
+            result,
+            Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::CommitRecord(detail)))
+                if detail.as_str() == "commit record failed"
+        ));
+        assert_eq!(
+            git_calls.lock().unwrap().as_slice(),
+            &[MergeCall {
+                workspace_root: PathBuf::from("/workspace"),
+                source: "snapshot-base".to_owned(),
+                target: "track/merge-track".to_owned(),
+            }]
+        );
+        let git_operations = git_operations.lock().unwrap();
+        assert_eq!(git_operations.as_slice(), &[GitOperation::MergeBase]);
+        assert!(
+            !git_operations.contains(&GitOperation::CreateCommit),
+            "the failed commit-record update must not create a Git commit: {git_operations:?}"
+        );
+        assert_eq!(
+            cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>(),
+            vec![CleanupStage::Baseline, CleanupStage::Views]
+        );
+        assert_eq!(
+            commit_record_calls.lock().unwrap().as_slice(),
+            &[TrackId::try_new("merge-track").unwrap()]
+        );
+        assert!(recorded_hashes.lock().unwrap().is_empty());
+    }
+
+    #[test]
     fn test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request() {
         let git_calls = Arc::new(Mutex::new(Vec::new()));
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
@@ -744,6 +954,7 @@ mod tests {
                 calls: Arc::clone(&git_calls),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let outcome = interactor.execute(command()).unwrap();
@@ -774,6 +985,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
@@ -785,16 +997,28 @@ mod tests {
     }
 
     #[test]
-    fn test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views() {
+    fn test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record()
+     {
         let git_calls = Arc::new(Mutex::new(Vec::new()));
+        let git_operations = Arc::new(Mutex::new(Vec::new()));
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let commit_record_calls = Arc::new(Mutex::new(Vec::new()));
+        let recorded_hashes = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
             Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(RecordingGit {
-                response: GitResponse::Conflict,
-                calls: Arc::clone(&git_calls),
-            }),
+            Arc::new(RecordingGitWithOperations::new(
+                GitResponse::Conflict,
+                Arc::clone(&git_calls),
+                Arc::clone(&git_operations),
+            )),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            Arc::new(RecordingCommitRecord {
+                cleanup_calls: Arc::clone(&cleanup_calls),
+                operations: Arc::clone(&git_operations),
+                calls: Arc::clone(&commit_record_calls),
+                recorded_hashes: Arc::clone(&recorded_hashes),
+                result: Ok(CommitHash::try_new("fedcba9876543210").unwrap()),
+            }),
         );
 
         let outcome = interactor.execute(command()).unwrap();
@@ -808,6 +1032,9 @@ mod tests {
                 CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
             ]
         );
+        assert_eq!(git_operations.lock().unwrap().as_slice(), &[GitOperation::MergeBase]);
+        assert!(commit_record_calls.lock().unwrap().is_empty());
+        assert!(recorded_hashes.lock().unwrap().is_empty());
     }
 
     #[test]
@@ -821,6 +1048,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Conflicted);
@@ -848,6 +1076,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), Some(BaselineFailure::Generation)),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -879,6 +1108,7 @@ mod tests {
                 calls: Arc::clone(&cleanup_calls),
                 failure: Some(CleanupStage::Views),
             }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -905,6 +1135,7 @@ mod tests {
             Arc::new(UnavailableContext),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -924,6 +1155,7 @@ mod tests {
             Arc::new(MismatchedContext),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -942,6 +1174,7 @@ mod tests {
             Arc::new(SnapshotSourceMismatchContext),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -960,6 +1193,7 @@ mod tests {
             Arc::new(ReverseDirectionContext),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -978,6 +1212,7 @@ mod tests {
             Arc::new(NonTrackContext),
             Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -1003,6 +1238,7 @@ mod tests {
                 merge_calls: Arc::clone(&merge_calls),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -1027,6 +1263,7 @@ mod tests {
                 merge_calls: Arc::clone(&merge_calls),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -1048,6 +1285,7 @@ mod tests {
                 calls: Arc::clone(&git_calls),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let error = interactor.execute(command()).unwrap_err();
@@ -1075,6 +1313,7 @@ mod tests {
                     calls: Arc::clone(&cleanup_calls),
                     failure: Some(failure),
                 }),
+                noop_commit_record(),
             );
 
             let error = interactor.execute(command()).unwrap_err();
@@ -1127,6 +1366,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), None),
+            noop_commit_record(),
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
@@ -1146,6 +1386,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), Some(BaselineFailure::Isolation)),
+            noop_commit_record(),
         );
 
         let result = interactor.execute(command());
@@ -1175,6 +1416,7 @@ mod tests {
                     calls: Arc::new(Mutex::new(Vec::new())),
                 }),
                 stateful_cleanup(Arc::clone(&state), Some(failure)),
+                noop_commit_record(),
             );
 
             let result = interactor.execute(command());
@@ -1224,6 +1466,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), None),
+            noop_commit_record(),
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
@@ -1252,6 +1495,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Conflicted);
@@ -1274,6 +1518,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), Some(BaselineFailure::Generation)),
+            noop_commit_record(),
         );
 
         let result = interactor.execute(command());
@@ -1340,6 +1585,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             stateful_cleanup(Arc::clone(&state), None),
+            noop_commit_record(),
         );
 
         let outcome = interactor.execute(command()).unwrap();
@@ -1361,6 +1607,7 @@ mod tests {
                 calls: Arc::new(Mutex::new(Vec::new())),
             }),
             Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+            noop_commit_record(),
         );
 
         let outcome = interactor.execute(command()).unwrap();
@@ -1390,6 +1637,11 @@ mod tests {
             )),
             PostMergeCleanupError::Baseline(BaselineReplacementError::Validation(detail))
                 if detail.as_str() == "baseline failed"
+        ));
+        assert!(matches!(
+            PostMergeCleanupError::CommitRecord(DiagnosticText::new("commit record failed")),
+            PostMergeCleanupError::CommitRecord(detail)
+                if detail.as_str() == "commit record failed"
         ));
     }
 }
