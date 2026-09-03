@@ -1675,7 +1675,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         .as_digest()
         .as_str()
         .to_owned();
-    let signal_file = serde_json::json!({
+    let mut signal_file = serde_json::json!({
         "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
@@ -1691,6 +1691,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
             }
         ],
     });
+    crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut signal_file);
     std::fs::write(
         track_dir.join("domain-type-signals.json"),
         serde_json::to_string_pretty(&signal_file).unwrap(),
@@ -1740,7 +1741,7 @@ fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
     std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline_bytes).unwrap();
 
     let write_signal_file = |baseline_hash: String| {
-        let signal_file = serde_json::json!({
+        let mut signal_file = serde_json::json!({
             "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-19T00:00:00Z",
             "declaration_hash": declaration_hash.clone(),
@@ -1756,6 +1757,7 @@ fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
                 }
             ],
         });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut signal_file);
         std::fs::write(
             track_dir.join("domain-type-signals.json"),
             serde_json::to_string_pretty(&signal_file).unwrap(),

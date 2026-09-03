@@ -134,8 +134,9 @@ mod tests {
     use crate::tddd::catalogue_linter::FreeText;
     use crate::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use crate::tddd::type_signals_doc::{
-        BaselineHash, CatalogueDeclarationHash, Sha256Digest, TypeSignalsCacheKey,
-        TypeSignalsDocument,
+        BaselineHash, CargoProfileName, CatalogueDeclarationHash, ExpectedRustdocJsonPath,
+        ImplementationFingerprint, ResolutionFingerprint, ResolvedCargoTargetDirectory,
+        RustdocExecutionIdentity, Sha256Digest, TypeSignalsCacheKey, TypeSignalsDocument,
     };
 
     fn ts() -> Timestamp {
@@ -159,12 +160,30 @@ mod tests {
             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_owned(),
         )
         .unwrap();
+        let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-consistency-target",
+        ))
+        .unwrap();
+        let expected =
+            ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
+                .unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            crate::tddd::catalogue_v2::CrateName::new("domain").unwrap(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
         TypeSignalsDocument::new(
             ts(),
             TypeSignalsCacheKey::new(
                 CatalogueDeclarationHash::new(digest.clone()),
                 CommitHash::try_new("a".repeat(40)).unwrap(),
                 BaselineHash::new(digest),
+                ImplementationFingerprint::new(Sha256Digest::try_new("b".repeat(64)).unwrap()),
+                ResolutionFingerprint::new(Sha256Digest::try_new("c".repeat(64)).unwrap()),
+                identity,
             ),
             signals,
         )

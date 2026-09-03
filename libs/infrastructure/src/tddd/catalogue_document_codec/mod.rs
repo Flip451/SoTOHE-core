@@ -1973,7 +1973,6 @@ mod tests {
         assert_eq!(doc, doc2, "keyword generic context must round-trip for non-alias entries");
         // The acceptance must survive the full DTO-to-evaluator flow: the
         // structural encoder processes bounds / returns with the same context.
-        use domain::tddd::CatalogueToExtendedCratePort;
         let mut paths = std::collections::HashMap::new();
         paths.insert(
             rustdoc_types::Id(2),
@@ -2001,9 +2000,12 @@ mod tests {
             format_version: rustdoc_types::FORMAT_VERSION,
             target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
         };
-        crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-            .encode(doc2, &authoritative, &authoritative)
-            .expect("keyword generic context must survive the extended-crate encoding");
+        crate::tddd::catalogue_to_extended_crate_codec::encode_document(
+            doc2,
+            &authoritative,
+            &authoritative,
+        )
+        .expect("keyword generic context must survive the extended-crate encoding");
     }
 
     #[test]

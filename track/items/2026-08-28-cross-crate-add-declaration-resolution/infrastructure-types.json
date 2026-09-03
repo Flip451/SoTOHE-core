@@ -1,0 +1,635 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "docs": "Per-layer type-signals evaluator entrypoint (IN-01, IN-02).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::ids::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&crate::verify::tddd_layers::TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::feature_declaration::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueToExtendedCrateCodec",
+      "trait_ref": "domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCrateAdapter",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+    },
+    {
+      "action": "add",
+      "for_type": "RustdocCrateAdapter",
+      "trait_ref": "usecase::catalogue_impl_signals::ports::EvaluationStartCapturePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "domain::schema::SchemaExporter"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "usecase::export_schema::SchemaExporterPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::convert::From<serde_json::error::Error>"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "infrastructure::schema_export::RustdocSchemaExporter": {
+      "action": "modify",
+      "docs": "RustdocSchemaExporter: preserve the legacy crate-name string input and carry rustdoc JSON as opaque bytes across schema-export ports (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<u8>, domain::schema::SchemaExportError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json_with_features",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&domain::tddd::catalogue_v2::identifiers::CrateName"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::feature_declaration::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<u8>, domain::schema::SchemaExportError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "schema_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec": {
+      "action": "modify",
+      "docs": "Catalogue-to-extended-crate codec adapter (IN-01, IN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter": {
+      "action": "modify",
+      "docs": "RustdocCrateAdapter: implement authoritative evaluation-start capture for type-signal evaluation (IN-09, CO-09, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::rustdoc_crate_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-09",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError": {
+      "action": "modify",
+      "docs": "Fail-closed type-signal document decode errors (AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "serde_json::error::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersion"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDigest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "field",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::tddd::type_signals_doc::Sha256DigestError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidSignal",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidNamespace",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidExecutionIdentity",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError": {
+      "action": "modify",
+      "docs": "Type-signals evaluator error vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheWrite",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_linter::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_evaluator",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter": {
+      "action": "modify",
+      "docs": "Type-signals execution adapter (IN-01, IN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  }
+}

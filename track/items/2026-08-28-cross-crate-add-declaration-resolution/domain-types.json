@@ -1,0 +1,2624 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot": {
+      "action": "add",
+      "docs": "Capture-attested rustdoc snapshot factory (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "evaluation_start",
+          "ty": "ImplementationFingerprint"
+        },
+        {
+          "name": "identity",
+          "ty": "RustdocExecutionIdentity"
+        },
+        {
+          "name": "bytes",
+          "ty": "&[u8]"
+        },
+        {
+          "name": "decode",
+          "ty": "fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>"
+        }
+      ],
+      "returns": "Result<AttestedRustdocSnapshot, RustdocCratePortError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::construct_captured_rustdoc_json": {
+      "action": "add",
+      "docs": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "bytes",
+          "ty": "&[u8]"
+        },
+        {
+          "name": "decode",
+          "ty": "fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>"
+        }
+      ],
+      "returns": "Result<CapturedRustdocJson, RustdocCratePortError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::construct_rustdoc_snapshot": {
+      "action": "add",
+      "docs": "Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "identity",
+          "ty": "RustdocExecutionIdentity"
+        },
+        {
+          "name": "bytes",
+          "ty": "&[u8]"
+        },
+        {
+          "name": "decode",
+          "ty": "fn(&[u8]) -> Result<rustdoc_types::Crate, RustdocCratePortError>"
+        }
+      ],
+      "returns": "Result<RustdocSnapshot, RustdocCratePortError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::decide_type_signals_reuse": {
+      "action": "modify",
+      "docs": "Type-signals reuse decision function (AC-04).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "input",
+          "ty": "&TypeSignalsReuseInput"
+        }
+      ],
+      "returns": "TypeSignalsReuseDecision",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            },
+            {
+              "name": "baseline",
+              "ty": "rustdoc_types::Crate"
+            },
+            {
+              "name": "current",
+              "ty": "AttestedRustdocSnapshot"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "baseline",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&rustdoc_types::Crate",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "current",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&rustdoc_types::Crate",
+          "spec_refs": [
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "current_snapshot",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AttestedRustdocSnapshot",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "AuthoritativeRustdocContext"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "digest",
+              "ty": "Sha256Digest"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_digest",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Sha256Digest",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "ImplementationFingerprint"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "digest",
+              "ty": "Sha256Digest"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_digest",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Sha256Digest",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "ResolutionFingerprint"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "digest",
+              "ty": "Sha256Digest"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_digest",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Sha256Digest",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "RustdocJsonHash"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Validates only that the resolved Cargo target path is absolute. Unix descriptor-relative no-follow trusted-root admission is intentionally not claimed here and is enforced solely by RustdocCrateAdapter during capture.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, RustdocExecutionIdentityError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "ResolvedCargoTargetDirectory"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs only for a non-empty Cargo profile name; the only producible RustdocExecutionIdentityError variant is EmptyProfile.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, RustdocExecutionIdentityError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "CargoProfileName"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs only when the expected JSON path is contained by the validated target directory; the only producible RustdocExecutionIdentityError variant is ExpectedJsonOutsideTargetDirectory.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "target_directory",
+              "ty": "&ResolvedCargoTargetDirectory"
+            }
+          ],
+          "returns": "Result<Self, RustdocExecutionIdentityError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "ExpectedRustdocJsonPath"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs a complete execution identity only when the expected JSON path belongs to the supplied resolved target directory; the only producible RustdocExecutionIdentityError variant is ExpectedJsonOutsideTargetDirectory.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "target_directory",
+              "ty": "ResolvedCargoTargetDirectory"
+            },
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "features",
+              "ty": "Vec<CargoFeatureName>"
+            },
+            {
+              "name": "profile",
+              "ty": "CargoProfileName"
+            },
+            {
+              "name": "expected_json_path",
+              "ty": "ExpectedRustdocJsonPath"
+            }
+          ],
+          "returns": "Result<Self, RustdocExecutionIdentityError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_directory",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ResolvedCargoTargetDirectory",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CrateName",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "features",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[CargoFeatureName]",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "profile",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CargoProfileName",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "expected_json_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ExpectedRustdocJsonPath",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "RustdocExecutionIdentity"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execution_identity",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocExecutionIdentity",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "json_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocJsonHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_data",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&rustdoc_types::Crate",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "RustdocSnapshot"
+    },
+    {
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "json_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocJsonHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_data",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&rustdoc_types::Crate",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "CapturedRustdocJson"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ImplementationFingerprint",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "snapshot",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocSnapshot",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "AttestedRustdocSnapshot"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AuthoritativeRustdocContext",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AuthoritativeRustdocContext",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AuthoritativeRustdocContext",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AuthoritativeRustdocContext",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ImplementationFingerprint",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ImplementationFingerprint",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ImplementationFingerprint",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ImplementationFingerprint",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ImplementationFingerprint",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "ResolutionFingerprint",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolutionFingerprint",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolutionFingerprint",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolutionFingerprint",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ResolutionFingerprint",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "RustdocJsonHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocJsonHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocJsonHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocJsonHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocJsonHash",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "ResolvedCargoTargetDirectory",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolvedCargoTargetDirectory",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolvedCargoTargetDirectory",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolvedCargoTargetDirectory",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ResolvedCargoTargetDirectory",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "CargoProfileName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CargoProfileName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CargoProfileName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CargoProfileName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CargoProfileName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "ExpectedRustdocJsonPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ExpectedRustdocJsonPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ExpectedRustdocJsonPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ExpectedRustdocJsonPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ExpectedRustdocJsonPath",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "RustdocExecutionIdentity",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocExecutionIdentity",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocExecutionIdentity",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocExecutionIdentity",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocExecutionIdentity",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "RustdocSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocSnapshot",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocSnapshot",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "RustdocExecutionIdentityError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseDecision",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseDecision",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseDecision",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseDecision",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseDecision",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapturedRustdocJson",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapturedRustdocJson",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapturedRustdocJson",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapturedRustdocJson",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCratePortError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AttestedRustdocSnapshot",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "CatalogueToExtendedCratePort": {
+      "action": "modify",
+      "docs": "Catalogue-to-extended-crate encoding port (IN-01, IN-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "encode",
+          "params": [
+            {
+              "name": "target_layer",
+              "ty": "&LayerId"
+            },
+            {
+              "name": "track_catalogues",
+              "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>"
+            },
+            {
+              "name": "rustdoc_contexts",
+              "ty": "&std::collections::BTreeMap<LayerId, AuthoritativeRustdocContext>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "RustdocCratePort": {
+      "action": "modify",
+      "docs": "RustdocCratePort: define the synchronous blocking rustdoc acquisition boundary (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "load_from_path: perform synchronous baseline rustdoc loading (IN-07).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_from_path",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapturedRustdocJson, RustdocCratePortError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "modify",
+          "docs": "capture_current: return a fingerprint-bound rustdoc snapshot (IN-07, CO-07, AC-06).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capture_current",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "features",
+              "ty": "&[CargoFeatureName]"
+            },
+            {
+              "name": "evaluation_start",
+              "ty": "&ImplementationFingerprint"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<AttestedRustdocSnapshot, RustdocCratePortError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-08",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "SchemaExporter": {
+      "action": "reference",
+      "docs": "Baseline-identical secondary port for extracting a crate's public API schema; carried so RustdocSchemaExporter trait-implementation edges remain explicit. Its crate_name: &str parameter is an unchanged legacy compatibility surface, not a newly introduced concept representation; the typed feature-aware capture path uses CrateName.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SchemaExport, SchemaExportError>"
+        }
+      ],
+      "module_path": "schema",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "AttestedRustdocSnapshot": {
+      "action": "add",
+      "docs": "Capture-attested rustdoc snapshot (IN-07, CO-07, AC-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "AuthoritativeRustdocContext": {
+      "action": "add",
+      "docs": "Authoritative per-layer rustdoc context (IN-02, IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "CapturedRustdocJson": {
+      "action": "add",
+      "docs": "Captured rustdoc JSON value (IN-03, IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "CargoProfileName": {
+      "action": "add",
+      "docs": "Validated non-empty Cargo profile selected for one rustdoc export and included in its reuse identity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "ExpectedRustdocJsonPath": {
+      "action": "add",
+      "docs": "Expected rustdoc JSON path (IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "ImplementationFingerprint": {
+      "action": "add",
+      "docs": "Implementation fingerprint value (IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "ResolutionFingerprint": {
+      "action": "add",
+      "docs": "Resolution-input digest (IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "ResolvedCargoTargetDirectory": {
+      "action": "add",
+      "docs": "Resolved Cargo target directory value (IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "RustdocExecutionIdentity": {
+      "action": "add",
+      "docs": "Rustdoc execution identity (IN-03, IN-05, IN-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "RustdocExecutionIdentityError": {
+      "action": "add",
+      "docs": "Rustdoc execution identity error vocabulary (IN-03, IN-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TargetDirectoryNotAbsolute",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ExpectedJsonOutsideTargetDirectory",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyProfile",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "RustdocJsonHash": {
+      "action": "add",
+      "docs": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "RustdocSnapshot": {
+      "action": "add",
+      "docs": "Identity-bearing rustdoc snapshot (IN-03, IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError": {
+      "action": "modify",
+      "docs": "Rustdoc port error vocabulary (AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ParseFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CaptureFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "reason",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::TypeSignalsCacheKey": {
+      "action": "modify",
+      "docs": "Type-signals cache identity (IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "declaration_hash",
+              "ty": "CatalogueDeclarationHash"
+            },
+            {
+              "name": "head_commit",
+              "ty": "CommitHash"
+            },
+            {
+              "name": "baseline_hash",
+              "ty": "BaselineHash"
+            },
+            {
+              "name": "implementation_fingerprint",
+              "ty": "ImplementationFingerprint"
+            },
+            {
+              "name": "resolution_fingerprint",
+              "ty": "ResolutionFingerprint"
+            },
+            {
+              "name": "rustdoc_execution_identity",
+              "ty": "RustdocExecutionIdentity"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueDeclarationHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "head_commit",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CommitHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "baseline_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BaselineHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ImplementationFingerprint",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolution_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ResolutionFingerprint",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rustdoc_execution_identity",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RustdocExecutionIdentity",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "CO-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "CO-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::TypeSignalsDocument": {
+      "action": "modify",
+      "docs": "Persisted type-signals document (IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "generated_at",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "cache_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "signals",
+              "ty": "Vec<TypeSignal>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_schema_version",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "TypeSignalsSchemaVersion"
+            },
+            {
+              "name": "generated_at",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "cache_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "signals",
+              "ty": "Vec<TypeSignal>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "TypeSignalsSchemaVersion",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "generated_at",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Timestamp",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cache_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeSignalsCacheKey",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signals",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TypeSignal]",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::TypeSignalsReuseDecision": {
+      "action": "modify",
+      "docs": "Type-signals reuse outcome (AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SkipEvaluation",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReextractAndEvaluate",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::TypeSignalsReuseInput": {
+      "action": "modify",
+      "docs": "Verified type-signals reuse input (IN-03, IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify",
+          "params": [
+            {
+              "name": "recorded_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "current_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "worktree_status",
+              "ty": "TypeSignalsWorktreeStatus"
+            },
+            {
+              "name": "authority_status",
+              "ty": "TypeSignalsAuthorityStatus"
+            }
+          ],
+          "returns": "Option<Self>",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "IN-07",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        }
+      ]
+    }
+  }
+}

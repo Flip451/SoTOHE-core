@@ -4,32 +4,10 @@
 //! `ExtendedCrate` (TypeGraph A). It implements the secondary-adapter role for the
 //! `CatalogueToExtendedCratePort` port declared in the domain layer.
 //!
-//! ## Conversion pipeline (ADR 2 D8 / D9 / D10 / D11)
-//!
-//! 1. Pre-pass Id assignment: assign incremental `rustdoc_types::Id`s to all entries.
-//!    Id(0) is reserved for the root module.
-//! 2. External crate collection: the TypeRef parser gathers crate prefixes from
-//!    trait implementations and their nested type expressions to build
-//!    `Crate::external_crates`.
-//! 3. TypeRef parse: convert each `TypeRef` string via `syn::parse_str` into
-//!    `rustdoc_types::Type`. Unresolvable identifiers become open-world "unresolved
-//!    markers" (ADR 2 D10).
-//! 4. Inline → id-ref: `FieldDecl` / `VariantDecl` are promoted to individual
-//!    `rustdoc_types::Item` entries and the parent references them via `Vec<Id>`.
-//! 5. Inherent impl grouping: all `MethodDeclaration`s on a type are grouped into a
-//!    single `Impl` item per type.
-//! 6. Trait impl blocks: `TraitImplDeclV2` entries produce `Impl` items with trait
-//!    identity only (no method items — ADR 2 D12).
-//! 7. Crate.paths: each in-crate item gets an `ItemSummary` with
-//!    `path = [crate_name, ...module_path, item_name]`.
-//! 8. item_actions: each catalogue entry's `ItemAction` is recorded in
-//!    `ExtendedCrate::item_actions`.
-//!
 //! (infrastructure-types.json: CatalogueToExtendedCrateCodec)
 
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::NewTypeGraphCodecError;
 use domain::tddd::catalogue_v2::identifiers::{
     CatalogueItemNamespace, FullyQualifiedItemPath, Identifier, ModulePath, TypeRef,
@@ -39,7 +17,9 @@ use domain::tddd::catalogue_v2::identity_resolution::{
 };
 use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey, ItemAction};
 use domain::tddd::extended_crate::ExtendedCrate;
+use domain::tddd::layer_id::LayerId;
 use domain::tddd::test_obligation::ids::{DiagnosticMessage, unavailable_diagnostic_message};
+use domain::tddd::{AuthoritativeRustdocContext, CatalogueToExtendedCratePort};
 use rustdoc_types::{Crate, Id, ItemSummary};
 
 use crate::tddd::canonical_type_identity::{
@@ -72,6 +52,13 @@ enum PathNamespace {
     Function,
     Other(rustdoc_types::ItemKind),
 }
+
+/// Marker used for placed synthetic declarations from another catalogue.
+///
+/// The resolution-path map has no accompanying `external_crates` table, so it
+/// only needs a non-local crate id to preserve the external-vs-local distinction
+/// while the final encoder allocates the real external crate id on demand.
+const SYNTHETIC_EXTERNAL_CRATE_ID: u32 = u32::MAX - 1;
 
 fn path_namespace(kind: rustdoc_types::ItemKind) -> PathNamespace {
     match kind {
@@ -153,35 +140,111 @@ impl CatalogueToExtendedCrateCodec {
 impl CatalogueToExtendedCratePort for CatalogueToExtendedCrateCodec {
     fn encode(
         &self,
-        doc: domain::tddd::catalogue_v2::CatalogueDocument,
-        baseline: &Crate,
-        current: &Crate,
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
-        let resolution_paths = resolution_paths_for_catalogue(&doc, baseline, current)?;
+        validate_rustdoc_context_layers(rustdoc_contexts)?;
+        let Some(doc) = track_catalogues.get(target_layer) else {
+            // An enabled layer may legitimately have no catalogue yet. The
+            // absence means that this target contributes no declarations; the
+            // usecase deliberately keeps that layer absent from the map so it
+            // cannot fabricate catalogue metadata.
+            return Ok(empty_extended_crate());
+        };
+        let rustdoc_context = rustdoc_contexts.get(target_layer).ok_or_else(|| {
+            invalid_type_ref(
+                target_layer.to_string(),
+                "target layer has no authoritative rustdoc context",
+            )
+        })?;
+        let resolution_paths = resolution_paths_for_catalogue_with_contexts(
+            target_layer,
+            track_catalogues,
+            rustdoc_contexts,
+        )?;
         // Non-add declarations and deletions must resolve against the baseline
         // only (D3): keep the baseline identity set separate from the merged
         // resolution set the add route reads.
-        let baseline_paths = normalized_paths_for_doc(baseline, doc.crate_name());
+        let baseline_paths = normalized_paths_for_doc(rustdoc_context.baseline(), doc.crate_name());
         let baseline_identities =
             paths_from_map_for_catalogue_crate(&baseline_paths, doc.crate_name());
-        Encoder::new(doc, resolution_paths, baseline_identities).run()
+        Encoder::new(doc.clone(), resolution_paths, baseline_identities).run()
     }
 }
 
-/// Builds the one rustdoc/catalogue resolution set consumed by the codec.
+/// Builds TypeGraph A for a layer with no catalogue declarations.
+fn empty_extended_crate() -> ExtendedCrate {
+    ExtendedCrate::new(
+        Crate {
+            root: Id(0),
+            crate_version: None,
+            includes_private: false,
+            index: HashMap::new(),
+            paths: HashMap::new(),
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+        },
+        BTreeMap::new(),
+    )
+}
+
+fn validate_rustdoc_context_layers(
+    rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
+) -> Result<(), NewTypeGraphCodecError> {
+    for (map_layer, context) in rustdoc_contexts {
+        if map_layer != context.layer() {
+            return Err(invalid_type_ref(
+                map_layer.to_string(),
+                format!(
+                    "authoritative rustdoc context for layer '{}' is stored under map key '{}'",
+                    context.layer(),
+                    map_layer
+                ),
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Builds the codec resolution set from the target catalogue and the
+/// layer-keyed authoritative rustdoc contexts.
 ///
-/// Rustdoc remains authoritative for existing declarations. Catalogue `add`
-/// declarations are appended as synthetic summaries so declaration-first work
-/// can reference a type before rustdoc contains its implementation. Omitted
-/// placement is resolved against the current set when there is exactly one
-/// candidate; otherwise it remains unplaced or fails closed according to D3.
-pub(super) fn resolution_paths_for_catalogue(
-    doc: &CatalogueDocument,
-    baseline: &Crate,
-    current: &Crate,
+/// The target context supplies the rustdoc paths that are exposed to the
+/// encoded crate. A declaring layer's context is used only to resolve the
+/// placement of that layer's `add` declarations; the target context is never
+/// reused for an external declaration. If a legacy caller has not supplied a
+/// declaring context yet, its omitted placement remains unplaced rather than
+/// being guessed from another layer's rustdoc.
+pub(super) fn resolution_paths_for_catalogue_with_contexts(
+    target_layer: &LayerId,
+    track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
 ) -> Result<HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
-    let baseline_paths = normalized_paths_for_doc(baseline, doc.crate_name());
-    let current_paths = normalized_paths_for_doc(current, doc.crate_name());
+    let target_doc = track_catalogues.get(target_layer).ok_or_else(|| {
+        invalid_type_ref(
+            target_layer.to_string(),
+            "target layer has no catalogue in the track catalogue map",
+        )
+    })?;
+    let target_context = rustdoc_contexts.get(target_layer).ok_or_else(|| {
+        invalid_type_ref(
+            target_layer.to_string(),
+            "target layer has no authoritative rustdoc context",
+        )
+    })?;
+    for layer in track_catalogues.keys() {
+        if !rustdoc_contexts.contains_key(layer) {
+            return Err(invalid_type_ref(
+                layer.to_string(),
+                format!("catalogue layer '{layer}' has no authoritative rustdoc context"),
+            ));
+        }
+    }
+    let baseline_paths =
+        normalized_paths_for_doc(target_context.baseline(), target_doc.crate_name());
+    let current_paths = normalized_paths_for_doc(target_context.current(), target_doc.crate_name());
     let mut paths = merge_authoritative_paths(&baseline_paths, &current_paths)?;
     let baseline_identities = paths_from_map(&baseline_paths);
     let current_identities = paths_from_map(&current_paths);
@@ -192,49 +255,120 @@ pub(super) fn resolution_paths_for_catalogue(
     let mut used_ids = paths.keys().copied().collect::<HashSet<_>>();
     let mut next_id = used_ids.iter().map(|id| id.0).max().unwrap_or(0).saturating_add(1);
 
-    for (key, entry) in doc.types() {
-        if entry.action() != ItemAction::Add {
+    // Keep the target layer's existing add route first. Other layers extend the
+    // same set; they do not create a second resolution path or require a
+    // duplicate entry in the target catalogue.
+    insert_catalogue_additions(
+        target_doc,
+        false,
+        &mut paths,
+        &mut known_paths,
+        &mut next_id,
+        &mut used_ids,
+        &baseline_identities,
+        &current_identities,
+    )?;
+    for (layer, catalogue) in track_catalogues {
+        if layer == target_layer {
             continue;
         }
-        let identity = resolve_add_identity(
-            doc.crate_name(),
-            key,
-            entry.module_path(),
-            CatalogueItemNamespace::Type,
-            &baseline_identities,
-            &current_identities,
-        )?;
-        insert_synthetic_summary(
+        // External add placement belongs to the declaring layer. In particular,
+        // do not pass the target layer's identity sets here: a target-side
+        // same-name item must not determine an external item's module path.
+        let declaring_context = rustdoc_contexts.get(layer).ok_or_else(|| {
+            invalid_type_ref(
+                layer.to_string(),
+                format!("catalogue layer '{layer}' has no authoritative rustdoc context"),
+            )
+        })?;
+        let declaring_baseline_paths =
+            normalized_paths_for_doc(declaring_context.baseline(), catalogue.crate_name());
+        let declaring_current_paths =
+            normalized_paths_for_doc(declaring_context.current(), catalogue.crate_name());
+        let declaring_baseline_identities = paths_from_map(&declaring_baseline_paths);
+        let declaring_current_identities = paths_from_map(&declaring_current_paths);
+        insert_catalogue_additions(
+            catalogue,
+            true,
             &mut paths,
             &mut known_paths,
             &mut next_id,
             &mut used_ids,
-            &identity,
-            rustdoc_types::ItemKind::Struct,
-        )?;
-    }
-    for (key, entry) in doc.traits() {
-        if entry.action() != ItemAction::Add {
-            continue;
-        }
-        let identity = resolve_add_identity(
-            doc.crate_name(),
-            key,
-            entry.module_path(),
-            CatalogueItemNamespace::Trait,
-            &baseline_identities,
-            &current_identities,
-        )?;
-        insert_synthetic_summary(
-            &mut paths,
-            &mut known_paths,
-            &mut next_id,
-            &mut used_ids,
-            &identity,
-            rustdoc_types::ItemKind::Trait,
+            &declaring_baseline_identities,
+            &declaring_current_identities,
         )?;
     }
     Ok(paths)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn insert_catalogue_additions(
+    catalogue: &CatalogueDocument,
+    external: bool,
+    paths: &mut HashMap<Id, ItemSummary>,
+    known_paths: &mut HashSet<(Vec<String>, PathNamespace)>,
+    next_id: &mut u32,
+    used_ids: &mut HashSet<Id>,
+    baseline_identities: &BTreeSet<FullyQualifiedItemPath>,
+    current_identities: &BTreeSet<FullyQualifiedItemPath>,
+) -> Result<(), NewTypeGraphCodecError> {
+    for (key, entry) in catalogue.types() {
+        if entry.action() != ItemAction::Add {
+            continue;
+        }
+        let identity = resolve_add_identity(
+            catalogue.crate_name(),
+            key,
+            entry.module_path(),
+            CatalogueItemNamespace::Type,
+            baseline_identities,
+            current_identities,
+        )?;
+        if external {
+            let path = identity_path(&identity);
+            if known_paths.contains(&(path, PathNamespace::Type)) {
+                continue;
+            }
+        }
+        insert_synthetic_summary(
+            paths,
+            known_paths,
+            next_id,
+            used_ids,
+            &identity,
+            rustdoc_types::ItemKind::Struct,
+            external,
+        )?;
+    }
+    for (key, entry) in catalogue.traits() {
+        if entry.action() != ItemAction::Add {
+            continue;
+        }
+        let identity = resolve_add_identity(
+            catalogue.crate_name(),
+            key,
+            entry.module_path(),
+            CatalogueItemNamespace::Trait,
+            baseline_identities,
+            current_identities,
+        )?;
+        if external {
+            let path = identity_path(&identity);
+            if known_paths.contains(&(path, PathNamespace::Trait)) {
+                continue;
+            }
+        }
+        insert_synthetic_summary(
+            paths,
+            known_paths,
+            next_id,
+            used_ids,
+            &identity,
+            rustdoc_types::ItemKind::Trait,
+            external,
+        )?;
+    }
+    Ok(())
 }
 
 fn resolve_add_identity(
@@ -245,21 +379,7 @@ fn resolve_add_identity(
     baseline: &BTreeSet<FullyQualifiedItemPath>,
     current: &BTreeSet<FullyQualifiedItemPath>,
 ) -> Result<FullyQualifiedItemPath, NewTypeGraphCodecError> {
-    let identity = match namespace {
-        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
-            crate_name,
-            key,
-            declared_module_path,
-        ),
-        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
-            crate_name,
-            key,
-            declared_module_path,
-        ),
-    }
-    .map_err(|error| {
-        invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
-    })?;
+    let identity = catalogue_entry_identity(crate_name, key, declared_module_path, namespace)?;
     let reference = TypeRef::new(if identity.is_placed() {
         identity.to_string()
     } else {
@@ -279,6 +399,45 @@ fn resolve_add_identity(
     .map_err(map_identity_resolution_error)
 }
 
+fn catalogue_entry_identity(
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
+    declared_module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
+) -> Result<FullyQualifiedItemPath, NewTypeGraphCodecError> {
+    let identity = match namespace {
+        CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+            crate_name,
+            key,
+            declared_module_path,
+        ),
+        CatalogueItemNamespace::Trait => FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+            crate_name,
+            key,
+            declared_module_path,
+        ),
+    }
+    .map_err(|error| {
+        invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+    })?;
+    if key.as_str().contains("::") {
+        if let (Some(declared), Some(actual)) = (declared_module_path, identity.module_path()) {
+            if declared != actual {
+                return Err(invalid_type_ref(
+                    key.as_str(),
+                    format!(
+                        "catalogue key '{}' implies module_path '{}', but entry module_path is '{}',",
+                        key.as_str(),
+                        actual,
+                        declared
+                    ),
+                ));
+            }
+        }
+    }
+    Ok(identity)
+}
+
 fn insert_synthetic_summary(
     paths: &mut HashMap<Id, ItemSummary>,
     known_paths: &mut HashSet<(Vec<String>, PathNamespace)>,
@@ -286,6 +445,7 @@ fn insert_synthetic_summary(
     used_ids: &mut HashSet<Id>,
     identity: &FullyQualifiedItemPath,
     kind: rustdoc_types::ItemKind,
+    external: bool,
 ) -> Result<(), NewTypeGraphCodecError> {
     let path = identity_path(identity);
     let namespace = path_namespace(kind);
@@ -294,7 +454,11 @@ fn insert_synthetic_summary(
     }
     let id = next_unused_id(next_id, used_ids)
         .ok_or_else(|| invalid_type_ref("catalogue paths", "no unused item id remains"))?;
-    let crate_id = if identity.is_placed() { 0 } else { SYNTHETIC_UNPLACED_CRATE_ID };
+    let crate_id = if identity.is_placed() {
+        if external { SYNTHETIC_EXTERNAL_CRATE_ID } else { 0 }
+    } else {
+        SYNTHETIC_UNPLACED_CRATE_ID
+    };
     paths.insert(id, ItemSummary { crate_id, path, kind });
     Ok(())
 }
@@ -358,12 +522,6 @@ fn summary_identity(summary: &ItemSummary) -> Option<FullyQualifiedItemPath> {
             FullyQualifiedItemPath::new_trait(crate_name, module_path, name)
         }
     })
-}
-
-#[cfg(test)]
-#[allow(clippy::expect_used)]
-fn authoritative_paths(baseline: &Crate, current: &Crate) -> HashMap<Id, ItemSummary> {
-    merge_authoritative_paths(&baseline.paths, &current.paths).expect("path ids must be available")
 }
 
 pub(super) fn normalized_paths_for_doc(
@@ -443,6 +601,155 @@ fn next_unused_id(next_id: &mut u32, used_ids: &mut HashSet<Id>) -> Option<Id> {
         *next_id = (*next_id).checked_add(1)?;
     }
 }
+
+#[cfg(test)]
+mod codec_test_support {
+    use std::collections::{BTreeMap, HashMap};
+
+    use domain::FreeText;
+    use domain::tddd::catalogue_v2::{CatalogueDocument, CrateName};
+    use domain::tddd::extended_crate::ExtendedCrate;
+    use domain::tddd::layer_id::LayerId;
+    use domain::tddd::type_signals_doc::{
+        AttestedRustdocSnapshot, CargoProfileName, ExpectedRustdocJsonPath,
+        ImplementationFingerprint, ResolvedCargoTargetDirectory, RustdocExecutionIdentity,
+        Sha256Digest, construct_attested_rustdoc_snapshot,
+    };
+    use domain::tddd::{
+        AuthoritativeRustdocContext, CatalogueToExtendedCratePort, NewTypeGraphCodecError,
+    };
+    use rustdoc_types::{Crate, Id, ItemSummary};
+
+    use super::{
+        CatalogueToExtendedCrateCodec, merge_authoritative_paths,
+        resolution_paths_for_catalogue_with_contexts,
+    };
+
+    /// Builds a test snapshot for a single catalogue's current rustdoc data.
+    #[allow(clippy::expect_used, clippy::unwrap_used)]
+    fn attested_snapshot(crate_name: &CrateName, crate_data: &Crate) -> AttestedRustdocSnapshot {
+        fn decode(
+            bytes: &[u8],
+        ) -> Result<Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
+            serde_json::from_slice(bytes).map_err(|error| {
+                domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                    crate_name: CrateName::new("test").unwrap(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })
+        }
+        let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-codec-test-target",
+        ))
+        .unwrap();
+        let expected = ExpectedRustdocJsonPath::try_new(
+            target.as_path().join(format!("{}.json", crate_name.as_str())),
+            &target,
+        )
+        .unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            crate_name.clone(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let bytes = serde_json::to_vec(crate_data).unwrap();
+        construct_attested_rustdoc_snapshot(
+            ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+            identity,
+            &bytes,
+            decode,
+        )
+        .unwrap()
+    }
+
+    pub(crate) fn encode_document(
+        doc: CatalogueDocument,
+        baseline: &Crate,
+        current: &Crate,
+    ) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
+        let layer = doc.layer().clone();
+        let crate_name = doc.crate_name().clone();
+        let catalogues = BTreeMap::from([(layer.clone(), doc)]);
+        let rustdoc_contexts = BTreeMap::from([(
+            layer.clone(),
+            AuthoritativeRustdocContext::new(
+                layer.clone(),
+                baseline.clone(),
+                attested_snapshot(&crate_name, current),
+            ),
+        )]);
+        CatalogueToExtendedCrateCodec::new().encode(&layer, &catalogues, &rustdoc_contexts)
+    }
+
+    /// Builds the shared resolution set for a single-catalogue test or caller.
+    #[cfg(feature = "test-helpers")]
+    pub(crate) fn resolution_paths_for_document(
+        doc: &CatalogueDocument,
+        baseline: &Crate,
+        current: &Crate,
+    ) -> Result<HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
+        let layer = doc.layer().clone();
+        let catalogues = BTreeMap::from([(layer.clone(), doc.clone())]);
+        resolution_paths_for_catalogue(&layer, &catalogues, baseline, current)
+    }
+
+    /// Builds the one rustdoc/catalogue resolution set consumed by the codec.
+    ///
+    /// Rustdoc remains authoritative for existing declarations. Catalogue `add`
+    /// declarations are appended as synthetic summaries so declaration-first work
+    /// can reference a type before rustdoc contains its implementation. Add
+    /// declarations from other track catalogues use their declaring crate as the
+    /// external identity root; the referencing catalogue does not need a duplicate
+    /// declaration. Omitted placement is resolved against the current set when
+    /// there is exactly one candidate; otherwise it remains unplaced or fails closed
+    /// according to D3.
+    #[allow(clippy::expect_used)]
+    pub(crate) fn resolution_paths_for_catalogue(
+        target_layer: &LayerId,
+        track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        baseline: &Crate,
+        current: &Crate,
+    ) -> Result<HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
+        let rustdoc_contexts = BTreeMap::from([(
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                baseline.clone(),
+                attested_snapshot(
+                    track_catalogues
+                        .get(target_layer)
+                        .expect("target catalogue exists")
+                        .crate_name(),
+                    current,
+                ),
+            ),
+        )]);
+        resolution_paths_for_catalogue_with_contexts(
+            target_layer,
+            track_catalogues,
+            &rustdoc_contexts,
+        )
+    }
+
+    #[allow(clippy::expect_used)]
+    pub(crate) fn authoritative_paths(
+        baseline: &Crate,
+        current: &Crate,
+    ) -> HashMap<Id, ItemSummary> {
+        merge_authoritative_paths(&baseline.paths, &current.paths)
+            .expect("path ids must be available")
+    }
+}
+
+#[cfg(test)]
+pub(crate) use codec_test_support::encode_document;
+#[cfg(all(test, feature = "test-helpers"))]
+pub(crate) use codec_test_support::resolution_paths_for_document;
+#[cfg(test)]
+pub(super) use codec_test_support::{authoritative_paths, resolution_paths_for_catalogue};
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic, clippy::expect_used)]

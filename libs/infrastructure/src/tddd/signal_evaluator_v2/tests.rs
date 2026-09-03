@@ -9,10 +9,7 @@ use domain::tddd::catalogue_v2::{
     DeletionRecord, FieldDecl, FieldName, ItemAction, StructKind as CatalogueStructKind,
     StructShape as CatalogueStructShape, TypeEntry, TypeKindV2, TypeRef,
 };
-use domain::tddd::{
-    CatalogueToExtendedCratePort, ExtendedCrate, LayerId, Phase1Error, SignalEvaluatorPort,
-    SignalRegion,
-};
+use domain::tddd::{ExtendedCrate, LayerId, Phase1Error, SignalEvaluatorPort, SignalRegion};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, FunctionHeader, FunctionSignature, Generics, Id, Item, ItemEnum,
     ItemKind, ItemSummary, Module, Struct, StructKind, Target, Type, Visibility,
@@ -99,7 +96,7 @@ fn encode_catalogue_doc(
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     };
-    crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new().encode(
+    crate::tddd::catalogue_to_extended_crate_codec::encode_document(
         doc,
         &authoritative,
         &authoritative,
@@ -1165,8 +1162,7 @@ fn test_type_add_from_catalogue_codec_uses_synthetic_summary_identity() {
         ),
     );
     let empty = empty_crate();
-    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-        .encode(doc, &empty, &empty)
+    let a = crate::tddd::catalogue_to_extended_crate_codec::encode_document(doc, &empty, &empty)
         .expect("catalogue Add declaration produces a synthetic summary");
     let b = empty_crate();
     let c = simple_crate_with_struct("domain", "NewType");
@@ -1210,9 +1206,9 @@ fn test_signal_evaluator_shared_catalogue_identity_flows_through_codec_phase1_an
 
     let baseline = simple_crate_with_struct("domain", "OldType");
     let current = simple_crate_with_struct("domain", "NewType");
-    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-        .encode(doc, &baseline, &current)
-        .expect("codec constructs the shared add/delete identity graph");
+    let a =
+        crate::tddd::catalogue_to_extended_crate_codec::encode_document(doc, &baseline, &current)
+            .expect("codec constructs the shared add/delete identity graph");
     let (s, _d) = super::phase1::phase1_build_s_and_d(a.clone(), &baseline)
         .expect("Phase 1 consumes the codec graph and applies deletion actions");
     let identities = super::build_type_trait_identity_map(s.krate())
@@ -1437,8 +1433,7 @@ fn codec_derived_holder_with_unresolved_reference(reference: &str) -> ExtendedCr
     );
     let baseline = simple_crate_with_struct("fixture", "Known");
     let encoded =
-        crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-            .encode(doc, &baseline, &baseline)
+        crate::tddd::catalogue_to_extended_crate_codec::encode_document(doc, &baseline, &baseline)
             .expect("the initial catalogue-derived graph is valid");
     let (mut krate, actions) = encoded.into_parts();
     let holder_id = krate
@@ -3324,9 +3319,10 @@ fn test_deleted_external_trait_impl_keeps_local_owner_identity() {
         vec![],
     ));
 
-    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-        .encode(document, &baseline, &current)
-        .expect("codec must encode the deleted trait impl");
+    let a = crate::tddd::catalogue_to_extended_crate_codec::encode_document(
+        document, &baseline, &current,
+    )
+    .expect("codec must encode the deleted trait impl");
     let report = SignalEvaluatorV2::new()
         .evaluate(a, baseline, current)
         .expect("evaluator must preserve the deleted impl identity");
@@ -5790,9 +5786,12 @@ fn test_impl_identity_evaluator_matches_std_reexport_to_core_definition_path() {
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     };
-    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-        .encode(document, &authoritative, &authoritative)
-        .expect("the catalogue std re-export must resolve through the core definition path");
+    let a = crate::tddd::catalogue_to_extended_crate_codec::encode_document(
+        document,
+        &authoritative,
+        &authoritative,
+    )
+    .expect("the catalogue std re-export must resolve through the core definition path");
 
     let root_id = Id(0);
     let widget_id = Id(1);

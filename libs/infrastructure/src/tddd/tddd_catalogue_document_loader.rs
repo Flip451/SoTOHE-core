@@ -199,7 +199,33 @@ fn open_catalogue_file_nofollow(_path: &Path) -> Result<std::fs::File, std::io::
 /// Reads an already-opened regular catalogue descriptor with the shared byte
 /// limit semantics used by repository-authored text files.
 fn read_catalogue_file(path: &Path) -> Result<String, std::io::Error> {
-    let file = open_catalogue_file_nofollow(path)?;
+    let bytes = match read_optional_regular_file_bytes(path, None, MAX_TYPE_CATALOGUE_BYTES)? {
+        Some(bytes) => bytes,
+        None => {
+            return Err(Error::new(
+                ErrorKind::NotFound,
+                format!("{} was not found", path.display()),
+            ));
+        }
+    };
+    String::from_utf8(bytes).map_err(|error| Error::new(ErrorKind::InvalidData, error))
+}
+
+/// Opens `path` with the shared no-follow catalogue primitive.
+///
+/// An absent file is `Ok(None)`. A present FIFO, directory, or non-regular
+/// node is rejected from the opened descriptor. On Linux the opened path is
+/// also confirmed to stay under `trusted_root` when that root is supplied.
+pub(crate) fn read_optional_regular_file_bytes(
+    path: &Path,
+    trusted_root: Option<&Path>,
+    max_bytes: u64,
+) -> Result<Option<Vec<u8>>, std::io::Error> {
+    let file = match open_catalogue_file_nofollow(path) {
+        Ok(file) => file,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(error),
+    };
     let metadata = file.metadata()?;
     if !metadata.is_file() {
         return Err(Error::new(
@@ -207,33 +233,28 @@ fn read_catalogue_file(path: &Path) -> Result<String, std::io::Error> {
             format!("{} is not a regular file", path.display()),
         ));
     }
-    if metadata.len() > MAX_TYPE_CATALOGUE_BYTES {
+    if metadata.len() > max_bytes {
         return Err(Error::new(
             ErrorKind::InvalidData,
-            format!(
-                "{} exceeds the maximum allowed size of {MAX_TYPE_CATALOGUE_BYTES} bytes",
-                path.display()
-            ),
+            format!("{} exceeds the maximum allowed size of {max_bytes} bytes", path.display()),
         ));
+    }
+    if let Some(trusted_root) = trusted_root {
+        #[cfg(target_os = "linux")]
+        crate::trusted_file::verify_opened_file_within_root(&file, trusted_root)?;
+        #[cfg(not(target_os = "linux"))]
+        let _ = trusted_root;
     }
 
-    let mut reader = file.take(MAX_TYPE_CATALOGUE_BYTES.saturating_add(1));
-    let mut content = String::new();
-    reader.read_to_string(&mut content)?;
-    if content.len()
-        > usize::try_from(MAX_TYPE_CATALOGUE_BYTES).map_err(|_| {
-            Error::new(ErrorKind::InvalidData, "catalogue byte limit exceeds platform capacity")
-        })?
-    {
+    let mut bytes = Vec::new();
+    file.take(max_bytes.saturating_add(1)).read_to_end(&mut bytes)?;
+    if bytes.len() as u64 > max_bytes {
         return Err(Error::new(
             ErrorKind::InvalidData,
-            format!(
-                "{} exceeds the maximum allowed size of {MAX_TYPE_CATALOGUE_BYTES} bytes",
-                path.display()
-            ),
+            format!("{} exceeds the maximum allowed size of {max_bytes} bytes", path.display()),
         ));
     }
-    Ok(content)
+    Ok(Some(bytes))
 }
 
 // ---------------------------------------------------------------------------

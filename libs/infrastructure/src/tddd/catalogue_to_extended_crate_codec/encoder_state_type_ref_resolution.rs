@@ -59,7 +59,26 @@ impl EncoderState {
             .map_err(|_| invalid_type_ref(lookup, "empty TypeRef path"))?;
         let namespace_paths = self.resolution_paths_for_namespace(namespace);
         match canonicalize_catalogue_type_ref(&type_ref, &self.crate_name, &namespace_paths, &[]) {
-            Ok(identity) => self.local_id_for_identity_in_namespace(&identity, namespace),
+            Ok(identity) => {
+                // A bare name may use the catalogue's local namespace or the Rust
+                // prelude, but it must not select an identity declared by another
+                // track layer. Cross-crate references need their fully-qualified
+                // crate root; otherwise the post-processing pass would leave an
+                // unresolved marker that reconciliation had already accepted.
+                if !lookup.contains("::")
+                    && !STD_PRELUDE_TYPES.contains(&lookup)
+                    && identity
+                        .as_str()
+                        .split_once("::")
+                        .is_some_and(|(root, _)| root != self.crate_name.as_str())
+                {
+                    return Err(invalid_type_ref(
+                        lookup,
+                        "cross-crate references require a fully qualified crate path",
+                    ));
+                }
+                self.local_id_for_identity_in_namespace(&identity, namespace)
+            }
             Err(error) => Err(error),
         }
     }

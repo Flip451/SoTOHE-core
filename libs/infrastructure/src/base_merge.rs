@@ -791,7 +791,7 @@ mod tests {
 
     fn write_cleanup_type_signals(track_dir: &Path, baseline: &[u8]) {
         let catalogue = std::fs::read(track_dir.join("domain-types.json")).unwrap();
-        let document = serde_json::json!({
+        let mut document = serde_json::json!({
             "schema_version": domain::tddd::type_signals_doc::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-08-11T00:00:00Z",
             "declaration_hash": crate::tddd::type_signals_codec::declaration_hash(&catalogue)
@@ -809,6 +809,7 @@ mod tests {
                 "found_type": true,
             }],
         });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut document);
         std::fs::write(
             track_dir.join("domain-type-signals.json"),
             serde_json::to_string_pretty(&document).unwrap(),

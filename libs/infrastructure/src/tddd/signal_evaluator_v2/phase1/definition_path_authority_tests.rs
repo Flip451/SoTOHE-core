@@ -10,7 +10,7 @@ use domain::tddd::catalogue_v2::composite::{
 use domain::tddd::catalogue_v2::entries::TypeEntry;
 use domain::tddd::catalogue_v2::roles::DataRole;
 use domain::tddd::catalogue_v2::{CatalogueDocument, CatalogueEntryKey, CrateName, ItemAction};
-use domain::tddd::{CatalogueToExtendedCratePort, ExtendedCrate, LayerId};
+use domain::tddd::{ExtendedCrate, LayerId};
 use rustdoc_types::{
     Crate, FORMAT_VERSION, Generics, Id, Item, ItemEnum, ItemKind, ItemSummary, Module, Struct,
     StructKind, Target, Visibility,
@@ -175,9 +175,10 @@ fn test_phase1_preserves_unplaced_add_marker_in_s_paths() {
             vec![],
         ),
     );
-    let a = crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
-        .encode(catalogue, &baseline, &baseline)
-        .expect("the production codec must emit the unplaced add");
+    let a = crate::tddd::catalogue_to_extended_crate_codec::encode_document(
+        catalogue, &baseline, &baseline,
+    )
+    .expect("the production codec must emit the unplaced add");
 
     let (s, _d) = super::builder::phase1_build_s_and_d(a, &baseline)
         .expect("Phase 1 must retain the unplaced add");

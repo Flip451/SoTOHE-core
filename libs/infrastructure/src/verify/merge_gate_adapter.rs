@@ -453,7 +453,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Ok(object_id) => object_id,
             Err(error) => return BlobFetchResult::FetchError(error),
         };
-        match crate::tddd::type_signals_codec::decode(&text) {
+        match crate::tddd::type_signals_codec::decode_with_workspace(&text, &self.repo_root) {
             Ok(doc) => {
                 let evaluation_commit = match read_branch_evaluation_commit(&self.repo_root, branch)
                 {
@@ -758,18 +758,27 @@ mod tests {
         let declaration_hash =
             crate::tddd::type_signals_codec::declaration_hash(DOMAIN_TYPES_V3_MINIMAL.as_bytes());
         let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(b"baseline fixture\n");
-        let recorded_head = format!("\"head_commit\": \"{}\"", "0".repeat(40));
-        let signal = TYPE_SIGNALS_MINIMAL
-            .replace(
-                &format!("\"declaration_hash\": \"{}\"", "0".repeat(64)),
-                &format!("\"declaration_hash\": \"{}\"", declaration_hash.as_digest().as_str()),
-            )
-            .replace(
-                &format!("\"baseline_hash\": \"{}\"", "0".repeat(64)),
-                &format!("\"baseline_hash\": \"{}\"", baseline_hash.as_digest().as_str()),
-            )
-            .replace(&recorded_head, &format!("\"head_commit\": \"{evaluation_commit}\""));
-        std::fs::write(track_dir.join("domain-type-signals.json"), signal).unwrap();
+        let mut signal =
+            serde_json::from_str::<serde_json::Value>(&type_signals_minimal()).unwrap();
+        if let Some(object) = signal.as_object_mut() {
+            object.insert(
+                "declaration_hash".to_owned(),
+                serde_json::Value::String(declaration_hash.as_digest().as_str().to_owned()),
+            );
+            object.insert(
+                "baseline_hash".to_owned(),
+                serde_json::Value::String(baseline_hash.as_digest().as_str().to_owned()),
+            );
+            object.insert(
+                "head_commit".to_owned(),
+                serde_json::Value::String(evaluation_commit.to_owned()),
+            );
+        }
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&signal).unwrap(),
+        )
+        .unwrap();
         git(dir.path(), &["add", "architecture-rules.json", "track"]);
         git(dir.path(), &["commit", "--quiet", "-m", "add type signals"]);
         git(dir.path(), &["fetch", "--quiet", "origin"]);
@@ -1608,16 +1617,24 @@ decisions:
     /// The hashes are all-zeroes before the complete fixture helper binds them
     /// to the catalogue bytes and evaluation commit. This keeps the fixture
     /// readable while still exercising the branch-tip freshness checks.
-    const TYPE_SIGNALS_MINIMAL: &str = r#"{
-  "schema_version": 5,
-  "generated_at": "2026-04-18T12:00:00Z",
-  "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "head_commit": "0000000000000000000000000000000000000000",
-  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "signals": [
-    { "type_name": "TrackId", "namespace": "type", "kind_tag": "value_object", "signal": "blue", "found_type": true }
-  ]
-}"#;
+    fn type_signals_minimal() -> String {
+        let mut document = serde_json::json!({
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": "0".repeat(64),
+            "head_commit": "0".repeat(40),
+            "baseline_hash": "0".repeat(64),
+            "signals": [{
+                "type_name": "TrackId",
+                "namespace": "type",
+                "kind_tag": "value_object",
+                "signal": "blue",
+                "found_type": true
+            }],
+        });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut document);
+        serde_json::to_string_pretty(&document).unwrap()
+    }
 
     #[test]
     fn test_read_type_signals_found_decodes_document() {

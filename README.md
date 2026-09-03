@@ -60,6 +60,7 @@ track 作業には `/adr:add <slug>` で ADR を作り
 
 このテンプレートを使うには以下が必要:
 
+- **Unix（type-signals rustdoc 評価）** — 評価器は解決済み target root から専用 selection directory（immediate parent が正確に `.sotp-rustdoc`）と lock file を descriptor-relative に開き、親を含む path を no-follow で検証できる Unix に限る。Windows 等は unsupported であり、rustdoc snapshot の再利用および export は fail-closed で拒否する
 - **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。未初期化の export ツリーでは host で `cargo make init` を実行する
 - **Docker（任意）** — 既定の品質ゲートと CI は host toolchain で実行する。隔離環境を選ぶ場合だけ `Makefile.toml` の extend 参照先を `Makefile.docker.toml` に切り替える
 - **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)

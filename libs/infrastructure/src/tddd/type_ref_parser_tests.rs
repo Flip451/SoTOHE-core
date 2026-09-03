@@ -2373,7 +2373,8 @@ fn test_second_generic_param_produces_type_generic() {
 /// encodes the produced rustdoc impl target as `Type::Generic("T")`.
 #[test]
 fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+    use crate::tddd::catalogue_to_extended_crate_codec::encode_document;
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::entries::TraitEntry;
     use domain::tddd::catalogue_v2::methods::MethodGenericParam;
     use domain::tddd::catalogue_v2::roles::{ContractRole, ItemAction};
@@ -2381,7 +2382,6 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     use domain::tddd::catalogue_v2::{
         CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
     use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, Target};
 
     let mut doc = CatalogueDocument::new(
@@ -2427,8 +2427,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         format_version: FORMAT_VERSION,
         target: Target { triple: String::new(), target_features: vec![] },
     };
-    let encoded =
-        CatalogueToExtendedCrateCodec::new().encode(doc, &authoritative, &authoritative).unwrap();
+    let encoded = encode_document(doc, &authoritative, &authoritative).unwrap();
     let for_type = encoded
         .krate()
         .index

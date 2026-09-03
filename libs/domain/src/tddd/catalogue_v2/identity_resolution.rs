@@ -318,7 +318,12 @@ fn matching_candidates(
         let exact = universe
             .iter()
             .filter(|identity| {
-                identity.is_placed()
+                // An unplaced identity from another crate still has an exact
+                // crate-qualified spelling (`crate::Name`); only its module
+                // placement is unknown. A local unplaced identity must not
+                // match after `crate::` normalization, because that would
+                // treat omitted placement as an implicit crate-root path.
+                (identity.is_placed() || identity.crate_name() != catalogue_crate)
                     && identity.to_string() == lookup
                     && namespace.is_none_or(|expected| identity.namespace() == expected)
             })
@@ -1511,6 +1516,56 @@ mod tests {
             CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
                 if unresolved.as_str() == "domain::beta::Thing"
         ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_qualified_path_matches_unplaced_identity() {
+        let catalogue_crate = CrateName::new("usecase").expect("valid crate");
+        let unplaced = FullyQualifiedItemPath::new_unplaced_type(
+            CrateName::new("domain").expect("valid crate"),
+            Identifier::new("UserId").expect("valid item name"),
+        );
+        let universe = BTreeSet::from([unplaced.clone()]);
+
+        let resolved =
+            resolve_catalogue_identity(&reference("domain::UserId"), &catalogue_crate, &universe)
+                .expect("a crate-qualified reference identifies an unplaced declaration");
+        assert_eq!(resolved, unplaced);
+
+        let error = resolve_catalogue_identity(
+            &reference("domain::model::UserId"),
+            &catalogue_crate,
+            &universe,
+        )
+        .expect_err("an unmatched module path remains fail-closed");
+        assert!(matches!(
+            error,
+            CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                if unresolved.as_str() == "domain::model::UserId"
+        ));
+    }
+
+    #[test]
+    fn test_resolve_catalogue_identity_same_crate_qualified_unplaced_identity_remains_unresolved() {
+        let catalogue_crate = CrateName::new("domain").expect("valid crate");
+        let unplaced = FullyQualifiedItemPath::new_unplaced_type(
+            catalogue_crate.clone(),
+            Identifier::new("UserId").expect("valid item name"),
+        );
+        let universe = BTreeSet::from([unplaced.clone()]);
+
+        for spelling in ["crate::UserId", "domain::UserId"] {
+            let error =
+                resolve_catalogue_identity(&reference(spelling), &catalogue_crate, &universe)
+                    .expect_err("a same-crate qualified path must not place an unplaced identity");
+            assert!(matches!(
+                error,
+                CatalogueIdentityResolutionError::UnresolvedIdentifier(unresolved)
+                    if unresolved.as_str() == spelling
+            ));
+        }
+        assert!(!unplaced.is_placed());
+        assert_eq!(unplaced.module_path(), None);
     }
 
     #[test]

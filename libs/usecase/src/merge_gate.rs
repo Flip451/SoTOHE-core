@@ -696,6 +696,39 @@ mod tests {
     /// All signals carry the given `ConfidenceSignal`. The `declaration_hash`
     /// is set to [`ZERO_HASH`] so the companion catalogue mock (bytes of all
     /// zeros, or any fixture where the adapter returns `ZERO_HASH`) matches.
+    fn test_cache_key(
+        declaration_hash: domain::CatalogueDeclarationHash,
+        head_commit: domain::CommitHash,
+        baseline_hash: domain::BaselineHash,
+    ) -> domain::TypeSignalsCacheKey {
+        let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-usecase-test-target",
+        ))
+        .unwrap();
+        let expected = domain::ExpectedRustdocJsonPath::try_new(
+            target.as_path().join("doc/legacy.json"),
+            &target,
+        )
+        .unwrap();
+        let identity = domain::RustdocExecutionIdentity::new(
+            target,
+            domain::tddd::catalogue_v2::CrateName::new("legacy").unwrap(),
+            vec![],
+            domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let zero = domain::Sha256Digest::try_new("0".repeat(64)).unwrap();
+        domain::TypeSignalsCacheKey::new(
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            domain::ImplementationFingerprint::new(zero.clone()),
+            domain::ResolutionFingerprint::new(zero),
+            identity,
+        )
+    }
+
     fn signals_doc_with(entries: &[(&str, ConfidenceSignal)]) -> TypeSignalsDocument {
         let ts = domain::Timestamp::new("2026-05-08T00:00:00Z").unwrap();
         let sigs: Vec<domain::tddd::catalogue::TypeSignal> = entries
@@ -718,7 +751,7 @@ mod tests {
         let digest = domain::Sha256Digest::try_new(ZERO_HASH.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts,
-            domain::TypeSignalsCacheKey::new(
+            test_cache_key(
                 domain::CatalogueDeclarationHash::new(digest.clone()),
                 domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(digest),
