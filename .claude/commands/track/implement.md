@@ -10,6 +10,12 @@ User invokes this command as `/track:implement`. Use `$ARGUMENTS` as optional sc
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the implement workflow SSoT's `Summary-first context intake`.
+  Before selecting or dispatching tasks, use its CLI summaries as the primary context and treat
+  the selected task briefing as primary for task details. Do not bulk-read `*-types.json`,
+  review or binding JSON, full sub-workflow texts, or a `Related Conventions` list. Open only a
+  targeted diff or the artifact body named by a blocker; the dispatcher supplies resolved
+  convention paths with the implementer briefing for the delegated capability.
 - **Parallel implementation**: use Agent Teams (multiple subagents with `run_in_background: true`) for independent tasks. Serialize `cargo add` / `cargo update` / `Cargo.lock`-changing steps through a single worker.
 - **Task state transitions**: the calling orchestrator, never the `implementer` capability, performs them; do NOT edit `plan.md` directly (read-only view).
 - **Test validation per worker**: `cargo make test`; reserve full-suite commands for single workers to avoid `target/` build lock contention.

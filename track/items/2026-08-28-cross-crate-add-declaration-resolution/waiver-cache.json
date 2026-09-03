@@ -1,0 +1,1397 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "f03f696ce84249573ecf1d7388c81d87e35d5e6bafb4e4ad6d723476c8229afc",
+        "waived_reason_hash": "e74f6422f343afb3f66cf98caf52b0720714a14012365bbac55746923a9172fe"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Fail-closed type-signal document decode errors (AC-04).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
+        "waived_reason_hash": "6761aa549a903fe02f136a99d9f008a79f00c40e5c2eccc857793d4fddb7d909"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
+        "waived_reason_hash": "e728945ab9e8c45346258afe5b3de4f34627b8e2b3f4f1521515702c460213fd"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
+        "waived_reason_hash": "eb2817540baaa84b0af47a16a76e214cd1487fa8d44feb62c601bf279df09708"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte captured rustdoc JSON constructor",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
+        "waived_reason_hash": "1812abc69f8b6251386b4e9af5cbcd35597b068f3602c769c5a1156ad46aae41"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "7474bee4754e02a02a97155e456c13035f8ab7886bdd6f8d0c678ad8f0bfecc5",
+        "waived_reason_hash": "84ff63d6ffee609ae5536c5cb384f00e85232766658f81dc08114936102813d4"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte captured rustdoc JSON constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
+        "waived_reason_hash": "15254ca11ac06d301c954a7be5377650d0f0a4e4737474638b607b9d77322249"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte rustdoc snapshot constructor",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
+        "waived_reason_hash": "da05a97041d50e5a530698a09a16efb2714d494d01eca5b2ec6fb2982c172e59"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
+        "waived_reason_hash": "e0f01a0468ca8f893ea161caafa142dcfe0e18b790f1958cd2653503b3841a52"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
+        "waived_reason_hash": "71f8b3eb54a37842c2e2974a37d5ab761d4947cb26ba0033e7bfe84761b0d291"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "625a1f4ed56066ab250288bf8cd4989127eac76b83f043c021e176071b47a3e1",
+        "waived_reason_hash": "168a185602c8d26d2bee1b368f5a19c133430b7e7c1774725ac0bf7d3783eca6"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Opaque-byte rustdoc snapshot constructor (IN-03, IN-07).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "f715c51cb6a8cee86796724520a5bdbb8d57376d9b0a6be16a728c2920466087",
+        "waived_reason_hash": "78f8b8a052563602688f72acea876f65e51cbbdfe8e71bdf0c19c2daa19c1654"
+      },
+      "obligation_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "6e4e73e30da051ca7dfe6ae60c23d8ba4f45d123e93f8b9d6038aee4324b2d12",
+        "waived_reason_hash": "273fe8a3be7e4036a298738ea745a5c879345e23dbd7ead84c0d2b9500f3fc42"
+      },
+      "obligation_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "1316103e84076679179fe4253c8ffa699dd57df910b0e22a5abb3e65dd667348",
+        "waived_reason_hash": "15e1d0d7ecebed2a94f31a5c6dae56c4d73d4101126f9673eac24cc1ede41fb7"
+      },
+      "obligation_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Expected rustdoc JSON path (IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ImplementationFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "85d6688b1cb715dd6cb867cd7e3c7aeccbb3d052aa7d5c573459ecde7ed34516",
+        "waived_reason_hash": "6c6ee85524732052bd6e43834769bcf3d5c1211d1e32a04ebc9696f41f89ec0b"
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationFingerprint",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Implementation fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ImplementationFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "489b61bd7f6e508701f1c3cca37ea00e95ca83252fc28119526efe3fcbb79913",
+        "declaration_hash": "672b2c0105fff33aceaad289298f9c27b72e73c9ec1e2d4f1d28001a42ff764d",
+        "waived_reason_hash": "4c11548d6c836f2e28277a0b5b5309e0b45571dcecf0dedc7510496b8134d950"
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationFingerprint",
+        "item_identifier": "voluntary:CO-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ImplementationFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "e55b6f3c052fdf23b2e5a42a801d5d22b16de5f778f4dfba0f3a28a2b6904809",
+        "waived_reason_hash": "111dea38d0aa194abf8737fc873eba58f3467c96752217f5a3d5327cbf923125"
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationFingerprint",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Implementation fingerprint value (IN-03).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ResolutionFingerprint"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "edba60ea8a6a3691c9c1c495163c8d58cffcca11b174857b9cbd5bfbe0af3d0f",
+        "waived_reason_hash": "6bff1322c765010c7985d842f3e6e39ea2ed95e085059d4825115abe7b0f9961"
+      },
+      "obligation_id": {
+        "entry_key": "ResolutionFingerprint",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")])), docs: Some(DocString(\"Resolution-input digest (IN-03).\")) }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "ResolvedCargoTargetDirectory"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "8c3deca2bafca329c3d3a35eb7827a3831b0e8a2d3306ef1cded7db203595c00",
+        "waived_reason_hash": "9300347ffba63688c5eee1e2332c690e2b98355843669cfeb3b60d3f25b45bc7"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Resolved Cargo target directory value (IN-03).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
+        "declaration_hash": "958bad497c411ebcbe314c8fca92ea508ca0a9578168eb0f0eb25e217380f31b",
+        "waived_reason_hash": "75960aa65e7d2d9d22da6033c2738859a4780cad143dbd226a78b87ae65e7e1a"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Rustdoc execution identity (IN-03, IN-05, IN-06).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
+        "declaration_hash": "1575ab2f3b2b9a195df157b4e608d4931d8bda29b275e92d570b80f4dcd7f0d4",
+        "waived_reason_hash": "84f809bd8841184fd6c023f8e1f915373fbedf39279db6a332da2da414ff46b2"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:CO-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")])), docs: Some(DocString(\"Rustdoc execution identity (IN-03, IN-05, IN-06).\")), spec_refs: [SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-03\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-05\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"CO-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-07\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "2b33c5753bacca9470ee03c51e459da56db19acd1317262f133e6c9405867c72",
+        "declaration_hash": "d41bb644d4f37ef1bc88be2d02477c5e1d31fbd3288560a03c655f1a30f5116f",
+        "waived_reason_hash": "2d58c52b391b42739a2e8a2c6ae8bb490888dd6fba2d6a51d1bb663b948f8ad1"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "1a29b288283a72fa323bea04ad31a5521746139ae48591b2d4eccd0506f7f54e",
+        "waived_reason_hash": "c243c2c4fc10083dfccc217b469c522ba023463e1c21dfe94a39eae3f3d37ad0"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      "key": {
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "91e971264b2ea5a296a783fdcd4e38bdf965dafab1f693e4d2a47425cada882a",
+        "waived_reason_hash": "73af69a54e8e194d92780b866f41b63128c5308dfe329908488248d14d99c30a"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "docs: Some(DocString(\"Rustdoc execution identity (IN-03, IN-05, IN-06).\")), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      "key": {
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "886c283aca5695d4d39aa667493e5ca30901aa2f50dad80849fc677cb1e70bc2",
+        "waived_reason_hash": "67ca6b8a8da5ef5c7cbcbc0b78d6973e50d46d637058e03951d398cbed0dae89"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      "key": {
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "64f7e3e19cb44bd421e1c890a7b13ba3be2d0e1baecbb0d9d98ec3d008858dc7",
+        "waived_reason_hash": "8bd6d95b188d9c3365347848a6fdb98418765c046e6240f1b2cb5d48bd09a7df"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "variants: [VariantDecl { name: VariantName(Identifier(\"TargetDirectoryNotAbsolute\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ExpectedJsonOutsideTargetDirectory\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"EmptyProfile\")), payload: Unit }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "6716d9486a3ca580a4314fe95cd30583f04c7ef8e2a5c1667444b9274548a75f",
+        "waived_reason_hash": "3ed06a9986b3f37dd15e7e34b963e8a7f0b14e66afc5319d1e0c5b07e705585f"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals cache identity (IN-03).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "6fe452d069e71db7a89efab0033569506c063f0043936683d8ce30ac384be433",
+        "waived_reason_hash": "d1767ef78e2ae23053bd5eb9946fd09585bbfadf4c92367005534e76c991c25a"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals cache identity (IN-03).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "11bcc7f8833b05acce0869f07460f558455a6d537966ae2f98a43e8e769edb23",
+        "waived_reason_hash": "fd9304c5aa06ff56c17d8a33d1ca7ce0be03b6998b5dc0ed09909449fca3f706"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals cache identity (IN-03).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "3820fbfa938b73adcd65bf0e8042619b1e658e7e393b586c2366d249527cd287",
+        "waived_reason_hash": "d6dee3253bf8f431ec743767554a08e53c62bddfc2eaed0a66e95d5762a78a58"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals reuse outcome (AC-04).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "daad5a1216d9d4ac24e3084eb6bae85104463428cf4cc7d4778c30d405665739",
+        "waived_reason_hash": "2cd8b857e4be261e2d86d4b81de1fc9b046bb873295960a9eea6241df8beb3f7"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals reuse outcome (AC-04).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "cb5535ffd83a474b6899a8f24257005e1d6c229836f8eba3f2e0fd1a95a3d2f9",
+        "waived_reason_hash": "e3afd59a2cbbce1320ee38238683fa1a796c4edbec662f4a8f93e59e807449ed"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true } })",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "a641bbae2a9442ee252b18de796699ba45c41567e08fcda9f516c185fce840b2",
+        "waived_reason_hash": "beeedc78ce3ce6f04b0b1d2a87df00e735e65a69986740cad9951ee686024616"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Verified type-signals reuse input (IN-03, IN-07).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CapturedRustdocJson"
+      },
+      "key": {
+        "anchor_text_hash": "a0534c3d15c1b2181589fc9541ab5d950fb7ab98f42561d16ebe4d790a88d59d",
+        "declaration_hash": "310259a3eb00ca368ed2a837820a1b3d8005ae09b11288c5d09c87426c4976e8",
+        "waived_reason_hash": "c7cf29ff8c23b2b746c9c5cd7cff6c2f61d9c7c4aa47c2f8ddba56050e9d917f"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedRustdocJson",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Captured rustdoc JSON value (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CapturedRustdocJson"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "aca8a4e9ce291c62b11d3feb5439a4d949f147ace64a801cd773e37b39c03dec",
+        "waived_reason_hash": "219ebe77beb9afa94cd8a71b6a6eceb55b974131f267b508f073707174dd3482"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedRustdocJson",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CapturedRustdocJson"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "06799725a5920fc1cce5103e5c45eecaaadb24bd3cba1acc42c6b839aa622a7c",
+        "waived_reason_hash": "18a71569fb3fd598bba3e529bd25187a06b490d6e2dcc7271a7f15a14cf521c5"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedRustdocJson",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Captured rustdoc JSON value (IN-03, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CapturedRustdocJson"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "d5f0cc46947a471bc36cbf85dd73e60a52eeec04888377b01b297a5eb9096529",
+        "waived_reason_hash": "733fefd99a2a12d845200de0f1464e5531664e578cd6196a17b6cbd745c5392e"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedRustdocJson",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [],",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "CapturedRustdocJson"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "9d3f093f8cdb7b8ec026835592d125a93ca53e390b93449532ed2098e5899237",
+        "waived_reason_hash": "1e5a8ae344496c74d6df25d8caee2fd4bf019fb81860d70878c0664593e6d2d3"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedRustdocJson",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "9fa9ce00c5613069e7c433971f3a24ca3eff42d7e9e57112ee9ff4dad7a6bcd1",
+        "waived_reason_hash": "f22e85cdfa332aba99603b5201c0ada6c079c77dddc9bf8cf15d9732a5163251"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSnapshot",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "5c409f04ebc39c459f9e9700004789c7beccf73093ab565f4732fd947328c9d9",
+        "waived_reason_hash": "ddeb139f11c6fc50cedd40a567d1dd0c835dd8d4d15dfade85b32a0591769bc1"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSnapshot",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "fields: [], methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "0ff2a51bff0ea3da6f02a99e62013b677c01c7db91a341e226efe15380b43549",
+        "waived_reason_hash": "3dd4262974b5612e1a279fba57151c900fb5c430f66e244f37d7c96344e4f16b"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSnapshot",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Identity-bearing rustdoc snapshot (IN-03, IN-07).\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "66da4605f52fc17e143406313c9578226cde50c46006c0bb3c9ec94f5883bf1e",
+        "waived_reason_hash": "b1bbb6a9986eb47f990eedb0130ad766caa0d45425c3570010e8b0ba290f703e"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSnapshot",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocJsonHash"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "fd4a3c353e0ad2c669f0e7ae23d0ec47d4bcfefaab9acec441055d65def5330c",
+        "waived_reason_hash": "be5e23ca937d5072da3291d0d4603b515580db7b9976841d5c75527305b00b99"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocJsonHash",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocJsonHash"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "1845082299ff5564b6a8c5b8a3f031186e125320d4482ca8d514545eb0d5d72d",
+        "waived_reason_hash": "d6fb15738846380439f25185510e2779bd47ecdf693d72343b8f3a1ba5e9a4d2"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocJsonHash",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocJsonHash"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "e1caecfcefb1e83d06652de8fa69ff1992becdb42565d23762d1add504915074",
+        "waived_reason_hash": "eee00cd326bc43531041602f56077634d9c40d34fa19a9bf3db658072c00e24d"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocJsonHash",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "RustdocJsonHash"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "3a577bd98937cbca9c63bbcda9b49190730b442eefc0f22a90769e9e6e502390",
+        "waived_reason_hash": "8bcc926a8edcfa26da174a03a91dd11fb69889566a57bb66b1ea93036625e67e"
+      },
+      "obligation_id": {
+        "entry_key": "RustdocJsonHash",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Content identity of the exact rustdoc JSON bytes read while the matching target-directory lock remains held.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      "key": {
+        "anchor_text_hash": "e68a734337ecfa61803575e86873c8b0213753032bb9a26442ec3cf1fc8d8bd8",
+        "declaration_hash": "e8c00fa9fe5188496ae6032f320e106df04a7594e27539c244dfadb625c3c91c",
+        "waived_reason_hash": "26b2bcc213bfa4cd419c68533dbf5a7c61d06665f3075db72a118cc055b527c6"
+      },
+      "obligation_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      "key": {
+        "anchor_text_hash": "4cbe55f516128a2acc597597dff21d7c88d857242498b10b47b1a9ef5d0abcca",
+        "declaration_hash": "20822cdbc456c755289ef76dcfb03d029b127b7c5e14a0cdefbc93c98ae9d5c5",
+        "waived_reason_hash": "d847f58b2ffbe20eee9c521e44beace6930d209b4f07142491fd6fdc95090394"
+      },
+      "obligation_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "item_identifier": "voluntary:CO-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Authoritative per-layer rustdoc context (IN-02, IN-07).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      "key": {
+        "anchor_text_hash": "a0c402f0527e3fec8d9495555321e6b8b774379384365acd6eaa733979028622",
+        "declaration_hash": "4f4180d6ba327e44bab422c2845fa25a06aa5545f90279589a52f964050844ab",
+        "waived_reason_hash": "a47c247f070ca7ee9d2b32394d7dbb2de01c2bc909a9f9cd19e027c1db36c4e4"
+      },
+      "obligation_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "9fe6f922d8a5786c78a0179cac62e55a50f68f710c477c96bc57679d3323aeab",
+        "declaration_hash": "ba4482063192787112c1ce3899a7f1186af7568c6df55961b10937a9daf62782",
+        "waived_reason_hash": "104e3a9dd7f1317147a46d8ad0af97d6068d020e59442d3245ecc258b11b6bb7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"AuthoritativeInput\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"Evaluation\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"CacheWrite\")), payload: Tuple([TypeRef(\"domain::tddd::catalogue_linter::FreeText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: Some(ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_evaluator\")])), docs: Some(DocString(\"Type-signals evaluator error vocabulary.\")), spec_refs: [SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-04\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"CO-05\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-05\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-05\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"CO-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-07\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"IN-06\") }, SpecRef { file: \"track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "58b640b9a033e9bc973810a0f337b7895862c4f152faa995066a69219a80651e",
+        "declaration_hash": "9f0f8ae1420e8bc8b2f49971756e2e73f6065b8028d41cb8bbfee37316f30b88",
+        "waived_reason_hash": "2f48056f95c97c0b040a70946c0c14972958da77861227d8ac55bb9b653dc3a7"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:CO-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "23ca451eadbbe20130b2fc81e2453fe2d47d2867470563e2b4a1ea5d3072f8a9",
+        "declaration_hash": "c5ca56166f7abb56ca9bf4fb7acc33b5cb25103c1efc0391543b7643ebfd7a46",
+        "waived_reason_hash": "9ebff6d24e79dbd7ef6e9c66f0a38a5f80b94adb478e3146b05b801c0310e293"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "841613b4ac1da90f5b6210d55385323fb29a28814e9959c02b996eacd88483af",
+        "declaration_hash": "89fb2a7e9ba25a4419f0e0d43350d0498c0cd4519c15abbaff53adcc9d9ef7c4",
+        "waived_reason_hash": "96c3ce861a2458cbcecfe02bb1a4df0f21e13d164bd18c6fb58729c81a766509"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "e1f2757880facfce2b5ce37fcc16eb68c105288a00e418de43d7c0bc9e8501cc",
+        "declaration_hash": "57cae52cd8a9f60ff8cc5f17c6f355d22dd2f0e95e5a2bfeacb531c696154bc6",
+        "waived_reason_hash": "8a866e55a141977b67a93f9ff8f541bb989d99786463cd770635134e6f512636"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:CO-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "2b33c5753bacca9470ee03c51e459da56db19acd1317262f133e6c9405867c72",
+        "declaration_hash": "8d16e5f2b459711d0201bff96aa7e10aaba33aec3b07a2707333aab61e2dd08b",
+        "waived_reason_hash": "e5dd19dea8e316c20c12213bc0044246032948fb9c4cda0cfb35ad0d60728a60"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-06",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "36429b546283e80237f4d9438e4e79672964030916dfff851638757b6041a77d",
+        "declaration_hash": "17307cfa8062f9a51998c756208bac5165836fabce1b135774b34a1af95e8c5c",
+        "waived_reason_hash": "0f64f676217fda93c6f458a657226046ec427aa7963ba3a98d920ae6f349473b"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:IN-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "a4ebb2e48a82c70143640e39117f7afe2e211334deadaf71fccd8d4ad67c914c",
+        "declaration_hash": "d4a9413b816759b974079197381d0eb25acdb92835e03add074f20d3616b2e0d",
+        "waived_reason_hash": "7ef13bbddd9584099b463e6cd92df156b8e28e755b8e6741936b997532175fc5"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Type-signals evaluator error vocabulary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json"
+        },
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+      },
+      "key": {
+        "anchor_text_hash": "1c12897da7a4f521aeb52b05a6b5474dba8d2e15bf875dfaf35d871e8758f813",
+        "declaration_hash": "41de41297a69b4dabe716606237e58a38804ab1042d0e8b9adfa07c41d7510a2",
+        "waived_reason_hash": "fce673d08b4d1550be2ef83934f59b047eb153b574b7c2bc2f63b37a6c90edfe"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Rustdoc port error vocabulary (AC-04).",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-08-28-cross-crate-add-declaration-resolution"
+}

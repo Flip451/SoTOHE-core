@@ -1,0 +1,152 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "不正な静的秘匿パターンは構築検証で検出され、秘匿を無音で無効化したまま出力処理を続行しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "有効な静的秘匿パターンを用いる出力経路では、対象となる機密値が従来どおり秘匿される。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "security 規約は、秘匿・検証・権限判定の各セキュリティ境界で無音の機能縮退を禁止し、構築又は初期化の失敗を停止させる方針を明記する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "静的秘匿パターンのためだけに、新しい起動時一括検証コマンド又は実行面を追加しない。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "静的秘匿パターンの構築不能はプログラミングエラーとして fail-stop とし、警告のみの通知、無効値への縮退、又は秘匿なしでの出力継続を許さない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "この変更は静的な秘匿境界パターンに限定し、追加される同種の静的リテラルにも同一の fail-closed 構築保証を適用する。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "sotp が静的な秘匿パターンを利用する際、パターン不正によって秘匿機能全体が無音で無効化され、機密値が出力へ流出する状態を許さない。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "秘匿境界で使用する全ての静的正規表現リテラルについて、構築失敗が秘匿のスキップ又は代替なしの継続につながらず、処理を停止させること。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "静的秘匿パターンごとに構築を検証し、production で初めて不正パターンが検出される経路を残さないこと。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "秘匿・検証・権限判定のセキュリティ境界では無音の機能縮退を禁止し、構築又は初期化の失敗を停止として扱う規約を記録すること。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "operator 設定その他の外部入力で動的に供給される秘匿パターンの設計又は失敗時の扱いは対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-20-1053-sensitive-redaction-fail-closed.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "起動時に静的パターンを一括検証するための新しいコマンド又は実行面は追加しない。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 12,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "シークレット秘匿の静的正規表現を fail-closed にする",
+  "version": "1.0"
+}

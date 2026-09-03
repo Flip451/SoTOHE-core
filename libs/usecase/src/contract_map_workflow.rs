@@ -274,13 +274,12 @@ mod tests {
     use domain::RoleKind;
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
-    use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FunctionName, FunctionPath, TraitName, TypeName,
-    };
+    use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
     use domain::tddd::catalogue_v2::{
         MethodDeclaration, ModulePath, StructKind, StructShape, TypeKindV2,
     };
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::{ContractMapContent, ContractMapRenderResult, ContractMapRenderWarning};
     use mockall::{mock, predicate};
 
@@ -340,7 +339,7 @@ mod tests {
         // domain: 1 type entry (User)
         let mut domain_doc = empty_v3_doc("domain");
         domain_doc.insert_type(
-            TypeName::new("User").unwrap(),
+            CatalogueEntryKey::try_new("User".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::entity().unwrap(),
@@ -351,7 +350,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -363,7 +362,7 @@ mod tests {
         let mut usecase_doc = empty_v3_doc("usecase");
         for trait_name in ["RegisterUser", "RegisterUserCommand"] {
             usecase_doc.insert_trait(
-                TraitName::new(trait_name).unwrap(),
+                CatalogueEntryKey::try_new(trait_name.to_owned()).unwrap(),
                 TraitEntry::new(
                     ItemAction::Add,
                     ContractRole::ApplicationService,
@@ -386,7 +385,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
-                    ModulePath::root(),
+                    Some(ModulePath::root()),
                     None,
                     vec![],
                     vec![],

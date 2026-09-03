@@ -24,6 +24,14 @@ User invokes this command as `/track:obligation-fulfillment`. 引数は不要（
 - **Progress tracking**: ラウンドごとに lane counts（`bin/sotp test-obligation results`）を
   記録して報告する。
 
+### Gate waiting
+
+- Each implementer round and each orchestrator-host `bin/sotp test-obligation evaluate` is run as
+  one blocking call whose result is read once; `evaluate` is a synchronous repair step, never a
+  background or fire-and-forget launch, and `check` — not `evaluate` — is what the commit gate
+  runs. Do not poll for round completion; if the host backgrounds a call, read the result once
+  after the single completion notification.
+
 ## Report format
 
 After execution, summarize:

@@ -2,6 +2,8 @@
 
 use std::collections::HashMap;
 
+use domain::tddd::catalogue_linter::ExtractedTypeRefPath;
+use domain::tddd::catalogue_v2::identifiers::ParamName;
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, Id, Path, Type,
 };
@@ -48,6 +50,36 @@ fn parse_generic_projection(s: &str, generic_params: &[&str]) -> Type {
     let mut emitted = |_name: String| 1_u32;
     parse_type_ref_with_generics(s, &no_local, 100, &HashMap::new(), &mut emitted, generic_params)
         .unwrap()
+}
+
+#[test]
+fn test_extract_type_ref_path_context_classifies_lifetime_and_const_parameters() {
+    let adapter = SynTypeRefPathExtractorAdapter;
+    let type_ref = domain::tddd::catalogue_v2::identifiers::TypeRef::new(
+        "std::vec::Vec<&'a T, [u8; N]>".to_owned(),
+    )
+    .unwrap();
+    let type_parameters = vec![ParamName::new("T").unwrap()];
+    let lifetime_parameters = vec![ParamName::new("a").unwrap()];
+    let const_parameters = vec![ParamName::new("N").unwrap()];
+
+    let occurrences = adapter
+        .extract(&type_ref, &type_parameters, &lifetime_parameters, &const_parameters)
+        .unwrap();
+
+    assert!(
+        occurrences.contains(&ExtractedTypeRefPath::TypeParameter(ParamName::new("T").unwrap(),))
+    );
+    assert!(
+        occurrences
+            .contains(&ExtractedTypeRefPath::LifetimeParameter(ParamName::new("a").unwrap(),))
+    );
+    assert!(
+        occurrences.contains(&ExtractedTypeRefPath::ConstParameter(ParamName::new("N").unwrap(),))
+    );
+    assert!(!occurrences.iter().any(|occurrence| {
+        matches!(occurrence, ExtractedTypeRefPath::Path { type_ref: path, .. } if path.as_str() == "T" || path.as_str() == "N")
+    }));
 }
 
 // -----------------------------------------------------------------------
@@ -2341,16 +2373,16 @@ fn test_second_generic_param_produces_type_generic() {
 /// encodes the produced rustdoc impl target as `Type::Generic("T")`.
 #[test]
 fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
-    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+    use crate::tddd::catalogue_to_extended_crate_codec::encode_document;
+    use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::entries::TraitEntry;
     use domain::tddd::catalogue_v2::methods::MethodGenericParam;
     use domain::tddd::catalogue_v2::roles::{ContractRole, ItemAction};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::{
-        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeRef,
+        CatalogueDocument, CatalogueEntryKey, CrateName, ModulePath, ParamName, TypeRef,
     };
-    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
-    use rustdoc_types::ItemEnum;
+    use rustdoc_types::{Crate, FORMAT_VERSION, ItemEnum, Target};
 
     let mut doc = CatalogueDocument::new(
         2,
@@ -2358,7 +2390,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         LayerId::try_new("domain").unwrap(),
     );
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -2368,7 +2400,7 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -2384,7 +2416,18 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     );
     doc.push_trait_impl(trait_impl);
 
-    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let paths = std::collections::HashMap::new();
+    let authoritative = Crate {
+        root: rustdoc_types::Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths,
+        external_crates: std::collections::HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let encoded = encode_document(doc, &authoritative, &authoritative).unwrap();
     let for_type = encoded
         .krate()
         .index

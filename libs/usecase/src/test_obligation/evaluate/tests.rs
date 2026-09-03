@@ -10,14 +10,12 @@ use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, MethodDeclaration, MethodName, ModulePath, SelfReceiver,
-    StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2,
-    TypeName, TypeRef,
+    AttestedCatalogueDocument, CatalogueDocument, CrateName, MethodDeclaration, MethodName,
+    ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2, TypeEntry,
+    TypeKindV2, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier,
@@ -71,6 +69,7 @@ use super::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::test_obligation::LoadedCatalogueDocument;
 
 fn run<F: Future>(future: F) -> F::Output {
@@ -440,9 +439,12 @@ impl SpecDocumentLoaderPort for StubSpec {
 }
 
 struct StubCatalogue(CatalogueDocument);
-impl CatalogueDocumentLoaderPort for StubCatalogue {
-    fn load(&self, _p: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
-        Ok(self.0.clone())
+impl AttestedCatalogueDocumentLoaderPort for StubCatalogue {
+    fn load(&self, _p: &Path) -> Result<AttestedCatalogueDocument, CatalogueDocumentLoaderError> {
+        Ok(AttestedCatalogueDocument::attest(b"T014 test catalogue", |_| {
+            Ok::<_, std::convert::Infallible>(self.0.clone())
+        })
+        .unwrap())
     }
 }
 
@@ -744,7 +746,7 @@ fn method_anchor_ownership_catalogue() -> CatalogueDocument {
         LayerId::try_new("usecase").unwrap(),
     );
     catalogue.insert_trait(
-        TraitName::new("ApplicationService").unwrap(),
+        CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::ApplicationService,
@@ -754,7 +756,7 @@ fn method_anchor_ownership_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![
                 method_owned_spec_ref("IN-01"),
@@ -830,7 +832,7 @@ fn money_catalogue() -> CatalogueDocument {
         LayerId::try_new("domain").unwrap(),
     );
     doc.insert_type(
-        TypeName::new("Money").unwrap(),
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TypeEntry::new(
             domain::tddd::catalogue_v2::roles::ItemAction::Add,
             DataRole::value_object(),
@@ -838,14 +840,14 @@ fn money_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
     doc.insert_trait(
-        TraitName::new("MyPort").unwrap(),
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -882,7 +884,7 @@ fn money_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -922,7 +924,7 @@ fn type_entry(kind: TypeKindV2, role: DataRole) -> TypeEntry {
         vec![],
         vec![],
         vec![],
-        ModulePath::root(),
+        Some(ModulePath::root()),
         None,
         vec![],
         vec![],
@@ -940,7 +942,7 @@ fn catalogue_with_type_entries(
         LayerId::try_new(layer).unwrap(),
     );
     for (name, entry) in entries {
-        catalogue.insert_type(TypeName::new(name).unwrap(), entry);
+        catalogue.insert_type(CatalogueEntryKey::try_new(name.to_owned()).unwrap(), entry);
     }
     catalogue
 }

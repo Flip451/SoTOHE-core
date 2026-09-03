@@ -152,6 +152,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         Arc::new(infrastructure::base_merge::FsBaseMergeContextAdapter::new()),
         Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
         base_merge_cleanup,
+        Arc::new(infrastructure::track::GitTrackCommitHashAdapter::new()),
     ));
     cli_driver::track::TrackDriver::new(
         track_init_service,
@@ -225,7 +226,9 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
         ),
     );
     let catalogue_lint_active_operation = Arc::new(
-        infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter,
+        infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter::new(
+            Arc::new(infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter),
+        ),
     );
     let catalogue_lint_active_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
     let catalogue_lint_active_service = Arc::new(
@@ -235,7 +238,9 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
         ),
     );
     let lint_operation =
-        Arc::new(infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter);
+        Arc::new(infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter::new(
+            Arc::new(infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter),
+        ));
     let lint_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
     let lint_service = Arc::new(usecase::track_lifecycle::tddd::lint::TrackLintInteractor::new(
         lint_operation,

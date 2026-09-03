@@ -174,9 +174,20 @@ id(s) / records and the grounds for the verdict.
 - Verdicts are relayed to the finding's origin verbatim — the orchestrator must not rewrite
   or summarize them into an adjudication of its own.
 
-## Session resume
+## Session continuity and resume
 
-When dispatched with `--resume`, first check whether the briefing, current ADR, latest
-baseline, or ledger entry changed since the previous session. Re-read every changed input
-before returning a verdict. A failed or expired resume starts fresh and does not weaken the
-judgment.
+This capability session is independent of the calling orchestrator's parent session. A
+parent-session refresh discards the parent orchestrator's in-memory context; it neither resumes
+this capability nor transfers unpersisted verdict reasoning. This capability writes no durable
+verdict state. The handoff is the current briefing plus the current ADR, relevant diff, latest
+baseline, and ledger records named by the briefing and this contract.
+
+After a parent refresh, the dispatcher must issue a fresh briefing for the current judgment
+mode, carrying those exact paths and the current diagnostic / edit context; it must not refer
+only to discarded parent context. A fresh dispatch, or a dispatch that changes concern, starts
+from that briefing. Only an explicit `sotp capability exec --resume` for the same track and
+capability continues a capability session. Fresh and resumed dispatches re-specify every
+execution flag (model, sandbox, and effort); a failed or expired resume, or a provider/model
+mismatch, falls back to a fresh session. On resume, first check whether the briefing, current ADR,
+latest baseline, or ledger entry changed since the prior capability session, and re-read every
+changed input before returning a verdict.

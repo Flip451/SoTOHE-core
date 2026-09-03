@@ -1,196 +1,357 @@
-//! Global node and trait indexes for TypeRef/trait_ref resolution.
+//! Global canonical-identity indexes for contract-map resolution.
 //!
 //! All items are `pub(super)` — implementation details of the render module.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
-use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::ContractMapRendererError;
+#[cfg(test)]
+use domain::tddd::catalogue_v2::Identifier;
+use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity;
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, CatalogueEntryKey, CatalogueItemNamespace, CrateName,
+    FullyQualifiedItemPath, ModulePath, TypeRef,
+};
+use syn::visit::Visit;
 
 use super::{trait_rep_node_id, type_rep_node_id};
 
 // ---------------------------------------------------------------------------
-// Global node index for TypeRef resolution
+// Canonical identity index
 // ---------------------------------------------------------------------------
 
-/// Global node index for resolving `TypeRef` strings to rendered mermaid node IDs.
+/// Index of declared catalogue identities and their rendered node ids.
 ///
-/// Built once per render call from all catalogue documents (Decision O-2/O-3
-/// pattern, CN-05). Used to resolve field/param/return/variant TypeRef targets so
-/// edges connect to the actual rendered subgraph nodes rather than auto-created
-/// ghost nodes.
-///
-/// The index stores a single qualified map: `"crate_name::TypeName"` → `node_id`.
-/// This supports two resolution modes:
-/// - **Qualified lookup** (`"crate::Name"` in the TypeRef): exact map lookup.
-/// - **Bare-name lookup** (no `::` in the TypeRef): self-crate scoped — resolves
-///   `current_crate::name`. Bare names in the catalogue schema represent self-crate
-///   types; no cross-crate fallback is performed (avoids silently wiring generic
-///   params like `T` or `Self` to a coincidentally-named type in another crate).
+/// The catalogue key is not used as an identity lookup. Each entry is first
+/// represented as a [`FullyQualifiedItemPath`], and every reference is resolved
+/// through the domain identity resolver against the complete index universe.
+/// An identity with more than one rendered node is marked ambiguous and cannot
+/// be selected by a caller.
 pub(crate) struct NodeIndex {
-    /// `"crate_name::TypeName"` → `node_id`.
-    qualified: BTreeMap<String, String>,
+    nodes: BTreeMap<FullyQualifiedItemPath, Option<String>>,
+    universe: BTreeSet<FullyQualifiedItemPath>,
 }
 
 impl NodeIndex {
     pub(crate) fn new() -> Self {
-        Self { qualified: BTreeMap::new() }
+        Self { nodes: BTreeMap::new(), universe: BTreeSet::new() }
     }
 
-    /// Insert a type entry into the index.
+    /// Inserts a synthetic root identity. This helper is retained for focused
+    /// renderer tests; production indexes use
+    /// [`Self::insert_catalogue_entry_in_namespace`].
+    #[cfg(test)]
     pub(crate) fn insert(&mut self, crate_name: &str, bare_name: &str, node_id: String) {
-        let qualified_key = format!("{crate_name}::{bare_name}");
-        self.qualified.insert(qualified_key, node_id);
+        let Ok(crate_name) = CrateName::new(crate_name.to_owned()) else {
+            return;
+        };
+        let Ok(name) = Identifier::new(bare_name.to_owned()) else {
+            return;
+        };
+        self.insert_identity(
+            FullyQualifiedItemPath::new(crate_name, ModulePath::root(), name),
+            node_id,
+        );
     }
 
-    /// Look up a `TypeRef` string and return the matching node_id, if resolvable.
-    ///
-    /// `current_crate` is the crate name of the catalogue document that owns the
-    /// entry being emitted. It is used to scope bare-name lookups: bare `TypeRef`
-    /// strings denote self-crate types, so resolution is restricted to the
-    /// current-crate's index entries.
-    ///
-    /// Resolution:
-    /// 1. Strip generic suffix (`"Foo<T>"` → `"Foo"`). If stripping yields an empty
-    ///    string (e.g. `"<T as Trait>::Assoc"`), skip index lookup — these complex
-    ///    forms are never catalogue entries and would produce malformed ids.
-    /// 2. Normalize Rust-keyword path prefixes (`crate::`, `self::`, `super::`) by
-    ///    taking the last `::` segment. This handles catalogue TypeRefs written as
-    ///    `"crate::Foo"` or `"crate::module::Foo"`, treating them as self-crate bare
-    ///    names (`"Foo"`).
-    /// 3. If the normalised ref has `::`, try qualified lookup (`"crate_name::Foo"`)
-    ///    in `qualified`. Returns `None` if not found (workspace-external path).
-    /// 4. For bare names, look up `current_crate::stripped` in `qualified`. Returns
-    ///    `None` if not found — bare names in the catalogue schema represent self-crate
-    ///    types; no cross-crate fallback is performed (avoids silently wiring generic
-    ///    params like `T` or `Self` to a coincidentally-named type in another crate).
-    pub(crate) fn resolve(&self, type_ref_str: &str, current_crate: &str) -> Option<&str> {
-        let stripped = strip_generics(type_ref_str);
-        // Guard: complex refs that strip to empty are not catalogue entries.
-        if stripped.is_empty() {
-            return None;
-        }
-        // Normalize Rust-keyword path prefixes (crate::, self::, super::) to bare name.
-        // e.g. "crate::module::Foo" → "Foo", "self::Bar" → "Bar".
-        let normalised = if stripped.starts_with("crate::")
-            || stripped.starts_with("self::")
-            || stripped.starts_with("super::")
-        {
-            stripped.rsplit("::").next().unwrap_or(stripped)
-        } else {
-            stripped
+    /// Inserts a catalogue entry under its canonical identity.
+    #[cfg(test)]
+    pub(crate) fn insert_catalogue_entry(
+        &mut self,
+        crate_name: &CrateName,
+        key: &CatalogueEntryKey,
+        module_path: &ModulePath,
+        node_id: String,
+    ) {
+        self.insert_catalogue_entry_in_namespace(
+            crate_name,
+            key,
+            Some(module_path),
+            CatalogueItemNamespace::Type,
+            node_id,
+        );
+    }
+
+    /// Inserts a catalogue entry while retaining its type/trait namespace and
+    /// omitted-placement state.
+    pub(crate) fn insert_catalogue_entry_in_namespace(
+        &mut self,
+        crate_name: &CrateName,
+        key: &CatalogueEntryKey,
+        module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+        node_id: String,
+    ) {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => {
+                FullyQualifiedItemPath::from_type_catalogue_entry_key(crate_name, key, module_path)
+            }
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(crate_name, key, module_path)
+            }
         };
-        if normalised.is_empty() {
-            return None;
-        }
-        if normalised.contains("::") {
-            // Qualified path: try exact lookup first (e.g. "domain_core::UserId" — 2 segments).
-            if let Some(node_id) = self.qualified.get(normalised) {
-                return Some(node_id.as_str());
+        let Ok(identity) = identity else {
+            return;
+        };
+        self.insert_identity(identity, node_id);
+    }
+
+    fn insert_identity(&mut self, identity: FullyQualifiedItemPath, node_id: String) {
+        self.universe.insert(identity.clone());
+        match self.nodes.entry(identity) {
+            std::collections::btree_map::Entry::Vacant(entry) => {
+                entry.insert(Some(node_id));
             }
-            // Fallback for module-qualified paths (3+ segments, e.g. "domain::module::TypeName"):
-            // extract crate (first segment) + type name (last segment) and try "crate::TypeName".
-            // This covers TypeRefs written as fully module-qualified paths where the index key
-            // stores only "crate::TypeName" (the catalogue key is bare name, not module-path).
-            let mut segments = normalised.splitn(2, "::");
-            if let (Some(crate_seg), Some(rest)) = (segments.next(), segments.next()) {
-                let type_name = rest.rsplit("::").next().unwrap_or(rest);
-                let fallback_key = format!("{crate_seg}::{type_name}");
-                return self.qualified.get(fallback_key.as_str()).map(|s| s.as_str());
+            std::collections::btree_map::Entry::Occupied(mut entry) => {
+                let current = entry.get_mut();
+                if current.as_deref() != Some(node_id.as_str()) {
+                    *current = None;
+                }
             }
-            return None;
         }
-        // Bare name: self-crate only (no cross-crate fallback).
-        let current_crate_key = format!("{current_crate}::{normalised}");
-        self.qualified.get(&current_crate_key).map(|s| s.as_str())
+    }
+
+    /// Looks up a type or trait reference through the shared domain resolver.
+    ///
+    /// The input may be a complete type expression such as `Wrapper<T>`; the
+    /// root path is extracted by `syn`, while identity selection itself remains
+    /// owned by `resolve_catalogue_identity`. Ambiguous and unresolved paths
+    /// return `Ok(None)`, so the renderer never guesses a node.
+    ///
+    /// Relative prefixes and a leading absolute `::` cannot be interpreted
+    /// without the referring module context. They are rejected instead of
+    /// being rewritten into a potentially wrong catalogue identity.
+    pub(crate) fn resolve(
+        &self,
+        type_ref_str: &str,
+        current_crate: &str,
+    ) -> Result<Option<&str>, ContractMapRendererError> {
+        let syn_type = match syn::parse_str::<syn::Type>(type_ref_str) {
+            Ok(syn_type) => syn_type,
+            Err(_) => return Ok(None),
+        };
+        reject_unsupported_prefixes(&syn_type, current_crate)?;
+        let syn::Type::Path(type_path) = syn_type else {
+            return Ok(None);
+        };
+        if type_path.qself.is_some() {
+            return Ok(None);
+        }
+
+        let path = path_as_string(&type_path.path);
+        let reference = match TypeRef::new(path.clone()) {
+            Ok(reference) => reference,
+            Err(_) => return Ok(None),
+        };
+        let catalogue_crate = match CrateName::new(current_crate.to_owned()) {
+            Ok(catalogue_crate) => catalogue_crate,
+            Err(_) => return Ok(None),
+        };
+        let absolute_crate =
+            reference.as_str().strip_prefix("::").and_then(|path| path.split("::").next());
+        let universe = self
+            .universe
+            .iter()
+            .filter(|identity| {
+                if let Some(absolute_crate) = absolute_crate {
+                    identity.crate_name().as_str() == absolute_crate
+                } else {
+                    reference.as_str().contains("::") || identity.crate_name() == &catalogue_crate
+                }
+            })
+            .cloned()
+            .collect::<BTreeSet<_>>();
+        let identity = match resolve_catalogue_identity(&reference, &catalogue_crate, &universe) {
+            Ok(identity) => identity,
+            Err(_) => return Ok(None),
+        };
+        Ok(self.nodes.get(&identity).and_then(Option::as_deref))
     }
 }
 
-// ---------------------------------------------------------------------------
-// Strip generic arguments
-// ---------------------------------------------------------------------------
+struct UnsupportedPrefixVisitor {
+    unsupported: Option<(String, &'static str)>,
+}
 
-/// Strip generic arguments from a type/trait name string.
-///
-/// `"SomeTrait<Foo, Bar>"` → `"SomeTrait"`.
-/// `"MyType"` → `"MyType"` (unchanged).
-pub(crate) fn strip_generics(name: &str) -> &str {
-    name.split_once('<').map_or(name, |(head, _)| head)
+impl UnsupportedPrefixVisitor {
+    fn new() -> Self {
+        Self { unsupported: None }
+    }
+}
+
+impl<'ast> Visit<'ast> for UnsupportedPrefixVisitor {
+    fn visit_path(&mut self, path: &'ast syn::Path) {
+        if self.unsupported.is_none() {
+            let spelling = path_as_string(path);
+            if let Some(prefix) = unsupported_prefix(&spelling) {
+                self.unsupported = Some((spelling, prefix));
+                return;
+            }
+        }
+        syn::visit::visit_path(self, path);
+    }
+}
+
+pub(super) fn reject_unsupported_prefixes(
+    syn_type: &syn::Type,
+    current_crate: &str,
+) -> Result<(), ContractMapRendererError> {
+    let mut visitor = UnsupportedPrefixVisitor::new();
+    visitor.visit_type(syn_type);
+    if let Some((spelling, prefix)) = visitor.unsupported {
+        Err(unsupported_prefix_error(&spelling, current_crate, prefix))
+    } else {
+        Ok(())
+    }
+}
+
+fn path_as_string(path: &syn::Path) -> String {
+    let segments = path
+        .segments
+        .iter()
+        .map(|segment| segment.ident.to_string())
+        .collect::<Vec<_>>()
+        .join("::");
+    if path.leading_colon.is_some() { format!("::{segments}") } else { segments }
+}
+
+fn unsupported_prefix(path: &str) -> Option<&'static str> {
+    if path.starts_with("self::") {
+        Some("self::")
+    } else if path.starts_with("super::") {
+        Some("super::")
+    } else if path.starts_with("::") {
+        Some("::")
+    } else {
+        None
+    }
+}
+
+fn unsupported_prefix_error(
+    spelling: &str,
+    current_crate: &str,
+    prefix: &str,
+) -> ContractMapRendererError {
+    ContractMapRendererError::RenderFailed {
+        reason: format!(
+            "unsupported contract-map TypeRef '{spelling}' in crate '{current_crate}': prefix '{prefix}' cannot be interpreted without the referring module context; accepted forms are the rustdoc fully-qualified path as supplied or the catalogue module_path + name"
+        ),
+    }
 }
 
 // ---------------------------------------------------------------------------
 // Index builders
 // ---------------------------------------------------------------------------
 
-/// Build a global trait index from all catalogues (Decision O-2/O-3).
+/// Build a global trait index from all catalogues.
 ///
-/// Returns `BTreeMap<(crate_name_str, trait_name_str), rep_node_id_str>` where
-/// `rep_node_id_str` is the **representative node** id inside the trait subgraph
-/// (i.e. the `__self` node, not the subgraph container id).  Edges must target
-/// representative nodes, never subgraph ids, to avoid Dagre/ELK cluster-boundary
-/// layout breakage.
-///
-/// Entries with `action: Delete` are excluded — deleted items must not appear
-/// as edge targets or in the rendered contract-map output.
-pub(crate) fn build_trait_index(
-    catalogues: &[CatalogueDocument],
-) -> BTreeMap<(String, String), String> {
+/// The returned index is separate from the type index so a same-named type and
+/// trait can never be conflated. Deleted entries are excluded from both the
+/// node map and the resolution universe.
+pub(crate) fn build_trait_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
     use domain::tddd::catalogue_v2::roles::ItemAction;
 
-    let mut index: BTreeMap<(String, String), String> = BTreeMap::new();
+    let mut index = NodeIndex::new();
     for doc in catalogues {
         let layer = doc.layer().as_ref();
-        let crate_name = doc.crate_name().as_str();
+        let crate_name = doc.crate_name();
         for (trait_name, trait_entry) in doc.traits() {
-            // Skip Delete-action entries — they must not appear in the rendered map.
             if trait_entry.action() == ItemAction::Delete {
                 continue;
             }
-            // Store the representative node id (not the subgraph container id) so that
-            // trait_impl edges target a real node rather than a subgraph.
-            let rep_node_id = trait_rep_node_id(layer, crate_name, trait_name.as_str());
-            index.insert((crate_name.to_string(), trait_name.as_str().to_string()), rep_node_id);
+            let rep_node_id = trait_rep_node_id(layer, crate_name.as_str(), trait_name.as_str());
+            index.insert_catalogue_entry_in_namespace(
+                crate_name,
+                trait_name,
+                trait_entry.module_path(),
+                CatalogueItemNamespace::Trait,
+                rep_node_id,
+            );
         }
     }
     index
 }
 
-/// Build a global node index from all catalogues for TypeRef resolution.
+/// Build a global type index from all catalogues for TypeRef resolution.
 ///
-/// Populates `NodeIndex` covering **`TypeEntry` only** (not `TraitEntry`), keyed
-/// both by qualified `"crate_name::Name"` and by bare `"Name"`. This index is
-/// used to resolve field/param/return/variant TypeRef targets to their actual
-/// rendered mermaid node IDs (Decision D-2).
-///
-/// The stored node id is the **representative node** id (the `__self` node inside
-/// the entry subgraph), not the subgraph container id.  Edges must target
-/// representative nodes, never subgraph ids, to avoid Dagre/ELK cluster-boundary
-/// layout breakage.
-///
-/// `TraitEntry` names are deliberately excluded: trait_impl target resolution uses
-/// a separate `build_trait_index` + `resolve_trait_subgraph` path. Mixing type and
-/// trait names in the same index would cause a TypeRef that matches only a trait to
-/// incorrectly link to a trait subgraph, and a name shared by a type and a trait to
-/// become ambiguous and fall back to a ghost node.
-///
-/// Entries with `action: Delete` are excluded — deleted types must not appear as
-/// edge target nodes in the rendered contract-map output.
+/// Only `TypeEntry` values are included. Trait references use the separate
+/// index from [`build_trait_index`], preventing a TypeRef from linking to a
+/// same-named trait node.
 pub(crate) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
     use domain::tddd::catalogue_v2::roles::ItemAction;
 
     let mut index = NodeIndex::new();
     for doc in catalogues {
         let layer = doc.layer().as_ref();
-        let crate_name = doc.crate_name().as_str();
+        let crate_name = doc.crate_name();
         for (type_name, type_entry) in doc.types() {
-            // Skip Delete-action entries — they must not appear in the rendered map.
             if type_entry.action() == ItemAction::Delete {
                 continue;
             }
-            // Store the representative node id (not the subgraph container id) so that
-            // all resolved edges target a real node rather than a subgraph.
-            let rep_node_id = type_rep_node_id(layer, crate_name, type_name.as_str());
-            index.insert(crate_name, type_name.as_str(), rep_node_id);
+            let rep_node_id = type_rep_node_id(layer, crate_name.as_str(), type_name.as_str());
+            index.insert_catalogue_entry_in_namespace(
+                crate_name,
+                type_name,
+                type_entry.module_path(),
+                CatalogueItemNamespace::Type,
+                rep_node_id,
+            );
         }
     }
     index
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic)]
+mod tests {
+    use super::{
+        CatalogueEntryKey, CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, NodeIndex,
+    };
+    use domain::tddd::ContractMapRendererError;
+
+    #[test]
+    fn test_node_index_rejects_nested_unsupported_prefixes_with_location_aware_error() {
+        let index = NodeIndex::new();
+        for (type_ref, nested_spelling) in [
+            ("Port<super::Input>", "super::Input"),
+            ("Wrapper<self::Input>", "self::Input"),
+            ("Wrapper<::external::Input>", "::external::Input"),
+            ("<T as super::Trait>::Assoc", "super::Trait"),
+            ("impl Trait<super::Input>", "super::Input"),
+            ("fn(super::Input) -> Output", "super::Input"),
+        ] {
+            let error = index.resolve(type_ref, "domain").expect_err(type_ref);
+            let ContractMapRendererError::RenderFailed { reason } = error else {
+                panic!("unsupported prefix must return RenderFailed: {type_ref}");
+            };
+            assert!(reason.contains(nested_spelling), "diagnostic lost nested spelling: {reason}");
+            assert!(reason.contains("crate 'domain'"), "diagnostic lost location: {reason}");
+        }
+    }
+
+    #[test]
+    fn test_node_index_preserves_unplaced_catalogue_identity() {
+        let mut index = NodeIndex::new();
+        let crate_name = CrateName::new("domain".to_owned()).expect("valid crate");
+        let key = CatalogueEntryKey::try_new("Item".to_owned()).expect("valid key");
+        index.insert_catalogue_entry_in_namespace(
+            &crate_name,
+            &key,
+            None,
+            CatalogueItemNamespace::Type,
+            "item".to_owned(),
+        );
+
+        assert_eq!(index.resolve("Item", "domain").expect("lookup succeeds"), Some("item"));
+        assert_eq!(
+            index.resolve("domain::Item", "domain").expect("lookup succeeds"),
+            None,
+            "an omitted module path must not become a crate-root identity",
+        );
+        assert!(
+            index.universe.iter().any(|identity| {
+                matches!(identity, FullyQualifiedItemPath::UnplacedType { .. })
+            })
+        );
+    }
 }

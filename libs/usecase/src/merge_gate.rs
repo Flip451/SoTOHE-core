@@ -606,8 +606,10 @@ mod tests {
         SpecElementId,
     };
     use domain::spec::{SpecRequirement, SpecScope};
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use domain::verify::Severity;
-    use domain::{ChainGateEntry, ConfidenceSignal, SignalCounts};
+    use domain::{ChainGateEntry, ConfidenceSignal, FreeText, SignalCounts};
 
     use super::*;
 
@@ -694,14 +696,50 @@ mod tests {
     /// All signals carry the given `ConfidenceSignal`. The `declaration_hash`
     /// is set to [`ZERO_HASH`] so the companion catalogue mock (bytes of all
     /// zeros, or any fixture where the adapter returns `ZERO_HASH`) matches.
+    fn test_cache_key(
+        declaration_hash: domain::CatalogueDeclarationHash,
+        head_commit: domain::CommitHash,
+        baseline_hash: domain::BaselineHash,
+    ) -> domain::TypeSignalsCacheKey {
+        let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-usecase-test-target",
+        ))
+        .unwrap();
+        let expected = domain::ExpectedRustdocJsonPath::try_new(
+            target.as_path().join("doc/legacy.json"),
+            &target,
+        )
+        .unwrap();
+        let identity = domain::RustdocExecutionIdentity::new(
+            target,
+            domain::tddd::catalogue_v2::CrateName::new("legacy").unwrap(),
+            vec![],
+            domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let zero = domain::Sha256Digest::try_new("0".repeat(64)).unwrap();
+        domain::TypeSignalsCacheKey::new(
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            domain::ImplementationFingerprint::new(zero.clone()),
+            domain::ResolutionFingerprint::new(zero),
+            identity,
+        )
+    }
+
     fn signals_doc_with(entries: &[(&str, ConfidenceSignal)]) -> TypeSignalsDocument {
         let ts = domain::Timestamp::new("2026-05-08T00:00:00Z").unwrap();
         let sigs: Vec<domain::tddd::catalogue::TypeSignal> = entries
             .iter()
             .map(|(name, sig)| {
                 domain::tddd::catalogue::TypeSignal::new(
-                    *name,
-                    "value_object",
+                    ThreeWaySignalIdentity::CatalogueItem {
+                        item_name: FreeText::new(*name),
+                        namespace: CatalogueItemNamespace::Type,
+                    },
+                    "value_object".to_owned(),
                     *sig,
                     true,
                     vec![],
@@ -713,7 +751,7 @@ mod tests {
         let digest = domain::Sha256Digest::try_new(ZERO_HASH.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts,
-            domain::TypeSignalsCacheKey::new(
+            test_cache_key(
                 domain::CatalogueDeclarationHash::new(digest.clone()),
                 domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(digest),
@@ -1904,14 +1942,15 @@ mod tests {
         use domain::tddd::catalogue_v2::CatalogueDocument;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
-        use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
+        use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath};
         use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+        use domain::tddd::semantic_verify::CatalogueEntryKey;
 
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         doc.insert_type(
-            TypeName::new("TrackId").unwrap(),
+            CatalogueEntryKey::try_new("TrackId".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1922,7 +1961,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],

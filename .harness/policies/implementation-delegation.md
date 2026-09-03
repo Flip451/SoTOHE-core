@@ -19,9 +19,13 @@ layer の id、path、依存方向は `architecture-rules.json` が持つ。本 
 
 ## Rules
 
+### R0. 委譲時の context intake
+
+委譲元は、track の進行・review 必要性・obligation 状態・catalogue 状態を、workflow が指定する CLI summary (`bin/sotp track resolve`、`bin/sotp track task-counts`、`bin/sotp track next-task`、`bin/sotp review results`、`bin/sotp test-obligation results`、`bin/sotp catalog check`、`bin/sotp ref-verify results`) と task briefing から取得する。これらを一次情報とし、`*-types.json`、`review.json`、bindings JSON、full sub-workflow texts、`Related Conventions` list を委譲開始時に一括で開かない。差分または blocker を調査する場合に限り対象 artifact body を開く。convention path は dispatcher が briefing に記載し、委譲元は `Related Conventions` list を列挙・読まず、delegated capability がその path を読む。
+
 ### R1. 委譲時に architecture 制約を注入する
 
-source を編集する capability への依頼には `## Architecture Constraints` 節を必ず含める。節の内容は track の ADR と rendered plan view から抽出し、次を明示する。
+source を編集する capability への依頼には `## Architecture Constraints` 節を必ず含める。節の内容は task briefing と CLI summary を一次情報とし、設計上の配置を確定する必要がある場合に限り、briefing が示す track の ADR と rendered plan view の該当部分から抽出して、次を明示する。
 
 | 項目 | 抽出元 |
 | --- | --- |
@@ -48,6 +52,16 @@ review briefing には `## Architecture Verification Checklist` 節を含め、�
 - `architecture-rules.json` が宣言する依存方向と層境界に従っているか
 - 依存先 layer の logic が呼び出し側 layer へ漏れていないか
 - port 実装を bypass する no-op 代替が入っていないか (設計が明示的に許可した no-op 実装を除く)
+
+### R4. review / PR finding の修正を委譲する
+
+PR review で actionable finding が source または review-scope の編集を要求する場合、委譲元は finding ごとに `dispatch_mode: delegated-pr-finding`、comment、対象 path / line、track context、requested correction を含む focused briefing を作成し、対象 artifact の owner に委譲する。実装変更と implementer の boundary 内の通常の policy / documentation は `implementer` に委譲する。`spec.json` とその生成 view は `spec-designer` の `spec-design`、`<layer>-types.json` とその生成 view は `type-designer` の `type-design`、`impl-plan.json`、`task-coverage.json`、`task-contract.json`、`batch-plan.json` は `impl-planner` の `impl-plan` の通常 writer workflow に戻す。生成された plan view は sanctioned views-sync operation で更新する。writer-owned artifact を implementer の focused dispatch に入れてはならない。`review-fix-lead` は通常の `scope-review` 専用であり、wrapper が typed focused mode をサポートするまでは PR finding の transport として使用しない。source 編集を許す briefing には、R1 が定める `## Architecture Constraints` 節も必ず含める。委譲元が親コンテキストで修正を inline edit することを通常経路にしてはならない。
+
+委譲先が修正を完了した後、writer-owned artifact の修正であれば完了した owner workflow を影響フェーズの dispatch とみなし、workflow SSoT の partial-reentry / post-routing descent でそのフェーズを再収束させてから downstream まで完了させる。生成された plan view は sanctioned views-sync operation で更新する。その後、委譲元は local review workflow を `zero_findings` まで収束させ、`commit` workflow を実行してから PR review を再実行する。委譲が失敗した場合だけ親の直接編集を recovery として行えるが、これは implementer-owned non-ADR finding に限る。writer-owned artifact はその owner workflow に戻し、親が inline edit してはならない。`knowledge/adr/*.md` の編集を要する finding は親も `review-fix-lead` も決して適用せず、review workflow SSoT の `ADR-scope repair lane` section に従って guardian lane へ route する。その lane の完了後も同じ local review の収束と `commit` workflow を経てから再レビューする。
+
+### R5. 長時間処理の待機
+
+委譲先 capability、workflow、または gate wrapper が長時間実行される場合、orchestrator は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合も、1 回の完了通知後に result を読むだけとし、ログの polling、status probe の再実行、fire-and-forget launch を行わない。内部の loop / poll は呼び出された capability または workflow の責務である。`bin/sotp test-obligation evaluate` は orchestrator host の repair round 内でだけ同期実行し、委譲元が commit prerequisite として launch してはならない。commit gate は `check` を使う。
 
 ## Enforcement
 

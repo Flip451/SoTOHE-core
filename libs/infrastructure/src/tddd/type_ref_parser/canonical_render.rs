@@ -19,7 +19,7 @@ use rustdoc_types::{
     GenericParamDef, GenericParamDefKind, Term, TraitBoundModifier, Type,
 };
 
-pub(super) fn render_type(ty: &Type) -> Option<String> {
+pub(crate) fn render_type(ty: &Type) -> Option<String> {
     match ty {
         Type::ResolvedPath(path) => render_path(path),
         Type::Generic(name) => Some(name.clone()),
@@ -73,7 +73,7 @@ pub(super) fn render_type(ty: &Type) -> Option<String> {
     }
 }
 
-pub(super) fn render_bound(bound: &GenericBound) -> Option<String> {
+pub(crate) fn render_bound(bound: &GenericBound) -> Option<String> {
     match bound {
         GenericBound::TraitBound { trait_, generic_params, modifier } => {
             let binder = render_binder(generic_params)?;

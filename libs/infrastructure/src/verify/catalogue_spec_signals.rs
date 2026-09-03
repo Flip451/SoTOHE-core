@@ -19,6 +19,12 @@ use crate::verify::path_safety::{check_signals_file, normalize_and_guard_path};
 use crate::verify::plan_artifact_refs::{canonical_json, canonical_json_sha256};
 use crate::verify::tddd_layers::{self, TdddLayerBinding};
 
+#[path = "catalogue_spec_signal_keys.rs"]
+mod catalogue_spec_signal_keys;
+use catalogue_spec_signal_keys::{
+    CatalogueEntryKey, normalized_delete_identity, raw_catalogue_entry_key,
+};
+
 /// Validated preflight context for catalogue verification functions.
 ///
 /// Encapsulates the resolved `items_dir`, `workspace_root`, `track_dir`, and TDDD
@@ -131,22 +137,6 @@ impl CatalogueVerifyContext {
         }
 
         Ok(Self { items_dir, track_dir, bindings })
-    }
-}
-
-struct CatalogueEntryKey {
-    section: String,
-    entry_key: String,
-    name: String,
-}
-
-impl CatalogueEntryKey {
-    fn new(
-        section: impl Into<String>,
-        entry_key: impl Into<String>,
-        name: impl Into<String>,
-    ) -> Self {
-        Self { section: section.into(), entry_key: entry_key.into(), name: name.into() }
     }
 }
 
@@ -364,7 +354,10 @@ fn check_catalogue_integrity(
         .iter()
         .zip(doc.signals.iter())
         .enumerate()
-        .find(|(_, (entry, sig))| entry.name.as_str() != sig.type_name.as_str())
+        .find(|(_, (entry, sig))| {
+            entry.entry_key.as_str() != sig.type_name.as_str()
+                && entry.name.as_str() != sig.type_name.as_str()
+        })
         .map(|(i, (entry, sig))| (i, entry, sig))
     {
         let cat_name = &entry.name;
@@ -542,19 +535,53 @@ fn read_and_decode_catalogue(
             ))]));
         }
     };
+    let raw_catalogue: serde_json::Value = match serde_json::from_str(&catalogue_text) {
+        Ok(value) => value,
+        Err(e) => {
+            return Err(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "{}: catalogue JSON parse error while resolving entry keys: {e}",
+                signals_display.display()
+            ))]));
+        }
+    };
     let mut catalogue_entries = Vec::new();
     for entry in iter_catalogue_entries(&catalogue_doc) {
-        let (section, entry_key) = entry.section_key.split_once(':').ok_or_else(|| {
+        let (section, resolved_key) = entry.section_key.split_once(':').ok_or_else(|| {
             VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "internal: malformed catalogue section key '{}'",
                 entry.section_key
             ))])
         })?;
-        catalogue_entries.push(CatalogueEntryKey::new(section, entry_key, entry.key));
+        let entry_key = raw_catalogue_entry_key(
+            &raw_catalogue,
+            section,
+            resolved_key,
+            matches!(entry.action, domain::tddd::catalogue_v2::roles::ItemAction::Delete),
+        )
+        .map_err(|reason| {
+            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "{}: {reason}",
+                signals_display.display()
+            ))])
+        })?;
+        let name = if matches!(entry.action, domain::tddd::catalogue_v2::roles::ItemAction::Delete)
+            && matches!(section, "types" | "traits")
+        {
+            normalized_delete_identity(
+                &raw_catalogue,
+                section,
+                &entry_key,
+                catalogue_doc.crate_name().as_str(),
+            )
+        } else {
+            entry.key
+        };
+        catalogue_entries.push(CatalogueEntryKey::new(section, entry_key, name));
     }
     Ok((catalogue_entries, catalogue_text))
 }
 
+/// Return the resolved identity of a type/trait tombstone while leaving its raw
 /// Execute `signal check-catalog-spec` after git-based branch resolution.
 ///
 /// Resolves the active track via the shared `ActiveTrackResolveInteractor`
@@ -889,6 +916,27 @@ mod tests {
         assert!(
             outcome.findings().is_empty(),
             "delete tombstone must be covered by matching catalogue-spec signal: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_delete_tombstone_with_normalized_identity_signal_passes_freshness() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let signals = signals_referencing_type(
+            "domain::old::RemovedType",
+            &declaration_hash_for(V3_CATALOGUE_DELETE_TYPE),
+            &entry_hash_for(V3_CATALOGUE_DELETE_TYPE, "types", "RemovedType"),
+        );
+        let (items_dir, track_id) =
+            setup_workspace(tmp.path(), "my-track-2026-01-01", V3_CATALOGUE_DELETE_TYPE, &signals);
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        assert!(
+            outcome.findings().is_empty(),
+            "normalized delete identity must remain covered by its raw entry hash: {:?}",
             outcome.findings()
         );
     }

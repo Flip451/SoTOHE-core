@@ -31,6 +31,18 @@
 
 これらのコマンドは `bin/sotp` ネイティブサブコマンドとして直接呼び出す（`--items-dir` のデフォルトは `track/items`）。対応する `cargo make` ラッパータスクは廃止済み。
 
+### 状態照会と長時間ゲート
+
+`bin/sotp track` や各 gate の結果照会は、その時点の CLI summary を読むための単発の照会であり、長時間処理の polling ループではない。長時間の capability、workflow、または gate wrapper は 1 回の blocking call として実行し、terminal result を 1 回だけ読む。host が call を background 化した場合は、1 回の完了通知後に result を読む。ログの polling、status probe の反復、fire-and-forget launch は行わない。`bin/sotp test-obligation evaluate` は obligation repair における orchestrator host の同期 step に限り、commit gate の前提にはしない。
+
+### 親セッション更新と永続状態からの再開
+
+`adr2pr` の親セッションは、計画成果物コミットが成功した後（Step 9 の開始前）、Step 9 の最初の実装バッチが完了した後（残りのバッチを続ける前）、および Step 10 の PR レーン開始時（`pr-review` の呼出し前）に更新する。host が親セッションを自動更新できない場合は、同じ `track/<id>` ブランチで新しいセッションを再入させるよう user に要求してよい。
+
+これらの境界では、親コンテキストを状態として保持せず、git、track artifacts、track / review summary、宣言済みの batch / task state、および read-only git state を機械状態として扱う。既存トラックへの再入時は、その永続状態から最初の未完了 lifecycle boundary（部分完了した step では最初の未完了 sub-step）を再構成し、過去の親コンテキストを前提に Step 2 へ戻ったり、完了済み step を再実行したりしない。証拠が曖昧または相反する場合は、再実行や未完了 step の飛ばしをせず停止して報告する。
+
+これは orchestrator の session boundary だけを定める規律であり、host 固有の backgrounding threshold、通知形式、または compaction timing は定めない。
+
 ### ADR baseline lifecycle
 
 - `/track:init` completes track initialization and then the orchestrator designates each primary
@@ -99,6 +111,7 @@
 - [ ] タイムスタンプが `date -u +%Y-%m-%dT%H:%M:%SZ` 由来か（手入力 / 推測がないか）
 - [ ] primary ADR の init snapshot が workflow 経由で作られ、review / commit / ci-track の
   freeze checks が維持されているか
+- [ ] 親セッション更新点で、継続判断を親コンテキストではなく永続した git / track state から再構成しているか
 
 ## Decision Reference
 

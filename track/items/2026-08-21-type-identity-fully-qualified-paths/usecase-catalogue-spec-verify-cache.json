@@ -1,0 +1,270 @@
+{
+  "entries": [
+    {
+      "claim_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8ee1358a88efda8345a93e540b1309739fb0934008396df6d4d1dacdcc8e5f29",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は、TypeRef の参照が各宣言の受理 spelling（stored key、module_path と名前の結合形、又は crate 修飾の完全修飾形）のいずれかに一致するカタログ内参照である場合、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。複数宣言に一致する曖昧な参照は、候補の完全修飾パスを列挙して fail-closed とする。どの宣言にも一致しない参照は外部参照としてこの検査では検証せずに通す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TypeRef の参照が各宣言の受理 spelling（stored key、module_path と名前の結合形、又は crate 修飾の完全修飾形）のいずれかに一致するカタログ内参照である場合、評価入力 catalogue の有効な型・トレイト宣言に対して一意に解決できた場合にのみ成功する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "100e49845f95be64d93c4128054d53bd0e29cd07faf2b1188292785114fcbbc4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-lint は、未対応構文、解析不能、深さ又は資源上限によって TypeRef 全体の検査を完了できない場合、位置を示して fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は、未対応構文、解析不能、深さ又は資源上限によって TypeRef 全体の検査を完了できない場合、位置を示して fail-closed とし、部分的な解決成功を成功扱いしない。generic parameter、lifetime、const 値、associated item のラベルはカタログ内参照として解決しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ade7d965efaae172de309780ea560c3f99122c97badf138e5a8aa13c738fcbfe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならない。各宣言の受理 spelling のいずれにも一致しない参照は外部参照としてこの検査で検証せずに通し、その存在と正しさは Chain ③ のコンパイラに検証された実装との突合で検証する。書き誤りはこの突合の不一致として検出する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint は TypeRef 全体の検査完了を確認できない限り成功してはならない。各宣言の受理 spelling のいずれにも一致しない参照は外部参照としてこの検査で検証せずに通し、その存在と正しさは Chain ③ のコンパイラに検証された実装との突合で検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RunCatalogueLint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RunCatalogueLint",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ba5e5a2b0e0dce3fa54d248f9b290f573b8d54450ca886aa4e5676db452b8936",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ba5e5a2b0e0dce3fa54d248f9b290f573b8d54450ca886aa4e5676db452b8936",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abd593c1b905c0b91913dceaead389e9a0144170cecd834601f495d96e97b4be",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b54e514a94e8ef67a9888c9fe69492149d7c7797ce843b0e17c06934e7d90998",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue-lint が評価入力 catalogue の有効な型・トレイト宣言に対して、TypeRef に含まれるすべてのカタログ内参照を解決すること。検査を完了できない場合又は一意に解決できない場合は、位置を示して fail-closed とすること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abd593c1b905c0b91913dceaead389e9a0144170cecd834601f495d96e97b4be",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort",
+          "file_path": "track/items/2026-08-21-type-identity-fully-qualified-paths/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b465422603db7941db9a39ab6d511bc36319873eec4e7b2a792a28ef8299d57f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同名型または同名トレイトを含む入力で、型・トレイト参照、impl と generic 引数の比較、型シグナル出力および contract-map の対応付けは完全修飾パスごとに別々に扱われ、片方の対象の結果が他方へ結合されず DanglingId を生じさせない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

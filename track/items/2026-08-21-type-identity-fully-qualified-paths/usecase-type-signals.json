@@ -1,0 +1,36 @@
+{
+  "baseline_hash": "28269a07a5b71ed692da698a797e36a49a7429424fda58c20ceb0684f0701058",
+  "declaration_hash": "9b9daed915c81e5703f90c8a2273a175653f2951bb72422c2a208849b31b26e0",
+  "generated_at": "2026-08-25T02:55:06Z",
+  "head_commit": "45af327661cc67f3533c5afa09860b45b43be3de",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "RunCatalogueLint"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "RunCatalogueLint"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+    }
+  ]
+}

@@ -3,16 +3,16 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{
     StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
 };
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ItemAction, MethodGenericParam,
-    MethodName, ModulePath, TraitImplDeclV2, TraitName, TypeName, TypeRef,
+    CatalogueEntryKey, CrateName, DeletionRecord, FullyQualifiedItemPath, FunctionPath, ItemAction,
+    MethodGenericParam, MethodName, ModulePath, TraitImplDeclV2, TypeName, TypeRef,
 };
 use std::str::FromStr;
 
-use super::CatalogueDocumentCodecError;
 use super::decode_assoc::{assoc_const_decl_from_dto, assoc_type_decl_from_dto};
 use super::decode_impls::{
     function_entry_from_dto, inherent_impl_from_dto, method_decl_from_dto_with_outer_generics,
@@ -29,6 +29,7 @@ use super::validate::{
     validate_type_alias_generic_names, validate_type_alias_relaxed_bounds,
     validate_type_alias_target, validate_type_alias_where_predicates,
 };
+use super::{CatalogueDocumentCodecError, EXPLICIT_ROOT_MODULE_PATH};
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 // Keep the path-only validator referenced for callers outside top-level impl slots.
 const _: fn(&str) -> Result<(), String> = super::validate::validate_trait_ref_is_path;
@@ -44,22 +45,17 @@ pub(super) fn dto_to_domain(
         .map_err(|e| err(&dto.crate_name, format!("invalid crate_name: {e}")))?;
     let layer =
         LayerId::try_new(&dto.layer).map_err(|e| err(&dto.layer, format!("invalid layer: {e}")))?;
-    let mut doc = CatalogueDocument::new(dto.schema_version, crate_name, layer);
+    let mut doc = CatalogueDocument::new(dto.schema_version, crate_name.clone(), layer);
     // Delete slots become deletion records rather than live entries.
     for (type_name_str, slot) in dto.types {
-        let type_name = TypeName::new(&type_name_str)
-            .map_err(|e| err(&type_name_str, format!("invalid type name: {e}")))?;
+        let type_name = CatalogueEntryKey::try_new(type_name_str.clone())
+            .map_err(|e| err(&type_name_str, format!("invalid catalogue entry key: {e}")))?;
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
-                let module_path = tombstone_module_path(&type_name_str, &tombstone)?;
                 let (spec_refs, informal_grounds) =
                     tombstone_grounding(&type_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Type {
-                    name: type_name,
-                    module_path,
-                    spec_refs,
-                    informal_grounds,
-                });
+                let name = tombstone_entry_key(&crate_name, &type_name, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Type { name, spec_refs, informal_grounds });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = type_entry_from_dto(&type_name_str, entry_dto)?;
@@ -69,19 +65,14 @@ pub(super) fn dto_to_domain(
     }
     // Traits
     for (trait_name_str, slot) in dto.traits {
-        let trait_name = TraitName::new(&trait_name_str)
-            .map_err(|e| err(&trait_name_str, format!("invalid trait name: {e}")))?;
+        let trait_name = CatalogueEntryKey::try_new(trait_name_str.clone())
+            .map_err(|e| err(&trait_name_str, format!("invalid catalogue entry key: {e}")))?;
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
-                let module_path = tombstone_module_path(&trait_name_str, &tombstone)?;
                 let (spec_refs, informal_grounds) =
                     tombstone_grounding(&trait_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Trait {
-                    name: trait_name,
-                    module_path,
-                    spec_refs,
-                    informal_grounds,
-                });
+                let name = tombstone_entry_key(&crate_name, &trait_name, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Trait { name, spec_refs, informal_grounds });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = trait_entry_from_dto(&trait_name_str, entry_dto)?;
@@ -140,22 +131,6 @@ pub(super) fn dto_to_domain(
     Ok(doc)
 }
 
-fn tombstone_module_path(
-    entry_name: &str,
-    tombstone: &TombstoneDto,
-) -> Result<ModulePath, CatalogueDocumentCodecError> {
-    if tombstone.module_path.is_empty() {
-        Ok(ModulePath::root())
-    } else {
-        ModulePath::from_str(&tombstone.module_path).map_err(|e| {
-            CatalogueDocumentCodecError::InvalidEntry {
-                entry_name: entry_name.to_owned(),
-                reason: format!("invalid delete module_path '{}': {e}", tombstone.module_path),
-            }
-        })
-    }
-}
-
 fn tombstone_grounding(
     entry_name: &str,
     tombstone: &TombstoneDto,
@@ -176,6 +151,69 @@ fn tombstone_grounding(
     Ok((spec_refs, informal_grounds))
 }
 
+/// Keeps the module context of a type/trait tombstone in its identity-only
+/// domain record. Type and trait deletion records have no separate
+/// `module_path` field, so a bare key with an explicit module path must be
+/// promoted to the corresponding qualified notation before the DTO context is
+/// discarded. An omitted module path remains an unplaced/bare key, preserving
+/// the fail-closed resolution rule for placement-unspecified deletions.
+fn tombstone_entry_key(
+    crate_name: &CrateName,
+    entry_key: &CatalogueEntryKey,
+    tombstone: &TombstoneDto,
+) -> Result<CatalogueEntryKey, CatalogueDocumentCodecError> {
+    let entry_name = entry_key.as_str();
+    // Route the tombstone through the same marker-aware decoder as live
+    // entries: the explicit root marker written by `encode_module_path` must
+    // decode as the crate root. An empty value is deliberately retained as
+    // `None` so omitted placement does not become an implicit root identity.
+    let module_path = decode_module_path(&tombstone.module_path).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid module_path '{}': {error}", tombstone.module_path),
+        }
+    })?;
+    // Validate the key even when its placement is omitted. The root fallback
+    // is only a parsing context here; the returned key below remains bare.
+    let identity_module_path = module_path.clone().unwrap_or_else(ModulePath::root);
+    let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+        crate_name,
+        entry_key,
+        &identity_module_path,
+    )
+    .map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason: format!("invalid catalogue entry identity: {error}"),
+    })?;
+    let Some(module_path) = module_path else {
+        return Ok(entry_key.clone());
+    };
+    if identity.module_path() != Some(&module_path) {
+        return Err(CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!(
+                "tombstone key '{entry_name}' identifies module_path '{}', but tombstone \
+                 module_path is '{}'",
+                identity.module_path().map_or_else(|| "<unplaced>".to_owned(), ToString::to_string),
+                tombstone.module_path
+            ),
+        });
+    }
+    let effective_name = if module_path.is_root() && !entry_name.contains("::") {
+        format!("{crate_name}::{entry_name}")
+    } else if entry_name.contains("::") {
+        entry_name.to_owned()
+    } else {
+        format!("{module_path}::{entry_name}")
+    };
+    CatalogueEntryKey::try_new(effective_name.clone()).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid catalogue entry key: {error}"),
+        }
+    })
+}
+
 pub(super) fn type_entry_from_dto(
     name: &str,
     dto: TypeEntryDto,
@@ -184,7 +222,6 @@ pub(super) fn type_entry_from_dto(
         entry_name: name.to_owned(),
         reason,
     };
-
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
@@ -229,13 +266,8 @@ pub(super) fn type_entry_from_dto(
         validate_type_alias_relaxed_bounds(name, effective_generics, &where_predicates)?;
     }
 
-    let module_path = if dto.module_path.is_empty() {
-        ModulePath::root()
-    } else {
-        ModulePath::from_str(&dto.module_path)
-            .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
-    };
-
+    let module_path = decode_module_path(&dto.module_path)
+        .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?;
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -453,19 +485,13 @@ pub(super) fn trait_entry_from_dto(
         entry_name: name.to_owned(),
         reason,
     };
-
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
     let role = contract_role_from_dto(name, dto.role)?;
 
-    let module_path = if dto.module_path.is_empty() {
-        ModulePath::root()
-    } else {
-        ModulePath::from_str(&dto.module_path)
-            .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
-    };
-
+    let module_path = decode_module_path(&dto.module_path)
+        .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?;
     let generics = method_generics_from_dtos(name, dto.generics)?;
     let generic_names = generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
     let methods = dto
@@ -528,4 +554,16 @@ pub(super) fn trait_entry_from_dto(
         spec_refs,
         informal_grounds,
     ))
+}
+
+fn decode_module_path(
+    module_path: &str,
+) -> Result<Option<ModulePath>, domain::tddd::catalogue_v2::identifiers::IdentifierError> {
+    if module_path.is_empty() {
+        Ok(None)
+    } else if module_path == EXPLICIT_ROOT_MODULE_PATH {
+        Ok(Some(ModulePath::root()))
+    } else {
+        ModulePath::from_str(module_path).map(Some)
+    }
 }

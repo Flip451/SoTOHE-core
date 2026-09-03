@@ -1,0 +1,153 @@
+{
+  "baseline_hash": "3a7b153f588d16bfc4e188a5e27516a106ae356d574bc834f4c72d395d66ccf3",
+  "declaration_hash": "5043c291c99b0bd4a6acc995243953b4d58e6b31031dd6909c1593c6fff3f827",
+  "generated_at": "2026-08-25T02:54:40Z",
+  "head_commit": "45af327661cc67f3533c5afa09860b45b43be3de",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "core::convert::From<domain::tddd::catalogue_linter::TypeRefPathExtractionError>",
+        "core::convert::From<domain::tddd::catalogue_v2::identity_resolution::CatalogueIdentityResolutionError>"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLinterError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+    },
+    {
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "DeletionRecord"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CatalogueDocument"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "InherentImplDeclV2"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "FullyQualifiedItemPath"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CatalogueIdentityResolutionError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TraitRefScope"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "NewTypeGraphCodecError"
+    },
+    {
+      "found_items": [
+        "core::cmp::Ord",
+        "core::cmp::PartialOrd"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CatalogueEntryKey"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+    },
+    {
+      "found_items": [
+        "TypeRefPathExtractorPort"
+      ],
+      "found_type": true,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "std::sync::Arc<T>"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::CatalogueLintViolation"
+    }
+  ]
+}

@@ -8,12 +8,16 @@ description: Drive a prepared ADR all the way to a reviewed PR — init → revi
 
 User invokes this command as
 `/track:adr2pr [<feature>] [--primary-adr <primary-adr-file>.md]`. Both arguments are
-optional: an explicitly supplied value always takes precedence, and any missing value is
-resolved and user-confirmed per the workflow SSoT's input-acquisition contract (conversation
-context resolution, one confirmation of the completed pair, candidate selection when
-resolution is not unique). Use AskUserQuestion for that confirmation / selection. After input
-acquisition, pass the values unchanged to `/track:init <feature> --primary-adr <file>`; the
-filename is recorded as that track's init baseline.
+optional. Before any input acquisition, check whether the current branch is
+an initialized `track/<id>` with `metadata.json`. On that re-invocation path, skip feature/ADR
+resolution, user confirmation, and `/track:init` forwarding entirely; let Step 1 derive the first
+incomplete lifecycle boundary from persisted state and resume there. Only when the track needs
+initialization does an explicitly supplied value take precedence, with any missing value resolved
+and user-confirmed per the workflow SSoT's input-acquisition contract (conversation context
+resolution, one confirmation of the completed pair, candidate selection when resolution is not
+unique). Use AskUserQuestion for that confirmation / selection. When Step 1 determines that the
+track needs initialization, pass the resolved values unchanged to `/track:init <feature>
+--primary-adr <file>`; the filename is recorded as that track's init baseline.
 
 ## Claude Code invocation constraints
 
@@ -37,6 +41,12 @@ filename is recorded as that track's init baseline.
   (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
+- **Parent-session refresh points**: use the workflow SSoT's three fixed boundaries as resume
+  points. Claude Code manages context automatically (compaction), so do not stop at a boundary
+  and do not ask the user to run `/clear` or start a fresh session — continue the workflow. A
+  re-invocation of `/track:adr2pr` on the same `track/<id>` branch (for any reason) still lets
+  Step 1 inspect persisted state, skip `init`, and resume at the first incomplete boundary. Do
+  not add host-specific backgrounding, notification-format, or compaction handling here.
 - **Phase 0 governing convention**: apply
   `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
   normative source for Phase 0. This adapter states no procedure of its own for that phase.

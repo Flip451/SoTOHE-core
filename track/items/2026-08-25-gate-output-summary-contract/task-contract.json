@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-gate-output-summary-contract",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "GateProcessPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateAdapterFailureReason"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateExitCode"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogPath"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateProcessError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateProcessOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunCommandError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunInteractor"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsGateLogPersistence"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ProcessGateRunner"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::gate_output::failure_excerpts"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::gate_output::is_failure_line"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::gate_output::truncate_line"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "GateOutputDriver"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "GateOutputInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::render::CommandOutcome"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::gate_output::exit_code_from_u8"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CliCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "GateNameArg"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "GateOutputArgs"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "GateOutputComposition"
+      }
+    ],
+    "T002": [],
+    "T003": [],
+    "T004": [
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogReservation"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogReservationError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunCommandError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunInteractor"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsGateLogPersistence"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "GateOutputDriver"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogPersistencePort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogReservation"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunService"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsGateLogPersistence"
+      }
+    ],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogPersistencePort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogPath"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogWriteError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogWriteOutcome"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsGateLogPersistence"
+      }
+    ],
+    "T007": [
+      {
+        "layer": "usecase",
+        "entry_key": "GateLogWriteOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GateRunResult"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::gate_output::render_summary"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "GateOutputDriver"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::gate_output::execute"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "GateOutputComposition"
+      }
+    ]
+  }
+}

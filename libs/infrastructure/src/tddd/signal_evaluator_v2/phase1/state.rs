@@ -6,6 +6,7 @@ use super::child_items::{
     collect_impl_child_ids, copy_non_impl_children_to_d, move_impl_children_to_d,
     remove_child_items_from_s,
 };
+use domain::tddd::Phase1Error;
 use domain::tddd::catalogue_v2::ItemAction;
 use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
 
@@ -17,6 +18,13 @@ use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
 pub(super) struct Phase1State {
     /// Fresh Id counter (Id(0) = root module reserved).
     pub(super) next_id: u32,
+    /// Whether an allocation was attempted after the Id space was exhausted.
+    ///
+    /// The allocator is used by helpers in sibling modules that cannot return a
+    /// `Phase1Error` without widening their APIs.  Latching this condition keeps
+    /// those helpers panic-free; the Phase 1 entry-point turns it into a typed
+    /// error before publishing S or D.
+    id_allocation_exhausted: bool,
     /// item index for S.
     pub(super) s_index: HashMap<Id, Item>,
     /// paths map for S.
@@ -27,12 +35,19 @@ pub(super) struct Phase1State {
     pub(super) d_index: HashMap<Id, Item>,
     /// paths map for D.
     pub(super) d_paths: HashMap<Id, ItemSummary>,
-    /// short_name → Id for types/traits currently in S.
+    /// short_name → Id for unresolved catalogue type references currently in S.
+    ///
+    /// This is an input-resolution compatibility map, not the identity map.
+    /// Full type/trait identity is tracked by `s_type_identity_to_id` below.
     pub(super) s_type_name_to_id: BTreeMap<String, Id>,
+    /// fully-qualified type/trait identity → Id for items currently in S.
+    pub(super) s_type_identity_to_id: BTreeMap<String, Id>,
     /// function_path_string → Id for functions currently in S.
     pub(super) s_fn_path_to_id: BTreeMap<String, Id>,
-    /// short_name → Id for types/traits currently in D.
+    /// short_name → Id for unresolved catalogue type references currently in D.
     pub(super) d_type_name_to_id: BTreeMap<String, Id>,
+    /// fully-qualified type/trait identity → Id for items currently in D.
+    pub(super) d_type_identity_to_id: BTreeMap<String, Id>,
     /// function_path_string → Id for functions in D.
     pub(super) d_fn_path_to_id: BTreeMap<String, Id>,
     /// Pre-built remap for every B-side Id → fresh S Id.
@@ -61,20 +76,21 @@ impl Phase1State {
     /// Creates a new `Phase1State`.
     ///
     /// `first_fresh_id` is the first Id value that is safe to allocate without
-    /// colliding with any Id already present in B's index.  Pass `b.index.keys().map(|id|
-    /// id.0).max().map_or(1, |m| m + 1)` to ensure all fresh Ids are above the
-    /// B-side namespace.
+    /// colliding with any Id already present in B's index or paths map.
     pub(super) fn new(first_fresh_id: u32) -> Self {
         Self {
             next_id: first_fresh_id,
+            id_allocation_exhausted: false,
             s_index: HashMap::new(),
             s_paths: HashMap::new(),
             s_actions: BTreeMap::new(),
             d_index: HashMap::new(),
             d_paths: HashMap::new(),
             s_type_name_to_id: BTreeMap::new(),
+            s_type_identity_to_id: BTreeMap::new(),
             s_fn_path_to_id: BTreeMap::new(),
             d_type_name_to_id: BTreeMap::new(),
+            d_type_identity_to_id: BTreeMap::new(),
             d_fn_path_to_id: BTreeMap::new(),
             b_id_remap: HashMap::new(),
             a_id_remap: HashMap::new(),
@@ -83,17 +99,37 @@ impl Phase1State {
 
     pub(super) fn alloc_id(&mut self) -> Id {
         let id = Id(self.next_id);
-        self.next_id += 1;
+        if let Some(next_id) = self.next_id.checked_add(1) {
+            self.next_id = next_id;
+        } else {
+            self.id_allocation_exhausted = true;
+        }
         id
+    }
+
+    /// Fails closed if any fresh-Id allocation reached the end of the `u32`
+    /// namespace.
+    pub(super) fn check_id_allocation(&self) -> Result<(), Phase1Error> {
+        if self.id_allocation_exhausted {
+            Err(Phase1Error::rustdoc_root_resolution(
+                "Phase 1 item-id space was exhausted while constructing S and D",
+            ))
+        } else {
+            Ok(())
+        }
     }
 
     /// Inserts a type/trait item into S at a *specific* Id (for Modify: keep same Id position).
     pub(super) fn insert_s_type_at(&mut self, id: Id, item: Item, action: ItemAction) {
         let name = item.name.clone().unwrap_or_default();
+        let identity_key = self.s_paths.get(&id).map(|summary| summary.path.join("::"));
         let mut new_item = item;
         new_item.id = id;
         self.s_index.insert(id, new_item);
         self.s_actions.insert(id, action);
+        if let Some(identity_key) = identity_key.filter(|key| !key.is_empty()) {
+            self.s_type_identity_to_id.insert(identity_key, id);
+        }
         if !name.is_empty() {
             self.s_type_name_to_id.insert(name, id);
         }
@@ -169,6 +205,10 @@ impl Phase1State {
             let path_summary = self.s_paths.remove(&s_id);
             self.d_index.insert(new_id, new_item);
             if let Some(ps) = path_summary {
+                let identity_key = ps.path.join("::");
+                if !identity_key.is_empty() {
+                    self.d_type_identity_to_id.insert(identity_key, new_id);
+                }
                 self.d_paths.insert(new_id, ps);
             }
             if !name.is_empty() {
@@ -253,6 +293,7 @@ impl Phase1State {
         self.s_actions.remove(&s_id);
         // Remove from s name map
         self.s_type_name_to_id.retain(|_, v| *v != s_id);
+        self.s_type_identity_to_id.retain(|_, v| *v != s_id);
     }
 
     /// Moves a function from S to D.
@@ -272,9 +313,9 @@ impl Phase1State {
         self.s_fn_path_to_id.remove(&fn_path);
     }
 
-    /// Returns the Id of a type/trait currently in S by short name.
-    pub(super) fn s_type_id(&self, name: &str) -> Option<Id> {
-        self.s_type_name_to_id.get(name).copied()
+    /// Returns the Id of a type/trait currently in S by fully-qualified identity.
+    pub(super) fn s_type_id(&self, identity: &str) -> Option<Id> {
+        self.s_type_identity_to_id.get(identity).copied()
     }
 
     /// Returns the Id of a function currently in S by FunctionPath string.

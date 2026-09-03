@@ -10,13 +10,22 @@ User invokes this command as `/track:review`. No arguments.
 
 ## Claude Code invocation constraints
 
+- **Context intake**: follow the review workflow SSoT's `Summary-first context intake`. Use CLI
+  summaries as the primary context; do not bulk-read review or binding JSON, catalogues, full
+  sub-workflow texts, or a `Related Conventions` list. Open only a targeted diff or an artifact
+  body named by a blocker. For the typed-pipeline local reviewer and review-fix-lead routes, the
+  workflow resolves applicable convention paths before dispatch and supplies them to delegated
+  capabilities.
 - **Scope discovery**: `bin/sotp review results`
 - **ADR guardian dispatch**: when the workflow SSoT selects an ADR guardian-lane capability,
   dispatch that selected `adr-editor` or `adr-diagnoser` capability through
   `bin/sotp capability exec <capability> --host claude --briefing-file <path>`. If the dispatch
   returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the matching Claude Agent tool
   with the returned briefing path and discipline body before continuing.
-- **Briefing files**: write to `tmp/reviewer-runtime/briefing-{scope}.md`; use Read + Edit tools for existing files.
+- **Briefing files**: write to `tmp/reviewer-runtime/briefing-{scope}.md` using the workflow
+  SSoT template, including its `## Context Paths` section with the exact spec / plan / task and
+  workflow-resolved convention paths supplied for the delegated reviewer or fixer; use Read +
+  Edit tools for existing briefing files.
 - **Fix loop dispatch** (provider-agnostic wrapper — do NOT branch on `capabilities.review-fix-lead.provider` here):
   ```
   cargo make track-local-review-fix -- --scope {scope} \

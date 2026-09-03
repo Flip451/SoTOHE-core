@@ -19,26 +19,50 @@ use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 use super::is_local_unresolved_path;
 
 // ---------------------------------------------------------------------------
-// Local-path normalization helper
+// Canonical local-path resolution
 // ---------------------------------------------------------------------------
 
-/// Extracts the short (last-segment) name from a local unresolved path.
+/// Resolves a local unresolved marker against the fully-qualified S identity map.
 ///
-/// A catalogue `TypeRef` may use a relative path like `crate::nested::User`.
-/// Phase 1.5 looks up names in `s_name_to_id`, which is keyed by **short names**
-/// (e.g. `"User"`).  Stripping only one `crate::` prefix leaves `nested::User`,
-/// which would never match.  Instead we always take the last `::` segment.
-///
-/// # Examples
-///
-/// ```text
-/// "User"                 → "User"
-/// "crate::User"          → "User"
-/// "crate::nested::User"  → "User"
-/// "self::MyTrait"        → "MyTrait"
-/// ```
-fn local_path_short_name(path: &str) -> &str {
-    path.rsplit("::").next().unwrap_or(path)
+/// The old Phase 1.5 path used a `short_name → Id` map.  That map silently chose
+/// whichever same-named declaration was inserted last, which made a reference to
+/// `crate::alpha::Input` indistinguishable from `crate::beta::Input`.  The map
+/// supplied by the caller is keyed by the authoritative `Crate::paths` identity;
+/// a short or relative spelling is accepted only when it has exactly one suffix
+/// candidate.
+fn resolve_local_path_id(
+    path: &str,
+    type_identity_to_id: &BTreeMap<String, Id>,
+) -> Result<Id, Phase1Error> {
+    let raw = path.strip_prefix("::").unwrap_or(path);
+    let raw = raw.split('<').next().unwrap_or(raw);
+    let suffix = ["crate::", "self::", "super::"]
+        .iter()
+        .find_map(|prefix| raw.strip_prefix(prefix))
+        .unwrap_or(raw);
+    let mut candidates: Vec<(&str, Id)> = type_identity_to_id
+        .iter()
+        .filter_map(|(identity, id)| {
+            let matches = if suffix.contains("::") {
+                identity == suffix || identity.ends_with(&format!("::{suffix}"))
+            } else {
+                identity.rsplit("::").next() == Some(suffix)
+            };
+            matches.then_some((identity.as_str(), *id))
+        })
+        .collect();
+    candidates.sort_unstable_by(|left, right| left.0.cmp(right.0));
+    match candidates.as_slice() {
+        [(_, id)] => Ok(*id),
+        [] => Err(Phase1Error::unresolved_type_ref(path.to_owned())),
+        _ => {
+            let identities =
+                candidates.iter().map(|(identity, _)| *identity).collect::<Vec<_>>().join(", ");
+            Err(Phase1Error::unresolved_type_ref(format!(
+                "ambiguous local type reference '{path}'; candidates: {identities}"
+            )))
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -56,14 +80,7 @@ pub(super) fn resolve_generic_bound(
             // Resolve the trait Id if it's a local unresolved marker.
             let mut new_id = trait_.id;
             if new_id == Id(UNRESOLVED_CRATE_ID) && is_local_unresolved_path(&trait_.path) {
-                let bare_name = local_path_short_name(&trait_.path);
-                if s_known_names.contains(bare_name) {
-                    if let Some(&resolved_id) = s_name_to_id.get(bare_name) {
-                        new_id = resolved_id;
-                    }
-                } else {
-                    return Err(Phase1Error::unresolved_type_ref(trait_.path.clone()));
-                }
+                new_id = resolve_local_path_id(&trait_.path, s_name_to_id)?;
             }
             let new_args = match trait_.args {
                 Some(boxed) => {
@@ -167,17 +184,7 @@ pub(super) fn resolve_type(
     match ty {
         Type::ResolvedPath(mut p) => {
             if p.id == Id(UNRESOLVED_CRATE_ID) && is_local_unresolved_path(&p.path) {
-                // Local/relative unresolved marker: look up the short name in S.
-                // Use the last segment so that `crate::nested::User` resolves the
-                // same as bare `User` — the name map only has short names.
-                let bare_name = local_path_short_name(&p.path);
-                if s_known_names.contains(bare_name) {
-                    if let Some(&resolved_id) = s_name_to_id.get(bare_name) {
-                        p.id = resolved_id;
-                    }
-                } else {
-                    return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
-                }
+                p.id = resolve_local_path_id(&p.path, s_name_to_id)?;
             }
             // Recurse into args.
             let new_args = match p.args {
@@ -248,14 +255,7 @@ pub(super) fn resolve_type(
             let new_trait = match trait_ {
                 Some(mut p) => {
                     if p.id == Id(UNRESOLVED_CRATE_ID) && is_local_unresolved_path(&p.path) {
-                        let bare_name = local_path_short_name(&p.path);
-                        if s_known_names.contains(bare_name) {
-                            if let Some(&resolved_id) = s_name_to_id.get(bare_name) {
-                                p.id = resolved_id;
-                            }
-                        } else {
-                            return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
-                        }
+                        p.id = resolve_local_path_id(&p.path, s_name_to_id)?;
                     }
                     let new_path_args = match p.args {
                         Some(boxed) => Some(Box::new(resolve_generic_args(
@@ -294,14 +294,7 @@ pub(super) fn resolve_type(
                         if new_id == Id(UNRESOLVED_CRATE_ID)
                             && is_local_unresolved_path(&trait_.path)
                         {
-                            let bare_name = local_path_short_name(&trait_.path);
-                            if s_known_names.contains(bare_name) {
-                                if let Some(&resolved_id) = s_name_to_id.get(bare_name) {
-                                    new_id = resolved_id;
-                                }
-                            } else {
-                                return Err(Phase1Error::unresolved_type_ref(trait_.path.clone()));
-                            }
+                            new_id = resolve_local_path_id(&trait_.path, s_name_to_id)?;
                         }
                         // Resolve HRTB binder params (e.g. `for<T: LocalTrait>`).
                         let new_generic_params = {
@@ -340,14 +333,7 @@ pub(super) fn resolve_type(
                     };
                     let mut new_id = p.id;
                     if new_id == Id(UNRESOLVED_CRATE_ID) && is_local_unresolved_path(&p.path) {
-                        let bare_name = local_path_short_name(&p.path);
-                        if s_known_names.contains(bare_name) {
-                            if let Some(&resolved_id) = s_name_to_id.get(bare_name) {
-                                new_id = resolved_id;
-                            }
-                        } else {
-                            return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
-                        }
+                        new_id = resolve_local_path_id(&p.path, s_name_to_id)?;
                     }
                     // Resolve HRTB binder params (e.g. `for<T: LocalTrait>`).
                     let new_generic_params = {

@@ -36,7 +36,7 @@ use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2, TraitRefScope};
+use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2};
 use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::obligations::TestObligation;
@@ -294,9 +294,16 @@ fn declaration_for_obligation_in<'a>(
             return Some(type_text);
         }
         for inherent in catalogue.inherent_impls() {
-            if inherent.type_name.as_str() == type_name
-                && inherent.methods.iter().any(|method| method.name().as_str() == method_name)
-            {
+            if !inherent.methods().iter().any(|method| method.name().as_str() == method_name) {
+                continue;
+            }
+            let resolved_owner =
+                match derive::resolve_named_type_entry(catalogue, inherent.type_name()) {
+                    Ok(resolved_owner) => resolved_owner,
+                    Err(_) => return None,
+                };
+            let Some((owner_key, _)) = resolved_owner else { continue };
+            if owner_key.as_str() == type_name {
                 return Some(format!("type: {type_text}\ninherent_impl: {inherent:?}"));
             }
         }
@@ -327,11 +334,12 @@ fn trait_impl_declaration_text_in<'a>(
     let for_type = obligation.id().entry_key().as_str();
     for catalogue in catalogues {
         for impl_decl in catalogue.trait_impls() {
-            if impl_decl.for_type().as_str() == for_type
-                && impl_decl.trait_ref().as_str() == trait_ref
+            let resolved_for_type =
+                derive::resolve_named_type_key(catalogue, impl_decl.for_type()).ok()?;
+            if resolved_for_type.as_str() == for_type && impl_decl.trait_ref().as_str() == trait_ref
             {
                 let trait_declaration =
-                    trait_declaration_text_for_impl(all_catalogues, catalogue, impl_decl)?;
+                    trait_declaration_text_for_impl(all_catalogues, impl_decl).ok()??;
                 return Some(trait_impl_pair_declaration_text(impl_decl, &trait_declaration));
             }
         }
@@ -352,40 +360,9 @@ pub(crate) fn trait_impl_pair_declaration_text(
 
 fn trait_declaration_text_for_impl(
     catalogues: &[&CatalogueDocument],
-    impl_catalogue: &CatalogueDocument,
     impl_declaration: &TraitImplDeclV2,
-) -> Option<String> {
-    let scope = impl_declaration.trait_ref_scope();
-    let (crate_name, trait_name) = match scope {
-        TraitRefScope::SelfCrate { bare_name } => {
-            return trait_entry_declaration_text(impl_catalogue, bare_name.as_str());
-        }
-        TraitRefScope::Workspace { crate_name, bare_name } => (crate_name, bare_name),
-        TraitRefScope::External => return None,
-    };
-
-    let mut found = None;
-    for catalogue in catalogues {
-        if catalogue.crate_name() != &crate_name {
-            continue;
-        }
-        let Some(declaration) = trait_entry_declaration_text(catalogue, trait_name.as_str()) else {
-            continue;
-        };
-        if found.is_some() {
-            return None;
-        }
-        found = Some(declaration);
-    }
-    found
-}
-
-fn trait_entry_declaration_text(catalogue: &CatalogueDocument, name: &str) -> Option<String> {
-    catalogue
-        .traits()
-        .iter()
-        .find(|(trait_name, _)| trait_name.as_str() == name)
-        .map(|(_, entry)| format!("{entry:?}"))
+) -> Result<Option<String>, DiagnosticMessage> {
+    derive::trait_declaration_text_for_reference(catalogues, impl_declaration.trait_ref())
 }
 
 /// Returns the artifact identity for a catalogue path.
@@ -444,13 +421,15 @@ pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> 
             push_method_cited_anchor_ids(&mut ids, entry.methods());
         }
         for inherent in catalogue.inherent_impls() {
-            let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+            let Ok(Some((_, owner))) =
+                derive::resolve_named_type_entry(catalogue, inherent.type_name())
+            else {
                 continue;
             };
             if !cited_action(owner.action()) {
                 continue;
             }
-            push_method_cited_anchor_ids(&mut ids, &inherent.methods);
+            push_method_cited_anchor_ids(&mut ids, inherent.methods());
         }
     }
     ids

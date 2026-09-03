@@ -23,11 +23,20 @@ See `.harness/capabilities/spec-designer.md` for the capability's full operation
 - **ADR path(s)** — referenced ADRs under `knowledge/adr/` (resolved from `metadata.json`
   context or caller briefing).
 
-Conventions are **not** an input to this workflow. The `spec-designer` capability reads exactly
-the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
-that set as complete — including when it resolves to zero documents
-(`.harness/capabilities/spec-designer.md` § Design Principles). This workflow neither selects nor
-forwards convention paths.
+The workflow does not read or select conventions. The capability dispatcher supplies the
+resolved convention paths in the delegated briefing (possibly an empty set), and the
+`spec-designer` capability reads those paths as its complete convention input.
+
+## Summary-first context intake
+
+Before the pre-check, use `bin/sotp track resolve` for phase and blocker state. When reviewing
+existing work, use `bin/sotp review results` for review necessity and
+`bin/sotp ref-verify results --chain 1 --filter all` for the cached specification-to-ADR summary;
+use `bin/sotp test-obligation results` and `bin/sotp catalog check` only when those artifacts are
+enrolled or catalogue state is relevant. These CLI summaries and the phase-entry output are the
+primary context. Do not open `spec.json`, review or binding JSON, a full sub-workflow, or a
+`Related Conventions` list during intake. Open only a targeted diff or the artifact body named by
+a blocker; the delegated capability receives and reads the exact paths in its briefing.
 
 ## Sequence
 
@@ -44,9 +53,9 @@ Prepare the configured writer briefing at `tmp/spec-designer-briefing.md`. It mu
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
 - Any explicit constraints from the ADR that scope the behavioral contract
 
-The briefing must **not** carry convention paths. The capability's convention set comes solely
-from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
-document an input and would leave a zero-document resolution non-authoritative.
+Do not add hand-picked convention paths to the workflow-generated file. The dispatcher supplies
+the resolved paths alongside the delegated briefing, and an empty resolved set remains
+authoritative.
 
 Then run `bin/sotp phase enter spec-design`. The phase engine runs the declared pre-entry
 checks and, only when they all succeed, invokes the configured `spec-designer` writer. The

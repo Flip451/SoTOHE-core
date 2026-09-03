@@ -209,7 +209,7 @@ pub enum CatalogueSectionKey {
 /// is empty.
 ///
 /// [`try_new`]: CatalogueEntryKey::try_new
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CatalogueEntryKey(String);
 
 impl CatalogueEntryKey {
@@ -545,6 +545,14 @@ mod tests {
     fn test_catalogue_entry_key_try_new_with_whitespace_only_returns_error() {
         let err = CatalogueEntryKey::try_new("   \t  ".to_string()).unwrap_err();
         assert!(matches!(err, ValidationError::EmptyString));
+    }
+
+    #[test]
+    fn test_catalogue_entry_key_orders_lexicographically() {
+        let first = CatalogueEntryKey::try_new("a::Input".to_string()).unwrap();
+        let second = CatalogueEntryKey::try_new("b::Input".to_string()).unwrap();
+
+        assert!(first < second);
     }
 
     // ── VerifyOriginRef ───────────────────────────────────────────────────

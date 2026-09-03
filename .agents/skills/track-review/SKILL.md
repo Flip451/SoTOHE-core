@@ -32,7 +32,19 @@ or failure-recovery procedures here.
   (`.codex/agents/review-fix-lead.toml`) directly on an assumed provider.
 - Scope discovery and briefing preparation are handled by the workflow orchestrator (this skill).
 
-### (4) Reporting format
+### (4) Context intake
+
+- Follow the workflow SSoT's summary-first context intake with the summaries it names:
+  `bin/sotp track resolve` and `bin/sotp track task-counts` for progress (zero counts before
+  the plan exists), `bin/sotp review results` for review necessity,
+  `bin/sotp test-obligation results` when enrolled, and `bin/sotp catalog check` plus
+  `bin/sotp ref-verify results --chain 2 --filter all` for catalogue state.
+- Do not bulk-read `*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a
+  `Related Conventions` list at intake; open an artifact body only for a targeted diff or the
+  blocker it names. Convention paths are listed in each delegated briefing and read by the
+  delegated capability, not by this root session.
+
+### (5) Reporting format
 
 - On successful completion, print: `REVIEW_STATUS: completed — all scopes zero_findings`
 - On failure or block, print: `REVIEW_STATUS: blocked — <scope>: <reason>`

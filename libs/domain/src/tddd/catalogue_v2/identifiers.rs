@@ -17,6 +17,66 @@
 use std::fmt;
 use std::str::FromStr;
 
+#[path = "identifiers_helpers.rs"]
+mod helpers;
+
+use helpers::is_valid_rust_identifier;
+
+mod fully_qualified_item_path;
+
+/// Namespace carried by a catalogue item identity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum CatalogueItemNamespace {
+    /// A data type / type alias identity.
+    Type,
+    /// A trait identity.
+    Trait,
+}
+
+/// Fully qualified identity for a catalogue type or trait entry.
+///
+/// A catalogue declaration may omit `module_path` while it is still being
+/// resolved. That state is represented by an `Unplaced*` variant rather than
+/// by treating the crate root as an implicit placement. The variants also keep
+/// the type and trait namespaces separate, so same-named declarations cannot be
+/// collapsed accidentally.
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum FullyQualifiedItemPath {
+    /// A type with an explicitly known module path.
+    PlacedType { crate_name: CrateName, module_path: ModulePath, name: Identifier },
+    /// A type whose module path is not specified by the catalogue declaration.
+    UnplacedType { crate_name: CrateName, name: Identifier },
+    /// A trait with an explicitly known module path.
+    PlacedTrait { crate_name: CrateName, module_path: ModulePath, name: Identifier },
+    /// A trait whose module path is not specified by the catalogue declaration.
+    UnplacedTrait { crate_name: CrateName, name: Identifier },
+}
+
+impl fmt::Debug for FullyQualifiedItemPath {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut debug = formatter.debug_struct("FullyQualifiedItemPath");
+        debug.field("crate_name", self.crate_name());
+        if let Some(module_path) = self.module_path() {
+            debug.field("module_path", module_path);
+        } else {
+            debug.field("module_path", &None::<&ModulePath>);
+        }
+        debug.field("name", self.name());
+        debug.field("path", &self.to_string());
+        debug.finish()
+    }
+}
+
+impl fmt::Display for FullyQualifiedItemPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self.crate_name(), f)?;
+        if let Some(module_path) = self.module_path().filter(|path| !path.is_root()) {
+            write!(f, "::{module_path}")?;
+        }
+        write!(f, "::{}", self.name())
+    }
+}
+
 // ---------------------------------------------------------------------------
 // IdentifierError — shared error type for all identifier newtypes
 // ---------------------------------------------------------------------------
@@ -45,25 +105,6 @@ pub enum IdentifierError {
         "function path '{0}' could not be parsed; expected form '<crate_name>[::<module_segment>...].<function_name>'"
     )]
     InvalidFunctionPath(String),
-}
-
-// ---------------------------------------------------------------------------
-// Internal helper
-// ---------------------------------------------------------------------------
-
-/// Returns `true` if `s` is a syntactically valid Rust identifier fragment:
-/// - Non-empty
-/// - First character: ASCII alphabetic or underscore
-/// - Remaining characters: ASCII alphanumeric or underscore
-fn is_valid_rust_identifier(s: &str) -> bool {
-    let mut chars = s.chars();
-    match chars.next() {
-        None => false,
-        Some(first) => {
-            (first.is_ascii_alphabetic() || first == '_')
-                && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -470,6 +511,12 @@ impl TypeRef {
             return Err(IdentifierError::Empty);
         }
         Ok(Self(s))
+    }
+
+    /// Creates a `TypeRef` from a value whose non-empty invariant was already
+    /// established by another domain value object.
+    pub(crate) fn from_non_empty(s: String) -> Self {
+        Self(s)
     }
 
     /// Returns the underlying string slice.

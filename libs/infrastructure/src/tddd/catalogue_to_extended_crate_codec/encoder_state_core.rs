@@ -4,24 +4,114 @@
 //! TypeRef parsing and external-id resolution live in the sibling module
 //! `encoder_state_type_ref_parsing` to keep each file within the 700-line limit.
 
+use std::collections::HashMap;
+
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, FullyQualifiedItemPath};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CrateName, MethodGenericParam, ModulePath, WherePredicateDecl,
+    BoundOp, CatalogueEntryKey, CrateName, MethodGenericParam, ModulePath, TypeRef,
+    WherePredicateDecl,
 };
 use rustdoc_types::{
     ExternalCrate, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id, ItemKind,
     ItemSummary, Term, Type, WherePredicate,
 };
 
-use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
+use domain::tddd::NewTypeGraphCodecError;
 
 use super::encoder::EncoderState;
-use super::helpers::{is_bare_generic_name, rewrite_generic_types, try_build_generic_projection};
+use super::invalid_type_ref;
+use crate::tddd::canonical_type_identity::{
+    SYNTHETIC_UNPLACED_CRATE_ID, canonicalize_catalogue_type_ref,
+};
+use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 impl EncoderState {
+    pub(super) fn resolution_paths_for_namespace(
+        &self,
+        namespace: CatalogueItemNamespace,
+    ) -> HashMap<rustdoc_types::Id, ItemSummary> {
+        self.resolution_paths
+            .iter()
+            .filter(|(_, summary)| {
+                matches!(
+                    (namespace, super::path_namespace(summary.kind)),
+                    (CatalogueItemNamespace::Type, super::PathNamespace::Type)
+                        | (CatalogueItemNamespace::Trait, super::PathNamespace::Trait)
+                )
+            })
+            .map(|(id, summary)| (*id, summary.clone()))
+            .collect()
+    }
+
+    pub(super) fn effective_module_path(
+        &self,
+        key: &CatalogueEntryKey,
+        namespace: CatalogueItemNamespace,
+        fallback: &ModulePath,
+    ) -> ModulePath {
+        let prefix = match namespace {
+            CatalogueItemNamespace::Type => "type",
+            CatalogueItemNamespace::Trait => "trait",
+        };
+        self.resolved_entry_module_paths
+            .get(&format!("{prefix}:{}", key.as_str()))
+            .cloned()
+            .unwrap_or_else(|| fallback.clone())
+    }
+
     pub(super) fn alloc_id(&mut self) -> Id {
         let id = Id(self.next_id);
         self.next_id += 1;
         id
+    }
+
+    pub(super) fn local_id_for_catalogue_key(
+        &self,
+        key: &CatalogueEntryKey,
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+    ) -> Result<Id, NewTypeGraphCodecError> {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+                &self.crate_name,
+                key,
+                declared_module_path,
+            ),
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+                    &self.crate_name,
+                    key,
+                    declared_module_path,
+                )
+            }
+        }
+        .map_err(|error| {
+            invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+        })?;
+        if key.as_str().contains("::") {
+            if let (Some(declared), Some(actual)) = (declared_module_path, identity.module_path()) {
+                if declared != actual {
+                    return Err(invalid_type_ref(
+                        key.as_str(),
+                        format!(
+                            "catalogue key '{}' implies module_path '{}', but entry module_path is '{}',",
+                            key.as_str(),
+                            actual,
+                            declared
+                        ),
+                    ));
+                }
+            }
+        }
+        let source =
+            if identity.is_placed() { identity.to_string() } else { key.as_str().to_owned() };
+        let type_ref = TypeRef::new(source.clone())
+            .map_err(|_| invalid_type_ref(&source, "catalogue entry path is empty"))?;
+        let namespace_paths = self.resolution_paths_for_namespace(namespace);
+        let canonical =
+            canonicalize_catalogue_type_ref(&type_ref, &self.crate_name, &namespace_paths, &[])?;
+        self.local_id_for_identity_in_namespace(&canonical, namespace)?
+            .ok_or_else(|| invalid_type_ref(&source, "catalogue entry identity is not registered"))
     }
 
     /// Ensures an external crate is registered and returns its `crate_id`.
@@ -54,8 +144,37 @@ impl EncoderState {
     /// Returns the synthetic `Id` for use in `Path.id`.  Repeated calls with the
     /// same `canonical_path` return the same `Id` (cached in
     /// `external_type_path_to_id`).
-    pub(super) fn ensure_external_type_id(&mut self, canonical_path: &str, crate_name: &str) -> Id {
+    pub(super) fn ensure_external_type_id(
+        &mut self,
+        canonical_path: &str,
+        crate_name: &str,
+        namespace: CatalogueItemNamespace,
+    ) -> Id {
+        // D3: the synthesized summary carries the namespace of the reference so
+        // the resolution set never holds one external path as both a type and a
+        // trait identity (an impl's trait path must resolve to exactly one).
+        let kind = match namespace {
+            CatalogueItemNamespace::Type => ItemKind::Struct,
+            CatalogueItemNamespace::Trait => ItemKind::Trait,
+        };
         if let Some(&cached) = self.external_type_path_to_id.get(canonical_path) {
+            let Some(summary) = self.paths.get(&cached) else {
+                self.record_resolution_error(invalid_type_ref(
+                    canonical_path,
+                    "external type cache points to a missing path summary",
+                ));
+                return Id(UNRESOLVED_CRATE_ID);
+            };
+            if summary.kind != kind {
+                self.record_resolution_error(invalid_type_ref(
+                    canonical_path,
+                    format!(
+                        "external path is already registered as {:?} and cannot be reused as {:?}",
+                        summary.kind, namespace
+                    ),
+                ));
+                return Id(UNRESOLVED_CRATE_ID);
+            }
             return cached;
         }
         let synthetic_id = self.alloc_id();
@@ -63,10 +182,8 @@ impl EncoderState {
 
         let crate_id = self.ensure_external_crate(crate_name.to_string());
         let path_segs: Vec<String> = canonical_path.split("::").map(str::to_string).collect();
-        self.paths.insert(
-            synthetic_id,
-            ItemSummary { crate_id, path: path_segs, kind: ItemKind::Struct },
-        );
+        let summary = ItemSummary { crate_id, path: path_segs, kind };
+        self.paths.insert(synthetic_id, summary.clone());
         synthetic_id
     }
 
@@ -86,7 +203,7 @@ impl EncoderState {
         generics_decl: &[MethodGenericParam],
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, false)
     }
 
@@ -98,7 +215,7 @@ impl EncoderState {
         generics_decl: &[MethodGenericParam],
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, true)
     }
 
@@ -108,7 +225,7 @@ impl EncoderState {
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
         preserve_bound_spelling: bool,
-    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+    ) -> Result<Generics, NewTypeGraphCodecError> {
         let mut params: Vec<GenericParamDef> = Vec::with_capacity(generics_decl.len());
         let mut where_predicates: Vec<WherePredicate> = Vec::new();
         let preserve_lexical_types = preserve_bound_spelling && !generic_names.is_empty();
@@ -118,11 +235,11 @@ impl EncoderState {
         for g in generics_decl {
             let mut bounds: Vec<GenericBound> = Vec::with_capacity(g.bounds.len());
             for b in &g.bounds {
-                let bound = if preserve_bound_spelling {
-                    self.encode_and_validate_bound_preserving_spelling(b.as_str(), generic_names)?
-                } else {
-                    self.encode_and_validate_bound(b.as_str(), generic_names)?
-                };
+                let bound = self.encode_bound_with_trait_root(
+                    b.as_str(),
+                    generic_names,
+                    preserve_bound_spelling,
+                )?;
                 bounds.push(bound);
             }
             params.push(GenericParamDef {
@@ -152,12 +269,11 @@ impl EncoderState {
             // syntactically invalid in Rust (`where T:` without any bound).
             // This mirrors the symmetrical check in `where_predicates_from_dtos`.
             if w.rhs.is_empty() {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: lhs_str.to_owned(),
-                    reason: "where predicate has no rhs (`where T:` is not valid Rust); \
-                             at least one rhs entry is required"
-                        .to_owned(),
-                });
+                return Err(invalid_type_ref(
+                    lhs_str,
+                    "where predicate has no rhs (`where T:` is not valid Rust); \
+                     at least one rhs entry is required",
+                ));
             }
             // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable LHS,
             // including qualified-path forms such as `<T as Trait>::Assoc`.  The type-ref
@@ -169,23 +285,8 @@ impl EncoderState {
             // preserve round-trip symmetry.
             let lhs_type = if preserve_lexical_types {
                 self.parse_type_ref_str_with_generics_preserving_spelling(lhs_str, generic_names)?
-            } else if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
-                // Simple bare generic: `T` → `Type::Generic("T")`
-                Type::Generic(lhs_str.trim().to_string())
             } else if !generic_names.is_empty() {
-                if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
-                    // Single-level associated-type projection: `T::Item` →
-                    // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
-                    //  trait_: None, args: None }`.
-                    //
-                    // This matches the shape that rustdoc emits for `where T::Item: …`
-                    // predicates so that A-catalogue and C-rustdoc representations
-                    // compare equal in `build_where_form_view`.
-                    proj
-                } else {
-                    let raw = self.parse_type_ref_str_with_generics(lhs_str, generic_names)?;
-                    rewrite_generic_types(raw, generic_names)
-                }
+                self.parse_type_ref_str_with_generics(lhs_str, generic_names)?
             } else {
                 self.parse_type_ref_str(lhs_str)?
             };
@@ -193,14 +294,11 @@ impl EncoderState {
                 BoundOp::Bound => {
                     let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
                     for b in &w.rhs {
-                        let bound = if preserve_bound_spelling {
-                            self.encode_and_validate_bound_preserving_spelling(
-                                b.as_str(),
-                                generic_names,
-                            )?
-                        } else {
-                            self.encode_and_validate_bound(b.as_str(), generic_names)?
-                        };
+                        let bound = self.encode_bound_with_trait_root(
+                            b.as_str(),
+                            generic_names,
+                            preserve_bound_spelling,
+                        )?;
                         bounds.push(bound);
                     }
                     where_predicates.push(WherePredicate::BoundPredicate {
@@ -214,27 +312,26 @@ impl EncoderState {
                     // Enforce rhs.len() == 1 defensively: decode validates this, but
                     // in-memory domain values constructed outside the codec must also pass.
                     if w.rhs.len() != 1 {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: lhs_str.to_owned(),
-                            reason: format!(
+                        return Err(invalid_type_ref(
+                            lhs_str,
+                            format!(
                                 "Equal predicate must have exactly one rhs entry (got {}); \
                                  `where T::Assoc = U` accepts a single RHS only",
                                 w.rhs.len()
                             ),
-                        });
+                        ));
                     }
                     // Permissive principle (ADR `2026-05-18-1223` / `2026-05-20-0048`):
                     // accept any syn-parseable LHS for Equal predicates, including bare
                     // type parameters (`T = U`).  The `lhs_type` has already been computed
-                    // via `parse_type_ref_str` / `is_bare_generic_name` above; no additional
-                    // shape validation is applied here.
+                    // via the shared syn-backed parser above; no additional shape validation
+                    // is applied here.
                     // Safe: len == 1 asserted above.
                     let rhs_entry = w.rhs.first().ok_or_else(|| {
-                        CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: lhs_str.to_owned(),
-                            reason: "Equal predicate has no rhs (codec invariant violated)"
-                                .to_owned(),
-                        }
+                        invalid_type_ref(
+                            lhs_str,
+                            "Equal predicate has no rhs (codec invariant violated)",
+                        )
                     })?;
                     let rhs_str = rhs_entry.as_str();
                     // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable
@@ -246,18 +343,8 @@ impl EncoderState {
                             rhs_str,
                             generic_names,
                         )?
-                    } else if !generic_names.is_empty()
-                        && is_bare_generic_name(rhs_str, generic_names)
-                    {
-                        Type::Generic(rhs_str.trim().to_string())
                     } else if !generic_names.is_empty() {
-                        if let Some(proj) = try_build_generic_projection(rhs_str, generic_names) {
-                            proj
-                        } else {
-                            let raw =
-                                self.parse_type_ref_str_with_generics(rhs_str, generic_names)?;
-                            rewrite_generic_types(raw, generic_names)
-                        }
+                        self.parse_type_ref_str_with_generics(rhs_str, generic_names)?
                     } else {
                         self.parse_type_ref_str(rhs_str)?
                     };
@@ -270,6 +357,31 @@ impl EncoderState {
         }
 
         Ok(Generics { params, where_predicates })
+    }
+
+    pub(super) fn encode_bound_with_trait_root(
+        &mut self,
+        bound: &str,
+        generic_names: &[&str],
+        preserve_bound_spelling: bool,
+    ) -> Result<GenericBound, NewTypeGraphCodecError> {
+        let previous_root_namespace = self.pending_root_namespace;
+        // The ordinary bound resolver handles the root path itself. Only the
+        // `~const` parser shortcut calls `resolve_external_type_ids` directly,
+        // so it needs the root namespace hint here. Nested generic arguments
+        // must continue to use their normal type namespace.
+        self.pending_root_namespace = if bound.starts_with("~const ") {
+            Some(CatalogueItemNamespace::Trait)
+        } else {
+            previous_root_namespace
+        };
+        let result = if preserve_bound_spelling {
+            self.encode_and_validate_bound_preserving_spelling(bound, generic_names)
+        } else {
+            self.encode_and_validate_bound(bound, generic_names)
+        };
+        self.pending_root_namespace = previous_root_namespace;
+        result
     }
 
     /// Builds `[crate_name, ...module_path, item_name]` path segments.
@@ -286,9 +398,26 @@ impl EncoderState {
         segments
     }
 
+    /// Registers an item path using an already resolved catalogue identity.
+    ///
+    /// An unplaced identity retains the adapter-owned synthetic crate id instead of
+    /// being silently represented as a crate-root placement.
+    pub(super) fn register_identity_path(
+        &mut self,
+        id: Id,
+        kind: ItemKind,
+        identity: &FullyQualifiedItemPath,
+    ) {
+        let path = super::identity_path(identity);
+        let crate_id = if identity.is_placed() { 0 } else { SYNTHETIC_UNPLACED_CRATE_ID };
+        let summary = ItemSummary { crate_id, path, kind };
+        self.paths.insert(id, summary);
+    }
+
     /// Registers an `ItemSummary` in `Crate::paths` using the document crate name.
     ///
-    /// Always uses `self.crate_name` as the crate component and `crate_id: 0` (local crate).
+    /// An existing synthetic unplaced marker is preserved because the type/trait
+    /// encoding pass calls this method after identity assignment.
     /// Use `register_path_for_crate` when the effective crate name may differ.
     pub(super) fn register_path(
         &mut self,
@@ -298,7 +427,13 @@ impl EncoderState {
         module_path: &ModulePath,
     ) {
         let path = Self::build_path_segments(&self.crate_name.clone(), module_path, item_name);
-        self.paths.insert(id, ItemSummary { crate_id: 0, path, kind });
+        let crate_id = self
+            .paths
+            .get(&id)
+            .filter(|summary| summary.crate_id == SYNTHETIC_UNPLACED_CRATE_ID)
+            .map_or(0, |summary| summary.crate_id);
+        let summary = ItemSummary { crate_id, path, kind };
+        self.paths.insert(id, summary);
     }
 
     /// Registers an `ItemSummary` in `Crate::paths` using an explicit crate name.
@@ -322,6 +457,7 @@ impl EncoderState {
             (fn_crate_name.clone(), ext_id)
         };
         let path = Self::build_path_segments(&effective_crate_name, module_path, item_name);
-        self.paths.insert(id, ItemSummary { crate_id, path, kind });
+        let summary = ItemSummary { crate_id, path, kind };
+        self.paths.insert(id, summary);
     }
 }

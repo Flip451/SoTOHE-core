@@ -10,6 +10,7 @@
     { "pattern": ".claude/rules/guardrails.md", "classification": "include" },
     { "pattern": ".claude/rules/language.md", "classification": "overlay" },
     { "pattern": ".claude/rules/maintainer-checklist.md", "classification": "exclude" },
+    { "pattern": ".claude/rules/orchestrator.md", "classification": "include" },
     { "pattern": ".claude/rules/orchestration.md", "classification": "include" },
     { "pattern": ".claude/skills/.gitignore", "classification": "include" },
     { "pattern": ".claude/skills/architecture-customizer", "classification": "include" },

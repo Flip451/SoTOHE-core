@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-gate-output-summary-contract",
+  "task_estimates": [
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 90,
+          "test_lines": 90
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 75,
+          "test_lines": 80
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 30,
+          "test_lines": 40
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 0,
+          "test_lines": 40
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T006",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 20,
+          "test_lines": 20
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 125
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T007",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 30,
+          "test_lines": 30
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 50,
+          "test_lines": 70
+        },
+        {
+          "scope": "cli",
+          "production_lines": 35,
+          "test_lines": 55
+        },
+        {
+          "scope": "cli_composition",
+          "production_lines": 15,
+          "test_lines": 25
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T004",
+        "T005"
+      ]
+    },
+    {
+      "id": "B2",
+      "task_ids": [
+        "T006"
+      ]
+    },
+    {
+      "id": "B3",
+      "task_ids": [
+        "T007"
+      ]
+    }
+  ]
+}

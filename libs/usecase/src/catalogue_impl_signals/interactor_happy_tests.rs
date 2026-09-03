@@ -8,10 +8,12 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use domain::tddd::catalogue_v2::{CatalogueDocument, TdddLayerBinding};
 use domain::tddd::extended_crate::ExtendedCrate;
+use domain::tddd::{AuthoritativeRustdocContext, LayerId};
 
 use super::super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
 use super::{
@@ -30,9 +32,10 @@ struct EmptyExtendedCrateCodec;
 impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
     fn encode(
         &self,
-        _doc: CatalogueDocument,
+        _target_layer: &LayerId,
+        _track_catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+        _rustdoc_contexts: &BTreeMap<LayerId, AuthoritativeRustdocContext>,
     ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
-        use std::collections::BTreeMap;
         Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
     }
 }

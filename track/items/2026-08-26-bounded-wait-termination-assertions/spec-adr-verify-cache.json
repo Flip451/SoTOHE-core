@@ -1,0 +1,511 @@
+{
+  "entries": [
+    {
+      "claim_hash": "8b8c138516af28a687e43c6a67c0979193770d46c54dd5c37d820ce8b317b7db",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "子孫プロセスの終了保証を、即時の単発状態観測ではなく、有界時間内の再観測により最終的な非存在として検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "プロセス・リソースの終了保証を検証するテストは、有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "603a55dbeece672e857af30bb0f62e095da3bd53c10a12929d30b5daca6acf8a",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "adr2pr workflow は、計画成果物 commit 後、最初の implementation batch 後、PR lane 開始時を、耐久状態から親 session を再開できる phase boundary として宣言する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4100181f5154c0eccbffe90e7cdc2424cfe8ffd4fdd5e3d50f3c09db6002c5d9",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "自動的にコンテキストを管理する host は、宣言済みの phase boundary を停止せず user に refresh を要求せずに継続する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39721b5d498fb00820766718770c29c6864b85696f8d3a8a7e0a0533f92c69f0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Unix/Linux cfg の `libs/infrastructure/src/review_v2/review_fix_runner/launch_context.rs` にある `test_version_probe_terminates_descendant_after_clean_pipe_drain` を、有界待ちによる再観測の検証様式へ変更する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "発見済みの該当テスト(version probe の子孫検証)をこの様式へ改める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "64f03c5353acb1af1c7e22062a68c425ccd43a8c326b2b6e2f259b08f7a86989",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "終了保証の判定では、対象が終端状態に達したか消滅するまで再観測し、遷移中の中間状態の観測を失敗として扱わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。遷移中の中間状態を観測しても失敗にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "969259ea2551bd9b19c80ef957e8d4d3e8e94def799142e7dcbd5b0d710ac9b5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "`.harness/workflows/track/adr2pr.md` の parent-session refresh/resume contract、Step 9、gate table を、境界を refresh/resume point として宣言し、unconditional stop と one-way handoff を削除する内容へ改訂する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f2917485e66fa2b1161b3c44ce080989b1cac9ae5ae038f725ab75967472a1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "`.claude/commands/track/adr2pr.md` で Claude Code の automatic compaction を automatic context management として扱い、境界ごとの `/clear` または fresh-session 要求を削除する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bdf8fe777a80918be03ade070a16b845c0ad3cb285f3478fd253264c2eeea1d7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "`.agents/skills/track-adr2pr/SKILL.md` の note (5) と cross-reference を、Codex では automatic context management が無い場合にだけ refresh を要求できる内容へ改訂する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3e6b616191436b1800abe1c19ae5167787c7fc05e272158c205cade3320f50c1",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "`TrustedLaunchContext::run_version_probe` とその子孫 cleanup を含む production の終了保証実装は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "production の終了保証の実装は変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "477fd23e49cfef5cb451794d6d933efcb59fea09d05968fe9fd8e8e084fcd524",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "同型の即時観測テストを repository 全体で探索または変更することは、この track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "他の該当テストの探索は、同一の欠陥が再発したときに範囲を広げる(本 track では網羅走査を要求しない)。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7cdd7878b0d3e3f539c5b98e7792aa168e68913f1a6fe38b548649946eb081d3",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "再観測には有限の時間上限を設け、失敗はその上限を超過した場合に限る。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1b98334c09625558b7bd704f7e44e47bdb37df93af3f000c2b17b7332e839d5a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "対象テストの子孫プロセス終了を再観測する有界待ちには、秒単位で表す固定された有限の時間上限を設け、その上限は対象テストごとの名前付き定数として再観測処理にのみ適用する。上限が過大でも終了保証の判定を誤らせず、超過時のみ失敗とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。遷移中の中間状態を観測しても失敗にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18d9f5e76b661c9514782ca3e3e01933f8150168cf27fadbc166d88790e0880a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "既存テストの probe script の detached background child について、kernel に reap されて消滅した場合と、非実行中の zombie として残る場合のいずれも、D1 が要求する「終端状態に達した、または消滅した」を満たす。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「終端状態に達した、または消滅した」ことを要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "73bb6491cf8067d5d32e81fb65b32c06270c075849b5b1d4726edc891f9f3d0d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "最初の implementation batch の `--single-batch` と、git および track artifacts から再開位置を導出する既存の規則は維持し、停止・handoff の意味だけを変更する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0584573016969d5defb07ed6e9878e40df9bc993584e3ed332d73884d49c564",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "user への refresh 要求は、自動的にコンテキストを管理できない host に限る条件付きの任意経路とし、無条件の step にしてはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2920ebca1ffb5c869ea7a0a0c308f71594d74a3042c4271cc12d5ccf51450e50",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象テストは、即時の単発 `/proc/<pid>/stat` 状態 assert に依存せず、終端状態または対象消滅を確認して成功する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b5f5f1c0600f7ae2134be761fd64316f3310f05c6352bcc0ad399a5d25ff0d0",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象テストの有界待ち上限は、秒単位で設定される名前付きのテストごとの定数で表される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "プロセス・リソースの終了保証を検証するテストは、有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a7808e79fce243300c8963ebf2521d5390ab78dc6ccd7414d4fbf5754bdb0bfe",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象テストは、有界待ちの時間上限を超過した場合にのみ失敗する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "失敗は上限超過のみとする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3f2dfab55651ce4deb2a7aeb54b8bd6cf0a55ace4a879fc43ca6e6c9e8fc51a7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "production の `TrustedLaunchContext::run_version_probe` と子孫 cleanup の差分は空である。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "production の終了保証の実装は変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdb6b029f03e1c2e604e15cdd94f73266fd322a90926049904101ba5e770695c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "遷移中の状態を一度以上観測しても、時間上限内に終端状態または消滅を観測できれば対象テストは成功する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "c6885256db4e12a57171ddb4eadecc3ef001eb0b76d6bb844f826408467d52c8",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-26-0211-bounded-wait-termination-assertions.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "有限の時間上限内で対象の状態を再観測し、「終端状態に達した、または消滅した」ことを要求する。失敗は上限超過のみとする。遷移中の中間状態を観測しても失敗にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5aea3bea3754429adcb5185d3e442351efd896c4ecb8b3a1835f98e6d9f5f97d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "`.harness/workflows/track/adr2pr.md`、`.claude/commands/track/adr2pr.md`、`.agents/skills/track-adr2pr/SKILL.md` のいずれも、自動的にコンテキストを管理する host に対して、宣言済みの境界で無条件に停止すること、または user に `/clear` や fresh session を要求することを指示しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。ホストに自動更新が無い場合はユーザーへ更新を要求してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41ed6bbfec53bcb72e55329508bb4358ddef359dd281dc0a5467a36e827fdef9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "adr2pr の SSoT は、計画成果物 commit 後、最初の実装 batch 後、PR lane 開始時の三つの境界と、git および track artifacts からの既存の durable-state resume 導出規則を保持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "ae69cda1bf33736b69eb8b0a251fa3fb34143fe603fb623466c62c3ddc4b7614",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-22-0145-orchestrator-context-discipline.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adr2pr 手順に、計画成果物コミット後・最初の実装バッチ後・PR レーン開始時のセッション更新点を明記する。機械状態は git と track 成果物にあり、親コンテキストは捨ててよい。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,327 @@
+{
+  "entries": [
+    {
+      "claim_hash": "9ff224cf9816fac6c0b99ad8b200fca6c22e0c654aa1c26a0855d970ae74f97e",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Keep the active track's commit record aligned with merge HEAD after base-merge cleanup so post-merge review scope and signal evaluation exclude changes owned by the incorporated base."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ce9473d8ae278dcab8e08b4483a4222f92ca98cfe115845a9e2b8bf35a81210f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD as part of clean base-merge cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5b2186a8ab429988c63120e21b6a302dc8e415ab3f523a4557dba5a9b317c12f",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "43196f916dd5c46e1e188d5948e529eff7f9d5c7a5a842f7f1ac42b69c4fc162",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Changing the existing Baseline → Views cleanup ordering is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録は既存の commit record 更新経路を用い、既存の後始末段と同じ完了条件で扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "43196f916dd5c46e1e188d5948e529eff7f9d5c7a5a842f7f1ac42b69c4fc162",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Changing the existing Baseline → Views cleanup ordering is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "競合なしの merge の後始末は Baseline → Views の順でのみ完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "00e14852d5e07774680e87602754f2c1b4c17c0be17ec52f0d658b742718beba",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Creating a Git commit as part of commit-record advancement is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録は既存の commit record 更新経路を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "31190f2e3ae31132e529d781f6513840fa3c7b9c93f65b3af0dddb1c78d02536",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。記録は既存の commit record 更新経路を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3f30be12871a27a4525b77454f6ad385b236498affa83bf224c51d1867a040cd",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録は既存の commit record 更新経路を用い、既存の後始末段と同じ完了条件で扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3f30be12871a27a4525b77454f6ad385b236498affa83bf224c51d1867a040cd",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "競合なしの merge の後始末は Baseline → Views の順でのみ完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24e2538364d6b4a6316d8d96cd72f2dd4e7914807839db24d14cf01db5ee04f1",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録に失敗した場合は fail-closed とし、後始末の部分完了を成功として報告しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "25fef487ab42eb665ccbda7aea88079548c9e521cb0208f344206a3135420378",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。記録は既存の commit record 更新経路を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b6be86a41a30127ee0463a5fc8ccd9eb22a0ecc688d25aa4d252d14be497f827",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。記録は既存の commit record 更新経路を用い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f1cbbe815dff93387d8ea862285cdbe42bfb651b72baf5bff0d4b1dae98c1927",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録に失敗した場合は fail-closed とし、後始末の部分完了を成功として報告しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f6f34f4b5c89c89a4eff643345f7e1a2ba9adb1db87116b1e35f21245c5b8a52",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "The commit-record update rewrites only track state and does not create a Git commit."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3d964ce98ad44408f14b54302f69743a62e0cb27db72e792fce8ea512cb35a2a",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "clean merge と conflict 回復の完了時、いずれも merge 後の HEAD を track の commit record として記録する。記録は既存の commit record 更新経路を用い、既存の後始末段と同じ完了条件で扱う。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

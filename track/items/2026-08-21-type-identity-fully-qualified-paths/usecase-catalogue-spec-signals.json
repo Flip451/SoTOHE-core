@@ -1,0 +1,26 @@
+{
+  "catalogue_declaration_hash": "9b9daed915c81e5703f90c8a2273a175653f2951bb72422c2a208849b31b26e0",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "c88f07c0d2ac7d772516f224dbc48ac1144d56650221bac059e349965a6b543a",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+    },
+    {
+      "entry_hash": "3039d9666f5eae49f36edab4d2e918f4868b90acaf23edea14e837597e80e63e",
+      "signal": "blue",
+      "type_name": "RunCatalogueLint"
+    },
+    {
+      "entry_hash": "ba5e5a2b0e0dce3fa54d248f9b290f573b8d54450ca886aa4e5676db452b8936",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+    },
+    {
+      "entry_hash": "abd593c1b905c0b91913dceaead389e9a0144170cecd834601f495d96e97b4be",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+    }
+  ]
+}

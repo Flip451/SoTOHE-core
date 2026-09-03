@@ -1,25 +1,28 @@
 //! `Encoder` and `EncoderState` struct definitions, plus `Encoder` impl
 //! (pre-passes and the main encoding pipeline `run()`).
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
+use domain::tddd::NewTypeGraphCodecError;
+use domain::tddd::catalogue_v2::identifiers::{CatalogueItemNamespace, FullyQualifiedItemPath};
 use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ModulePath, StructShape, TraitName,
-    TypeKindV2, TypeName,
+    CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord, ModulePath, StructShape,
+    TypeKindV2, TypeRef,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use rustdoc_types::{
-    Crate, ExternalCrate, FORMAT_VERSION, FunctionHeader, FunctionSignature, Id, Impl, Item,
-    ItemEnum, ItemKind, ItemSummary, Module, Struct, StructKind, Target, Trait as RustdocTrait,
+    Crate, ExternalCrate, FORMAT_VERSION, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Module,
+    Target,
 };
 
-use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
-
-use super::helpers::{
-    empty_generics, make_item, make_item_with_crate_id, normalize_impl_for_type_path,
-    resolved_path_type,
+use super::encoder_deletions::encode_deletion_record;
+use super::helpers::{make_item, normalize_impl_for_type_path, resolved_path_type};
+use super::{entry_item_name, invalid_type_ref, map_identity_resolution_error, summary_identity};
+use crate::tddd::canonical_type_identity::{
+    CanonicalTypeIdentity, canonicalize_catalogue_type_ref,
 };
+use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace;
 
 // ---------------------------------------------------------------------------
 // Encoder — internal per-call state
@@ -47,25 +50,32 @@ pub(super) struct EncoderState {
     pub(super) index: HashMap<Id, Item>,
     /// Paths map for `Crate::paths`.
     pub(super) paths: HashMap<Id, ItemSummary>,
+    /// Authoritative baseline/current rustdoc paths used for reconciliation.
+    pub(super) resolution_paths: HashMap<Id, ItemSummary>,
+    /// Identities present in the baseline rustdoc only. Non-add declarations
+    /// (`modify` / `reference`) and deletions must resolve here (D3); the merged
+    /// `resolution_paths` is read only by the add route.
+    pub(super) baseline_identities: BTreeSet<FullyQualifiedItemPath>,
+    /// Effective placement selected for catalogue declarations during the
+    /// action-aware pre-pass.
+    pub(super) resolved_entry_module_paths: HashMap<String, ModulePath>,
     /// `crate_id` → `ExternalCrate` for `Crate::external_crates`.
     pub(super) external_crates: HashMap<u32, ExternalCrate>,
     /// `crate_name` → `crate_id` lookup for TypeRef resolution.
     pub(super) ext_name_to_id: HashMap<String, u32>,
     /// Next external crate_id to assign (0 is reserved for self).
     pub(super) next_ext_id: u32,
-    /// Catalogue-declared type/trait short name → assigned `Id` for TypeRef resolution.
+    /// Canonical implementation identity → all assigned local item ids.
     ///
-    /// Only types and traits are stored here. Function path strings are kept
-    /// in `fn_path_to_id` to prevent function ids from polluting TypeRef
-    /// resolution (which operates on single-segment names only).
-    pub(super) local_name_to_id: HashMap<String, Id>,
+    /// Multiple catalogue declarations may temporarily share one rustdoc identity. The
+    /// evaluator owns the eventual collision decision; codec resolution remains fail-closed
+    /// by rejecting an identity with more than one local declaration when it is referenced.
+    pub(super) local_identity_to_id:
+        HashMap<CanonicalTypeIdentity, Vec<(FullyQualifiedItemPath, Id)>>,
     /// Full `FunctionPath` string → assigned `Id`.
     ///
-    /// Kept separate from `local_name_to_id` so that function paths (which are
-    /// multi-segment strings such as `"my_crate::fn_name"`) are never
-    /// accidentally matched by the single-segment TypeRef resolver, and so that
-    /// `AmbiguousIdentifier` checks are applied independently to the two
-    /// namespaces (types/traits vs. functions).
+    /// Kept separate from the canonical type/trait identity index because
+    /// function paths are a distinct namespace from TypeRef identities.
     pub(super) fn_path_to_id: HashMap<String, Id>,
     /// Crate name used for `ItemSummary::path` construction.
     pub(super) crate_name: CrateName,
@@ -75,10 +85,22 @@ pub(super) struct EncoderState {
     /// synthetic item id within a single codec run, so `Crate::paths` entries are not
     /// duplicated and downstream consumers can reliably look up external types.
     pub(super) external_type_path_to_id: HashMap<String, Id>,
+    /// First fail-closed local-resolution error observed while walking a parsed type.
+    pub(super) resolution_error: Option<NewTypeGraphCodecError>,
+    /// Namespace to use for the root path of the next parsed expression.
+    ///
+    /// Ordinary type expressions default to `Type`; the top-level trait-ref
+    /// route sets this for one parse so its root path is resolved as a trait
+    /// while nested generic arguments retain type resolution.
+    pub(super) pending_root_namespace: Option<CatalogueItemNamespace>,
 }
 
 impl Encoder {
-    pub(super) fn new(doc: CatalogueDocument) -> Self {
+    pub(super) fn new(
+        doc: CatalogueDocument,
+        resolution_paths: HashMap<Id, ItemSummary>,
+        baseline_identities: BTreeSet<FullyQualifiedItemPath>,
+    ) -> Self {
         let crate_name = doc.crate_name().clone();
         Self {
             doc,
@@ -86,38 +108,65 @@ impl Encoder {
                 next_id: 0,
                 index: HashMap::new(),
                 paths: HashMap::new(),
+                resolution_paths,
+                baseline_identities,
+                resolved_entry_module_paths: HashMap::new(),
                 external_crates: HashMap::new(),
                 ext_name_to_id: HashMap::new(),
                 next_ext_id: 1,
-                local_name_to_id: HashMap::new(),
+                local_identity_to_id: HashMap::new(),
                 fn_path_to_id: HashMap::new(),
                 crate_name,
                 external_type_path_to_id: HashMap::new(),
+                resolution_error: None,
+                pending_root_namespace: None,
             },
         }
     }
 
     /// Pre-pass: assign `Id`s to all declared types, traits, and functions.
     ///
-    /// Returns `AmbiguousTypeName` if two entries share the same short name.
-    fn assign_ids(&mut self) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    /// Assigns ids without collapsing declarations that share a short name.
+    ///
+    /// The short-name index is populated only after every declaration has been indexed. This
+    /// lets two modules declare the same item name while preserving a fail-closed ambiguity
+    /// result when a TypeRef uses that short name without enough context.
+    fn assign_ids(&mut self) -> Result<(), NewTypeGraphCodecError> {
         // Id(0) = root module.
         let _ = self.state.alloc_id();
 
-        // Collect keys first to avoid simultaneous borrow + mutable borrow.
-        let type_names: Vec<String> =
-            self.doc.types().keys().map(|k| k.as_str().to_string()).collect();
-        for name in type_names {
-            self.assign_local_name_id(&name)?;
+        // Collect declarations first to avoid simultaneous document/state borrows.
+        let type_entries: Vec<(CatalogueEntryKey, Option<ModulePath>, ItemAction)> = self
+            .doc
+            .types()
+            .iter()
+            .map(|(key, entry)| (key.clone(), entry.module_path().cloned(), entry.action()))
+            .collect();
+        for (key, module_path, action) in type_entries {
+            self.assign_local_entry(
+                &key,
+                module_path.as_ref(),
+                CatalogueItemNamespace::Type,
+                action,
+            )?;
         }
-        let trait_names: Vec<String> =
-            self.doc.traits().keys().map(|k| k.as_str().to_string()).collect();
-        for name in trait_names {
-            self.assign_local_name_id(&name)?;
+        let trait_entries: Vec<(CatalogueEntryKey, Option<ModulePath>, ItemAction)> = self
+            .doc
+            .traits()
+            .iter()
+            .map(|(key, entry)| (key.clone(), entry.module_path().cloned(), entry.action()))
+            .collect();
+        for (key, module_path, action) in trait_entries {
+            self.assign_local_entry(
+                &key,
+                module_path.as_ref(),
+                CatalogueItemNamespace::Trait,
+                action,
+            )?;
         }
         // Functions are keyed by their full `FunctionPath` string (e.g. `"my_crate::fn"`).
-        // Store them in the dedicated `fn_path_to_id` map to keep the TypeRef-resolution
-        // map (`local_name_to_id`) free of multi-segment function keys.
+        // Store them in the dedicated `fn_path_to_id` map; TypeRef identity resolution only
+        // consults the canonical type/trait identity index.
         let fn_paths: Vec<String> = self.doc.functions().keys().map(|k| k.to_string()).collect();
         for path in fn_paths {
             self.assign_function_id(&path)?;
@@ -126,18 +175,25 @@ impl Encoder {
         // Deletion records still participate in TypeGraph A as
         // Delete-marked top-level items. Phase 1 uses only their identity to
         // move the matching B-side item into the delete set.
-        let deletion_local_names: Vec<String> = self
+        let deletion_local_names: Vec<(String, CatalogueItemNamespace)> = self
             .doc
             .deletions()
             .iter()
             .filter_map(|record| match record {
-                DeletionRecord::Type { name, .. } => Some(name.as_str().to_owned()),
-                DeletionRecord::Trait { name, .. } => Some(name.as_str().to_owned()),
+                DeletionRecord::Type { name, .. } => {
+                    Some((name.as_str().to_owned(), CatalogueItemNamespace::Type))
+                }
+                DeletionRecord::Trait { name, .. } => {
+                    Some((name.as_str().to_owned(), CatalogueItemNamespace::Trait))
+                }
                 DeletionRecord::Function { .. } => None,
             })
             .collect();
-        for name in deletion_local_names {
-            self.assign_local_name_id(&name)?;
+        for (name, namespace) in deletion_local_names {
+            let key = CatalogueEntryKey::try_new(name).map_err(|_| {
+                invalid_type_ref("<delete>", "delete tombstone contains an empty catalogue key")
+            })?;
+            self.assign_deletion_entry(&key, namespace)?;
         }
 
         let deletion_fn_paths: Vec<String> = self
@@ -155,87 +211,160 @@ impl Encoder {
         Ok(())
     }
 
-    fn assign_local_name_id(
+    fn assign_local_entry(
         &mut self,
-        name: &str,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        if self.state.local_name_to_id.contains_key(name) {
-            return Err(CatalogueToExtendedCrateCodecError::AmbiguousIdentifier {
-                name: name.to_owned(),
-            });
+        key: &CatalogueEntryKey,
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+        action: ItemAction,
+    ) -> Result<(), NewTypeGraphCodecError> {
+        let (fully_qualified, module_path) =
+            self.identity_for_key(key, declared_module_path, namespace, action)?;
+        // D3: a non-add declaration names something that already exists in the
+        // baseline; an identity that only the current rustdoc (or nothing) knows
+        // is rejected instead of being silently accepted through the merged set.
+        if action != ItemAction::Add && !self.state.baseline_identities.contains(&fully_qualified) {
+            return Err(invalid_type_ref(
+                key.as_str(),
+                format!(
+                    "{action:?} declaration `{fully_qualified}` does not exist in the baseline rustdoc; non-add declarations resolve against the baseline only"
+                ),
+            ));
         }
         let id = self.state.alloc_id();
-        self.state.local_name_to_id.insert(name.to_owned(), id);
+        let item_kind = match namespace {
+            CatalogueItemNamespace::Type => ItemKind::Struct,
+            CatalogueItemNamespace::Trait => ItemKind::Trait,
+        };
+        self.state.register_identity_path(id, item_kind, &fully_qualified);
+        self.state
+            .resolved_entry_module_paths
+            .insert(entry_scope_key(key, namespace), module_path.clone());
+        let identity_ref = TypeRef::new(if fully_qualified.is_placed() {
+            fully_qualified.to_string()
+        } else {
+            key.as_str().to_owned()
+        })
+        .map_err(|_| {
+            invalid_type_ref(key.as_str(), "catalogue key produced an invalid identity")
+        })?;
+        let namespace_paths = self.state.resolution_paths_for_namespace(namespace);
+        let identity = canonicalize_catalogue_type_ref(
+            &identity_ref,
+            &self.state.crate_name,
+            &namespace_paths,
+            &[],
+        )?;
+        self.state.local_identity_to_id.entry(identity).or_default().push((fully_qualified, id));
         Ok(())
     }
 
-    fn assign_function_id(&mut self, path: &str) -> Result<(), CatalogueToExtendedCrateCodecError> {
+    fn assign_deletion_entry(
+        &mut self,
+        key: &CatalogueEntryKey,
+        namespace: CatalogueItemNamespace,
+    ) -> Result<(), NewTypeGraphCodecError> {
+        let identity = self.state.resolve_catalogue_key_identity(key, namespace)?;
+        let identity_ref = TypeRef::new(identity.to_string()).map_err(|_| {
+            invalid_type_ref(key.as_str(), "delete catalogue key is not valid TypeRef notation")
+        })?;
+        let namespace_paths = self.state.resolution_paths_for_namespace(namespace);
+        let canonical = canonicalize_catalogue_type_ref(
+            &identity_ref,
+            &self.state.crate_name,
+            &namespace_paths,
+            &[],
+        )?;
+        if let Some(id) = self.state.local_id_for_identity_in_namespace(&canonical, namespace)? {
+            return Err(invalid_type_ref(
+                key.as_str(),
+                format!(
+                    "delete catalogue identity '{}' resolves to existing item id {}; refusing to overwrite the existing item",
+                    key.as_str(),
+                    id.0
+                ),
+            ));
+        }
+        let module_path = identity.module_path().cloned().ok_or_else(|| {
+            invalid_type_ref(
+                key.as_str(),
+                "delete catalogue identity has no authoritative module placement",
+            )
+        })?;
+        let effective_key = CatalogueEntryKey::try_new(identity.to_string()).map_err(|_| {
+            invalid_type_ref(key.as_str(), "delete catalogue identity is not a valid catalogue key")
+        })?;
+        self.assign_local_entry(&effective_key, Some(&module_path), namespace, ItemAction::Delete)
+    }
+
+    fn identity_for_key(
+        &self,
+        key: &CatalogueEntryKey,
+        declared_module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+        action: ItemAction,
+    ) -> Result<(FullyQualifiedItemPath, ModulePath), NewTypeGraphCodecError> {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => FullyQualifiedItemPath::from_type_catalogue_entry_key(
+                &self.state.crate_name,
+                key,
+                declared_module_path,
+            ),
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+                    &self.state.crate_name,
+                    key,
+                    declared_module_path,
+                )
+            }
+        }
+        .map_err(|error| {
+            invalid_type_ref(key.as_str(), format!("invalid catalogue identity: {error}"))
+        })?;
+        let identity = if identity.is_placed() {
+            identity
+        } else {
+            // D3: an omitted placement resolves against the merged set for `add`
+            // (declaration-first) and against the baseline only for every other
+            // action.
+            let universe = if action == ItemAction::Add {
+                self.state
+                    .resolution_paths
+                    .values()
+                    .filter_map(summary_identity)
+                    .collect::<BTreeSet<_>>()
+            } else {
+                self.state.baseline_identities.clone()
+            };
+            let reference = TypeRef::new(key.as_str().to_owned())
+                .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key has no item name"))?;
+            match resolve_catalogue_identity_in_namespace(
+                &reference,
+                &self.state.crate_name,
+                &universe,
+                Some(namespace),
+            ) {
+                Ok(resolved) => resolved,
+                Err(error) => return Err(map_identity_resolution_error(error)),
+            }
+        };
+        let module_path = identity.module_path().cloned().unwrap_or_else(ModulePath::root);
+        Ok((identity, module_path))
+    }
+
+    fn assign_function_id(&mut self, path: &str) -> Result<(), NewTypeGraphCodecError> {
         if self.state.fn_path_to_id.contains_key(path) {
-            return Err(CatalogueToExtendedCrateCodecError::AmbiguousIdentifier {
-                name: path.to_owned(),
-            });
+            return Err(invalid_type_ref(path, "duplicate function path in catalogue"));
         }
         let id = self.state.alloc_id();
         self.state.fn_path_to_id.insert(path.to_owned(), id);
         Ok(())
     }
 
-    /// Pre-pass: register external crates from top-level `trait_impls` (ADR `2026-05-20-0048` D1/D2).
-    ///
-    /// Both `trait_ref` and `for_type` may contain crate-prefixed type references.
-    /// Extracts the first path segment (the crate name) from each string using
-    /// AST-aware extraction: the `::` is only searched in the prefix before the
-    /// first `<` so that generic arguments like `"Foo<serde::Serialize>"` do not
-    /// produce a spurious `"Foo<serde"` crate registration.
-    ///
-    /// Rust path-keyword segments (`crate`, `self`, `super`) and the self-crate name
-    /// are skipped — they are not real external crates.
-    fn collect_external_from_trait_impls(&mut self) {
-        let self_crate_name = self.doc.crate_name().as_str().to_string();
-        // Reserved Rust path keywords that must not be registered as external crates.
-        const PATH_KEYWORDS: &[&str] = &["crate", "self", "super"];
-
-        // Returns the crate-name prefix of `type_str` if it looks like an
-        // external-crate path (`first_seg::rest`), excluding Rust path keywords
-        // and the self-crate name.
-        let extract_crate = |type_str: &str| -> Option<String> {
-            // Truncate at the first `<` to avoid matching `::` inside generic args.
-            let angle_pos = type_str.find('<').unwrap_or(type_str.len());
-            let base = &type_str[..angle_pos];
-            let colon_pos = base.find("::")?;
-            let first_seg = base[..colon_pos].trim();
-            // Reject empty first segment (e.g. absolute paths starting with `::`)
-            // and Rust path keywords / self-crate names.
-            if first_seg.is_empty()
-                || first_seg == self_crate_name.as_str()
-                || PATH_KEYWORDS.contains(&first_seg)
-            {
-                return None;
-            }
-            Some(first_seg.to_string())
-        };
-
-        let mut crate_names: Vec<String> = Vec::new();
-        for ti in self.doc.trait_impls() {
-            // Extract crate prefix from trait_ref (e.g. "core" from "core::convert::From<X>").
-            if let Some(cn) = extract_crate(ti.trait_ref().as_str()) {
-                crate_names.push(cn);
-            }
-            // Extract crate prefix from for_type (e.g. "std" from "std::vec::Vec<i32>").
-            if let Some(cn) = extract_crate(ti.for_type().as_str()) {
-                crate_names.push(cn);
-            }
-        }
-        for cn in crate_names {
-            self.state.ensure_external_crate(cn);
-        }
-    }
-
     /// Runs the full encoding pipeline.
-    pub(super) fn run(mut self) -> Result<ExtendedCrate, CatalogueToExtendedCrateCodecError> {
+    pub(super) fn run(mut self) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
         // Pre-passes.
         self.assign_ids()?;
-        self.collect_external_from_trait_impls();
         self.state.ensure_external_crate("std".to_string());
 
         // Destructure: separate `doc` from mutable `state` so encoding loops can
@@ -247,13 +376,11 @@ impl Encoder {
 
         // Encode types.
         for (type_name, entry) in doc.types() {
-            let type_id =
-                state.local_name_to_id.get(type_name.as_str()).copied().ok_or_else(|| {
-                    CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                        type_ref: type_name.as_str().to_string(),
-                        reason: "pre-pass id not found (internal error)".to_string(),
-                    }
-                })?;
+            let type_id = state.local_id_for_catalogue_key(
+                type_name,
+                entry.module_path(),
+                CatalogueItemNamespace::Type,
+            )?;
             let action = entry.action();
             match entry.kind().clone() {
                 TypeKindV2::Struct(struct_kind) => {
@@ -295,13 +422,11 @@ impl Encoder {
 
         // Encode traits.
         for (trait_name, entry) in doc.traits() {
-            let trait_id =
-                state.local_name_to_id.get(trait_name.as_str()).copied().ok_or_else(|| {
-                    CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                        type_ref: trait_name.as_str().to_string(),
-                        reason: "pre-pass id not found (internal error)".to_string(),
-                    }
-                })?;
+            let trait_id = state.local_id_for_catalogue_key(
+                trait_name,
+                entry.module_path(),
+                CatalogueItemNamespace::Trait,
+            )?;
             let action = entry.action();
             state.encode_trait(trait_id, trait_name, entry)?;
             item_actions.insert(trait_id, action);
@@ -311,10 +436,7 @@ impl Encoder {
         for (fn_path, entry) in doc.functions() {
             let fn_id =
                 state.fn_path_to_id.get(&fn_path.to_string()).copied().ok_or_else(|| {
-                    CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                        type_ref: fn_path.to_string(),
-                        reason: "pre-pass id not found (internal error)".to_string(),
-                    }
+                    invalid_type_ref(fn_path.to_string(), "pre-pass id not found (internal error)")
                 })?;
             let action = entry.action();
             state.encode_function(fn_id, fn_path, entry)?;
@@ -325,30 +447,7 @@ impl Encoder {
             encode_deletion_record(&mut state, &mut item_actions, record)?;
         }
 
-        // Encode top-level `trait_impls` (ADR `2026-05-20-0048` D1 / D2 / D4).
-        //
-        // `CatalogueDocument::trait_impls` is a Vec of `TraitImplDeclV2` entries, each
-        // representing one `impl Trait for Type` block as a STANDALONE catalogue-level
-        // independent entry — symmetric with `CatalogueDocument::inherent_impls` (D2).
-        //
-        // Per ADR D1, impl blocks are peers of TypeEntry/TraitEntry with NO "parent type"
-        // relationship. Self-crate types and external-crate types are handled symmetrically:
-        //
-        // - `trait_ref`: parsed via syn; self-crate traits resolved via `local_name_to_id`,
-        //   external traits via `ext_name_to_id` / `ensure_external_type_id`.
-        //
-        // - `for_type`: parsed via `parse_type_ref_str` (which includes Pass 3
-        //   `resolve_external_type_ids` internally). Per ADR `2026-05-20-0048` D2, a
-        //   self-crate type's `for_type` is its bare short name (e.g. `"SelfType"`),
-        //   so `parse_type_ref` resolves it via `resolve_local` to the pre-assigned
-        //   local id. An external type uses a fully-qualified crate-prefixed path
-        //   (e.g. `"std::vec::Vec<i32>"`), resolved to a synthetic external item id.
-        //
-        // IMPORTANT (ADR D4): The resulting `Impl` items are NOT attached to any type's
-        // `Struct.impls` / `Enum.impls` list. Each `Impl` item is a STANDALONE entry in
-        // the index with its own `item_actions` entry. The unified A-side impl insertion
-        // loop in Phase 1 (builder.rs) inserts these impls into S directly via their own
-        // action, with no parent-type traversal needed.
+        // Encode top-level trait implementations as standalone items.
         for ti in doc.trait_impls() {
             let impl_id = state.alloc_id();
             // Read action from the TraitImplDeclV2 entry (CN-04: ItemAction::Add must NOT be
@@ -387,7 +486,10 @@ impl Encoder {
 
             // Resolve trait_ref: parse and resolve via parse_type_ref_str so that
             // nested type references in generic args are fully resolved.
-            let trait_path = state.resolve_trait_ref_for_top_level(ti.trait_ref().as_str())?;
+            let trait_path = state.resolve_trait_ref_for_top_level_in_trait_namespace(
+                ti.trait_ref().as_str(),
+                &impl_generic_names,
+            )?;
 
             // Encode impl-block-level generics.
             let impl_generics = state.build_where_form_generics(
@@ -413,49 +515,33 @@ impl Encoder {
             item_actions.insert(impl_id, action);
         }
 
-        // Encode `inherent_impls` (IN-05 / IN-08, ADR `2026-05-18-1223` D2).
-        //
-        // `CatalogueDocument::inherent_impls` is a Vec of `InherentImplDeclV2` entries,
-        // each representing one inherent `impl` block for a named type with optional
-        // impl-block-level generic parameters. Multiple entries for the same type_name
-        // represent multiple impl blocks (the Rust source may split methods across impl
-        // blocks, each potentially with its own generic constraints).
-        //
-        // Each `InherentImplDeclV2` entry is encoded as a separate `Impl` item (inherent,
-        // `trait_: None`) with the type's pre-assigned `Id` as the `for_` type. The
-        // impl-block-level generics are encoded in the maximally-desugared where-form via
-        // `build_where_form_generics`, mirroring the treatment of method-level and
-        // function-level generics.
-        //
-        // The new `Impl` items are appended to the existing type's `impls` list. If the
-        // type is not found in `local_name_to_id`, encoding fails with `InvalidTypeRef`:
-        // inherent impl blocks for external types are not valid Rust, so a missing entry
-        // indicates a malformed catalogue (the domain catalogue must always declare the
-        // type in the `types` map before referencing it from `inherent_impls`).
+        // Encode each inherent implementation as a separate item and attach it to its owner.
         for iid in doc.inherent_impls() {
-            let type_name_str = iid.type_name.as_str();
-            let type_id = match state.local_name_to_id.get(type_name_str).copied() {
-                Some(id) => id,
-                None => {
-                    // Fail-closed: `InherentImplDeclV2` must always reference a type declared
-                    // in this catalogue's `types` map. Inherent impl blocks for external types
-                    // are not valid Rust, so a missing entry indicates a malformed catalogue.
-                    return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                        type_ref: type_name_str.to_string(),
-                        reason: format!(
-                            "InherentImplDeclV2 references type '{type_name_str}' which is not \
+            let type_name_key = iid.type_name().as_str();
+            let type_name_str = entry_item_name(iid.type_name());
+            let type_id =
+                match state.local_id_for_path(type_name_key, CatalogueItemNamespace::Type)? {
+                    Some(id) => id,
+                    None => {
+                        // Fail-closed: `InherentImplDeclV2` must always reference a type declared
+                        // in this catalogue's `types` map. Inherent impl blocks for external types
+                        // are not valid Rust, so a missing entry indicates a malformed catalogue.
+                        return Err(invalid_type_ref(
+                            type_name_key,
+                            format!(
+                                "InherentImplDeclV2 references type '{type_name_key}' which is not \
                              declared in the catalogue's types map"
-                        ),
-                    });
-                }
-            };
+                            ),
+                        ));
+                    }
+                };
 
             // Encode impl-block-level generics in the maximally-desugared where form.
             let impl_generic_names: Vec<&str> =
-                iid.impl_generics.iter().map(|g| g.name.as_str()).collect();
+                iid.impl_generics().iter().map(|g| g.name.as_str()).collect();
             let impl_generics = state.build_where_form_generics(
-                &iid.impl_generics,
-                &iid.impl_where_predicates,
+                iid.impl_generics(),
+                iid.impl_where_predicates(),
                 &impl_generic_names,
             )?;
 
@@ -487,7 +573,7 @@ impl Encoder {
                 ModulePath::from_segments(module_path).unwrap_or_else(|_| ModulePath::root())
             };
             let method_ids = state.encode_method_items(
-                &iid.methods,
+                iid.methods(),
                 true,
                 type_name_str,
                 &module_path_domain,
@@ -518,27 +604,31 @@ impl Encoder {
                     ItemEnum::Struct(s) => s.impls.push(impl_id),
                     ItemEnum::Enum(e) => e.impls.push(impl_id),
                     _ => {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: type_name_str.to_string(),
-                            reason: format!(
-                                "InherentImplDeclV2 targets '{type_name_str}' which is not a \
+                        return Err(invalid_type_ref(
+                            type_name_key,
+                            format!(
+                                "InherentImplDeclV2 targets '{type_name_key}' which is not a \
                                  Struct or Enum — only Struct and Enum can bear inherent impl \
                                  blocks in Rust; TypeAlias and other kinds are not supported"
                             ),
-                        });
+                        ));
                     }
                 }
             }
         }
 
-        // Root module: children = all top-level ids assigned in pre-pass
-        // (types + traits from `local_name_to_id`, functions from `fn_path_to_id`).
+        // Root module children are all pre-assigned type, trait, and function ids.
         // Sort by numeric id to produce a stable ordering across runs (HashMap iteration
         // order is nondeterministic; sorting by id preserves pre-pass insertion order).
         let root_id = Id(0);
-        let mut top_level_ids: Vec<Id> =
-            state.local_name_to_id.values().chain(state.fn_path_to_id.values()).copied().collect();
-        top_level_ids.sort_by_key(|id| id.0);
+        let mut top_level_ids: Vec<Id> = state
+            .local_identity_to_id
+            .values()
+            .flat_map(|entries| entries.iter().map(|(_, id)| *id))
+            .chain(state.fn_path_to_id.values().copied())
+            .collect();
+        top_level_ids.sort_unstable_by_key(|id| id.0);
+        top_level_ids.dedup();
         let root_item = make_item(
             root_id,
             Some(doc.crate_name().as_str().to_string()),
@@ -562,128 +652,32 @@ impl Encoder {
     }
 }
 
-fn encode_deletion_record(
-    state: &mut EncoderState,
-    item_actions: &mut BTreeMap<Id, ItemAction>,
-    record: &DeletionRecord,
-) -> Result<(), CatalogueToExtendedCrateCodecError> {
-    match record {
-        DeletionRecord::Type { name, module_path, .. } => {
-            encode_type_deletion(state, item_actions, name, module_path)
-        }
-        DeletionRecord::Trait { name, module_path, .. } => {
-            encode_trait_deletion(state, item_actions, name, module_path)
-        }
-        DeletionRecord::Function { path, .. } => {
-            encode_function_deletion(state, item_actions, path)
-        }
+impl EncoderState {
+    /// Resolves a type or trait catalogue key through the shared rustdoc and
+    /// catalogue resolution set, retaining the caller's namespace.
+    pub(super) fn resolve_catalogue_key_identity(
+        &self,
+        key: &CatalogueEntryKey,
+        namespace: CatalogueItemNamespace,
+    ) -> Result<FullyQualifiedItemPath, NewTypeGraphCodecError> {
+        let reference = TypeRef::new(key.as_str().to_owned())
+            .map_err(|_| invalid_type_ref(key.as_str(), "catalogue key is empty"))?;
+        // D3: a deletion names something that existed in the baseline, so it
+        // resolves against the baseline identities only.
+        resolve_catalogue_identity_in_namespace(
+            &reference,
+            &self.crate_name,
+            &self.baseline_identities,
+            Some(namespace),
+        )
+        .map_err(map_identity_resolution_error)
     }
 }
 
-fn encode_type_deletion(
-    state: &mut EncoderState,
-    item_actions: &mut BTreeMap<Id, ItemAction>,
-    name: &TypeName,
-    module_path: &ModulePath,
-) -> Result<(), CatalogueToExtendedCrateCodecError> {
-    let type_id = deletion_local_id(state, name.as_str())?;
-    let item = make_item(
-        type_id,
-        Some(name.as_str().to_owned()),
-        None,
-        ItemEnum::Struct(Struct {
-            kind: StructKind::Unit,
-            generics: empty_generics(),
-            impls: vec![],
-        }),
-    );
-    state.index.insert(type_id, item);
-    state.register_path(type_id, ItemKind::Struct, name.as_str(), module_path);
-    item_actions.insert(type_id, ItemAction::Delete);
-    Ok(())
-}
-
-fn encode_trait_deletion(
-    state: &mut EncoderState,
-    item_actions: &mut BTreeMap<Id, ItemAction>,
-    name: &TraitName,
-    module_path: &ModulePath,
-) -> Result<(), CatalogueToExtendedCrateCodecError> {
-    let trait_id = deletion_local_id(state, name.as_str())?;
-    let item = make_item(
-        trait_id,
-        Some(name.as_str().to_owned()),
-        None,
-        ItemEnum::Trait(RustdocTrait {
-            is_auto: false,
-            is_unsafe: false,
-            is_dyn_compatible: true,
-            items: vec![],
-            generics: empty_generics(),
-            bounds: vec![],
-            implementations: vec![],
-        }),
-    );
-    state.index.insert(trait_id, item);
-    state.register_path(trait_id, ItemKind::Trait, name.as_str(), module_path);
-    item_actions.insert(trait_id, ItemAction::Delete);
-    Ok(())
-}
-
-fn encode_function_deletion(
-    state: &mut EncoderState,
-    item_actions: &mut BTreeMap<Id, ItemAction>,
-    path: &FunctionPath,
-) -> Result<(), CatalogueToExtendedCrateCodecError> {
-    let fn_path = path.to_string();
-    let fn_id = state.fn_path_to_id.get(&fn_path).copied().ok_or_else(|| {
-        CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-            type_ref: fn_path.clone(),
-            reason: "delete tombstone id not found (internal error)".to_owned(),
-        }
-    })?;
-    let crate_id = if path.crate_name.as_str() == state.crate_name.as_str() {
-        0
-    } else {
-        state.ensure_external_crate(path.crate_name.as_str().to_owned())
+fn entry_scope_key(key: &CatalogueEntryKey, namespace: CatalogueItemNamespace) -> String {
+    let prefix = match namespace {
+        CatalogueItemNamespace::Type => "type",
+        CatalogueItemNamespace::Trait => "trait",
     };
-    let item = make_item_with_crate_id(
-        crate_id,
-        fn_id,
-        Some(path.name.as_str().to_owned()),
-        None,
-        ItemEnum::Function(rustdoc_types::Function {
-            sig: FunctionSignature { inputs: vec![], output: None, is_c_variadic: false },
-            generics: empty_generics(),
-            has_body: true,
-            header: FunctionHeader {
-                is_async: false,
-                is_const: false,
-                is_unsafe: false,
-                abi: rustdoc_types::Abi::Rust,
-            },
-        }),
-    );
-    state.index.insert(fn_id, item);
-    state.register_path_for_crate(
-        fn_id,
-        ItemKind::Function,
-        path.name.as_str(),
-        &path.module_path,
-        &path.crate_name,
-    );
-    item_actions.insert(fn_id, ItemAction::Delete);
-    Ok(())
-}
-
-fn deletion_local_id(
-    state: &EncoderState,
-    name: &str,
-) -> Result<Id, CatalogueToExtendedCrateCodecError> {
-    state.local_name_to_id.get(name).copied().ok_or_else(|| {
-        CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-            type_ref: name.to_owned(),
-            reason: "delete tombstone id not found (internal error)".to_owned(),
-        }
-    })
+    format!("{prefix}:{}", key.as_str())
 }

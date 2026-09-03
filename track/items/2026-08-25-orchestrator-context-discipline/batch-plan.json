@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-orchestrator-context-discipline",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 125,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 65,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 90,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 40,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T006",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T019",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T020",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T021",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T022",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T023",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T024",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T007",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T008",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 15,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T009",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 30,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T010",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 15,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T011",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T012",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 12,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T013",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 28,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T014",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 10,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T015",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 170,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T016",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 95,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T017",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 8,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T018",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 0,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001",
+        "T002",
+        "T004",
+        "T015",
+        "T017",
+        "T007",
+        "T008",
+        "T010",
+        "T012",
+        "T014"
+      ]
+    },
+    {
+      "id": "B2",
+      "task_ids": [
+        "T003",
+        "T005",
+        "T006",
+        "T009",
+        "T011",
+        "T013",
+        "T016"
+      ]
+    },
+    {
+      "id": "B3",
+      "task_ids": [
+        "T019",
+        "T022"
+      ]
+    },
+    {
+      "id": "B4",
+      "task_ids": [
+        "T020",
+        "T023"
+      ]
+    },
+    {
+      "id": "B5",
+      "task_ids": [
+        "T021",
+        "T024",
+        "T018"
+      ]
+    }
+  ]
+}

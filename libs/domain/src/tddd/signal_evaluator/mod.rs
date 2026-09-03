@@ -46,4 +46,7 @@ pub mod region;
 
 pub use phase1_error::Phase1Error;
 pub use port::SignalEvaluatorPort;
-pub use region::{SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal, ThreeWaySignalKind};
+pub use region::{
+    SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal, ThreeWaySignalIdentity,
+    ThreeWaySignalKind,
+};

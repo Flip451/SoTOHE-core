@@ -5,19 +5,27 @@
 //! items are identical (determining the `Match` / `Mismatch` sub-region).
 //!
 //! Generics, function, and trait helpers live in the sibling `generics_eq`
-//! module; the alias lexical-signature serialization lives in the sibling
-//! `alias_lexical` module.
+//! module; type-alias lexical comparison lives in the sibling
+//! `alias_structural_eq` module.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use rustdoc_types::{Id, Item, ItemEnum};
+use domain::tddd::catalogue_v2::identifiers::CrateName;
+use rustdoc_types::{Id, Item, ItemEnum, ItemSummary};
 
-use super::alias_lexical::type_alias_lexical_signature;
+use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
+
+use super::alias_structural_eq::{
+    type_alias_generics_lexically_equal, type_alias_targets_lexically_equal,
+};
 use super::format::{format_type, format_type_strip_type_params};
 use super::generics_eq::{
     fn_sigs_structurally_equal, generics_structurally_equal, traits_structurally_equal,
 };
-use super::target_lifetimes::collect_type_lifetimes;
+use super::impl_identity_helpers::{
+    collect_normalized_generic_paths, collect_path_identities, path_identity_sequences_match,
+    path_identity_value,
+};
 
 // Re-export so callers (tests, phase2) can access via this module path.
 pub(super) use super::generics_eq::build_trait_method_map;
@@ -33,13 +41,75 @@ pub(super) use super::generics_eq::build_trait_method_map;
 ///
 /// Type comparison uses `format_type` (L1 short-name string representation) so
 /// A-derived and rustdoc-derived items compare symmetrically.
-pub(super) fn items_structurally_equal(
+///
+/// The path-aware comparison checks every referenced rustdoc path identity
+/// before applying the structural shape comparison.
+///
+/// The structural formatters intentionally retain short display spellings for
+/// compatibility, but short spellings cannot decide whether `alpha::Input` and
+/// `beta::Input` are the same type. The evaluator supplies the authoritative path
+/// universes here; a different fully-qualified path is a mismatch even when the
+/// legacy structural fingerprint would otherwise be identical.
+#[cfg(test)]
+pub(super) fn items_structurally_equal_with_paths(
     a: &Item,
     b: &Item,
     a_index: &HashMap<Id, Item>,
     b_index: &HashMap<Id, Item>,
-    _crate_name: &str,
+    a_paths: &HashMap<Id, ItemSummary>,
+    b_paths: &HashMap<Id, ItemSummary>,
+    crate_name: &str,
 ) -> bool {
+    let authority = DefinitionPathAuthority::from_path_maps(a_paths, &[b_paths]);
+    items_structurally_equal_with_authority(
+        a, b, a_index, b_index, a_paths, b_paths, crate_name, &authority,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn items_structurally_equal_with_authority(
+    a: &Item,
+    b: &Item,
+    a_index: &HashMap<Id, Item>,
+    b_index: &HashMap<Id, Item>,
+    a_paths: &HashMap<Id, ItemSummary>,
+    b_paths: &HashMap<Id, ItemSummary>,
+    crate_name: &str,
+    authority: &DefinitionPathAuthority,
+) -> bool {
+    if !a_paths.is_empty() || !b_paths.is_empty() {
+        let Ok(crate_name) = CrateName::new(crate_name.to_owned()) else {
+            return false;
+        };
+        let omit_struct_generics = matches!(
+            (&a.inner, &b.inner),
+            (ItemEnum::Struct(structure), ItemEnum::Struct(_))
+                if structure.generics.params.is_empty()
+        );
+        let Some(left) = referenced_path_identities(
+            a,
+            a_index,
+            a_paths,
+            &crate_name,
+            authority,
+            omit_struct_generics,
+        ) else {
+            return false;
+        };
+        let Some(right) = referenced_path_identities(
+            b,
+            b_index,
+            b_paths,
+            &crate_name,
+            authority,
+            omit_struct_generics,
+        ) else {
+            return false;
+        };
+        if !path_identity_sequences_match(&left, &right) {
+            return false;
+        }
+    }
     match (&a.inner, &b.inner) {
         (ItemEnum::Struct(sa), ItemEnum::Struct(sb)) => {
             structs_structurally_equal(sa, sb, a_index, b_index)
@@ -173,6 +243,151 @@ pub(super) fn items_structurally_equal(
     }
 }
 
+/// Collects path identities keyed by the structural location that owns them.
+/// The key makes named fields and methods order-insensitive without reducing
+/// different field positions to one unordered short-name set.
+fn referenced_path_identities(
+    item: &Item,
+    index: &HashMap<Id, Item>,
+    paths: &HashMap<Id, ItemSummary>,
+    crate_name: &CrateName,
+    authority: &DefinitionPathAuthority,
+    omit_root_generics: bool,
+) -> Option<BTreeMap<String, Vec<String>>> {
+    let mut pending = vec![(item_context(item), item.clone(), omit_root_generics)];
+    let mut visited = BTreeSet::new();
+    let mut identities = BTreeMap::new();
+    while let Some((context, candidate, omit_generics)) = pending.pop() {
+        if !visited.insert(candidate.id) {
+            continue;
+        }
+        let value = path_identity_value(&candidate)?;
+        if !collect_path_identities(&value, paths, crate_name, authority, &context, &mut identities)
+        {
+            return None;
+        }
+        if !omit_generics
+            && !collect_normalized_generic_paths(
+                &candidate,
+                &context,
+                paths,
+                crate_name,
+                authority,
+                &mut identities,
+            )
+        {
+            return None;
+        }
+        for (child_index, referenced_id) in
+            child_item_ids(&candidate, index).into_iter().enumerate()
+        {
+            // Id(0) is rustdoc's `Self` sentinel and may also be the crate root;
+            // following it would pull unrelated top-level items into this item's
+            // identity fingerprint.
+            if referenced_id != Id(0) {
+                if let Some(child) = index.get(&referenced_id) {
+                    pending.push((
+                        child_context(&context, &candidate, child, child_index),
+                        child.clone(),
+                        false,
+                    ));
+                }
+            }
+        }
+    }
+    Some(identities)
+}
+
+/// Returns graph-local child item ids that are part of an item's structural shape.
+fn child_item_ids(item: &Item, index: &HashMap<Id, Item>) -> Vec<Id> {
+    match &item.inner {
+        ItemEnum::Struct(structure) => {
+            let mut children = match &structure.kind {
+                rustdoc_types::StructKind::Plain { fields, .. } => fields.clone(),
+                rustdoc_types::StructKind::Tuple(fields) => {
+                    fields.iter().flatten().copied().collect()
+                }
+                rustdoc_types::StructKind::Unit => Vec::new(),
+            };
+            children.extend(structure.impls.iter().copied().filter(|id| {
+                index.get(id).is_some_and(|item| {
+                    matches!(&item.inner, ItemEnum::Impl(implementation) if implementation.trait_.is_none())
+                })
+            }));
+            children
+        }
+        ItemEnum::Enum(enumeration) => {
+            let mut children = enumeration.variants.clone();
+            children.extend(enumeration.impls.iter().copied().filter(|id| {
+                index.get(id).is_some_and(|item| {
+                    matches!(&item.inner, ItemEnum::Impl(implementation) if implementation.trait_.is_none())
+                })
+            }));
+            children
+        }
+        ItemEnum::Trait(trait_) => trait_.items.clone(),
+        ItemEnum::Impl(implementation) if implementation.trait_.is_none() => {
+            implementation.items.clone()
+        }
+        ItemEnum::Impl(_) => Vec::new(),
+        ItemEnum::Variant(variant) => match &variant.kind {
+            rustdoc_types::VariantKind::Plain => Vec::new(),
+            rustdoc_types::VariantKind::Tuple(fields) => fields.iter().flatten().copied().collect(),
+            rustdoc_types::VariantKind::Struct { fields, .. } => fields.clone(),
+        },
+        _ => Vec::new(),
+    }
+}
+
+fn item_context(item: &Item) -> String {
+    let kind = match &item.inner {
+        ItemEnum::StructField(_) => "field",
+        ItemEnum::Variant(_) => "variant",
+        ItemEnum::Function(_) => "fn",
+        ItemEnum::AssocType { .. } => "type",
+        ItemEnum::AssocConst { .. } => "const",
+        ItemEnum::Impl(implementation) if implementation.trait_.is_none() => "inherent_impl",
+        ItemEnum::Impl(_) => "trait_impl",
+        _ => "item",
+    };
+    let name = match (&item.inner, item.name.as_deref()) {
+        // The catalogue codec has no tuple-field names, while rustdoc names
+        // those same fields "0", "1", ... . Keep the structural context
+        // representation independent of that graph-local naming detail.
+        (ItemEnum::StructField(_), Some(name))
+            if !name.is_empty() && name.bytes().all(|byte| byte.is_ascii_digit()) =>
+        {
+            "<anonymous>"
+        }
+        (_, Some(name)) => name,
+        (_, None) => "<anonymous>",
+    };
+    format!("{kind}:{name}")
+}
+
+fn child_context(parent: &str, parent_item: &Item, child: &Item, child_index: usize) -> String {
+    let position = if positional_child(parent_item, child_index) {
+        format!("[{child_index}]")
+    } else {
+        String::new()
+    };
+    format!("{parent}/{}{position}", item_context(child))
+}
+
+fn positional_child(parent: &Item, child_index: usize) -> bool {
+    match &parent.inner {
+        ItemEnum::Struct(structure) => matches!(
+            &structure.kind,
+            rustdoc_types::StructKind::Tuple(fields) if child_index < fields.len()
+        ),
+        ItemEnum::Variant(variant) => matches!(
+            &variant.kind,
+            rustdoc_types::VariantKind::Tuple(fields) if child_index < fields.len()
+        ),
+        _ => false,
+    }
+}
+
 /// Compares alias targets while retaining the established catalogue/rustdoc
 /// short-path symmetry.
 ///
@@ -182,249 +397,6 @@ pub(super) fn items_structurally_equal(
 /// its short name, and the former `format_type` comparison treated those forms
 /// alike. Normalize only that representation difference after serializing the
 /// target.
-fn type_alias_targets_lexically_equal(a: &rustdoc_types::Type, b: &rustdoc_types::Type) -> bool {
-    let (Ok(a_signature), Ok(b_signature)) =
-        (type_alias_lexical_signature(a), type_alias_lexical_signature(b))
-    else {
-        return false;
-    };
-    let (Ok(mut a_value), Ok(mut b_value)) = (
-        serde_json::from_str::<serde_json::Value>(&a_signature),
-        serde_json::from_str::<serde_json::Value>(&b_signature),
-    ) else {
-        return false;
-    };
-    normalize_alias_target_path_pairs(&mut a_value, &mut b_value);
-    a_value == b_value
-}
-
-/// Normalizes only the qualified-vs-short path representation difference.
-///
-/// The caller has already produced the alias lexical signature, so rustdoc
-/// IDs and the signature's other deliberate normalizations remain intact.
-/// A serialized `Path` is the only target object with both `path` and `args`;
-/// this covers resolved paths and trait paths in dyn, impl-trait, qualified,
-/// and nested bound forms without changing other target strings.  Qualified
-/// paths are shortened only when their counterpart is already short.  Two
-/// qualified paths retain their crate/module identity and therefore cannot
-/// compare equal merely because their final segments happen to match.
-fn normalize_alias_target_path_pairs(a: &mut serde_json::Value, b: &mut serde_json::Value) {
-    match (a, b) {
-        (serde_json::Value::Array(a_values), serde_json::Value::Array(b_values)) => {
-            for (a_value, b_value) in a_values.iter_mut().zip(b_values.iter_mut()) {
-                normalize_alias_target_path_pairs(a_value, b_value);
-            }
-        }
-        (serde_json::Value::Object(a_values), serde_json::Value::Object(b_values)) => {
-            let a_path = a_values.get("path").and_then(serde_json::Value::as_str);
-            let b_path = b_values.get("path").and_then(serde_json::Value::as_str);
-            if a_values.contains_key("args")
-                && b_values.contains_key("args")
-                && let (Some(a_path), Some(b_path)) = (a_path, b_path)
-                && a_path.contains("::") != b_path.contains("::")
-            {
-                let qualified_path = if a_path.contains("::") { a_path } else { b_path };
-                if let Some(short_name) = qualified_path.rsplit("::").next() {
-                    let short_name = serde_json::Value::String(short_name.to_owned());
-                    if a_path.contains("::") {
-                        a_values.insert("path".to_owned(), short_name);
-                    } else {
-                        b_values.insert("path".to_owned(), short_name);
-                    }
-                }
-            }
-
-            let keys: Vec<String> = a_values.keys().cloned().collect();
-            for key in keys {
-                if let (Some(a_value), Some(b_value)) =
-                    (a_values.get_mut(&key), b_values.get_mut(&key))
-                {
-                    normalize_alias_target_path_pairs(a_value, b_value);
-                }
-            }
-        }
-        _ => {}
-    }
-}
-
-/// Compares type-alias generics as the catalogue declares them.
-///
-/// Function, trait, and impl generics use the name-independent where-form
-/// comparison because their bindings are structural. Alias declarations are a
-/// document-level contract instead: parameter names, parameter order, and
-/// bound order are all observable. The catalogue encoder places inline bounds
-/// into `where_predicates`, while rustdoc may retain them on the parameter, so
-/// this helper preserves their order while accepting those equivalent storage
-/// locations.
-fn type_alias_generics_lexically_equal(
-    a: &rustdoc_types::Generics,
-    a_target: &rustdoc_types::Type,
-    b: &rustdoc_types::Generics,
-    b_target: &rustdoc_types::Type,
-) -> bool {
-    // The catalogue schema cannot declare lifetime parameters: an alias whose
-    // source declares them records the lifetimes lexically in the target
-    // (accepted target lifetime policy). A lifetime parameter is therefore
-    // excluded from this comparison ONLY when its name appears in that side's
-    // target — a lifetime parameter the target does not carry (an unused
-    // declaration) is unrecorded information and stays a mismatch.
-    let a_params = comparable_alias_params(a, a_target);
-    let b_params = comparable_alias_params(b, b_target);
-    if a_params.len() != b_params.len()
-        || !a_params
-            .iter()
-            .zip(&b_params)
-            .all(|(left, right)| type_alias_param_lexically_equal(left, right))
-    {
-        return false;
-    }
-
-    let parameter_names: BTreeSet<&str> =
-        a_params.iter().map(|param| param.name.as_str()).collect();
-    for (left, right) in a_params.iter().zip(&b_params) {
-        let (Ok(left_bounds), Ok(right_bounds)) = (
-            type_alias_bounds_for_parameter(a, &left.name),
-            type_alias_bounds_for_parameter(b, &right.name),
-        ) else {
-            return false;
-        };
-        if left_bounds != right_bounds {
-            return false;
-        }
-    }
-
-    matches!(
-        (
-            type_alias_non_parameter_predicates(a, &parameter_names),
-            type_alias_non_parameter_predicates(b, &parameter_names),
-        ),
-        (Ok(left), Ok(right)) if left == right
-    )
-}
-
-/// The alias generic parameters that participate in the lexical comparison.
-///
-/// A lifetime parameter is excluded only when the alias TARGET carries its
-/// name (the catalogue schema cannot declare lifetime parameters, so a
-/// source-declared lifetime is recorded lexically in the target). A lifetime
-/// parameter the target does not mention — an unused declaration — stays in
-/// the list and therefore surfaces as a mismatch against a side that does not
-/// declare it.
-fn comparable_alias_params<'generics>(
-    generics: &'generics rustdoc_types::Generics,
-    target: &rustdoc_types::Type,
-) -> Vec<&'generics rustdoc_types::GenericParamDef> {
-    let mut target_lifetimes: BTreeSet<String> = BTreeSet::new();
-    collect_type_lifetimes(target, &mut target_lifetimes);
-    generics
-        .params
-        .iter()
-        .filter(|param| match &param.kind {
-            // Only the plain `<'a>` declaration is representable by the
-            // lexical target convention: a lifetime parameter carrying
-            // outlives metadata (`<'a: 'static>`) holds unrecorded
-            // declaration information and stays in the comparison.
-            rustdoc_types::GenericParamDefKind::Lifetime { outlives } => {
-                !(outlives.is_empty() && target_lifetimes.contains(&param.name))
-            }
-            _ => true,
-        })
-        .collect()
-}
-
-fn type_alias_param_lexically_equal(
-    a: &rustdoc_types::GenericParamDef,
-    b: &rustdoc_types::GenericParamDef,
-) -> bool {
-    use rustdoc_types::GenericParamDefKind;
-
-    if a.name != b.name {
-        return false;
-    }
-    match (&a.kind, &b.kind) {
-        (
-            GenericParamDefKind::Type { default: a_default, is_synthetic: a_synthetic, .. },
-            GenericParamDefKind::Type { default: b_default, is_synthetic: b_synthetic, .. },
-        ) => {
-            a_synthetic == b_synthetic
-                && a_default.as_ref().map(format_type) == b_default.as_ref().map(format_type)
-        }
-        (
-            GenericParamDefKind::Const { type_: a_type, default: a_default },
-            GenericParamDefKind::Const { type_: b_type, default: b_default },
-        ) => format_type(a_type) == format_type(b_type) && a_default == b_default,
-        (
-            GenericParamDefKind::Lifetime { outlives: a_outlives },
-            GenericParamDefKind::Lifetime { outlives: b_outlives },
-        ) => a_outlives == b_outlives,
-        _ => false,
-    }
-}
-
-fn type_alias_bounds_for_parameter(
-    generics: &rustdoc_types::Generics,
-    name: &str,
-) -> Result<Vec<String>, serde_json::Error> {
-    use rustdoc_types::{GenericBound, GenericParamDef, GenericParamDefKind, Type, WherePredicate};
-
-    // Each entry's signature pairs the bound with the predicate-level HRTB
-    // binder (`where for<'a> T: Clone` records `'a` in
-    // `BoundPredicate.generic_params`), so a binder difference is a lexical
-    // mismatch. An inline parameter bound has no predicate binder and pairs
-    // with the empty list, keeping the accepted inline-vs-where storage
-    // equivalence intact.
-    fn binder_scoped_signature(
-        binder: &[GenericParamDef],
-        bound: &GenericBound,
-    ) -> Result<String, serde_json::Error> {
-        type_alias_lexical_signature(&(binder, bound))
-    }
-
-    let inline_bounds = generics
-        .params
-        .iter()
-        .find(|param| param.name == name)
-        .and_then(|param| match &param.kind {
-            GenericParamDefKind::Type { bounds, .. } => Some(bounds),
-            GenericParamDefKind::Lifetime { .. } | GenericParamDefKind::Const { .. } => None,
-        })
-        .into_iter()
-        .flatten()
-        .map(|bound| binder_scoped_signature(&[], bound));
-    let where_bounds = generics.where_predicates.iter().filter_map(|predicate| match predicate {
-        WherePredicate::BoundPredicate {
-            type_: Type::Generic(predicate_name),
-            bounds,
-            generic_params,
-        } if predicate_name == name => {
-            Some(bounds.iter().map(|bound| binder_scoped_signature(generic_params, bound)))
-        }
-        _ => None,
-    });
-
-    inline_bounds.chain(where_bounds.flatten()).collect()
-}
-
-fn type_alias_non_parameter_predicates(
-    generics: &rustdoc_types::Generics,
-    parameter_names: &BTreeSet<&str>,
-) -> Result<Vec<String>, serde_json::Error> {
-    use rustdoc_types::{Type, WherePredicate};
-
-    generics
-        .where_predicates
-        .iter()
-        .filter(|predicate| {
-            !matches!(
-                predicate,
-                WherePredicate::BoundPredicate { type_: Type::Generic(name), .. }
-                    if parameter_names.contains(name.as_str())
-            )
-        })
-        .map(type_alias_lexical_signature)
-        .collect()
-}
-
 /// Builds a merged `method_name → sig_str` map for all inherent impl blocks
 /// (impl blocks without a trait) of a type.
 ///
@@ -700,13 +672,31 @@ mod tests {
     use rustdoc_types::{
         Abi, AssocItemConstraint, AssocItemConstraintKind, DynTrait, FunctionHeader,
         FunctionPointer, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
-        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, PolyTrait,
-        PreciseCapturingArg, Struct, StructKind, Term, TraitBoundModifier, Type, TypeAlias,
-        Visibility,
+        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Path,
+        PolyTrait, PreciseCapturingArg, Struct, StructKind, Term, TraitBoundModifier, Type,
+        TypeAlias, Variant, VariantKind, Visibility,
     };
 
-    use super::{items_structurally_equal, structs_structurally_equal};
+    use super::structs_structurally_equal;
     use crate::tddd::signal_evaluator_v2::generics_eq::make_simple_trait_bound as make_trait_bound;
+
+    fn items_structurally_equal(
+        a: &Item,
+        b: &Item,
+        a_index: &HashMap<Id, Item>,
+        b_index: &HashMap<Id, Item>,
+        crate_name: &str,
+    ) -> bool {
+        super::items_structurally_equal_with_paths(
+            a,
+            b,
+            a_index,
+            b_index,
+            &HashMap::new(),
+            &HashMap::new(),
+            crate_name,
+        )
+    }
 
     fn make_struct_field_item(id: Id, ty_str: &str) -> Item {
         Item {
@@ -870,6 +860,336 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_structural_equality_rejects_different_qualified_path_identities() {
+        let a_fields = vec![Some(Id(1))];
+        let mut a_index = HashMap::new();
+        a_index.insert(Id(1), make_struct_field_resolved_path(Id(1), "alpha::SameName", Id(101)));
+        let a = make_item(Id(10), ItemEnum::Struct(make_tuple_struct(a_fields)));
+
+        let b_fields = vec![Some(Id(2))];
+        let mut b_index = HashMap::new();
+        b_index.insert(Id(2), make_struct_field_resolved_path(Id(2), "beta::SameName", Id(202)));
+        let b = make_item(Id(20), ItemEnum::Struct(make_tuple_struct(b_fields)));
+
+        let a_paths = HashMap::from([(
+            Id(101),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "alpha".to_owned(), "SameName".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(202),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "beta".to_owned(), "SameName".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(
+            !super::items_structurally_equal_with_paths(
+                &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+            ),
+            "same short display name must not hide different canonical path identities"
+        );
+    }
+
+    #[test]
+    fn test_structural_equality_keeps_tuple_path_positions_distinct() {
+        let a_fields = vec![Some(Id(1)), Some(Id(2))];
+        let mut a_index = HashMap::new();
+        a_index.insert(Id(1), make_struct_field_resolved_path(Id(1), "SameName", Id(101)));
+        a_index.insert(Id(2), make_struct_field_resolved_path(Id(2), "SameName", Id(102)));
+        let a = make_item(Id(10), ItemEnum::Struct(make_tuple_struct(a_fields)));
+
+        let b_fields = vec![Some(Id(11)), Some(Id(12))];
+        let mut b_index = HashMap::new();
+        b_index.insert(Id(11), make_struct_field_resolved_path(Id(11), "SameName", Id(202)));
+        b_index.insert(Id(12), make_struct_field_resolved_path(Id(12), "SameName", Id(201)));
+        let b = make_item(Id(20), ItemEnum::Struct(make_tuple_struct(b_fields)));
+
+        let a_paths = HashMap::from([
+            (
+                Id(101),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["fixture".to_owned(), "alpha".to_owned(), "SameName".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(102),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["fixture".to_owned(), "beta".to_owned(), "SameName".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]);
+        let b_paths = HashMap::from([
+            (
+                Id(201),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["fixture".to_owned(), "alpha".to_owned(), "SameName".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                Id(202),
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["fixture".to_owned(), "beta".to_owned(), "SameName".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]);
+
+        assert!(!super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
+    #[test]
+    fn test_structural_equality_normalizes_codec_and_rustdoc_tuple_field_names() {
+        let a_field_id = Id(3);
+        let a_variant_id = Id(2);
+        let a_root_id = Id(1);
+        let b_field_id = Id(13);
+        let b_variant_id = Id(12);
+        let b_root_id = Id(11);
+
+        let field = |id: Id, name: Option<&str>, path_id: Id| {
+            let mut item = make_struct_field_resolved_path(id, "Thing", path_id);
+            item.name = name.map(str::to_owned);
+            item
+        };
+        let variant = |id: Id, field_id: Id| {
+            let mut item = make_item(
+                id,
+                ItemEnum::Variant(Variant {
+                    kind: VariantKind::Tuple(vec![Some(field_id)]),
+                    discriminant: None,
+                }),
+            );
+            item.name = Some("Value".to_owned());
+            item
+        };
+
+        let a = make_item(
+            a_root_id,
+            ItemEnum::Enum(rustdoc_types::Enum {
+                generics: empty_generics(),
+                variants: vec![a_variant_id],
+                impls: vec![],
+                has_stripped_variants: false,
+            }),
+        );
+        let b = make_item(
+            b_root_id,
+            ItemEnum::Enum(rustdoc_types::Enum {
+                generics: empty_generics(),
+                variants: vec![b_variant_id],
+                impls: vec![],
+                has_stripped_variants: false,
+            }),
+        );
+        let a_index = HashMap::from([
+            (a_root_id, a.clone()),
+            (a_variant_id, variant(a_variant_id, a_field_id)),
+            (a_field_id, field(a_field_id, None, Id(101))),
+        ]);
+        let b_index = HashMap::from([
+            (b_root_id, b.clone()),
+            (b_variant_id, variant(b_variant_id, b_field_id)),
+            (b_field_id, field(b_field_id, Some("0"), Id(201))),
+        ]);
+        let a_paths = HashMap::from([(
+            Id(101),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Thing".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(201),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Thing".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
+    #[test]
+    fn test_structural_equality_ignores_codec_self_path_receiver_marker() {
+        let method = |id: Id, input: Type| {
+            make_item(
+                id,
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("self".to_owned(), input)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            )
+        };
+        let inherent_impl = |id: Id, method_id: Id| {
+            make_item(
+                id,
+                ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: empty_generics(),
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: Type::ResolvedPath(Path {
+                        path: "Widget".to_owned(),
+                        id: Id(0),
+                        args: None,
+                    }),
+                    items: vec![method_id],
+                    is_synthetic: false,
+                    is_negative: false,
+                    blanket_impl: None,
+                }),
+            )
+        };
+        let a = make_item(
+            Id(1),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(2)],
+            }),
+        );
+        let b = make_item(
+            Id(11),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(12)],
+            }),
+        );
+        let a_method = method(
+            Id(3),
+            Type::ResolvedPath(Path { path: "Self".to_owned(), id: Id(0), args: None }),
+        );
+        let b_method = method(Id(13), Type::Generic("Self".to_owned()));
+        let a_index = HashMap::from([
+            (Id(1), a.clone()),
+            (Id(2), inherent_impl(Id(2), Id(3))),
+            (Id(3), a_method),
+        ]);
+        let b_index = HashMap::from([
+            (Id(11), b.clone()),
+            (Id(12), inherent_impl(Id(12), Id(13))),
+            (Id(13), b_method),
+        ]);
+        let a_paths = HashMap::from([(
+            Id(101),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(201),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
+    #[test]
+    fn test_structural_equality_ignores_inherent_impl_block_grouping() {
+        let inherent_impl = |id: Id, owner_id: Id| {
+            make_item(
+                id,
+                ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: empty_generics(),
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: Type::ResolvedPath(Path {
+                        path: "Widget".to_owned(),
+                        id: owner_id,
+                        args: None,
+                    }),
+                    items: vec![],
+                    is_synthetic: false,
+                    is_negative: false,
+                    blanket_impl: None,
+                }),
+            )
+        };
+        let a = make_item(
+            Id(10),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(11)],
+            }),
+        );
+        let b = make_item(
+            Id(20),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Unit,
+                generics: empty_generics(),
+                impls: vec![Id(21), Id(22)],
+            }),
+        );
+        let a_index = HashMap::from([(Id(10), a.clone()), (Id(11), inherent_impl(Id(11), Id(10)))]);
+        let b_index = HashMap::from([
+            (Id(20), b.clone()),
+            (Id(21), inherent_impl(Id(21), Id(20))),
+            (Id(22), inherent_impl(Id(22), Id(20))),
+        ]);
+        let a_paths = HashMap::from([(
+            Id(10),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(20),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "Widget".to_owned()],
+                kind: ItemKind::Struct,
+            },
+        )]);
+
+        assert!(super::items_structurally_equal_with_paths(
+            &a, &b, &a_index, &b_index, &a_paths, &b_paths, "fixture"
+        ));
+    }
+
     // -----------------------------------------------------------------------
     // ADR D9: provenance-agnostic trait-impl comparison
     // -----------------------------------------------------------------------
@@ -887,6 +1207,99 @@ mod tests {
             deprecation: None,
             inner,
         }
+    }
+
+    #[test]
+    fn test_nested_supertrait_self_projection_path_marker_compares_equal() {
+        fn self_projection(trait_id: Id) -> Type {
+            Type::BorrowedRef {
+                lifetime: None,
+                is_mutable: false,
+                type_: Box::new(Type::QualifiedPath {
+                    name: "Input".to_owned(),
+                    args: Some(Box::new(GenericArgs::AngleBracketed {
+                        args: vec![GenericArg::Lifetime("'_".to_owned())],
+                        constraints: vec![],
+                    })),
+                    self_type: Box::new(Type::Generic("Self".to_owned())),
+                    trait_: Some(Path { path: String::new(), id: trait_id, args: None }),
+                }),
+            }
+        }
+
+        fn method(id: Id, trait_id: Id) -> Item {
+            make_item(
+                id,
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("input".to_owned(), self_projection(trait_id))],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            )
+        }
+
+        let a_method_id = Id(11);
+        let b_method_id = Id(21);
+        let a_trait = make_item(
+            Id(10),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: false,
+                items: vec![a_method_id],
+                generics: empty_generics(),
+                bounds: vec![make_trait_bound("ChainIdentity")],
+                implementations: vec![],
+            }),
+        );
+        let b_trait = make_item(
+            Id(20),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: false,
+                items: vec![b_method_id],
+                generics: empty_generics(),
+                bounds: vec![make_trait_bound("ChainIdentity")],
+                implementations: vec![],
+            }),
+        );
+        let a_index = HashMap::from([(a_method_id, method(a_method_id, Id(31)))]);
+        let b_index = HashMap::from([(b_method_id, method(b_method_id, Id(41)))]);
+        let a_paths = HashMap::from([(
+            Id(30),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "ChainIdentity".to_owned()],
+                kind: ItemKind::Trait,
+            },
+        )]);
+        let b_paths = HashMap::from([(
+            Id(40),
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["fixture".to_owned(), "ChainIdentity".to_owned()],
+                kind: ItemKind::Trait,
+            },
+        )]);
+
+        assert!(
+            super::items_structurally_equal_with_paths(
+                &a_trait, &b_trait, &a_index, &b_index, &a_paths, &b_paths, "fixture",
+            ),
+            "nested supertrait method projections with unnamed rustdoc trait markers must compare \
+             equal and allow the surrounding signal to remain Blue"
+        );
     }
 
     fn default_fn_item(id: Id) -> Item {
@@ -986,6 +1399,108 @@ mod tests {
         assert!(
             !items_structurally_equal(&s_impl, &c_impl, &s_index, &c_index, "my_crate"),
             "impls with different trait names must not be structurally equal"
+        );
+    }
+
+    /// The catalogue keeps `impl Trait` in the function signature, while rustdoc
+    /// represents the same argument as `Generic("impl Trait")` plus a synthetic
+    /// generic parameter carrying the bound. The path precheck must use the same
+    /// representation boundary as `fn_sigs_structurally_equal`.
+    #[test]
+    fn test_impl_trait_path_identity_matches_synthetic_rustdoc_parameter() {
+        let bound = |id: Id, path: &str| GenericBound::TraitBound {
+            trait_: Path { path: path.to_owned(), id, args: None },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        let function = |id: Id, input: Type, generics: Generics| {
+            make_item(
+                id,
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("value".to_owned(), input)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics,
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            )
+        };
+
+        let catalogue =
+            function(Id(10), Type::ImplTrait(vec![bound(Id(100), "Port")]), empty_generics());
+        let rustdoc = function(
+            Id(20),
+            Type::Generic("impl Port".to_owned()),
+            Generics {
+                params: vec![GenericParamDef {
+                    name: "impl Port".to_owned(),
+                    kind: GenericParamDefKind::Type {
+                        bounds: vec![bound(Id(200), "Port")],
+                        default: None,
+                        is_synthetic: true,
+                    },
+                }],
+                where_predicates: vec![],
+            },
+        );
+        let paths = |id: Id, module: &str| {
+            HashMap::from([(
+                id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec!["fixture".to_owned(), module.to_owned(), "Port".to_owned()],
+                    kind: ItemKind::Trait,
+                },
+            )])
+        };
+
+        assert!(
+            super::items_structurally_equal_with_paths(
+                &catalogue,
+                &rustdoc,
+                &HashMap::new(),
+                &HashMap::new(),
+                &paths(Id(100), "alpha"),
+                &paths(Id(200), "alpha"),
+                "fixture",
+            ),
+            "impl-trait bounds and rustdoc synthetic bounds must enter path identity checking symmetrically"
+        );
+
+        let rustdoc_different_path = function(
+            Id(30),
+            Type::Generic("impl Port".to_owned()),
+            Generics {
+                params: vec![GenericParamDef {
+                    name: "impl Port".to_owned(),
+                    kind: GenericParamDefKind::Type {
+                        bounds: vec![bound(Id(300), "Port")],
+                        default: None,
+                        is_synthetic: true,
+                    },
+                }],
+                where_predicates: vec![],
+            },
+        );
+        assert!(
+            !super::items_structurally_equal_with_paths(
+                &catalogue,
+                &rustdoc_different_path,
+                &HashMap::new(),
+                &HashMap::new(),
+                &paths(Id(100), "alpha"),
+                &paths(Id(300), "beta"),
+                "fixture",
+            ),
+            "distinct qualified impl-trait bound paths must not collapse to a shared short name"
         );
     }
 

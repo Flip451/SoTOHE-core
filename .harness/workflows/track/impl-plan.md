@@ -26,11 +26,20 @@ See `.harness/capabilities/impl-planner.md` for the capability's full operationa
   the `type-design` workflow first.
 - **ADR path(s)** — paths under `knowledge/adr/` for the feature domain.
 
-Conventions are **not** an input to this workflow. The `impl-planner` capability reads exactly
-the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
-that set as complete — including when it resolves to zero documents
-(`.harness/capabilities/impl-planner.md` § Design Principles). This workflow neither selects nor
-forwards convention paths.
+The workflow does not read or select conventions. The capability dispatcher supplies the
+resolved convention paths in the delegated briefing (possibly an empty set), and the
+`impl-planner` capability reads those paths as its complete convention input.
+
+## Summary-first context intake
+
+Before opening a catalogue or plan artifact, use `bin/sotp track resolve` and
+`bin/sotp track task-counts` for progress, `bin/sotp review results` for review necessity,
+`bin/sotp test-obligation results` for obligation state when enrolled, and
+`bin/sotp catalog check` plus `bin/sotp ref-verify results --chain 2 --filter all` for catalogue
+and catalogue-to-specification state. These CLI summaries are primary. Do not bulk-read
+`*-types.json`, `review.json`, bindings JSON, full sub-workflow texts, or a `Related Conventions`
+list. Open only a targeted diff or the body named by a blocker; the delegated capability receives
+and reads exact spec, catalogue, ADR, and convention paths from its briefing.
 
 ## Sequence
 
@@ -39,13 +48,15 @@ forwards convention paths.
 Confirm `track/items/<track-id>/spec.json` exists (Phase 1 output). If not, stop and
 instruct the caller to run the `spec-design` workflow first.
 
-Confirm at least one `track/items/<track-id>/<layer>-types.json` exists for every TDDD-enabled
-layer (Phase 2 output). If not, stop and instruct the caller to run the `type-design` workflow
-(`.harness/workflows/track/type-design.md`) first.
+Run `bin/sotp catalog check` and use its summary to confirm that every TDDD-enabled layer has a
+complete catalogue (Phase 2 output). If it reports a missing or incomplete catalogue, stop and
+instruct the caller to run the `type-design` workflow first. Do not open catalogue JSON merely to
+perform this presence check.
 
 **Step 2: Review the types scope**
 
-1. Invoke the `review` workflow's single-scope re-entry round for `types`
+1. Use `bin/sotp review results` to determine whether the `types` scope needs attention, then
+   invoke the `review` workflow's single-scope re-entry round for `types`
    (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`.
 
 **Step 3: Enter the impl-plan phase**
@@ -55,9 +66,9 @@ Prepare the configured writer briefing at `tmp/impl-planner-briefing.md`. It mus
 - Track id and paths to `track/items/<track-id>/spec.json` and each `<layer>-types.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
 
-The briefing must **not** carry convention paths. The capability's convention set comes solely
-from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
-document an input and would leave a zero-document resolution non-authoritative.
+Do not add hand-picked convention paths to the workflow-generated file. The dispatcher supplies
+the resolved paths alongside the delegated briefing, and an empty resolved set remains
+authoritative.
 
 Then run `bin/sotp phase enter impl-plan`. The phase engine runs the declared pre-entry checks
 and, only when they all succeed, invokes the configured `impl-planner` writer. The workflow

@@ -1,0 +1,1038 @@
+{
+  "entries": [
+    {
+      "claim_hash": "37f7b2123459687888d4e9230fc9146b5551c1f52cb701866f6e6eda9159411f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCaptureError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9b47e7e79dc74e410d7c0dad84b832e30cca007f17530f13219fcd408a6205f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "37f7b2123459687888d4e9230fc9146b5551c1f52cb701866f6e6eda9159411f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCaptureError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a3a44318202b901993c26119084eeec5a0c3470efed443fb996d3666f4de703b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-08",
+          "section": "constraint",
+          "text_label": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "37f7b2123459687888d4e9230fc9146b5551c1f52cb701866f6e6eda9159411f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCaptureError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03a0d136c401574c80d25c1e086c7eef8968f9d8940e60079caa9e2fdf46ca7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1cc76a5f7ff6b38dba8b0d61c20c3d126f4e17ecd2d8eaeb47c24c612f97e580",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlan",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "369f53ec697b2ed3bfa47b0c25890cf76fbfb67d2a8176f894525238a62b4630",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1cc76a5f7ff6b38dba8b0d61c20c3d126f4e17ecd2d8eaeb47c24c612f97e580",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlan",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d8c0d5abc83d47e376918c8932b9eca9971c12604f765947f274c5b1dc0edbd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-05",
+          "section": "constraint",
+          "text_label": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1cc76a5f7ff6b38dba8b0d61c20c3d126f4e17ecd2d8eaeb47c24c612f97e580",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlan",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7383773232c5987974001768f6fb50a3f366952c42fb17dd338d2f5c3a44b25",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し、層を分割して続行せず、上限外の層を既存 snapshot で補わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し、層を分割して続行せず、上限外の層を既存 snapshot で補わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1cc76a5f7ff6b38dba8b0d61c20c3d126f4e17ecd2d8eaeb47c24c612f97e580",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlan",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c1155122f177b3bfa983491d998a55185ed9c0aef0270c24b4b6ad6db8bf8786",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76d568d968725f8e1378432f02829059f268655cdaad1728130a2def27c46fbe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlanValidationError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "369f53ec697b2ed3bfa47b0c25890cf76fbfb67d2a8176f894525238a62b4630",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76d568d968725f8e1378432f02829059f268655cdaad1728130a2def27c46fbe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlanValidationError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d8c0d5abc83d47e376918c8932b9eca9971c12604f765947f274c5b1dc0edbd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-05",
+          "section": "constraint",
+          "text_label": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "76d568d968725f8e1378432f02829059f268655cdaad1728130a2def27c46fbe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExportPlanValidationError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7383773232c5987974001768f6fb50a3f366952c42fb17dd338d2f5c3a44b25",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し、層を分割して続行せず、上限外の層を既存 snapshot で補わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9cf9b39fd3dde3a54f53c0ec39c4fbc12c66f059858ae784fdd5f3722de31be2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c1155122f177b3bfa983491d998a55185ed9c0aef0270c24b4b6ad6db8bf8786",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9b47e7e79dc74e410d7c0dad84b832e30cca007f17530f13219fcd408a6205f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a3a44318202b901993c26119084eeec5a0c3470efed443fb996d3666f4de703b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-08",
+          "section": "constraint",
+          "text_label": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03a0d136c401574c80d25c1e086c7eef8968f9d8940e60079caa9e2fdf46ca7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9b47e7e79dc74e410d7c0dad84b832e30cca007f17530f13219fcd408a6205f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a3a44318202b901993c26119084eeec5a0c3470efed443fb996d3666f4de703b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-08",
+          "section": "constraint",
+          "text_label": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03a0d136c401574c80d25c1e086c7eef8968f9d8940e60079caa9e2fdf46ca7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "369f53ec697b2ed3bfa47b0c25890cf76fbfb67d2a8176f894525238a62b4630",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export を最大 64 層に制限し、65 層目が必要なら export、評価、及び結果の再利用を fail-closed に停止すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d8c0d5abc83d47e376918c8932b9eca9971c12604f765947f274c5b1dc0edbd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-05",
+          "section": "constraint",
+          "text_label": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の context 組立てで実行する rustdoc export は最大 64 層とし、65 層目が必要なら評価、export、結果再利用のすべてを fail-closed にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7383773232c5987974001768f6fb50a3f366952c42fb17dd338d2f5c3a44b25",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し、層を分割して続行せず、上限外の層を既存 snapshot で補わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "一回の評価で 65 層目の rustdoc export が必要な場合は、export、評価、及び結果の再利用を fail-closed で停止し、層を分割して続行せず、上限外の層を既存 snapshot で補わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9b47e7e79dc74e410d7c0dad84b832e30cca007f17530f13219fcd408a6205f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ authoritative に完全取得し、取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止すること。partial fingerprint、fallback、又は捏造した層 attribution は用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a3a44318202b901993c26119084eeec5a0c3470efed443fb996d3666f4de703b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-08",
+          "section": "constraint",
+          "text_label": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate に依存しない評価開始 fingerprint は layer export より前に run-wide に一度だけ complete かつ authoritative に取得する。取得不能時は評価全体を EvaluationStartCaptureError::AuthoritativeInput で停止し、partial fingerprint、fallback、又は層 attribution の捏造を許さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03a0d136c401574c80d25c1e086c7eef8968f9d8940e60079caa9e2fdf46ca7f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "いずれの層の export より前に、crate に依存しない評価開始 fingerprint を run-wide に一度だけ完全かつ authoritative に取得する。取得に失敗した場合は、評価全体を専用の EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bc6f0a7ca100c399927107e214214c4bc1f3238598b2b35d3223f1b5b89c4de1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。いずれかの超過は EvaluationStartCaptureError::AuthoritativeInput で fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution を用いない。rustdoc export と専用 selection directory の lock は含めない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価開始時の authoritative input 捕捉における workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に、実行 120 秒・drain 1 秒の時間上限を適用すること。いずれかの超過は EvaluationStartCaptureError::AuthoritativeInput で fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "42f77c872d13d16ae526c6546bc99ab4511affe8bbf91dbf8effab61a62d0c29",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-09",
+          "section": "constraint",
+          "text_label": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。超過時は EvaluationStartCaptureError::AuthoritativeInput として fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution で継続しない。rustdoc export と専用 selection directory の lock はこの上限の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "EvaluationStartCapturePort による authoritative input の捕捉では、workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain に実行 120 秒・drain 1 秒の上限を適用する。超過時は EvaluationStartCaptureError::AuthoritativeInput として fail-closed にし、partial fingerprint、fallback、又は生成した層 attribution で継続しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluationStartCapturePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0f4e5c7dd2ca0cf11f9bebe26657fdbc2602e3aecdc36f290db08b0228bfcd37",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。rustdoc export と専用 selection directory の lock はこの基準の対象外であり、D6 の上限に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価開始時の workspace walk、nightly 選択済み tool の解決、cargo metadata --no-deps --locked、及びそれらの出力 drain は、実行 120 秒・drain 1 秒以内に完了する。いずれかを超過した場合は EvaluationStartCaptureError::AuthoritativeInput で fail-closed に停止し、partial fingerprint、fallback、又は捏造した層 attribution を用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "70c2e526d8e2863d007907a23d95a7a51f2102663825f41a0dc6089b1284b703",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporterPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc 出力の同一性",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "70c2e526d8e2863d007907a23d95a7a51f2102663825f41a0dc6089b1284b703",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporterPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "70c2e526d8e2863d007907a23d95a7a51f2102663825f41a0dc6089b1284b703",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporterPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "70c2e526d8e2863d007907a23d95a7a51f2102663825f41a0dc6089b1284b703",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporterPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c1155122f177b3bfa983491d998a55185ed9c0aef0270c24b4b6ad6db8bf8786",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象となる他層の集合は architecture-rules.json が定める TDDD 有効層に委ね、catalogue ファイルがない層は宣言なしとして扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0030fe137ba7b6b4a8dc6842e26ba0c02a0ed31a09859f22f1d851b73bf5852d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cc57a0f3ee59396d23baa32982c051968dffc47a0d079f3ecf680a209054134f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9cf9b39fd3dde3a54f53c0ec39c4fbc12c66f059858ae784fdd5f3722de31be2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

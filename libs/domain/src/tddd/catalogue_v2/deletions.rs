@@ -14,7 +14,8 @@
 //! `action: delete` entries into this type.
 
 use crate::plan_ref::{InformalGroundRef, SpecRef};
-use crate::tddd::catalogue_v2::identifiers::{FunctionPath, ModulePath, TraitName, TypeName};
+use crate::tddd::catalogue_v2::identifiers::FunctionPath;
+use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 /// A grounded identity record of a catalogue entry being removed.
 ///
@@ -28,9 +29,7 @@ pub enum DeletionRecord {
     /// A removed `types`-map entry.
     Type {
         /// The removed type's name (its `types` map key).
-        name: TypeName,
-        /// The removed type's crate-relative module path.
-        module_path: ModulePath,
+        name: CatalogueEntryKey,
         /// Spec anchors grounding the deletion.
         spec_refs: Vec<SpecRef>,
         /// Informal grounds for deletion work not yet promoted to spec refs.
@@ -39,9 +38,7 @@ pub enum DeletionRecord {
     /// A removed `traits`-map entry.
     Trait {
         /// The removed trait's name (its `traits` map key).
-        name: TraitName,
-        /// The removed trait's crate-relative module path.
-        module_path: ModulePath,
+        name: CatalogueEntryKey,
         /// Spec anchors grounding the deletion.
         spec_refs: Vec<SpecRef>,
         /// Informal grounds for deletion work not yet promoted to spec refs.
@@ -83,23 +80,19 @@ impl DeletionRecord {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
-    use std::str::FromStr;
-
     use super::*;
     use crate::tddd::catalogue_v2::identifiers::{CrateName, FunctionName};
 
     #[test]
-    fn test_deletion_record_type_variant_carries_name_and_module() {
+    fn test_deletion_record_type_variant_carries_full_key() {
         let record = DeletionRecord::Type {
-            name: TypeName::new("LayerId").unwrap(),
-            module_path: ModulePath::from_str("tddd::foo").unwrap(),
+            name: CatalogueEntryKey::try_new("domain::tddd::foo::LayerId".to_owned()).unwrap(),
             spec_refs: vec![],
             informal_grounds: vec![],
         };
         match record {
-            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
-                assert_eq!(name.as_str(), "LayerId");
-                assert_eq!(module_path.to_string(), "tddd::foo");
+            DeletionRecord::Type { name, spec_refs, informal_grounds } => {
+                assert_eq!(name.as_str(), "domain::tddd::foo::LayerId");
                 assert!(spec_refs.is_empty());
                 assert!(informal_grounds.is_empty());
             }
@@ -108,18 +101,16 @@ mod tests {
     }
 
     #[test]
-    fn test_deletion_record_trait_variant_carries_name_and_module() {
+    fn test_deletion_record_trait_variant_carries_full_key() {
         let record = DeletionRecord::Trait {
-            name: TraitName::new("CatalogPort").unwrap(),
-            module_path: ModulePath::root(),
+            name: CatalogueEntryKey::try_new("domain::CatalogPort".to_owned()).unwrap(),
             spec_refs: vec![],
             informal_grounds: vec![],
         };
         assert_eq!(
             record,
             DeletionRecord::Trait {
-                name: TraitName::new("CatalogPort").unwrap(),
-                module_path: ModulePath::root(),
+                name: CatalogueEntryKey::try_new("domain::CatalogPort".to_owned()).unwrap(),
                 spec_refs: vec![],
                 informal_grounds: vec![],
             }

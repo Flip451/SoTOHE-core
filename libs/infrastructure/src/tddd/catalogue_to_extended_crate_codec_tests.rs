@@ -1,5 +1,8 @@
 //! Tests for [`catalogue_to_extended_crate_codec`] (split out to keep the main module under the 200-400 line guideline).
 
+use std::collections::BTreeMap;
+
+use domain::FreeText;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
 use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl, TraitEntry, TypeEntry};
@@ -10,26 +13,387 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, Self
 use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    AssocConstName, BoundOp, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
-    FunctionPath, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
-    WherePredicateDecl,
+    AssocConstName, BoundOp, CatalogueDocument, CatalogueEntryKey, CrateName, DeletionRecord,
+    FieldName, FullyQualifiedItemPath, FunctionName, FunctionPath, MethodName, ModulePath,
+    ParamName, TypeName, TypeRef, VariantName, WherePredicateDecl,
 };
-use domain::tddd::{CatalogueToExtendedCratePort, SignalEvaluatorPort};
+use domain::tddd::{
+    AttestedRustdocSnapshot, AuthoritativeRustdocContext, CargoProfileName,
+    CatalogueToExtendedCratePort, ExpectedRustdocJsonPath, ImplementationFingerprint,
+    NewTypeGraphCodecError, ResolvedCargoTargetDirectory, RustdocExecutionIdentity, Sha256Digest,
+    SignalEvaluatorPort, construct_attested_rustdoc_snapshot,
+};
 use rustdoc_types::{
-    AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
-    ItemEnum, ItemKind, Term, TraitBoundModifier, Type, VariantKind, WherePredicate,
+    AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id, Item,
+    ItemEnum, ItemKind, ItemSummary, Module, Term, TraitBoundModifier, Type, VariantKind,
+    Visibility, WherePredicate,
 };
 
 use super::*;
 use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
-use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
+use crate::tddd::type_ref_parser::{STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID, std_canonical_path};
 
 fn make_doc(crate_name: &str) -> CatalogueDocument {
+    make_doc_with_layer(crate_name, "domain")
+}
+
+fn snapshot_for_test(
+    crate_name: &str,
+    crate_data: &rustdoc_types::Crate,
+) -> AttestedRustdocSnapshot {
+    fn decode(
+        bytes: &[u8],
+    ) -> Result<rustdoc_types::Crate, domain::tddd::catalogue_v2::RustdocCratePortError> {
+        serde_json::from_slice(bytes).map_err(|error| {
+            domain::tddd::catalogue_v2::RustdocCratePortError::ParseFailed {
+                crate_name: CrateName::new("test").unwrap(),
+                reason: FreeText::new(error.to_string()),
+            }
+        })
+    }
+    let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+        "/tmp/sotohe-codec-test-target",
+    ))
+    .unwrap();
+    let expected = ExpectedRustdocJsonPath::try_new(
+        target.as_path().join(format!("{crate_name}.json")),
+        &target,
+    )
+    .unwrap();
+    let identity = RustdocExecutionIdentity::new(
+        target,
+        CrateName::new(crate_name).unwrap(),
+        vec![],
+        CargoProfileName::try_new("dev".to_owned()).unwrap(),
+        expected,
+    )
+    .unwrap();
+    let bytes = serde_json::to_vec(crate_data).unwrap();
+    construct_attested_rustdoc_snapshot(
+        ImplementationFingerprint::new(Sha256Digest::try_new("a".repeat(64)).unwrap()),
+        identity,
+        &bytes,
+        decode,
+    )
+    .unwrap()
+}
+
+fn make_doc_with_layer(crate_name: &str, layer_name: &str) -> CatalogueDocument {
     CatalogueDocument::new(
         2,
         CrateName::new(crate_name).unwrap(),
-        LayerId::try_new("domain").expect("static valid"),
+        LayerId::try_new(layer_name).expect("static valid"),
     )
+}
+
+fn target_rustdoc_contexts(
+    target_layer: &LayerId,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> BTreeMap<LayerId, AuthoritativeRustdocContext> {
+    BTreeMap::from([(
+        target_layer.clone(),
+        AuthoritativeRustdocContext::new(
+            target_layer.clone(),
+            baseline.clone(),
+            snapshot_for_test(target_layer.as_ref(), current),
+        ),
+    )])
+}
+
+fn rustdoc_contexts_for_catalogues(
+    catalogues: &BTreeMap<LayerId, CatalogueDocument>,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> BTreeMap<LayerId, AuthoritativeRustdocContext> {
+    catalogues
+        .keys()
+        .map(|layer| {
+            (
+                layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    layer.clone(),
+                    baseline.clone(),
+                    snapshot_for_test(layer.as_ref(), current),
+                ),
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn test_encode_rejects_rustdoc_context_stored_under_different_layer_key() {
+    let target_layer = LayerId::try_new("domain").unwrap();
+    let context_layer = LayerId::try_new("usecase").unwrap();
+    let catalogue = make_doc_with_layer("domain", "domain");
+    let catalogues = BTreeMap::from([(target_layer.clone(), catalogue)]);
+    let contexts = BTreeMap::from([(
+        target_layer.clone(),
+        AuthoritativeRustdocContext::new(
+            context_layer,
+            rustdoc_crate_with_paths([]),
+            snapshot_for_test("usecase", &rustdoc_crate_with_paths([])),
+        ),
+    )]);
+
+    let error = CatalogueToExtendedCrateCodec::new()
+        .encode(&target_layer, &catalogues, &contexts)
+        .expect_err("a context keyed for another layer must fail closed");
+    let message = error.to_string();
+    assert!(message.contains("authoritative rustdoc context"));
+    assert!(message.contains("usecase"));
+    assert!(message.contains("domain"));
+}
+
+#[test]
+fn test_encode_missing_target_catalogue_returns_empty_declarations() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let catalogues = BTreeMap::new();
+    let empty = rustdoc_crate_with_paths([]);
+    let contexts = target_rustdoc_contexts(&target_layer, &empty, &empty);
+
+    let encoded = CatalogueToExtendedCrateCodec::new()
+        .encode(&target_layer, &catalogues, &contexts)
+        .expect("a missing target catalogue is an empty declaration set");
+
+    assert!(encoded.krate().index.is_empty());
+    assert!(encoded.krate().paths.is_empty());
+    assert!(encoded.krate().external_crates.is_empty());
+    assert!(encoded.item_actions().is_empty());
+}
+
+fn insert_empty_enum_type(doc: &mut CatalogueDocument, name: &str) {
+    doc.insert_type(
+        CatalogueEntryKey::try_new(name.to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+}
+
+fn insert_empty_trait(doc: &mut CatalogueDocument, name: &str) {
+    doc.insert_trait(
+        CatalogueEntryKey::try_new(name.to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+}
+
+fn authoritative_crate_for_doc(doc: &CatalogueDocument) -> rustdoc_types::Crate {
+    let mut paths = std::collections::HashMap::new();
+    let mut known_paths = std::collections::HashSet::new();
+    let mut next_id = 1;
+    let mut add_path = |path: Vec<String>, kind: ItemKind| {
+        if known_paths.insert((path.clone(), kind)) {
+            paths.insert(Id(next_id), ItemSummary { crate_id: 0, path, kind });
+            next_id += 1;
+        }
+    };
+    let entry_path = |key: &CatalogueEntryKey, module_path: &ModulePath| {
+        let mut path = vec![doc.crate_name().as_str().to_owned()];
+        path.extend(module_path.segments().iter().map(|segment| segment.as_str().to_owned()));
+        path.push(key.as_str().rsplit("::").next().unwrap_or(key.as_str()).to_owned());
+        path
+    };
+
+    for (key, entry) in doc.types() {
+        if entry.action() == ItemAction::Add {
+            continue;
+        }
+        let module_path = entry.module_path().cloned().unwrap_or_default();
+        add_path(entry_path(key, &module_path), ItemKind::Struct);
+    }
+    for (key, entry) in doc.traits() {
+        if entry.action() == ItemAction::Add {
+            continue;
+        }
+        let module_path = entry.module_path().cloned().unwrap_or_default();
+        add_path(entry_path(key, &module_path), ItemKind::Trait);
+    }
+    for deletion in doc.deletions() {
+        let (name, kind) = match deletion {
+            DeletionRecord::Type { name, .. } => (name, ItemKind::Struct),
+            DeletionRecord::Trait { name, .. } => (name, ItemKind::Trait),
+            DeletionRecord::Function { .. } => continue,
+        };
+        let mut path = name.as_str().split("::").map(str::to_owned).collect::<Vec<_>>();
+        if path.first().map(String::as_str) != Some(doc.crate_name().as_str()) {
+            path.insert(0, doc.crate_name().as_str().to_owned());
+        }
+        add_path(path, kind);
+    }
+
+    // The production codec receives these paths from the evaluator's
+    // baseline/current rustdoc crates. Keep the fixture explicit about the
+    // external items used by the codec tests so that removing a path from this
+    // list exercises the same fail-closed behaviour as a missing rustdoc item.
+    let prelude_traits = [
+        "Default",
+        "Clone",
+        "Copy",
+        "Debug",
+        "Display",
+        "PartialEq",
+        "Eq",
+        "Hash",
+        "Ord",
+        "PartialOrd",
+        "Send",
+        "Sync",
+        "Sized",
+        "Unpin",
+        "Drop",
+        "AsRef",
+        "AsMut",
+        "Deref",
+        "DerefMut",
+        "From",
+        "Into",
+        "TryFrom",
+        "TryInto",
+        "IntoIterator",
+        "Iterator",
+        "DoubleEndedIterator",
+        "ExactSizeIterator",
+        "FnOnce",
+        "FnMut",
+        "Fn",
+        "ToString",
+        "ToOwned",
+        "BorrowMut",
+        "Borrow",
+    ];
+    for short_name in STD_PRELUDE_TYPES {
+        let path =
+            std_canonical_path(short_name).split("::").map(str::to_owned).collect::<Vec<_>>();
+        let kind =
+            if prelude_traits.contains(short_name) { ItemKind::Trait } else { ItemKind::Struct };
+        add_path(path, kind);
+    }
+    for (path, kind) in [
+        (vec!["core", "convert", "From"], ItemKind::Trait),
+        (vec!["serde", "Serialize"], ItemKind::Trait),
+        (vec!["ext", "Foo"], ItemKind::Struct),
+        (vec!["ext", "Trait"], ItemKind::Trait),
+    ] {
+        add_path(path.into_iter().map(str::to_owned).collect(), kind);
+    }
+
+    rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths,
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    }
+}
+
+fn encode_doc(doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
+    let baseline = authoritative_crate_for_doc(&doc);
+    let current = baseline.clone();
+    encode_single_doc(doc, &baseline, &current)
+}
+
+fn encode_single_doc(
+    doc: CatalogueDocument,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> Result<ExtendedCrate, NewTypeGraphCodecError> {
+    let target_layer = doc.layer().clone();
+    let track_catalogues = BTreeMap::from([(target_layer.clone(), doc)]);
+    let rustdoc_contexts = target_rustdoc_contexts(&target_layer, baseline, current);
+    <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &track_catalogues,
+        &rustdoc_contexts,
+    )
+}
+
+fn resolution_paths_single_doc(
+    doc: &CatalogueDocument,
+    baseline: &rustdoc_types::Crate,
+    current: &rustdoc_types::Crate,
+) -> Result<std::collections::HashMap<Id, ItemSummary>, NewTypeGraphCodecError> {
+    let target_layer = doc.layer().clone();
+    let track_catalogues = BTreeMap::from([(target_layer.clone(), doc.clone())]);
+    resolution_paths_for_catalogue(&target_layer, &track_catalogues, baseline, current)
+}
+
+fn rustdoc_crate_with_paths<'a, I>(paths: I) -> rustdoc_types::Crate
+where
+    I: IntoIterator<Item = (u32, Vec<&'a str>, ItemKind)>,
+{
+    let paths = paths
+        .into_iter()
+        .map(|(id, path, kind)| {
+            (
+                Id(id),
+                ItemSummary {
+                    crate_id: 0,
+                    path: path.into_iter().map(str::to_owned).collect(),
+                    kind,
+                },
+            )
+        })
+        .collect();
+    rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths,
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    }
+}
+
+fn rustdoc_crate_with_root_and_paths<'a, I>(root_name: &str, paths: I) -> rustdoc_types::Crate
+where
+    I: IntoIterator<Item = (u32, Vec<&'a str>, ItemKind)>,
+{
+    let mut krate = rustdoc_crate_with_paths(paths);
+    krate.index.insert(
+        Id(0),
+        Item {
+            id: Id(0),
+            crate_id: 0,
+            name: Some(root_name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+        },
+    );
+    krate
 }
 
 fn item_id_for_path(ec: &domain::tddd::ExtendedCrate, path: &[&str]) -> Id {
@@ -42,6 +406,1947 @@ fn item_id_for_path(ec: &domain::tddd::ExtendedCrate, path: &[&str]) -> Id {
         .expect("path should be present in encoded crate")
 }
 
+#[test]
+fn test_authoritative_paths_deduplicates_same_identity_with_independent_ids() {
+    let path = vec!["domain".to_owned(), "entries".to_owned(), "TypeEntry".to_owned()];
+    let summary =
+        |id: u32| (Id(id), ItemSummary { crate_id: 0, path: path.clone(), kind: ItemKind::Struct });
+    let baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [summary(1)].into_iter().collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let current = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [summary(2)].into_iter().collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let paths = authoritative_paths(&baseline, &current);
+
+    assert_eq!(paths.len(), 1);
+    assert_eq!(paths.values().next().map(|item| &item.path), Some(&path));
+}
+
+#[test]
+fn test_authoritative_paths_reserves_current_ids_before_remapping_collisions() {
+    let summary = |path: &[&str], kind: ItemKind| ItemSummary {
+        crate_id: 0,
+        path: path.iter().map(|segment| (*segment).to_owned()).collect(),
+        kind,
+    };
+    let baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [
+            (Id(5), summary(&["domain", "BaselineA"], ItemKind::Struct)),
+            (Id(10), summary(&["domain", "BaselineB"], ItemKind::Struct)),
+        ]
+        .into_iter()
+        .collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let current = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [
+            (Id(5), summary(&["domain", "CurrentAtBaselineId"], ItemKind::Struct)),
+            (Id(11), summary(&["domain", "CurrentOnly"], ItemKind::Struct)),
+        ]
+        .into_iter()
+        .collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let paths = authoritative_paths(&baseline, &current);
+
+    assert_eq!(paths.len(), 4);
+    for expected in [
+        ["domain", "BaselineA"],
+        ["domain", "BaselineB"],
+        ["domain", "CurrentAtBaselineId"],
+        ["domain", "CurrentOnly"],
+    ] {
+        assert!(
+            paths.values().any(|summary| summary.path == expected),
+            "merged paths must retain {expected:?}"
+        );
+    }
+}
+
+#[test]
+fn test_resolution_paths_allocate_catalogue_adds_after_merged_ids() {
+    let mut doc = make_doc("domain");
+    insert_empty_enum_type(&mut doc, "Added");
+    let baseline = rustdoc_crate_with_paths([
+        (5, vec!["domain", "BaselineA"], ItemKind::Struct),
+        (10, vec!["domain", "BaselineB"], ItemKind::Struct),
+    ]);
+    let current = rustdoc_crate_with_paths([
+        (5, vec!["domain", "CurrentAtBaselineId"], ItemKind::Struct),
+        (11, vec!["domain", "CurrentOnly"], ItemKind::Struct),
+    ]);
+
+    let paths = resolution_paths_single_doc(&doc, &baseline, &current)
+        .expect("synthetic catalogue paths must not overwrite merged rustdoc paths");
+
+    assert_eq!(paths.len(), 5);
+    let current_id = paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "CurrentAtBaselineId"])
+        .map(|(id, _)| *id)
+        .expect("the remapped current path must remain authoritative");
+    let added_id = paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "Added"])
+        .map(|(id, _)| *id)
+        .expect("the catalogue add must be synthesized");
+    assert_eq!(current_id, Id(12), "the current collision must be remapped above all input ids");
+    assert_eq!(added_id, Id(13), "catalogue-only ids must follow the merged path ids");
+}
+
+#[test]
+fn test_codec_implements_catalogue_to_extended_crate_port() {
+    fn assert_port_implementation<T: CatalogueToExtendedCratePort>() {}
+
+    assert_port_implementation::<CatalogueToExtendedCrateCodec>();
+}
+
+#[test]
+fn test_resolution_paths_for_catalogues_adds_other_layer_declarations_as_external_items() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let target = make_doc_with_layer("usecase", "usecase");
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    declaring.insert_trait(
+        CatalogueEntryKey::try_new("domain::ports::Repository".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["ports".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("RemoteFuture".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues = BTreeMap::from([
+        (target_layer.clone(), target),
+        (LayerId::try_new("domain").unwrap(), declaring),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("available other-layer catalogues must extend one resolution set");
+
+    let user_id = paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "model", "UserId"])
+        .map(|(id, summary)| (*id, summary))
+        .expect("the declaring layer's type add must be present");
+    assert_eq!(user_id.1.kind, ItemKind::Struct);
+    assert_eq!(user_id.1.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);
+
+    let repository = paths
+        .values()
+        .find(|summary| summary.path == ["domain", "ports", "Repository"])
+        .expect("the declaring layer's trait add must be present");
+    assert_eq!(repository.kind, ItemKind::Trait);
+    assert_eq!(repository.crate_id, SYNTHETIC_EXTERNAL_CRATE_ID);
+
+    let future = paths
+        .values()
+        .find(|summary| summary.path == ["domain", "RemoteFuture"])
+        .expect("an omitted placement must remain represented");
+    assert_eq!(future.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);
+    assert!(matches!(summary_identity(future), Some(FullyQualifiedItemPath::UnplacedType { .. })));
+    assert!(
+        !paths.values().any(|summary| summary.path == ["usecase", "model", "UserId"]),
+        "the target catalogue must not duplicate the declaring-layer item"
+    );
+}
+
+#[test]
+fn test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("id").unwrap(),
+                        TypeRef::new("domain::model::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    target.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::ports::Repository").unwrap(),
+        TypeRef::new("Handler").unwrap(),
+    ));
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    declaring.insert_trait(
+        CatalogueEntryKey::try_new("domain::ports::Repository".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["ports".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("cross-layer add declarations must resolve as external identities");
+
+    let user_id = item_id_for_path(&encoded, &["domain", "model", "UserId"]);
+    let user_summary = &encoded.krate().paths[&user_id];
+    assert_ne!(user_summary.crate_id, 0);
+    assert_eq!(encoded.krate().external_crates[&user_summary.crate_id].name, "domain");
+
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id
+    ));
+
+    assert!(encoded.krate().index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(impl_item)
+                if impl_item
+                    .trait_
+                    .as_ref()
+                    .is_some_and(|path| {
+                        path.id != Id(UNRESOLVED_CRATE_ID)
+                            && encoded.krate().paths.get(&path.id).is_some_and(|summary| {
+                                summary.path == ["domain", "ports", "Repository"]
+                                    && summary.crate_id != 0
+                            })
+                    })
+                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == handler_id)
+        )
+    }));
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| summary.path == ["usecase", "model", "UserId"]),
+        "the referencing catalogue must not duplicate the external declaration"
+    );
+}
+
+#[test]
+fn test_generated_cross_layer_context_maps_use_declaring_current_placement() {
+    for case in 0..16_u32 {
+        let module = format!("generated_{case}");
+        let item = format!("Name{case}");
+        let reference = format!("domain::{module}::{item}");
+        let target_layer = LayerId::try_new("usecase").unwrap();
+        let declaring_layer = LayerId::try_new("domain").unwrap();
+
+        let mut target = make_doc_with_layer("usecase", "usecase");
+        target.insert_type(
+            CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("reference").unwrap(),
+                            TypeRef::new(reference).unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let mut declaring = make_doc_with_layer("domain", "domain");
+        declaring.insert_type(
+            CatalogueEntryKey::try_new(item.clone()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.clone()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogues =
+            BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+        let target_baseline = rustdoc_crate_with_paths([]);
+        let target_current = rustdoc_crate_with_paths([]);
+        let declaring_baseline = rustdoc_crate_with_paths([]);
+        let declaring_current = rustdoc_crate_with_paths([(
+            1,
+            vec!["domain", module.as_str(), item.as_str()],
+            ItemKind::Struct,
+        )]);
+        let rustdoc_contexts = BTreeMap::from([
+            (
+                target_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    target_layer.clone(),
+                    target_baseline,
+                    snapshot_for_test("infrastructure", &target_current),
+                ),
+            ),
+            (
+                declaring_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    declaring_layer,
+                    declaring_baseline,
+                    snapshot_for_test("domain", &declaring_current),
+                ),
+            ),
+        ]);
+
+        let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+            &CatalogueToExtendedCrateCodec::new(),
+            &target_layer,
+            &catalogues,
+            &rustdoc_contexts,
+        )
+        .expect("generated cross-layer declarations must resolve");
+        let item_id = item_id_for_path(&encoded, &["domain", module.as_str(), item.as_str()]);
+        let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+        let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+            panic!("expected generated Handler struct");
+        };
+        let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+            panic!("expected generated Handler fields");
+        };
+        assert!(matches!(
+            &encoded.krate().index[&fields[0]].inner,
+            ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == item_id
+        ));
+        assert_eq!(
+            encoded.krate().paths[&item_id].path,
+            ["domain", module.as_str(), item.as_str()]
+        );
+    }
+}
+
+#[test]
+fn test_property_cross_layer_context_completeness_and_declaring_placement() {
+    // A small deterministic generator keeps this property test reproducible
+    // without making the production codec depend on a test-only generator
+    // crate. Each generated state exercises a different declaration name,
+    // target-side distractor, and declaring-layer candidate shape.
+    let mut generator = PropertyGenerator::new(0x5eed_2026);
+    for _case in 0..48 {
+        let module = format!("module_{}", generator.next_u32() % 11);
+        let item = format!("Name{}", generator.next_u32() % 17);
+        let candidate_shape = generator.next_u32() % 3;
+        let reference = if candidate_shape == 1 {
+            format!("domain::{module}::{item}")
+        } else {
+            format!("domain::{item}")
+        };
+        let target_layer = LayerId::try_new("usecase").unwrap();
+        let declaring_layer = LayerId::try_new("domain").unwrap();
+
+        let mut target = make_doc_with_layer("usecase", "usecase");
+        target.insert_type(
+            CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new("reference").unwrap(),
+                            TypeRef::new(reference).unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::root()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let mut declaring = make_doc_with_layer("domain", "domain");
+        declaring.insert_type(
+            CatalogueEntryKey::try_new(item.clone()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let catalogues =
+            BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+        let target_baseline = rustdoc_crate_with_paths([]);
+        let mut target_current =
+            rustdoc_crate_with_paths([(1, vec!["domain", "target", "Other"], ItemKind::Struct)]);
+        target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+        let declaring_baseline = rustdoc_crate_with_paths([]);
+        let declaring_current = match candidate_shape {
+            0 => rustdoc_crate_with_paths([]),
+            1 => rustdoc_crate_with_paths([(
+                2,
+                vec!["domain", module.as_str(), item.as_str()],
+                ItemKind::Struct,
+            )]),
+            _ => rustdoc_crate_with_paths([
+                (2, vec!["domain", "alpha", item.as_str()], ItemKind::Struct),
+                (3, vec!["domain", "beta", item.as_str()], ItemKind::Struct),
+            ]),
+        };
+        let contexts = BTreeMap::from([
+            (
+                target_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    target_layer.clone(),
+                    target_baseline,
+                    snapshot_for_test("infrastructure", &target_current),
+                ),
+            ),
+            (
+                declaring_layer.clone(),
+                AuthoritativeRustdocContext::new(
+                    declaring_layer.clone(),
+                    declaring_baseline,
+                    snapshot_for_test("domain", &declaring_current),
+                ),
+            ),
+        ]);
+
+        let result =
+            CatalogueToExtendedCrateCodec::new().encode(&target_layer, &catalogues, &contexts);
+        if candidate_shape == 2 {
+            assert!(result.is_err(), "ambiguous declaring candidates must fail closed");
+        } else {
+            let encoded = result.expect("generated declaring candidate must be resolvable");
+            let expected_path = if candidate_shape == 1 {
+                vec!["domain", module.as_str(), item.as_str()]
+            } else {
+                vec!["domain", item.as_str()]
+            };
+            let item_id = item_id_for_path(&encoded, &expected_path);
+            let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+            let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+                panic!("generated Handler must remain a struct");
+            };
+            let ItemKind::Struct = encoded.krate().paths[&item_id].kind else {
+                panic!("generated declaring item must remain a struct path");
+            };
+            let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+                panic!("generated Handler must retain its field");
+            };
+            assert!(matches!(
+                &encoded.krate().index[&fields[0]].inner,
+                ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == item_id
+            ));
+            assert!(
+                !encoded
+                    .krate()
+                    .paths
+                    .values()
+                    .any(|summary| { summary.path == ["usecase", "target", item.as_str()] }),
+                "target-layer distractors must not place a declaring-layer add"
+            );
+        }
+
+        let mut missing_declaring = contexts.clone();
+        missing_declaring.remove(&declaring_layer);
+        let missing_declaring_error = CatalogueToExtendedCrateCodec::new()
+            .encode(&target_layer, &catalogues, &missing_declaring)
+            .expect_err("a missing declaring context must fail closed");
+        assert!(missing_declaring_error.to_string().contains("no authoritative rustdoc context"));
+
+        let mut missing_target = contexts;
+        missing_target.remove(&target_layer);
+        let missing_target_error = CatalogueToExtendedCrateCodec::new()
+            .encode(&target_layer, &catalogues, &missing_target)
+            .expect_err("a missing target context must fail closed");
+        assert!(missing_target_error.to_string().contains("no authoritative rustdoc context"));
+    }
+}
+
+struct PropertyGenerator {
+    state: u64,
+}
+
+impl PropertyGenerator {
+    fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
+
+    fn next_u32(&mut self) -> u32 {
+        self.state = self.state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+        (self.state >> 32) as u32
+    }
+}
+
+#[test]
+fn test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("id").unwrap(),
+                        TypeRef::new("domain::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+    let resolution_paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("the unplaced declaring add remains in the shared resolution set");
+    let unplaced_summary = resolution_paths
+        .values()
+        .find(|summary| summary.path == ["domain", "UserId"])
+        .expect("the declaring layer's unplaced add must be represented");
+    assert_eq!(unplaced_summary.crate_id, SYNTHETIC_UNPLACED_CRATE_ID);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("a qualified reference must resolve an unplaced cross-layer add");
+
+    let user_id = item_id_for_path(&encoded, &["domain", "UserId"]);
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == user_id
+    ));
+    assert_ne!(encoded.krate().paths[&user_id].crate_id, 0);
+    assert_eq!(
+        encoded.krate().external_crates[&encoded.krate().paths[&user_id].crate_id].name,
+        "domain"
+    );
+}
+
+#[test]
+fn test_encode_cross_layer_omitted_module_path_uses_declaring_current_rustdoc() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::model::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "target", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current =
+        rustdoc_crate_with_paths([(2, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer.clone(),
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("an omitted external add must use the declaring layer's current placement");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "model", "Name"]);
+    assert_eq!(encoded.krate().paths[&name_id].path, ["domain", "model", "Name"]);
+    assert_ne!(encoded.krate().paths[&name_id].crate_id, 0);
+    assert!(
+        !encoded.krate().paths.values().any(|summary| summary.path == ["domain", "Name"]),
+        "the omitted external add must not remain at an unplaced crate-root spelling"
+    );
+
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id
+    ));
+}
+
+#[test]
+fn test_encode_cross_layer_omitted_module_path_without_declaring_rustdoc_uses_unplaced_catalogue_identity()
+ {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "referring", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current = rustdoc_crate_with_paths([]);
+    let declaring_context = AuthoritativeRustdocContext::new(
+        declaring_layer.clone(),
+        declaring_baseline,
+        snapshot_for_test("domain", &declaring_current),
+    );
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (declaring_layer, declaring_context),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("an absent declaring identity must synthesize an unplaced external add");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "Name"]);
+    let name_summary = &encoded.krate().paths[&name_id];
+    assert_ne!(name_summary.crate_id, 0);
+    assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, "domain");
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| summary.path == ["domain", "referring", "Name"]),
+        "the synthesized item must not use the referring-side rustdoc placement"
+    );
+
+    let handler_id = item_id_for_path(&encoded, &["usecase", "Handler"]);
+    let ItemEnum::Struct(handler) = &encoded.krate().index[&handler_id].inner else {
+        panic!("expected Handler struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &handler.kind else {
+        panic!("expected Handler named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == name_id
+    ));
+}
+
+#[test]
+fn test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let target = make_doc_with_layer("usecase", "usecase");
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let catalogues =
+        BTreeMap::from([(declaring_layer.clone(), declaring), (target_layer.clone(), target)]);
+
+    let target_baseline = rustdoc_crate_with_paths([]);
+    let mut target_current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    target_current.paths.get_mut(&Id(1)).unwrap().crate_id = 7;
+    let declaring_baseline = rustdoc_crate_with_paths([]);
+    let declaring_current =
+        rustdoc_crate_with_paths([(2, vec!["domain", "model", "Name"], ItemKind::Struct)]);
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_baseline,
+                snapshot_for_test("infrastructure", &target_current),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer.clone(),
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("rustdoc must win when it supplies the same resolved identity");
+    let matching = paths
+        .iter()
+        .filter(|(_, summary)| summary.path == ["domain", "model", "Name"])
+        .collect::<Vec<_>>();
+    assert_eq!(matching.len(), 1, "the identity must not be synthesized twice");
+    assert_eq!(*matching[0].0, Id(1));
+    assert_eq!(matching[0].1.crate_id, 7);
+}
+
+#[test]
+fn test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let target = make_doc_with_layer("usecase", "usecase");
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("domain::model::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let rustdoc_id = Id(7);
+    let mut current = rustdoc_crate_with_paths([]);
+    current.paths.insert(
+        rustdoc_id,
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["domain".to_owned(), "model".to_owned(), "UserId".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                rustdoc_crate_with_paths([]),
+                snapshot_for_test("infrastructure", &current),
+            ),
+        ),
+        (
+            LayerId::try_new("domain").unwrap(),
+            AuthoritativeRustdocContext::new(
+                LayerId::try_new("domain").unwrap(),
+                rustdoc_crate_with_paths([]),
+                snapshot_for_test("domain", &rustdoc_crate_with_paths([])),
+            ),
+        ),
+    ]);
+    let paths =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect("a referring-side rustdoc identity must win over the other-layer add");
+
+    let (id, summary) = paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "model", "UserId"])
+        .expect("the rustdoc identity must remain in the resolution set");
+    assert_eq!(*id, rustdoc_id);
+    assert_eq!(summary.crate_id, 1);
+    assert_ne!(summary.crate_id, u32::MAX - 1);
+}
+
+#[test]
+fn test_encode_cross_layer_short_name_reference_fails_closed() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("user_id").unwrap(),
+                        TypeRef::new("UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    insert_empty_enum_type(&mut declaring, "UserId");
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+
+    let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect_err("a cross-layer short name must not use an external fallback");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "UserId"
+    ));
+}
+
+#[test]
+fn test_encode_cross_layer_short_name_trait_reference_fails_closed() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    insert_empty_enum_type(&mut target, "Adapter");
+    target.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Repository").unwrap(),
+        TypeRef::new("Adapter").unwrap(),
+    ));
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    insert_empty_trait(&mut declaring, "Repository");
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &empty, &empty);
+
+    let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect_err("a cross-layer short trait name must not use an external fallback");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "Repository"
+    ));
+}
+
+#[test]
+fn test_encode_cross_layer_reference_to_missing_crate_fails_closed() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("user_id").unwrap(),
+                        TypeRef::new("domain::missing::UserId").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let catalogues = BTreeMap::from([(target_layer.clone(), target)]);
+    let empty = rustdoc_crate_with_paths([]);
+    let rustdoc_contexts = target_rustdoc_contexts(&target_layer, &empty, &empty);
+
+    let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect_err("a missing declaring crate must not pass as an unresolved external");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "domain::missing::UserId"
+    ));
+}
+
+#[test]
+fn test_resolution_paths_rustdoc_precedence_does_not_mask_target_add_collision() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::OwnType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    insert_empty_enum_type(&mut declaring, "RemoteType");
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let baseline = rustdoc_crate_with_paths([
+        (1, vec!["usecase", "OwnType"], ItemKind::Struct),
+        (2, vec!["domain", "RemoteType"], ItemKind::Enum),
+    ]);
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &baseline, &baseline);
+
+    let error = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect_err("an own-layer baseline collision must remain fail-closed");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "usecase::OwnType"
+    ));
+}
+
+#[test]
+fn test_resolution_paths_rejects_conflicting_other_layer_add_before_rustdoc_precedence() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let target = make_doc_with_layer("usecase", "usecase");
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("domain::declared::UserId".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["actual".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let catalogues = BTreeMap::from([
+        (LayerId::try_new("domain").unwrap(), declaring),
+        (target_layer.clone(), target),
+    ]);
+    let rustdoc =
+        rustdoc_crate_with_paths([(1, vec!["domain", "declared", "UserId"], ItemKind::Struct)]);
+
+    let rustdoc_contexts = rustdoc_contexts_for_catalogues(&catalogues, &rustdoc, &rustdoc);
+    let error =
+        resolution_paths_for_catalogue_with_contexts(&target_layer, &catalogues, &rustdoc_contexts)
+            .expect_err("a malformed add must not be hidden by rustdoc precedence");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::InvalidTypeRef(ref type_ref, ref diagnostic)
+            if type_ref.as_str() == "domain::declared::UserId"
+                && diagnostic.as_str().contains("module_path")
+    ));
+}
+
+#[test]
+fn test_encode_catalogue_add_types_can_reference_each_other_without_rustdoc_paths() {
+    let mut doc = make_doc("domain");
+    for (name, field, target) in [("First", "second", "Second"), ("Second", "first", "First")] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(name.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![FieldDecl::new(
+                            FieldName::new(field.to_owned()).unwrap(),
+                            TypeRef::new(target.to_owned()).unwrap(),
+                        )],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+
+    let baseline = rustdoc_crate_with_paths([]);
+    let current = baseline.clone();
+    let encoded = encode_single_doc(doc, &baseline, &current)
+        .expect("catalogue add declarations must seed the production resolution set");
+
+    assert!(
+        encoded.krate().paths.values().any(|summary| { summary.path == vec!["domain", "First"] })
+    );
+    assert!(
+        encoded.krate().paths.values().any(|summary| { summary.path == vec!["domain", "Second"] })
+    );
+}
+
+#[test]
+fn test_resolution_paths_preserve_unplaced_add_identity() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Future".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let empty = rustdoc_crate_with_paths([]);
+    let paths = resolution_paths_single_doc(&doc, &empty, &empty)
+        .expect("an absent add is a valid unplaced resolution identity");
+    let summary = paths
+        .values()
+        .find(|summary| summary.path == vec!["domain".to_owned(), "Future".to_owned()])
+        .expect("the production resolution set must contain the add declaration");
+
+    assert_eq!(summary.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID);
+    assert!(matches!(summary_identity(summary), Some(FullyQualifiedItemPath::UnplacedType { .. })));
+}
+
+#[test]
+fn test_add_identity_rejects_qualified_baseline_collision() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::generated::Thing".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["generated".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let rustdoc =
+        rustdoc_crate_with_paths([(1, vec!["domain", "generated", "Thing"], ItemKind::Struct)]);
+
+    let error = encode_single_doc(doc, &rustdoc, &rustdoc)
+        .expect_err("an add colliding with baseline must fail closed");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(reference)
+            if reference.as_str() == "domain::generated::Thing"
+    ));
+}
+
+#[test]
+fn test_resolution_paths_do_not_alias_external_rustdoc_root() {
+    let doc = make_doc("cli");
+    let mut rustdoc = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [(1, vec!["sotp", "external", "Thing"], ItemKind::Struct)],
+    );
+    if let Some(summary) = rustdoc.paths.get_mut(&Id(1)) {
+        summary.crate_id = 7;
+    }
+
+    let paths = resolution_paths_single_doc(&doc, &rustdoc, &rustdoc)
+        .expect("external paths remain valid resolution inputs");
+    let summary = paths
+        .values()
+        .find(|summary| summary.path.last().map(String::as_str) == Some("Thing"))
+        .expect("external summary should remain in the resolution set");
+    assert_eq!(summary.path, vec!["sotp".to_owned(), "external".to_owned(), "Thing".to_owned()]);
+}
+
+#[test]
+fn test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root() {
+    let target_layer = LayerId::try_new("usecase").unwrap();
+    let declaring_layer = LayerId::try_new("domain").unwrap();
+    let mut target = make_doc_with_layer("usecase", "usecase");
+    target.insert_type(
+        CatalogueEntryKey::try_new("usecase::Handler".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("domain::model::Name").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let mut declaring = make_doc_with_layer("domain", "domain");
+    declaring.insert_type(
+        CatalogueEntryKey::try_new("Name".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["model".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let catalogues =
+        BTreeMap::from([(target_layer.clone(), target), (declaring_layer.clone(), declaring)]);
+    let target_rustdoc = rustdoc_crate_with_root_and_paths("usecase", []);
+    let declaring_baseline = rustdoc_crate_with_root_and_paths("sotp", []);
+    let declaring_current = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [(1, vec!["sotp", "model", "Name"], ItemKind::Struct)],
+    );
+    let rustdoc_contexts = BTreeMap::from([
+        (
+            target_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                target_layer.clone(),
+                target_rustdoc.clone(),
+                snapshot_for_test("infrastructure", &target_rustdoc),
+            ),
+        ),
+        (
+            declaring_layer.clone(),
+            AuthoritativeRustdocContext::new(
+                declaring_layer,
+                declaring_baseline,
+                snapshot_for_test("domain", &declaring_current),
+            ),
+        ),
+    ]);
+
+    let encoded = <CatalogueToExtendedCrateCodec as CatalogueToExtendedCratePort>::encode(
+        &CatalogueToExtendedCrateCodec::new(),
+        &target_layer,
+        &catalogues,
+        &rustdoc_contexts,
+    )
+    .expect("a declaring bin-target root must be canonicalized to the package root");
+
+    let name_id = item_id_for_path(&encoded, &["domain", "model", "Name"]);
+    let name_summary = &encoded.krate().paths[&name_id];
+    assert_eq!(name_summary.path, ["domain", "model", "Name"]);
+    assert_ne!(name_summary.crate_id, 0);
+    assert_eq!(encoded.krate().external_crates[&name_summary.crate_id].name, "domain");
+    assert!(
+        !encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| { summary.path == ["sotp", "model", "Name"] }),
+        "the synthesized identity must not retain the bin-target rustdoc root"
+    );
+}
+
+#[test]
+fn test_encode_catalogue_modify_can_reference_add_and_absent_type_fails_closed() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::generated::AddedType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["generated".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("AddedType").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let baseline = rustdoc_crate_with_paths([(1, vec!["domain", "Holder"], ItemKind::Struct)]);
+    let encoded = encode_single_doc(doc, &baseline, &baseline)
+        .expect("modify entries can resolve a catalogue-declared add target");
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected Holder named fields");
+    };
+    let added_id = item_id_for_path(&encoded, &["domain", "generated", "AddedType"]);
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path))
+            if path.id == added_id
+    ));
+    assert_eq!(encoded.krate().paths[&added_id].path, ["domain", "generated", "AddedType"]);
+
+    let mut missing_doc = make_doc("domain");
+    missing_doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("AbsentFromBoth").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let error = encode_single_doc(missing_doc, &baseline, &baseline)
+        .expect_err("a modify reference absent from both sets fails closed");
+    assert!(matches!(error, NewTypeGraphCodecError::UnresolvedIdentifier(_)));
+}
+
+#[test]
+fn test_encode_catalogue_alias_normalizes_modify_and_reference_type_paths() {
+    let mut doc = make_doc("cli");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("cli::generated::AddedType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["generated".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("cli::Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("AddedType").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("cli::RefHolder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Reference,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("AddedType").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let baseline = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [
+            (1, vec!["sotp", "Holder"], ItemKind::Struct),
+            (3, vec!["sotp", "RefHolder"], ItemKind::Struct),
+        ],
+    );
+    let current = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [
+            (1, vec!["sotp", "Holder"], ItemKind::Struct),
+            (2, vec!["sotp", "generated", "AddedType"], ItemKind::Struct),
+            (3, vec!["sotp", "RefHolder"], ItemKind::Struct),
+        ],
+    );
+    let encoded = encode_single_doc(doc, &baseline, &current)
+        .expect("catalogue package and rustdoc bin roots normalize once");
+    let holder_id = item_id_for_path(&encoded, &["cli", "Holder"]);
+    let added_id = item_id_for_path(&encoded, &["cli", "generated", "AddedType"]);
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected Holder named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id
+    ));
+    assert_eq!(encoded.krate().paths[&added_id].path, ["cli", "generated", "AddedType"]);
+
+    let ref_holder_id = item_id_for_path(&encoded, &["cli", "RefHolder"]);
+    let ItemEnum::Struct(ref_holder) = &encoded.krate().index[&ref_holder_id].inner else {
+        panic!("expected RefHolder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &ref_holder.kind else {
+        panic!("expected RefHolder named fields");
+    };
+    assert!(matches!(
+        &encoded.krate().index[&fields[0]].inner,
+        ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == added_id
+    ));
+}
+
+#[test]
+fn test_encode_omitted_module_path_add_resolves_to_one_current_candidate() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("FutureType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let baseline = rustdoc_crate_with_paths([]);
+    let current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "generated", "FutureType"], ItemKind::Enum)]);
+
+    let encoded = encode_single_doc(doc, &baseline, &current)
+        .expect("one current candidate supplies omitted placement");
+    assert!(
+        encoded
+            .krate()
+            .paths
+            .values()
+            .any(|summary| { summary.path == vec!["domain", "generated", "FutureType"] })
+    );
+}
+
+#[test]
+fn test_encode_omitted_module_path_add_without_current_is_unplaced() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("FutureType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let empty = rustdoc_crate_with_paths([]);
+
+    let encoded = encode_single_doc(doc, &empty, &empty)
+        .expect("an omitted add without a rustdoc candidate remains unplaced");
+    let id = item_id_for_path(&encoded, &["domain", "FutureType"]);
+
+    assert_eq!(encoded.action_for(&id), Some(ItemAction::Add));
+    assert_eq!(encoded.krate().paths[&id].path, ["domain", "FutureType"]);
+    assert_eq!(
+        encoded.krate().paths[&id].crate_id,
+        crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID
+    );
+    assert!(matches!(encoded.krate().index[&id].inner, ItemEnum::Struct(_)));
+}
+
+#[test]
+fn test_encode_omitted_module_path_add_rejects_multiple_current_candidates() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("FutureType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let baseline = rustdoc_crate_with_paths([]);
+    let current = rustdoc_crate_with_paths([
+        (1, vec!["domain", "alpha", "FutureType"], ItemKind::Enum),
+        (2, vec!["domain", "beta", "FutureType"], ItemKind::Enum),
+    ]);
+
+    let error = encode_single_doc(doc, &baseline, &current)
+        .expect_err("multiple current placements must fail closed");
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates)
+            if identifier.as_str() == "FutureType" && candidates.as_slice().len() == 2
+    ));
+}
+
+#[test]
+fn test_encode_omitted_module_path_modify_reference_and_delete_use_unique_baseline_identity() {
+    let encode_entry = |action: ItemAction, key: &str, module: &str| {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                action,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                None,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let baseline =
+            rustdoc_crate_with_paths([(1, vec!["domain", module, key], ItemKind::Struct)]);
+        encode_single_doc(doc, &baseline, &baseline)
+    };
+
+    for (action, key, module) in [
+        (ItemAction::Modify, "Modified", "before"),
+        (ItemAction::Reference, "Referenced", "already"),
+    ] {
+        let encoded = encode_entry(action, key, module)
+            .expect("modify/reference must resolve one baseline identity");
+        let id = item_id_for_path(&encoded, &["domain", module, key]);
+        assert_eq!(encoded.action_for(&id), Some(action));
+    }
+
+    let mut deletion_doc = make_doc("domain");
+    deletion_doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("Removed".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+    let baseline =
+        rustdoc_crate_with_paths([(1, vec!["domain", "gone", "Removed"], ItemKind::Struct)]);
+    let encoded = encode_single_doc(deletion_doc, &baseline, &baseline)
+        .expect("delete must resolve one baseline identity");
+    let id = item_id_for_path(&encoded, &["domain", "gone", "Removed"]);
+    assert_eq!(encoded.action_for(&id), Some(ItemAction::Delete));
+}
+
+#[test]
+fn test_encode_omitted_module_path_add_rejects_baseline_name_collision() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("ExistingType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let baseline =
+        rustdoc_crate_with_paths([(1, vec!["domain", "old", "ExistingType"], ItemKind::Enum)]);
+    let error = encode_single_doc(doc, &baseline, &baseline)
+        .expect_err("an omitted add cannot replace a baseline declaration");
+    assert!(matches!(error, NewTypeGraphCodecError::AmbiguousIdentifier(..)));
+}
+
+#[test]
+fn test_authoritative_paths_keeps_same_path_in_distinct_namespaces() {
+    let path = vec!["domain".to_owned(), "Thing".to_owned()];
+    let summary =
+        |id: u32, kind: ItemKind| (Id(id), ItemSummary { crate_id: 0, path: path.clone(), kind });
+    let baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [summary(1, ItemKind::Function)].into_iter().collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let current = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [summary(2, ItemKind::Struct)].into_iter().collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let paths = authoritative_paths(&baseline, &current);
+
+    assert_eq!(paths.len(), 2);
+    assert!(paths.values().any(|summary| summary.kind == ItemKind::Function));
+    assert!(paths.values().any(|summary| summary.kind == ItemKind::Struct));
+}
+
+#[test]
+fn test_authoritative_paths_keeps_same_type_name_and_trait_name_identity() {
+    let path = vec!["domain".to_owned(), "Shared".to_owned()];
+    let baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [(Id(1), ItemSummary { crate_id: 0, path: path.clone(), kind: ItemKind::Struct })]
+            .into_iter()
+            .collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let current = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [(Id(2), ItemSummary { crate_id: 0, path, kind: ItemKind::Trait })]
+            .into_iter()
+            .collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let paths = authoritative_paths(&baseline, &current);
+    assert_eq!(paths.len(), 2);
+    assert!(paths.values().any(|summary| summary.kind == ItemKind::Struct));
+    assert!(paths.values().any(|summary| summary.kind == ItemKind::Trait));
+}
+
+#[test]
+fn test_authoritative_paths_deduplicates_type_kind_changes() {
+    let path = vec!["domain".to_owned(), "Thing".to_owned()];
+    let make_crate = |id: u32, kind: ItemKind| rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: [(Id(id), ItemSummary { crate_id: 0, path: path.clone(), kind })]
+            .into_iter()
+            .collect(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let paths =
+        authoritative_paths(&make_crate(1, ItemKind::Struct), &make_crate(2, ItemKind::Enum));
+
+    assert_eq!(paths.len(), 1);
+    assert_eq!(paths.values().next().map(|summary| summary.kind), Some(ItemKind::Struct));
+}
+
 // -----------------------------------------------------------------------
 // Delete tombstones
 // -----------------------------------------------------------------------
@@ -50,13 +2355,12 @@ fn item_id_for_path(ec: &domain::tddd::ExtendedCrate, path: &[&str]) -> Id {
 fn test_encode_type_deletion_record_emits_delete_action() {
     let mut doc = make_doc("domain");
     doc.push_deletion(DeletionRecord::Type {
-        name: TypeName::new("OldType").unwrap(),
-        module_path: ModulePath::root(),
+        name: CatalogueEntryKey::try_new("OldType".to_owned()).unwrap(),
         spec_refs: vec![],
         informal_grounds: vec![],
     });
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let id = item_id_for_path(&ec, &["domain", "OldType"]);
 
     assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
@@ -68,18 +2372,117 @@ fn test_encode_type_deletion_record_emits_delete_action() {
 fn test_encode_trait_deletion_record_emits_delete_action() {
     let mut doc = make_doc("domain");
     doc.push_deletion(DeletionRecord::Trait {
-        name: TraitName::new("OldPort").unwrap(),
-        module_path: ModulePath::root(),
+        name: CatalogueEntryKey::try_new("OldPort".to_owned()).unwrap(),
         spec_refs: vec![],
         informal_grounds: vec![],
     });
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let id = item_id_for_path(&ec, &["domain", "OldPort"]);
 
     assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
     assert_eq!(ec.krate().paths[&id].kind, ItemKind::Trait);
     assert!(matches!(ec.krate().index[&id].inner, ItemEnum::Trait(_)));
+}
+
+#[test]
+fn test_encode_type_and_trait_deletions_keep_namespace_specific_identities() {
+    let mut doc = make_doc("domain");
+    doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("alpha::Shared".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+    doc.push_deletion(DeletionRecord::Trait {
+        name: CatalogueEntryKey::try_new("beta::Shared".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+
+    let encoded = encode_doc(doc).expect("type and trait tombstones use separate namespaces");
+    let type_id = item_id_for_path(&encoded, &["domain", "alpha", "Shared"]);
+    let trait_id = item_id_for_path(&encoded, &["domain", "beta", "Shared"]);
+
+    assert_ne!(type_id, trait_id);
+    assert_eq!(encoded.krate().paths[&type_id].kind, ItemKind::Struct);
+    assert_eq!(encoded.krate().paths[&trait_id].kind, ItemKind::Trait);
+    assert_eq!(encoded.action_for(&type_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&trait_id), Some(ItemAction::Delete));
+}
+
+#[test]
+fn test_encode_explicit_root_tombstone_targets_root_and_omitted_stays_ambiguous() {
+    use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+
+    let explicit_root_json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "GoneType": { "action": "delete", "module_path": "." }
+  },
+  "traits": {
+    "GoneTrait": { "action": "delete", "module_path": "." }
+  },
+  "functions": {}
+}"#;
+    let explicit_root_doc = CatalogueDocumentCodec::decode(explicit_root_json, "domain")
+        .expect("explicit root decodes");
+    let baseline = rustdoc_crate_with_paths([
+        (1, vec!["domain", "GoneType"], ItemKind::Struct),
+        (2, vec!["domain", "nested", "GoneType"], ItemKind::Struct),
+        (3, vec!["domain", "GoneTrait"], ItemKind::Trait),
+        (4, vec!["domain", "nested", "GoneTrait"], ItemKind::Trait),
+    ]);
+
+    let encoded = encode_single_doc(explicit_root_doc, &baseline, &baseline)
+        .expect("explicit root tombstones resolve to the root identities");
+    let root_type_id = item_id_for_path(&encoded, &["domain", "GoneType"]);
+    let root_trait_id = item_id_for_path(&encoded, &["domain", "GoneTrait"]);
+    assert_eq!(encoded.action_for(&root_type_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&root_trait_id), Some(ItemAction::Delete));
+    assert!(
+        encoded
+            .krate()
+            .paths
+            .values()
+            .all(|summary| summary.path != ["domain", "nested", "GoneType"])
+    );
+    assert!(
+        encoded
+            .krate()
+            .paths
+            .values()
+            .all(|summary| summary.path != ["domain", "nested", "GoneTrait"])
+    );
+
+    for section in ["types", "traits"] {
+        let omitted_json = format!(
+            r#"{{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {types},
+  "traits": {traits},
+  "functions": {{}}
+}}"#,
+            types =
+                if section == "types" { r#"{ "GoneType": { "action": "delete" } }"# } else { "{}" },
+            traits = if section == "traits" {
+                r#"{ "GoneTrait": { "action": "delete" } }"#
+            } else {
+                "{}"
+            },
+        );
+        let omitted_doc = CatalogueDocumentCodec::decode(&omitted_json, "domain")
+            .expect("omitted placement decodes");
+        let error = encode_single_doc(omitted_doc, &baseline, &baseline)
+            .expect_err("omitted placement must remain fail-closed when the baseline is ambiguous");
+        assert!(
+            matches!(error, NewTypeGraphCodecError::AmbiguousIdentifier(..)),
+            "omitted {section} tombstone must be ambiguous, got {error:?}"
+        );
+    }
 }
 
 #[test]
@@ -95,7 +2498,7 @@ fn test_encode_function_deletion_record_emits_delete_action() {
         informal_grounds: vec![],
     });
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let id = item_id_for_path(&ec, &["domain", "old_fn"]);
 
     assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
@@ -103,32 +2506,66 @@ fn test_encode_function_deletion_record_emits_delete_action() {
     assert!(matches!(ec.krate().index[&id].inner, ItemEnum::Function(_)));
 }
 
-// -----------------------------------------------------------------------
-// Error path: AmbiguousIdentifier
-// -----------------------------------------------------------------------
-
 #[test]
-fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
-    // A type named "Foo" and a trait named "Foo" in the same catalogue collide
-    // in the short-name index, triggering AmbiguousIdentifier.
-    let mut doc = make_doc("domain");
-    doc.insert_type(
-        TypeName::new("Foo").unwrap(),
-        TypeEntry::new(
+fn test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias() {
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+    let mut doc = make_doc("cli");
+    let function_path = FunctionPath::new(
+        CrateName::new("cli").unwrap(),
+        ModulePath::from_segments(vec!["commands".to_owned()]).unwrap(),
+        FunctionName::new("run").unwrap(),
+    );
+    doc.insert_function(
+        function_path,
+        FunctionEntry::new(
             ItemAction::Add,
-            DataRole::value_object(),
-            TypeKindV2::Enum { variants: vec![] },
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
             vec![],
             vec![],
-            vec![],
-            ModulePath::root(),
             None,
             vec![],
             vec![],
         ),
     );
-    doc.insert_trait(
-        TraitName::new("Foo").unwrap(),
+
+    let baseline = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [(1, vec!["sotp", "commands", "run"], ItemKind::Function)],
+    );
+    let encoded = encode_single_doc(doc, &baseline, &baseline)
+        .expect("function encoding must retain the package-facing path");
+    let id = item_id_for_path(&encoded, &["cli", "commands", "run"]);
+
+    assert_eq!(encoded.krate().paths[&id].kind, ItemKind::Function);
+    assert_eq!(encoded.action_for(&id), Some(ItemAction::Add));
+    assert!(matches!(encoded.krate().index[&id].inner, ItemEnum::Function(_)));
+}
+
+#[test]
+fn test_encode_shared_resolution_set_normalizes_all_codec_identity_routes_once() {
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+    let type_entry = |action: ItemAction| {
+        TypeEntry::new(
+            action,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        )
+    };
+    let trait_entry = || {
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -138,21 +2575,1092 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            None,
+            None,
+            vec![],
+            vec![],
+        )
+    };
+    let mut doc = make_doc("cli");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Added".to_owned()).unwrap(),
+        type_entry(ItemAction::Add),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Modified".to_owned()).unwrap(),
+        type_entry(ItemAction::Modify),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Referenced".to_owned()).unwrap(),
+        type_entry(ItemAction::Reference),
+    );
+    doc.insert_trait(CatalogueEntryKey::try_new("Port".to_owned()).unwrap(), trait_entry());
+    doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("Removed".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+    doc.insert_function(
+        FunctionPath::new(
+            CrateName::new("cli").unwrap(),
+            ModulePath::from_segments(vec!["commands".to_owned()]).unwrap(),
+            FunctionName::new("run").unwrap(),
+        ),
+        FunctionEntry::new(
+            ItemAction::Modify,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
             None,
             vec![],
             vec![],
         ),
     );
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
-    assert!(result.is_err(), "expected error due to name collision between type Foo and trait Foo");
-    // The domain error should be AmbiguousTypeName (converted from AmbiguousIdentifier).
-    let err = result.unwrap_err();
-    assert!(
-        matches!(err, domain::tddd::NewTypeGraphCodecError::AmbiguousTypeName(_)),
-        "expected AmbiguousTypeName error, got: {err:?}"
+    let baseline = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [
+            (1, vec!["sotp", "commands", "Modified"], ItemKind::Struct),
+            (2, vec!["sotp", "commands", "Referenced"], ItemKind::Struct),
+            (3, vec!["sotp", "commands", "Removed"], ItemKind::Struct),
+            (4, vec!["sotp", "commands", "run"], ItemKind::Function),
+        ],
     );
+    let current = rustdoc_crate_with_root_and_paths(
+        "sotp",
+        [
+            (1, vec!["sotp", "commands", "Modified"], ItemKind::Struct),
+            (2, vec!["sotp", "commands", "Referenced"], ItemKind::Struct),
+            (4, vec!["sotp", "commands", "run"], ItemKind::Function),
+            (5, vec!["sotp", "generated", "Added"], ItemKind::Struct),
+            (6, vec!["sotp", "ports", "Port"], ItemKind::Trait),
+        ],
+    );
+    let paths = resolution_paths_single_doc(&doc, &baseline, &current)
+        .expect("one normalized resolution set must cover every codec route");
+    for (expected, kind) in [
+        (vec!["cli", "generated", "Added"], ItemKind::Struct),
+        (vec!["cli", "ports", "Port"], ItemKind::Trait),
+        (vec!["cli", "commands", "Modified"], ItemKind::Struct),
+        (vec!["cli", "commands", "Referenced"], ItemKind::Struct),
+        (vec!["cli", "commands", "Removed"], ItemKind::Struct),
+        (vec!["cli", "commands", "run"], ItemKind::Function),
+    ] {
+        assert!(
+            paths.values().any(|summary| summary.path == expected && summary.kind == kind),
+            "shared resolution set must contain canonical path {expected:?}"
+        );
+    }
+
+    let encoded = encode_single_doc(doc, &baseline, &current)
+        .expect("all codec identity routes must consume the normalized set");
+    for (path, action) in [
+        (&["cli", "generated", "Added"][..], ItemAction::Add),
+        (&["cli", "ports", "Port"][..], ItemAction::Add),
+        (&["cli", "commands", "Modified"][..], ItemAction::Modify),
+        (&["cli", "commands", "Referenced"][..], ItemAction::Reference),
+        (&["cli", "commands", "Removed"][..], ItemAction::Delete),
+        (&["cli", "commands", "run"][..], ItemAction::Modify),
+    ] {
+        let id = item_id_for_path(&encoded, path);
+        assert_eq!(encoded.action_for(&id), Some(action));
+    }
+}
+
+// -----------------------------------------------------------------------
+// Namespace-specific declaration identities
+// -----------------------------------------------------------------------
+
+#[test]
+fn test_encode_same_path_type_and_trait_declarations_are_not_ambiguous() {
+    // A type and a trait may share the same crate/module/name identity because
+    // Rust keeps them in separate namespaces. The codec must retain both.
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded =
+        encode_doc(doc).expect("type and trait namespace identities must remain distinct");
+    let type_id = encoded
+        .krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "Foo"] && summary.kind == ItemKind::Enum)
+        .map(|(id, _)| *id)
+        .expect("type declaration must be emitted");
+    let trait_id = encoded
+        .krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "Foo"] && summary.kind == ItemKind::Trait)
+        .map(|(id, _)| *id)
+        .expect("trait declaration must be emitted");
+    assert_ne!(type_id, trait_id);
+}
+
+#[test]
+fn test_encode_same_name_type_and_trait_preserves_distinct_evaluator_identities() {
+    // One catalogue may contain a type and a trait with the same short name when their
+    // declaration modules differ. The encoder must retain both full paths, and the evaluator's
+    // identity map must keep them as separate targets rather than collapsing by short name.
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("alpha::SharedName".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("beta::SharedName".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["beta".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded = encode_doc(doc).unwrap();
+    let type_id = item_id_for_path(&encoded, &["domain", "alpha", "SharedName"]);
+    let trait_id = item_id_for_path(&encoded, &["domain", "beta", "SharedName"]);
+    assert_ne!(type_id, trait_id);
+
+    let identities =
+        crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(encoded.krate()).unwrap();
+    assert_eq!(identities.get_by_path("domain::alpha::SharedName"), Some(&type_id));
+    assert_eq!(identities.get_by_path("domain::beta::SharedName"), Some(&trait_id));
+    assert_eq!(identities.len(), 2, "the evaluator must retain both full-path identities");
+}
+
+#[test]
+fn test_encode_same_path_type_and_trait_use_separate_namespaces() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Shared".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Shared".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let empty = rustdoc_crate_with_paths([]);
+    let encoded = encode_single_doc(doc, &empty, &empty)
+        .expect("same-path type and trait declarations use separate namespaces");
+    let type_id = encoded
+        .krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == ["domain", "Shared"] && summary.kind == ItemKind::Enum)
+        .map(|(id, _)| *id)
+        .expect("type namespace identity must be emitted");
+    let trait_id = encoded
+        .krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| {
+            summary.path == ["domain", "Shared"] && summary.kind == ItemKind::Trait
+        })
+        .map(|(id, _)| *id)
+        .expect("trait namespace identity must be emitted");
+
+    assert_ne!(type_id, trait_id);
+    assert_eq!(encoded.action_for(&type_id), Some(ItemAction::Add));
+    assert_eq!(encoded.action_for(&trait_id), Some(ItemAction::Add));
+    assert!(matches!(encoded.krate().index[&type_id].inner, ItemEnum::Enum(_)));
+    assert!(matches!(encoded.krate().index[&trait_id].inner, ItemEnum::Trait(_)));
+}
+
+#[test]
+fn test_encode_external_trait_reference_registers_trait_kind_summary() {
+    // D3: a synthesized external path carries the namespace of the reference.
+    // A trait in trait position must not be registered as a `Struct` summary,
+    // otherwise the resolution set holds the same path as both a type and a
+    // trait identity and impl-trait resolution becomes ambiguous.
+    let mut doc = make_doc("usecase");
+    insert_empty_enum_type(&mut doc, "Adapter");
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Clone").unwrap(),
+        TypeRef::new("Adapter").unwrap(),
+    ));
+
+    let ec = encode_doc(doc).unwrap();
+    let krate = ec.krate();
+    let trait_ids: Vec<Id> = krate
+        .index
+        .values()
+        .filter_map(|item| match &item.inner {
+            ItemEnum::Impl(impl_) => impl_.trait_.as_ref().map(|path| path.id),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(trait_ids.len(), 1, "exactly one trait impl expected");
+    let summary = krate.paths.get(&trait_ids[0]).expect("external trait summary registered");
+    assert_eq!(summary.path.last().map(String::as_str), Some("Clone"));
+    assert_eq!(summary.kind, ItemKind::Trait, "trait-position reference must be a Trait summary");
+}
+
+#[test]
+fn test_encode_external_path_reused_across_namespaces_fails_closed() {
+    let mut state = super::encoder::Encoder::new(
+        make_doc("domain"),
+        std::collections::HashMap::new(),
+        std::collections::BTreeSet::new(),
+    )
+    .state;
+    let type_id = state.ensure_external_type_id(
+        "ext::Shared",
+        "ext",
+        domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Type,
+    );
+    let trait_id = state.ensure_external_type_id(
+        "ext::Shared",
+        "ext",
+        domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace::Trait,
+    );
+
+    assert_eq!(trait_id, Id(UNRESOLVED_CRATE_ID));
+    assert_eq!(state.paths.get(&type_id).map(|summary| summary.kind), Some(ItemKind::Struct));
+    let Some(NewTypeGraphCodecError::InvalidTypeRef(type_ref, diagnostic)) =
+        state.resolution_error.as_ref()
+    else {
+        panic!("cross-namespace external path reuse must record an invalid-reference error");
+    };
+    assert_eq!(type_ref.as_str(), "ext::Shared");
+    assert!(diagnostic.as_str().contains("already registered"));
+}
+
+#[test]
+fn test_type_reference_to_trait_namespace_rejects_cross_namespace_fallback() {
+    let mut doc = make_doc("domain");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("OnlyTrait".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value".to_owned()).unwrap(),
+                        TypeRef::new("OnlyTrait".to_owned()).unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let empty = rustdoc_crate_with_paths([]);
+    let result = encode_single_doc(doc, &empty, &empty);
+
+    assert!(result.is_err(), "a type-position reference must not bind to a trait");
+}
+
+#[test]
+fn test_trait_bound_to_type_namespace_rejects_cross_namespace_fallback() {
+    let mut doc = make_doc("domain");
+    insert_empty_enum_type(&mut doc, "OnlyType");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("BoundedTrait".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![TypeRef::new("OnlyType".to_owned()).unwrap()],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let empty = rustdoc_crate_with_paths([]);
+    let result = encode_single_doc(doc, &empty, &empty);
+
+    assert!(result.is_err(), "a trait bound must not bind to a type");
+}
+
+#[test]
+fn test_encode_resolution_set_distinguishes_omitted_and_explicit_root_placement() {
+    let mut doc = make_doc("domain");
+    for (key, module_path) in [("Omitted", None), ("Explicit", Some(ModulePath::root()))] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                module_path,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    let empty = rustdoc_crate_with_paths([]);
+    let paths = resolution_paths_single_doc(&doc, &empty, &empty)
+        .expect("placement states must be retained in the shared resolution set");
+    let omitted = paths
+        .values()
+        .find(|summary| summary.path == ["domain", "Omitted"])
+        .expect("omitted declaration must have a synthetic summary");
+    let explicit = paths
+        .values()
+        .find(|summary| summary.path == ["domain", "Explicit"])
+        .expect("explicit root declaration must have a synthetic summary");
+
+    assert!(matches!(summary_identity(omitted), Some(FullyQualifiedItemPath::UnplacedType { .. })));
+    assert!(matches!(summary_identity(explicit), Some(FullyQualifiedItemPath::PlacedType { .. })));
+    assert_eq!(explicit.crate_id, 0);
+    assert_eq!(omitted.crate_id, crate::tddd::canonical_type_identity::SYNTHETIC_UNPLACED_CRATE_ID);
+}
+
+#[test]
+fn test_encode_unique_short_names_resolve_incrate_type_and_trait_refs_to_qualified_paths() {
+    // Declarations stay in their normal short-name form. A unique in-crate TypeRef and a
+    // unique short trait_ref must resolve to the corresponding module-qualified catalogue
+    // entries, with the rustdoc paths map remaining the identity authority.
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("UniqueType".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("UniqueTrait".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["beta".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Implementor".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("UniqueType").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("UniqueTrait").unwrap(),
+        TypeRef::new("Implementor").unwrap(),
+    ));
+
+    let encoded = encode_doc(doc).unwrap();
+    let unique_type_id = item_id_for_path(&encoded, &["domain", "alpha", "UniqueType"]);
+    let unique_trait_id = item_id_for_path(&encoded, &["domain", "beta", "UniqueTrait"]);
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected named Holder fields");
+    };
+    let ItemEnum::StructField(Type::ResolvedPath(field_path)) =
+        &encoded.krate().index[&fields[0]].inner
+    else {
+        panic!("expected Holder.value to be a resolved local TypeRef");
+    };
+    assert_eq!(field_path.id, unique_type_id);
+    assert_eq!(encoded.krate().paths[&field_path.id].path, ["domain", "alpha", "UniqueType"]);
+
+    let trait_impl = encoded.krate().index.values().find_map(|item| {
+        let ItemEnum::Impl(impl_item) = &item.inner else {
+            return None;
+        };
+        impl_item
+            .trait_
+            .as_ref()
+            .filter(|trait_path| trait_path.id == unique_trait_id)
+            .map(|trait_path| (trait_path, &impl_item.for_))
+    });
+    let Some((trait_path, Type::ResolvedPath(for_path))) = trait_impl else {
+        panic!("expected impl UniqueTrait for Implementor");
+    };
+    assert_eq!(trait_path.id, unique_trait_id);
+    assert_eq!(encoded.krate().paths[&trait_path.id].path, ["domain", "beta", "UniqueTrait"]);
+    assert_eq!(for_path.path, "Implementor");
+}
+
+#[test]
+fn test_encode_same_short_name_in_different_modules_resolves_qualified_paths() {
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::Input", "a"), ("b::Input", "b")] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![
+                        FieldDecl::new(
+                            FieldName::new("left").unwrap(),
+                            TypeRef::new("domain::a::Input").unwrap(),
+                        ),
+                        FieldDecl::new(
+                            FieldName::new("right").unwrap(),
+                            TypeRef::new("domain::b::Input").unwrap(),
+                        ),
+                    ],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded = encode_doc(doc).unwrap();
+    assert!(!encoded.krate().external_crates.values().any(|external| external.name == "domain"));
+    let left_id = item_id_for_path(&encoded, &["domain", "a", "Input"]);
+    let right_id = item_id_for_path(&encoded, &["domain", "b", "Input"]);
+    assert_ne!(left_id, right_id);
+
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected named Holder fields");
+    };
+    let field_types =
+        fields.iter().map(|field_id| &encoded.krate().index[field_id].inner).collect::<Vec<_>>();
+    assert!(
+        matches!(field_types[0], ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == left_id)
+    );
+    assert!(
+        matches!(field_types[1], ItemEnum::StructField(Type::ResolvedPath(path)) if path.id == right_id)
+    );
+}
+
+#[test]
+fn test_encode_duplicate_module_type_and_trait_impl_references_preserve_each_qualified_identity() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+    use domain::tddd::catalogue_v2::traits::TraitRefScope;
+
+    let mut doc = make_doc("domain");
+    let unit_type = |module: &str| {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        )
+    };
+    let port_trait = |module: &str| {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        )
+    };
+
+    doc.insert_type(
+        CatalogueEntryKey::try_new("alpha::Input".to_owned()).unwrap(),
+        unit_type("alpha"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("beta::Input".to_owned()).unwrap(),
+        unit_type("beta"),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("alpha::Port".to_owned()).unwrap(),
+        port_trait("alpha"),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("beta::Port".to_owned()).unwrap(),
+        port_trait("beta"),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![
+                        FieldDecl::new(
+                            FieldName::new("alpha_input").unwrap(),
+                            TypeRef::new("domain::alpha::Input").unwrap(),
+                        ),
+                        FieldDecl::new(
+                            FieldName::new("beta_input").unwrap(),
+                            TypeRef::new("domain::beta::Input").unwrap(),
+                        ),
+                    ],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::alpha::Port<domain::alpha::Input>").unwrap(),
+        TypeRef::new("domain::alpha::Input").unwrap(),
+    ));
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::beta::Port<domain::beta::Input>").unwrap(),
+        TypeRef::new("domain::beta::Input").unwrap(),
+    ));
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("alpha::Input".to_owned()).unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+        vec![],
+    ));
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("beta::Input".to_owned()).unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+        vec![],
+    ));
+
+    let encoded = encode_doc(doc).expect("duplicate-module references must encode");
+    let alpha_id = item_id_for_path(&encoded, &["domain", "alpha", "Input"]);
+    let beta_id = item_id_for_path(&encoded, &["domain", "beta", "Input"]);
+    let alpha_port_id = item_id_for_path(&encoded, &["domain", "alpha", "Port"]);
+    let beta_port_id = item_id_for_path(&encoded, &["domain", "beta", "Port"]);
+    assert_ne!(alpha_id, beta_id);
+    assert_ne!(alpha_port_id, beta_port_id);
+    assert_eq!(encoded.krate().paths[&alpha_id].path, ["domain", "alpha", "Input"]);
+    assert_eq!(encoded.krate().paths[&beta_id].path, ["domain", "beta", "Input"]);
+    assert_eq!(encoded.krate().paths[&alpha_port_id].path, ["domain", "alpha", "Port"]);
+    assert_eq!(encoded.krate().paths[&beta_port_id].path, ["domain", "beta", "Port"]);
+    assert_ne!(alpha_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(beta_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(alpha_port_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(beta_port_id, Id(UNRESOLVED_CRATE_ID));
+
+    let identities =
+        crate::tddd::signal_evaluator_v2::build_type_trait_identity_map(encoded.krate())
+            .expect("type and trait identities must be indexed by fully qualified path");
+    assert_eq!(identities.get_by_path("domain::alpha::Port"), Some(&alpha_port_id));
+    assert_eq!(identities.get_by_path("domain::beta::Port"), Some(&beta_port_id));
+
+    let alpha_scope = TraitImplDeclV2::new(
+        TypeRef::new("domain::alpha::Port").unwrap(),
+        TypeRef::new("domain::alpha::Input").unwrap(),
+    )
+    .trait_ref_scope();
+    let beta_scope = TraitImplDeclV2::new(
+        TypeRef::new("domain::beta::Port").unwrap(),
+        TypeRef::new("domain::beta::Input").unwrap(),
+    )
+    .trait_ref_scope();
+    let TraitRefScope::Workspace(alpha_scope_key) = alpha_scope else {
+        panic!("expected alpha trait reference to retain workspace scope");
+    };
+    let TraitRefScope::Workspace(beta_scope_key) = beta_scope else {
+        panic!("expected beta trait reference to retain workspace scope");
+    };
+    assert_ne!(alpha_scope_key, beta_scope_key);
+    assert_eq!(
+        identities.get_by_path(alpha_scope_key.as_str()),
+        Some(&alpha_port_id),
+        "alpha trait scope must resolve to its fully qualified rustdoc identity"
+    );
+    assert_eq!(
+        identities.get_by_path(beta_scope_key.as_str()),
+        Some(&beta_port_id),
+        "beta trait scope must resolve to its fully qualified rustdoc identity"
+    );
+
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected Holder fields");
+    };
+    let field_type_ids = fields
+        .iter()
+        .map(|field_id| match &encoded.krate().index[field_id].inner {
+            ItemEnum::StructField(Type::ResolvedPath(path)) => path.id,
+            other => panic!("expected resolved in-crate TypeRef, got {other:?}"),
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(field_type_ids, vec![alpha_id, beta_id]);
+    assert!(field_type_ids.iter().all(|id| *id != Id(UNRESOLVED_CRATE_ID)));
+
+    let trait_impl_records = encoded
+        .krate()
+        .index
+        .values()
+        .filter_map(|item| {
+            let ItemEnum::Impl(impl_item) = &item.inner else {
+                return None;
+            };
+            let trait_path = impl_item.trait_.as_ref()?;
+            let GenericArgs::AngleBracketed { args, .. } = trait_path.args.as_deref()? else {
+                return None;
+            };
+            let argument_id = args.iter().find_map(|arg| match arg {
+                GenericArg::Type(Type::ResolvedPath(path)) => Some(path.id),
+                _ => None,
+            })?;
+            let Type::ResolvedPath(for_path) = &impl_item.for_ else {
+                return None;
+            };
+            Some((trait_path.path.clone(), trait_path.id, argument_id, for_path.id))
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(trait_impl_records.len(), 2, "both trait_impls must remain distinct");
+    assert!(trait_impl_records.contains(&(
+        "domain::alpha::Port".to_owned(),
+        alpha_port_id,
+        alpha_id,
+        alpha_id,
+    )));
+    assert!(trait_impl_records.contains(&(
+        "domain::beta::Port".to_owned(),
+        beta_port_id,
+        beta_id,
+        beta_id,
+    )));
+    for (trait_ref_path, trait_id, argument_id, for_id) in &trait_impl_records {
+        assert_ne!(*trait_id, Id(UNRESOLVED_CRATE_ID));
+        assert_ne!(*argument_id, Id(UNRESOLVED_CRATE_ID));
+        assert_ne!(*for_id, Id(UNRESOLVED_CRATE_ID));
+        assert_eq!(
+            encoded.krate().paths[trait_id].path,
+            trait_ref_path.split("::").map(str::to_owned).collect::<Vec<_>>(),
+            "emitted trait_ref ID must resolve to its fully qualified rustdoc path"
+        );
+    }
+
+    let inherent_impl_for_ids = encoded
+        .krate()
+        .index
+        .values()
+        .filter_map(|item| {
+            let ItemEnum::Impl(impl_item) = &item.inner else {
+                return None;
+            };
+            if impl_item.trait_.is_some() || impl_item.generics.params.is_empty() {
+                return None;
+            }
+            let Type::ResolvedPath(for_path) = &impl_item.for_ else {
+                return None;
+            };
+            Some(for_path.id)
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(inherent_impl_for_ids.len(), 2);
+    assert!(inherent_impl_for_ids.contains(&alpha_id));
+    assert!(inherent_impl_for_ids.contains(&beta_id));
+    assert!(inherent_impl_for_ids.iter().all(|id| *id != Id(UNRESOLVED_CRATE_ID)));
+}
+
+#[test]
+fn test_encode_loose_type_and_trait_deletion_names_with_module_paths_preserve_distinct_qualified_identities()
+ {
+    use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+
+    let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "alpha::GoneType": { "action": "delete", "module_path": "alpha" },
+    "beta::GoneType": { "action": "delete", "module_path": "beta" }
+  },
+  "traits": {
+    "alpha::GoneTrait": { "action": "delete", "module_path": "alpha" },
+    "beta::GoneTrait": { "action": "delete", "module_path": "beta" }
+  },
+  "functions": {}
+}"#;
+    let doc = CatalogueDocumentCodec::decode(json, "domain").expect("loose tombstones decode");
+
+    let mut type_deletion_keys = doc
+        .deletions()
+        .iter()
+        .filter_map(|record| match record {
+            DeletionRecord::Type { name, .. } => Some(name.as_str().to_owned()),
+            DeletionRecord::Trait { .. } | DeletionRecord::Function { .. } => None,
+        })
+        .collect::<Vec<_>>();
+    type_deletion_keys.sort();
+    assert_eq!(type_deletion_keys, vec!["alpha::GoneType", "beta::GoneType"]);
+    let mut trait_deletion_keys = doc
+        .deletions()
+        .iter()
+        .filter_map(|record| match record {
+            DeletionRecord::Trait { name, .. } => Some(name.as_str().to_owned()),
+            DeletionRecord::Type { .. } | DeletionRecord::Function { .. } => None,
+        })
+        .collect::<Vec<_>>();
+    trait_deletion_keys.sort();
+    assert_eq!(trait_deletion_keys, vec!["alpha::GoneTrait", "beta::GoneTrait"]);
+
+    let encoded = encode_doc(doc).expect("loose tombstones resolve against rustdoc paths");
+    let alpha_id = item_id_for_path(&encoded, &["domain", "alpha", "GoneType"]);
+    let beta_id = item_id_for_path(&encoded, &["domain", "beta", "GoneType"]);
+    let alpha_trait_id = item_id_for_path(&encoded, &["domain", "alpha", "GoneTrait"]);
+    let beta_trait_id = item_id_for_path(&encoded, &["domain", "beta", "GoneTrait"]);
+    assert_ne!(alpha_id, beta_id);
+    assert_ne!(alpha_trait_id, beta_trait_id);
+    assert_eq!(encoded.action_for(&alpha_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&beta_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&alpha_trait_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.action_for(&beta_trait_id), Some(ItemAction::Delete));
+    assert_eq!(encoded.krate().paths[&alpha_id].path, ["domain", "alpha", "GoneType"]);
+    assert_eq!(encoded.krate().paths[&beta_id].path, ["domain", "beta", "GoneType"]);
+    assert_eq!(encoded.krate().paths[&alpha_trait_id].path, ["domain", "alpha", "GoneTrait"]);
+    assert_eq!(encoded.krate().paths[&beta_trait_id].path, ["domain", "beta", "GoneTrait"]);
+    assert_ne!(alpha_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(beta_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(alpha_trait_id, Id(UNRESOLVED_CRATE_ID));
+    assert_ne!(beta_trait_id, Id(UNRESOLVED_CRATE_ID));
+}
+
+#[test]
+fn test_encode_delete_tombstone_alias_of_live_entry_returns_collision_error() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("a::Thing".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["a".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, NewTypeGraphCodecError::InvalidTypeRef(..)));
+    let message = error.to_string();
+    assert!(
+        message.contains("domain::a::Thing") && message.contains("a::Thing"),
+        "collision diagnostic must include both catalogue spellings: {message}"
+    );
+    assert!(
+        message.contains("refusing to overwrite"),
+        "collision must fail before the live declaration can be replaced: {message}"
+    );
+}
+
+#[test]
+fn test_encode_rejects_qualified_type_key_with_conflicting_module_path() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["b".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let message = error.to_string();
+    assert!(message.contains("domain::a::Thing"), "diagnostic must name the key: {message}");
+    assert!(message.contains("module_path 'a'"), "diagnostic must name the key path: {message}");
+    assert!(message.contains("module_path is 'b'"), "diagnostic must name the DTO path: {message}");
+}
+
+#[test]
+fn test_encode_rejects_qualified_trait_key_with_conflicting_module_path() {
+    let mut doc = make_doc("domain");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("domain::a::Thing".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["b".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let message = error.to_string();
+    assert!(message.contains("domain::a::Thing"), "diagnostic must name the key: {message}");
+    assert!(message.contains("module_path 'a'"), "diagnostic must name the key path: {message}");
+    assert!(message.contains("module_path is 'b'"), "diagnostic must name the DTO path: {message}");
+}
+
+#[test]
+fn test_encode_ambiguous_short_name_returns_all_fully_qualified_candidates() {
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::Input", "a"), ("b::Input", "b")] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("Input").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {
+        panic!("expected AmbiguousIdentifier, got {error:?}");
+    };
+    assert_eq!(identifier.as_str(), "Input");
+    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+    assert_eq!(candidate_paths, vec!["domain::a::Input", "domain::b::Input"]);
 }
 
 // -----------------------------------------------------------------------
@@ -164,7 +3672,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
     // A struct field with a TypeRef that syn cannot parse triggers InvalidTypeRef.
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("BadType").unwrap(),
+        CatalogueEntryKey::try_new("BadType".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -195,18 +3703,18 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
             )],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(result.is_err(), "expected InvalidTypeRef error for unparseable return type");
     let err = result.unwrap_err();
     assert!(
-        matches!(err, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)),
+        matches!(err, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)),
         "expected InvalidTypeRef error, got: {err:?}"
     );
 }
@@ -219,7 +3727,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
 fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("User").unwrap(),
+        CatalogueEntryKey::try_new("User".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -239,14 +3747,14 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let struct_field_count = ec
         .krate()
         .index
@@ -264,7 +3772,7 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
 fn test_encode_enum_variants_are_promoted_to_variant_items() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("ItemAction").unwrap(),
+        CatalogueEntryKey::try_new("ItemAction".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -280,14 +3788,14 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let variant_count =
         ec.krate().index.values().filter(|item| matches!(item.inner, ItemEnum::Variant(_))).count();
     assert_eq!(variant_count, 2);
@@ -301,7 +3809,7 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
 fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Email").unwrap(),
+        CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -339,14 +3847,14 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
             ],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     // Exactly 1 inherent Impl block.
@@ -371,7 +3879,7 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
 fn test_encode_paths_includes_module_path_segments() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Draft").unwrap(),
+        CatalogueEntryKey::try_new("Draft".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -382,14 +3890,14 @@ fn test_encode_paths_includes_module_path_segments() {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
+            Some(ModulePath::from_segments(vec!["review".to_string()]).unwrap()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let summary = ec
         .krate()
         .paths
@@ -403,7 +3911,7 @@ fn test_encode_paths_includes_module_path_segments() {
 fn test_encode_paths_crate_root_type_has_two_segment_path() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("UserId").unwrap(),
+        CatalogueEntryKey::try_new("UserId".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -414,14 +3922,14 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let summary = ec
         .krate()
         .paths
@@ -439,7 +3947,7 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
 fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Cart").unwrap(),
+        CatalogueEntryKey::try_new("Cart".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -456,14 +3964,14 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let field_with_args = ec.krate().index.values().find(|item| {
         matches!(&item.inner, ItemEnum::StructField(Type::ResolvedPath(p)) if p.path.contains("Vec") && p.args.is_some())
     });
@@ -478,7 +3986,7 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
 fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -495,27 +4003,273 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let has_std = ec.krate().external_crates.values().any(|e| e.name == "std");
     assert!(has_std, "expected 'std' in external_crates");
 }
 
+#[test]
+fn test_encode_bare_prelude_name_with_ambiguous_local_candidates_returns_candidates() {
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::String", "a"), ("b::String", "b")] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("String").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {
+        panic!("expected AmbiguousIdentifier for bare String, got {error:?}");
+    };
+    assert_eq!(identifier.as_str(), "String");
+    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+    assert_eq!(candidate_paths, vec!["domain::a::String", "domain::b::String"]);
+}
+
+#[test]
+fn test_encode_generic_bound_with_ambiguous_local_prelude_trait_returns_candidates() {
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::Clone", "a"), ("b::Clone", "b")] {
+        doc.insert_trait(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    let crate_name = CrateName::new("domain").unwrap();
+    let function_path = FunctionPath::at_root(crate_name, FunctionName::new("bounded").unwrap());
+    doc.insert_function(
+        function_path,
+        domain::tddd::catalogue_v2::entries::FunctionEntry::new(
+            ItemAction::Add,
+            domain::tddd::catalogue_v2::roles::FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Clone").unwrap()],
+            }],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {
+        panic!("expected AmbiguousIdentifier for bound Clone, got {error:?}");
+    };
+    assert_eq!(identifier.as_str(), "Clone");
+    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+    assert_eq!(candidate_paths, vec!["domain::a::Clone", "domain::b::Clone"]);
+}
+
+#[test]
+fn test_encode_type_alias_generic_bound_with_ambiguous_local_prelude_trait_returns_candidates() {
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::Clone", "a"), ("b::Clone", "b")] {
+        doc.insert_trait(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SpecificationPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Clone").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {
+        panic!("expected AmbiguousIdentifier for alias bound Clone, got {error:?}");
+    };
+    assert_eq!(identifier.as_str(), "Clone");
+    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+    assert_eq!(candidate_paths, vec!["domain::a::Clone", "domain::b::Clone"]);
+}
+
+#[test]
+fn test_encode_inherent_impl_unique_short_name_resolves_to_qualified_entry() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+
+    let mut doc = make_doc("domain");
+    let type_key = CatalogueEntryKey::try_new("a::Thing".to_owned()).unwrap();
+    doc.insert_type(
+        type_key.clone(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["a".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Thing".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![],
+    ));
+
+    let encoded = encode_doc(doc).unwrap();
+    let type_id = item_id_for_path(&encoded, &["domain", "a", "Thing"]);
+    assert!(
+        encoded.krate().index.values().any(|item| {
+            matches!(
+                &item.inner,
+                ItemEnum::Impl(impl_item)
+                    if impl_item.trait_.is_none()
+                        && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == type_id)
+            )
+        }),
+        "the short inherent-impl name must resolve to the only qualified Thing declaration"
+    );
+}
+
+#[test]
+fn test_encode_inherent_impl_ambiguous_short_name_returns_candidates() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+
+    let mut doc = make_doc("domain");
+    for (key, module) in [("a::Thing", "a"), ("b::Thing", "b")] {
+        doc.insert_type(
+            CatalogueEntryKey::try_new(key.to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                Some(ModulePath::from_segments(vec![module.to_owned()]).unwrap()),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Thing".to_owned()).unwrap(),
+        vec![],
+        vec![],
+        vec![],
+    ));
+
+    let error = encode_doc(doc).unwrap_err();
+    let NewTypeGraphCodecError::AmbiguousIdentifier(identifier, candidates) = error else {
+        panic!("expected AmbiguousIdentifier for inherent Thing, got {error:?}");
+    };
+    assert_eq!(identifier.as_str(), "Thing");
+    let candidate_paths = candidates.as_slice().iter().map(ToString::to_string).collect::<Vec<_>>();
+    assert_eq!(candidate_paths, vec!["domain::a::Thing", "domain::b::Thing"]);
+}
+
 // -----------------------------------------------------------------------
-// AC-06: unresolved marker for undeclared types
+// AC-04: undeclared local types fail closed
 // -----------------------------------------------------------------------
 
 #[test]
-fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
+fn test_encode_undeclared_type_ref_field_returns_unresolved_identifier() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -532,18 +4286,137 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
-    let unresolved = ec.krate().index.values().find(|item| {
-        matches!(&item.inner, ItemEnum::StructField(Type::ResolvedPath(p)) if p.id == Id(UNRESOLVED_CRATE_ID))
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(
+        error,
+        domain::tddd::NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "DomainError"
+    ));
+}
+
+#[test]
+fn test_encode_modify_present_only_in_current_fails_closed() {
+    // D3: a non-add declaration resolves against the baseline only. An identity
+    // that exists solely in the current rustdoc must be rejected, not accepted
+    // through the merged resolution set.
+    for module_path in [None, Some(ModulePath::root())] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            CatalogueEntryKey::try_new("OnlyCurrent".to_owned()).unwrap(),
+            TypeEntry::new(
+                ItemAction::Modify,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![] },
+                vec![],
+                vec![],
+                vec![],
+                module_path,
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let baseline = rustdoc_crate_with_paths([]);
+        let current =
+            rustdoc_crate_with_paths([(1, vec!["domain", "OnlyCurrent"], ItemKind::Enum)]);
+        let error = encode_single_doc(doc, &baseline, &current)
+            .expect_err("a modify declaration absent from the baseline must fail closed");
+        let message = error.to_string();
+        assert!(
+            message.contains("OnlyCurrent"),
+            "error must name the rejected declaration: {message}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_delete_present_only_in_current_fails_closed() {
+    // D3: a deletion names something that existed in the baseline; a key that
+    // only the current rustdoc knows must be rejected.
+    let mut doc = make_doc("domain");
+    doc.push_deletion(DeletionRecord::Type {
+        name: CatalogueEntryKey::try_new("Removed".to_owned()).unwrap(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
     });
-    assert!(unresolved.is_some(), "expected unresolved marker field item");
+    let baseline = rustdoc_crate_with_paths([]);
+    let current =
+        rustdoc_crate_with_paths([(1, vec!["domain", "gone", "Removed"], ItemKind::Struct)]);
+    let error = encode_single_doc(doc, &baseline, &current)
+        .expect_err("a deletion absent from the baseline must fail closed");
+    assert!(error.to_string().contains("Removed"));
+}
+
+#[test]
+fn test_encode_non_add_external_only_name_fails_closed() {
+    // D3: an omitted non-add declaration must resolve to a local catalogue
+    // crate baseline item, not to an external rustdoc item with the same name.
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("String".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let mut baseline =
+        rustdoc_crate_with_paths([(1, vec!["std", "string", "String"], ItemKind::Struct)]);
+    baseline.paths.get_mut(&Id(1)).expect("fixture path exists").crate_id = 7;
+
+    let error = encode_single_doc(doc, &baseline, &baseline)
+        .expect_err("an external-only baseline name must not satisfy a local declaration");
+    assert!(error.to_string().contains("String"));
+}
+
+#[test]
+fn test_encode_external_type_ref_absent_from_authoritative_paths_fails_closed() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("missing").unwrap(),
+                        TypeRef::new("ghost::Missing").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(
+        error,
+        NewTypeGraphCodecError::UnresolvedIdentifier(ref type_ref)
+            if type_ref.as_str() == "ghost::Missing"
+    ));
 }
 
 // -----------------------------------------------------------------------
@@ -554,7 +4427,7 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
 fn test_encode_item_actions_contains_declared_action() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Email").unwrap(),
+        CatalogueEntryKey::try_new("Email".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Modify,
             DataRole::value_object(),
@@ -565,14 +4438,14 @@ fn test_encode_item_actions_contains_declared_action() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let has_modify = ec.item_actions().values().any(|a| *a == ItemAction::Modify);
     assert!(has_modify);
 }
@@ -585,7 +4458,7 @@ fn test_encode_item_actions_contains_declared_action() {
 fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -596,7 +4469,7 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -608,9 +4481,46 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
         TypeRef::new("Foo").unwrap(),
     ));
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let has_serde = ec.krate().external_crates.values().any(|e| e.name == "serde");
     assert!(has_serde, "expected 'serde' in external_crates");
+}
+
+#[test]
+fn test_encode_trait_impl_nested_type_paths_register_only_syntax_crate_names() {
+    let mut doc = make_doc("domain");
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("serde::Serialize").unwrap(),
+        TypeRef::new("&ext::Foo").unwrap(),
+    ));
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("serde::Serialize").unwrap(),
+        TypeRef::new("(ext::Foo, other::Bar)").unwrap(),
+    ));
+
+    let mut baseline = authoritative_crate_for_doc(&doc);
+    baseline.paths.insert(
+        Id(10_000),
+        ItemSummary {
+            crate_id: 7,
+            path: vec!["other".to_owned(), "Bar".to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let encoded = encode_single_doc(doc, &baseline, &baseline)
+        .expect("nested trait-impl type paths must encode");
+    let external_names = encoded
+        .krate()
+        .external_crates
+        .values()
+        .map(|external| external.name.as_str())
+        .collect::<Vec<_>>();
+    assert!(external_names.contains(&"ext"), "expected ext crate: {external_names:?}");
+    assert!(external_names.contains(&"other"), "expected other crate: {external_names:?}");
+    assert!(
+        !external_names.iter().any(|name| name.starts_with('&') || name.starts_with('(')),
+        "syntax punctuation must not become crate names: {external_names:?}"
+    );
 }
 
 // -----------------------------------------------------------------------
@@ -621,7 +4531,7 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
 fn test_encode_trait_entry_produces_trait_item() {
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("UserRepository").unwrap(),
+        CatalogueEntryKey::try_new("UserRepository".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
@@ -631,14 +4541,14 @@ fn test_encode_trait_entry_produces_trait_item() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let trait_item = ec.krate().index.values().find(|item| {
         matches!(&item.inner, ItemEnum::Trait(_)) && item.name.as_deref() == Some("UserRepository")
     });
@@ -653,25 +4563,25 @@ fn test_encode_trait_entry_produces_trait_item() {
 fn test_encode_type_alias_produces_type_alias_item() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("UserResult").unwrap(),
+        CatalogueEntryKey::try_new("UserResult".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
             TypeKindV2::TypeAlias {
-                target: TypeRef::new("Result<User, DomainError>").unwrap(),
+                target: TypeRef::new("Result<String, String>").unwrap(),
                 generics: vec![],
             },
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias_item = ec.krate().index.values().find(|item| {
         matches!(&item.inner, ItemEnum::TypeAlias(_)) && item.name.as_deref() == Some("UserResult")
     });
@@ -685,7 +4595,7 @@ fn test_encode_type_alias_produces_type_alias_item() {
 #[test]
 fn test_encode_empty_catalogue_produces_root_module() {
     let doc = make_doc("domain");
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     assert!(ec.krate().index.contains_key(&Id(0)), "expected root Id(0)");
 }
 
@@ -702,8 +4612,10 @@ fn test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_
     // producing `"RenderContractMapError: core::convert::From<CatalogueLoaderError>"` on
     // both the S-side (this codec) and the C-side (rustdoc).
     let mut doc = make_doc("usecase");
+    insert_empty_enum_type(&mut doc, "CatalogueLoaderError");
+    insert_empty_enum_type(&mut doc, "ContractMapWriterError");
     doc.insert_type(
-        TypeName::new("RenderContractMapError").unwrap(),
+        CatalogueEntryKey::try_new("RenderContractMapError".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Modify,
             DataRole::ErrorType,
@@ -711,7 +4623,7 @@ fn test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -727,7 +4639,7 @@ fn test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_
         TypeRef::new("RenderContractMapError").unwrap(),
     ));
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     // Collect (base_path, structured_args) from all Impl items that have a trait.
@@ -788,7 +4700,7 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
     // emit the same form to avoid identity-key mismatches.
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("SomeError").unwrap(),
+        CatalogueEntryKey::try_new("SomeError".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::ErrorType,
@@ -796,7 +4708,7 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -808,7 +4720,7 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
         TypeRef::new("SomeError").unwrap(),
     ));
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     let trait_paths: Vec<String> = krate
@@ -837,7 +4749,7 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
 fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("ParseError").unwrap(),
+        CatalogueEntryKey::try_new("ParseError".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::ErrorType,
@@ -853,14 +4765,14 @@ fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let struct_variant = ec.krate().index.values().find(|item| {
         if let ItemEnum::Variant(v) = &item.inner {
             matches!(&v.kind, VariantKind::Struct { fields, .. } if !fields.is_empty())
@@ -899,7 +4811,7 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
         None,
     );
     doc.insert_type(
-        TypeName::new("ValueHolder").unwrap(),
+        CatalogueEntryKey::try_new("ValueHolder".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -910,14 +4822,14 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
             vec![method],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
     // Find the method Function item (set_value).
     let fn_item = krate.index.values().find(|item| {
@@ -935,6 +4847,208 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
     );
 }
 
+#[test]
+fn test_encode_method_nested_generic_type_resolves_as_generic() {
+    fn assert_option_of_generic(ty: &Type) {
+        let Type::ResolvedPath(path) = ty else {
+            panic!("expected Option<T> to be a resolved path, got {ty:?}");
+        };
+        let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+            panic!("expected Option<T> to carry angle-bracketed arguments: {path:?}");
+        };
+        assert!(
+            args.iter()
+                .any(|arg| matches!(arg, GenericArg::Type(Type::Generic(name)) if name == "T")),
+            "expected Option<T> to contain Type::Generic(\"T\"), got {args:?}"
+        );
+    }
+
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("GenericHolder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![MethodDeclaration::new(
+                MethodName::new("round_trip").unwrap(),
+                None,
+                vec![ParamDeclaration::new(
+                    ParamName::new("value").unwrap(),
+                    TypeRef::new("Option<T>").unwrap(),
+                )],
+                TypeRef::new("Option<T>").unwrap(),
+                false,
+                false,
+                vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+                vec![],
+                vec![],
+                ItemAction::Add,
+                None,
+            )],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded = encode_doc(doc).unwrap();
+    let method = encoded
+        .krate()
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::Function(function) if item.name.as_deref() == Some("round_trip") => {
+                Some(function)
+            }
+            _ => None,
+        })
+        .expect("expected round_trip method item");
+    let (_, parameter_type) = method
+        .sig
+        .inputs
+        .iter()
+        .find(|(name, _)| name == "value")
+        .expect("expected value parameter");
+    assert_option_of_generic(parameter_type);
+    assert_option_of_generic(method.sig.output.as_ref().expect("expected return type"));
+}
+
+#[test]
+fn test_encode_function_nested_generic_type_resolves_as_generic() {
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+
+    let mut doc = make_doc("domain");
+    let function_path = FunctionPath::at_root(
+        CrateName::new("domain").unwrap(),
+        FunctionName::new("round_trip_fn").unwrap(),
+    );
+    doc.insert_function(
+        function_path,
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![ParamDeclaration::new(
+                ParamName::new("value").unwrap(),
+                TypeRef::new("Option<T>").unwrap(),
+            )],
+            TypeRef::new("Option<T>").unwrap(),
+            false,
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let encoded = encode_doc(doc).unwrap();
+    let function = encoded
+        .krate()
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::Function(function) if item.name.as_deref() == Some("round_trip_fn") => {
+                Some(function)
+            }
+            _ => None,
+        })
+        .expect("expected free function item");
+    for ty in
+        [&function.sig.inputs[0].1, function.sig.output.as_ref().expect("expected function output")]
+    {
+        let Type::ResolvedPath(path) = ty else {
+            panic!("expected Option<T> to be a resolved path, got {ty:?}");
+        };
+        let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+            panic!("expected Option<T> generic args, got {path:?}");
+        };
+        assert!(
+            args.iter()
+                .any(|arg| matches!(arg, GenericArg::Type(Type::Generic(name)) if name == "T")),
+            "expected Option<T> to contain Type::Generic(\"T\"), got {args:?}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_trait_impl_nested_generic_type_resolves_as_generic() {
+    fn assert_trait_argument_is_generic(impl_item: &rustdoc_types::Impl) {
+        let trait_path = impl_item.trait_.as_ref().expect("expected a trait impl path");
+        let Some(GenericArgs::AngleBracketed { args, .. }) = trait_path.args.as_deref() else {
+            panic!("expected Trait<T> to carry angle-bracketed arguments: {trait_path:?}");
+        };
+        assert!(
+            args.iter()
+                .any(|arg| matches!(arg, GenericArg::Type(Type::Generic(name)) if name == "T")),
+            "expected Trait<T> to contain Type::Generic(\"T\"), got {args:?}"
+        );
+    }
+
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Target".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Trait".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::from_parts(
+        ItemAction::Add,
+        TypeRef::new("Trait<T>").unwrap(),
+        TypeRef::new("Target").unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+    ));
+
+    let encoded = encode_doc(doc).unwrap();
+    let trait_impl = encoded
+        .krate()
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::Impl(impl_item) if impl_item.trait_.is_some() => Some(impl_item),
+            _ => None,
+        })
+        .expect("expected Trait<T> impl item");
+    assert_trait_argument_is_generic(trait_impl);
+}
+
 // -----------------------------------------------------------------------
 // ADR 2026-07-02-1345 D6: type-declaration-level generics on struct fields,
 // enum payloads, and alias targets encode as Type::Generic
@@ -949,7 +5063,7 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
 fn test_encode_struct_field_generic_type_emits_type_generic() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Holder").unwrap(),
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -966,14 +5080,14 @@ fn test_encode_struct_field_generic_type_emits_type_generic() {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let field = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("value") && matches!(item.inner, ItemEnum::StructField(_))
     });
@@ -993,7 +5107,7 @@ fn test_encode_struct_field_generic_type_emits_type_generic() {
 fn test_encode_enum_tuple_variant_payload_generic_emits_type_generic() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Opt").unwrap(),
+        CatalogueEntryKey::try_new("Opt".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1006,14 +5120,14 @@ fn test_encode_enum_tuple_variant_payload_generic_emits_type_generic() {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     // The enum encoding produces exactly one StructField: the variant payload.
     let field =
         ec.krate().index.values().find(|item| matches!(item.inner, ItemEnum::StructField(_)));
@@ -1033,7 +5147,7 @@ fn test_encode_enum_tuple_variant_payload_generic_emits_type_generic() {
 fn test_encode_type_alias_target_generic_emits_type_generic() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1047,14 +5161,14 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1071,7 +5185,7 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
 fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1085,14 +5199,14 @@ fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1150,8 +5264,9 @@ fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
 #[test]
 fn test_encode_type_alias_generic_bound_preserves_unknown_abi_literal_quotes() {
     let mut doc = make_doc("domain");
+    insert_empty_trait(&mut doc, "Outer");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1165,14 +5280,14 @@ fn test_encode_type_alias_generic_bound_preserves_unknown_abi_literal_quotes() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1198,8 +5313,9 @@ fn test_encode_type_alias_generic_bound_preserves_unknown_abi_literal_quotes() {
 #[test]
 fn test_encode_type_alias_generic_bound_accepts_raw_pointer_argument() {
     let mut doc = make_doc("domain");
+    insert_empty_trait(&mut doc, "Outer");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1213,14 +5329,14 @@ fn test_encode_type_alias_generic_bound_accepts_raw_pointer_argument() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1248,7 +5364,7 @@ fn test_encode_type_alias_generic_bound_accepts_raw_pointer_argument() {
 fn test_encode_type_alias_where_subject_preserves_catalogue_spelling() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1266,14 +5382,14 @@ fn test_encode_type_alias_where_subject_preserves_catalogue_spelling() {
                 rhs: vec![TypeRef::new("Clone").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1296,7 +5412,7 @@ fn test_encode_type_alias_where_subject_rejects_unsupported_array_lengths() {
     for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Alias").unwrap(),
+            CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1314,16 +5430,16 @@ fn test_encode_type_alias_where_subject_rejects_unsupported_array_lengths() {
                     rhs: vec![TypeRef::new("Clone").unwrap()],
                     operator: BoundOp::Bound,
                 }],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
             ),
         );
 
-        let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+        let error = encode_doc(doc).unwrap_err();
         assert!(
-            matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)),
+            matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)),
             "unsupported lexical array length should be rejected: {lhs}: {error:?}"
         );
     }
@@ -1334,7 +5450,7 @@ fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
     for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
         let mut doc = make_doc("domain");
         doc.insert_type(
-            TypeName::new("Alias").unwrap(),
+            CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1346,7 +5462,7 @@ fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
                     rhs: vec![TypeRef::new("Clone").unwrap()],
                     operator: BoundOp::Bound,
                 }],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1354,7 +5470,7 @@ fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
         );
 
         assert!(
-            CatalogueToExtendedCrateCodec::new().encode(doc).is_ok(),
+            encode_doc(doc).is_ok(),
             "legacy alias where subject should remain accepted: {lhs}"
         );
     }
@@ -1364,7 +5480,7 @@ fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
 fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1378,14 +5494,14 @@ fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec.krate().index.values().find(|item| {
         item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
     });
@@ -1403,6 +5519,96 @@ fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling
     assert_eq!(*modifier, TraitBoundModifier::MaybeConst);
 }
 
+#[test]
+fn test_encode_type_alias_generic_maybe_const_bound_resolves_local_trait() {
+    let mut doc = make_doc("domain");
+    insert_empty_trait(&mut doc, "LocalTrait");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("~const LocalTrait").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let empty = rustdoc_crate_with_paths([]);
+    let encoded = encode_single_doc(doc, &empty, &empty)
+        .expect("a local ~const trait bound must resolve in the trait namespace");
+    let alias = encoded.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref alias) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) =
+        alias.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    assert_eq!(trait_.path, "LocalTrait");
+    assert_eq!(trait_.id, item_id_for_path(&encoded, &["domain", "LocalTrait"]));
+}
+
+#[test]
+fn test_encode_trait_maybe_const_supertrait_resolves_local_trait() {
+    // `trait Child: ~const LocalTrait` — the supertrait route must apply the
+    // same trait-root namespace hint as the generic-bound routes.
+    let mut doc = make_doc("domain");
+    insert_empty_trait(&mut doc, "LocalTrait");
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Child".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![TypeRef::new("~const LocalTrait").unwrap()],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let empty = rustdoc_crate_with_paths([]);
+    let encoded = encode_single_doc(doc, &empty, &empty)
+        .expect("a local ~const supertrait bound must resolve in the trait namespace");
+    let child = encoded
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("Child") && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("expected the Child trait item");
+    let ItemEnum::Trait(ref child_trait) = child.inner else { panic!("expected Trait") };
+    let Some(GenericBound::TraitBound { trait_, modifier, .. }) = child_trait.bounds.first() else {
+        panic!("expected a supertrait bound")
+    };
+    assert_eq!(trait_.path, "LocalTrait");
+    assert_eq!(*modifier, TraitBoundModifier::MaybeConst);
+}
+
 /// A type-alias target using an unqualified associated-type projection rooted
 /// at its declared generic (`type Alias<T: Iterator> = T::Item`) must encode
 /// as a `QualifiedPath` over `Type::Generic("T")`, not as an external crate
@@ -1411,7 +5617,7 @@ fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling
 fn test_encode_type_alias_target_generic_projection_emits_qualified_path() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1425,14 +5631,14 @@ fn test_encode_type_alias_target_generic_projection_emits_qualified_path() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let alias = ec
         .krate()
         .index
@@ -1460,7 +5666,7 @@ fn test_encode_type_alias_target_generic_projection_emits_qualified_path() {
 fn test_encode_type_alias_target_keyword_generic_projection_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1474,15 +5680,15 @@ fn test_encode_type_alias_target_keyword_generic_projection_is_rejected() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// Raw/keyword generic declarations are rejected; qself parsing is not used to
@@ -1496,7 +5702,7 @@ fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_reject
         ("ImplAlias", "impl", "<impl as Trait>::Assoc"),
     ] {
         doc.insert_type(
-            TypeName::new(alias_name).unwrap(),
+            CatalogueEntryKey::try_new(alias_name.to_owned()).unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
@@ -1510,7 +5716,7 @@ fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_reject
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1518,8 +5724,8 @@ fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_reject
         );
     }
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// Raw/keyword spellings are rejected at the catalogue boundary instead of
@@ -1528,7 +5734,7 @@ fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_reject
 fn test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1542,15 +5748,15 @@ fn test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// A keyword-named generic is rejected even when it appears next to valid raw
@@ -1559,7 +5765,7 @@ fn test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected() {
 fn test_encode_type_alias_target_const_pointer_keyword_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1573,15 +5779,15 @@ fn test_encode_type_alias_target_const_pointer_keyword_generic_is_rejected() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// Keyword generic names in both targets and where predicates are rejected;
@@ -1590,7 +5796,7 @@ fn test_encode_type_alias_target_const_pointer_keyword_generic_is_rejected() {
 fn test_encode_type_alias_where_predicate_nested_keyword_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1608,15 +5814,15 @@ fn test_encode_type_alias_where_predicate_nested_keyword_generic_is_rejected() {
                 rhs: vec![TypeRef::new("Clone").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// A keyword declaration is rejected even if the target expression itself has
@@ -1625,7 +5831,7 @@ fn test_encode_type_alias_where_predicate_nested_keyword_generic_is_rejected() {
 fn test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1639,15 +5845,15 @@ fn test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_reje
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// A `dyn` declaration is rejected rather than being inferred from a `dyn`
@@ -1656,7 +5862,7 @@ fn test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_reje
 fn test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1670,15 +5876,15 @@ fn test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generi
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 /// A keyword declaration is rejected even when the target has a valid `dyn`
@@ -1687,7 +5893,7 @@ fn test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generi
 fn test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1701,22 +5907,22 @@ fn test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
-    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+    let error = encode_doc(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..)));
 }
 
 #[test]
 fn test_encode_type_alias_with_two_generic_declarations_returns_error() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Alias").unwrap(),
+        CatalogueEntryKey::try_new("Alias".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1730,14 +5936,14 @@ fn test_encode_type_alias_with_two_generic_declarations_returns_error() {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let err = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    let err = encode_doc(doc).unwrap_err();
     assert!(
         err.to_string().contains("both the entry and kind payload"),
         "unexpected error: {err:?}"
@@ -1768,7 +5974,7 @@ fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() 
         None,
     );
     doc.insert_trait(
-        TraitName::new("Describable").unwrap(),
+        CatalogueEntryKey::try_new("Describable".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -1778,14 +5984,14 @@ fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() 
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -1823,7 +6029,7 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
     // has_default_impl is explicitly false via MethodDeclaration::new.
     assert!(!method.has_default_impl());
     doc.insert_trait(
-        TraitName::new("RequiredOps").unwrap(),
+        CatalogueEntryKey::try_new("RequiredOps".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -1833,14 +6039,14 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -1880,7 +6086,7 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
     );
     assert!(!method.has_default_impl());
     doc.insert_type(
-        TypeName::new("Calculator").unwrap(),
+        CatalogueEntryKey::try_new("Calculator".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -1891,14 +6097,14 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
             vec![method],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -1949,7 +6155,7 @@ fn test_encode_function_with_generics_emits_type_generic_in_signature() {
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -2008,7 +6214,7 @@ fn test_encode_function_without_generics_emits_empty_generics() {
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -2062,7 +6268,7 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "precise-capture bound `use<U>` must be accepted without error, got: {result:?}"
@@ -2106,7 +6312,7 @@ fn test_encode_function_with_use_capture_bound_with_space_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "precise-capture bound `use <U>` (spaced) must be accepted without error, got: {result:?}"
@@ -2150,7 +6356,7 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_succeeds() {
     doc.insert_function(fn_path, entry);
 
     // Permissive: encoding must succeed (no shape validation rejection).
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "expected Ok for syn-parseable `<T as Trait>::Assoc` LHS under permissive principle, \
@@ -2198,7 +6404,7 @@ fn test_encode_function_with_explicit_where_predicate_emits_bound_predicate() {
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -2274,7 +6480,7 @@ fn test_encode_function_with_non_trivial_lhs_where_predicate_emits_bound_predica
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -2339,7 +6545,7 @@ fn test_encode_function_with_equal_where_predicate_emits_eq_predicate() {
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let fn_item = ec
         .krate()
         .index
@@ -2403,7 +6609,7 @@ fn test_encode_function_with_equal_predicate_multiple_rhs_returns_error() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_err(),
         "Equal predicate with multiple rhs must return an error, got: {result:?}"
@@ -2447,9 +6653,7 @@ fn test_encode_function_with_equal_predicate_bare_type_param_lhs_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let ec = CatalogueToExtendedCrateCodec::new()
-        .encode(doc)
-        .expect("bare type param LHS must succeed under permissive principle");
+    let ec = encode_doc(doc).expect("bare type param LHS must succeed under permissive principle");
     let fn_item = ec
         .krate()
         .index
@@ -2518,7 +6722,7 @@ fn test_encode_function_with_lifetime_bound_static_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "lifetime bound `'static` must be accepted without error, got: {result:?}"
@@ -2591,7 +6795,7 @@ fn test_encode_function_with_lifetime_bound_named_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "named lifetime bound `'a` must be accepted without error, got: {result:?}"
@@ -2661,7 +6865,7 @@ fn test_encode_function_with_hrtb_trait_bound_succeeds() {
     );
     doc.insert_function(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
         result.is_ok(),
         "HRTB trait bound `for<'a> Fn(&'a ())` must be accepted without error, got: {result:?}"
@@ -2699,6 +6903,43 @@ fn test_encode_function_with_hrtb_trait_bound_succeeds() {
     );
 }
 
+#[test]
+fn test_encode_hrtb_external_trait_absent_from_authoritative_paths_fails_closed() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let function_path = FunctionPath::at_root(
+        CrateName::new("domain").unwrap(),
+        FunctionName::new("missing_hrtb_trait").unwrap(),
+    );
+    doc.insert_function(
+        function_path,
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![MethodGenericParam {
+                name: ParamName::new("F").unwrap(),
+                bounds: vec![TypeRef::new("for<'a> ghost::Trait").unwrap()],
+            }],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = encode_doc(doc).expect_err("missing HRTB trait must fail closed");
+    assert!(matches!(error, NewTypeGraphCodecError::UnresolvedIdentifier(_)));
+}
+
 // -----------------------------------------------------------------------
 // T007 / AC-08: A-codec — impl-block-level generics encoding
 // (IN-09: InherentImplDeclV2.impl_generics, TraitImplDeclV2.impl_generics,
@@ -2727,7 +6968,7 @@ fn test_trait_decl_generics_encoded_correctly() {
         rhs: vec![TypeRef::new("Send").unwrap()],
     };
     doc.insert_trait(
-        TraitName::new("MyTrait").unwrap(),
+        CatalogueEntryKey::try_new("MyTrait".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -2737,14 +6978,14 @@ fn test_trait_decl_generics_encoded_correctly() {
             vec![],
             vec![method_generic],
             vec![where_pred],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     // Find the Trait item for "MyTrait".
@@ -2830,7 +7071,7 @@ fn test_trait_impl_block_generics_encoded_correctly() {
     );
 
     doc.insert_type(
-        TypeName::new("Foo").unwrap(),
+        CatalogueEntryKey::try_new("Foo".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -2841,7 +7082,7 @@ fn test_trait_impl_block_generics_encoded_correctly() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -2849,7 +7090,7 @@ fn test_trait_impl_block_generics_encoded_correctly() {
     );
     doc.push_trait_impl(trait_impl);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     // Find the trait Impl item (trait_ is Some).
@@ -2892,7 +7133,7 @@ fn test_trait_impl_block_generics_encoded_correctly() {
 fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("T").unwrap(),
+        CatalogueEntryKey::try_new("T".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -2903,14 +7144,14 @@ fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
     doc.insert_trait(
-        TraitName::new("Port").unwrap(),
+        CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -2920,7 +7161,7 @@ fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -2936,7 +7177,7 @@ fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
     );
     doc.push_trait_impl(trait_impl);
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let trait_impl_item = ec
         .krate()
         .index
@@ -2970,7 +7211,7 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
 
     // Register the type "Bar" so the impl block can reference it.
     doc.insert_type(
-        TypeName::new("Bar").unwrap(),
+        CatalogueEntryKey::try_new("Bar".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -2981,7 +7222,7 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
@@ -2989,9 +7230,9 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
     );
 
     // InherentImplDeclV2 with impl_generics: [L, R, W].
-    doc.push_inherent_impl(InherentImplDeclV2 {
-        type_name: TypeName::new("Bar").unwrap(),
-        impl_generics: vec![
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Bar".to_owned()).unwrap(),
+        vec![
             MethodGenericParam {
                 name: ParamName::new("L").unwrap(),
                 bounds: vec![TypeRef::new("Send").unwrap()],
@@ -3002,11 +7243,11 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
                 bounds: vec![TypeRef::new("Sync").unwrap()],
             },
         ],
-        impl_where_predicates: vec![],
-        methods: vec![],
-    });
+        vec![],
+        vec![],
+    ));
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     // Find the inherent Impl item that was produced from the InherentImplDeclV2
@@ -3107,7 +7348,7 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
 fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("MyPort").unwrap(),
+        CatalogueEntryKey::try_new("MyPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3116,15 +7357,18 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
             vec![],
             vec![],
             vec![], // generics empty = old catalogue
-            vec![], // where_predicates empty = old catalogue
-            ModulePath::root(),
+            vec![],
+            Some(
+                // where_predicates empty = old catalogue
+                ModulePath::root(),
+            ),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let ec = encode_doc(doc).unwrap();
     let krate = ec.krate();
 
     let trait_item = krate
@@ -3153,7 +7397,7 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
 fn test_trait_assoc_items_encode_trait_generic_projection_types() {
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("ProjectionPort").unwrap(),
+        CatalogueEntryKey::try_new("ProjectionPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3171,14 +7415,14 @@ fn test_trait_assoc_items_encode_trait_generic_projection_types() {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let encoded = encode_doc(doc).unwrap();
     let krate = encoded.krate();
     let trait_item = krate
         .index
@@ -3234,7 +7478,7 @@ fn test_trait_assoc_items_encode_trait_generic_projection_types() {
 fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("InvalidProjectionPort").unwrap(),
+        CatalogueEntryKey::try_new("InvalidProjectionPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3248,16 +7492,16 @@ fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
             vec![],
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let result = encode_doc(doc);
     assert!(
-        matches!(result, Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_))),
+        matches!(result, Err(domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(..))),
         "invalid associated projection names must fall through to parser validation, got {result:?}"
     );
 }
@@ -3266,7 +7510,7 @@ fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
 fn test_trait_assoc_items_resolve_external_ids_inside_explicit_qualified_paths() {
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("ExternalProjectionPort").unwrap(),
+        CatalogueEntryKey::try_new("ExternalProjectionPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3280,14 +7524,14 @@ fn test_trait_assoc_items_resolve_external_ids_inside_explicit_qualified_paths()
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let encoded = encode_doc(doc).unwrap();
     let krate = encoded.krate();
     let trait_item = krate
         .index
@@ -3373,7 +7617,7 @@ fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
 
     let mut doc = make_doc("domain");
     doc.insert_trait(
-        TraitName::new("NestedProjectionPort").unwrap(),
+        CatalogueEntryKey::try_new("NestedProjectionPort".to_owned()).unwrap(),
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SpecificationPort,
@@ -3412,14 +7656,14 @@ fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
                 MethodGenericParam { name: ParamName::new("From").unwrap(), bounds: vec![] },
             ],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let encoded = encode_doc(doc).unwrap();
     let krate = encoded.krate();
     assert!(
         !krate.external_crates.values().any(|krate| krate.name == "T"),
@@ -3509,7 +7753,7 @@ fn test_encode_struct_declared_generics_reach_rustdoc_generics() {
 
     let mut doc = make_doc("domain");
     doc.insert_type(
-        TypeName::new("Container").unwrap(),
+        CatalogueEntryKey::try_new("Container".to_owned()).unwrap(),
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
@@ -3527,14 +7771,14 @@ fn test_encode_struct_declared_generics_reach_rustdoc_generics() {
                 rhs: vec![TypeRef::new("Send").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             vec![],
             vec![],
         ),
     );
 
-    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let a = encode_doc(doc).unwrap();
     let krate = a.krate();
     let struct_inner = krate
         .index
@@ -3558,4 +7802,206 @@ fn test_encode_struct_declared_generics_reach_rustdoc_generics() {
         !struct_inner.generics.where_predicates.is_empty(),
         "declared struct where-predicate / bound must be encoded, not dropped"
     );
+}
+
+#[test]
+fn test_encode_public_std_reexports_preserve_adapter_spelling_and_resolve_definition_paths() {
+    let mut doc = make_doc("domain");
+    insert_empty_enum_type(&mut doc, "Widget");
+    for trait_ref in ["std::iter::Iterator", "std::ops::Deref", "std::ops::FnOnce"] {
+        doc.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new(trait_ref.to_owned()).unwrap(),
+            TypeRef::new("Widget".to_owned()).unwrap(),
+        ));
+    }
+
+    // Model the rustdoc authority at the adapter boundary: the public std paths
+    // are absent, while rustdoc exposes the defining core paths. The codec keeps
+    // the adapter's source spelling, while the canonical identity assertion below
+    // verifies that the shared resolver supplies the re-export semantics.
+    let mut baseline = authoritative_crate_for_doc(&doc);
+    let public_paths = [
+        vec!["std".to_owned(), "iter".to_owned(), "Iterator".to_owned()],
+        vec!["std".to_owned(), "ops".to_owned(), "Deref".to_owned()],
+        vec!["std".to_owned(), "ops".to_owned(), "FnOnce".to_owned()],
+    ];
+    baseline.paths.retain(|_, summary| !public_paths.contains(&summary.path));
+    for (id, path) in [
+        (
+            Id(10_000),
+            vec![
+                "core".to_owned(),
+                "iter".to_owned(),
+                "traits".to_owned(),
+                "iterator".to_owned(),
+                "Iterator".to_owned(),
+            ],
+        ),
+        (
+            Id(10_001),
+            vec!["core".to_owned(), "ops".to_owned(), "deref".to_owned(), "Deref".to_owned()],
+        ),
+        (
+            Id(10_002),
+            vec!["core".to_owned(), "ops".to_owned(), "function".to_owned(), "FnOnce".to_owned()],
+        ),
+    ] {
+        baseline.paths.insert(id, ItemSummary { crate_id: 0, path, kind: ItemKind::Trait });
+    }
+    let current = baseline.clone();
+
+    let encoded = encode_single_doc(doc, &baseline, &current)
+        .expect("public std re-exports resolve through authoritative core paths");
+
+    for (source, expected_identity) in [
+        ("std::iter::Iterator", "core::iter::traits::iterator::Iterator"),
+        ("std::ops::Deref", "core::ops::deref::Deref"),
+        ("std::ops::FnOnce", "core::ops::function::FnOnce"),
+    ] {
+        let trait_path = encoded
+            .krate()
+            .index
+            .values()
+            .find_map(|item| match &item.inner {
+                ItemEnum::Impl(impl_item) => {
+                    impl_item.trait_.as_ref().filter(|path| path.path == source).cloned()
+                }
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("expected adapter-preserved trait path {source}"));
+        assert_eq!(
+            encoded.krate().paths[&trait_path.id].path.join("::"),
+            source,
+            "the adapter retains the source spelling on the emitted rustdoc path"
+        );
+
+        let source_ref = TypeRef::new(source.to_owned()).unwrap();
+        let identity = crate::tddd::canonical_type_identity::canonicalize_catalogue_type_ref(
+            &source_ref,
+            &CrateName::new("domain").unwrap(),
+            &baseline.paths,
+            &[],
+        )
+        .expect("the shared resolver normalizes the public re-export");
+        assert_eq!(identity.as_str(), expected_identity);
+    }
+}
+
+#[test]
+fn test_encode_short_declaration_keys_resolve_through_module_paths_for_impl_and_generics() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Node".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["alpha".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_trait(
+        CatalogueEntryKey::try_new("Port".to_owned()).unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::from_segments(vec!["beta".to_owned()]).unwrap()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.insert_type(
+        CatalogueEntryKey::try_new("Holder".to_owned()).unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("Option<Node>").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            Some(ModulePath::root()),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    doc.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("Port".to_owned()).unwrap(),
+        TypeRef::new("Node".to_owned()).unwrap(),
+    ));
+    doc.push_inherent_impl(InherentImplDeclV2::new(
+        CatalogueEntryKey::try_new("Node".to_owned()).unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+        vec![],
+    ));
+
+    let encoded = encode_doc(doc).expect("short declaration notation remains resolvable");
+    let node_id = item_id_for_path(&encoded, &["domain", "alpha", "Node"]);
+    let port_id = item_id_for_path(&encoded, &["domain", "beta", "Port"]);
+    let holder_id = item_id_for_path(&encoded, &["domain", "Holder"]);
+
+    let ItemEnum::Struct(holder) = &encoded.krate().index[&holder_id].inner else {
+        panic!("expected Holder struct");
+    };
+    let rustdoc_types::StructKind::Plain { fields, .. } = &holder.kind else {
+        panic!("expected named Holder fields");
+    };
+    let ItemEnum::StructField(Type::ResolvedPath(option_path)) =
+        &encoded.krate().index[&fields[0]].inner
+    else {
+        panic!("expected Option<Node> to encode as a resolved generic path");
+    };
+    assert_eq!(option_path.path, "std::option::Option");
+    let Some(GenericArgs::AngleBracketed { args, .. }) = option_path.args.as_deref() else {
+        panic!("expected Option<Node> generic arguments");
+    };
+    assert!(matches!(
+        args.first(),
+        Some(GenericArg::Type(Type::ResolvedPath(path))) if path.id == node_id
+    ));
+
+    assert!(encoded.krate().index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(impl_item)
+                if impl_item
+                    .trait_
+                    .as_ref()
+                    .is_some_and(|path| path.id == port_id)
+                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == node_id)
+        )
+    }));
+    assert!(encoded.krate().index.values().any(|item| {
+        matches!(
+            &item.inner,
+            ItemEnum::Impl(impl_item)
+                if impl_item.trait_.is_none()
+                    && impl_item.generics.params.iter().any(|param| param.name == "T")
+                    && matches!(&impl_item.for_, Type::ResolvedPath(path) if path.id == node_id)
+        )
+    }));
 }

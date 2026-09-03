@@ -9,11 +9,9 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::SpecRef;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderPort, TrackStatusReaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use domain::tddd::catalogue_v2::{CatalogueDocument, MethodDeclaration, TraitRefScope};
+use domain::tddd::catalogue_v2::{CatalogueDocument, MethodDeclaration};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::errors::{ObligationDeriveError, TrackStatusReadFailureKind};
 use domain::tddd::test_obligation::hashes::DeclarationHash;
@@ -42,8 +40,17 @@ use super::{
     TestObligationCatalogueCommandInput, catalogue_artifact_path, diag, is_active_branch,
     sha256_content_hash,
 };
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 
+mod identity;
 mod inherent;
+mod trait_roles;
+
+pub(super) use identity::{
+    resolve_catalogue_reference, resolve_named_type_entry, resolve_named_type_key,
+    trait_declaration_text_for_reference,
+};
+use trait_roles::{TraitRoleEntry, index_trait_roles, resolve_trait_role};
 
 /// Command input for [`DeriveTestObligationsApplicationService`] (IN-07).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -77,7 +84,7 @@ pub struct DeriveTestObligationsInteractor {
     rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
     track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
     items_dir: PathBuf,
     projector: RoleObligationItemsProjector,
@@ -90,7 +97,7 @@ impl DeriveTestObligationsInteractor {
         rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
         obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
         items_dir: PathBuf,
         projector: RoleObligationItemsProjector,
@@ -137,8 +144,11 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
         let mut catalogues: Vec<(PathBuf, CatalogueDocument)> =
             Vec::with_capacity(input.catalogue_paths().len());
         for path in input.catalogue_paths() {
-            let doc =
-                self.catalogue_reader.load(path).map_err(ObligationDeriveError::CatalogueLoad)?;
+            let doc = self
+                .catalogue_reader
+                .load(path)
+                .map_err(ObligationDeriveError::CatalogueLoad)?
+                .into_document();
             catalogues.push((path.clone(), doc));
         }
 
@@ -224,66 +234,13 @@ fn validate_named_catalogue_methods(
         validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
     }
     for inherent in catalogue.inherent_impls() {
-        validate_add_modify_methods_have_spec_refs(&inherent.methods)?;
-        let Some(owner) = catalogue.types().get(&inherent.type_name) else {
-            return Err(diag(&format!(
-                "inherent_impl type_name '{}' is not in the named catalogue",
-                inherent.type_name.as_str(),
-            )));
+        validate_add_modify_methods_have_spec_refs(inherent.methods())?;
+        let Some((_, owner)) = resolve_named_type_entry(catalogue, inherent.type_name())? else {
+            continue;
         };
-        validate_parent_forbids_method_spec_refs(owner.action(), &inherent.methods)?;
+        validate_parent_forbids_method_spec_refs(owner.action(), inherent.methods())?;
     }
     Ok(())
-}
-
-/// Trait metadata needed to derive obligations for matching `trait_impl`s.
-struct TraitRoleEntry {
-    crate_name: String,
-    name: String,
-    role: ContractRole,
-    anchors: Vec<TestObligationAnchorId>,
-    declaration_text: String,
-}
-
-/// Indexes every catalogue `TraitEntry` name to its `ContractRole` and anchors
-/// so a `trait_impl`'s `trait_ref` can be resolved across crates (IN-17).
-fn index_trait_roles(
-    catalogues: &[(PathBuf, CatalogueDocument)],
-) -> Result<Vec<TraitRoleEntry>, DiagnosticMessage> {
-    let mut index = Vec::new();
-    for (_, catalogue) in catalogues {
-        for (name, entry) in catalogue.traits() {
-            index.push(TraitRoleEntry {
-                crate_name: catalogue.crate_name().as_str().to_owned(),
-                name: name.as_str().to_owned(),
-                role: entry.role().clone(),
-                anchors: anchors_from_spec_refs(entry.spec_refs())?,
-                declaration_text: format!("{entry:?}"),
-            });
-        }
-    }
-    Ok(index)
-}
-
-/// Resolves a trait impl's classified `trait_ref` to the matching catalogue trait.
-///
-/// Bare trait refs are self-crate refs and must match the impl catalogue's crate;
-/// workspace-qualified refs must match the qualified crate. External refs yield
-/// no obligations because there is no catalogue `TraitEntry` role to project.
-fn resolve_trait_role<'a>(
-    trait_roles: &'a [TraitRoleEntry],
-    scope: &TraitRefScope,
-    impl_crate_name: &str,
-) -> Option<&'a TraitRoleEntry> {
-    match scope {
-        TraitRefScope::SelfCrate { bare_name } => trait_roles
-            .iter()
-            .find(|entry| entry.crate_name == impl_crate_name && entry.name == bare_name.as_str()),
-        TraitRefScope::Workspace { crate_name, bare_name } => trait_roles.iter().find(|entry| {
-            entry.crate_name == crate_name.as_str() && entry.name == bare_name.as_str()
-        }),
-        TraitRefScope::External => None,
-    }
 }
 
 /// Derives obligations for every derivable `TypeEntry` (role + typestate).
@@ -296,7 +253,7 @@ fn derive_type_obligations(
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.types() {
         let method_axes_only = !is_derivable(entry.action());
-        let entry_key = catalogue_key(name.as_str())?;
+        let entry_key = name.clone();
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Types,
@@ -350,7 +307,7 @@ fn derive_trait_obligations(
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.traits() {
         let method_axes_only = !is_derivable(entry.action());
-        let entry_key = catalogue_key(name.as_str())?;
+        let entry_key = name.clone();
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Traits,
@@ -435,9 +392,8 @@ fn derive_trait_impl_obligations(
         if !is_derivable(impl_decl.action()) {
             continue;
         }
-        let scope = impl_decl.trait_ref_scope();
         let Some(trait_entry) =
-            resolve_trait_role(trait_roles, &scope, catalogue.crate_name().as_str())
+            resolve_trait_role(trait_roles, catalogue.crate_name(), impl_decl.trait_ref())?
         else {
             continue;
         };
@@ -445,7 +401,7 @@ fn derive_trait_impl_obligations(
         let Some(role_rules) = find_trait_impl_rules(rules, &role) else {
             continue;
         };
-        let entry_key = catalogue_key(impl_decl.for_type().as_str())?;
+        let entry_key = resolve_named_type_key(catalogue, impl_decl.for_type())?;
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
             CatalogueSectionKey::Traits,

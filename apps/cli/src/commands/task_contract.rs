@@ -165,7 +165,14 @@ fn task_contract_check_core(
             return ExitCode::FAILURE;
         }
     };
-    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
+        Err(error) => {
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Check { layer, track_id: resolved_track_id }),
     )
@@ -200,7 +207,14 @@ fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf)
             return ExitCode::FAILURE;
         }
     };
-    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
+        Err(error) => {
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Coverage { track_id: resolved_track_id }),
     )
@@ -310,6 +324,28 @@ mod tests {
             TaskContractCommand::Check(args) => {
                 assert_eq!(args.track_id, None, "omitting --track-id must yield None");
                 assert_eq!(args.layer, Some("domain".to_owned()));
+            }
+            other => panic!("expected Check, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_task_contract_check_preserves_qualified_filter_text_for_driver_validation() {
+        // The command surface carries the layer filter as an opaque string;
+        // it must not split or shorten path-shaped text before the driver
+        // validates it alongside the task-contract attribution artifacts.
+        let cmd = parse_task_contract(&[
+            "task-contract",
+            "check",
+            "--layer",
+            "domain::alpha::Shared",
+            "--track-id",
+            "my-track",
+        ]);
+        match cmd {
+            TaskContractCommand::Check(args) => {
+                assert_eq!(args.layer.as_deref(), Some("domain::alpha::Shared"));
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
             }
             other => panic!("expected Check, got {other:?}"),
         }

@@ -28,7 +28,15 @@ or failure-recovery procedures here.
 
 - No capabilities are delegated; commit is a standalone terminal workflow step.
 
-### (4) Reporting format
+### (4) Gate waiting
+
+- `cargo make track-commit-message` is a long-running gate: run it as one blocking call and read
+  its exit status once. Do not poll its log, re-run status probes, or add periodic re-checks; if
+  the host backgrounds the call, read the result once after the single completion notification.
+- Do not launch `bin/sotp test-obligation evaluate` around the commit: the commit gate runs
+  `check`, and `evaluate` is only a synchronous step inside repair work on the orchestrator host.
+
+### (5) Reporting format
 
 - On successful completion, print: `COMMIT_STATUS: completed — <short-hash> <subject>`
 - On failure or block, print: `COMMIT_STATUS: blocked — <reason>`

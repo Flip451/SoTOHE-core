@@ -60,19 +60,27 @@ track 作業には `/adr:add <slug>` で ADR を作り
 
 このテンプレートを使うには以下が必要:
 
+- **Unix（type-signals rustdoc 評価）** — 評価器は解決済み target root から専用 selection directory（immediate parent が正確に `.sotp-rustdoc`）と lock file を descriptor-relative に開き、親を含む path を no-follow で検証できる Unix に限る。Windows 等は unsupported であり、rustdoc snapshot の再利用および export は fail-closed で拒否する
 - **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。未初期化の export ツリーでは host で `cargo make init` を実行する
 - **Docker（任意）** — 既定の品質ゲートと CI は host toolchain で実行する。隔離環境を選ぶ場合だけ `Makefile.toml` の extend 参照先を `Makefile.docker.toml` に切り替える
 - **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
   - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
   - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
-- **Claude Code** — 主操作面。`/track:*` コマンドの入口
-- **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`) とリサーチ担当 (`researcher`)
+- **Claude Code / Codex CLI** — ルート入口はそれぞれ `CLAUDE.md` / `AGENTS.md`、常時適用する orchestrator rules は `.claude/rules/orchestrator.md` / `.codex/instructions.md` に置く。Claude Code は `/track:*` コマンドの入口、Codex CLI は profile に従う orchestrator / capability の実行面として使う
 
 補足:
 
 - capability の担当者は `.harness/config/agent-profiles.json` で切り替えられる
 - 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
 - プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
+
+## エージェントのルールと利用者所有設定
+
+ルートの `CLAUDE.md` と `AGENTS.md` は入口ポインタであり、Claude Code の常時適用 orchestrator rules は `.claude/rules/orchestrator.md`、Codex の orchestrator rules は `.codex/instructions.md`、Codex のコマンドポリシーは `.codex/rules/default.rules` にある。PR reviewer 向けの指針は `.harness/custom/review-prompts/pr-review.md` に分離され、ルート orchestrator の常時適用文書には含まれない。
+
+Claude Code / Codex の設定でこれらの rules を常時適用するための provider-side compatibility / loader 設定は、`.claude/settings.json` の `permissions.allow` と同じく consumer-owned configuration である。SoTOHE は推奨する配置と設定方法を文書化するが、provider 設定の値、rules ファイルの存在、常時適用状態、または散文の正確な文言を CI で強制しない。採用する provider とその運用上の責任は利用者が判断する。
+
+workflow、policy、capability、provider rules などの runtime-instruction documents は自己完結し、ADR の日付 ID に依存せずに動作と境界を記述する。この enforcement boundary は文書化と review の対象であり、consumer 側の provider 設定と同様に CI の hard-fail 条件ではない。詳しい分界は [Consumer Ownership policy](.harness/policies/consumer-ownership.md) を参照する。
 
 ## 外部プロバイダーを capability 単位で設定する
 
@@ -132,15 +140,43 @@ dispatch 経路だけが行う。
 ```
 
 `reviewer` や `review-fix-lead` など `execution_mode = "typed-pipeline"` の capability は専用の
-固定出力経路を持ち、`model_provider` を generic dispatch のようには転送しない。そのため、
-typed-pipeline の provider gate は `codex` のままであり、外部 provider への routing を設定で
-有効化できない。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の typed-pipeline capability としての
-verdict envelope / structured output 準拠も未検証である。この未検証状態は、接続経路が実際に
-選択されることを意味しない。provider ごとの status と更新条件は、次の表で管理する。
+固定出力経路を持ち、`model_provider` を generic dispatch のようには転送しない。そのため
+typed-pipeline の provider gate が受理するのは、**専用の typed adapter を実装した組み込み
+provider だけ**である。
+
+次の表は、各 typed-pipeline capability が **受理しうる provider の集合**を宣言する。実際に
+どれが選ばれているかは `.harness/config/agent-profiles.json` が決めるので、この表は現在の
+routing ではなく可能なセットを示す。集合の外の provider を設定すると fail-closed になる。
+
+| typed-pipeline capability | 受理しうる provider |
+|---|---|
+| `reviewer` | `codex` / `claude` / `grok`† |
+| `review-fix-lead` | `codex` / `claude` / `grok`† |
+| `ref-verifier-chain1` / `ref-verifier-chain2` | `codex` / `claude` / `grok`† |
+| `obligation-fulfillment-verifier` / `waiver-verifier` | 同上 (reference 検証 runner を共有) |
+| `dry-checker` / `dry-fix-lead` | `codex` / `grok`† |
+| `pr-reviewer` | `codex` |
+
+`claude` 解決は Agent tool の subagent ではなく headless subprocess として動く。
+`review-fix-lead` だけは例外で、`claude` 解決時に wrapper が subagent-dispatch sentinel を
+返し、呼び出し側がそれを受けて subagent を起動する。`fast_provider` / `fast_model` を持つ
+capability は fast lane と final lane で別の provider を選べるので、いずれの lane も上表の
+集合に収まっている必要がある。† `grok` は provider 名だけで有効になるのではなく、対象
+capability の adapter 定義に許可された `grok-sandbox` があり、宣言 model (あれば) が profile
+model と一致する admission が必要である。`grok-sandbox` の宣言がない配布 adapter では
+Grok の解決は fail-closed になる。`reviewer` / `review-fix-lead` / `dry-fix-lead` は
+model override も profile model と一致し、`dry-checker` は fast / final の両 model の定義が
+admission される必要がある。条件を満たさない設定は fail-closed になる。
+
+いずれの capability も `model_provider` を転送しないため、**外部 provider への routing は
+typed-pipeline では設定で有効化できない**。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の
+typed-pipeline capability としての verdict envelope / structured output 準拠も未検証である。
+この未検証状態は、接続経路が実際に選択されることを意味しない。provider ごとの status と
+更新条件は、次の表で管理する。
 
 ### typed-pipeline の検証ステータス
 
-`typed-pipeline` の provider gate が `codex` のまま維持されることと、外部 provider が
+typed-pipeline の provider gate が上表の組み込み provider に限定されることと、外部 provider が
 typed-pipeline の出力契約に準拠することは別の判定である。現時点では、次の provider は
 すべて **未検証** として扱う。
 

@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-21-type-identity-fully-qualified-paths",
+  "entries": {
+    "T001": [],
+    "T002": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueEntryKey"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "FullyQualifiedItemPath"
+      }
+    ],
+    "T003": [],
+    "T004": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "DeletionRecord"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "InherentImplDeclV2"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TraitRefScope"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "NewTypeGraphCodecError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CanonicalTypeIdentity"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      }
+    ],
+    "T005": [],
+    "T006": [],
+    "T008": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueIdentityResolutionError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLintViolation"
+      }
+    ],
+    "T011": [],
+    "T012": [],
+    "T013": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractorPort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::TypeRefPathExtractionError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::CatalogueLinterError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "std::sync::Arc<T>"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_ref_parser::SynTypeRefPathExtractorAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_lint_workflow::RunCatalogueLintInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RunCatalogueLint"
+      }
+    ],
+    "T014": [],
+    "T015": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueDocument"
+      }
+    ]
+  }
+}

@@ -3,20 +3,20 @@
 use std::collections::{BTreeMap, btree_map::Entry};
 
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
+use domain::tddd::catalogue_v2::document::CatalogueDocument;
 use domain::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, DeletionRecord, InvariantDecl, MethodDeclaration,
-    MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueEntryKey, DeletionRecord, FullyQualifiedItemPath, InvariantDecl,
+    MethodDeclaration, MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
 use super::CatalogueDocumentCodecError;
-use super::SCHEMA_VERSION;
 use super::dto::{
     AssocConstDeclDto, AssocTypeDeclDto, BoundOpDto, CatalogueDocumentDto, FieldDeclDto,
     FunctionEntryDto, InherentImplDeclDto, MethodDeclarationDto, MethodGenericParamDto, ParamDto,
@@ -33,6 +33,7 @@ use super::validate::{
     validate_type_alias_target, validate_type_alias_where_predicates,
     validate_type_ref_str_with_generics,
 };
+use super::{EXPLICIT_ROOT_MODULE_PATH, SCHEMA_VERSION};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -68,20 +69,20 @@ pub(super) fn domain_to_dto(
     // deterministically.
     for record in doc.deletions() {
         match record {
-            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
+            DeletionRecord::Type { name, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut types,
                     "type",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                    tombstone_dto(doc.crate_name(), name, spec_refs, informal_grounds),
                 )?;
             }
-            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
+            DeletionRecord::Trait { name, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut traits,
                     "trait",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                    tombstone_dto(doc.crate_name(), name, spec_refs, informal_grounds),
                 )?;
             }
             DeletionRecord::Function { path, spec_refs, informal_grounds } => {
@@ -89,7 +90,7 @@ pub(super) fn domain_to_dto(
                     &mut functions,
                     "function",
                     path.to_string(),
-                    tombstone_dto(String::new(), spec_refs, informal_grounds),
+                    function_tombstone_dto(spec_refs, informal_grounds),
                 )?;
             }
         }
@@ -111,22 +112,49 @@ pub(super) fn domain_to_dto(
     })
 }
 
-/// Build a grounded deletion tombstone DTO for a removed entry.
-///
-/// `module_path` is the crate-relative module of a type / trait deletion, or the
-/// empty string for a crate-root item or a function (whose module lives in the
-/// map key). `ModulePath::root()` renders as the empty string, which the DTO
-/// omits from JSON.
+// ---------------------------------------------------------------------------
+// Entry converters
+// ---------------------------------------------------------------------------
+
 fn tombstone_dto(
-    module_path: String,
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
     spec_refs: &[domain::SpecRef],
     informal_grounds: &[domain::InformalGroundRef],
 ) -> TombstoneDto {
     TombstoneDto {
         action: "delete".to_owned(),
-        module_path,
+        module_path: encode_tombstone_module_path(crate_name, key),
         spec_refs: spec_refs_to_dtos(spec_refs),
         informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
+}
+
+fn function_tombstone_dto(
+    spec_refs: &[domain::SpecRef],
+    informal_grounds: &[domain::InformalGroundRef],
+) -> TombstoneDto {
+    TombstoneDto {
+        action: "delete".to_owned(),
+        module_path: String::new(),
+        spec_refs: spec_refs_to_dtos(spec_refs),
+        informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
+}
+
+fn encode_tombstone_module_path(
+    crate_name: &domain::tddd::catalogue_v2::CrateName,
+    key: &CatalogueEntryKey,
+) -> String {
+    let Ok(identity) = FullyQualifiedItemPath::from_type_fully_qualified_key(key) else {
+        return String::new();
+    };
+    if identity.crate_name() == crate_name
+        && identity.module_path().is_some_and(|module_path| module_path.is_root())
+    {
+        EXPLICIT_ROOT_MODULE_PATH.to_owned()
+    } else {
+        String::new()
     }
 }
 
@@ -150,10 +178,6 @@ fn insert_tombstone<T>(
         }),
     }
 }
-
-// ---------------------------------------------------------------------------
-// Entry converters
-// ---------------------------------------------------------------------------
 
 pub(super) fn type_entry_to_dto(
     entry_name: &str,
@@ -203,11 +227,19 @@ pub(super) fn type_entry_to_dto(
         methods,
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path().to_string(),
+        module_path: encode_module_path(entry.module_path()),
         docs: entry.docs().map(|d| d.as_str().to_owned()),
         spec_refs: spec_refs_to_dtos(entry.spec_refs()),
         informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
+}
+
+fn encode_module_path(module_path: Option<&domain::tddd::catalogue_v2::ModulePath>) -> String {
+    match module_path {
+        None => String::new(),
+        Some(module_path) if module_path.is_root() => EXPLICIT_ROOT_MODULE_PATH.to_owned(),
+        Some(module_path) => module_path.to_string(),
+    }
 }
 
 fn data_role_to_dto(role: &DataRole) -> DataRoleDto {
@@ -554,7 +586,7 @@ pub(super) fn trait_entry_to_dto(
             .collect(),
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path().to_string(),
+        module_path: encode_module_path(entry.module_path()),
         docs: entry.docs().map(|d| d.as_str().to_owned()),
         spec_refs: spec_refs_to_dtos(entry.spec_refs()),
         informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
@@ -592,21 +624,21 @@ pub(super) fn inherent_impl_to_dto(
     decl: &InherentImplDeclV2,
 ) -> Result<InherentImplDeclDto, CatalogueDocumentCodecError> {
     let generic_names =
-        decl.impl_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
-    validate_generic_params_for_encode("inherent_impl", &decl.impl_generics, &[])?;
+        decl.impl_generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("inherent_impl", decl.impl_generics(), &[])?;
     let impl_where_predicates = decl
-        .impl_where_predicates
+        .impl_where_predicates()
         .iter()
         .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
     let methods = decl
-        .methods
+        .methods()
         .iter()
         .map(|method| method_decl_to_dto_with_outer_generics(method, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(InherentImplDeclDto {
-        type_name: decl.type_name.as_str().to_owned(),
-        impl_generics: method_generic_params_to_dtos(&decl.impl_generics),
+        type_name: decl.type_name().as_str().to_owned(),
+        impl_generics: method_generic_params_to_dtos(decl.impl_generics()),
         impl_where_predicates,
         methods,
     })

@@ -15,8 +15,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use super::helpers::{
-    collect_methods_for_type, function_entries_for_target, trait_entries_for_target,
-    type_entries_for_target,
+    collect_methods_for_type, function_entries_for_target, inherent_impls_for_type,
+    trait_entries_for_target, type_entries_for_target,
 };
 use super::{CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule};
 use crate::tddd::catalogue_v2::CatalogueDocument;
@@ -314,15 +314,11 @@ fn collect_type_entry_slots(
         // `impl_where_predicates`, not on any method -- `collect_methods_for_type`
         // above only merges each impl block's *methods*, so these must be
         // collected separately here (PR #179 round 2 P1).
-        for impl_decl in catalogue
-            .inherent_impls()
-            .iter()
-            .filter(|decl| decl.type_name.as_str() == entry_name.as_str())
-        {
+        for impl_decl in inherent_impls_for_type(catalogue, entry, &entry_name)? {
             push_generic_and_where_slots(
                 &entry_name,
-                &impl_decl.impl_generics,
-                &impl_decl.impl_where_predicates,
+                impl_decl.impl_generics(),
+                impl_decl.impl_where_predicates(),
                 bound_filter,
                 slots,
             );

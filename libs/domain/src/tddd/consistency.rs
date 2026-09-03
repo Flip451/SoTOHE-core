@@ -131,9 +131,12 @@ mod tests {
     use crate::ConfidenceSignal;
     use crate::Timestamp;
     use crate::tddd::catalogue::TypeSignal;
+    use crate::tddd::catalogue_linter::FreeText;
+    use crate::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use crate::tddd::type_signals_doc::{
-        BaselineHash, CatalogueDeclarationHash, Sha256Digest, TypeSignalsCacheKey,
-        TypeSignalsDocument,
+        BaselineHash, CargoProfileName, CatalogueDeclarationHash, ExpectedRustdocJsonPath,
+        ImplementationFingerprint, ResolutionFingerprint, ResolvedCargoTargetDirectory,
+        RustdocExecutionIdentity, Sha256Digest, TypeSignalsCacheKey, TypeSignalsDocument,
     };
 
     fn ts() -> Timestamp {
@@ -141,12 +144,35 @@ mod tests {
     }
 
     fn make_signal(name: &str, kind: &str, signal: ConfidenceSignal) -> TypeSignal {
-        TypeSignal::new(name, kind, signal, true, Vec::new(), Vec::new(), Vec::new())
+        TypeSignal::new(
+            ThreeWaySignalIdentity::Label { label: FreeText::new(name) },
+            kind.to_owned(),
+            signal,
+            true,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )
     }
 
     fn make_doc(signals: Vec<TypeSignal>) -> TypeSignalsDocument {
         let digest = Sha256Digest::try_new(
             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_owned(),
+        )
+        .unwrap();
+        let target = ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-consistency-target",
+        ))
+        .unwrap();
+        let expected =
+            ExpectedRustdocJsonPath::try_new(target.as_path().join("doc/domain.json"), &target)
+                .unwrap();
+        let identity = RustdocExecutionIdentity::new(
+            target,
+            crate::tddd::catalogue_v2::CrateName::new("domain").unwrap(),
+            vec![],
+            CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
         )
         .unwrap();
         TypeSignalsDocument::new(
@@ -155,6 +181,9 @@ mod tests {
                 CatalogueDeclarationHash::new(digest.clone()),
                 CommitHash::try_new("a".repeat(40)).unwrap(),
                 BaselineHash::new(digest),
+                ImplementationFingerprint::new(Sha256Digest::try_new("b".repeat(64)).unwrap()),
+                ResolutionFingerprint::new(Sha256Digest::try_new("c".repeat(64)).unwrap()),
+                identity,
             ),
             signals,
         )
@@ -240,8 +269,8 @@ mod tests {
         // A TypeSignalsDocument that contains a Red entry for "UndeclaredImpl"
         // (the CMinusSUnionD region: present in C but absent from S ∪ D).
         let doc = make_doc(vec![TypeSignal::new(
-            "UndeclaredImpl",
-            "undeclared_type",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("UndeclaredImpl") },
+            "undeclared_type".to_owned(),
             ConfidenceSignal::Red,
             /* found_type = */ true,
             Vec::new(),
@@ -268,8 +297,8 @@ mod tests {
         // A Red signal with an empty (zero-entry) catalogue scenario:
         // the evaluator still reports it (reverse-direction drift).
         let doc = make_doc(vec![TypeSignal::new(
-            "UndeclaredType",
-            "undeclared_type",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("UndeclaredType") },
+            "undeclared_type".to_owned(),
             ConfidenceSignal::Red,
             true,
             Vec::new(),
@@ -288,8 +317,8 @@ mod tests {
         // In v3 the evaluator only emits Yellow for declared entries, but the gate
         // does not need to verify that invariant — it just applies the Yellow rule.
         let doc = make_doc(vec![TypeSignal::new(
-            "SomeType",
-            "value_object",
+            ThreeWaySignalIdentity::Label { label: FreeText::new("SomeType") },
+            "value_object".to_owned(),
             ConfidenceSignal::Yellow,
             false,
             Vec::new(),
