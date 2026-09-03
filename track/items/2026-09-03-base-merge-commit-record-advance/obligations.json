@@ -1,0 +1,61 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a result test covering 'entry' of usecase::base_merge::BaseMergeInteractor",
+      "declaration_hash": "fa3ae69fb031c703195e903bb8a246767ff81d2a377daf5af48301bbf6a69b7b",
+      "id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    }
+  ],
+  "track_id": "2026-09-03-base-merge-commit-record-advance"
+}

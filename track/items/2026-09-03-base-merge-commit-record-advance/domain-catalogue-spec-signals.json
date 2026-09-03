@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "01d351a2a8ecae93593d3967065eb8b3bcb421df38bc1832829730199e7209ba",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "ccc4bb4f5daba58200694db8a5b418976449a53c19f71fd9aa375933dc8bdc97",
+      "signal": "blue",
+      "type_name": "domain::ids::CommitHash"
+    },
+    {
+      "entry_hash": "dd3b1af0a1cdd2c71cff6a5bdece88f9515c677684af07d1f20ba46cde7144fa",
+      "signal": "blue",
+      "type_name": "domain::ids::TrackId"
+    }
+  ]
+}

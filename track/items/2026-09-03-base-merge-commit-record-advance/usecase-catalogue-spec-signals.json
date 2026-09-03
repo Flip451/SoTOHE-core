@@ -1,0 +1,26 @@
+{
+  "catalogue_declaration_hash": "a262686d928de6f119c4dfdd2e8e435be56402f76c2f4b817587533167155258",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "11e0e3f4eabd930c5494b05febe627576a5e678f2347dd0fa22cc70308705118",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::BaseMergeInteractor"
+    },
+    {
+      "entry_hash": "7b1d11e40677454456715afbba71ed1dc74142548524dc38a2fd4857a4112476",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::PostMergeCleanupError"
+    },
+    {
+      "entry_hash": "f11d42f340b3e5c0fadecf9a663c725c773f9bfb24b858f09ba03e332652635a",
+      "signal": "blue",
+      "type_name": "usecase::git_workflow::DiagnosticText"
+    },
+    {
+      "entry_hash": "804f0c4e13077d7c215b847a23565334b9ca05cb1190a8d9825b2194dc3ab9c1",
+      "signal": "blue",
+      "type_name": "TrackCommitHashPort"
+    }
+  ]
+}
