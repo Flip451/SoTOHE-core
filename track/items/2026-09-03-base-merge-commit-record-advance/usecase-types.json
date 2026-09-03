@@ -1,0 +1,393 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "BaseMergeInteractor",
+      "trait_ref": "BaseMergeService"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackSetCommitHashInteractor",
+      "trait_ref": "TrackSetCommitHashService"
+    },
+    {
+      "action": "reference",
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "TrackCommitHashPort": {
+      "action": "reference",
+      "docs": "Reuse `TrackCommitHashPort` unchanged; `is_async: false` deliberately models its blocking Git/state I/O boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "persist_current_for_track",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::ids::CommitHash, DiagnosticText>"
+        }
+      ],
+      "module_path": "track_lifecycle",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TrackSetCommitHashService": {
+      "action": "reference",
+      "docs": "Reference the existing track commit-hash application-service boundary unchanged.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "TrackSetCommitHashCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TrackSetCommitHashResult, TrackSetCommitHashError>"
+        }
+      ],
+      "module_path": "track_lifecycle::track_set_commit_hash",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "usecase::base_merge::BaseMergeInteractor": {
+      "action": "modify",
+      "docs": "Dependency-injected interactor for `BaseMergeService`; the added dependency reuses the existing commit-hash persistence port.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "context",
+              "ty": "Arc<dyn BaseMergeContextPort>"
+            },
+            {
+              "name": "git",
+              "ty": "Arc<dyn BaseMergeGitPort>"
+            },
+            {
+              "name": "cleanup",
+              "ty": "Arc<dyn BaseMergeCleanupPort>"
+            },
+            {
+              "name": "commit_record",
+              "ty": "Arc<dyn TrackCommitHashPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-01",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+            },
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "base_merge",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    },
+    "usecase::base_merge::PostMergeCleanupError": {
+      "action": "modify",
+      "docs": "Failure union for the ordered post-merge cleanup stages.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Views",
+            "payload": {
+              "fields": [
+                "ViewsRegenerationError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Baseline",
+            "payload": {
+              "fields": [
+                "BaselineReplacementError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CommitRecord",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    },
+    "usecase::git_workflow::DiagnosticText": {
+      "action": "reference",
+      "docs": "Reference `DiagnosticText` unchanged as opaque presentation text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "git_workflow",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    },
+    "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor": {
+      "action": "reference",
+      "docs": "Reference the existing track commit-hash interactor unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "persistence",
+              "ty": "Arc<dyn TrackCommitHashPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "track_lifecycle::track_set_commit_hash",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    }
+  }
+}

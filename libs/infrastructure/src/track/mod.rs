@@ -885,8 +885,13 @@ mod lifecycle_adapter_tests {
                 let persisted = GitTrackCommitHashAdapter::new()
                     .persist_current_for_track(&track_id)
                     .expect("matching branch persists the current HEAD");
+                let head_after = git_stdout(Path::new("."), &["rev-parse", "HEAD"]);
 
                 assert_eq!(persisted.as_ref(), expected);
+                assert_eq!(
+                    head_after, expected,
+                    "updating the commit record must not create a Git commit"
+                );
                 assert_eq!(
                     fs::read_to_string(track_dir.join(".commit_hash"))
                         .expect("commit hash is persisted"),

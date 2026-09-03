@@ -1,0 +1,160 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "The commit-record update rewrites only track state and does not create a Git commit."
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent."
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "Keep the active track's commit record aligned with merge HEAD after base-merge cleanup so post-merge review scope and signal evaluation exclude changes owned by the incorporated base."
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "Advance the active track's commit record to merge-result HEAD as part of clean base-merge cleanup."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes."
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "Changing the existing Baseline → Views cleanup ordering is out of scope."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-14-1049-base-merge-commit-record-advance.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "Creating a Git commit as part of commit-record advancement is out of scope."
+      }
+    ]
+  },
+  "signals": {
+    "blue": 12,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "Base Merge Commit Record Advance",
+  "version": "1.0"
+}
