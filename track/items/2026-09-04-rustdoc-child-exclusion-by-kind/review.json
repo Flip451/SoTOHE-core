@@ -56,6 +56,60 @@
           "hash": "rvw1:sha256:90a88bb90a925ddddad07f8e741f7168945720aa07012f9166d5d5ede735c92a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:18:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d37e648277c1a05998a95da3754cce87695bf6f90058621f7db56000ec958a3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:24:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d37e648277c1a05998a95da3754cce87695bf6f90058621f7db56000ec958a3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-04T04:22:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e726da14164f61e314213bda01c1bb7bb5d48a9d137f40d47eaabd3955e61504",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:52:50Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 1066,
+              "message": "AC-02 の Module 除外が traversal 経由で検証されていません。この行は private helper の分類結果だけを assert し、その後の結果検証は retained field しか確認していません。Module は path identity を生成せず `child_item_ids` にも Module arm がないため、本番の `if is_module_item(child)` 分岐を削除しても新規テストはすべて通ります。Module child が enqueue された場合に失敗する観測可能な回帰テストへ変更してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 898,
+              "message": "変更された evaluator は固定 fixture のテストだけで、`knowledge/conventions/testing.md` が evaluator 変更に要求する property-based test がありません。zero/nonzero の child ID、Module/non-Module kind、index 欠落を生成して、数値に依存せず Module だけを除外する不変条件を検証してください。現状では別の magic ID 条件が再導入されても固定ケース外なら検出できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e726da14164f61e314213bda01c1bb7bb5d48a9d137f40d47eaabd3955e61504",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T05:16:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:384a2eb41d09ac1bbb28ec7b2d3ad27be9bbd899abe611c350a96d8a46806896",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
