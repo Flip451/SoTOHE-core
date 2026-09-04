@@ -18,6 +18,129 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:22:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/impl-plan.json",
+              "line": 6,
+              "message": "The section description restates the upstream behavior contract (kind-based exclusion, Id(0) field retention, module exclusion, and blue signal) in prose. Keep only target + operation + anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/impl-plan.json",
+              "line": 24,
+              "message": "T001 restates the upstream behavior contract in prose, including numeric-id handling, field/reference retention, module exclusion, and signal color. Keep only target + operation + anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:45c37a6bf9168f2d5887b66c335a7a24a7cf34dc45fa3abc70f73bad2e200c19",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T03:26:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90a88bb90a925ddddad07f8e741f7168945720aa07012f9166d5d5ede735c92a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:34:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90a88bb90a925ddddad07f8e741f7168945720aa07012f9166d5d5ede735c92a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:30:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8314694dac237ca83cb1e713424f697984d2d7b303251a878237620584c72dc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:37:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8314694dac237ca83cb1e713424f697984d2d7b303251a878237620584c72dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-04T02:47:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3293f07302dd84125d5998a2f9d552257216ddc38f52b6e55e143ff4f138a7ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:47:31Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/spec.json",
+              "line": 31,
+              "message": "AC-03 は参照集合との「完全な照合」を要求するだけで、GO-01 が掲げる誤った 🟡 判定が 🔵 になることを決定的に証明しない。最終的な signal 判定結果のカバレッジが不足している。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:3293f07302dd84125d5998a2f9d552257216ddc38f52b6e55e143ff4f138a7ae",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T02:50:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:51:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:56:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:09:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b2d1fe3eea8915f20e135358af5365db397eba81b9b4730d5ade18bf8b6559",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:15:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b2d1fe3eea8915f20e135358af5365db397eba81b9b4730d5ade18bf8b6559",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
