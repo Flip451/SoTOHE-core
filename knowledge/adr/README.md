@@ -150,6 +150,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 | [型シグナル評価の型識別を完全修飾パスで行う](2026-08-21-0055-type-identity-fully-qualified-paths.md) | Proposed | 2026-08-21 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
+| [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
 
 ### トラック・ワークフロー
 

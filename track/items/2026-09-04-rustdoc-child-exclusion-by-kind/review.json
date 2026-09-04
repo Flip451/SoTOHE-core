@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-04T02:08:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee6139db092343dd94350fa16fc45bd7d812055adbc47e98ee22674e3ea8f56e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:13:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee6139db092343dd94350fa16fc45bd7d812055adbc47e98ee22674e3ea8f56e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
