@@ -153,6 +153,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型シグナルの rustdoc 再利用と実行環境を拘束する](2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md) | Accepted | 2026-08-29 |
 | [評価開始時の authoritative input 捕捉に時間上限を設ける](2026-09-02-0000-evaluation-start-capture-time-bounds.md) | Accepted | 2026-09-02 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
+| [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
 
 ### トラック・ワークフロー
 

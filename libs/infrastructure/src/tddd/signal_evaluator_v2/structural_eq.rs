@@ -281,21 +281,24 @@ fn referenced_path_identities(
         for (child_index, referenced_id) in
             child_item_ids(&candidate, index).into_iter().enumerate()
         {
-            // Id(0) is rustdoc's `Self` sentinel and may also be the crate root;
-            // following it would pull unrelated top-level items into this item's
-            // identity fingerprint.
-            if referenced_id != Id(0) {
-                if let Some(child) = index.get(&referenced_id) {
-                    pending.push((
-                        child_context(&context, &candidate, child, child_index),
-                        child.clone(),
-                        false,
-                    ));
-                }
+            let Some(child) = index.get(&referenced_id) else {
+                continue;
+            };
+            if is_module_item(child) {
+                continue;
             }
+            pending.push((
+                child_context(&context, &candidate, child, child_index),
+                child.clone(),
+                false,
+            ));
         }
     }
     Some(identities)
+}
+
+fn is_module_item(item: &Item) -> bool {
+    matches!(&item.inner, ItemEnum::Module(_))
 }
 
 /// Returns graph-local child item ids that are part of an item's structural shape.
@@ -316,6 +319,7 @@ fn child_item_ids(item: &Item, index: &HashMap<Id, Item>) -> Vec<Id> {
             }));
             children
         }
+        ItemEnum::Module(module) => module.items.clone(),
         ItemEnum::Enum(enumeration) => {
             let mut children = enumeration.variants.clone();
             children.extend(enumeration.impls.iter().copied().filter(|id| {
@@ -667,17 +671,20 @@ fn format_variant_kind(kind: &rustdoc_types::VariantKind, index: &HashMap<Id, It
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
-    use std::collections::HashMap;
+    use std::collections::{BTreeMap, HashMap};
 
     use rustdoc_types::{
-        Abi, AssocItemConstraint, AssocItemConstraintKind, DynTrait, FunctionHeader,
-        FunctionPointer, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
-        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, ItemKind, ItemSummary, Path,
-        PolyTrait, PreciseCapturingArg, Struct, StructKind, Term, TraitBoundModifier, Type,
-        TypeAlias, Variant, VariantKind, Visibility,
+        Abi, AssocItemConstraint, AssocItemConstraintKind, Crate, DynTrait, FORMAT_VERSION,
+        FunctionHeader, FunctionPointer, FunctionSignature, GenericArg, GenericArgs, GenericBound,
+        GenericParamDef, GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, ItemKind,
+        ItemSummary, Module, Path, PolyTrait, PreciseCapturingArg, Struct, StructKind, Target,
+        Term, TraitBoundModifier, Type, TypeAlias, Variant, VariantKind, Visibility,
     };
 
+    use domain::tddd::catalogue_v2::CrateName;
+
     use super::structs_structurally_equal;
+    use crate::tddd::canonical_type_identity::DefinitionPathAuthority;
     use crate::tddd::signal_evaluator_v2::generics_eq::make_simple_trait_bound as make_trait_bound;
 
     fn items_structurally_equal(
@@ -858,6 +865,441 @@ mod tests {
             "cross-crate refs with different path lengths and differing per-graph ids \
              must still compare equal at L1 short-name (D13 shape-based matching)"
         );
+    }
+
+    fn make_named_struct_field_resolved_path(
+        id: Id,
+        name: &str,
+        type_path: &str,
+        type_id: Id,
+    ) -> Item {
+        let mut item = make_struct_field_resolved_path(id, type_path, type_id);
+        item.name = Some(name.to_owned());
+        item
+    }
+
+    fn make_named_item(id: Id, name: &str, inner: ItemEnum) -> Item {
+        let mut item = make_item(id, inner);
+        item.name = Some(name.to_owned());
+        item
+    }
+
+    fn identities_contain_field_path(
+        identities: &BTreeMap<String, Vec<String>>,
+        field_name: &str,
+        expected_identity: &str,
+    ) -> bool {
+        identities.iter().any(|(context, values)| {
+            context.contains(&format!("field:{field_name}"))
+                && values.iter().any(|value| value == expected_identity)
+        })
+    }
+
+    #[test]
+    fn test_referenced_path_identities_include_id_zero_struct_field() {
+        let crate_name = "fixture";
+        let root_id = Id(10);
+        let record_id = Id(11);
+        let zero_field_id = Id(0);
+        let other_field_id = Id(12);
+        let zero_type_id = Id(100);
+        let other_type_id = Id(101);
+
+        let record = make_named_item(
+            record_id,
+            "Record",
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain {
+                    fields: vec![zero_field_id, other_field_id],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index: HashMap::from([
+                (
+                    root_id,
+                    make_named_item(
+                        root_id,
+                        crate_name,
+                        ItemEnum::Module(Module {
+                            is_crate: true,
+                            items: vec![record_id],
+                            is_stripped: false,
+                        }),
+                    ),
+                ),
+                (record_id, record.clone()),
+                (
+                    zero_field_id,
+                    make_named_struct_field_resolved_path(
+                        zero_field_id,
+                        "zero",
+                        "ZeroType",
+                        zero_type_id,
+                    ),
+                ),
+                (
+                    other_field_id,
+                    make_named_struct_field_resolved_path(
+                        other_field_id,
+                        "other",
+                        "OtherType",
+                        other_type_id,
+                    ),
+                ),
+            ]),
+            paths: HashMap::from([
+                (
+                    record_id,
+                    ItemSummary {
+                        crate_id: 0,
+                        path: vec![crate_name.to_owned(), "Record".to_owned()],
+                        kind: ItemKind::Struct,
+                    },
+                ),
+                (
+                    zero_type_id,
+                    ItemSummary {
+                        crate_id: 0,
+                        path: vec![crate_name.to_owned(), "ZeroType".to_owned()],
+                        kind: ItemKind::Struct,
+                    },
+                ),
+                (
+                    other_type_id,
+                    ItemSummary {
+                        crate_id: 0,
+                        path: vec![crate_name.to_owned(), "OtherType".to_owned()],
+                        kind: ItemKind::Struct,
+                    },
+                ),
+            ]),
+            external_crates: HashMap::new(),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let authority = DefinitionPathAuthority::from_path_maps(&krate.paths, &[]);
+        let crate_name = CrateName::new(crate_name.to_owned()).expect("valid fixture crate name");
+
+        let identities = super::referenced_path_identities(
+            &record,
+            &krate.index,
+            &krate.paths,
+            &crate_name,
+            &authority,
+            false,
+        )
+        .expect("fixture paths must resolve");
+
+        assert!(identities_contain_field_path(&identities, "zero", "fixture::ZeroType"));
+        assert!(identities_contain_field_path(&identities, "other", "fixture::OtherType"));
+    }
+
+    #[test]
+    fn test_child_traversal_excludes_modules_including_crate_root_but_keeps_non_module_id_zero() {
+        let crate_name = "fixture";
+        let root_id = Id(0);
+        let module_case_record_id = Id(1);
+        let module_case_field_id = Id(2);
+        let module_case_leaked_field_id = Id(3);
+        let module_case_type_id = Id(100);
+        let module_case_record = make_named_item(
+            module_case_record_id,
+            "ModuleCase",
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain {
+                    // The crate-root module is deliberately referenced as a child so the
+                    // exclusion is tested by item kind rather than by its Id.
+                    fields: vec![root_id, module_case_field_id],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        let module_case_index = HashMap::from([
+            (
+                root_id,
+                make_named_item(
+                    root_id,
+                    crate_name,
+                    ItemEnum::Module(Module {
+                        is_crate: true,
+                        items: vec![module_case_record_id, module_case_leaked_field_id],
+                        is_stripped: false,
+                    }),
+                ),
+            ),
+            (module_case_record_id, module_case_record.clone()),
+            (
+                module_case_field_id,
+                make_named_struct_field_resolved_path(
+                    module_case_field_id,
+                    "kept",
+                    "KeptType",
+                    module_case_type_id,
+                ),
+            ),
+            (
+                module_case_leaked_field_id,
+                make_named_struct_field_resolved_path(
+                    module_case_leaked_field_id,
+                    "leaked",
+                    "MissingType",
+                    Id(999),
+                ),
+            ),
+        ]);
+        let module_case_paths = HashMap::from([
+            (
+                module_case_record_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "ModuleCase".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                module_case_type_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "KeptType".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]);
+        let authority = DefinitionPathAuthority::from_path_maps(&module_case_paths, &[]);
+        let crate_name_value = CrateName::new(crate_name.to_owned()).expect("valid fixture name");
+        let module_case_identities = super::referenced_path_identities(
+            &module_case_record,
+            &module_case_index,
+            &module_case_paths,
+            &crate_name_value,
+            &authority,
+            false,
+        )
+        .expect("module fixture paths must resolve");
+        assert!(identities_contain_field_path(
+            &module_case_identities,
+            "kept",
+            "fixture::KeptType"
+        ));
+        assert!(
+            !module_case_identities.keys().any(|context| context.contains("field:leaked")),
+            "a skipped module must not traverse its unresolved descendant"
+        );
+
+        let non_module_root_id = Id(10);
+        let non_module_record_id = Id(11);
+        let non_module_other_field_id = Id(12);
+        let non_module_zero_type_id = Id(101);
+        let non_module_record = make_named_item(
+            non_module_record_id,
+            "NonModuleCase",
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain {
+                    fields: vec![Id(0), non_module_other_field_id],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        let non_module_zero_field = make_named_struct_field_resolved_path(
+            Id(0),
+            "zero",
+            "ZeroType",
+            non_module_zero_type_id,
+        );
+        let non_module_index = HashMap::from([
+            (
+                non_module_root_id,
+                make_named_item(
+                    non_module_root_id,
+                    crate_name,
+                    ItemEnum::Module(Module {
+                        is_crate: true,
+                        items: vec![non_module_record_id],
+                        is_stripped: false,
+                    }),
+                ),
+            ),
+            (non_module_record_id, non_module_record.clone()),
+            (Id(0), non_module_zero_field),
+            (
+                non_module_other_field_id,
+                make_named_struct_field_resolved_path(
+                    non_module_other_field_id,
+                    "other",
+                    "OtherType",
+                    module_case_type_id,
+                ),
+            ),
+        ]);
+        let non_module_paths = HashMap::from([
+            (
+                non_module_record_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "NonModuleCase".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                non_module_zero_type_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "ZeroType".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                module_case_type_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "OtherType".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]);
+        let authority = DefinitionPathAuthority::from_path_maps(&non_module_paths, &[]);
+        let non_module_identities = super::referenced_path_identities(
+            &non_module_record,
+            &non_module_index,
+            &non_module_paths,
+            &crate_name_value,
+            &authority,
+            false,
+        )
+        .expect("non-module fixture paths must resolve");
+        assert!(identities_contain_field_path(&non_module_identities, "zero", "fixture::ZeroType"));
+    }
+
+    #[test]
+    fn test_referenced_path_identities_generated_child_cases_preserve_invariants() {
+        let crate_name = "fixture";
+        let crate_name = CrateName::new(crate_name.to_owned()).expect("valid fixture crate name");
+
+        // Exhaustively generate the small boundary domain relevant to the traversal:
+        // zero and non-zero ids, Module and non-Module kinds, and present or absent
+        // index entries.  A present Module carries an unresolved descendant so that
+        // traversing it would fail closed; correct kind filtering must skip it.
+        for child_id in [Id(0), Id(1), Id(2), Id(u32::MAX)] {
+            for is_module in [false, true] {
+                for is_indexed in [false, true] {
+                    let record_id = Id(10_000);
+                    let child_type_id = Id(10_001);
+                    let leaked_field_id = Id(10_002);
+                    let mut index = HashMap::from([(
+                        record_id,
+                        make_named_item(
+                            record_id,
+                            "Record",
+                            ItemEnum::Struct(Struct {
+                                kind: StructKind::Plain {
+                                    fields: vec![child_id],
+                                    has_stripped_fields: false,
+                                },
+                                generics: empty_generics(),
+                                impls: vec![],
+                            }),
+                        ),
+                    )]);
+                    if is_indexed {
+                        let child = if is_module {
+                            make_named_item(
+                                child_id,
+                                "crate",
+                                ItemEnum::Module(Module {
+                                    is_crate: true,
+                                    items: vec![leaked_field_id],
+                                    is_stripped: false,
+                                }),
+                            )
+                        } else {
+                            make_named_struct_field_resolved_path(
+                                child_id,
+                                "child",
+                                "ChildType",
+                                child_type_id,
+                            )
+                        };
+                        index.insert(child_id, child);
+                        if is_module {
+                            index.insert(
+                                leaked_field_id,
+                                make_named_struct_field_resolved_path(
+                                    leaked_field_id,
+                                    "leaked",
+                                    "MissingType",
+                                    Id(10_003),
+                                ),
+                            );
+                        }
+                    }
+
+                    let paths = HashMap::from([
+                        (
+                            record_id,
+                            ItemSummary {
+                                crate_id: 0,
+                                path: vec!["fixture".to_owned(), "Record".to_owned()],
+                                kind: ItemKind::Struct,
+                            },
+                        ),
+                        (
+                            child_type_id,
+                            ItemSummary {
+                                crate_id: 0,
+                                path: vec!["fixture".to_owned(), "ChildType".to_owned()],
+                                kind: ItemKind::Struct,
+                            },
+                        ),
+                    ]);
+                    let authority = DefinitionPathAuthority::from_path_maps(&paths, &[]);
+                    let record = index.get(&record_id).expect("generated record must be indexed");
+                    let identities = super::referenced_path_identities(
+                        record,
+                        &index,
+                        &paths,
+                        &crate_name,
+                        &authority,
+                        false,
+                    );
+
+                    assert!(
+                        identities.is_some(),
+                        "missing children and Module children must not make traversal fail: child_id={:?}, is_module={}, is_indexed={}",
+                        child_id,
+                        is_module,
+                        is_indexed,
+                    );
+                    let identities = identities.expect("presence was asserted above");
+                    let child_is_collected =
+                        identities.keys().any(|context| context.contains("field:child"));
+                    assert_eq!(
+                        child_is_collected,
+                        is_indexed && !is_module,
+                        "only present non-Module children are collected: child_id={:?}, is_module={}, is_indexed={}",
+                        child_id,
+                        is_module,
+                        is_indexed,
+                    );
+                    assert!(
+                        !identities.keys().any(|context| context.contains("field:leaked")),
+                        "Module descendants must never be traversed: child_id={:?}, is_indexed={}",
+                        child_id,
+                        is_indexed,
+                    );
+                }
+            }
+        }
     }
 
     #[test]

@@ -367,6 +367,149 @@ fn simple_crate_with_fn(crate_name: &str, fn_path: &[&str]) -> Crate {
     }
 }
 
+#[test]
+fn test_structural_signal_with_id_zero_field_is_blue() {
+    use domain::tddd::catalogue_v2::composite::{
+        StructKind as CatalogueStructKind, StructShape, TypeKindV2,
+    };
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::roles::DataRole;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CatalogueEntryKey, CrateName, FieldDecl, FieldName, ModulePath, TypeRef,
+    };
+
+    let crate_name = "fixture";
+    let mut document = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).expect("valid fixture crate name"),
+        domain::tddd::LayerId::try_new("domain").expect("valid fixture layer"),
+    );
+    document.insert_type(
+        CatalogueEntryKey::try_new("Payload".to_owned()).expect("valid payload key"),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(CatalogueStructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let field = |name: &str| {
+        FieldDecl::new(
+            FieldName::new(name).expect("valid fixture field name"),
+            TypeRef::new("Payload").expect("valid fixture field type"),
+        )
+    };
+    document.insert_type(
+        CatalogueEntryKey::try_new("Record".to_owned()).expect("valid record key"),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(CatalogueStructKind::new(
+                StructShape::Plain {
+                    fields: vec![field("zero"), field("other")],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    let a = encode_catalogue_doc(document).expect("catalogue fixture must encode");
+
+    let root_id = Id(100);
+    let payload_id = Id(1);
+    let record_id = Id(2);
+    let zero_field_id = Id(0);
+    let other_field_id = Id(3);
+    let payload_path =
+        rustdoc_types::Path { path: "Payload".to_owned(), id: payload_id, args: None };
+    let mut c_index = HashMap::new();
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![payload_id, record_id]));
+    c_index.insert(payload_id, struct_item(payload_id, "Payload"));
+    c_index.insert(
+        record_id,
+        make_item(
+            record_id,
+            Some("Record"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain {
+                    fields: vec![zero_field_id, other_field_id],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        ),
+    );
+    c_index.insert(
+        zero_field_id,
+        make_item(
+            zero_field_id,
+            Some("zero"),
+            ItemEnum::StructField(Type::ResolvedPath(payload_path.clone())),
+        ),
+    );
+    c_index.insert(
+        other_field_id,
+        make_item(
+            other_field_id,
+            Some("other"),
+            ItemEnum::StructField(Type::ResolvedPath(payload_path)),
+        ),
+    );
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: HashMap::from([
+            (
+                payload_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "Payload".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+            (
+                record_id,
+                ItemSummary {
+                    crate_id: 0,
+                    path: vec![crate_name.to_owned(), "Record".to_owned()],
+                    kind: ItemKind::Struct,
+                },
+            ),
+        ]),
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, empty_crate(), c).expect("fixture must evaluate");
+    let record_signal = report.iter().find(|signal| signal.item_name() == "Record");
+
+    assert!(record_signal.is_some(), "Expected Record signal; got: {report:?}");
+    let record_signal = record_signal.expect("Record signal was checked above");
+    assert_eq!(record_signal.region(), SignalRegion::SIntersectC_Match_Add);
+    assert!(
+        record_signal.signal().is_blue(),
+        "all catalogue-declared fields, including Id(0), must compare as Blue: {record_signal:?}"
+    );
+}
+
 // -----------------------------------------------------------------------
 // Region coverage tests — one per non-Skip SignalRegion variant (AC-08)
 // -----------------------------------------------------------------------

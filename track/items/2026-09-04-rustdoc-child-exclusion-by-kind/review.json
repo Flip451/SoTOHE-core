@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-04T02:08:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee6139db092343dd94350fa16fc45bd7d812055adbc47e98ee22674e3ea8f56e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:13:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee6139db092343dd94350fa16fc45bd7d812055adbc47e98ee22674e3ea8f56e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:22:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/impl-plan.json",
+              "line": 6,
+              "message": "The section description restates the upstream behavior contract (kind-based exclusion, Id(0) field retention, module exclusion, and blue signal) in prose. Keep only target + operation + anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/impl-plan.json",
+              "line": 24,
+              "message": "T001 restates the upstream behavior contract in prose, including numeric-id handling, field/reference retention, module exclusion, and signal color. Keep only target + operation + anchor cites, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:45c37a6bf9168f2d5887b66c335a7a24a7cf34dc45fa3abc70f73bad2e200c19",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T03:26:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90a88bb90a925ddddad07f8e741f7168945720aa07012f9166d5d5ede735c92a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:34:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90a88bb90a925ddddad07f8e741f7168945720aa07012f9166d5d5ede735c92a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:18:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d37e648277c1a05998a95da3754cce87695bf6f90058621f7db56000ec958a3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:24:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d37e648277c1a05998a95da3754cce87695bf6f90058621f7db56000ec958a3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T05:30:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb09b861b81979c8fcf6da9d548a0c751a17387c13359fdda124449ae7f1c3d9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T05:33:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb09b861b81979c8fcf6da9d548a0c751a17387c13359fdda124449ae7f1c3d9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-04T04:22:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e726da14164f61e314213bda01c1bb7bb5d48a9d137f40d47eaabd3955e61504",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T04:52:50Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 1066,
+              "message": "AC-02 の Module 除外が traversal 経由で検証されていません。この行は private helper の分類結果だけを assert し、その後の結果検証は retained field しか確認していません。Module は path identity を生成せず `child_item_ids` にも Module arm がないため、本番の `if is_module_item(child)` 分岐を削除しても新規テストはすべて通ります。Module child が enqueue された場合に失敗する観測可能な回帰テストへ変更してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "testing convention",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 898,
+              "message": "変更された evaluator は固定 fixture のテストだけで、`knowledge/conventions/testing.md` が evaluator 変更に要求する property-based test がありません。zero/nonzero の child ID、Module/non-Module kind、index 欠落を生成して、数値に依存せず Module だけを除外する不変条件を検証してください。現状では別の magic ID 条件が再導入されても固定ケース外なら検出できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e726da14164f61e314213bda01c1bb7bb5d48a9d137f40d47eaabd3955e61504",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T05:16:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:384a2eb41d09ac1bbb28ec7b2d3ad27be9bbd899abe611c350a96d8a46806896",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:30:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8314694dac237ca83cb1e713424f697984d2d7b303251a878237620584c72dc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:37:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8314694dac237ca83cb1e713424f697984d2d7b303251a878237620584c72dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-04T02:47:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3293f07302dd84125d5998a2f9d552257216ddc38f52b6e55e143ff4f138a7ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:47:31Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-09-04-rustdoc-child-exclusion-by-kind/spec.json",
+              "line": 31,
+              "message": "AC-03 は参照集合との「完全な照合」を要求するだけで、GO-01 が掲げる誤った 🟡 判定が 🔵 になることを決定的に証明しない。最終的な signal 判定結果のカバレッジが不足している。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:3293f07302dd84125d5998a2f9d552257216ddc38f52b6e55e143ff4f138a7ae",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-04T02:50:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:51:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T02:56:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699e90692bcdab4a1100dbc89209f265744871df731b2e9f0118d32e5e8caa74",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-04T03:09:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b2d1fe3eea8915f20e135358af5365db397eba81b9b4730d5ade18bf8b6559",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-04T03:15:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b2d1fe3eea8915f20e135358af5365db397eba81b9b4730d5ade18bf8b6559",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
