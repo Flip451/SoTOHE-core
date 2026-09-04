@@ -1,0 +1,708 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-03T00:49:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29bfbb025003d3490d24b4da773fb31a2adc4338b9deeba161773d7f4d37a8eb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T00:53:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29bfbb025003d3490d24b4da773fb31a2adc4338b9deeba161773d7f4d37a8eb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T01:05:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:21e0b2fb50f27e63d66a79d6da48bbc005a10fd4456c17f0d8c417b615805c7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T01:07:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:21e0b2fb50f27e63d66a79d6da48bbc005a10fd4456c17f0d8c417b615805c7b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-09-03T05:59:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:239a1bfdfae3df11a3d0c0308a565be1c32403f071d38dd813280b966d77971d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:13:33Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "apps/cli-composition/src/track/composition_root.rs",
+              "line": 155,
+              "message": "`BaseMergeInput` carries an explicit `workspace_root`, and the context, Git, and cleanup adapters operate on that root, but the newly injected `GitTrackCommitHashAdapter` instead discovers its repository from the process current directory before writing `track/items/<id>/.commit_hash`. Neither the track spec nor `environment-assumptions.md` declares that the current directory must identify the same repository as `workspace_root`. A caller supplying another workspace can complete the merge and earlier cleanup there, then fail commit-record advancement—or update another repository with the same active track ID. Preserve `workspace_root` across the commit-record port so every collaborator targets the same repository.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:239a1bfdfae3df11a3d0c0308a565be1c32403f071d38dd813280b966d77971d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T06:26:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:239a1bfdfae3df11a3d0c0308a565be1c32403f071d38dd813280b966d77971d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-09-03T05:59:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80afc073f04d382d8252e0bb9096c92cbe382c9ca34ed2d701c0557ac480f93d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:11:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80afc073f04d382d8252e0bb9096c92cbe382c9ca34ed2d701c0557ac480f93d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-09-03T09:43:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc6d87c14e3dd7f4cba728d2842c97df5ad98741bcd9e382d08f048ebc5a49b4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:53:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc6d87c14e3dd7f4cba728d2842c97df5ad98741bcd9e382d08f048ebc5a49b4",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-09-03T03:35:07Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 6,
+              "message": "T1 description restates the upstream behavior contract instead of only naming target, operation, and anchor: “advance the active track commit record after the established Baseline then Views stages for both clean merge and conflict recovery, map record failures to the cleanup error, and add focused success, ordering, failure, and no-Git-commit tests.” Remove the prose behavior restatement and reference the applicable anchors.",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 18,
+              "message": "SECTION-01 description restates the upstream behavior contract: “Preserve the Baseline then Views sequence, append commit-record advancement as the final completion condition, and fail closed without creating a Git commit.” Replace it with target + operation + anchor cite only.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:71ef9d7520de5dee70ef46bad1bb77b7b0180abe32c053facb10930e49afc276",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T03:39:27Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 11,
+              "message": "spec.json defines GO-01, but impl-plan.json has no plan.summary, so the goal has no goal-to-task traceability. Goals are intentionally excluded from task-coverage.json; add a concise GO-01 → T1 mapping in plan.summary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c7ce6c43a1c0f70e7a3c7b71cc8ce4f1041a843421e2cb607db322c9cc1ae938",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T03:41:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c84d2d01e692b1bdfe32c504fded35a77e4c669fbb6c70122614e2ee135a6eb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T03:50:44Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 6,
+              "message": "T1 is not executable within its declared “usecase-layer” boundary. The catalogued change to `BaseMergeInteractor::new` adds a `TrackCommitHashPort` argument, so the production caller at `apps/cli-composition/src/track/composition_root.rs` and existing direct callers in infrastructure/CLI-driver tests must also be updated. T1 names none of those targets or operations, and `batch-plan.json` estimates only the usecase scope; following the task literally leaves the tree unwired and uncompilable. Name and estimate the required caller migrations or assign them to dependent tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/task-contract.json",
+              "line": 4,
+              "message": "T1 omits four required catalogue-entry attributions: `domain / domain::ids::TrackId`, `domain / domain::ids::CommitHash`, `usecase / usecase::git_workflow::DiagnosticText`, and `usecase / TrackCommitHashPort`. `bin/sotp task-contract coverage` currently reports all four as `OrphanEntry`. Reference entries still require an attribution even though T1 need not modify them; attribute them to T1 or to the appropriate tasks after decomposition.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 6,
+              "message": "T1 is still `todo` and bundles two independently verifiable behavior units implemented in separate merge-result paths: clean-merge completion (`IN-01`, `AC-01`) and conflict-recovery completion (`IN-02`, `AC-02`). Split these into dependent pre-implementation tasks with their focused validation, then redistribute the shared constraints and `AC-03`/`AC-04` validation, contract attributions, estimates, and batch membership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c84d2d01e692b1bdfe32c504fded35a77e4c669fbb6c70122614e2ee135a6eb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T04:01:49Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 6,
+              "message": "T1のdescriptionは、許可された対象・操作・anchor citeを超えて、clean-merge時の注入、エラー伝播、fail-closed、Git commit禁止、Baseline→Views順序という上流の挙動契約を散文で再記述しています。`.harness/policies/no-upstream-restatement.md`に従い、対象・操作・anchor citeだけにしてください。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 14,
+              "message": "T2のdescriptionは、conflict-recovery時の成功、fail-closed、Git commit禁止、Baseline→Views順序という上流の挙動契約を再記述しています。対象・操作・anchor citeだけに簡略化してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 25,
+              "message": "SECTION-01のdescriptionは、clean-merge completion pathにおけるcommit-record dependencyとerror propagationという上流契約を再記述しています。section descriptionは対象・操作・anchor citeに限定してください。",
+              "severity": "P2"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 36,
+              "message": "SECTION-02のdescriptionは、conflict-recoveryのsuccessおよびfail-closed behaviorを独立検証するという上流契約を再記述しています。対象・操作・anchor citeに置き換えてください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:f5a75fd363d00d0f532681f7621921730708b540d83efc2b5927a322ea2435f5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T04:05:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22252078cccefeb9a38df9905c6ee197c4d6fb41b183c4aa221bcc00e65488f5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T04:09:43Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/task-contract.json",
+              "line": 10,
+              "message": "T1 is attributed to `usecase::base_merge::PostMergeCleanupError`, but T1’s executable description and SECTION-01 name operations only on `BaseMergeInteractor` and its callers. Nothing directs T1 to make `PostMergeCleanupError` conform to the catalogue-declared `CommitRecord` variant, so the task can complete its stated work without fulfilling this attribution. Add the error symbol and operation to T1 with the existing CN-03/AC-03 anchors, or move the attribution to a task that explicitly owns that convergence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22252078cccefeb9a38df9905c6ee197c4d6fb41b183c4aa221bcc00e65488f5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T04:13:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:838898b61f3f657c7abdd898aa427b7c4e5a9e9b76df83ba51944cbb9efdc89d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T05:56:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:259db27c04075dd81260ab6038e4d01cc203746560a79a22c4cc835362a9a6e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:07:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:259db27c04075dd81260ab6038e4d01cc203746560a79a22c4cc835362a9a6e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:14:04Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 34,
+              "message": "T1 の task description は対象と操作は示していますが、AC-NN/IN-NN/CN-NN または spec element id のアンカーを含まないため、impl-plan の実行可能性要件を満たしていません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 40,
+              "message": "T2 の task description は対象と操作は示していますが、AC-NN/IN-NN/CN-NN または spec element id のアンカーを含まないため、impl-plan の実行可能性要件を満たしていません。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 34,
+              "message": "T1 の description にある「preserving the non-persisting Conflicted return branch」は upstream の挙動契約を本文で再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、対象・操作・アンカーだけを残してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 6,
+              "message": "SECTION-01 の description にある「leaving the Conflicted return branch free of persistence」は upstream の挙動契約の再記述です。`.harness/policies/no-upstream-restatement.md` に従い、対象・操作・アンカーだけを記載してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c291381ac5d9e05d9bc85fff66df06b9cb6d87f5eba0ae7d82dc2a309115383",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T09:18:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55261b39c29143239e36a41041f32f4784f1c5441ec1a3e76e561b31edd40dff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:24:45Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/task-coverage.json",
+              "line": 26,
+              "message": "T2 is the sole conflict-recovery task, but CN-02, CN-03, and AC-03 are mapped only to T1. These are branch-spanning requirements: commit-record advancement must follow the existing cleanup ordering and any update failure must prevent successful completion. T1 covers only the clean path, while T2's description merely invokes `set-commit-hash` and provides no terminal failure-handling step. Map these anchors to T2 and make the ordering/fail-closed operation executable in T2.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55261b39c29143239e36a41041f32f4784f1c5441ec1a3e76e561b31edd40dff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T09:29:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef3ed614196fd1a69c36b64ea3aa234497080b2b0ad270c0b746c9b4909065a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:44:21Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 38,
+              "message": "T2 の task description は「add explicit non-zero-result handling that stops recovery before reporting completion」として AC-03 の挙動契約を本文で再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、対象・操作・アンカーだけを残してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/impl-plan.json",
+              "line": 17,
+              "message": "SECTION-02 の description は「add explicit non-zero-result handling that stops recovery before reporting completion」として AC-03 の挙動契約を本文で再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、対象・操作・アンカーだけを記載してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4fec4c9fbe5834b7d1affaba6ed0d70383389256e3d772674731f8a0ceb2f984",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T09:46:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cec995cc56db38410a6eb3a66bd19130d33b4c16bbb93cde1781e45fd83784e0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:52:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cec995cc56db38410a6eb3a66bd19130d33b4c16bbb93cde1781e45fd83784e0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T10:23:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67cc3ea7fca4ea5fec05aaafcc9acff93e9856abb702a9cc7bd049b15e793f57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T10:25:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67cc3ea7fca4ea5fec05aaafcc9acff93e9856abb702a9cc7bd049b15e793f57",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-09-03T05:59:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4202dc4363cda120fa0f06a2450cda2927e375919a1326068e7f2c598f1efb3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:12:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4202dc4363cda120fa0f06a2450cda2927e375919a1326068e7f2c598f1efb3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-09-03T03:34:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37dce7d8aaa2a25700b836f05b04230e1f9f8e828fd94e7d460d4f9e95785686",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T03:37:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37dce7d8aaa2a25700b836f05b04230e1f9f8e828fd94e7d460d4f9e95785686",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T05:56:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c6a0416e1ade6ca353cc202794332b1f0d45fdd7acb0d41aa1017bc34f48df95",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:09:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c6a0416e1ade6ca353cc202794332b1f0d45fdd7acb0d41aa1017bc34f48df95",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T06:24:02Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/test-bindings.json",
+              "line": 15,
+              "message": "The fulfillment record now binds only the two clean-merge tests, while the cached obligation verdicts still reference the four-test set (including the conflict tests). `bin/sotp test-obligation check` therefore fails with `StaleVerdicts` (CN-01); update the binding/cache consistently or retain the complete bound test set.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:daebbb41ebe01163d734b69920507137799d312acb4afa172bb89d71744fea16",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T06:32:19Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/test-bindings.json",
+              "line": 15,
+              "message": "The binding now points to test bodies whose frozen obligation verdicts are stale: `bin/sotp test-obligation check` reports `TestChanged` drifts for the BaseMergeInteractor edges (IN-01, IN-02, CN-01, CN-02, CN-03, AC-01, AC-02, AC-03, and AC-04). Refresh the obligation verdict/cache for this exact test set before treating the fulfillment record as valid.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e4425c87c1c745478b4ee69077b46920aa5bd21e400f6b55539aaa9bd9de9b10",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T09:44:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd11911e9e79238005655cb00f598b999872830370694ef4bd39213e82d67b1d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:51:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd11911e9e79238005655cb00f598b999872830370694ef4bd39213e82d67b1d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-09-03T01:18:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3c58264b5f62d584b3b61a299b1cc5dbe0b5313858440f6ed8694cd0da4013",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T01:24:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3c58264b5f62d584b3b61a299b1cc5dbe0b5313858440f6ed8694cd0da4013",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-09-03T02:19:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 56,
+              "message": "`TrackCommitHashPort` の `docs` は、current HEAD の解決・永続化という spec の挙動契約を散文で再掲しています。docs は変更対象・操作・spec anchor の参照に限定してください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 105,
+              "message": "`usecase::base_merge::BaseMergeInteractor` の `docs` は、Baseline → Views → commit-record の順序と clean/conflicted merge の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 209,
+              "message": "`usecase::base_merge::PostMergeCleanupError` の `docs` は、commit-record failure を fail-closed とする spec の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 273,
+              "message": "`usecase::git_workflow::DiagnosticText` の `docs` は、private String を opaque presentation detail とする型設計上の rationale を散文で再記述しています。docs は upstream anchor を参照するだけにしてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b4d27e1738aa0fa947ed524cff694954b64e0f80443dc95f50e76ab32cb3c7b8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T02:41:01Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 56,
+              "message": "`TrackCommitHashPort` の `docs` が current HEAD の解決・永続化という upstream spec の挙動契約を再記述しています。docs は変更対象・操作・spec anchor の参照に限定してください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 105,
+              "message": "`usecase::base_merge::BaseMergeInteractor` の `docs` が Baseline → Views → commit-record の順序と clean/conflicted merge の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 209,
+              "message": "`usecase::base_merge::PostMergeCleanupError` の `docs` が commit-record failure を fail-closed とする upstream spec の挙動契約を再記述しています。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 273,
+              "message": "`usecase::git_workflow::DiagnosticText` の `docs` が private String を opaque presentation detail とする型設計上の rationale を再記述しています。docs は upstream anchor を参照するだけにしてください。根拠: `.harness/policies/no-upstream-restatement.md`。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97f776dca6d27e211a6a91ff4b41640c6628cb8e7cd3d2d29436952ceb4df037",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T02:46:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97f776dca6d27e211a6a91ff4b41640c6628cb8e7cd3d2d29436952ceb4df037",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T02:55:15Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 56,
+              "message": "`TrackCommitHashPort::persist_current_for_track` resolves Git state and persists the active track’s commit record, but it remains synchronous (`is_async: false`) while the entry docs merely say the port is reused and do not acknowledge the deliberate blocking-I/O boundary. Restore a concise synchronous-I/O rationale or change the port’s execution color.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97f776dca6d27e211a6a91ff4b41640c6628cb8e7cd3d2d29436952ceb4df037",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T03:16:03Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 63,
+              "message": "`TrackCommitHashPort::persist_current_for_track` は commit record を永続化する外部 I/O を伴うにもかかわらず `is_async: false` で、現在の `docs` (`Reuse ... unchanged`) が同期実装を選ぶ理由または選択を明示していません。同期/非同期の boundary color を確定できず adapter 実装時に再設計が必要になります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba6fb2ac7710cd5a8f7a980f0f90d0c159ad698d435c05e0907c45b29076d64f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T03:23:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ba6fb2ac7710cd5a8f7a980f0f90d0c159ad698d435c05e0907c45b29076d64f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T03:26:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ba6fb2ac7710cd5a8f7a980f0f90d0c159ad698d435c05e0907c45b29076d64f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T08:52:06Z",
+          "findings": [
+            {
+              "category": "spec_refs/role/action mismatch",
+              "file": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+              "line": 187,
+              "message": "`usecase::base_merge::BaseMergeInteractor` still declares a `commit_record: Arc<dyn TrackCommitHashPort>` constructor dependency at lines 187–188, so the catalogue continues to assign commit-record persistence to BaseMergeInteractor. This contradicts the briefing’s ownership decision that recovery completion moves to the existing `TrackSetCommitHashService`/`TrackSetCommitHashInteractor` path and that BaseMergeInteractor must not own IN-02/AC-02. Remove this dependency from the BaseMergeInteractor contract; retain commit-record ownership only on the set-commit-hash path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a6bc0336db873f6ee3b6ea2f9b27fef8d703babf82c41675c198b5fde9079ccf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T08:56:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bc0336db873f6ee3b6ea2f9b27fef8d703babf82c41675c198b5fde9079ccf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T09:04:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bc0336db873f6ee3b6ea2f9b27fef8d703babf82c41675c198b5fde9079ccf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-09-03T05:59:50Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/base_merge.rs",
+              "line": 273,
+              "message": "競合分岐で `persist_current_for_track` を呼んでいますが、既存ポートは `HEAD` を解決します。Git の競合状態では `HEAD` はマージ前の track commit のままで、`MERGE_HEAD` は結果 commit ではありません。このため、競合解決後の merge-result HEAD を記録するという AC-02/CN-01 を満たさず、古い commit record を再保存して成功扱いします。競合解決後に実行されるフローで記録するか、競合時に結果 HEAD を明示的に渡せる既存ポート経路へ接続してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:45baa4ac55f4e0c439316faa15743137e975660079299353a20a4c103d42930e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T06:26:23Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/base_merge.rs",
+              "line": 273,
+              "message": "競合完了分岐では Baseline → Views の後に `TrackCommitHashPort` を呼ばず、そのまま `Conflicted` を成功返却しています。したがって conflict recovery 後の merge-result HEAD が commit record に記録されず、AC-02/CN-01 を満たしません。競合完了時にも既存の commit-record 更新経路を実行し、失敗時は `ConflictedCleanupFailed(PostMergeCleanupError::CommitRecord(...))` として fail-closed にしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0066df54a6c542414320c8ad21e3ab9db6ea5a7c46f14baa5d00fb23de7d6b7a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T09:53:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0066df54a6c542414320c8ad21e3ab9db6ea5a7c46f14baa5d00fb23de7d6b7a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-03T10:03:52Z",
+          "findings": [
+            {
+              "category": "未宣言の前提への依存",
+              "file": "libs/usecase/src/base_merge.rs",
+              "line": 288,
+              "message": "The clean branch does not carry the merge-result HEAD forward; after Baseline → Views it asks `TrackCommitHashPort` to re-resolve the then-current HEAD. The merge lock has already ended, and no shared lock or typed expected hash protects this interval, so a concurrent Git actor can advance HEAD and cause an unrelated commit to be recorded while `Completed` is returned. Neither the spec nor the concurrency section of the environment-assumption declaration defines exclusive repository execution. Preserve and persist the exact merge-result hash, or declare and enforce serialized execution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0066df54a6c542414320c8ad21e3ab9db6ea5a7c46f14baa5d00fb23de7d6b7a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-03T10:14:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0066df54a6c542414320c8ad21e3ab9db6ea5a7c46f14baa5d00fb23de7d6b7a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

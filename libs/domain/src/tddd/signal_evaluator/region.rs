@@ -33,6 +33,9 @@
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free.
 
+use crate::tddd::catalogue_linter::FreeText;
+use crate::tddd::catalogue_v2::CatalogueItemNamespace;
+
 // ---------------------------------------------------------------------------
 // SignalRegion — 12 evaluation region variants (ADR 3 D3)
 // ---------------------------------------------------------------------------
@@ -145,10 +148,9 @@ impl ThreeWaySignalKind {
 
 /// Maps a `SignalRegion` to its canonical `ThreeWaySignalKind` per ADR 3 D3.
 ///
-/// Crate-internal helper used by [`ThreeWaySignal::new`].
-/// Callers outside this crate should construct [`ThreeWaySignal`] via
-/// `ThreeWaySignal::new(item_name, region)` which automatically derives the
-/// signal kind.
+/// Crate-internal helper used by [`ThreeWaySignal::catalogue_item`] and
+/// [`ThreeWaySignal::label`]. Callers outside this crate should use one of
+/// those constructors so the signal identity remains explicit.
 #[must_use]
 pub(crate) fn signal_for_region(region: SignalRegion) -> ThreeWaySignalKind {
     match region {
@@ -168,6 +170,35 @@ pub(crate) fn signal_for_region(region: SignalRegion) -> ThreeWaySignalKind {
 }
 
 // ---------------------------------------------------------------------------
+// ThreeWaySignalIdentity — per-item identity
+// ---------------------------------------------------------------------------
+
+/// Identity carried by a Phase 2 report signal.
+///
+/// Catalogue type and trait items use their namespace as part of the identity,
+/// while functions and trait-impl signals retain the report label that callers
+/// use to display them. Keeping these cases distinct prevents a type and trait
+/// with the same catalogue key from sharing status through a display label.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ThreeWaySignalIdentity {
+    /// A catalogue type or trait identity.
+    CatalogueItem { item_name: FreeText, namespace: CatalogueItemNamespace },
+    /// A function or trait-impl report label.
+    Label { label: FreeText },
+}
+
+impl ThreeWaySignalIdentity {
+    /// Returns the catalogue namespace, or `None` for a report-only label.
+    #[must_use]
+    pub fn namespace(&self) -> Option<CatalogueItemNamespace> {
+        match self {
+            Self::CatalogueItem { namespace, .. } => Some(*namespace),
+            Self::Label { .. } => None,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // ThreeWaySignal — per-item evaluation result
 // ---------------------------------------------------------------------------
 
@@ -181,13 +212,13 @@ pub(crate) fn signal_for_region(region: SignalRegion) -> ThreeWaySignalKind {
 ///
 /// ## Invariant
 ///
-/// `signal` is always `signal_for_region(region)` — the only constructor is
-/// [`ThreeWaySignal::new`], which derives the signal automatically.  All fields
-/// are private so external code cannot construct an inconsistent value.
+/// `signal` is always `signal_for_region(region)` — the constructors derive the
+/// signal automatically. All fields are private so external code cannot
+/// construct an inconsistent value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ThreeWaySignal {
-    /// Identity key of the item (short name for types/traits; `FunctionPath` for functions).
-    item_name: String,
+    /// Identity of the item or report label.
+    identity: ThreeWaySignalIdentity,
     /// Evaluation region this item falls into.
     region: SignalRegion,
     /// Canonical signal kind derived from `region` (see `signal_for_region` in this module).
@@ -195,28 +226,44 @@ pub struct ThreeWaySignal {
 }
 
 impl ThreeWaySignal {
-    /// Constructs a `ThreeWaySignal`.
+    /// Constructs a signal for a catalogue type or trait item.
     ///
     /// The `signal` field is automatically derived from `region` to ensure
     /// consistency with the ADR 3 D3 signal table.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use domain::tddd::signal_evaluator::region::{SignalRegion, ThreeWaySignal, ThreeWaySignalKind};
-    /// let s = ThreeWaySignal::new("User".to_string(), SignalRegion::SIntersectC_Match_Add);
-    /// assert_eq!(s.signal(), ThreeWaySignalKind::Blue);
-    /// ```
     #[must_use]
-    pub fn new(item_name: String, region: SignalRegion) -> Self {
+    pub fn catalogue_item(
+        item_name: FreeText,
+        namespace: CatalogueItemNamespace,
+        region: SignalRegion,
+    ) -> Self {
         let signal = signal_for_region(region);
-        Self { item_name, region, signal }
+        Self {
+            identity: ThreeWaySignalIdentity::CatalogueItem { item_name, namespace },
+            region,
+            signal,
+        }
+    }
+
+    /// Constructs a signal that retains a function or trait-impl report label.
+    #[must_use]
+    pub fn label(label: FreeText, region: SignalRegion) -> Self {
+        let signal = signal_for_region(region);
+        Self { identity: ThreeWaySignalIdentity::Label { label }, region, signal }
+    }
+
+    /// Returns the signal identity.
+    #[must_use]
+    pub fn identity(&self) -> &ThreeWaySignalIdentity {
+        &self.identity
     }
 
     /// Returns the item identity key.
     #[must_use]
     pub fn item_name(&self) -> &str {
-        &self.item_name
+        match &self.identity {
+            ThreeWaySignalIdentity::CatalogueItem { item_name, .. } => item_name.as_str(),
+            ThreeWaySignalIdentity::Label { label } => label.as_str(),
+        }
     }
 
     /// Returns the evaluation region.
@@ -319,6 +366,46 @@ impl ThreeWayEvaluationReport {
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_three_way_signal_namespace_is_recorded_for_type_and_trait_items() {
+        let plain =
+            ThreeWaySignal::label(FreeText::new("User"), SignalRegion::SIntersectC_Match_Add);
+        assert_eq!(plain.identity().namespace(), None);
+
+        let typed = ThreeWaySignal::catalogue_item(
+            FreeText::new("Shared"),
+            CatalogueItemNamespace::Type,
+            SignalRegion::SIntersectC_Match_Add,
+        );
+        let trait_signal = ThreeWaySignal::catalogue_item(
+            FreeText::new("Shared"),
+            CatalogueItemNamespace::Trait,
+            SignalRegion::SMinusC_Add,
+        );
+        assert_eq!(typed.identity().namespace(), Some(CatalogueItemNamespace::Type));
+        assert_eq!(trait_signal.identity().namespace(), Some(CatalogueItemNamespace::Trait));
+        assert_eq!(
+            typed.identity(),
+            &ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("Shared"),
+                namespace: CatalogueItemNamespace::Type,
+            }
+        );
+        assert_eq!(
+            trait_signal.identity(),
+            &ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new("Shared"),
+                namespace: CatalogueItemNamespace::Trait,
+            }
+        );
+        assert_eq!(
+            plain.identity(),
+            &ThreeWaySignalIdentity::Label { label: FreeText::new("User") }
+        );
+        assert_ne!(typed, trait_signal, "same label, different namespace");
+        assert_eq!(typed.signal(), signal_for_region(typed.region()));
+    }
+
     // -- SignalRegion coverage: all 12 variants map to a signal ---------------
 
     #[test]
@@ -402,16 +489,19 @@ mod tests {
     // -- ThreeWaySignal constructor auto-derives signal from region -----------
 
     #[test]
-    fn test_three_way_signal_new_derives_signal_from_region() {
-        let s = ThreeWaySignal::new("User".to_string(), SignalRegion::SIntersectC_Match_Add);
+    fn test_three_way_signal_label_derives_signal_from_region() {
+        let s = ThreeWaySignal::label(FreeText::new("User"), SignalRegion::SIntersectC_Match_Add);
         assert_eq!(s.signal(), ThreeWaySignalKind::Blue);
         assert_eq!(s.region(), SignalRegion::SIntersectC_Match_Add);
         assert_eq!(s.item_name(), "User");
     }
 
     #[test]
-    fn test_three_way_signal_new_reference_match_yields_skip() {
-        let s = ThreeWaySignal::new("Order".to_string(), SignalRegion::SIntersectC_Match_Reference);
+    fn test_three_way_signal_label_reference_match_yields_skip() {
+        let s = ThreeWaySignal::label(
+            FreeText::new("Order"),
+            SignalRegion::SIntersectC_Match_Reference,
+        );
         assert!(s.signal().is_skip());
     }
 
@@ -428,10 +518,11 @@ mod tests {
 
     #[test]
     fn test_report_new_filters_skip_signals() {
-        // Skip signals must be excluded from the report, even if passed to `new`.
+        // Skip signals must be excluded from the report, even when supplied to
+        // the report constructor.
         let skip =
-            ThreeWaySignal::new("Ref".to_string(), SignalRegion::SIntersectC_Match_Reference);
-        let blue = ThreeWaySignal::new("Add".to_string(), SignalRegion::SIntersectC_Match_Add);
+            ThreeWaySignal::label(FreeText::new("Ref"), SignalRegion::SIntersectC_Match_Reference);
+        let blue = ThreeWaySignal::label(FreeText::new("Add"), SignalRegion::SIntersectC_Match_Add);
         let report = ThreeWayEvaluationReport::new(vec![skip, blue]);
         // Skip entry is filtered; only the Blue entry remains.
         assert_eq!(report.len(), 1);
@@ -442,7 +533,8 @@ mod tests {
 
     #[test]
     fn test_report_has_violations_when_red_present() {
-        let signals = vec![ThreeWaySignal::new("Ghost".to_string(), SignalRegion::CMinusSUnionD)];
+        let signals =
+            vec![ThreeWaySignal::label(FreeText::new("Ghost"), SignalRegion::CMinusSUnionD)];
         let report = ThreeWayEvaluationReport::new(signals);
         assert!(report.has_violations());
         assert!(!report.is_in_progress());
@@ -450,7 +542,8 @@ mod tests {
 
     #[test]
     fn test_report_is_in_progress_when_only_yellow_present() {
-        let signals = vec![ThreeWaySignal::new("Feature".to_string(), SignalRegion::SMinusC_Add)];
+        let signals =
+            vec![ThreeWaySignal::label(FreeText::new("Feature"), SignalRegion::SMinusC_Add)];
         let report = ThreeWayEvaluationReport::new(signals);
         assert!(!report.has_violations());
         assert!(report.is_in_progress());
@@ -459,8 +552,8 @@ mod tests {
     #[test]
     fn test_report_len_matches_signals_count() {
         let signals = vec![
-            ThreeWaySignal::new("A".to_string(), SignalRegion::SIntersectC_Match_Add),
-            ThreeWaySignal::new("B".to_string(), SignalRegion::DMinusC),
+            ThreeWaySignal::label(FreeText::new("A"), SignalRegion::SIntersectC_Match_Add),
+            ThreeWaySignal::label(FreeText::new("B"), SignalRegion::DMinusC),
         ];
         let report = ThreeWayEvaluationReport::new(signals);
         assert_eq!(report.len(), 2);
@@ -469,8 +562,8 @@ mod tests {
     #[test]
     fn test_report_iter_yields_all_signals() {
         let signals = vec![
-            ThreeWaySignal::new("X".to_string(), SignalRegion::SIntersectC_Match_Modify),
-            ThreeWaySignal::new("Y".to_string(), SignalRegion::DIntersectC),
+            ThreeWaySignal::label(FreeText::new("X"), SignalRegion::SIntersectC_Match_Modify),
+            ThreeWaySignal::label(FreeText::new("Y"), SignalRegion::DIntersectC),
         ];
         let report = ThreeWayEvaluationReport::new(signals.clone());
         let collected: Vec<_> = report.iter().collect();

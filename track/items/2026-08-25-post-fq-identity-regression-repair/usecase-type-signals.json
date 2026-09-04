@@ -1,0 +1,79 @@
+{
+  "baseline_hash": "db2db09895b6202639f54f54262f6463d7b1eaa69c4d103ccfcba805a39ea91c",
+  "declaration_hash": "64dfdf74e041655797cccf77abc6fe0cd64ce09d5e5ad2bd8cfecda1649a07ab",
+  "generated_at": "2026-08-28T05:22:19Z",
+  "head_commit": "d4489fcc29bab7a58413793feb177ffdde8f1def",
+  "schema_version": 5,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "AttestedCatalogueDocumentLoaderPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::CoverageVerifyInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::pre_review_gate::PreReviewGateInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::test_obligation::results::TestObligationResultsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "CatalogPort"
+    }
+  ]
+}

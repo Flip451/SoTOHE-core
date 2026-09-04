@@ -1,0 +1,129 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "domain::ids::CommitHash": {
+      "action": "reference",
+      "docs": "Baseline-identical validated Git commit identity reused by the existing commit-record update path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    },
+    "domain::ids::TrackId": {
+      "action": "reference",
+      "docs": "Baseline-identical validated track identity reused by the existing commit-record update path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::hash::Hash", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialOrd", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::Ord", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::convert::AsRef<str>", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::hash::Hash", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialOrd", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::Ord", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::convert::AsRef<str>", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "CommitHash" }
+  ]
+}

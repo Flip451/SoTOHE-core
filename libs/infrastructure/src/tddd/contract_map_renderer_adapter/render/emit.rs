@@ -9,9 +9,9 @@ use std::collections::BTreeMap;
 use domain::tddd::ContractMapRendererError;
 
 use super::{
-    NodeIndex, StyleConfig, apply_shape, edge_arrow_label, edge_line, function_node_id,
-    resolve_type_ref_node_ids, resolve_type_ref_node_ids_with_generics, sanitize, trait_node_id,
-    trait_rep_node_id, type_node_id, type_rep_node_id,
+    NodeIndex, StyleConfig, apply_shape, edge_arrow_label, edge_line, effective_entry_module_path,
+    function_node_id, resolve_type_ref_node_ids, resolve_type_ref_node_ids_with_generics, sanitize,
+    trait_node_id, trait_rep_node_id, type_node_id, type_rep_node_id,
 };
 
 // ---------------------------------------------------------------------------
@@ -64,7 +64,13 @@ pub(super) fn emit_entry<'a>(
             let rep_node_id = type_rep_node_id(layer, crate_name, type_name);
 
             // Build entry subgraph label: full module path + terminal name (U-6d-iii).
-            let label = build_entry_label(type_entry.module_path(), type_name);
+            let module_path = effective_entry_module_path(
+                crate_name,
+                type_name,
+                type_entry.module_path(),
+                domain::tddd::catalogue_v2::CatalogueItemNamespace::Type,
+            )?;
+            let label = build_entry_label(module_path.as_ref(), type_name);
             // Short name used as the representative node label (matches subgraph title).
             let short_name = terminal_entry_name(type_name);
 
@@ -318,7 +324,13 @@ pub(super) fn emit_entry<'a>(
             let entry_sg_id = trait_node_id(layer, crate_name, trait_name);
             // The representative node id is the sole valid edge target for this trait.
             let rep_node_id = trait_rep_node_id(layer, crate_name, trait_name);
-            let label = build_entry_label(trait_entry.module_path(), trait_name);
+            let module_path = effective_entry_module_path(
+                crate_name,
+                trait_name,
+                trait_entry.module_path(),
+                domain::tddd::catalogue_v2::CatalogueItemNamespace::Trait,
+            )?;
+            let label = build_entry_label(module_path.as_ref(), trait_name);
             let short_name = terminal_entry_name(trait_name);
 
             // T005: trait entry subgraph (empty even with 0 methods, AC-02).
@@ -455,11 +467,15 @@ pub(super) fn emit_entry<'a>(
 /// For module_path = ["team", "manager"] and name "TeamManager", produces
 /// "team::manager::TeamManager".
 fn build_entry_label(
-    module_path: &domain::tddd::catalogue_v2::identifiers::ModulePath,
+    module_path: Option<&domain::tddd::catalogue_v2::identifiers::ModulePath>,
     name: &str,
 ) -> String {
     let name = terminal_entry_name(name);
-    if module_path.is_root() { name.to_string() } else { format!("{module_path}::{name}") }
+    match module_path {
+        Some(module_path) if module_path.is_root() => name.to_string(),
+        Some(module_path) => format!("{module_path}::{name}"),
+        None => format!("<unplaced>::{name}"),
+    }
 }
 
 fn terminal_entry_name(name: &str) -> &str {
@@ -596,6 +612,11 @@ mod tests {
         let module_path =
             ModulePath::from_segments(vec!["alpha".to_owned()]).expect("valid module path");
 
-        assert_eq!(build_entry_label(&module_path, "domain::alpha::Shared"), "alpha::Shared");
+        assert_eq!(build_entry_label(Some(&module_path), "domain::alpha::Shared"), "alpha::Shared");
+    }
+
+    #[test]
+    fn test_build_entry_label_marks_omitted_module_path_as_unplaced() {
+        assert_eq!(build_entry_label(None, "domain::Shared"), "<unplaced>::Shared");
     }
 }

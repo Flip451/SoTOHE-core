@@ -16,11 +16,14 @@
 
 mod helpers;
 mod interactor;
+pub mod ports;
 mod service;
 
 pub use interactor::CatalogueImplSignalsInteractor;
+pub use ports::{EvaluationStartCaptureError, EvaluationStartCapturePort};
 pub use service::{
     CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+    RustdocExportPlan, RustdocExportPlanValidationError,
 };
 
 // ---------------------------------------------------------------------------

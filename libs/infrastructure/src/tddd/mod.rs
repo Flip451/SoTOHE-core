@@ -32,6 +32,7 @@ pub mod fs_lint_config_loader;
 pub(crate) mod mermaid_style;
 pub mod rustdoc_baseline_capture_adapter;
 pub mod rustdoc_crate_adapter;
+pub(crate) mod rustdoc_output_lock;
 pub mod semantic_verify_codec;
 pub mod signal_evaluator_v2;
 pub mod spec_ground_codec;

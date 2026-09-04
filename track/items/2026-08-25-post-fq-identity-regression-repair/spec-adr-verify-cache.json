@@ -1,0 +1,534 @@
+{
+  "entries": [
+    {
+      "claim_hash": "794cad7f8fb49f9969c265137ab5758790c29b8d852b6f320fe07a8e4c74d872",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "完全修飾 identity の解決を一貫した fail-closed な解決集合と正準化に基づかせ、実装前 add 型、bin root 別名、module_path 省略による回帰を解消する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "794cad7f8fb49f9969c265137ab5758790c29b8d852b6f320fe07a8e4c74d872",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "完全修飾 identity の解決を一貫した fail-closed な解決集合と正準化に基づかせ、実装前 add 型、bin root 別名、module_path 省略による回帰を解消する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "794cad7f8fb49f9969c265137ab5758790c29b8d852b6f320fe07a8e4c74d872",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "完全修飾 identity の解決を一貫した fail-closed な解決集合と正準化に基づかせ、実装前 add 型、bin root 別名、module_path 省略による回帰を解消する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`module_path` の省略は crate root を意味せず、配置未指定を意味する（配置は解決規則により rustdoc から得る）。明示した `module_path` または修飾 key は、従来どおり完全一致で照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9b05c0cf5aea009f2f32cb4e8e9e6d9e28d6a114f070e63fa90e733131d44bd1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "rustdoc paths と catalogue の add 宣言を統合した解決集合を用い、catalogue 由来の合成 summary を含む型 identity の解決を行うこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "259dbd0f48734f0f384b25b1fb09ff93ccd3612c41d348927166b65ac3092832",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "259dbd0f48734f0f384b25b1fb09ff93ccd3612c41d348927166b65ac3092832",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "解決集合を読む既存の型解決経路、function identity、catalog import を、共通の解決結果と crate root 正準化に通すこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。関数 identity と catalog import に散っている個別の読み替えは廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b3ca044a777bb0e6fe707a1483b10ed1c06a68375456d34e2724e20e44e1d97",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "module_path 省略時の add、modify、delete、reference の identity 解決規則、および namespace-aware な同名比較を実現すること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`module_path` の省略は crate root を意味せず、配置未指定を意味する（配置は解決規則により rustdoc から得る）。明示した `module_path` または修飾 key は、従来どおり完全一致で照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66b79499a80b47f977d4954e0eb36d38adb7805cdc4642fe66c70caa54030c50",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "test-obligation derive の trait role index、task-contract と pre-review gate の `CatalogueEntryKey`、および `sotp catalog add` / `cite` と `import` が書き込む entry key。これらは短名を前提にしているため、完全修飾パスへの解決と同名併存に追従させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66b79499a80b47f977d4954e0eb36d38adb7805cdc4642fe66c70caa54030c50",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "test-obligation derive における trait_impls[].for_type の trait-impl carrier 解決を、catalogue の完全修飾 entry key に従わせること。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "45b44e9788179a1baa20923052bad138fb54fdec42510fbaf1b7e45ad0605943",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "一つの crate に複数の bin target があり root 別名が一対一でなくなる構成への対応は本 track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dee858e2a882c61c55c46199ad769923a4fabc1e98d9bd520d66a3e2a15df426",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "baseline と current の rustdoc paths および catalogue 宣言を合わせた解決集合は一箇所で構築し、codec、type-signal identity index、deletion 処理、Phase 1 definition-path authority の各解決経路は同じ結果を使用する。経路別の add 型の黙認、生名 fallback、又は個別 fallback を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合の構築は 1 箇所で行い、rustdoc 由来のパスに加えて catalogue が add 宣言した型を、宣言から合成した summary として入れる。解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。ここでいう経路とは解決集合を参照する呼び出し箇所であり、コード上で列挙できる閉集合である（現時点では codec、type-signal identity index、deletion 処理、Phase 1 の定義パス authority の 4 箇所）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a7b6e0b38e8d51bb8b86e296b000921f765c0ef377b4758c78cff02e500f208f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "crate root 別名は解決集合を読む正準化で一度だけ適用し、D1 の四経路、function identity、catalog import はその正準化を通過する。経路ごとの別名適用は残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli`↔`sotp` の読み替えは、解決集合を参照して型の名前を正式な形に整える段階で 1 回だけ行い、すべての解決経路がそこを通る。関数 identity と catalog import に散っている個別の読み替えは廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ad18351bab958aa73653000c750353e40c98fa0eb29987f0fd8f20c7e68faa1",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "module_path の省略は crate root ではなく配置未指定を表す。明示 module_path 又は修飾 key は完全一致で照合し、catalogue crate 内では type と trait の namespace を分けて同名を比較する。曖昧又は根拠不足の解決は fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`module_path` の省略は crate root を意味せず、配置未指定を意味する（配置は解決規則により rustdoc から得る）。明示した `module_path` または修飾 key は、従来どおり完全一致で照合する。\n\n同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d46be988ba4df1d191b3b159d4067db2250363a9b3966e563a152cd9fc0a4b7f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。短い名前だけのキーへ暗黙に戻してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d46be988ba4df1d191b3b159d4067db2250363a9b3966e563a152cd9fc0a4b7f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "test-obligation derive の trait-impl carrier 解決は catalogue の完全修飾 identity を唯一の entry key とし、短名への raw fallback 又は経路固有の fallback を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0fa50b9685e1eddbc4d0ab3846589ea3d182e96472cf2e4ca0a2588522d60c00",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-05",
+          "section": "constraint",
+          "text_label": "Phase 2 の three-way report identity は、解決集合に由来する catalogue item では type 又は trait の namespace を必須の identity 構成要素とし、function と trait-impl signal では report label を保持して区別する。いずれの signal も report から脱落させない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5e184a87f8ca2d6f6cd7eec23ebe499c30e6549c5be1eaebe680b04796535bfd",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue が宣言する未実装 add 型を含め、add 型同士の相互参照、modify 型から add 型への参照、および宣言順序に依存しない参照解決が成功する。rustdoc と catalogue のいずれにも存在しない参照は fail-closed で拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰テスト: add 型同士の相互参照、modify 型から add 型への参照、宣言順序への非依存。rustdoc にも catalogue にも無い参照が fail-closed で拒否される挙動は不変。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e10807a145f0ef89c44562aea4b988fb51acaf9afa48868a70e4878729fc5eb",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "bin target crate で catalogue の crate 名と rustdoc root 名が異なる場合も、型 entry の add、modify、reference と function path の双方が正しく解決される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "回帰テスト: bin ターゲット crate の型エントリ(add / modify / reference)と関数パスの双方が解決されること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3d677282d1ed3a3d3fbba7b1e57a325ac4db74ba172e38f7181646e9b85d2662",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "module_path を省略した add は、baseline に同名があれば fail-closed とし、baseline に同名がなく current に同名が一つだけあるときその実装済み identity に解決し、current に複数候補があるときは明示指定を求めて fail-closed とし、候補がないときは module 未確定の未実装 identity として扱う。modify、delete、reference は baseline に同名が一つだけある場合にのみ解決する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`add` は baseline に同名があれば fail-closed とする。baseline に無ければ、current に同名が 1 つなら実装済みとしてその path を identity とし、複数なら曖昧として fail-closed として `module_path` または修飾 key を要求し、無ければ未実装として crate と名前を identity としモジュールは未確定とする。`modify` / `delete` / `reference` は baseline に同名が 1 つならそこで解決して current と突合し、複数または無ければ fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "957611ae8bc068f2bedadb93824f292582fdae5690d25ef0116bffcd1cad5c7c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "95e7057dfe38d9b98108e8217d8c5afae74c85a54af298e40edfb6aa14e4f578",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-21-0055-type-identity-fully-qualified-paths.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "完全修飾パスを解決できない場合は、解決できなかった対象を診断メッセージで示して fail-closed とする。短い名前だけのキーへ暗黙に戻してはならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "957611ae8bc068f2bedadb93824f292582fdae5690d25ef0116bffcd1cad5c7c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "test-obligation derive は trait_impls[].for_type を catalogue の完全修飾 entry key に解決し、解決不能又は曖昧な場合は fail-closed とする。短名を raw entry key として用いる fallback は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "解決集合を参照するすべての経路はこの 1 箇所の結果を使い、経路ごとの add 特例（黙認・生の名前へのフォールバック・経路固有のフォールバック）は廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4f26a5ac6e414c9f25a711ec2ab09b14576435c63873150b28bd891da4b71a8a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "Phase 2 の three-way report と永続化される type-signal row は、同名の catalogue type と trait を namespace を含む別々の identity として保持し、双方の status が相互に混入しない。function と trait-impl signal はそれぞれの report label を保持したまま report に残る。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "69a372c119486c3dd11b09302616d393b3b0f70eb56a5199eb5a03fb652ab6a9",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-25-0804-post-fq-identity-regression-repair.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同名比較は catalogue 自身の crate 内で namespace を分け、型は型、trait は trait と照合する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

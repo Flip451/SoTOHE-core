@@ -125,6 +125,116 @@ impl TdddActualFeatureDeclarationPort for FsTdddFeatureDeclarationAdapter {
     }
 }
 
+/// Decodes and validates a feature declaration from already-captured bytes.
+///
+/// The caller owns the trusted-root and file-snapshot checks. This helper keeps
+/// declaration decoding and manifest validation shared with the filesystem
+/// port without reopening the declaration path.
+///
+/// # Errors
+///
+/// Returns [`TdddFeatureDeclarationReadError`] when the bytes exceed the read
+/// limit, cannot be decoded, or fail layer or Cargo-feature validation.
+pub(crate) fn decode_declaration_bytes(
+    declaration_path: &Path,
+    bytes: &[u8],
+    workspace_root: &Path,
+    bindings: &[TdddLayerBinding],
+) -> Result<TdddFeatureDeclaration, TdddFeatureDeclarationReadError> {
+    if bytes.len() > MAX_READ_BYTES {
+        return Err(TdddFeatureDeclarationReadError::ReadDeclaration {
+            path: declaration_path.to_path_buf(),
+            reason: file_size_limit_error(declaration_path),
+        });
+    }
+    let dto: FeatureDeclarationDto = serde_json::from_slice(bytes).map_err(|error| {
+        TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path.to_path_buf(),
+            reason: diagnostic(error.to_string()),
+        }
+    })?;
+    if dto.schema_version != 1 {
+        return Err(TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path.to_path_buf(),
+            reason: diagnostic(format!(
+                "unsupported tddd feature declaration schema version {}",
+                dto.schema_version
+            )),
+        });
+    }
+
+    let required_layers = bindings
+        .iter()
+        .map(|binding| parse_layer(&binding.layer_id, declaration_path))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut declaration_layers = BTreeMap::new();
+    for (layer, features) in dto.layers {
+        let layer = parse_layer(&layer, declaration_path)?;
+        let features = features
+            .into_iter()
+            .map(|feature| {
+                CargoFeatureName::try_new(feature).map_err(|error| {
+                    TdddFeatureDeclarationReadError::DecodeDeclaration {
+                        path: declaration_path.to_path_buf(),
+                        reason: diagnostic(error.to_string()),
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        declaration_layers.insert(layer, features);
+    }
+    let declaration = TdddFeatureDeclaration::try_new(declaration_layers, &required_layers)
+        .map_err(|error| TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path.to_path_buf(),
+            reason: diagnostic(error.to_string()),
+        })?;
+    validate_cargo_features(&declaration, workspace_root, bindings)?;
+    Ok(declaration)
+}
+
+/// Validates a feature declaration and its baseline snapshot from captured bytes.
+///
+/// # Errors
+///
+/// Returns the same actual-capture errors as the filesystem port when either
+/// captured artifact is absent, invalid, oversized, or mismatched.
+pub(crate) fn load_actual_from_captured_bytes(
+    track_dir: &Path,
+    workspace_root: &Path,
+    bindings: &[TdddLayerBinding],
+    declaration_bytes: Option<&[u8]>,
+    snapshot_bytes: Option<&[u8]>,
+) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+    let declaration_path = track_dir.join(DECLARATION_FILE);
+    let declaration_bytes = declaration_bytes.ok_or_else(|| {
+        TdddActualFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::MissingDeclaration { path: declaration_path.clone() },
+        )
+    })?;
+    let declaration =
+        decode_declaration_bytes(&declaration_path, declaration_bytes, workspace_root, bindings)
+            .map_err(TdddActualFeatureDeclarationPortError::Read)?;
+    let snapshot_path = track_dir.join(SNAPSHOT_FILE);
+    let snapshot_bytes = snapshot_bytes.ok_or_else(|| {
+        TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot {
+            path: snapshot_path.clone(),
+        }
+    })?;
+    if snapshot_bytes.len() > MAX_READ_BYTES {
+        return Err(TdddActualFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::ReadDeclaration {
+                path: snapshot_path.clone(),
+                reason: file_size_limit_error(&snapshot_path),
+            },
+        ));
+    }
+    if snapshot_bytes == declaration_bytes {
+        Ok(declaration)
+    } else {
+        Err(TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct FeatureDeclarationDto {
@@ -200,48 +310,8 @@ fn load_declaration(
     let bytes = bytes.ok_or_else(|| TdddFeatureDeclarationReadError::MissingDeclaration {
         path: declaration_path.clone(),
     })?;
-    let dto: FeatureDeclarationDto = serde_json::from_slice(&bytes).map_err(|error| {
-        TdddFeatureDeclarationReadError::DecodeDeclaration {
-            path: declaration_path.clone(),
-            reason: diagnostic(error.to_string()),
-        }
-    })?;
-    if dto.schema_version != 1 {
-        return Err(TdddFeatureDeclarationReadError::DecodeDeclaration {
-            path: declaration_path,
-            reason: diagnostic(format!(
-                "unsupported tddd feature declaration schema version {}",
-                dto.schema_version
-            )),
-        });
-    }
-
-    let required_layers = bindings
-        .iter()
-        .map(|binding| parse_layer(&binding.layer_id, &declaration_path))
-        .collect::<Result<Vec<_>, _>>()?;
-    let mut declaration_layers = BTreeMap::new();
-    for (layer, features) in dto.layers {
-        let layer = parse_layer(&layer, &declaration_path)?;
-        let features = features
-            .into_iter()
-            .map(|feature| {
-                CargoFeatureName::try_new(feature).map_err(|error| {
-                    TdddFeatureDeclarationReadError::DecodeDeclaration {
-                        path: declaration_path.clone(),
-                        reason: diagnostic(error.to_string()),
-                    }
-                })
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-        declaration_layers.insert(layer, features);
-    }
-    let declaration = TdddFeatureDeclaration::try_new(declaration_layers, &required_layers)
-        .map_err(|error| TdddFeatureDeclarationReadError::DecodeDeclaration {
-            path: declaration_path,
-            reason: diagnostic(error.to_string()),
-        })?;
-    validate_cargo_features(&declaration, workspace_root, bindings)?;
+    let declaration =
+        decode_declaration_bytes(&declaration_path, &bytes, workspace_root, bindings)?;
     Ok((declaration, bytes))
 }
 

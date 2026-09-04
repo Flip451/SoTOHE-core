@@ -1,0 +1,2569 @@
+{
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_attested_rustdoc_snapshot_binds_start_and_snapshot_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_captured_rustdoc_json_hashes_and_decodes_one_byte_snapshot"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_binds_identity_and_decoded_bytes"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "item_identifier": "trait_method:load_from_path",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_invalid_json_returns_parse_failed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_hashes_and_decodes_the_same_immutable_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_symlinked_file_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_symlinked_parent_dir_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_outside_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_relative_escape_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_unverifiable_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_non_directory_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "item_identifier": "trait_method:capture_current",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_holds_one_selection_lock_through_path_check_and_byte_copy"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "test_non_unix_lock_acquisition_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_symlinked_selection_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_pairs_execution_identity_components"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_oversized_json_without_fallback"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_holds_one_selection_lock_through_path_check_and_byte_copy"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_symlinked_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reads_output_only_through_the_owned_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_generates_lock_contention_generation_and_uncooperative_writer_states"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fails_closed_on_lock_operation_without_retry_or_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_lock_operation_failure_does_not_retry_or_reuse_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_hashes_and_decodes_the_same_immutable_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_relative_escape_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_unverifiable_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_non_directory_workspace_root_returns_io_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "test_non_unix_lock_acquisition_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_discards_result_when_workspace_fingerprint_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_execution_identity_owns_exclusive_sotp_rustdoc_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_non_cooperative_parent_cargo_target_json_is_not_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_cooperative_writers_serialize_on_the_exclusive_target_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_non_immediate_private_or_shared_target"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_symlinked_selection_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_pairs_execution_identity_components"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_rejects_oversized_json_without_fallback"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CatalogueToExtendedCratePort",
+        "item_identifier": "trait_method:encode",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_unplaced_add_with_qualified_reference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_trait_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_function_identity_preserves_catalogue_path_for_bin_root_alias"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_binds_one_evaluation_start_to_every_current_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_receives_all_track_catalogues_for_each_target_layer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_skips_missing_non_target_catalogue_when_layer_is_selected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_handoff_observes_synthesized_item_identity_and_module_placement"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_handoff_reuses_referencing_rustdoc_identity_and_canonicalizes_declaring_bin_target"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_forwards_current_capture_failure_without_fallback"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_unfiltered_missing_enabled_catalogue_is_empty_declaration_set"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_catalogue_set_when_declaration_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_baseline_set_when_json_hash_changes_on_reread"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_forwards_cross_layer_trait_add_without_reference_duplicate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_codec_resolution_set_adds_referenced_trait_as_declaring_crate_external_item"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_mismatched_cross_layer_candidate_fail_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_resolves_cross_layer_type_and_trait_adds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_canonicalizes_bin_target_for_synthesized_external_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_treats_missing_enabled_catalogue_as_no_declarations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_skips_missing_catalogue_before_resolving_package_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_ungrounded_cross_layer_reference"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_fingerprint_failure_between_snapshots_is_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_uses_authoritative_feature_snapshot_after_generation_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_uses_nightly_selected_tools_not_path_proxies"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_nightly_tool_snapshot_failure_is_authoritative"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_short_name_reference_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_reuses_only_when_every_cache_key_component_matches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_allows_external_path_and_build_script_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_fingerprints_resolved_tool_contents_and_rejects_untrusted_tools"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_ignores_parent_cargo_config_and_resolved_home"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_excludes_only_the_resolved_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator_properties",
+          "test_name": "property_evaluator_allows_more_than_64_configured_layers_without_catalogues"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_more_than_64_configured_layers_when_only_target_is_exported"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_65th_actual_export_before_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_dirty_worktree_before_cache_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_reextracts_after_source_change"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_implementation_change_before_persist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_changed_generation_before_persist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_discards_result_before_persist_when_resolution_changes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_path_reread_generation_change"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_aba_generation_before_cache_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_context_cache_invalidates_for_generated_semantic_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_oversized_file_returns_typed_limit_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_rustdoc_input_fingerprint_includes_nested_track_source_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_distinguishes_missing_from_empty_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_includes_feature_declaration_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_resolution_input_fingerprint_rejects_symlinked_architecture_rules"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_verify_baseline_snapshots_rejects_changed_baseline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_rejects_stale_target_catalogue_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_dangling_symlink_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_rejects_fifo_before_opening"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_symlinked_target_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_non_exclusive_target_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_accepts_aba_generation_after_path_restoration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_mixed_layer_snapshot_after_source_aba_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_metadata_output_change_invalidates_reuse"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_metadata_failure_does_not_reuse_existing_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_path_tool_resolution_failure_does_not_reuse_existing_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_lock_failure_does_not_reuse_or_retry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_symlinked_output_on_no_follow_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_rejects_non_unix_rustdoc_target_before_export"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_adapter_implements_type_signals_executor_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_evaluate_and_write_loads_all_track_catalogues_for_encode"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_load_track_catalogues_treats_enabled_layer_without_file_as_empty"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_loads_architecture_rules_catalogues_and_omits_absent_layer_files"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_canonicalizes_declaring_bin_target_alias_and_prefers_rustdoc_item"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_adapter_evaluate_layer_rejects_ungrounded_cross_layer_reference"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "EvaluationStartCapturePort",
+        "item_identifier": "trait_method:capture_evaluation_start",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_once_returns_complete_crate_independent_fingerprint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_fingerprint_tracks_each_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_metadata_execution_timeout_returns_authoritative_input_without_partial_fingerprint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_metadata_drain_timeout_returns_authoritative_input_without_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_nightly_resolution_timeout_returns_authoritative_input_without_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_uses_production_bounds_and_locked_metadata_without_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_workspace_walk_timeout_returns_authoritative_input_without_partial_fingerprint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_nightly_resolution_drain_timeout_returns_authoritative_input_without_fallback"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter",
+        "item_identifier": "trait_impl:usecase::catalogue_impl_signals::ports::EvaluationStartCapturePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_fingerprint_tracks_each_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_metadata_execution_timeout_returns_authoritative_input_without_partial_fingerprint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_metadata_drain_timeout_returns_authoritative_input_without_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_nightly_resolution_timeout_returns_authoritative_input_without_fallback"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_uses_production_bounds_and_locked_metadata_without_export"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_workspace_walk_timeout_returns_authoritative_input_without_partial_fingerprint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_nightly_resolution_drain_timeout_returns_authoritative_input_without_fallback"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This error vocabulary reports decode failures; it does not decide whether a type-signals document may be reused or compare the complete AC-04 cache identity. Reuse and fingerprint behavior is covered by the reuse and fingerprint entries, so AC-04 is not entry-local behavior."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_omitted_module_path_without_declaring_rustdoc_uses_unplaced_catalogue_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_prefers_referencing_side_rustdoc_item_over_other_layer_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_omitted_module_path_uses_declaring_current_rustdoc"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_resolves_cross_layer_type_and_trait_adds_from_declaring_crates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_omitted_module_path_uses_declaring_current_rustdoc"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_resolution_paths_cross_layer_omitted_add_preserves_rustdoc_precedence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_cross_layer_add_canonicalizes_declaring_bin_target_root"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This domain construction seam only hashes and decodes one caller-provided byte slice. It does not decide type-signal reuse or create the complete cache identity required by IN-03, so that reuse/fingerprint promise is not behavior of this entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This domain construction seam has no cache lookup, worktree observation, Cargo-input discovery, or reuse decision; it only builds a typed value from supplied bytes. The complete reuse and authoritative-fingerprint promise in AC-04 is not behavior of this entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This function has no output path, target directory, lock handle, writer coordination, or generation observation. It only hashes and decodes bytes already supplied by its caller, so IN-07's lock-held path-to-snapshot and ABA guarantee is not entry-local behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This byte-value factory neither resolves an expected rustdoc path nor acquires a target-directory lock or compares input generations before output. CO-07's lock-scoped output capture is therefore not behavior of this entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This function receives bytes after I/O and has no lock, exporter, target-directory ownership, writer-participation check, or fingerprint recheck. AC-06's end-to-end export and ABA safety conditions are not observable behavior of this byte-construction entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This domain constructor accepts an already resolved execution identity and byte slice and creates a typed snapshot. It does not decide cache reuse or discover the authoritative implementation and resolution inputs required by IN-03."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This constructor has no cache lookup, worktree check, Cargo-input discovery, or reuse decision; its inputs are already supplied. The complete AC-04 reuse and authoritative-fingerprint gate is not behavior of this entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This constructor does not acquire or retain a trusted-root lock, resolve an output path, coordinate writers, or observe generations; it only packages caller-supplied identity, hash, and decoded bytes. IN-07's lock-scoped capture and ABA guarantee is not entry-local behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This domain factory does not determine or read an expected output path and cannot establish target-directory ownership or the pre-write fingerprint comparison described by CO-07. Those conditions are not behavior of this entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This constructor has no exporter, target-directory lock, writer-coordination check, or input/resolution recheck. AC-06's end-to-end lock interval and changed-generation rejection are not observable behavior of this entry."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_catalogue_impl_signals_error_display_covers_all_variants"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_expected_rustdoc_json_path_rejects_parent_traversal"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This path value has no lock, exporter, or generation observation, so lock-held snapshot and ABA guarantees are not its behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This type neither hashes rustdoc JSON bytes nor holds a target-directory lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ExpectedRustdocJsonPath",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "A confined path value does not acquire an exclusive lock or detect non-cooperating writers."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "The ImplementationFingerprint declaration is a digest wrapper that stores an already computed Sha256Digest. It does not discover workspace, environment, PATH-tool, or cargo-metadata inputs and does not bind declaration, resolution, and execution identity into one cache key."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-04"
+        }
+      },
+      "reason": "The ImplementationFingerprint declaration stores only an already computed Sha256Digest. It does not walk workspace files, apply exclusions, resolve tools, include cargo-metadata bytes, or produce authoritative-input errors for symlink and limit failures."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ImplementationFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "The ImplementationFingerprint declaration stores only an already computed Sha256Digest. It does not decide type-signal reuse or construct the complete AC-04 cache key from hermetic inputs."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolutionFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "The ResolutionFingerprint declaration is a digest wrapper that stores an already computed Sha256Digest. It does not assemble the resolution snapshot or implementation-input set, so IN-03's authoritative input discovery is not behavior of this type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This newtype only stores a resolved Cargo target directory path used as one identity component. It does not compose the complete reuse identity or fingerprint rustdoc graph inputs."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolvedCargoTargetDirectory",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_rejects_expected_path_from_another_target"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_rustdoc_execution_identity_components_with_invalid_values_return_errors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "An identity value does not acquire the shared rustdoc output lock or wait 120 seconds."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "This type does not exclusively own a target directory or route rustdoc writers through a common lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "This type has no lock timeout, lock-operation failure path, or retry loop."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Pairing identity components does not implement Unix descriptor-relative no-follow locking."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This identity value does not gate export on Unix trusted-root lock availability."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "Construction-error variants do not open lock descriptors or validate trusted roots."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocExecutionIdentityError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This error type does not encode platform lock support or snapshot-reuse policy."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "The TypeSignalsCacheKey declaration stores an already computed identity tuple. It does not capture rustdoc bytes, select an output path, or hold the target-directory lock."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "The TypeSignalsCacheKey declaration stores an already computed identity tuple. It does not verify an expected rustdoc output path or hash JSON while a lock is held."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "The TypeSignalsCacheKey declaration provides stored-value equality only. It does not own an exclusive lock, check cooperative writers, or detect ABA replacements."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_document_retains_only_required_freshness_inputs"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This enum is the reuse outcome vocabulary. Fail-closed fingerprint construction happens before the enum is produced, not as behavior of the enum type itself."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "The declaration is an outcome enum with only SkipEvaluation and ReextractAndEvaluate variants. It classifies already-verified cache-key comparisons; worktree observation, fingerprint construction, and fail-closed input acquisition happen before this enum is produced."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_with_each_execution_identity_component_changed_reextracts"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This input value carries recorded and current cache keys plus cleanliness/authority flags. It does not determine rustdoc output paths, hold an export lock, or snapshot JSON bytes, so IN-07 lock-held capture is not local behavior of this type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "Constructing a reuse input does not acquire exclusive target-directory ownership, require writer participation, or detect ABA replacements of rustdoc output."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "This value object stores one SHA-256 digest and one decoded rustdoc graph produced from caller-supplied bytes. It does not assemble cache identity, walk Cargo inputs, or decide type-signal reuse."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This value object has no cache lookup, worktree observation, or reuse gate. AC-04's complete identity match on a clean worktree is not behavior of the captured-json value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This value object has no target directory, lock handle, output path, or generation observation. It only retains the hash and graph of bytes already supplied by its constructor."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This value object neither resolves an expected rustdoc path nor holds a lock through output snapshotting. CO-07's lock-scoped capture is not local behavior of the stored hash and graph."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapturedRustdocJson",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This value object has no exporter, writer-participation check, or fingerprint revalidation. Exclusive target ownership and ABA rejection are not observable on the captured-json type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This snapshot type has no cache lookup or worktree check. AC-04's complete reuse gate is not behavior of the stored identity-bearing capture."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "The snapshot type has no public constructor from independently built identity and captured values, and it does not itself acquire a lock or reread paths. Mixed-generation assembly is excluded from this type's surface rather than detected as I/O ABA."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This snapshot type retains identity and captured bytes after construction. It does not confirm exclusive target ownership or compare start/end fingerprints before persist."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This snapshot type cannot hold a lock, reject non-cooperative writers, or detect ABA of rustdoc output. Those conditions are not local behavior of the stored proof value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "This digest type has no cache, worktree, or reuse decision. AC-04's complete identity match is not behavior of the hash value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This digest type does not acquire a lock or snapshot JSON from an expected path. It only names the hash of bytes already in memory."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This digest type does not confirm target-directory ownership or hold a lock through output capture. CO-07 is not local behavior of the stored digest."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This digest type cannot lock a target directory, exclude writers, or recheck fingerprints. AC-06 lock and ABA conditions are not observable on the hash value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "This context value carries already captured rustdoc graphs keyed by layer. It has no lock handle, expected output path, or generation observation, so mixed-generation and ABA prevention are not local behavior of the stored context."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "reason": "This context type does not resolve an expected rustdoc path, acquire a target-directory lock, or snapshot JSON bytes. CO-07's lock-scoped capture is not behavior of the assembled context value."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "AuthoritativeRustdocContext",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "This context value does not own a target directory, participate in writer locking, or recheck fingerprints before persist. AC-06's exclusive-lock and ABA conditions are not observable on the context type."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "reason": "This error type does not enumerate architecture layers or enforce the 64-layer export bound. IN-04's layer-limit behavior is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "reason": "This error enum does not iterate configured layers or continue after a 64-layer overflow. CO-05 is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "reason": "This error type does not implement the 64-layer ceiling or split-continuation policy. AC-05 is not local behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "This error enum does not acquire or time out a target-directory lock. IN-05's exclusive-lock serialization is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-06"
+        }
+      },
+      "reason": "This error type has no lock file, writer set, or trusted-root descriptor. CO-06's lock policy is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "This error enum does not wait on or retry a 120-second lock. AC-07's lock-failure stop is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "reason": "This error type does not open descriptor-relative lock files or inspect platform lock capability. IN-06 is not local to the error vocabulary."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "This error enum does not implement Unix-only trusted-root admission. AC-08 is not behavior of the error vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocJsonHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_captured_rustdoc_json_hashes_and_decodes_one_byte_snapshot"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_distinct_byte_generations_yield_distinct_hashes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_rustdoc_exporter_expected_path_and_snapshot_capture_succeeds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_locked_byte_capture_is_immutable_after_output_replacement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_capture_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_at_post_export_before_byte_copy"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_before_expected_path_selection"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_rejects_output_path_differing_from_expected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_constructs_identity_bearing_snapshot_from_locked_bytes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_keeps_locked_byte_snapshot_when_output_file_is_replaced"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_distinct_byte_generations_yield_distinct_hashes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_configured_target_dir_relative_escape_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::tests",
+          "test_name": "test_resolve_exclusive_target_dir_symlinked_private_component_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_rustdoc_exporter_expected_path_and_snapshot_capture_succeeds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_capture_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_locked_byte_capture_is_immutable_after_output_replacement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_at_post_export_before_byte_copy"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_before_expected_path_selection"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_rejects_output_path_differing_from_expected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_rustdoc_exporter_expected_path_and_snapshot_capture_succeeds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_capture_waits_on_held_exclusive_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_locked_byte_capture_is_immutable_after_output_replacement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_at_post_export_before_byte_copy"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_holds_lock_before_expected_path_selection"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export_tests::tests",
+          "test_name": "test_exporter_rejects_output_path_differing_from_expected"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "The declaration docs identify this as \"Rustdoc port error vocabulary (AC-04, CO-04).\" This error vocabulary does not look up a type-signal cache or inspect worktree cleanliness; the AC-04 reuse slice is owned by decide_type_signals_reuse / execute_type_signals_for_layer and is unused by this error vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AttestedRustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_attested_rustdoc_snapshot_binds_start_and_snapshot_accessors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_holds_one_selection_lock_through_path_check_and_byte_copy"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AttestedRustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_attested_rustdoc_snapshot_binds_start_and_snapshot_accessors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AttestedRustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_attested_rustdoc_snapshot_binds_start_and_snapshot_accessors"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_holds_one_selection_lock_through_path_check_and_byte_copy"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "EvaluationStartCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "EvaluationStartCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "EvaluationStartCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_evaluation_start_unverifiable_workspace_root_returns_authoritative_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_evaluation_start_capture_failure_fails_closed_before_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlan",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_keeps_selected_and_catalogue_bearing_layers_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_skips_missing_non_target_catalogue_when_layer_is_selected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_rejects_65th_configured_layer_before_feature_or_rustdoc_access"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "CO-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocExportPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_64_bindings_accepts_and_returns_bindings"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::service::tests",
+          "test_name": "test_rustdoc_export_plan_try_new_with_65_bindings_returns_layer_limit_exceeded"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_construct_rustdoc_snapshot_carries_execution_identity_and_json_hash"
+        }
+      ]
+    }
+  ],
+  "track_id": "2026-08-28-cross-crate-add-declaration-resolution"
+}

@@ -92,6 +92,9 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::file::FileCommand,
     },
+    /// Capture a child gate's full output and print its compact summary.
+    #[command(name = "gate-output", alias = "gate")]
+    GateOutput(commands::gate_output::GateOutputArgs),
     /// Verification checks for CI validation.
     Verify {
         #[command(subcommand)]
@@ -204,6 +207,7 @@ macro_rules! run_cli_with_context {
             Some(CliCommand::Phase { cmd }) => (commands::phase::execute(cmd), None),
             Some(CliCommand::Review { cmd }) => (commands::review::execute(cmd), None),
             Some(CliCommand::File { cmd }) => (commands::file::execute(cmd), None),
+            Some(CliCommand::GateOutput(args)) => (commands::gate_output::execute(args), None),
             Some(CliCommand::Verify { cmd }) => (execute_verify_with_telemetry(cmd), None),
             Some(CliCommand::FindSimilar(args)) => {
                 (commands::semantic_dup::execute_find_similar(args), None)
@@ -589,6 +593,23 @@ mod tests {
             matches!(cli.command, Some(CliCommand::Capability { .. })),
             "capability exec must select the Capability variant"
         );
+    }
+
+    #[test]
+    fn test_cli_command_gate_output_parses_to_gate_output_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "gate-output",
+            "--name",
+            "leaf-check",
+            "--",
+            "/bin/sh",
+            "-c",
+            "true",
+        ])
+        .expect("gate-output must parse at the top-level command boundary");
+
+        assert!(matches!(cli.command, Some(CliCommand::GateOutput(_))));
     }
 
     #[test]

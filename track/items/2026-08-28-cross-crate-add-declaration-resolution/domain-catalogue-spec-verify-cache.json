@@ -1,0 +1,2214 @@
+{
+  "entries": [
+    {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AttestedRustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9cf9b39fd3dde3a54f53c0ec39c4fbc12c66f059858ae784fdd5f3722de31be2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AuthoritativeRustdocContext",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedRustdocJson",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc 出力の同一性",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedRustdocJson",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedRustdocJson",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedRustdocJson",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedRustdocJson",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ffc5c86625e2458e9e310bc127c8cd83ddf1eaa81f31d123bf48622f99f75586",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CargoProfileName",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ffc5c86625e2458e9e310bc127c8cd83ddf1eaa81f31d123bf48622f99f75586",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CargoProfileName",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate/feature/profile・期待 rustdoc JSON path がすべて一致し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ExpectedRustdocJsonPath",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ExpectedRustdocJsonPath",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON path がすべて一致し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ExpectedRustdocJsonPath",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ExpectedRustdocJsonPath",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ExpectedRustdocJsonPath",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationFingerprint",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationFingerprint",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e31c3a53905a2a8a4f7c6cc3efa2772fd1122946b4a41b9d3cf6c2c1f4bb3607",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-04",
+          "section": "constraint",
+          "text_label": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、symlink・I/O error・nightly 選択済み tool の解決又は content snapshot・metadata 実行が失敗する、又は入力が途中変更する場合は partial fingerprint を作らず authoritative-input error として fail-closed にする。catalogue と baseline の完全集合は architecture-rules.json の解決規則に委ね、独自の発見で補完しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint は、.git、.harness、.codex、.claude、.agents、target、track、tmp を除く workspace 内の regular file の相対 path と内容 hash、D3 の環境 allowlist、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationFingerprint",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e255d055c8897ed37f1b12293ef56a3f67926e767a4bc07340ce29038aa44734",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolutionFingerprint",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedCargoTargetDirectory",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedCargoTargetDirectory",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み Cargo target directory",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f4d68b925fc457abcfb903876580c7add73b593600d5ec3d31dcaa7a6f8aeec3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。lock を取得できない又は lock 操作が失敗した場合は、lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5cf312467c070bde55da5c1d20c639a59895cf9767408a51fdc482c37f35ed56",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-06",
+          "section": "constraint",
+          "text_label": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。この directory を使う閉じた協調 expected-output writer 集合の export は、directory 内の単一 advisory exclusive lock で最大 120 秒直列化する。非専用 target は fail-closed で拒否し、任意の shared Cargo target writer を排除又は検出できる OS mandatory-access 境界は主張しない。lock は descriptor-relative・no-follow の trusted-root 検証を提供する Unix だけで扱い、絶対 CARGO_TARGET_DIR は明示設定時でも全親 component と selection directory の symlink 不在を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "42f7bef4a42340116a59c2afe8bc83b9d26e82922e1d0dbd5b240cb0c740f3d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合では、その directory 内の単一 advisory exclusive lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合、評価を fail-closed で停止する。lockless export、既存 JSON の再利用、又は待機超過後の retry は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "その directory 内の単一 advisory exclusive lock を 120 秒以内に取得できない、又は lock 操作に失敗した場合、評価を fail-closed で停止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "16586c5f633df2b05f48155a48ac295369e84db685d5d50c00df71d928c283d5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否し、任意の shared Cargo target writer に対する OS mandatory-access 境界は主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentity",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d2aaab58ce266c1bfe65712d7e1ee3780a74f4add6b7cd0f76cec091ccf1796c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。これは任意の shared Cargo target writer に対する OS mandatory-access 境界を主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentityError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "16586c5f633df2b05f48155a48ac295369e84db685d5d50c00df71d928c283d5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否し、任意の shared Cargo target writer に対する OS mandatory-access 境界は主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocExecutionIdentityError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d2aaab58ce266c1bfe65712d7e1ee3780a74f4add6b7cd0f76cec091ccf1796c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。これは任意の shared Cargo target writer に対する OS mandatory-access 境界を主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocJsonHash",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocJsonHash",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocJsonHash",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocJsonHash",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocJsonHash",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocSnapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5fbfce206a6f2892d2eebc44ddbbe97e29c8493a5c89c1750786bfcd48425f00",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b83aa54376d10cb61e3b9416bf997f7784b0a5e2dfe1418257bd36a9cc39a55c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "35a05b40e88603d832afb909f4e5a092a44d236bc39a8009884acdc9cd6e18f1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "35a05b40e88603d832afb909f4e5a092a44d236bc39a8009884acdc9cd6e18f1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fbd6eca1f3246b8dda6ca365d1c44fa78a3a59fc5914a2cb0caa160ccd3502f7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。参照側 catalogue に重複する記述は要求しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある層の解決集合に、同じ track の他の TDDD 有効層の catalogue が add 宣言した型と trait を、宣言層 crate の外部項目として加えること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9cf9b39fd3dde3a54f53c0ec39c4fbc12c66f059858ae784fdd5f3722de31be2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "他層の add 宣言から合成する項目の identity と配置を、宣言層 catalogue の crate 名、既存の bin-target root 正準化、および宣言層自身の module 解決に従わせること。参照側 rustdoc paths に同一 identity がある場合は rustdoc 項目を優先する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f22dccba5c61ece67d42cccbf5fee6d0f4f811c03e184617081d594691622005",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決集合は一箇所で構築し、既存の自層 add 宣言の入力に他層 add 宣言を加える。経路ごとの add 型特例を新設しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04290835772a4854f908d8e8104306ebe456069e21bbbc0bbb303b9b96b9eaea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-03",
+          "section": "constraint",
+          "text_label": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成項目は宣言層の crate 名を identity root とし、bin-target alias は既存の正準化を通す。module_path は明示時はその配置を用い、省略時は既存の配置未確定規則に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0030fe137ba7b6b4a8dc6842e26ba0c02a0ed31a09859f22f1d851b73bf5852d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ある TDDD 有効層が add 宣言した未実装の型又は trait を、同じ track の別の TDDD 有効層が参照できる。参照側 catalogue には、その外部項目を重複記述しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a5ca46bee490e992855a3a9eeff8a262948fcafbdce7dfdac5f10b997dfdbabe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "合成された cross-crate 項目は、宣言層の crate 名を root とする fully-qualified identity で解決される。bin target の crate 名と rustdoc root 名が異なる場合も既存の正準化により解決され、明示 module_path 又は省略時の配置未確定の扱いは宣言層自身の規則と一致する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CatalogueToExtendedCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cc57a0f3ee59396d23baa32982c051968dffc47a0d079f3ecf680a209054134f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。未根拠の cross-crate 参照は短名 fallback 又は実装までの未解決許容によって通過しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "参照側の rustdoc paths が cross-crate add 宣言と同じ identity を持つ場合、rustdoc 項目が解決に用いられ、同一項目は合成されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f4d68b925fc457abcfb903876580c7add73b593600d5ec3d31dcaa7a6f8aeec3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "immediate parent が正確に .sotp-rustdoc である専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。lock を取得できない又は lock 操作が失敗した場合は、lockless export、既存 JSON の再利用、又は retry を行わず fail-closed に停止する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory を使う閉じた協調 expected-output writer 集合の rustdoc export を、directory 内の 120 秒上限の単一 advisory exclusive lock で直列化すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5cf312467c070bde55da5c1d20c639a59895cf9767408a51fdc482c37f35ed56",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-06",
+          "section": "constraint",
+          "text_label": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。この directory を使う閉じた協調 expected-output writer 集合の export は、directory 内の単一 advisory exclusive lock で最大 120 秒直列化する。非専用 target は fail-closed で拒否し、任意の shared Cargo target writer を排除又は検出できる OS mandatory-access 境界は主張しない。lock は descriptor-relative・no-follow の trusted-root 検証を提供する Unix だけで扱い、絶対 CARGO_TARGET_DIR は明示設定時でも全親 component と selection directory の symlink 不在を検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON の選択先は immediate parent が正確に .sotp-rustdoc である専用 selection directory に限る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "16586c5f633df2b05f48155a48ac295369e84db685d5d50c00df71d928c283d5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否し、任意の shared Cargo target writer に対する OS mandatory-access 境界は主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "rustdoc の共有出力 lock を、解決済み target root から descriptor-relative・no-follow で immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix だけで扱うこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d2aaab58ce266c1bfe65712d7e1ee3780a74f4add6b7cd0f76cec091ccf1796c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。Windows その他の platform、symlink を経る target directory、又は非専用 target は fail-closed で拒否する。これは任意の shared Cargo target writer に対する OS mandatory-access 境界を主張しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "rustdoc export と snapshot の再利用は、解決済み target root から descriptor-relative・no-follow で、immediate parent が .sotp-rustdoc の専用 selection directory と lock file を検証できる Unix でだけ許可する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RustdocCratePort",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "SkipEvaluationの永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SchemaExporter",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "cargo metadata の content fingerprint 又は結果 bytes を含め",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate/feature/profile・期待 rustdoc JSON path がすべて一致し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f908ee3682e8240a3ea3111c35676ef0719fec73ffabb66ecb187df9b01e2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。専用 selection directory の同じ lock を期待出力 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで保持する。SkipEvaluation の永続化又は cache 再利用では終端 fingerprint が開始 snapshot と一致しなければ結果を破棄し、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力を開始時の immutable な content-addressed in-memory snapshot に固定し、その後の評価はその snapshot だけを読むこと。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a2eff39c3fbc7014a4d8cddee8b2e45f4f995d8bd50a7e7804941ebcc215af46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-07",
+          "section": "constraint",
+          "text_label": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。出力は同一専用 selection directory の lock の臨界区間で期待 path の選択、export、path 一致確認、及び JSON bytes の lock 内 copy まで完了する。SkipEvaluation を永続化する場合又は cache を再利用する場合は、終端で開始 snapshot との fingerprint 一致を確認し、不一致なら結果を破棄する。終端確認の path 読み取りは評価入力にせず、A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "解決済み入力は開始時の content-addressed in-memory snapshot に固定し、その後の解決・比較・評価はその snapshot だけを読む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "85e3af04274ede5dee9a91cc20841331f729f66790e4eb848ecaf0ddebeccb99",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。期待 rustdoc JSON は、同じ専用 selection directory の lock を期待出力 path の選択、export、path 一致確認、及び lock 内での JSON bytes copy まで保持して得る。SkipEvaluation の永続化又は cache 再利用時は、評価終端で開始 snapshot と fingerprint が一致することを確認し、不一致なら結果を破棄する。A→B→A で開始 bytes に戻る場合は同じ generation と扱う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "評価は開始時に捕捉した source、catalogue、architecture rules、その他の関連入力の content-addressed in-memory snapshot だけを読み、snapshot 後にそれらの path を再読しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "320723171e3817f376dee24139a54879e7fc2730b6fbc2bdd4cad9de96ce9b74",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。実装 fingerprint は、非除外 workspace regular file、列挙環境、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc、及び cargo metadata の content fingerprint 又は結果 bytes を含め、PATH 上の rustup proxy を tool fingerprint に用いない。この列挙済み記録対象だけが再利用 identity であり、include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot に失敗する場合は authoritative-input error として fail-closed にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル再利用を、宣言、解決集合、Rust 実装、選択した Cargo 実行条件、期待 rustdoc 出力の同一性に束縛すること。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+          "file_path": "track/items/2026-08-28-cross-crate-add-declaration-resolution/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a1a5926079644aa984d925e74bfd0b69f1022aaf52eb7ca5cef8be655d97441",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。実装 fingerprint は、除外対象以外の workspace regular file の相対 path と内容 hash、D3 が列挙する環境値、cargo +nightly rustdoc が実際に使用する nightly 選択済み cargo/rustc/rustdoc の content fingerprint、及び cargo metadata --no-deps --locked の結果 bytes を順序付きで含める。PATH 上の rustup proxy の fingerprint をこれらの tool fingerprint として用いない。この列挙済み記録対象だけが再利用 identity であり、Cargo の include graph、build-script 入出力、proc-macro expansion はその identity の範囲外である。D4 の I/O 上限内で全対象を取得できない、nightly 選択済み tool の解決又は content snapshot、metadata 実行、又は fingerprint 作成に失敗する場合は authoritative-input error として fail-closed にし、partial fingerprint、旧結果、又は snapshot を成功として利用しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "型シグナル結果は、宣言・baseline・HEAD・実装 fingerprint・解決 fingerprint・解決済み Cargo target directory・crate/feature/profile・期待 rustdoc JSON path がすべて一致し、worktree が clean な場合にだけ再利用される。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

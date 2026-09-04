@@ -1,0 +1,917 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "DeriveTestObligationsInteractor",
+      "trait_ref": "DeriveTestObligationsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyInteractor",
+      "trait_ref": "CoverageVerifyService"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateInteractor",
+      "trait_ref": "PreReviewGateService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueImplSignalsInteractor",
+      "trait_ref": "CatalogueImplSignalsService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsInteractor",
+      "trait_ref": "CheckTestObligationsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateTestObligationsInteractor",
+      "trait_ref": "EvaluateTestObligationsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsInteractor",
+      "trait_ref": "TestObligationResultsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<TaskContractReadError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<ImplCatalogSignalReadError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<ImplPlanReadError>"
+    }
+  ],
+  "traits": {
+    "AttestedCatalogueDocumentLoaderPort": {
+      "action": "add",
+      "docs": "Application-owned attested catalogue document loader; bounded blocking reads of local track artifacts are deliberate within one CLI invocation, with no async runtime at this boundary; supplies the attested catalogue document for contracted-entry namespace resolution (IN-05).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Supplies the attested catalogue document from a bounded, atomic no-follow filesystem read, with the exact-byte hash used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::tddd::catalogue_v2::catalogue_impl_signals_ports::AttestedCatalogueDocument, domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "catalogue_document_loader",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CatalogPort": {
+      "action": "reference",
+      "docs": "Catalog command port referenced by this track as the catalog-import route (IN-02); synchronous filesystem execution is deliberate for bounded single-request CLI operations. Method error subsets are traced from the FsCatalogAdapter verb and helper call paths.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileExists, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "init",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogInitReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::DuplicateEntry, CatalogError::AnchorNotFound, CatalogError::InvalidRole, CatalogError::ParseFragment, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogAddCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::DuplicateEntry, CatalogError::AnchorNotFound, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "import",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogImportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::FileMissing, CatalogError::AnchorNotFound, CatalogError::SchemaInvalid, or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cite",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogCiteCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "action": "reference",
+          "docs": "Produces only CatalogError::SchemaInvalid or CatalogError::Port.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "query",
+              "ty": "CatalogCheckQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogCheckReport, CatalogError>"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor": {
+      "action": "modify",
+      "docs": "Receives the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "catalogue_loader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort>"
+            },
+            {
+              "name": "ext_crate_codec",
+              "ty": "Arc<dyn domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort>"
+            },
+            {
+              "name": "evaluator",
+              "ty": "Arc<dyn domain::tddd::signal_evaluator::port::SignalEvaluatorPort>"
+            },
+            {
+              "name": "rustdoc_crate_port",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort>"
+            },
+            {
+              "name": "layer_bindings_port",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "feature_declaration_port",
+              "ty": "Arc<dyn TdddActualFeatureDeclarationPort>"
+            },
+            {
+              "name": "symlink_guard",
+              "ty": "Arc<dyn domain::symlink_guard_port::SymlinkGuardPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "catalogue_impl_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::pre_review_gate::CoverageVerifyInteractor": {
+      "action": "modify",
+      "docs": "Uses repository-root layer bindings to load the attested catalogue from which contracted-entry namespaces are resolved (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the repository root and layer bindings used to load the attested catalogue for contracted-entry namespace resolution (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_contract_reader",
+              "ty": "Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "Arc<dyn ImplCatalogSignalReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "Arc<dyn ImplPlanReaderPort>"
+            },
+            {
+              "name": "catalogue_loader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort>"
+            },
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::pre_review_gate::PreReviewGateError": {
+      "action": "modify",
+      "docs": "Pre-review gate error vocabulary for attested catalogue loading and freshness verification in the contracted-entry namespace path (IN-05); FreeText payloads are opaque diagnostics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::layer_id::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueFreshnessMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::layer_id::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::layer_id::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::pre_review_gate::PreReviewGateInteractor": {
+      "action": "modify",
+      "docs": "Uses repository-root layer bindings to load the attested catalogue from which contracted-entry namespaces are resolved (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the repository root and layer bindings used to load the attested catalogue for contracted-entry namespace resolution (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_contract_reader",
+              "ty": "Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "Arc<dyn ImplCatalogSignalReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "Arc<dyn ImplPlanReaderPort>"
+            },
+            {
+              "name": "catalogue_loader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort>"
+            },
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::check::CheckTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Receives the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::derive::DeriveTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Owns test-obligation artifact derivation, including the trait-impl carrier identity resolution surface; see IN-04 / CO-04 / AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Constructs the test-obligation derivation interactor; see IN-04 / CO-04 / AC-04.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "track_status_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort + Send + Sync>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "projector",
+              "ty": "domain::tddd::test_obligation::projection::RoleObligationItemsProjector"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-04",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Receives the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_driver",
+              "ty": "Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
+            },
+            {
+              "name": "waiver_driver",
+              "ty": "Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "config",
+              "ty": "TestObligationEvaluateConfig"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "hasher",
+              "ty": "Arc<dyn ContentHasherPort + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "usecase::test_obligation::results::TestObligationResultsInteractor": {
+      "action": "modify",
+      "docs": "Receives the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Injects the application loader that supplies the attested catalogue document used to resolve contracted-entry namespaces against the same catalogue validated by the signal document (IN-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
+}

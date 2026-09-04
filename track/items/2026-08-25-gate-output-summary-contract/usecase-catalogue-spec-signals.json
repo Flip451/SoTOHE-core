@@ -1,0 +1,91 @@
+{
+  "catalogue_declaration_hash": "db894a9ab45af18717385802bed27dde05e3e45c069111ed2272d69a13cb9355",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "54271a318bec09d95310ebf80e6ee6fca6b599f70d176cf992320551f6654a86",
+      "signal": "blue",
+      "type_name": "GateAdapterFailureReason"
+    },
+    {
+      "entry_hash": "77fe6dfd9d5021f041c8813a2518b1cc8b0e11d9efa962585521c0311ef29a59",
+      "signal": "blue",
+      "type_name": "GateExitCode"
+    },
+    {
+      "entry_hash": "a2043f0da6b9d88104e03da21d90b3e8fb119854ac315d04f4259e4a06b68845",
+      "signal": "blue",
+      "type_name": "GateLogPath"
+    },
+    {
+      "entry_hash": "556798efb3acbdec623d8dff0cf55105fc85f09a394d920319a0f83ffa7559fa",
+      "signal": "blue",
+      "type_name": "GateLogReservation"
+    },
+    {
+      "entry_hash": "d3a1818f02e95822d61e2536edfb6b8400ee9b574a8e26d167156f87f691ce16",
+      "signal": "blue",
+      "type_name": "GateLogReservationError"
+    },
+    {
+      "entry_hash": "882b1a931339a8238e1d5891f44765a9d8973a46f94bb81547bd5a76e60c23ec",
+      "signal": "blue",
+      "type_name": "GateLogWriteError"
+    },
+    {
+      "entry_hash": "b52c42c6341edc0607213d3ccbaa0fec3807ede2300e5cecfdd5ee3616b92904",
+      "signal": "blue",
+      "type_name": "GateLogWriteOutcome"
+    },
+    {
+      "entry_hash": "cab97e920111d46dbb903fd7765d8bc33683b771aaf2d4be8f1068f80c53cddd",
+      "signal": "blue",
+      "type_name": "GateProcessError"
+    },
+    {
+      "entry_hash": "2fdca57aee33c3f62ea9444b84cc074aed793ee43e148b877ebbf9326e0c9b07",
+      "signal": "blue",
+      "type_name": "GateProcessOutput"
+    },
+    {
+      "entry_hash": "4fd1943a262211efa90c3b7ac537ecb193209816008d2027de63628fd9da47aa",
+      "signal": "blue",
+      "type_name": "GateRunCommand"
+    },
+    {
+      "entry_hash": "c0a64ad788f8efb1a9ac265fdf39eece479eb951f0e41718a2812036f99e8a5e",
+      "signal": "blue",
+      "type_name": "GateRunCommandError"
+    },
+    {
+      "entry_hash": "6cb2e5dce386cd03b0a4dd8d5a7f01a4d884a2535e318a69c4f0e393635c8e21",
+      "signal": "blue",
+      "type_name": "GateRunError"
+    },
+    {
+      "entry_hash": "c4edf87ddd67befb35f074cbb48c479b6f84a593c3ad9e92ec7dcee43852cbc8",
+      "signal": "blue",
+      "type_name": "GateRunInteractor"
+    },
+    {
+      "entry_hash": "128eccc4d272a13d5a7823559d609b1ae679760ca1488d0473cf4fc145f3a8b4",
+      "signal": "blue",
+      "type_name": "GateRunResult"
+    },
+    {
+      "entry_hash": "ad9d7c485d0204657dffbb9e5f1a2e2eb348336a600d07ceba3d56b027cb4f0c",
+      "signal": "blue",
+      "type_name": "GateLogPersistencePort"
+    },
+    {
+      "entry_hash": "4e70fdeaac1ce7b2c177c4b31dcaea182150e61df1d7186d94e05f4c728dc22a",
+      "signal": "blue",
+      "type_name": "GateProcessPort"
+    },
+    {
+      "entry_hash": "d9d02535aaa0c9d1b4ab71b9d970133ae58edf4713afbb7ce65fafda146fb735",
+      "signal": "blue",
+      "type_name": "GateRunService"
+    }
+  ]
+}

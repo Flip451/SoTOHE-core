@@ -6,7 +6,6 @@
 use std::sync::Arc;
 
 use domain::TaskStatusKind;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::test_obligation::binding::{
     TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -31,6 +30,7 @@ use domain::tddd::test_obligation::verdict::{
 
 use domain::SpecDocumentLoaderPort;
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 pub use super::check_contract::{
@@ -72,7 +72,7 @@ pub struct CheckTestObligationsInteractor {
     fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
     waiver_verifier_fingerprint: VerifierPromptFingerprint,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
 }
@@ -91,7 +91,7 @@ impl CheckTestObligationsInteractor {
         fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
         waiver_verifier_fingerprint: VerifierPromptFingerprint,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
     ) -> Self {

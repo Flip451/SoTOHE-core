@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "bf19f4b44975484bc612b905d3e9a829e99609cdc529f2083251a9f14c15a5d0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputComposition",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8816077014760631b559e108927959b379aaaa504e31cd2026710561123a37b5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ保存先の予約・準備に成功して子プロセスを実行できた各対象タスクは、フルログの保存が完了した場合にフル実行ログを tmp/gate/ 配下に保存し、stdout でそのログファイルへのパスを示す。子プロセス起動前に予約・準備が失敗した場合は、フルログパスを示さず、その失敗を短い理由として示す。子プロセス起動後にフルログの保存が失敗した場合は、フルログパスを示さず、フルログ未作成または参照不能をその短い理由として示す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bf19f4b44975484bc612b905d3e9a829e99609cdc529f2083251a9f14c15a5d0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputComposition",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "baf6dfefabd52618639a10a2a3e53e4681404c658a9d51195d6d04e9dd170fe2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "永続化ポートが一意なログ保存先を予約または準備し、その予約済み保存先を用いて子プロセスの実行ログを書き込み、永続化で予約を消費する流れを対象に含める。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "永続化ポートが一意なログ保存先を予約または準備し、その予約済み保存先を用いて子プロセスの実行ログを書き込み、永続化で予約を消費する流れを対象に含める。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bf19f4b44975484bc612b905d3e9a829e99609cdc529f2083251a9f14c15a5d0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GateOutputComposition",
+          "file_path": "track/items/2026-08-25-gate-output-summary-contract/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5431793d352c3eaef4f193a50abf3752dd030d7f46985030bfccf39773224372",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "ログ保存先の選択、衝突回避、名前の実現可能性、および子プロセス起動前に必要な予約は、永続化ポートとそのアダプターが所有しなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ログ保存先の選択、衝突回避、名前の実現可能性、および子プロセス起動前に必要な予約は、永続化ポートとそのアダプターが所有しなければならない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

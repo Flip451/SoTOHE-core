@@ -733,6 +733,7 @@ mod tests {
         BaseMergeContextError, BaseMergeContextPort, BaseMergeGitError, BaseMergeGitPort,
         BaseMergeOutcome, BaselineReplacementError, PostMergeCleanupError, ViewsRegenerationError,
     };
+    use usecase::track_lifecycle::TrackCommitHashPort;
     use usecase::track_lifecycle::track_clear_override::{
         TrackClearOverrideCommand, TrackClearOverrideError, TrackClearOverrideResult,
     };
@@ -756,6 +757,18 @@ mod tests {
     use usecase::track_lifecycle::track_transition::{
         TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
     };
+
+    struct NoopCommitRecord;
+
+    impl TrackCommitHashPort for NoopCommitRecord {
+        fn persist_current_for_track(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<CommitHash, usecase::git_workflow::DiagnosticText> {
+            Ok(CommitHash::try_new("0123456789abcdef").unwrap())
+        }
+    }
+
     struct UnusedTrackInitService;
 
     struct UnusedTrackArchiveService;
@@ -2431,6 +2444,7 @@ mod tests {
             }),
             Arc::new(RecordingGitPort { calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanupPort { calls: Arc::clone(&cleanup_calls) }),
+            Arc::new(NoopCommitRecord),
         );
         let driver = base_merge_driver(Arc::new(interactor));
 
@@ -2469,6 +2483,7 @@ mod tests {
             }),
             Arc::new(RecordingGitPort { calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanupPort { calls: Arc::clone(&cleanup_calls) }),
+            Arc::new(NoopCommitRecord),
         );
         let driver = base_merge_driver(Arc::new(interactor));
 
@@ -2493,6 +2508,7 @@ mod tests {
             Arc::new(SnapshotSourceMismatchContext { workspaces: Arc::clone(&context_workspaces) }),
             Arc::new(RecordingGitPort { calls: Arc::clone(&git_calls) }),
             Arc::new(RecordingCleanupPort { calls: Arc::clone(&cleanup_calls) }),
+            Arc::new(NoopCommitRecord),
         );
         let driver = base_merge_driver(Arc::new(interactor));
 

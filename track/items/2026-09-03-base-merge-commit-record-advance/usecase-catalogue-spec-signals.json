@@ -1,0 +1,36 @@
+{
+  "catalogue_declaration_hash": "26d8f4f7c9bdb376094e43ea7ab680b90e72f3504593010288d0951861f37b7a",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::BaseMergeInteractor"
+    },
+    {
+      "entry_hash": "504b1ac57503514b14016a05439f1f9853644803526112d39d46b08c70d8e501",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::PostMergeCleanupError"
+    },
+    {
+      "entry_hash": "153642a0d27c065a55477d8f244bccac371dc7c01f22f807732305b434d82f74",
+      "signal": "blue",
+      "type_name": "usecase::git_workflow::DiagnosticText"
+    },
+    {
+      "entry_hash": "2c1b098812ebe9a6894885d7a73ecb754acd4c0d73e5ff152364dd408107dc72",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor"
+    },
+    {
+      "entry_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "signal": "blue",
+      "type_name": "TrackCommitHashPort"
+    },
+    {
+      "entry_hash": "1e909e0a80e591ded9dbb357b6ca002ed2e9cb1a081f404c2d6130f659a62b7a",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashService"
+    }
+  ]
+}

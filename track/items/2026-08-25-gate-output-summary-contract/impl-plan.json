@@ -1,0 +1,148 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Layered shared gate-run mechanism across usecase, infrastructure, cli_driver, cli, and cli_composition, plus Makefile.toml and bin/sotp integration and focused regressions — add and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Shared summary and full-log behavior"
+      },
+      {
+        "description": [
+          "Makefile.toml and bin/sotp test-execution and obligation-evaluation tasks plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Leaf test and obligation tasks"
+      },
+      {
+        "description": [
+          "Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Aggregate pre-commit gates"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Reservation and preparation targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08."
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Reservation consumption and no-reclaim targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07."
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Contained final-publication targets"
+      },
+      {
+        "description": [
+          "libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06."
+        ],
+        "id": "S7",
+        "task_ids": [
+          "T007"
+        ],
+        "title": "Post-execution outcome and rendering targets"
+      }
+    ],
+    "summary": [
+      "T001-T003: apply gate-output changes across shared, leaf, and aggregate paths (GO-01).",
+      "T001-T003: update gate-output handling in place (GO-02).",
+      "T004: libs/usecase/src/gate_output.rs, libs/infrastructure/src/gate_output.rs, and apps/cli-driver/src/gate_output.rs reservation/preparation symbols and focused regressions — add and test; IN-04; CN-04; CN-05; AC-05.",
+      "T005: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs reservation-consumption/no-reclaim targets plus focused regressions — add and test; IN-04; CN-05; CN-07; AC-08.",
+      "T006: libs/usecase/src/gate_output.rs and libs/infrastructure/src/gate_output.rs final-publish containment targets plus focused regressions — add and test; IN-05; CN-06; AC-07.",
+      "T007: libs/usecase/src/gate_output.rs, apps/cli-driver/src/gate_output.rs, and conditional CLI/composition integration targets for post-execution write-outcome/result rendering plus focused regressions — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "415476acda9074085f5283a265e6b724a05c485d",
+      "description": "Layered shared gate-run mechanism across usecase, infrastructure, cli_driver, cli, and cli_composition, plus Makefile.toml and bin/sotp integration and focused regressions — standardize and test; GO-01; GO-02; IN-02; IN-03; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "be8b26e64ad6efd70f4b6f4cb974cb946001d217",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Makefile.toml and bin/sotp test-execution and obligation-evaluation tasks plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "16a3bcd17a8a95146184f179e357a59ebba8a248",
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "description": "Makefile.toml and bin/sotp pre-commit aggregate gates plus output-dependent tests — migrate and revise; GO-01; GO-02; IN-01; IN-02; IN-03; OUT-01; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "888eb4aee35f01653d76f1d8f66f82b66c49d894",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPersistencePort::reserve, GateLogReservation, GateLogReservationError including CreateFile, GateRunCommand, GateRunCommandError, GateRunError::Prepare, and the GateRunInteractor pre-launch path), libs/infrastructure/src/gate_output.rs (FsGateLogPersistence::reserve), apps/cli-driver/src/gate_output.rs (GateOutputDriver preparation-failure rendering), and focused regressions in those modules — add and test; IN-04; CN-04; CN-05; AC-05.",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d4f877064d0f392a799e1c9766ea710660f3e508",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPersistencePort::persist consuming GateLogReservation and the GateRunInteractor single-live-reservation flow) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence reservation-consumption/no-reclaim behavior), plus focused regressions in those modules — add and test; IN-04; CN-05; CN-07; AC-08.",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "b414acd4c6f8deb12c44b93e18a2af97f4ed3d18",
+      "depends_on": [
+        "T005"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogPath, GateLogWriteError, GateLogWriteOutcome, and GateLogPersistencePort::persist result contract) and libs/infrastructure/src/gate_output.rs (FsGateLogPersistence final-publish containment), plus focused regressions in those modules — add and test; IN-05; CN-06; AC-07.",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0cb7c7a1bdfc87bb9658266e0738528bda6b692f",
+      "depends_on": [
+        "T006"
+      ],
+      "description": "libs/usecase/src/gate_output.rs (GateLogWriteOutcome, GateRunService::execute, GateRunResult, and GateRunInteractor post-execution write outcome), apps/cli-driver/src/gate_output.rs (render_summary and GateOutputDriver result rendering), apps/cli/src/commands/gate_output.rs (execute if the result shape changes), apps/cli-composition/src/gate_output.rs (GateOutputComposition if wiring changes), and focused regressions in those modules — add and test; IN-02; IN-03; CN-01; AC-02; AC-03; AC-06.",
+      "id": "T007",
+      "status": "done"
+    }
+  ]
+}

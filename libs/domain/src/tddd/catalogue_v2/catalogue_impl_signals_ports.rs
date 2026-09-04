@@ -1,13 +1,13 @@
-//! Secondary ports for `CatalogueImplSignalsInteractor`.
+//! Domain values and secondary ports for `CatalogueImplSignalsInteractor`.
 //!
-//! Declared alongside `CatalogueToExtendedCratePort` and `SignalEvaluatorPort`
-//! because `CatalogueDocument` and `rustdoc_types::Crate` are domain types.
+//! The catalogue attestation and loader error remain domain values because
+//! they cross the application boundary. The filesystem loader port is owned
+//! by `libs/usecase`, where the loading orchestration is declared.
 //!
 //! ## Design (ADR 2026-05-11-2330 §D2)
 //!
-//! `CatalogueDocumentLoaderPort` wraps filesystem loading of a `CatalogueDocument`.
 //! `RustdocCratePort` wraps both baseline load (B-side) and live capture (C-side)
-//! of a `rustdoc_types::Crate`.  Injecting these via ports instead of calling
+//! of immutable, content-addressed rustdoc values. Injecting these via ports instead of calling
 //! infrastructure codecs directly keeps `libs/usecase` free of `infrastructure`
 //! dependencies (hexagonal architecture).
 //!
@@ -20,15 +20,22 @@
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-use crate::TrackId;
+use sha2::Digest as _;
+
 use crate::tddd::CargoFeatureName;
+use crate::tddd::catalogue_linter::FreeText;
 use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
+use crate::tddd::type_signals_doc::{
+    AttestedRustdocSnapshot, CapturedRustdocJson, CatalogueDeclarationHash,
+    ImplementationFingerprint, Sha256Digest,
+};
+use crate::{ContentHash, TrackId};
 
 // ---------------------------------------------------------------------------
 // CatalogueDocumentLoaderError
 // ---------------------------------------------------------------------------
 
-/// Error type for [`CatalogueDocumentLoaderPort::load`].
+/// Error type returned when a catalogue document cannot be loaded.
 ///
 /// Three variants: `NotFound` (file absent), `Io` (non-symlink I/O failure),
 /// `Decode` (JSON or schema-version failure from `CatalogueDocumentCodec`).
@@ -76,33 +83,60 @@ impl fmt::Display for CatalogueDocumentLoaderError {
 impl std::error::Error for CatalogueDocumentLoaderError {}
 
 // ---------------------------------------------------------------------------
-// CatalogueDocumentLoaderPort
+// AttestedCatalogueDocument
 // ---------------------------------------------------------------------------
 
-/// Secondary port for loading a `CatalogueDocument` from a filesystem path.
+/// A catalogue document paired with the declaration hash of the exact bytes
+/// from which it was decoded.
 ///
-/// A-side input for `CatalogueImplSignalsInteractor`. Placed in the domain
-/// alongside `CatalogueToExtendedCratePort` and `SignalEvaluatorPort` because
-/// `CatalogueDocument` is a domain type.
-///
-/// The infrastructure adapter (`FsCatalogueDocumentLoader`) wraps
-/// `CatalogueDocumentCodec::load`.
-///
-/// [source: ADR 2026-05-11-2330 D2 — hexagonal consequence of moving
-/// orchestration to usecase]
-pub trait CatalogueDocumentLoaderPort: Send + Sync {
-    /// Loads a `CatalogueDocument` from the given filesystem path.
+/// Keeping the attestation beside, rather than inside, [`CatalogueDocument`]
+/// preserves the persisted catalogue model while making freshness validation a
+/// mandatory part of every successful loader result.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AttestedCatalogueDocument {
+    document: CatalogueDocument,
+    declaration_hash: CatalogueDeclarationHash,
+}
+
+impl AttestedCatalogueDocument {
+    /// Decodes and attests one source byte sequence.
+    ///
+    /// The decoder receives the same bytes that are hashed, so callers cannot
+    /// construct a successful result with a separately supplied declaration
+    /// hash.
     ///
     /// # Errors
     ///
-    /// Returns [`CatalogueDocumentLoaderError::NotFound`] if the file is absent.
-    ///
-    /// Returns [`CatalogueDocumentLoaderError::Io`] if a non-symlink I/O error
-    /// occurs while reading the file.
-    ///
-    /// Returns [`CatalogueDocumentLoaderError::Decode`] if JSON deserialization
-    /// or schema-version validation fails.
-    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError>;
+    /// Returns the error produced by `decode(source)` when decoding fails.
+    pub fn attest<E, F>(source: &[u8], decode: F) -> Result<Self, E>
+    where
+        F: FnOnce(&[u8]) -> Result<CatalogueDocument, E>,
+    {
+        let document = decode(source)?;
+        let bytes: [u8; 32] = sha2::Sha256::digest(source).into();
+        let declaration_hash = CatalogueDeclarationHash::new(Sha256Digest::from_content_hash(
+            ContentHash::from_bytes(bytes),
+        ));
+        Ok(Self { document, declaration_hash })
+    }
+
+    /// Returns the decoded catalogue document.
+    #[must_use]
+    pub fn document(&self) -> &CatalogueDocument {
+        &self.document
+    }
+
+    /// Returns the declaration hash of the exact source bytes read by the loader.
+    #[must_use]
+    pub fn declaration_hash(&self) -> &CatalogueDeclarationHash {
+        &self.declaration_hash
+    }
+
+    /// Consumes the attested result and returns its decoded document.
+    #[must_use]
+    pub fn into_document(self) -> CatalogueDocument {
+        self.document
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -113,6 +147,8 @@ pub trait CatalogueDocumentLoaderPort: Send + Sync {
 ///
 /// `NotFound` / `Io` cover baseline file load failures;
 /// `ParseFailed` covers JSON parse failures (from `BaselineRustdocCodec::from_json`);
+/// `AuthoritativeInput` covers failures to acquire or verify the current
+/// rustdoc input;
 /// `CaptureFailed` covers `cargo rustdoc` invocation failures (from
 /// `RustdocSchemaExporter::export_rustdoc_json_path`).
 ///
@@ -129,21 +165,28 @@ pub enum RustdocCratePortError {
         /// Path that was being read.
         path: PathBuf,
         /// Human-readable reason from the underlying I/O error.
-        reason: String,
+        reason: FreeText,
     },
     /// JSON parse failure for the rustdoc output.
     ParseFailed {
         /// Crate name for which parsing failed.
-        crate_name: String,
+        crate_name: CrateName,
         /// Human-readable reason from the codec error.
-        reason: String,
+        reason: FreeText,
+    },
+    /// The current rustdoc input could not be acquired or verified as authoritative.
+    AuthoritativeInput {
+        /// Crate name for which authoritative input was requested.
+        crate_name: CrateName,
+        /// Human-readable reason the input could not be trusted.
+        reason: FreeText,
     },
     /// `cargo rustdoc` invocation failed during live capture.
     CaptureFailed {
         /// Crate name for which capture was attempted.
-        crate_name: String,
+        crate_name: CrateName,
         /// Human-readable reason from the exporter error.
-        reason: String,
+        reason: FreeText,
     },
 }
 
@@ -159,6 +202,9 @@ impl fmt::Display for RustdocCratePortError {
             Self::ParseFailed { crate_name, reason } => {
                 write!(f, "failed to parse rustdoc JSON for '{crate_name}': {reason}")
             }
+            Self::AuthoritativeInput { crate_name, reason } => {
+                write!(f, "authoritative rustdoc input unavailable for '{crate_name}': {reason}")
+            }
             Self::CaptureFailed { crate_name, reason } => {
                 write!(f, "rustdoc capture failed for '{crate_name}': {reason}")
             }
@@ -172,18 +218,18 @@ impl std::error::Error for RustdocCratePortError {}
 // RustdocCratePort
 // ---------------------------------------------------------------------------
 
-/// Secondary port for loading or capturing `rustdoc_types::Crate` instances.
+/// Secondary port for loading or capturing immutable, identity-bearing rustdoc values.
 ///
 /// - `load_from_path`: loads a previously captured rustdoc JSON file (B-side baseline).
 /// - `capture_current`: captures the current crate's rustdoc JSON via the nightly
-///   toolchain (C-side).
+///   toolchain (C-side), bound to that fingerprint.
 ///
 /// Placed in the domain alongside `SignalEvaluatorPort` because `rustdoc_types::Crate`
 /// is already part of the domain's vocabulary (the domain depends on `rustdoc_types`).
 ///
 /// [source: ADR 2026-05-11-2330 D2]
 pub trait RustdocCratePort: Send + Sync {
-    /// Loads a `rustdoc_types::Crate` from the given JSON file path (B-side).
+    /// Loads a content-addressed baseline value from the given JSON file path (B-side).
     ///
     /// # Errors
     ///
@@ -193,10 +239,11 @@ pub trait RustdocCratePort: Send + Sync {
     ///
     /// Returns [`RustdocCratePortError::ParseFailed`] if JSON deserialization or
     /// format-version validation fails.
-    fn load_from_path(&self, path: &Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
+    fn load_from_path(&self, path: &Path) -> Result<CapturedRustdocJson, RustdocCratePortError>;
 
-    /// Captures the current `rustdoc_types::Crate` via `cargo +nightly rustdoc`
-    /// (C-side live capture) with the validated layer feature selection.
+    /// Captures the current attested rustdoc snapshot via `cargo +nightly
+    /// rustdoc` (C-side live capture) with the validated layer feature
+    /// selection.
     ///
     /// # Errors
     ///
@@ -204,11 +251,15 @@ pub trait RustdocCratePort: Send + Sync {
     ///
     /// Returns [`RustdocCratePortError::ParseFailed`] if the generated JSON cannot
     /// be deserialized.
+    ///
+    /// Returns [`RustdocCratePortError::AuthoritativeInput`] if the current
+    /// rustdoc input cannot be acquired or verified.
     fn capture_current(
         &self,
         crate_name: &CrateName,
         features: &[CargoFeatureName],
-    ) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
+        evaluation_start: &ImplementationFingerprint,
+    ) -> Result<AttestedRustdocSnapshot, RustdocCratePortError>;
 }
 
 // ---------------------------------------------------------------------------
@@ -420,4 +471,29 @@ pub trait TrackStatusReaderPort: Send + Sync {
         items_dir: &Path,
         track_id: &str,
     ) -> Result<crate::TrackStatus, TrackStatusReadError>;
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::tddd::LayerId;
+
+    #[test]
+    fn attested_catalogue_document_preserves_document_and_hash() {
+        let document = CatalogueDocument::new(
+            5,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let source = b"catalogue source bytes";
+        let attested = AttestedCatalogueDocument::attest(source, |decoded| {
+            assert_eq!(decoded, source);
+            Ok::<_, std::convert::Infallible>(document.clone())
+        })
+        .unwrap();
+
+        assert_eq!(attested.document(), &document);
+        assert_eq!(attested.into_document(), document);
+    }
 }

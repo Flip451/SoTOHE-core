@@ -399,12 +399,16 @@ mod tests {
 
             let commands = tempfile::tempdir().expect("command shim directory exists");
             let rustup = commands.path().join("rustup");
-            fs::write(&rustup, "#!/bin/sh\nexit 0\n").expect("rustup shim is written");
+            fs::write(
+                &rustup,
+                "#!/bin/sh\nif [ \"$1\" = \"which\" ]; then printf '%s\\n' /bin/true; exit 0; fi\nexit 0\n",
+            )
+            .expect("rustup shim is written");
             make_executable(&rustup);
             let cargo = commands.path().join("cargo");
             fs::write(
                 &cargo,
-                "#!/bin/sh\nset -eu\nif [ \"$1\" = metadata ]; then\nprintf '%s\\n' '{\"packages\":[{\"name\":\"domain\",\"targets\":[{\"kind\":[\"lib\"],\"name\":\"domain\"}]}],\"target_directory\":\"target\"}'\nexit 0\nfi\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s' '{\"root\":0,\"crate_version\":null,\"includes_private\":false,\"index\":{},\"paths\":{},\"external_crates\":{},\"format_version\":57,\"target\":{\"triple\":\"\",\"target_features\":[]}}' > \"$CARGO_TARGET_DIR/doc/domain.json\"\n",
+                "#!/bin/sh\nset -eu\nif [ \"$1\" = metadata ]; then\nprintf '%s\\n' \"{\\\"packages\\\":[{\\\"name\\\":\\\"domain\\\",\\\"manifest_path\\\":\\\"$PWD/libs/domain/Cargo.toml\\\",\\\"targets\\\":[{\\\"kind\\\":[\\\"lib\\\"],\\\"name\\\":\\\"domain\\\"}]}],\\\"target_directory\\\":\\\"target\\\"}\"\nexit 0\nfi\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s' '{\"root\":0,\"crate_version\":null,\"includes_private\":false,\"index\":{},\"paths\":{},\"external_crates\":{},\"format_version\":57,\"target\":{\"triple\":\"\",\"target_features\":[]}}' > \"$CARGO_TARGET_DIR/doc/domain.json\"\n",
             )
             .expect("cargo shim is written");
             make_executable(&cargo);

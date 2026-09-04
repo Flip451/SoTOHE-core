@@ -445,58 +445,59 @@ fn top_level_toml_string_value(content: &str, key: &str) -> String {
     panic!("top-level TOML key {key} missing")
 }
 
-fn task_toml_value<'a>(makefile: &'a str, task_name: &str, key: &str) -> &'a str {
-    let task_header = format!("[tasks.{task_name}]");
-    let expected = format!("{key} = ");
-    let mut in_task = false;
+fn task_toml_optional_value(makefile: &str, task_name: &str, key: &str) -> Option<toml::Value> {
+    let document: toml::Value = toml::from_str(makefile)
+        .unwrap_or_else(|error| panic!("Makefile.toml must be valid TOML: {error}"));
 
-    for line in makefile.lines().map(str::trim) {
-        if line.starts_with('[') && line.ends_with(']') {
-            in_task = line == task_header;
-        } else if in_task && let Some(value) = line.strip_prefix(&expected) {
-            return value;
-        }
-    }
+    document
+        .get("tasks")
+        .and_then(toml::Value::as_table)
+        .and_then(|tasks| tasks.get(task_name))
+        .and_then(toml::Value::as_table)
+        .and_then(|task| task.get(key))
+        .cloned()
+}
 
-    panic!("TOML key {key} missing from task {task_name}")
+fn task_toml_value(makefile: &str, task_name: &str, key: &str) -> toml::Value {
+    task_toml_optional_value(makefile, task_name, key)
+        .unwrap_or_else(|| panic!("TOML key {key} missing from task {task_name}"))
 }
 
 fn task_toml_optional_bool_value(makefile: &str, task_name: &str, key: &str) -> Option<bool> {
-    let task_header = format!("[tasks.{task_name}]");
-    let mut in_task = false;
-
-    for line in makefile.lines().map(str::trim) {
-        if line.starts_with('[') && line.ends_with(']') {
-            in_task = line == task_header;
-        } else if in_task
-            && let Some((candidate_key, value)) = line.split_once('=')
-            && candidate_key.trim() == key
-        {
-            let boolean = value
-                .split_whitespace()
-                .next()
-                .unwrap_or_else(|| panic!("TOML boolean {key} missing from task {task_name}"));
-            return Some(match boolean {
-                "true" => true,
-                "false" => false,
-                _ => panic!("TOML key {key} in task {task_name} must be a boolean"),
-            });
-        }
-    }
-
-    None
+    task_toml_optional_value(makefile, task_name, key).map(|value| {
+        value
+            .as_bool()
+            .unwrap_or_else(|| panic!("TOML key {key} in task {task_name} must be a boolean"))
+    })
 }
 
 fn task_toml_string_array(makefile: &str, task_name: &str, key: &str) -> Vec<String> {
-    serde_json::from_str(task_toml_value(makefile, task_name, key)).unwrap_or_else(|error| {
-        panic!("{key} for task {task_name} must be a TOML string array: {error}")
-    })
+    let value = task_toml_value(makefile, task_name, key);
+    value
+        .as_array()
+        .unwrap_or_else(|| panic!("{key} for task {task_name} must be a TOML string array"))
+        .iter()
+        .map(|item| {
+            item.as_str()
+                .unwrap_or_else(|| panic!("{key} for task {task_name} must be a TOML string array"))
+        })
+        .map(str::to_owned)
+        .collect()
 }
 
 fn task_toml_string_value(makefile: &str, task_name: &str, key: &str) -> String {
-    serde_json::from_str(task_toml_value(makefile, task_name, key)).unwrap_or_else(|error| {
-        panic!("{key} for task {task_name} must be a TOML basic string: {error}")
-    })
+    task_toml_value(makefile, task_name, key)
+        .as_str()
+        .unwrap_or_else(|| panic!("{key} for task {task_name} must be a TOML basic string"))
+        .to_owned()
+}
+
+fn task_dependency_set(makefile: &str, task_name: &str) -> BTreeSet<String> {
+    task_toml_string_array(makefile, task_name, "dependencies").into_iter().collect()
+}
+
+fn dependency_set(dependencies: &[&str]) -> BTreeSet<String> {
+    dependencies.iter().map(|dependency| (*dependency).to_owned()).collect()
 }
 
 fn toml_table_value<'a>(content: &'a str, table: &str, key: &str) -> &'a str {
@@ -1008,7 +1009,7 @@ fn test_exported_ci_track_local_early_detection_preserves_track_gates() {
     let makefile = exported_file("Makefile.toml");
     let description = task_toml_string_value(&makefile, "ci-track", "description");
     let closure = task_dependency_closure(&makefile, "ci-track");
-    let script = task_toml_value(&makefile, "ci-track", "script");
+    let script = task_toml_string_array(&makefile, "ci-track", "script");
 
     assert!(description.contains("local early-detection"));
     assert!(description.contains("Requires a track/<id> branch"));
@@ -1020,7 +1021,7 @@ fn test_exported_ci_track_local_early_detection_preserves_track_gates() {
         !task_toml_optional_bool_value(&makefile, "ci-track", "disabled").unwrap_or(false),
         "ci-track must remain enabled for local early detection"
     );
-    assert_eq!(script, "['bin/sotp adr-baseline check-commit']");
+    assert_eq!(script, ["bin/sotp adr-baseline check-commit"]);
     assert!(closure.contains("task-contract-check-local"));
     assert!(closure.contains("verify-spec-states-current"));
     assert!(closure.contains("signal-check-impl-catalog"));
@@ -1047,6 +1048,175 @@ fn test_exported_environment_overlays_define_the_same_gate_tasks() {
         .collect::<BTreeSet<_>>();
 
     assert_eq!(host_gate_tasks, docker_gate_tasks);
+}
+
+#[test]
+fn test_root_aggregate_gate_wrappers_use_shared_summary_surface() {
+    let makefile = fs::read_to_string(workspace_root().join("Makefile.toml")).unwrap();
+    let local_wrappers = [
+        ("ci-rust-local", "ci-rust-local-steps"),
+        ("ci-track-local", "ci-track-local-steps"),
+        ("ci-rust-container", "ci-rust-local-steps"),
+        ("ci-track-container", "ci-track-local-steps"),
+    ];
+    for (task, child) in local_wrappers {
+        assert_eq!(task_toml_string_value(&makefile, task, "command"), "cargo");
+        assert_eq!(
+            task_toml_string_array(&makefile, task, "args"),
+            [
+                "run",
+                "--locked",
+                "--quiet",
+                "-p",
+                "cli",
+                "--",
+                "gate-output",
+                "--name",
+                task,
+                "--",
+                "cargo",
+                "make",
+                "--allow-private",
+                child,
+            ]
+        );
+        assert!(
+            task_toml_optional_value(&makefile, task, "script").is_none(),
+            "{task} wrapper must not declare a script field"
+        );
+    }
+
+    for aggregator in ["ci-local", "ci-container"] {
+        assert!(
+            task_toml_optional_value(&makefile, aggregator, "command").is_none(),
+            "{aggregator} is the D9 dependency aggregator and must not wrap gate-output"
+        );
+        assert!(
+            task_toml_optional_value(&makefile, aggregator, "script").is_none(),
+            "{aggregator} must not declare a script field"
+        );
+    }
+
+    let compose_wrappers = [
+        ("ci-rust", "ci-rust-local-steps"),
+        ("ci", "ci-local"),
+        ("ci-track", "ci-track-local-steps"),
+    ];
+    for (task, child) in compose_wrappers {
+        assert_eq!(task_toml_string_value(&makefile, task, "command"), "bin/sotp");
+        assert_eq!(
+            task_toml_string_array(&makefile, task, "args"),
+            [
+                "gate-output",
+                "--name",
+                task,
+                "--",
+                "docker",
+                "compose",
+                "run",
+                "--rm",
+                "tools",
+                "cargo",
+                "make",
+                "--allow-private",
+                child,
+            ]
+        );
+        assert!(
+            task_toml_optional_value(&makefile, task, "script").is_none(),
+            "{task} wrapper must not declare a script field"
+        );
+    }
+
+    assert_eq!(
+        task_dependency_set(&makefile, "ci-rust-local-steps"),
+        dependency_set(&[
+            "fmt-check-local",
+            "clippy-local",
+            "test-local",
+            "test-cli-feature-off-local",
+            "build-sotp-default-local",
+            "deny-local",
+            "check-layers-local",
+            "verify-canonical-modules-local",
+        ])
+    );
+    let repo_gate_dependencies = dependency_set(&[
+        "fmt-check-local",
+        "clippy-local",
+        "test-local",
+        "test-cli-feature-off-local",
+        "test-doc-local",
+        "build-sotp-default-local",
+        "deny-local",
+        "check-layers-local",
+        "verify-arch-docs-local",
+        "verify-doc-links-local",
+        "verify-plan-progress-local",
+        "verify-track-metadata-local",
+        "verify-track-registry-local",
+        "verify-hooks-path-local",
+        "verify-canonical-modules-local",
+        "verify-latest-track-local",
+        "verify-retention-gate-local",
+        "verify-module-size-local",
+        "verify-domain-strings-local",
+        "verify-domain-purity-local",
+        "verify-usecase-purity-local",
+        "verify-view-freshness-local",
+        "verify-plan-artifact-refs-local",
+        "verify-adr-signals-local",
+        "verify-machine-paths-local",
+        "verify-template-refs-local",
+        "template-export-smoke-local",
+    ]);
+    for task in ["ci-local", "ci-local-steps", "ci-container"] {
+        assert_eq!(
+            task_dependency_set(&makefile, task),
+            repo_gate_dependencies,
+            "{task} must retain the complete repo-wide quality-gate dependency set"
+        );
+    }
+    assert_eq!(
+        task_dependency_set(&makefile, "ci-track-local-steps"),
+        dependency_set(&[
+            "task-contract-coverage-local",
+            "task-contract-check-local",
+            "adr-baseline-check-commit-local",
+            "verify-spec-states-current-local",
+            "signal-check-impl-catalog-local",
+            "verify-catalogue-spec-refs-local",
+            "check-catalogue-spec-signals-local",
+            "test-obligation-check-local",
+        ])
+    );
+}
+
+#[test]
+fn test_repo_wide_ci_entry_points_wrap_dependency_aggregators() {
+    let makefile = fs::read_to_string(workspace_root().join("Makefile.toml")).unwrap();
+    let bootstrap_script = task_toml_string_array(&makefile, "bootstrap", "script").join("\n");
+    let expected_bootstrap_ci = "bin/sotp gate-output --name ci -- docker compose run --rm tools cargo make --allow-private ci-local";
+    assert!(
+        bootstrap_script.lines().any(|line| line.trim() == expected_bootstrap_ci),
+        "bootstrap Step 6 must persist the compose CI result through the shared summary surface"
+    );
+    assert!(
+        !bootstrap_script.lines().any(|line| line.trim()
+            == "docker compose run --rm tools cargo make --allow-private ci-local"),
+        "bootstrap must not invoke the compose CI aggregator without gate-output"
+    );
+
+    let workflow = fs::read_to_string(workspace_root().join(".github/workflows/ci.yml")).unwrap();
+    let expected_repo_wide_ci = "run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo run --locked --quiet -p cli -- gate-output --name ci-container -- cargo make --allow-private ci-local-steps";
+    assert!(
+        workflow.lines().any(|line| line.trim() == expected_repo_wide_ci),
+        "GitHub repo-wide CI must persist the in-container result through gate-output"
+    );
+    assert!(
+        !workflow.contains("ci-runner cargo make --allow-private ci-container"),
+        "GitHub repo-wide CI must not invoke the raw ci-container aggregator"
+    );
 }
 
 #[test]

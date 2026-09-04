@@ -165,7 +165,14 @@ fn task_contract_check_core(
             return ExitCode::FAILURE;
         }
     };
-    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
+        Err(error) => {
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Check { layer, track_id: resolved_track_id }),
     )
@@ -200,7 +207,14 @@ fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf)
             return ExitCode::FAILURE;
         }
     };
-    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    let composition_root = match TaskContractCompositionRoot::new(items_dir) {
+        Ok(root) => root,
+        Err(error) => {
+            eprintln!("[BLOCKED] cannot determine task-contract repository: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let driver = composition_root.task_contract_driver();
     driver_outcome_to_exit(
         driver.handle(TaskContractInput::Coverage { track_id: resolved_track_id }),
     )

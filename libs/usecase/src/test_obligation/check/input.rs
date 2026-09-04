@@ -4,23 +4,23 @@ use std::path::PathBuf;
 
 use domain::SpecDocumentLoaderPort;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use domain::tddd::test_obligation::errors::ObligationCheckError;
 
 use super::super::LoadedCatalogueDocument;
 use super::super::check_contract::CheckTestObligationsCommand;
 use super::super::check_support::{SpecElement, spec_elements_from_document};
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 
 /// Loads the catalogue documents named by a check command.
 pub(super) fn load_catalogues(
-    reader: &(dyn CatalogueDocumentLoaderPort + Send + Sync),
+    reader: &(dyn AttestedCatalogueDocumentLoaderPort + Send + Sync),
     cmd: &CheckTestObligationsCommand,
 ) -> Result<Vec<LoadedCatalogueDocument>, ObligationCheckError> {
     let mut catalogues = Vec::with_capacity(cmd.input.catalogue_paths().len());
     for path in cmd.input.catalogue_paths() {
-        let document = reader.load(path).map_err(ObligationCheckError::CatalogueLoad)?;
+        let document =
+            reader.load(path).map_err(ObligationCheckError::CatalogueLoad)?.into_document();
         catalogues.push(LoadedCatalogueDocument::new(path, document));
     }
     Ok(catalogues)
@@ -28,7 +28,7 @@ pub(super) fn load_catalogues(
 
 /// Reports whether the command names at least one existing catalogue.
 pub(super) fn has_catalogue(
-    reader: &(dyn CatalogueDocumentLoaderPort + Send + Sync),
+    reader: &(dyn AttestedCatalogueDocumentLoaderPort + Send + Sync),
     cmd: &CheckTestObligationsCommand,
 ) -> Result<bool, ObligationCheckError> {
     cmd.input.catalogue_paths().iter().try_fold(false, |exists, path| match reader.load(path) {

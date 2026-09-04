@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-25-post-fq-identity-regression-repair",
+  "entries": {
+    "T001": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::entries::TraitEntry"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::entries::TypeEntry"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::ExtractedTypeRefPath"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::canonicalize_catalogue_type_ref"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::canonical_type_identity::CanonicalTypeIdentity"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueToExtendedCratePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      }
+    ],
+    "T004": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::derive::DeriveTestObligationsInteractor"
+      }
+    ],
+    "T006": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ],
+    "T007": [
+      {
+        "layer": "domain",
+        "entry_key": "SignalEvaluatorPort"
+      }
+    ],
+    "T008": [
+      {
+        "layer": "usecase",
+        "entry_key": "CatalogPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalog_gen::FsCatalogAdapter"
+      }
+    ],
+    "T009": [],
+    "T010": [],
+    "T011": [],
+    "T012": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue::TypeSignal"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::signal_evaluator::region::ThreeWaySignal"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ThreeWaySignalIdentity"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      }
+    ],
+    "T013": [],
+    "T014": [
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::pre_review_gate::PreReviewGateInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::pre_review_gate::CoverageVerifyInteractor"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "AttestedCatalogueDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::document::CatalogueDocument"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "AttestedCatalogueDocumentLoaderPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::pre_review_gate::PreReviewGateError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::check::CheckTestObligationsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::evaluate::EvaluateTestObligationsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::test_obligation::results::TestObligationResultsInteractor"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::task_contract::TaskContractDriver"
+      }
+    ],
+    "T015": [],
+    "T016": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::repository_root_for_items_dir"
+      }
+    ]
+  }
+}

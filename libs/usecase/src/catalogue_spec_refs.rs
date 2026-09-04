@@ -343,7 +343,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::root(),
+            Some(ModulePath::root()),
             None,
             spec_refs,
             vec![],

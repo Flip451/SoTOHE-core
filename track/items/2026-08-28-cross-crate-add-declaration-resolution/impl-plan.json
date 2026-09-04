@@ -1,0 +1,383 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Completed the original domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort boundary and focused contract-conformance validation (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03)."
+        ],
+        "id": "SECTION-001",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Original resolution boundary"
+      },
+      {
+        "description": [
+          "Completed the original infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec implementation and focused validation in dependency order (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03)."
+        ],
+        "id": "SECTION-002",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Original cross-crate resolution"
+      },
+      {
+        "description": [
+          "Completed the original catalogue_impl_signals and type-signals executor/evaluator handoff paths as separate validation units (IN-01, CO-01, CO-02, AC-01, AC-03)."
+        ],
+        "id": "SECTION-003",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "Original catalogue handoff"
+      },
+      {
+        "description": [
+          "Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and revise the catalogue encoding boundary (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03)."
+        ],
+        "id": "SECTION-004",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Authoritative rustdoc boundary"
+      },
+      {
+        "description": [
+          "Modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused placement/regression validation (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-03, AC-01, AC-02, AC-03)."
+        ],
+        "id": "SECTION-005",
+        "task_ids": [
+          "T007"
+        ],
+        "title": "Declaring-layer placement"
+      },
+      {
+        "description": [
+          "Preserve the completed catalogue_impl_signals context assembly and finish the outstanding executor/evaluator compile closure without absorbing the later D3-D8 work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03)."
+        ],
+        "id": "SECTION-006",
+        "task_ids": [
+          "T008",
+          "T009"
+        ],
+        "title": "Complete rustdoc context assembly"
+      },
+      {
+        "description": [
+          "Implement the domain-owned complete reuse identity and fail-closed reuse decision vocabulary from the approved type catalogue (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08)."
+        ],
+        "id": "SECTION-007",
+        "task_ids": [
+          "T010"
+        ],
+        "title": "Complete reuse identity"
+      },
+      {
+        "description": [
+          "Implement immutable rustdoc capture and identity-bearing snapshot construction at the domain boundary (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07)."
+        ],
+        "id": "SECTION-008",
+        "task_ids": [
+          "T011"
+        ],
+        "title": "Immutable rustdoc snapshot contract"
+      },
+      {
+        "description": [
+          "Modify the rustdoc export plan and catalogue implementation-signals orchestration; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05)."
+        ],
+        "id": "SECTION-009",
+        "task_ids": [
+          "T012"
+        ],
+        "title": "Bounded rustdoc export planning"
+      },
+      {
+        "description": [
+          "Modify infrastructure typed decoding to reject invalid persisted rustdoc execution identities as TypeSignalsCodecError::InvalidExecutionIdentity and add focused invalid-identity decode validation (IN-03, CO-04, AC-04)."
+        ],
+        "id": "SECTION-010",
+        "task_ids": [
+          "T013"
+        ],
+        "title": "Persisted identity decoding"
+      },
+      {
+        "description": [
+          "Modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, libs/infrastructure/src/schema_export.rs::RustdocSchemaExporter, and libs/infrastructure/src/tddd/type_signals_evaluator.rs::execute_type_signals_for_layer and EvaluateSignalsError; add focused validation (IN-03, IN-05, IN-06, IN-07, OS-04, OS-05, CO-06, CO-07, AC-04, AC-06, AC-07, AC-08)."
+        ],
+        "id": "SECTION-011",
+        "task_ids": [
+          "T014",
+          "T015",
+          "T016",
+          "T017",
+          "T018",
+          "T019"
+        ],
+        "title": "Locked rustdoc export and snapshot integration"
+      },
+      {
+        "description": [
+          "Complete the nightly-selected implementation-fingerprint provenance and persisted type-signals schema v6 admission work as independently verifiable evaluator and codec changes without reopening the completed D3-D8 tasks (IN-03, OS-04, CO-04, AC-04)."
+        ],
+        "id": "SECTION-012",
+        "task_ids": [
+          "T020",
+          "T021"
+        ],
+        "title": "Nightly-selected fingerprint and schema v6"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/ports.rs::EvaluationStartCapturePort and EvaluationStartCaptureError, libs/domain/src/tddd/type_signals_doc.rs::AttestedRustdocSnapshot and construct_attested_rustdoc_snapshot, libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort::capture_current, libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor plus CatalogueImplSignalsError; add focused validation (IN-07, IN-08, CO-07, CO-08, AC-06, AC-09)."
+        ],
+        "id": "SECTION-013",
+        "task_ids": [
+          "T022"
+        ],
+        "title": "Evaluation-start port split and attested capture"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan, RustdocExportPlanValidationError, and CatalogueImplSignalsError plus libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor, and replace the RustdocSnapshot boundary in libs/domain/src/tddd/catalogue_to_extended_crate_port.rs::AuthoritativeRustdocContext::new and current_snapshot with AttestedRustdocSnapshot; add focused validation (CO-02, IN-04, IN-07, CO-05, CO-07, AC-05, AC-06)."
+        ],
+        "id": "SECTION-014",
+        "task_ids": [
+          "T023"
+        ],
+        "title": "Catalogue-bearing export plan"
+      },
+      {
+        "description": [
+          "Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06)."
+        ],
+        "id": "SECTION-015",
+        "task_ids": [
+          "T024"
+        ],
+        "title": "Snapshot-bound catalogue exports"
+      },
+      {
+        "description": [
+          "Modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter's EvaluationStartCapturePort implementation and add focused timeout and fail-closed validation (IN-09, CO-09, AC-10)."
+        ],
+        "id": "SECTION-016",
+        "task_ids": [
+          "T025"
+        ],
+        "title": "Time-bounded evaluation-start capture"
+      }
+    ],
+    "summary": [
+      "GO-01 original implementation and authoritative-context completion remain T001-T009; completed reuse, snapshot, export-limit, fingerprint, lock, platform, writer-participation, and ABA work remains T010-T019; nightly-selected tool provenance is T020 and persisted schema v6 admission is T021; completed evaluation-start port separation and catalogue-bearing export planning remain T022-T023; remaining snapshot-bound export orchestration and time-bounded evaluation-start capture are T024-T025."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "76e029f0ffe4440a3e48fb5e0af9105655c7a86f",
+      "description": "Modify domain::tddd::catalogue_to_extended_crate_port::CatalogueToExtendedCratePort; add focused contract-conformance validation for the port boundary (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "76e029f0ffe4440a3e48fb5e0af9105655c7a86f",
+      "description": "Modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused encode and resolution_paths_for_catalogue validation (IN-01, IN-02, OS-01, CO-01, CO-02, CO-03, AC-01, AC-02).",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "c86805d91aa9f560f05139bdef310ffb98fee18d",
+      "description": "After T002, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec and add focused precedence and negative resolution validation (IN-02, OS-02, OS-03, CO-01, CO-03, AC-03).",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "76e029f0ffe4440a3e48fb5e0af9105655c7a86f",
+      "description": "Modify usecase::catalogue_impl_signals to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused catalogue_impl_signals handoff validation (IN-01, CO-01, AC-01).",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "54bdad993b88b3ba44dd737d73dccd3af0386422",
+      "description": "Modify usecase::type_signals::ports, infrastructure::tddd::type_signals_executor_adapter, and infrastructure::tddd::type_signals_evaluator::evaluate_and_write to pass track-catalogue input to CatalogueToExtendedCratePort::encode; add focused executor/evaluator handoff validation (IN-01, CO-01, CO-02, AC-01, AC-03).",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
+      "description": "Add domain::tddd::catalogue_to_extended_crate_port::AuthoritativeRustdocContext and modify CatalogueToExtendedCratePort::encode; add focused boundary contract validation (GO-01, IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
+      "depends_on": [
+        "T006"
+      ],
+      "description": "After T006, modify infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec; add focused resolution/precedence/negative validation (IN-01, IN-02, OS-01, OS-02, OS-03, CO-01, CO-03, AC-01, AC-02, AC-03).",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1a0afaede9d35c1ed05a041d4948dfa850c05bb1",
+      "depends_on": [
+        "T006"
+      ],
+      "description": "After T006, modify usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor to load every configured TDDD layer catalogue and authoritative baseline/current rustdoc pair, assemble the complete LayerId-keyed context map before encode, and add focused handoff validation (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "commit_hash": "a85a73d45298014af3eda04ab9cbe40159ec8be4",
+      "depends_on": [
+        "T006"
+      ],
+      "description": "After T006, finish the outstanding compile closure for the type-signals executor/evaluator authoritative-context handoff and its focused validation; do not absorb the D3-D8 fingerprint, export-limit, lock, or snapshot work (IN-01, IN-02, CO-01, CO-02, CO-03, AC-01, AC-02, AC-03).",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb",
+      "description": "Modify libs/domain/src/tddd/type_signals_doc.rs::ImplementationFingerprint, ResolutionFingerprint, RustdocExecutionIdentity, TypeSignalsCacheKey, TypeSignalsReuseDecision, and TypeSignalsReuseInput; add focused value, validation, equality, and reuse-decision tests (IN-03, IN-06, OS-04, CO-04, AC-04, AC-08).",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "commit_hash": "3c360756c3b0745799a5ba2c7e1308116083d1fa",
+      "depends_on": [
+        "T010"
+      ],
+      "description": "After T010, modify libs/domain/src/tddd/type_signals_doc.rs::CapturedRustdocJson, RustdocSnapshot, construct_captured_rustdoc_json, and construct_rustdoc_snapshot, plus libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort; add focused same-bytes and mixed-generation rejection tests (IN-03, IN-05, IN-07, CO-06, CO-07, AC-04, AC-06, AC-07).",
+      "id": "T011",
+      "status": "done"
+    },
+    {
+      "commit_hash": "a85a73d45298014af3eda04ab9cbe40159ec8be4",
+      "description": "Modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and CatalogueImplSignalsError, and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add boundary tests for sixty-four and sixty-five layers (IN-04, OS-05, CO-05, AC-05).",
+      "id": "T012",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d08f4eff64c6c4dec9bc5eeb4a0380b7efc4c6eb",
+      "depends_on": [
+        "T009",
+        "T010"
+      ],
+      "description": "After T009 and T010, modify infrastructure::tddd::type_signals_codec::TypeSignalsCodecError and its typed persisted-document decoder to reject invalid rustdoc execution identities as TypeSignalsCodecError::InvalidExecutionIdentity; add focused invalid-identity decode tests (IN-03, CO-04, AC-04).",
+      "id": "T013",
+      "status": "done"
+    },
+    {
+      "commit_hash": "3c360756c3b0745799a5ba2c7e1308116083d1fa",
+      "depends_on": [
+        "T011",
+        "T012",
+        "T013"
+      ],
+      "description": "After T011-T013, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter lock acquisition and failure propagation; add focused serialization, 120-second timeout, lock-operation failure, no-retry, and no-fallback tests (IN-05, OS-05, CO-06, AC-07).",
+      "id": "T014",
+      "status": "done"
+    },
+    {
+      "commit_hash": "e7f8355bd40d8d6b74cddb2d42deac164422ee8e",
+      "depends_on": [
+        "T014"
+      ],
+      "description": "After T014, modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter and infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer to enforce the .sotp-rustdoc selection-directory writer boundary and cooperative expected-output handling; add focused writer-boundary and non-exclusive-target validation tests (CO-06, CO-07, AC-06).",
+      "id": "T015",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d605b8c1411d79a521a1806fffb8675b0c9a765f",
+      "depends_on": [
+        "T015"
+      ],
+      "description": "After T015, modify infrastructure::schema_export::RustdocSchemaExporter to expose immutable Vec<u8> export data, and modify infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter to determine, verify, read, hash, decode, and construct the current rustdoc snapshot from that one immutable byte capture while the common lock remains held; add focused same-bytes and output-replacement tests (IN-07, CO-07, AC-06).",
+      "id": "T016",
+      "status": "done"
+    },
+    {
+      "commit_hash": "cd4d4dc68472735f902a2422819fb3821b1b133c",
+      "depends_on": [
+        "T016"
+      ],
+      "description": "After T016, modify domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError for authoritative-input failure vocabulary and continue modifying infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter for trusted-root admission and failure propagation; keep this work in a later batch to avoid overlapping T016 ownership, and add focused non-Unix, relative escape, unverifiable root, symlinked target-component rejection, and authoritative-input error propagation tests (IN-06, OS-05, CO-06, AC-08).",
+      "id": "T017",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d605b8c1411d79a521a1806fffb8675b0c9a765f",
+      "depends_on": [
+        "T016"
+      ],
+      "description": "After T016, modify infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to capture the implementation fingerprint and integrate it into the reuse key and fail-closed reuse decision; add focused fingerprint and stale-reuse validation tests (IN-03, OS-04, CO-04, AC-04).",
+      "id": "T018",
+      "status": "done"
+    },
+    {
+      "commit_hash": "cd4d4dc68472735f902a2422819fb3821b1b133c",
+      "depends_on": [
+        "T018"
+      ],
+      "description": "After T018, continue modifying infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer and its EvaluateSignalsError integration to use start-snapshot evaluation and end-fingerprint revalidation; add focused snapshot and reuse validation tests (IN-07, CO-07, AC-06).",
+      "id": "T019",
+      "status": "done"
+    },
+    {
+      "commit_hash": "909395159e068c34cf6d22c5313bad95135d1334",
+      "depends_on": [
+        "T019"
+      ],
+      "description": "After T019, modify libs/infrastructure/src/tddd/type_signals_evaluator.rs::execute_type_signals_for_layer, libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs::rustdoc_input_fingerprint, and libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs::append_actual_rustdoc_tool_identity to capture nightly-selected cargo, rustc, and rustdoc fingerprints and propagate resolution or snapshot failures as AuthoritativeInput; add focused selected-tool and failure tests (IN-03, OS-04, CO-04, AC-04).",
+      "id": "T020",
+      "status": "done"
+    },
+    {
+      "commit_hash": "909395159e068c34cf6d22c5313bad95135d1334",
+      "depends_on": [
+        "T019"
+      ],
+      "description": "After T019, modify libs/domain/src/tddd/type_signals_doc.rs::TYPE_SIGNALS_SCHEMA_VERSION from 5 to 6 and libs/infrastructure/src/tddd/type_signals_codec.rs::decode_with_identity_root to reject persisted legacy-v5 documents during typed decode; add focused legacy-schema rejection tests in libs/infrastructure/src/tddd/type_signals_codec_tests.rs (AC-04).",
+      "id": "T021",
+      "status": "done"
+    },
+    {
+      "commit_hash": "7f32ad41078a452d8490a4e1e13d4abf8bebd01d",
+      "description": "Modify libs/usecase/src/catalogue_impl_signals/ports.rs::EvaluationStartCapturePort and EvaluationStartCaptureError, libs/domain/src/tddd/type_signals_doc.rs::AttestedRustdocSnapshot and construct_attested_rustdoc_snapshot, libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs::RustdocCratePort::capture_current, libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter, and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor plus CatalogueImplSignalsError; add focused validation (IN-07, IN-08, CO-07, CO-08, AC-06, AC-09).",
+      "id": "T022",
+      "status": "done"
+    },
+    {
+      "commit_hash": "7f32ad41078a452d8490a4e1e13d4abf8bebd01d",
+      "depends_on": [
+        "T022"
+      ],
+      "description": "After T022, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan, RustdocExportPlanValidationError, and CatalogueImplSignalsError plus libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor, and replace the RustdocSnapshot boundary in libs/domain/src/tddd/catalogue_to_extended_crate_port.rs::AuthoritativeRustdocContext::new and current_snapshot with AttestedRustdocSnapshot; add focused validation (CO-02, IN-04, IN-07, CO-05, CO-07, AC-05, AC-06).",
+      "id": "T023",
+      "status": "done"
+    },
+    {
+      "commit_hash": "eb1d057bc870944c91951d98649ed1313b0c43fd",
+      "depends_on": [
+        "T022",
+        "T023"
+      ],
+      "description": "After T022 and T023, modify libs/usecase/src/catalogue_impl_signals/service.rs::RustdocExportPlan and libs/usecase/src/catalogue_impl_signals/interactor.rs::CatalogueImplSignalsInteractor; add focused validation (IN-07, CO-07, AC-06).",
+      "id": "T024",
+      "status": "done"
+    },
+    {
+      "commit_hash": "7f32ad41078a452d8490a4e1e13d4abf8bebd01d",
+      "depends_on": [
+        "T022"
+      ],
+      "description": "After T022, modify libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs::RustdocCrateAdapter::capture_evaluation_start and the evaluation-start fingerprint helpers libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs::{rustdoc_implementation_fingerprint, rustdoc_input_digest, validate_authoritative_cargo_inputs, collect_rustdoc_input_paths, walk_rustdoc_inputs} and libs/infrastructure/src/tddd/type_signals_evaluator/environment_fingerprint.rs::{run_cargo_metadata_with_early_bounded_output, run_bounded_command_with_total, resolve_nightly_tool, terminate_nightly_process} to enforce bounded execution and output draining for the locked cargo metadata call, workspace walk, and nightly tool resolution, delegating process-group termination to capability_exec::process::terminate_bounded_process_group; add focused timeout and fail-closed validation, anchored to ADR 2026-09-02-0000-evaluation-start-capture-time-bounds.md D1 and IN-09/CO-09/AC-10.",
+      "id": "T025",
+      "status": "done"
+    }
+  ]
+}

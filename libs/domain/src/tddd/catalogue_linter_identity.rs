@@ -2,14 +2,15 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use super::super::identity_helpers::{classification_failed, root_path_is_anchored};
 use super::{CatalogueLinterError, FreeText, RoleKind, RolePayloadField, TypeRefPathExtractorPort};
 use crate::tddd::catalogue_linter::ExtractedTypeRefPath;
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::identifiers::{
-    CrateName, FullyQualifiedItemPath, ModulePath, ParamName, TypeRef,
+    CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, ModulePath, ParamName, TypeRef,
 };
 use crate::tddd::catalogue_v2::identity_resolution::{
-    CatalogueIdentityResolutionError, resolve_catalogue_identity,
+    CatalogueIdentityResolutionError, resolve_catalogue_identity_in_namespace,
 };
 use crate::tddd::catalogue_v2::methods::MethodGenericParam;
 use crate::tddd::catalogue_v2::roles::ItemAction;
@@ -34,6 +35,13 @@ pub(super) struct CatalogueIdentityContext<'a> {
     pub(super) catalogue_crate: &'a CrateName,
     pub(super) universe: &'a BTreeSet<FullyQualifiedItemPath>,
     pub(super) entries: &'a [DeclaredIdentity],
+    /// Expected Rust namespace for the references being classified.
+    ///
+    /// The catalogue identity universe contains both type and trait entries,
+    /// but a TypeRef-bearing linter route has a domain-level expected
+    /// namespace. Keeping that expectation in the context prevents a same-
+    /// named trait from making a type-only reference ambiguous.
+    pub(super) namespace: CatalogueItemNamespace,
 }
 
 pub(super) fn generic_parameter_names(generics: &[MethodGenericParam]) -> Vec<ParamName> {
@@ -49,7 +57,7 @@ pub(super) fn build_declared_identities(
             if entry.action() == ItemAction::Delete {
                 continue;
             }
-            let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+            let identity = FullyQualifiedItemPath::from_type_catalogue_entry_key(
                 catalogue.crate_name(),
                 key,
                 entry.module_path(),
@@ -66,7 +74,7 @@ pub(super) fn build_declared_identities(
             if entry.action() == ItemAction::Delete {
                 continue;
             }
-            let identity = FullyQualifiedItemPath::from_catalogue_entry_key(
+            let identity = FullyQualifiedItemPath::from_trait_catalogue_entry_key(
                 catalogue.crate_name(),
                 key,
                 entry.module_path(),
@@ -107,18 +115,22 @@ fn role_for_identity(
     role
 }
 
-pub(super) fn entry_identity(
+pub(super) fn entry_identity<'a>(
     catalogue: &CatalogueDocument,
     key: &CatalogueEntryKey,
-    module_path: &ModulePath,
+    module_path: impl Into<Option<&'a ModulePath>>,
 ) -> Result<FullyQualifiedItemPath, CatalogueLinterError> {
-    FullyQualifiedItemPath::from_catalogue_entry_key(catalogue.crate_name(), key, module_path)
-        .map_err(|error| {
-            CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-                "invalid catalogue entry identity '{}': {error}",
-                key.as_str()
-            )))
-        })
+    FullyQualifiedItemPath::from_type_catalogue_entry_key(
+        catalogue.crate_name(),
+        key,
+        module_path.into(),
+    )
+    .map_err(|error| {
+        CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+            "invalid catalogue entry identity '{}': {error}",
+            key.as_str()
+        )))
+    })
 }
 
 pub(super) fn resolve_reference_identities<E: TypeRefPathExtractorPort>(
@@ -128,17 +140,15 @@ pub(super) fn resolve_reference_identities<E: TypeRefPathExtractorPort>(
     inspection: TypeRefInspectionContext<'_>,
 ) -> Result<Vec<FullyQualifiedItemPath>, CatalogueLinterError> {
     let mut resolved = Vec::new();
-    for extracted in extractor.extract(
+    let extracted = extractor.extract(
         type_ref,
         inspection.type_parameters,
         inspection.lifetime_parameters,
         inspection.const_parameters,
-    )? {
-        let ExtractedTypeRefPath::Path(path) = extracted else {
-            continue;
-        };
+    )?;
+    for (path, namespace) in classify_extracted_paths(type_ref, extracted, context.namespace)? {
         if let Some(identity) =
-            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
+            classify_catalogue_path(&path, context.catalogue_crate, context.universe, namespace)?
         {
             if !resolved.contains(&identity) {
                 resolved.push(identity);
@@ -194,17 +204,15 @@ pub(super) fn signature_contains_identity<E: TypeRefPathExtractorPort>(
     extractor: &E,
     inspection: TypeRefInspectionContext<'_>,
 ) -> Result<bool, CatalogueLinterError> {
-    for extracted in extractor.extract(
+    let extracted = extractor.extract(
         type_ref,
         inspection.type_parameters,
         inspection.lifetime_parameters,
         inspection.const_parameters,
-    )? {
-        let ExtractedTypeRefPath::Path(path) = extracted else {
-            continue;
-        };
+    )?;
+    for (path, namespace) in classify_extracted_paths(type_ref, extracted, context.namespace)? {
         if let Some(identity) =
-            classify_catalogue_path(&path, context.catalogue_crate, context.universe)?
+            classify_catalogue_path(&path, context.catalogue_crate, context.universe, namespace)?
         {
             if identity == *target {
                 return Ok(true);
@@ -212,6 +220,79 @@ pub(super) fn signature_contains_identity<E: TypeRefPathExtractorPort>(
         }
     }
     Ok(false)
+}
+
+fn classify_extracted_paths(
+    type_ref: &TypeRef,
+    extracted: Vec<ExtractedTypeRefPath>,
+    slot_namespace: CatalogueItemNamespace,
+) -> Result<Vec<(TypeRef, CatalogueItemNamespace)>, CatalogueLinterError> {
+    let mut trait_root_paths = BTreeSet::new();
+    for occurrence in &extracted {
+        let ExtractedTypeRefPath::Path { type_ref: path, namespace } = occurrence else {
+            continue;
+        };
+        if *namespace == CatalogueItemNamespace::Trait && root_path_is_anchored(type_ref, path)? {
+            trait_root_paths.insert(path.clone());
+        }
+    }
+
+    let mut type_root_path = None;
+    let mut classified = Vec::new();
+    for occurrence in extracted {
+        let ExtractedTypeRefPath::Path { type_ref: path, namespace } = occurrence else {
+            continue;
+        };
+        let namespace = effective_namespace(
+            type_ref,
+            &path,
+            namespace,
+            slot_namespace,
+            &trait_root_paths,
+            &mut type_root_path,
+        )?;
+        classified.push((path, namespace));
+    }
+    Ok(classified)
+}
+
+/// Namespace used to classify one extracted occurrence.
+///
+/// The parser reports the syntactic position of every occurrence. A trait
+/// position is authoritative. For the root occurrence of a slot the slot-level
+/// expectation (`slot_namespace`) applies, because a trait slot such as
+/// `trait_ref` spells its root as a plain path. Every nested type-position
+/// occurrence is a type. Root-ness is determined from the complete TypeRef
+/// spelling rather than from the extractor's output order, so adapters may
+/// emit nested occurrences before the root without changing their meaning.
+/// When root and nested occurrences have the same spelling, one occurrence is
+/// assigned the slot namespace and the remaining identical occurrences are
+/// types; the two positions are otherwise indistinguishable.
+fn effective_namespace(
+    type_ref: &TypeRef,
+    path: &TypeRef,
+    occurrence: CatalogueItemNamespace,
+    slot_namespace: CatalogueItemNamespace,
+    trait_root_paths: &BTreeSet<TypeRef>,
+    type_root_path: &mut Option<TypeRef>,
+) -> Result<CatalogueItemNamespace, CatalogueLinterError> {
+    if occurrence == CatalogueItemNamespace::Trait {
+        Ok(CatalogueItemNamespace::Trait)
+    } else if root_path_is_anchored(type_ref, path)? {
+        if trait_root_paths.contains(path) {
+            return Ok(CatalogueItemNamespace::Type);
+        }
+        match type_root_path {
+            None => {
+                *type_root_path = Some(path.clone());
+                Ok(slot_namespace)
+            }
+            Some(root_path) if root_path == path => Ok(CatalogueItemNamespace::Type),
+            Some(_) => Err(classification_failed(type_ref)),
+        }
+    } else {
+        Ok(CatalogueItemNamespace::Type)
+    }
 }
 
 /// Classifies a syntactic path against the finite set of declared catalogue
@@ -223,13 +304,15 @@ fn classify_catalogue_path(
     path: &TypeRef,
     catalogue_crate: &CrateName,
     universe: &BTreeSet<FullyQualifiedItemPath>,
+    namespace: CatalogueItemNamespace,
 ) -> Result<Option<FullyQualifiedItemPath>, CatalogueLinterError> {
     let normalized = path.as_str().strip_prefix("::").unwrap_or(path.as_str());
     if normalized == "Self" {
         return Ok(None);
     }
 
-    match resolve_catalogue_identity(path, catalogue_crate, universe) {
+    match resolve_catalogue_identity_in_namespace(path, catalogue_crate, universe, Some(namespace))
+    {
         Ok(identity) => Ok(Some(identity)),
         Err(CatalogueIdentityResolutionError::UnresolvedIdentifier(_)) => Ok(None),
         Err(error) => Err(CatalogueLinterError::IdentityResolutionFailed(error)),
@@ -256,10 +339,10 @@ mod tests {
         ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
             if type_ref.as_str() == "Wrapper<domain::alpha::Event>" {
                 return Ok(vec![
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("Entity").expect("valid constructor path"),
                     ),
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("domain::alpha::Event").expect("valid nested reference path"),
                     ),
                 ]);
@@ -279,16 +362,16 @@ mod tests {
             _const_parameters: &[ParamName],
         ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
             match type_ref.as_str() {
-                "missing-catalogue-identity" => Ok(vec![ExtractedTypeRefPath::Path(
+                "missing-catalogue-identity" => Ok(vec![ExtractedTypeRefPath::type_path(
                     TypeRef::new("domain::missing::Customer")
                         .expect("valid unresolved catalogue path"),
                 )]),
                 "missing-catalogue-wrapper" => Ok(vec![
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("::domain::missing::Wrapper")
                             .expect("valid unresolved generic constructor"),
                     ),
-                    ExtractedTypeRefPath::Path(
+                    ExtractedTypeRefPath::type_path(
                         TypeRef::new("domain::alpha::Event").expect("valid nested catalogue path"),
                     ),
                 ]),
@@ -311,7 +394,23 @@ mod tests {
         catalogue_crate: &'a CrateName,
         universe: &'a BTreeSet<FullyQualifiedItemPath>,
     ) -> CatalogueIdentityContext<'a> {
-        CatalogueIdentityContext { catalogue_crate, universe, entries: &[] }
+        identity_context_in_namespace(catalogue_crate, universe, CatalogueItemNamespace::Type)
+    }
+
+    fn identity_context_in_namespace<'a>(
+        catalogue_crate: &'a CrateName,
+        universe: &'a BTreeSet<FullyQualifiedItemPath>,
+        namespace: CatalogueItemNamespace,
+    ) -> CatalogueIdentityContext<'a> {
+        CatalogueIdentityContext { catalogue_crate, universe, entries: &[], namespace }
+    }
+
+    fn trait_identity(module: &str, name: &str) -> FullyQualifiedItemPath {
+        FullyQualifiedItemPath::new_trait(
+            CrateName::new("domain").expect("valid crate name"),
+            ModulePath::from_segments(vec![module]).expect("valid module path"),
+            Identifier::new(name).expect("valid item name"),
+        )
     }
 
     fn empty_inspection() -> TypeRefInspectionContext<'static> {
@@ -345,6 +444,99 @@ mod tests {
             CatalogueLinterError::IdentityResolutionFailed(
                 CatalogueIdentityResolutionError::AmbiguousIdentifier(_, candidates)
             ) if candidates.as_slice() == [alpha_entity, beta_entity]
+        ));
+    }
+
+    struct ReorderedReferenceExtractor;
+
+    impl TypeRefPathExtractorPort for ReorderedReferenceExtractor {
+        fn extract(
+            &self,
+            type_ref: &TypeRef,
+            _type_parameters: &[ParamName],
+            _lifetime_parameters: &[ParamName],
+            _const_parameters: &[ParamName],
+        ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
+            if type_ref.as_str() == "Into<domain::alpha::Event>" {
+                return Ok(vec![
+                    ExtractedTypeRefPath::type_path(
+                        TypeRef::new("domain::alpha::Event").expect("valid nested reference path"),
+                    ),
+                    ExtractedTypeRefPath::type_path(
+                        TypeRef::new("Into").expect("valid root reference path"),
+                    ),
+                ]);
+            }
+            if type_ref.as_str() == "Foo<Foo>" {
+                return Ok(vec![
+                    ExtractedTypeRefPath::type_path(
+                        TypeRef::new("Foo").expect("valid first repeated path"),
+                    ),
+                    ExtractedTypeRefPath::type_path(
+                        TypeRef::new("Foo").expect("valid second repeated path"),
+                    ),
+                ]);
+            }
+            Err(TypeRefPathExtractionError::UnsupportedSyntax { location: type_ref.clone() })
+        }
+    }
+
+    #[test]
+    fn test_resolve_reference_identities_uses_path_spelling_when_nested_path_precedes_root() {
+        let event = identity("alpha", "Event");
+        let alpha_into = trait_identity("alpha", "Into");
+        let beta_into = trait_identity("beta", "Into");
+        let universe = BTreeSet::from([event, alpha_into.clone(), beta_into.clone()]);
+        let type_ref =
+            TypeRef::new("Into<domain::alpha::Event>").expect("valid wrapped trait reference");
+        let catalogue_crate = CrateName::new("domain").expect("valid crate name");
+
+        let error = resolve_reference_identities(
+            &type_ref,
+            identity_context_in_namespace(
+                &catalogue_crate,
+                &universe,
+                CatalogueItemNamespace::Trait,
+            ),
+            &ReorderedReferenceExtractor,
+            empty_inspection(),
+        )
+        .expect_err("the root trait must remain ambiguous when emitted after a nested path");
+
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                CatalogueIdentityResolutionError::AmbiguousIdentifier(_, candidates)
+            ) if candidates.as_slice() == [alpha_into, beta_into]
+        ));
+    }
+
+    #[test]
+    fn test_resolve_reference_identities_classifies_repeated_root_path_as_nested_type() {
+        let alpha_type = identity("alpha", "Foo");
+        let beta_type = identity("beta", "Foo");
+        let root_trait = trait_identity("traits", "Foo");
+        let universe = BTreeSet::from([alpha_type.clone(), beta_type, root_trait]);
+        let type_ref = TypeRef::new("Foo<Foo>").expect("valid repeated path reference");
+        let catalogue_crate = CrateName::new("domain").expect("valid crate name");
+
+        let error = resolve_reference_identities(
+            &type_ref,
+            identity_context_in_namespace(
+                &catalogue_crate,
+                &universe,
+                CatalogueItemNamespace::Trait,
+            ),
+            &ReorderedReferenceExtractor,
+            empty_inspection(),
+        )
+        .expect_err("the repeated nested type must remain ambiguous in its type namespace");
+
+        assert!(matches!(
+            error,
+            CatalogueLinterError::IdentityResolutionFailed(
+                CatalogueIdentityResolutionError::AmbiguousIdentifier(_, candidates)
+            ) if candidates.as_slice() == [alpha_type, identity("beta", "Foo")]
         ));
     }
 
@@ -397,7 +589,7 @@ mod tests {
             _lifetime_parameters: &[ParamName],
             _const_parameters: &[ParamName],
         ) -> Result<Vec<ExtractedTypeRefPath>, TypeRefPathExtractionError> {
-            Ok(vec![ExtractedTypeRefPath::Path(type_ref.clone())])
+            Ok(vec![ExtractedTypeRefPath::type_path(type_ref.clone())])
         }
     }
 

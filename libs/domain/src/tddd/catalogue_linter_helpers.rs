@@ -182,24 +182,48 @@ pub(super) fn inherent_impls_for_type<'a>(
 
 /// Converts a catalogue key and its declaration-module fallback into the shared
 /// fully qualified identity used by the linter.
-pub(super) fn canonical_catalogue_identity(
+pub(super) fn canonical_catalogue_identity<'a>(
     catalogue: &CatalogueDocument,
     raw_key: &str,
-    declared_module_path: &ModulePath,
+    declared_module_path: impl Into<Option<&'a ModulePath>>,
 ) -> Result<FullyQualifiedItemPath, CatalogueLinterError> {
     let key = CatalogueEntryKey::try_new(raw_key.to_owned()).map_err(|error| {
         CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
             "invalid catalogue entry identity '{raw_key}': {error}"
         )))
     })?;
-    FullyQualifiedItemPath::from_catalogue_entry_key(
+    FullyQualifiedItemPath::from_type_catalogue_entry_key(
         catalogue.crate_name(),
         &key,
-        declared_module_path,
+        declared_module_path.into(),
     )
     .map_err(|error| {
         CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
             "invalid catalogue entry identity '{raw_key}': {error}"
+        )))
+    })
+}
+
+/// Converts a catalogue trait key and its declaration-module fallback into the
+/// shared fully qualified trait identity used by the linter.
+pub(super) fn canonical_catalogue_trait_identity<'a>(
+    catalogue: &CatalogueDocument,
+    raw_key: &str,
+    declared_module_path: impl Into<Option<&'a ModulePath>>,
+) -> Result<FullyQualifiedItemPath, CatalogueLinterError> {
+    let key = CatalogueEntryKey::try_new(raw_key.to_owned()).map_err(|error| {
+        CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+            "invalid catalogue trait identity '{raw_key}': {error}"
+        )))
+    })?;
+    FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+        catalogue.crate_name(),
+        &key,
+        declared_module_path.into(),
+    )
+    .map_err(|error| {
+        CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+            "invalid catalogue trait identity '{raw_key}': {error}"
         )))
     })
 }
@@ -292,52 +316,9 @@ pub(super) fn struct_has_public_fields(kind: &StructKind) -> bool {
     }
 }
 
-/// Returns whether a trait implementation for `type_name` resolves to the
-/// required fully qualified trait identity.
-pub(super) fn has_trait_impl<E: TypeRefPathExtractorPort>(
-    catalogue: &CatalogueDocument,
-    type_name: &str,
-    type_module_path: &ModulePath,
-    trait_name_prefix: &str,
-    extractor: &E,
-) -> Result<bool, CatalogueLinterError> {
-    let type_identity = canonical_catalogue_identity(catalogue, type_name, type_module_path)?;
-    let type_identities = declared_type_identities(catalogue)?;
-    let trait_identities = declared_trait_identities(catalogue)?;
-    let external_trait_identities = allowed_external_trait_identities(catalogue, extractor)?;
-
-    for ti in catalogue.trait_impls() {
-        // Exclude delete-action impl entries: a deleted impl does not count as present.
-        if ti.action() == ItemAction::Delete {
-            continue;
-        }
-        let type_parameters = impl_type_parameters(ti);
-        let for_type = root_path_occurrence(ti.for_type(), extractor, &type_parameters)?;
-        let Some(for_type_identity) = resolve_catalogue_entry_reference(
-            catalogue,
-            for_type.as_str(),
-            &type_identities,
-            true,
-        )?
-        else {
-            continue;
-        };
-        if for_type_identity == type_identity
-            && trait_ref_matches(
-                catalogue,
-                ti.trait_ref(),
-                trait_name_prefix,
-                &trait_identities,
-                &external_trait_identities,
-                extractor,
-                &type_parameters,
-            )?
-        {
-            return Ok(true);
-        }
-    }
-    Ok(false)
-}
+#[path = "catalogue_linter_helpers_trait_impl.rs"]
+mod trait_impl_helpers;
+pub(super) use trait_impl_helpers::has_trait_impl;
 
 pub(super) fn declared_trait_identities(
     catalogue: &CatalogueDocument,
@@ -347,51 +328,13 @@ pub(super) fn declared_trait_identities(
         if entry.action() == ItemAction::Delete {
             continue;
         }
-        identities.insert(canonical_catalogue_identity(
+        identities.insert(canonical_catalogue_trait_identity(
             catalogue,
             name.as_str(),
             entry.module_path(),
         )?);
     }
     Ok(identities)
-}
-
-fn trait_ref_matches<E: TypeRefPathExtractorPort>(
-    catalogue: &CatalogueDocument,
-    actual_ref: &TypeRef,
-    required_ref: &str,
-    trait_identities: &BTreeSet<FullyQualifiedItemPath>,
-    external_trait_identities: &BTreeSet<FullyQualifiedItemPath>,
-    extractor: &E,
-    type_parameters: &[ParamName],
-) -> Result<bool, CatalogueLinterError> {
-    let actual_ref = root_path_occurrence(actual_ref, extractor, type_parameters)?;
-    let required_ref = TypeRef::new(required_ref.to_owned()).map_err(|error| {
-        CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-            "invalid required trait reference '{required_ref}': {error}"
-        )))
-    })?;
-    let required_ref = root_path_occurrence(&required_ref, extractor, &[])?;
-    let actual_identity = resolve_trait_identity(
-        catalogue,
-        &actual_ref,
-        trait_identities,
-        external_trait_identities,
-    )?;
-    let required_identity = resolve_trait_identity(
-        catalogue,
-        &required_ref,
-        trait_identities,
-        external_trait_identities,
-    )?;
-
-    match (actual_identity, required_identity) {
-        (Some(actual), Some(required)) => Ok(actual == required),
-        // Unresolved references are not identities and must not match by their
-        // terminal spelling or path suffix.
-        (None, None) => Ok(false),
-        _ => Ok(false),
-    }
 }
 
 /// Builds the standard-library seed for the external trait identity universe.
@@ -404,11 +347,12 @@ pub(super) fn standard_external_trait_identities()
                 "invalid allowed external trait path '{path}': {error}"
             )))
         })?;
-        let identity = FullyQualifiedItemPath::from_fully_qualified_key(&key).map_err(|error| {
-            CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
-                "invalid allowed external trait path '{path}': {error}"
-            )))
-        })?;
+        let identity =
+            FullyQualifiedItemPath::from_trait_fully_qualified_key(&key).map_err(|error| {
+                CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+                    "invalid allowed external trait path '{path}': {error}"
+                )))
+            })?;
         identities.insert(identity);
     }
     Ok(identities)
@@ -461,7 +405,7 @@ fn resolve_external_trait_identity(
                     path.as_str()
                 )))
             })?;
-            FullyQualifiedItemPath::from_fully_qualified_key(&key).map_err(|error| {
+            FullyQualifiedItemPath::from_trait_fully_qualified_key(&key).map_err(|error| {
                 CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
                     "invalid external trait implementation path '{}': {error}",
                     path.as_str()
@@ -748,7 +692,7 @@ mod tests {
                 "Thing<T> + Send" | "Thing " => "Thing",
                 value => value,
             };
-            Ok(vec![ExtractedTypeRefPath::Path(
+            Ok(vec![ExtractedTypeRefPath::type_path(
                 TypeRef::new(path.to_owned()).expect("test extractor emits a non-empty path"),
             )])
         }
@@ -774,7 +718,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                type_module_path,
+                Some(type_module_path),
                 None,
                 vec![],
                 vec![],
@@ -791,7 +735,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -816,7 +760,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path"),
+            Some(ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path")),
             None,
             vec![],
             vec![],
@@ -859,7 +803,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path"),
+                Some(ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path")),
                 None,
                 vec![],
                 vec![],
@@ -905,7 +849,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -946,7 +890,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path"),
+                Some(ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path")),
                 None,
                 vec![],
                 vec![],
@@ -963,7 +907,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path"),
+                Some(ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path")),
                 None,
                 vec![],
                 vec![],
@@ -1284,7 +1228,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path"),
+                Some(ModulePath::from_segments(vec!["a".to_owned()]).expect("valid module path")),
                 None,
                 vec![],
                 vec![],
@@ -1331,7 +1275,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1385,7 +1329,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1419,7 +1363,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1452,7 +1396,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1469,7 +1413,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1508,7 +1452,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],
@@ -1541,7 +1485,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
-                ModulePath::root(),
+                Some(ModulePath::root()),
                 None,
                 vec![],
                 vec![],

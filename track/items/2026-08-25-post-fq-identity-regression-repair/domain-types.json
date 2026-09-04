@@ -1,0 +1,2348 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity": {
+      "action": "modify",
+      "docs": "Catalogue identity lookup helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "reference",
+          "ty": "&TypeRef"
+        },
+        {
+          "name": "catalogue_crate",
+          "ty": "&CrateName"
+        },
+        {
+          "name": "universe",
+          "ty": "&std::collections::BTreeSet<FullyQualifiedItemPath>"
+        }
+      ],
+      "returns": "Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_for_action_in_namespace": {
+      "action": "add",
+      "docs": "Namespace-scoped action-aware catalogue identity lookup helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "reference",
+          "ty": "&TypeRef"
+        },
+        {
+          "name": "catalogue_crate",
+          "ty": "&CrateName"
+        },
+        {
+          "name": "action",
+          "ty": "ItemAction"
+        },
+        {
+          "name": "baseline",
+          "ty": "&std::collections::BTreeSet<FullyQualifiedItemPath>"
+        },
+        {
+          "name": "current",
+          "ty": "&std::collections::BTreeSet<FullyQualifiedItemPath>"
+        },
+        {
+          "name": "namespace",
+          "ty": "CatalogueItemNamespace"
+        }
+      ],
+      "returns": "Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity_in_namespace": {
+      "action": "add",
+      "docs": "Namespace-scoped catalogue identity lookup helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "reference",
+          "ty": "&TypeRef"
+        },
+        {
+          "name": "catalogue_crate",
+          "ty": "&CrateName"
+        },
+        {
+          "name": "universe",
+          "ty": "&std::collections::BTreeSet<FullyQualifiedItemPath>"
+        },
+        {
+          "name": "namespace",
+          "ty": "Option<CatalogueItemNamespace>"
+        }
+      ],
+      "returns": "Result<FullyQualifiedItemPath, CatalogueIdentityResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identity_resolution::resolve_contract_entry_namespace": {
+      "action": "add",
+      "docs": "Contract-reference namespace resolver (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "document",
+          "ty": "&CatalogueDocument"
+        },
+        {
+          "name": "entry_key",
+          "ty": "&CatalogueEntryKey"
+        }
+      ],
+      "returns": "Result<Option<CatalogueItemNamespace>, CatalogueIdentityResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "FullyQualifiedItemPath",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "CatalogueItemNamespace",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "ExtractedTypeRefPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ExtractedTypeRefPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ExtractedTypeRefPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ExtractedTypeRefPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ThreeWaySignal",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ThreeWaySignalIdentity",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignal",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignal",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignal",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignal",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AttestedCatalogueDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AttestedCatalogueDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AttestedCatalogueDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AttestedCatalogueDocument",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "CatalogueToExtendedCratePort": {
+      "action": "reference",
+      "docs": "Secondary port for catalogue-to-extended-crate encoding; referenced by this track as the catalogue codec resolution route (IN-01, IN-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "encode",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "CatalogueDocument"
+            },
+            {
+              "name": "baseline",
+              "ty": "&rustdoc_types::Crate"
+            },
+            {
+              "name": "current",
+              "ty": "&rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExtendedCrate, NewTypeGraphCodecError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "SignalEvaluatorPort": {
+      "action": "reference",
+      "docs": "Secondary port for three-way signal evaluation; referenced by this track as the type-signal identity-index route (IN-01, IN-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate",
+          "params": [
+            {
+              "name": "a",
+              "ty": "ExtendedCrate"
+            },
+            {
+              "name": "b",
+              "ty": "rustdoc_types::Crate"
+            },
+            {
+              "name": "c",
+              "ty": "rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ThreeWayEvaluationReport, Phase1Error>"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator::port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "AttestedCatalogueDocument": {
+      "action": "add",
+      "docs": "Attested catalogue loader result for contracted-entry namespace resolution (IN-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "docs": "Attests source bytes and decodes their catalogue document (IN-05).",
+          "generics": [
+            {
+              "bounds": [],
+              "name": "E"
+            },
+            {
+              "bounds": [],
+              "name": "F"
+            }
+          ],
+          "name": "attest",
+          "params": [
+            {
+              "name": "source",
+              "ty": "&[u8]"
+            },
+            {
+              "name": "decode",
+              "ty": "F"
+            }
+          ],
+          "returns": "Result<Self, E>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ],
+          "where_predicates": [
+            {
+              "lhs": "F",
+              "operator": "Bound",
+              "rhs": [
+                "FnOnce(&[u8]) -> Result<CatalogueDocument, E>"
+              ]
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "document",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueDocument",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueDeclarationHash",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_document",
+          "params": [],
+          "receiver": "self",
+          "returns": "CatalogueDocument",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "ThreeWaySignalIdentity": {
+      "action": "add",
+      "docs": "Phase 2 report identity (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CatalogueItem",
+            "payload": {
+              "fields": [
+                {
+                  "name": "item_name",
+                  "ty": "FreeText"
+                },
+                {
+                  "name": "namespace",
+                  "ty": "CatalogueItemNamespace"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Label",
+            "payload": {
+              "fields": [
+                {
+                  "name": "label",
+                  "ty": "FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Returns the shared report-identity namespace (IN-05, CO-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "namespace",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<CatalogueItemNamespace>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::signal_evaluator::region",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue::TypeSignal": {
+      "action": "modify",
+      "docs": "Value-equatable persisted type-signal row; raw kind/member strings are unconstrained report labels (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "docs": "Constructs a persisted type-signal row (IN-05, CO-05, AC-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "identity",
+              "ty": "ThreeWaySignalIdentity"
+            },
+            {
+              "name": "kind_tag",
+              "ty": "String"
+            },
+            {
+              "name": "signal",
+              "ty": "ConfidenceSignal"
+            },
+            {
+              "name": "found_type",
+              "ty": "bool"
+            },
+            {
+              "name": "found_items",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "missing_items",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "extra_items",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Returns the shared report identity (IN-05, CO-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "identity",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ThreeWaySignalIdentity",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "type_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind_tag",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ConfidenceSignal"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "found_type",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "found_items",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[String]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "missing_items",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[String]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "extra_items",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[String]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_unknown_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::catalogue",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::ExtractedTypeRefPath": {
+      "action": "modify",
+      "docs": "Domain-owned, value-equatable parser-occurrence classification that is stable across catalogue operations and independent of parser adapters.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Path",
+            "payload": {
+              "fields": [
+                {
+                  "name": "type_ref",
+                  "ty": "TypeRef"
+                },
+                {
+                  "name": "namespace",
+                  "ty": "CatalogueItemNamespace"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TypeParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LifetimeParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ConstParameter",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AssociatedItemLabel",
+            "payload": {
+              "fields": [
+                "ParamName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs a path occurrence in type position.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "type_path",
+          "params": [
+            {
+              "name": "type_ref",
+              "ty": "TypeRef"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Constructs a path occurrence in trait position.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_path",
+          "params": [
+            {
+              "name": "type_ref",
+              "ty": "TypeRef"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::document::CatalogueDocument": {
+      "action": "reference",
+      "docs": "Baseline catalogue aggregate referenced by the attested loader result (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CrateName"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "types",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<CatalogueEntryKey, TypeEntry>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "traits",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<CatalogueEntryKey, TraitEntry>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "functions",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<FunctionPath, FunctionEntry>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "inherent_impls",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[InherentImplDeclV2]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_impls",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TraitImplDeclV2]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "deletions",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[DeletionRecord]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_type",
+          "params": [
+            {
+              "name": "name",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "entry",
+              "ty": "TypeEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_trait",
+          "params": [
+            {
+              "name": "name",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "entry",
+              "ty": "TraitEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "insert_function",
+          "params": [
+            {
+              "name": "path",
+              "ty": "FunctionPath"
+            },
+            {
+              "name": "entry",
+              "ty": "FunctionEntry"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_inherent_impl",
+          "params": [
+            {
+              "name": "decl",
+              "ty": "InherentImplDeclV2"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_trait_impl",
+          "params": [
+            {
+              "name": "decl",
+              "ty": "TraitImplDeclV2"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push_deletion",
+          "params": [
+            {
+              "name": "record",
+              "ty": "DeletionRecord"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate_filename",
+          "params": [
+            {
+              "name": "filename_stem",
+              "ty": "&CrateName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CatalogueDocumentError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::document",
+      "role": {
+        "AggregateRoot": {
+          "identity": {
+            "method_name": "crate_name"
+          }
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::entries::TraitEntry": {
+      "action": "modify",
+      "docs": "Value-equatable catalogue trait declaration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "action",
+              "ty": "ItemAction"
+            },
+            {
+              "name": "role",
+              "ty": "ContractRole"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            },
+            {
+              "name": "assoc_types",
+              "ty": "Vec<AssocTypeDecl>"
+            },
+            {
+              "name": "assoc_consts",
+              "ty": "Vec<AssocConstDecl>"
+            },
+            {
+              "name": "supertrait_bounds",
+              "ty": "Vec<TypeRef>"
+            },
+            {
+              "name": "generics",
+              "ty": "Vec<MethodGenericParam>"
+            },
+            {
+              "name": "where_predicates",
+              "ty": "Vec<WherePredicateDecl>"
+            },
+            {
+              "name": "module_path",
+              "ty": "Option<ModulePath>"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<DocString>"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<SpecRef>"
+            },
+            {
+              "name": "informal_grounds",
+              "ty": "Vec<InformalGroundRef>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "action",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ItemAction"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContractRole"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "methods",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodDeclaration]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "assoc_types",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[AssocTypeDecl]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "assoc_consts",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[AssocConstDecl]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "supertrait_bounds",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TypeRef]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "generics",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodGenericParam]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "where_predicates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WherePredicateDecl]"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "module_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModulePath>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "docs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&DocString>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[SpecRef]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "informal_grounds",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[InformalGroundRef]"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::entries",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::entries::TypeEntry": {
+      "action": "modify",
+      "docs": "Value-equatable catalogue type declaration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "action",
+              "ty": "ItemAction"
+            },
+            {
+              "name": "role",
+              "ty": "DataRole"
+            },
+            {
+              "name": "kind",
+              "ty": "TypeKindV2"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            },
+            {
+              "name": "generics",
+              "ty": "Vec<MethodGenericParam>"
+            },
+            {
+              "name": "where_predicates",
+              "ty": "Vec<WherePredicateDecl>"
+            },
+            {
+              "name": "module_path",
+              "ty": "Option<ModulePath>"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<DocString>"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<SpecRef>"
+            },
+            {
+              "name": "informal_grounds",
+              "ty": "Vec<InformalGroundRef>"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "action",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ItemAction"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DataRole"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeKindV2"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "methods",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodDeclaration]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "generics",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodGenericParam]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "where_predicates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WherePredicateDecl]"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "module_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModulePath>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "docs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&DocString>"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[SpecRef]"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "informal_grounds",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[InformalGroundRef]"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::entries",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace": {
+      "action": "add",
+      "docs": "Catalogue item namespace discriminator.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Type",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Trait",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_v2::identifiers::FullyQualifiedItemPath": {
+      "action": "modify",
+      "docs": "Namespace-aware catalogue item identity value.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PlacedType",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "module_path",
+                  "ty": "ModulePath"
+                },
+                {
+                  "name": "name",
+                  "ty": "Identifier"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnplacedType",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "name",
+                  "ty": "Identifier"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PlacedTrait",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "module_path",
+                  "ty": "ModulePath"
+                },
+                {
+                  "name": "name",
+                  "ty": "Identifier"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnplacedTrait",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "name",
+                  "ty": "Identifier"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_type",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "module_path",
+              "ty": "ModulePath"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_trait",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "module_path",
+              "ty": "ModulePath"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Creates an unplaced type identity.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_unplaced_type",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Creates an unplaced trait identity.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_unplaced_trait",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "docs": "Creates a placed type identity for compatibility.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "CrateName"
+            },
+            {
+              "name": "module_path",
+              "ty": "ModulePath"
+            },
+            {
+              "name": "name",
+              "ty": "Identifier"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "crate_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CrateName"
+        },
+        {
+          "action": "modify",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "module_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModulePath>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Returns the item namespace.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "namespace",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CatalogueItemNamespace",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Reports whether placement is explicit.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_placed",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "spec_refs": [
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Identifier"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_type_catalogue_entry_key",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            },
+            {
+              "name": "declared_module_path",
+              "ty": "Option<&ModulePath>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_trait_catalogue_entry_key",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            },
+            {
+              "name": "declared_module_path",
+              "ty": "Option<&ModulePath>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "docs": "Resolves a catalogue key with an explicit module path.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_catalogue_entry_key",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            },
+            {
+              "name": "declared_module_path",
+              "ty": "&ModulePath"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_type_fully_qualified_key",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_trait_fully_qualified_key",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>",
+          "spec_refs": [
+            {
+              "anchor": "CO-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "docs": "Parses a fully qualified type key.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_fully_qualified_key",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&CatalogueEntryKey"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::signal_evaluator::region::ThreeWaySignal": {
+      "action": "modify",
+      "docs": "Phase 2 report signal identity (IN-05, CO-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "action": "add",
+          "docs": "Constructs a catalogue-item signal (IN-05, CO-05, AC-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "catalogue_item",
+          "params": [
+            {
+              "name": "item_name",
+              "ty": "FreeText"
+            },
+            {
+              "name": "namespace",
+              "ty": "CatalogueItemNamespace"
+            },
+            {
+              "name": "region",
+              "ty": "SignalRegion"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Constructs a report-label signal (IN-05, CO-05, AC-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "FreeText"
+            },
+            {
+              "name": "region",
+              "ty": "SignalRegion"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "add",
+          "docs": "Returns the shared report identity (IN-05, CO-05).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "identity",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ThreeWaySignalIdentity",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            },
+            {
+              "anchor": "CO-05",
+              "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+            }
+          ]
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "item_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "region",
+          "params": [],
+          "receiver": "&self",
+          "returns": "SignalRegion"
+        },
+        {
+          "action": "reference",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ThreeWaySignalKind"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator::region",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "CO-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-25-post-fq-identity-regression-repair/spec.json"
+        }
+      ]
+    }
+  }
+}

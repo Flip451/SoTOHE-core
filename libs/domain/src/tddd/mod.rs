@@ -36,6 +36,17 @@ pub mod signal_evaluator;
 pub mod test_obligation;
 pub mod type_signals_doc;
 
+pub use type_signals_doc::{
+    AttestedRustdocSnapshot, BaselineHash, CapturedRustdocJson, CargoProfileName,
+    CatalogueDeclarationHash, ExpectedRustdocJsonPath, ImplementationFingerprint,
+    ResolutionFingerprint, ResolvedCargoTargetDirectory, RustdocExecutionIdentity,
+    RustdocExecutionIdentityError, RustdocJsonHash, RustdocSnapshot, Sha256Digest,
+    Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsCacheKey, TypeSignalsDocument,
+    TypeSignalsLoadResult, TypeSignalsReuseDecision, TypeSignalsSchemaVersion,
+    TypeSignalsSchemaVersionError, construct_attested_rustdoc_snapshot,
+    construct_captured_rustdoc_json, construct_rustdoc_snapshot,
+};
+
 pub use baseline_document::BaselineDocument;
 pub use baseline_graph_ports::{
     BaselineGraphLoader, BaselineGraphLoaderError, BaselineGraphRenderer,
@@ -44,7 +55,9 @@ pub use baseline_graph_ports::{
 pub use catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
-pub use catalogue_to_extended_crate_port::CatalogueToExtendedCratePort;
+pub use catalogue_to_extended_crate_port::{
+    AuthoritativeRustdocContext, CatalogueToExtendedCratePort,
+};
 pub use contract_map_content::ContractMapContent;
 pub use contract_map_options::ContractMapRenderOptions;
 pub use contract_map_renderer::{
@@ -60,6 +73,7 @@ pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;
 pub use signal_evaluator::{
     Phase1Error, SignalEvaluatorPort, SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal,
-    ThreeWaySignalKind,
+    ThreeWaySignalIdentity, ThreeWaySignalKind,
 };
-// Note: `signal_for_region` is pub(crate) — use ThreeWaySignal::new() for public API.
+// Note: `signal_for_region` is pub(crate) — use the explicit ThreeWaySignal
+// constructors for the public API.

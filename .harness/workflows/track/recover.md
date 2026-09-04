@@ -96,8 +96,21 @@ provider-specific invocation. Always use `bin/sotp git add-all` after the final
 review; the commit workflow owns the complete staged scope.
 
 The commit workflow validates the staged scope, creates the commit, and attaches the repository
-note. On success, report that conflict recovery is complete and the track remains on its track
-branch.
+note. After the canonical commit workflow succeeds, invoke the existing commit-record command:
+
+```
+bin/sotp track set-commit-hash
+```
+
+This command must use the existing `TrackSetCommitHashService` → `TrackSetCommitHashInteractor`
+→ `TrackCommitHashPort` path to record the current HEAD for the active track. Check its result
+explicitly. If it returns non-zero, stop recovery and report the commit-record failure; do not
+report conflict recovery as complete. The record step rewrites track state only and must not
+create a Git commit itself.
+
+Do not persist a commit record from `BaseMergeInteractor`'s `Conflicted` branch: that branch only
+detects the conflict, and its HEAD is the pre-merge HEAD. On successful commit-record update,
+report that conflict recovery is complete and the track remains on its track branch.
 
 ## Gates
 
@@ -109,6 +122,7 @@ branch.
 | 3 | Canonical review reaches `zero_findings` | pass / fail |
 | 4 | Guarded staged diff matches the recovery scope | pass / fix-staging |
 | 4 | Guarded commit succeeds | pass / fail |
+| 4 | `bin/sotp track set-commit-hash` exits 0 | pass / stop |
 
 ## Failure / recovery
 
@@ -119,9 +133,11 @@ branch.
 - **Designated writer or regeneration failure**: retain the conflict and use that surface's failure route; do not substitute an orchestrator edit.
 - **Review finding**: repair through the normal review/fix loop, then repeat review.
 - **Staging or guarded commit failure**: follow the commit workflow's failure handling and retry only through its guarded staging and commit surfaces.
+- **Commit-record update failure**: stop after the commit workflow, report the non-zero result, and do not claim that conflict recovery completed; the record command does not create another Git commit.
 
 ## Outputs
 
 - A conflict resolution that has passed the normal verification and review gates.
 - A guarded commit and its normal repository note.
+- A successful commit-record update for the recovery commit's HEAD.
 - No cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself — or, after a reported cleanup failure, by the operator's manual recovery, which the recovery report records.

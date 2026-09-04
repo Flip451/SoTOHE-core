@@ -1,0 +1,46 @@
+{
+  "catalogue_declaration_hash": "9f7b4f38cf62f227496949dc82762cf921ecea1230588e9e80af408f228c928a",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "37f7b2123459687888d4e9230fc9146b5551c1f52cb701866f6e6eda9159411f",
+      "signal": "blue",
+      "type_name": "EvaluationStartCaptureError"
+    },
+    {
+      "entry_hash": "1cc76a5f7ff6b38dba8b0d61c20c3d126f4e17ecd2d8eaeb47c24c612f97e580",
+      "signal": "blue",
+      "type_name": "RustdocExportPlan"
+    },
+    {
+      "entry_hash": "76d568d968725f8e1378432f02829059f268655cdaad1728130a2def27c46fbe",
+      "signal": "blue",
+      "type_name": "RustdocExportPlanValidationError"
+    },
+    {
+      "entry_hash": "d0717ae9c60978d9014519988b3732c29554c6e864859d06f4b6d7452e931512",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+    },
+    {
+      "entry_hash": "558b60f5cf7e96435cb00d0989b3b7cc87d1a08ddde5ac8a6bcded49cb171c5d",
+      "signal": "blue",
+      "type_name": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+    },
+    {
+      "entry_hash": "3bf4efe0e65a81012f391f0049e2f7c4e4ba5fe7c98f82af3be53f8c8195b65c",
+      "signal": "blue",
+      "type_name": "EvaluationStartCapturePort"
+    },
+    {
+      "entry_hash": "70c2e526d8e2863d007907a23d95a7a51f2102663825f41a0dc6089b1284b703",
+      "signal": "blue",
+      "type_name": "SchemaExporterPort"
+    },
+    {
+      "entry_hash": "539a347ce81d55fef8b9029cea42b1347b4c24f468c0194ab702903745edcc58",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorPort"
+    }
+  ]
+}

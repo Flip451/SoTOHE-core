@@ -196,9 +196,11 @@ mod tests {
 
     use crate::chain::test_support::{assert_persisted_chain_bounds, call_sotchain_check};
     use crate::chain::traits::LoadablePersistedChain;
+    use domain::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
+    use domain::tddd::signal_evaluator::ThreeWaySignalIdentity;
     use domain::{
-        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, PersistedSoTChainGate, Strictness,
-        Timestamp, TypeSignal, TypeSignalsDocument, verify::Severity,
+        ChainId, ChainIdentity, ConfidenceSignal, ContentHash, FreeText, PersistedSoTChainGate,
+        Strictness, Timestamp, TypeSignal, TypeSignalsDocument, verify::Severity,
     };
 
     use super::{ImplCatalogChain, ImplCatalogInput, ImplCatalogStaleError};
@@ -243,15 +245,59 @@ mod tests {
         format!("{}{}", "0".repeat(63), "1")
     }
 
+    fn test_cache_key(
+        declaration_hash: domain::CatalogueDeclarationHash,
+        head_commit: domain::CommitHash,
+        baseline_hash: domain::BaselineHash,
+    ) -> domain::TypeSignalsCacheKey {
+        let target = domain::ResolvedCargoTargetDirectory::try_new(std::path::PathBuf::from(
+            "/tmp/sotohe-usecase-test-target",
+        ))
+        .unwrap();
+        let expected = domain::ExpectedRustdocJsonPath::try_new(
+            target.as_path().join("doc/legacy.json"),
+            &target,
+        )
+        .unwrap();
+        let identity = domain::RustdocExecutionIdentity::new(
+            target,
+            domain::tddd::catalogue_v2::CrateName::new("legacy").unwrap(),
+            vec![],
+            domain::CargoProfileName::try_new("dev".to_owned()).unwrap(),
+            expected,
+        )
+        .unwrap();
+        let zero = domain::Sha256Digest::try_new("0".repeat(64)).unwrap();
+        domain::TypeSignalsCacheKey::new(
+            declaration_hash,
+            head_commit,
+            baseline_hash,
+            domain::ImplementationFingerprint::new(zero.clone()),
+            domain::ResolutionFingerprint::new(zero),
+            identity,
+        )
+    }
+
     fn make_type_signal(name: &str, sig: ConfidenceSignal) -> TypeSignal {
-        TypeSignal::new(name, "value_object", sig, true, vec![], vec![], vec![])
+        TypeSignal::new(
+            ThreeWaySignalIdentity::CatalogueItem {
+                item_name: FreeText::new(name),
+                namespace: CatalogueItemNamespace::Type,
+            },
+            "value_object".to_owned(),
+            sig,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
     }
 
     fn make_doc(declaration_hash: &str, signals: Vec<TypeSignal>) -> TypeSignalsDocument {
         let digest = domain::Sha256Digest::try_new(declaration_hash.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts(),
-            domain::TypeSignalsCacheKey::new(
+            test_cache_key(
                 domain::CatalogueDeclarationHash::new(digest.clone()),
                 domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(digest),

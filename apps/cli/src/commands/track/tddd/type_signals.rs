@@ -70,6 +70,47 @@ mod tests {
         fs::set_permissions(path, permissions).expect("script is executable");
     }
 
+    #[cfg(unix)]
+    fn isolated_fixture_workspace() -> Result<(tempfile::TempDir, std::path::PathBuf), String> {
+        // Cargo metadata is UTF-8 JSON. Try environment-provided temporary
+        // parents, then cache/runtime homes, and retain only a canonical
+        // UTF-8 parent outside the repository. This avoids both repository
+        // pollution and an implicit encoding or fixed-platform assumption.
+        let repository_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .canonicalize()
+            .map_err(|error| format!("repository root canonicalizes: {error}"))?;
+        let mut candidates = vec![std::env::temp_dir()];
+        for variable in ["TMPDIR", "TMP", "TEMP", "XDG_RUNTIME_DIR", "XDG_CACHE_HOME", "HOME"] {
+            if let Some(parent) = std::env::var_os(variable) {
+                candidates.push(parent.into());
+            }
+        }
+
+        for parent in candidates {
+            let Ok(parent) = parent.canonicalize() else {
+                continue;
+            };
+            if parent.starts_with(&repository_root) || parent.to_str().is_none() {
+                continue;
+            }
+            let Ok(workspace) =
+                tempfile::Builder::new().prefix("sotp-cli-workspace-").tempdir_in(&parent)
+            else {
+                continue;
+            };
+            let Ok(root) = workspace.path().canonicalize() else {
+                continue;
+            };
+            if root.starts_with(&repository_root) || root.to_str().is_none() {
+                continue;
+            }
+            return Ok((workspace, root));
+        }
+
+        Err("no writable UTF-8 temporary parent outside the repository".to_owned())
+    }
+
     fn seed_track_branch(root: &std::path::Path, track_id: &str) {
         let track_dir = root.join("track/items").join(track_id);
         fs::create_dir_all(&track_dir).expect("track directory exists");
@@ -158,15 +199,37 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn cargo_and_rustup_shims() -> (tempfile::TempDir, std::ffi::OsString) {
+    fn cargo_and_rustup_shims(
+        manifest_path: &std::path::Path,
+    ) -> Result<(tempfile::TempDir, std::ffi::OsString, std::ffi::OsString), String> {
+        let manifest_path = manifest_path
+            .to_str()
+            .ok_or_else(|| "fixture manifest path is not valid UTF-8".to_owned())?;
         let commands = tempfile::tempdir().expect("command shim directory exists");
         let rustup = commands.path().join("rustup");
-        fs::write(&rustup, "#!/bin/sh\nexit 0\n").expect("rustup shim is written");
+        fs::write(
+            &rustup,
+            "#!/bin/sh\nif [ \"$1\" = which ]; then\nprintf '%s\\n' /bin/sh\nfi\nexit 0\n",
+        )
+        .expect("rustup shim is written");
         make_executable(&rustup);
         let cargo = commands.path().join("cargo");
+        // The workspace root was selected and validated as UTF-8 above. Keep
+        // that path lossless in the synthetic Cargo metadata rather than using
+        // a lossy fallback that could name a different file.
+        let manifest_path_json =
+            serde_json::to_string(manifest_path).map_err(|error| error.to_string())?;
         fs::write(
             &cargo,
-            "#!/bin/sh\nset -eu\nif [ \"$1\" = metadata ]; then\nprintf '%s\\n' '{\"packages\":[{\"name\":\"domain\",\"targets\":[{\"kind\":[\"lib\"],\"name\":\"domain\"}]}],\"target_directory\":\"target\"}'\nexit 0\nfi\nmkdir -p \"$CARGO_TARGET_DIR/doc\"\nprintf '%s' '{\"root\":0,\"crate_version\":null,\"includes_private\":false,\"index\":{},\"paths\":{},\"external_crates\":{},\"format_version\":57,\"target\":{\"triple\":\"\",\"target_features\":[]}}' > \"$CARGO_TARGET_DIR/doc/domain.json\"\n",
+            r#"#!/bin/sh
+set -eu
+if [ "$1" = metadata ]; then
+printf '%s\n' "{\"packages\":[{\"name\":\"domain\",\"manifest_path\":$SOTP_MANIFEST_PATH_JSON,\"targets\":[{\"kind\":[\"lib\"],\"name\":\"domain\"}]}],\"target_directory\":\"target\"}"
+exit 0
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '%s' '{"root":0,"crate_version":null,"includes_private":false,"index":{},"paths":{},"external_crates":{},"format_version":57,"target":{"triple":"","target_features":[]}}' > "$CARGO_TARGET_DIR/doc/domain.json"
+"#,
         )
         .expect("cargo shim is written");
         make_executable(&cargo);
@@ -175,7 +238,7 @@ mod tests {
                 .chain(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())),
         )
         .expect("test PATH is valid");
-        (commands, path)
+        Ok((commands, path, manifest_path_json.into()))
     }
 
     #[test]
@@ -234,22 +297,32 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_track_type_signals_call_site_persists_signal_artifact_and_returns_success() {
+    fn test_track_type_signals_call_site_persists_signal_artifact_and_returns_success()
+    -> Result<(), String> {
         let _guard = crate::commands::track::test_support::process_env_lock().lock().unwrap();
-        let workspace = tempfile::tempdir().expect("temporary workspace exists");
-        let root = workspace.path();
+        let (_workspace, root) = isolated_fixture_workspace()?;
+        let home = tempfile::tempdir().expect("temporary home exists");
         let track_id = "signals-track";
-        let track_dir = write_type_signals_success_fixture(root, track_id);
-        let (_shims, path) = cargo_and_rustup_shims();
-        let target_dir = root.join("target");
-        let argv_workspace = root.to_path_buf();
+        let track_dir = write_type_signals_success_fixture(&root, track_id);
+        let (_shims, path, manifest_path_json) =
+            cargo_and_rustup_shims(&root.join("libs/domain/Cargo.toml"))?;
+        let target_dir =
+            root.canonicalize().expect("fixture workspace canonicalizes").join("target");
+        let argv_workspace = root.clone();
         let argv_layer = Some("domain".to_owned());
         let ((exit, outcome), captured_stderr) =
             crate::commands::track::test_support::capture_stderr(|| {
                 temp_env::with_vars(
                     [
                         ("PATH", Some(path.as_os_str())),
+                        ("SOTP_MANIFEST_PATH_JSON", Some(manifest_path_json.as_os_str())),
+                        ("CARGO_HOME", None),
                         ("CARGO_TARGET_DIR", Some(target_dir.as_os_str())),
+                        ("HOME", Some(home.path().as_os_str())),
+                        ("RUSTC", None),
+                        ("RUSTDOC", None),
+                        ("RUSTC_WRAPPER", None),
+                        ("RUSTC_WORKSPACE_WRAPPER", None),
                     ],
                     || {
                         let exit = execute_type_signals(
@@ -257,7 +330,7 @@ mod tests {
                             argv_workspace.clone(),
                             argv_layer.clone(),
                         );
-                        let outcome = handle_domain_type_signals(root, track_id);
+                        let outcome = handle_domain_type_signals(&root, track_id);
                         (exit, outcome)
                     },
                 )
@@ -278,5 +351,6 @@ mod tests {
         assert!(signal_path.is_file(), "type-signals operation must persist its artifact");
         let persisted = fs::read_to_string(signal_path).expect("persisted signal file is readable");
         assert!(persisted.contains("\"signals\": []"));
+        Ok(())
     }
 }

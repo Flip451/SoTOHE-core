@@ -4,7 +4,12 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 
+use std::collections::BTreeSet;
+
 use super::*;
+use crate::tddd::catalogue_v2::{
+    ItemAction, identity_resolution::resolve_catalogue_identity_for_action_in_namespace,
+};
 use crate::tddd::semantic_verify::CatalogueEntryKey;
 
 // ---------------------------------------------------------------------------
@@ -336,7 +341,7 @@ fn test_fully_qualified_item_path_new_stores_components() {
     let path = FullyQualifiedItemPath::new(crate_name.clone(), module_path.clone(), name.clone());
 
     assert_eq!(path.crate_name(), &crate_name);
-    assert_eq!(path.module_path(), &module_path);
+    assert_eq!(path.module_path(), Some(&module_path));
     assert_eq!(path.name(), &name);
 }
 
@@ -366,6 +371,92 @@ fn test_fully_qualified_item_path_display_includes_crate_module_and_name() {
     );
 
     assert_eq!(path.to_string(), "domain_core::user::input::Input");
+}
+
+#[test]
+fn test_fully_qualified_item_path_ac03_covers_unique_and_fail_closed_resolution() {
+    let crate_name = CrateName::new("domain").unwrap();
+    let key = CatalogueEntryKey::try_new("Thing".to_owned()).unwrap();
+    let unplaced =
+        FullyQualifiedItemPath::from_type_catalogue_entry_key(&crate_name, &key, None).unwrap();
+    assert!(matches!(unplaced, FullyQualifiedItemPath::UnplacedType { .. }));
+
+    let current_identity = FullyQualifiedItemPath::new_type(
+        crate_name.clone(),
+        ModulePath::from_segments(vec!["generated".to_owned()]).unwrap(),
+        Identifier::new("Thing").unwrap(),
+    );
+    let resolved_add = resolve_catalogue_identity_for_action_in_namespace(
+        &TypeRef::new("Thing".to_owned()).unwrap(),
+        &crate_name,
+        ItemAction::Add,
+        &BTreeSet::new(),
+        &BTreeSet::from([current_identity.clone()]),
+        CatalogueItemNamespace::Type,
+    )
+    .unwrap();
+    assert_eq!(resolved_add, current_identity);
+    assert!(resolved_add.is_placed());
+
+    let baseline_collision = FullyQualifiedItemPath::new_type(
+        crate_name.clone(),
+        ModulePath::from_segments(vec!["baseline".to_owned()]).unwrap(),
+        Identifier::new("Thing").unwrap(),
+    );
+    assert!(
+        resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("Thing".to_owned()).unwrap(),
+            &crate_name,
+            ItemAction::Add,
+            &BTreeSet::from([baseline_collision]),
+            &BTreeSet::from([current_identity.clone()]),
+            CatalogueItemNamespace::Type,
+        )
+        .is_err()
+    );
+
+    let second_current_identity = FullyQualifiedItemPath::new_type(
+        crate_name.clone(),
+        ModulePath::from_segments(vec!["other".to_owned()]).unwrap(),
+        Identifier::new("Thing").unwrap(),
+    );
+    assert!(
+        resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("Thing".to_owned()).unwrap(),
+            &crate_name,
+            ItemAction::Add,
+            &BTreeSet::new(),
+            &BTreeSet::from([current_identity.clone(), second_current_identity]),
+            CatalogueItemNamespace::Type,
+        )
+        .is_err()
+    );
+
+    let unresolved_add = resolve_catalogue_identity_for_action_in_namespace(
+        &TypeRef::new("Thing".to_owned()).unwrap(),
+        &crate_name,
+        ItemAction::Add,
+        &BTreeSet::new(),
+        &BTreeSet::new(),
+        CatalogueItemNamespace::Type,
+    )
+    .unwrap();
+    assert_eq!(unresolved_add, unplaced);
+    assert!(!unresolved_add.is_placed());
+
+    let baseline = BTreeSet::from([current_identity.clone()]);
+    for action in [ItemAction::Modify, ItemAction::Delete, ItemAction::Reference] {
+        let resolved = resolve_catalogue_identity_for_action_in_namespace(
+            &TypeRef::new("Thing".to_owned()).unwrap(),
+            &crate_name,
+            action,
+            &baseline,
+            &BTreeSet::new(),
+            CatalogueItemNamespace::Type,
+        )
+        .unwrap();
+        assert_eq!(resolved, current_identity);
+    }
 }
 
 // ---------------------------------------------------------------------------

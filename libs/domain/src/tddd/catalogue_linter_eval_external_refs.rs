@@ -12,6 +12,7 @@ use super::identity::{
 use super::{CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, RolePayloadField};
 use crate::tddd::catalogue_linter::TypeRefPathExtractorPort;
 use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::identifiers::CatalogueItemNamespace;
 use crate::tddd::catalogue_v2::roles::ItemAction;
 use crate::tddd::layer_id::LayerId;
 
@@ -44,6 +45,7 @@ pub(super) fn evaluate_no_external_reference_in_methods<E: TypeRefPathExtractorP
         catalogue_crate: catalogue.crate_name(),
         universe: &identity_universe,
         entries: &declared_identities,
+        namespace: CatalogueItemNamespace::Type,
     };
     let mut violations = Vec::new();
 

@@ -23,6 +23,7 @@ pub mod demo;
 pub mod domain;
 pub mod dry;
 pub mod file;
+pub mod gate_output;
 pub mod git;
 pub mod guard;
 pub mod hook;

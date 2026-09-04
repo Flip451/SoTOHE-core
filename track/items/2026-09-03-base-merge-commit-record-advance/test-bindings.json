@@ -1,0 +1,112 @@
+{
+  "track_id": "2026-09-03-base-merge-commit-record-advance",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::base_merge::BaseMergeInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_persists_commit_record_after_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views_without_persisting_commit_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "PostMergeCleanupError is a failure union and has no clean-merge success behavior; clean commit-record advancement is owned by BaseMergeInteractor."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::base_merge::PostMergeCleanupError",
+        "anchor_id": {
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_commit_record_failure_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
+        }
+      ]
+    }
+  ]
+}

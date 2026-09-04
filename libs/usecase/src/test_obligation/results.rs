@@ -11,7 +11,6 @@ use domain::SpecDocumentLoaderPort;
 pub use domain::TaskStatusKind;
 use domain::TrackId;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 pub use domain::tddd::semantic_verify::CatalogueEntryKey;
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument,
@@ -35,6 +34,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 pub use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
+use crate::catalogue_document_loader::AttestedCatalogueDocumentLoaderPort;
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::diag;
@@ -246,7 +246,7 @@ pub struct TestObligationResultsInteractor {
     fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
     waiver_verifier_fingerprint: VerifierPromptFingerprint,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
 }
@@ -264,7 +264,7 @@ impl TestObligationResultsInteractor {
         fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
         waiver_verifier_fingerprint: VerifierPromptFingerprint,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
-        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn AttestedCatalogueDocumentLoaderPort + Send + Sync>,
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
     ) -> Self {

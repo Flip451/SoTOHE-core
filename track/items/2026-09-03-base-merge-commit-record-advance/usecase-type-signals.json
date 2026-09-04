@@ -1,0 +1,60 @@
+{
+  "baseline_hash": "75be0eb01b8f3a91b89365275f8d61c8546fd85347b008d6135bbb5d15a62ac3",
+  "declaration_hash": "26d8f4f7c9bdb376094e43ea7ab680b90e72f3504593010288d0951861f37b7a",
+  "generated_at": "2026-09-03T10:28:05Z",
+  "head_commit": "5fba82131cc42dab5f591d6bd84d74e4d47754a9",
+  "implementation_fingerprint": "001dbf418ed8dd675d121266a91ae7481ecc136496a38f7834b4f729b96f6c20",
+  "resolution_fingerprint": "2c7e299b470dc0e12e980b02de51f23557dda4be54013c4f226075f8a09b561a",
+  "rustdoc_execution_identity": {
+    "crate_name": "usecase",
+    "expected_json_path": "target/.sotp-rustdoc/caa4404e1ff1453d558bafe4c64059fc13f3ae29253aac820fd2c6cc2ea0139b/doc/usecase.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/caa4404e1ff1453d558bafe4c64059fc13f3ae29253aac820fd2c6cc2ea0139b"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::BaseMergeInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::base_merge::PostMergeCleanupError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "TrackCommitHashPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::git_workflow::DiagnosticText"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor"
+    }
+  ]
+}

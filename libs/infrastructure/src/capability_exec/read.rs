@@ -7,6 +7,7 @@ use std::path::Path;
 use super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, path_guard};
 
 pub(crate) fn bounded_read_utf8_file(path: &Path) -> Result<String, std::io::Error> {
+    let max_bytes = MAX_CAPABILITY_EXEC_TEXT_BYTES;
     let metadata = path.symlink_metadata()?;
     if !metadata.file_type().is_file() {
         return Err(Error::new(
@@ -22,28 +23,22 @@ pub(crate) fn bounded_read_utf8_file(path: &Path) -> Result<String, std::io::Err
             format!("{} is not a regular file", path.display()),
         ));
     }
-    if opened_metadata.len() > MAX_CAPABILITY_EXEC_TEXT_BYTES {
+    if opened_metadata.len() > max_bytes {
         return Err(Error::new(
             ErrorKind::InvalidData,
-            format!(
-                "{} exceeds the maximum allowed size of {MAX_CAPABILITY_EXEC_TEXT_BYTES} bytes",
-                path.display()
-            ),
+            format!("{} exceeds the maximum allowed size of {max_bytes} bytes", path.display()),
         ));
     }
 
     // The metadata check is only a snapshot. Read one byte past the limit as well so a file
     // that grows between inspection and reading is rejected without an unbounded allocation.
-    let mut reader = file.take(MAX_CAPABILITY_EXEC_TEXT_BYTES.saturating_add(1));
+    let mut reader = file.take(max_bytes.saturating_add(1));
     let mut content = String::new();
     reader.read_to_string(&mut content)?;
-    if content.len() > MAX_CAPABILITY_EXEC_TEXT_BYTES as usize {
+    if content.len() > max_bytes as usize {
         return Err(Error::new(
             ErrorKind::InvalidData,
-            format!(
-                "{} exceeds the maximum allowed size of {MAX_CAPABILITY_EXEC_TEXT_BYTES} bytes",
-                path.display()
-            ),
+            format!("{} exceeds the maximum allowed size of {max_bytes} bytes", path.display()),
         ));
     }
     Ok(content)

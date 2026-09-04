@@ -5,6 +5,7 @@
 //! kind_tag values are the historically-established set grandfathered by ADR
 //! `2026-04-12-1200-strict-spec-signal-gate-v2`.
 
+use domain::tddd::catalogue_v2::CatalogueItemNamespace;
 use domain::tddd::catalogue_v2::composite::TypeKindV2;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
 
@@ -70,6 +71,20 @@ pub(crate) const fn contract_role_kind_tag(role: &ContractRole) -> &'static str 
 /// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`.
 pub(crate) const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
     "free_function"
+}
+
+/// Returns the catalogue namespace a persisted kind_tag belongs to.
+///
+/// `ContractRole` tags describe trait entries, `DataRole` tags describe type
+/// entries, and the function / unknown tags carry no type-or-trait namespace.
+/// The signal builder uses this to join a namespace-aware evaluator signal to
+/// the matching persisted row when a type and a trait share one entry key.
+pub(crate) fn kind_tag_namespace(kind_tag: &str) -> Option<CatalogueItemNamespace> {
+    match kind_tag {
+        "secondary_port" | "application_service" => Some(CatalogueItemNamespace::Trait),
+        "free_function" | "unknown" => None,
+        _ => Some(CatalogueItemNamespace::Type),
+    }
 }
 
 // ---------------------------------------------------------------------------

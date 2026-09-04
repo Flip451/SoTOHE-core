@@ -696,8 +696,15 @@ mod tests {
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
-        let signals_array =
+        let mut signals_array =
             value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        for signal in &mut signals_array {
+            if let Some(signal) = signal.as_object_mut() {
+                // Legacy declaration fixtures describe type rows; the v6
+                // persisted document must make that namespace explicit.
+                signal.insert("namespace".to_owned(), serde_json::Value::String("type".to_owned()));
+            }
+        }
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
             .as_digest()
             .as_str()
@@ -712,14 +719,15 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
-        let signal_file = serde_json::json!({
-            "schema_version": 4,
+        let mut signal_file = serde_json::json!({
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
             "head_commit": "a".repeat(40),
             "baseline_hash": baseline_hash,
             "signals": signals_array,
         });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut signal_file);
         let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
         std::fs::write(track_dir.join(signal_name), encoded).unwrap();
     }
@@ -946,7 +954,7 @@ mod tests {
         verify_stage2_fixture(strict, |dir| {
             std::fs::write(dir.join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
                 .unwrap();
-            std::fs::write(dir.join("domain-type-signals.json"), DOMAIN_TYPE_SIGNALS_STALE_HASH)
+            std::fs::write(dir.join("domain-type-signals.json"), domain_type_signals_stale_hash())
                 .unwrap();
         })
     }
@@ -1547,16 +1555,24 @@ mod tests {
         assert!(outcome.has_errors(), "missing signal file must block merge gate: {outcome:?}");
     }
 
-    const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
-  "schema_version": 4,
-  "generated_at": "2026-04-18T12:00:00Z",
-  "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "head_commit": "0000000000000000000000000000000000000000",
-  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "signals": [
-    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
-  ]
-}"#;
+    fn domain_type_signals_stale_hash() -> String {
+        let mut document = serde_json::json!({
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": "0".repeat(64),
+            "head_commit": "0".repeat(40),
+            "baseline_hash": "0".repeat(64),
+            "signals": [{
+                "type_name": "TrackId",
+                "namespace": "type",
+                "kind_tag": "value_object",
+                "signal": "blue",
+                "found_type": true
+            }],
+        });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut document);
+        serde_json::to_string_pretty(&document).unwrap()
+    }
 
     #[test]
     fn test_signal_file_stale_hash_returns_error_in_both_modes() {
@@ -1771,24 +1787,26 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
-        let blue_signal_file = format!(
-            r#"{{
-              "schema_version": 4,
-              "generated_at": "2026-04-18T12:00:00Z",
-              "declaration_hash": "{digest}",
-              "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-              "baseline_hash": "{baseline_digest}",
-              "signals": [
-                {{
-                  "type_name": "TrackId",
-                  "kind_tag": "value_object",
-                  "signal": "blue",
-                  "found_type": true
-                }}
-              ]
-            }}"#,
-        );
-        std::fs::write(dir.path().join("domain-type-signals.json"), blue_signal_file).unwrap();
+        let mut blue_signal_file = serde_json::json!({
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": digest,
+            "head_commit": "a".repeat(40),
+            "baseline_hash": baseline_digest,
+            "signals": [{
+                "type_name": "TrackId",
+                "namespace": "type",
+                "kind_tag": "value_object",
+                "signal": "blue",
+                "found_type": true
+            }],
+        });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut blue_signal_file);
+        std::fs::write(
+            dir.path().join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&blue_signal_file).unwrap(),
+        )
+        .unwrap();
 
         let outcome = verify_type_signals_from_spec_json(
             spec_json_path.clone(),
@@ -1901,11 +1919,22 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
-        // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
-        // (deny_unknown_fields; missing fields fail decoding).
-        format!(
-            r#"{{"schema_version":4,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{declaration_hash}","head_commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","baseline_hash":"{baseline_hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
-        )
+        let mut document = serde_json::json!({
+            "schema_version": domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            "generated_at": "2026-01-01T00:00:00Z",
+            "declaration_hash": declaration_hash,
+            "head_commit": "a".repeat(40),
+            "baseline_hash": baseline_hash,
+            "signals": [{
+                "type_name": "Foo",
+                "namespace": "type",
+                "kind_tag": "value_object",
+                "signal": signal,
+                "found_type": true
+            }],
+        });
+        crate::tddd::type_signals_codec::merge_fixture_reuse_identity(&mut document);
+        serde_json::to_string(&document).unwrap()
     }
 
     /// Set up a minimal git repo containing catalogue + type-signals files.

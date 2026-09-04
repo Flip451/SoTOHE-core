@@ -180,6 +180,12 @@ fn render_gate_error(e: PreReviewGateError) -> String {
         PreReviewGateError::TaskContractReadFailed { .. } => {
             "failed to read task-contract.json".to_owned()
         }
+        PreReviewGateError::CatalogueReadFailed { layer, .. } => {
+            format!("failed to read catalogue for layer '{layer}'")
+        }
+        PreReviewGateError::CatalogueFreshnessMismatch { layer, .. } => {
+            format!("catalogue freshness mismatch for layer '{layer}'")
+        }
         PreReviewGateError::SignalReadFailed { layer, .. } => {
             format!("failed to read type-signals for layer '{layer}'")
         }
@@ -311,6 +317,7 @@ mod tests {
 
     use super::{
         TaskContractDriver, TaskContractInput, render_check_violations, render_coverage_violations,
+        render_gate_error,
     };
 
     struct FixedCheckService {
@@ -432,6 +439,22 @@ mod tests {
 
         assert!(check.contains("cli_driver / PhaseCommandDriver"));
         assert!(coverage.contains("missing catalogue entry"));
+    }
+
+    #[test]
+    fn test_render_catalogue_gate_errors_preserves_their_categories() {
+        let layer = LayerId::try_new("domain".to_owned()).expect("test layer");
+        let read_error = render_gate_error(PreReviewGateError::CatalogueReadFailed {
+            layer: layer.clone(),
+            message: FreeText::new("permission denied"),
+        });
+        let freshness_error = render_gate_error(PreReviewGateError::CatalogueFreshnessMismatch {
+            layer,
+            message: FreeText::new("hash mismatch"),
+        });
+
+        assert_eq!(read_error, "failed to read catalogue for layer 'domain'");
+        assert_eq!(freshness_error, "catalogue freshness mismatch for layer 'domain'");
     }
 
     #[test]

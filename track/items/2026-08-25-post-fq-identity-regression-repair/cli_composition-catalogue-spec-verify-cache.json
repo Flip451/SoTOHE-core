@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "claim_hash": "748feef21d622dd2dd724b130a214d44ed318b11278777a4dd8b91008d3195cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_composition::task_contract::TaskContractCompositionRoot",
+          "file_path": "track/items/2026-08-25-post-fq-identity-regression-repair/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3a2a2f5f4d2ed2c24819e24b0a77856bb7f4dd1930641819f8f9df32cea807c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。同名の catalogue type と trait の type-signal row は相互に status を混入させないこと。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase 2 の three-way report と、そこから構築される永続化 type-signal row において、namespace を必須に持つ catalogue type/trait item と、report label を保持する function/trait-impl signal を区別し、双方を保持すること。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

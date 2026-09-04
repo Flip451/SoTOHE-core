@@ -102,6 +102,7 @@ pub trait SignalEvaluatorPort: Send + Sync {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+    use crate::FreeText;
     use crate::tddd::signal_evaluator::region::{SignalRegion, ThreeWaySignal};
     use rustdoc_types::{Crate, FORMAT_VERSION};
     use std::collections::{BTreeMap, HashMap};
@@ -161,7 +162,7 @@ mod tests {
             _b: Crate,
             _c: Crate,
         ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-            let signal = ThreeWaySignal::new(self.item.clone(), self.region);
+            let signal = ThreeWaySignal::label(FreeText::new(self.item.clone()), self.region);
             Ok(ThreeWayEvaluationReport::new(vec![signal]))
         }
     }

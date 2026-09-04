@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-28-cross-crate-add-declaration-resolution",
+  "entries": {
+    "T005": [
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsExecutorPort"
+      }
+    ],
+    "T006": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueToExtendedCratePort"
+      }
+    ],
+    "T007": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec"
+      }
+    ],
+    "T008": [
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T009": [
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ],
+    "T010": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "CargoProfileName"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ExpectedRustdocJsonPath"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ImplementationFingerprint"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ResolutionFingerprint"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ResolvedCargoTargetDirectory"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocExecutionIdentity"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocExecutionIdentityError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+      }
+    ],
+    "T011": [
+      {
+        "layer": "domain",
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocCratePort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "CapturedRustdocJson"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocJsonHash"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocSnapshot"
+      }
+    ],
+    "T012": [
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlan"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+      }
+    ],
+    "T013": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      }
+    ],
+    "T014": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T015": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ],
+    "T016": [
+      {
+        "layer": "domain",
+        "entry_key": "SchemaExporter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SchemaExporterPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::schema_export::RustdocSchemaExporter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      }
+    ],
+    "T017": [
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T018": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T019": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T020": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::EvaluateSignalsError"
+      }
+    ],
+    "T021": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_codec::TypeSignalsCodecError"
+      }
+    ],
+    "T022": [
+      {
+        "layer": "domain",
+        "entry_key": "AttestedRustdocSnapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "RustdocCratePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCapturePort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCaptureError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T023": [
+      {
+        "layer": "domain",
+        "entry_key": "AuthoritativeRustdocContext"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlan"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlanValidationError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::service::CatalogueImplSignalsError"
+      }
+    ],
+    "T024": [
+      {
+        "layer": "usecase",
+        "entry_key": "RustdocExportPlan"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "usecase::catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"
+      }
+    ],
+    "T025": [
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluationStartCapturePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter"
+      }
+    ]
+  }
+}

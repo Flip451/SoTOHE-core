@@ -1,0 +1,126 @@
+{
+  "catalogue_declaration_hash": "81ab26ed22feb9326fc01f09db2447ecf89d80de54a2bf52fcaa2d63e0d7c46b",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "8bc7823dfe4cfba5f2fefaee633efd4a763b42dd448188fd43b02224c355a3d4",
+      "signal": "blue",
+      "type_name": "AttestedRustdocSnapshot"
+    },
+    {
+      "entry_hash": "e74004b53b2a36edfe9525785cb23ba5a79cb0fe67dde2b1ff95764e88faffe6",
+      "signal": "blue",
+      "type_name": "AuthoritativeRustdocContext"
+    },
+    {
+      "entry_hash": "75c59fa9460ce25fa223095f1d2a27e303fefda0d0f1f8cfd0732ce575310357",
+      "signal": "blue",
+      "type_name": "CapturedRustdocJson"
+    },
+    {
+      "entry_hash": "ffc5c86625e2458e9e310bc127c8cd83ddf1eaa81f31d123bf48622f99f75586",
+      "signal": "blue",
+      "type_name": "CargoProfileName"
+    },
+    {
+      "entry_hash": "ff147ab0836f0da0452dc96b629d54b37fe90ea1b8e5a36af67f2ff7ff811f01",
+      "signal": "blue",
+      "type_name": "ExpectedRustdocJsonPath"
+    },
+    {
+      "entry_hash": "e49645a0b7af6bab615273f26484d61407f753493f66e8906f31c6c99d4d41cf",
+      "signal": "blue",
+      "type_name": "ImplementationFingerprint"
+    },
+    {
+      "entry_hash": "e255d055c8897ed37f1b12293ef56a3f67926e767a4bc07340ce29038aa44734",
+      "signal": "blue",
+      "type_name": "ResolutionFingerprint"
+    },
+    {
+      "entry_hash": "4b53f05efea81d6d162201e3215916852787a842e81c34822ce3786d2f04771c",
+      "signal": "blue",
+      "type_name": "ResolvedCargoTargetDirectory"
+    },
+    {
+      "entry_hash": "55cb81374d7c650c98b17067e5478b7cc8e146fc4862596b10af489435acc314",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentity"
+    },
+    {
+      "entry_hash": "aff2cc3ce47ad64a69a699f87c91e2bb963765be91f46fd98cc35f74fc5c0015",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentityError"
+    },
+    {
+      "entry_hash": "645df650dcf65013cbdfc36104fb63ea4246785958cff9cdd5f8a33f9d27d52b",
+      "signal": "blue",
+      "type_name": "RustdocJsonHash"
+    },
+    {
+      "entry_hash": "574a5dcf3590dc7b20fd87d1db16224ef475f9cfb867789c38fe8ad23e367d34",
+      "signal": "blue",
+      "type_name": "RustdocSnapshot"
+    },
+    {
+      "entry_hash": "5fbfce206a6f2892d2eebc44ddbbe97e29c8493a5c89c1750786bfcd48425f00",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+    },
+    {
+      "entry_hash": "2b793f533a39ad1dc83951d2351538e76b0b295d71c29401a0f9c4396b07922f",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+    },
+    {
+      "entry_hash": "b83aa54376d10cb61e3b9416bf997f7784b0a5e2dfe1418257bd36a9cc39a55c",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+    },
+    {
+      "entry_hash": "35a05b40e88603d832afb909f4e5a092a44d236bc39a8009884acdc9cd6e18f1",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+    },
+    {
+      "entry_hash": "7b350ee769a1ee850dc1631a7619900fc0a4c71657970564741192ad7b88b548",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+    },
+    {
+      "entry_hash": "0f31693efdbe094f43f330a251ef7fedd08c145302a63c0a9fa2dc8f121a5370",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "entry_hash": "6423dafbee7793767039f2948aca4736e1ade5b27f3b6c80bb15bbbe3d7dd0b8",
+      "signal": "blue",
+      "type_name": "RustdocCratePort"
+    },
+    {
+      "entry_hash": "ae0b7cfe19c8bd503e9b985e4f6f8d2cc4ef9f512ce4dd1de2f31cdf95001f59",
+      "signal": "blue",
+      "type_name": "SchemaExporter"
+    },
+    {
+      "entry_hash": "cf70ef0f3b7d57ff60a6475535fc9b5f288ed4fdcaa40021c5da3c8a61d818ea",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
+    },
+    {
+      "entry_hash": "c1e9a8309ab00af15b63672ec4c6c1c07cc85fd23886f5402b28e23da7d04a8d",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+    },
+    {
+      "entry_hash": "bb4a3e710acbd0a019f20437643de7d7271f3d4c5c86464119edfa77f90e1151",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+    },
+    {
+      "entry_hash": "679dcfe2ed12f5a097f9e229b21f725b8622cfe56ff9704b28c88704b1085e93",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+    }
+  ]
+}

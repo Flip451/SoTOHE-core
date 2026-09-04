@@ -29,8 +29,10 @@ pub(super) struct TombstoneDto {
     /// Always `"delete"`; the discriminator the decoder peeks. Kept as a field so
     /// the entry stays self-describing and round-trips byte-for-byte.
     pub(super) action: String,
-    /// Crate-relative module path of the removed item. Empty for a crate-root
-    /// item or a function (whose module is embedded in the map key).
+    /// Crate-relative module path of the removed item. `.` denotes an explicit
+    /// crate-root placement; an omitted value preserves placement-unspecified
+    /// type/trait tombstones, while functions always omit it because their
+    /// module is embedded in the map key.
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub(super) module_path: String,
     /// Formal spec grounds for the deletion.

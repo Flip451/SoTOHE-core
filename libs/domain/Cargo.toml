@@ -12,6 +12,7 @@ workspace = true
 chrono = { workspace = true }
 globset = { workspace = true }
 rustdoc-types = "0.57"
+sha2 = "0.10.9"
 strum = { workspace = true }
 thiserror = { workspace = true }
 unicode-ident = { workspace = true }

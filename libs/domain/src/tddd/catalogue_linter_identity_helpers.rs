@@ -17,7 +17,7 @@ pub(super) fn root_path_occurrence<E: TypeRefPathExtractorPort>(
         .extract(type_ref, type_parameters, &[], &[])?
         .into_iter()
         .find_map(|occurrence| match occurrence {
-            ExtractedTypeRefPath::Path(path) => Some(path),
+            ExtractedTypeRefPath::Path { type_ref: path, .. } => Some(path),
             ExtractedTypeRefPath::TypeParameter(_)
             | ExtractedTypeRefPath::LifetimeParameter(_)
             | ExtractedTypeRefPath::ConstParameter(_)
@@ -37,7 +37,7 @@ pub(super) fn root_path_occurrence<E: TypeRefPathExtractorPort>(
 /// not a Rust type parser: it only verifies that the root path is followed by
 /// one balanced generic argument list, keeping the catalogue-lint identity
 /// check separate from syntax extraction and type-grammar interpretation.
-fn root_path_is_anchored(
+pub(super) fn root_path_is_anchored(
     type_ref: &TypeRef,
     canonical_path: &TypeRef,
 ) -> Result<bool, CatalogueLinterError> {
@@ -351,7 +351,7 @@ fn consume_path_segment(raw: &mut &str, canonical_segment: &str) -> bool {
     true
 }
 
-fn classification_failed(type_ref: &TypeRef) -> CatalogueLinterError {
+pub(super) fn classification_failed(type_ref: &TypeRef) -> CatalogueLinterError {
     CatalogueLinterError::IdentityResolutionFailed(
         CatalogueIdentityResolutionError::ClassificationFailed { location: type_ref.clone() },
     )

@@ -1,0 +1,299 @@
+{
+  "baseline_hash": "aa424f1607015bd507cff41afdfb49ef7f490d2f0e9ffe4b55528b0f4da4716a",
+  "declaration_hash": "81ab26ed22feb9326fc01f09db2447ecf89d80de54a2bf52fcaa2d63e0d7c46b",
+  "generated_at": "2026-09-02T19:12:10Z",
+  "head_commit": "0dad944386b26bfb684b32db33eca6976f6d5c33",
+  "implementation_fingerprint": "a083a3ee847d76020013ce422108173ced7b91931181ecb4a97899be9cca58d1",
+  "resolution_fingerprint": "5a31bb99af3b80a0c6979b395b9dfa4dace08b5a9529b4133e597439fb028d00",
+  "rustdoc_execution_identity": {
+    "crate_name": "domain",
+    "expected_json_path": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5/doc/domain.json",
+    "features": [],
+    "profile": "dev",
+    "target_directory": "target/.sotp-rustdoc/d4fa7482fd398f7e131751de05960b59d268e4087b79d714c3bbe4d681faadd5"
+  },
+  "schema_version": 6,
+  "signals": [
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "AuthoritativeRustdocContext"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "CatalogueToExtendedCratePort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "RustdocCratePort"
+    },
+    {
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePortError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "AttestedRustdocSnapshot"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CapturedRustdocJson"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "CargoProfileName"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ExpectedRustdocJsonPath"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ImplementationFingerprint"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ResolutionFingerprint"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "ResolvedCargoTargetDirectory"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentity"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocExecutionIdentityError"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocJsonHash"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "RustdocSnapshot"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsCacheKey"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsDocument"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseDecision"
+    },
+    {
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "namespace": "type",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::TypeSignalsReuseInput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_attested_rustdoc_snapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_captured_rustdoc_json"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::construct_rustdoc_snapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "namespace": null,
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "namespace": "trait",
+      "signal": "blue",
+      "type_name": "SchemaExporter"
+    }
+  ]
+}

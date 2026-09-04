@@ -1,9 +1,9 @@
 //! `SpecDocumentLoaderPort` — domain loader port for the persisted `spec.json`.
 //!
 //! Placed in the domain per `type-designer-kind-selection.md` R1's persistence-/aggregate-port
-//! bucket, symmetric with `CatalogueDocumentLoaderPort` and the `TrackReader` /
-//! `WorktreeReader` family — not the application-service port bucket. Its error
-//! type [`SpecDocumentLoadError`] lives here too.
+//! bucket, symmetric with the `TrackReader` / `WorktreeReader` family — not the
+//! application-service port bucket. Its error type [`SpecDocumentLoadError`]
+//! lives here too.
 
 use std::path::{Path, PathBuf};
 
@@ -59,8 +59,7 @@ pub enum SpecDocumentLoadError {
 /// Loader port for the persisted domain document `spec.json`.
 ///
 /// Placed in the domain per `type-designer-kind-selection.md` R1's
-/// persistence-/aggregate-port bucket (symmetric with `CatalogueDocumentLoaderPort` at
-/// `tddd::catalogue_v2::catalogue_impl_signals_ports` and with the `TrackReader` /
+/// persistence-/aggregate-port bucket (symmetric with the `TrackReader` /
 /// `WorktreeReader` family), not the application-service port bucket. Unlike the
 /// minimal [`SpecFileLoaderPort`](crate::SpecFileLoaderPort) which returns raw
 /// text, this port returns a fully deserialized [`SpecDocument`] so callers can

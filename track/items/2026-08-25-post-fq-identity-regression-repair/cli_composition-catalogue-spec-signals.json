@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "2212cb68dc1c5fedcb15792340fe756196ffe299368cb73fd4a51225436ea9b4",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "748feef21d622dd2dd724b130a214d44ed318b11278777a4dd8b91008d3195cf",
+      "signal": "blue",
+      "type_name": "cli_composition::task_contract::TaskContractCompositionRoot"
+    }
+  ]
+}

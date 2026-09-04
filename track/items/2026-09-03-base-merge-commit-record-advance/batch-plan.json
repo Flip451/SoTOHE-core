@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-09-03-base-merge-commit-record-advance",
+  "task_estimates": [
+    {
+      "task_id": "T1",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 30,
+          "test_lines": 70
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 15
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 0,
+          "test_lines": 15
+        },
+        {
+          "scope": "cli_composition",
+          "production_lines": 8,
+          "test_lines": 6
+        }
+      ]
+    },
+    {
+      "task_id": "T2",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 12,
+          "test_lines": 0
+        }
+      ]
+    }
+  ],
+  "batches": [
+    {
+      "id": "BATCH-001",
+      "task_ids": [
+        "T1",
+        "T2"
+      ]
+    }
+  ]
+}

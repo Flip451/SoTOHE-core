@@ -149,6 +149,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [親が reference / delete のとき子 Method の spec_refs を禁止する](2026-08-18-0040-parent-forbids-method-spec-refs.md) | Proposed | 2026-08-18 |
 | [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 | [型シグナル評価の型識別を完全修飾パスで行う](2026-08-21-0055-type-identity-fully-qualified-paths.md) | Proposed | 2026-08-21 |
+| [参照先 crate の add 宣言を解決集合に加える](2026-08-28-1034-cross-crate-add-declaration-resolution.md) | Proposed | 2026-08-28 |
+| [型シグナルの rustdoc 再利用と実行環境を拘束する](2026-08-29-1803-type-signals-rustdoc-reuse-and-environment-contracts.md) | Accepted | 2026-08-29 |
+| [評価開始時の authoritative input 捕捉に時間上限を設ける](2026-09-02-0000-evaluation-start-capture-time-bounds.md) | Accepted | 2026-09-02 |
 | [カタログ型参照の静的検査と実装突合の責務を分離する](2026-08-23-0000-catalogue-lint-chain3-responsibility-boundary.md) | Proposed | 2026-08-23 |
 | [rustdoc 子アイテムの除外は番兵 id ではなく kind で判定する](2026-09-04-0049-rustdoc-child-exclusion-by-kind.md) | Proposed | 2026-09-04 |
 
@@ -293,6 +296,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
 | [ワークフロー副産物によるディスク衛生の修繕 — scope diff の untracked ディレクトリ計測失敗と template export テストの /tmp scaffold リーク](2026-08-02-0643-workflow-byproduct-disk-hygiene.md) | Proposed | 2026-08-02 |
 | [template export 統合テストの source fixture 隔離配置](2026-08-14-0442-template-export-test-source-fixture-placement.md) | Proposed | 2026-08-14 |
+| [ゲートの標準出力をサマリ契約にする](2026-08-25-0425-gate-output-summary-contract.md) | Proposed | 2026-08-25 |
+| [ゲートログ名の実現可能性は永続化境界が担う](2026-08-29-1030-gate-log-name-feasibility.md) | Proposed | 2026-08-29 |
 
 ### DRY / リファクタ
 

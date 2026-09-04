@@ -14,7 +14,7 @@ use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use thiserror::Error;
 
-use super::path_resolution::resolve_target_dir;
+use super::RustdocCaptureError;
 
 const MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 const MAX_SCHEMA_EXPORT_COMMAND_DURATION: Duration = Duration::from_secs(120);
@@ -102,6 +102,18 @@ impl RustdocTargetResolution {
     pub fn target_kind(&self) -> RustdocTargetKind {
         self.target_kind
     }
+
+    /// Canonicalizes a rustdoc path under the package root used by catalogue
+    /// identities. Binary targets emit their target name as the path root;
+    /// the translation is delegated to the shared identity canonicalizer.
+    #[must_use]
+    pub(crate) fn canonicalize_rustdoc_path(&self, path: &[String]) -> Vec<String> {
+        crate::tddd::canonical_type_identity::canonicalize_rustdoc_root_path(
+            path,
+            &self.package_name,
+            Some(&self.rustdoc_root_name),
+        )
+    }
 }
 
 /// Failure while resolving a package's Cargo target and rustdoc root.
@@ -187,21 +199,33 @@ pub fn resolve_rustdoc_root_name(
 pub(super) fn run_rustdoc(
     workspace_root: &Path,
     crate_name: &str,
-) -> Result<PathBuf, SchemaExportError> {
+    target_directory: &Path,
+) -> Result<PathBuf, RustdocCaptureError> {
     let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
-        SchemaExportError::RustdocFailed(format!(
+        RustdocCaptureError::AuthoritativeInput(SchemaExportError::RustdocFailed(format!(
             "invalid catalogue crate name `{crate_name}`: {error}"
-        ))
+        )))
     })?;
-    run_rustdoc_for_package(workspace_root, &package_name, RustdocFeatureSelection::Legacy)
+    run_rustdoc_for_package(
+        workspace_root,
+        &package_name,
+        RustdocFeatureSelection::Legacy,
+        target_directory,
+    )
 }
 
 pub(super) fn run_rustdoc_with_features(
     workspace_root: &Path,
     crate_name: &CrateName,
     features: &[CargoFeatureName],
-) -> Result<PathBuf, SchemaExportError> {
-    run_rustdoc_for_package(workspace_root, crate_name, RustdocFeatureSelection::Declared(features))
+    target_directory: &Path,
+) -> Result<PathBuf, RustdocCaptureError> {
+    run_rustdoc_for_package(
+        workspace_root,
+        crate_name,
+        RustdocFeatureSelection::Declared(features),
+        target_directory,
+    )
 }
 
 #[derive(Clone, Copy)]
@@ -214,10 +238,11 @@ fn run_rustdoc_for_package(
     workspace_root: &Path,
     package_name: &CrateName,
     feature_selection: RustdocFeatureSelection<'_>,
-) -> Result<PathBuf, SchemaExportError> {
+    target_directory: &Path,
+) -> Result<PathBuf, RustdocCaptureError> {
     let crate_name = package_name.as_str();
-    let resolution =
-        resolve_rustdoc_root_name(workspace_root, package_name).map_err(schema_export_error)?;
+    let resolution = resolve_rustdoc_root_name(workspace_root, package_name)
+        .map_err(|error| RustdocCaptureError::AuthoritativeInput(schema_export_error(error)))?;
     let args = match resolution.target_kind() {
         RustdocTargetKind::Library => build_rustdoc_args(crate_name, &["--lib"], feature_selection),
         RustdocTargetKind::Binary => build_rustdoc_args(
@@ -227,34 +252,37 @@ fn run_rustdoc_for_package(
         ),
     };
     let mut command = Command::new("cargo");
-    command.args(args).current_dir(workspace_root);
+    command.args(args).current_dir(workspace_root).env("CARGO_TARGET_DIR", target_directory);
     let output = crate::capability_exec::process::run_command_with_bounded_output(
         &mut command,
         MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES,
         MAX_SCHEMA_EXPORT_COMMAND_DURATION,
         "cargo rustdoc",
     )
-    .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+    .map_err(|error| {
+        RustdocCaptureError::CaptureFailed(SchemaExportError::RustdocFailed(error.to_string()))
+    })?;
     if !output.status.success() {
-        return Err(SchemaExportError::RustdocFailed(format!(
+        return Err(RustdocCaptureError::CaptureFailed(SchemaExportError::RustdocFailed(format!(
             "cargo rustdoc for package `{crate_name}` target `{}` failed: {}",
             resolution.target_name().as_str(),
             String::from_utf8_lossy(&output.stderr)
-        )));
+        ))));
     }
 
-    let target_dir = resolve_target_dir(workspace_root)?;
-    let path =
-        target_dir.join("doc").join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
-    super::ensure_rustdoc_json_path_safe(&target_dir, &path, "cargo rustdoc")?;
+    let path = target_directory
+        .join("doc")
+        .join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
+    super::ensure_rustdoc_json_path_safe(target_directory, &path, "cargo rustdoc")
+        .map_err(RustdocCaptureError::AuthoritativeInput)?;
     if path.is_file() {
         Ok(path)
     } else {
-        Err(SchemaExportError::RustdocFailed(format!(
+        Err(RustdocCaptureError::AuthoritativeInput(SchemaExportError::RustdocFailed(format!(
             "expected rustdoc JSON for target `{}` at {} but file not found",
             resolution.target_name().as_str(),
             path.display()
-        )))
+        ))))
     }
 }
 
@@ -592,5 +620,65 @@ mod tests {
         let error = target_resolution_from_package(&package, &package_name()).unwrap_err();
 
         assert!(matches!(error, RustdocRootResolutionError::InvalidTargetName(_)));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_rustdoc_unsafe_output_restored_returns_authoritative_input() {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            let workspace = tempfile::tempdir().unwrap();
+            let commands = workspace.path().join("commands");
+            std::fs::create_dir_all(&commands).unwrap();
+            let cargo = commands.join("cargo");
+            std::fs::write(
+                &cargo,
+                r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+  printf '%s\n' '{"packages":[{"name":"catalogue_package","targets":[{"kind":["lib"],"name":"catalogue_package"}]}]}'
+fi
+exit 0
+"#,
+            )
+            .unwrap();
+            std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+            let target_directory = workspace.path().join(".sotp-rustdoc/selection");
+            std::fs::create_dir_all(&target_directory).unwrap();
+            let outside = workspace.path().join("outside");
+            std::fs::create_dir(&outside).unwrap();
+            let doc = target_directory.join("doc");
+            std::os::unix::fs::symlink(&outside, &doc).unwrap();
+
+            let mut path_entries = vec![commands];
+            path_entries
+                .extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+            let path = std::env::join_paths(path_entries).unwrap();
+
+            temp_env::with_vars([("PATH", Some(path.as_os_str()))], || {
+                let error = run_rustdoc_with_features(
+                    workspace.path(),
+                    &package_name(),
+                    &[],
+                    &target_directory,
+                )
+                .unwrap_err();
+
+                assert!(
+                    matches!(&error, RustdocCaptureError::AuthoritativeInput(_)),
+                    "unsafe rustdoc output must be classified as authoritative-input failure: {error:?}"
+                );
+
+                std::fs::remove_file(&doc).unwrap();
+                std::fs::create_dir(&doc).unwrap();
+                std::fs::write(doc.join("catalogue_package.json"), b"restored").unwrap();
+
+                assert!(
+                    matches!(&error, RustdocCaptureError::AuthoritativeInput(_)),
+                    "restoring a regular output under the exclusive target must not reclassify the captured error: {error:?}"
+                );
+            });
+        });
     }
 }

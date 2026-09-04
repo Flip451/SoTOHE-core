@@ -737,7 +737,8 @@ fn setup_type_signal_workspace()
     let track_dir = root.join("track/items").join(track_id);
     std::fs::create_dir_all(root.join("libs/domain/src")).unwrap();
     std::fs::create_dir_all(root.join("libs/usecase/src")).unwrap();
-    std::fs::create_dir_all(root.join("target/doc")).unwrap();
+    let rustdoc_target = root.join(".sotp-rustdoc/fixture");
+    std::fs::create_dir_all(rustdoc_target.join("doc")).unwrap();
     std::fs::write(
         root.join("Cargo.toml"),
         "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\nresolver = \"2\"\n",
@@ -770,8 +771,8 @@ fn setup_type_signal_workspace()
         "{\n  \"schema_version\": 5,\n  \"crate_name\": \"usecase\",\n  \"layer\": \"usecase\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
     )
     .unwrap();
-    let domain_rustdoc_json_path = root.join("target/doc/domain.json");
-    let usecase_rustdoc_json_path = root.join("target/doc/usecase.json");
+    let domain_rustdoc_json_path = rustdoc_target.join("doc/domain.json");
+    let usecase_rustdoc_json_path = rustdoc_target.join("doc/usecase.json");
     let rustdoc_json = minimal_rustdoc_json();
     std::fs::write(&domain_rustdoc_json_path, &rustdoc_json).unwrap();
     std::fs::write(&usecase_rustdoc_json_path, &rustdoc_json).unwrap();

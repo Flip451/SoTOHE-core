@@ -14,9 +14,11 @@ use domain::schema::SchemaExportError;
 
 use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
+use crate::tddd::tddd_catalogue_document_loader::read_optional_regular_file_bytes;
 use crate::track::atomic_write::atomic_write_file;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::TdddLayerBinding;
+use domain::tddd::catalogue_v2::CrateName;
 
 /// Error type returned by capture functions so the CLI can map to `CliError::Message`.
 #[derive(Debug)]
@@ -98,16 +100,23 @@ pub fn capture_rustdoc_baseline_for_layer(
     reject_symlinks_below(&baseline_path, items_dir)
         .map_err(|e| err(format!("symlink guard: {e}")))?;
 
-    // Idempotent: skip if baseline already exists as a regular file.
+    // Idempotent: skip if baseline already exists as a regular file. Read it
+    // through the bounded no-follow adapter so the idempotency branch has the
+    // same 64 MiB allocation limit and race-resistant file boundary as a new
+    // capture.
     // Validate the existing file's `format_version` to detect legacy `TypeBaseline`
     // JSON files left over from before the rustdoc migration. Such files will fail
     // `BaselineRustdocCodec::load` at signal-evaluation time, leaving the track
     // stuck. Surface a clear error here instead so the user knows to delete the
     // stale file and re-run.
-    if baseline_path.is_file() {
-        let existing = std::fs::read_to_string(&baseline_path).map_err(|e| {
-            err(format!("cannot read existing baseline at {}: {e}", baseline_path.display()))
-        })?;
+    if let Some(existing_bytes) =
+        read_optional_regular_file_bytes(&baseline_path, Some(items_dir), 64 * 1024 * 1024)
+            .map_err(|e| {
+                err(format!("cannot read existing baseline at {}: {e}", baseline_path.display()))
+            })?
+    {
+        let existing = String::from_utf8(existing_bytes)
+            .map_err(|e| err(format!("existing baseline is not UTF-8: {e}")))?;
         if let Err(e) = BaselineRustdocCodec::from_json(&existing) {
             return Err(err(format!(
                 "{}: existing baseline failed rustdoc format validation: {e}. \
@@ -148,8 +157,10 @@ pub fn capture_rustdoc_baseline_for_layer(
     };
 
     // Run cargo +nightly rustdoc and get the output JSON path.
+    let target_crate = CrateName::new(target_crate.to_owned())
+        .map_err(|e| err(format!("invalid schema-export target for layer '{layer_id}': {e}")))?;
     let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    let json_path = exporter.export_rustdoc_json_path(target_crate).map_err(|e| {
+    let (_, json_bytes) = exporter.capture_rustdoc_json_legacy(&target_crate).map_err(|e| {
         let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
             " (install with: rustup toolchain install nightly)".to_owned()
         } else {
@@ -158,9 +169,9 @@ pub fn capture_rustdoc_baseline_for_layer(
         err(format!("failed to export rustdoc JSON: {e}{hint}"))
     })?;
 
-    // Read the raw rustdoc JSON and validate format_version before writing.
-    let json_content = std::fs::read_to_string(&json_path)
-        .map_err(|e| err(format!("cannot read rustdoc JSON at {}: {e}", json_path.display())))?;
+    // Validate the immutable bytes returned from the locked capture before writing.
+    let json_content = String::from_utf8(json_bytes)
+        .map_err(|e| err(format!("rustdoc JSON is not UTF-8: {e}")))?;
 
     // Validate format_version before persisting: reject JSON produced by a
     // mismatched nightly toolchain rather than silently writing an unusable

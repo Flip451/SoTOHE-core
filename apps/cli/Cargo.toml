@@ -22,6 +22,7 @@ rstest = { workspace = true }
 rustdoc-types = "0.57"
 temp-env = "0.3"
 tempfile = "3.27.0"
+toml = { workspace = true }
 usecase = { path = "../../libs/usecase" }
 
 [dependencies]

@@ -9,7 +9,8 @@ use domain::tddd::ContractMapRendererError;
 use domain::tddd::catalogue_v2::Identifier;
 use domain::tddd::catalogue_v2::identity_resolution::resolve_catalogue_identity;
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CatalogueEntryKey, CrateName, FullyQualifiedItemPath, ModulePath, TypeRef,
+    CatalogueDocument, CatalogueEntryKey, CatalogueItemNamespace, CrateName,
+    FullyQualifiedItemPath, ModulePath, TypeRef,
 };
 use syn::visit::Visit;
 
@@ -37,7 +38,8 @@ impl NodeIndex {
     }
 
     /// Inserts a synthetic root identity. This helper is retained for focused
-    /// renderer tests; production indexes use [`Self::insert_catalogue_entry`].
+    /// renderer tests; production indexes use
+    /// [`Self::insert_catalogue_entry_in_namespace`].
     #[cfg(test)]
     pub(crate) fn insert(&mut self, crate_name: &str, bare_name: &str, node_id: String) {
         let Ok(crate_name) = CrateName::new(crate_name.to_owned()) else {
@@ -53,6 +55,7 @@ impl NodeIndex {
     }
 
     /// Inserts a catalogue entry under its canonical identity.
+    #[cfg(test)]
     pub(crate) fn insert_catalogue_entry(
         &mut self,
         crate_name: &CrateName,
@@ -60,9 +63,34 @@ impl NodeIndex {
         module_path: &ModulePath,
         node_id: String,
     ) {
-        let Ok(identity) =
-            FullyQualifiedItemPath::from_catalogue_entry_key(crate_name, key, module_path)
-        else {
+        self.insert_catalogue_entry_in_namespace(
+            crate_name,
+            key,
+            Some(module_path),
+            CatalogueItemNamespace::Type,
+            node_id,
+        );
+    }
+
+    /// Inserts a catalogue entry while retaining its type/trait namespace and
+    /// omitted-placement state.
+    pub(crate) fn insert_catalogue_entry_in_namespace(
+        &mut self,
+        crate_name: &CrateName,
+        key: &CatalogueEntryKey,
+        module_path: Option<&ModulePath>,
+        namespace: CatalogueItemNamespace,
+        node_id: String,
+    ) {
+        let identity = match namespace {
+            CatalogueItemNamespace::Type => {
+                FullyQualifiedItemPath::from_type_catalogue_entry_key(crate_name, key, module_path)
+            }
+            CatalogueItemNamespace::Trait => {
+                FullyQualifiedItemPath::from_trait_catalogue_entry_key(crate_name, key, module_path)
+            }
+        };
+        let Ok(identity) = identity else {
             return;
         };
         self.insert_identity(identity, node_id);
@@ -232,10 +260,11 @@ pub(crate) fn build_trait_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
                 continue;
             }
             let rep_node_id = trait_rep_node_id(layer, crate_name.as_str(), trait_name.as_str());
-            index.insert_catalogue_entry(
+            index.insert_catalogue_entry_in_namespace(
                 crate_name,
                 trait_name,
                 trait_entry.module_path(),
+                CatalogueItemNamespace::Trait,
                 rep_node_id,
             );
         }
@@ -260,10 +289,11 @@ pub(crate) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
                 continue;
             }
             let rep_node_id = type_rep_node_id(layer, crate_name.as_str(), type_name.as_str());
-            index.insert_catalogue_entry(
+            index.insert_catalogue_entry_in_namespace(
                 crate_name,
                 type_name,
                 type_entry.module_path(),
+                CatalogueItemNamespace::Type,
                 rep_node_id,
             );
         }
@@ -274,7 +304,9 @@ pub(crate) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic)]
 mod tests {
-    use super::NodeIndex;
+    use super::{
+        CatalogueEntryKey, CatalogueItemNamespace, CrateName, FullyQualifiedItemPath, NodeIndex,
+    };
     use domain::tddd::ContractMapRendererError;
 
     #[test]
@@ -295,5 +327,31 @@ mod tests {
             assert!(reason.contains(nested_spelling), "diagnostic lost nested spelling: {reason}");
             assert!(reason.contains("crate 'domain'"), "diagnostic lost location: {reason}");
         }
+    }
+
+    #[test]
+    fn test_node_index_preserves_unplaced_catalogue_identity() {
+        let mut index = NodeIndex::new();
+        let crate_name = CrateName::new("domain".to_owned()).expect("valid crate");
+        let key = CatalogueEntryKey::try_new("Item".to_owned()).expect("valid key");
+        index.insert_catalogue_entry_in_namespace(
+            &crate_name,
+            &key,
+            None,
+            CatalogueItemNamespace::Type,
+            "item".to_owned(),
+        );
+
+        assert_eq!(index.resolve("Item", "domain").expect("lookup succeeds"), Some("item"));
+        assert_eq!(
+            index.resolve("domain::Item", "domain").expect("lookup succeeds"),
+            None,
+            "an omitted module path must not become a crate-root identity",
+        );
+        assert!(
+            index.universe.iter().any(|identity| {
+                matches!(identity, FullyQualifiedItemPath::UnplacedType { .. })
+            })
+        );
     }
 }

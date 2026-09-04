@@ -1,0 +1,558 @@
+{
+  "entries": [
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce9473d8ae278dcab8e08b4483a4222f92ca98cfe115845a9e2b8bf35a81210f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD as part of clean base-merge cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Advance the active track's commit record to merge-result HEAD as part of clean base-merge cleanup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3f30be12871a27a4525b77454f6ad385b236498affa83bf224c51d1867a040cd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "24e2538364d6b4a6316d8d96cd72f2dd4e7914807839db24d14cf01db5ee04f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "25fef487ab42eb665ccbda7aea88079548c9e521cb0208f344206a3135420378",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f1cbbe815dff93387d8ea862285cdbe42bfb651b72baf5bff0d4b1dae98c1927",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb4d763e4ef70197b67998cee96288e7e8f9ff07fdfa61dd14238073e94cfde9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::BaseMergeInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f6f34f4b5c89c89a4eff643345f7e1a2ba9adb1db87116b1e35f21245c5b8a52",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "The commit-record update rewrites only track state and does not create a Git commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The commit-record update rewrites only track state and does not create a Git commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "504b1ac57503514b14016a05439f1f9853644803526112d39d46b08c70d8e501",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::PostMergeCleanupError",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3f30be12871a27a4525b77454f6ad385b236498affa83bf224c51d1867a040cd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Commit-record advancement is part of merge cleanup's completion condition and must preserve the existing Baseline → Views ordering.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "504b1ac57503514b14016a05439f1f9853644803526112d39d46b08c70d8e501",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::PostMergeCleanupError",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "24e2538364d6b4a6316d8d96cd72f2dd4e7914807839db24d14cf01db5ee04f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "504b1ac57503514b14016a05439f1f9853644803526112d39d46b08c70d8e501",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::PostMergeCleanupError",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "25fef487ab42eb665ccbda7aea88079548c9e521cb0208f344206a3135420378",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "504b1ac57503514b14016a05439f1f9853644803526112d39d46b08c70d8e501",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::base_merge::PostMergeCleanupError",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f1cbbe815dff93387d8ea862285cdbe42bfb651b72baf5bff0d4b1dae98c1927",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "153642a0d27c065a55477d8f244bccac371dc7c01f22f807732305b434d82f74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::git_workflow::DiagnosticText",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "24e2538364d6b4a6316d8d96cd72f2dd4e7914807839db24d14cf01db5ee04f1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Failure of commit-record advancement is fail-closed: cleanup must not claim success while the required record is absent.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "153642a0d27c065a55477d8f244bccac371dc7c01f22f807732305b434d82f74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::git_workflow::DiagnosticText",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f1cbbe815dff93387d8ea862285cdbe42bfb651b72baf5bff0d4b1dae98c1927",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If the commit-record update fails, cleanup reports failure and does not report a partially completed cleanup as successful.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2c1b098812ebe9a6894885d7a73ecb754acd4c0d73e5ff152364dd408107dc72",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5b2186a8ab429988c63120e21b6a302dc8e415ab3f523a4557dba5a9b317c12f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2c1b098812ebe9a6894885d7a73ecb754acd4c0d73e5ff152364dd408107dc72",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b6be86a41a30127ee0463a5fc8ccd9eb22a0ecc688d25aa4d252d14be497f827",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2c1b098812ebe9a6894885d7a73ecb754acd4c0d73e5ff152364dd408107dc72",
+      "claim_origin": {
+        "data": {
+          "entry_key": "usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "31190f2e3ae31132e529d781f6513840fa3c7b9c93f65b3af0dddb1c78d02536",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5b2186a8ab429988c63120e21b6a302dc8e415ab3f523a4557dba5a9b317c12f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "31190f2e3ae31132e529d781f6513840fa3c7b9c93f65b3af0dddb1c78d02536",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "25fef487ab42eb665ccbda7aea88079548c9e521cb0208f344206a3135420378",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean base merge completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b6be86a41a30127ee0463a5fc8ccd9eb22a0ecc688d25aa4d252d14be497f827",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "535d9e73d96c62b547b6949559e20ad57b427a7ce0c4901cd08458ba44368d3d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f6f34f4b5c89c89a4eff643345f7e1a2ba9adb1db87116b1e35f21245c5b8a52",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "The commit-record update rewrites only track state and does not create a Git commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The commit-record update rewrites only track state and does not create a Git commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e909e0a80e591ded9dbb357b6ca002ed2e9cb1a081f404c2d6130f659a62b7a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSetCommitHashService",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5b2186a8ab429988c63120e21b6a302dc8e415ab3f523a4557dba5a9b317c12f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Advance the active track's commit record to merge-result HEAD when conflict recovery completes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e909e0a80e591ded9dbb357b6ca002ed2e9cb1a081f404c2d6130f659a62b7a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSetCommitHashService",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b6be86a41a30127ee0463a5fc8ccd9eb22a0ecc688d25aa4d252d14be497f827",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After conflict recovery completes, the merge-result HEAD is recorded as the active track's commit record through the existing commit-record update path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e909e0a80e591ded9dbb357b6ca002ed2e9cb1a081f404c2d6130f659a62b7a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSetCommitHashService",
+          "file_path": "track/items/2026-09-03-base-merge-commit-record-advance/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "31190f2e3ae31132e529d781f6513840fa3c7b9c93f65b3af0dddb1c78d02536",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Both clean-merge and conflict-recovery completion must use the existing commit-record update path to record the merge-result HEAD.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

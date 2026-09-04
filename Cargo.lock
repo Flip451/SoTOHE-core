@@ -872,6 +872,7 @@ dependencies = [
  "temp-env",
  "tempfile",
  "thiserror",
+ "toml",
  "usecase",
  "windows-sys 0.59.0",
 ]
@@ -2033,6 +2034,7 @@ dependencies = [
  "rstest",
  "rustdoc-types",
  "serde_json",
+ "sha2",
  "strum 0.27.2",
  "thiserror",
  "unicode-ident",

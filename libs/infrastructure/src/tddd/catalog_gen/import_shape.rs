@@ -63,8 +63,8 @@ pub(super) fn resolve_shape(
     let rustdoc_root = resolve_rustdoc_root_name(workspace_root, &package_name).map_err(|err| {
         port_error(format!("rustdoc root resolution for crate `{crate_name}` failed: {err}"))
     })?;
-    let type_info = select_type(&schema, rustdoc_root.rustdoc_root_name().as_str(), &module, &name)
-        .ok_or_else(|| {
+    let type_info =
+        select_type_for_resolution(&schema, &rustdoc_root, &module, &name).ok_or_else(|| {
             schema_error(format!(
                 "type `{type_path}` not found in crate `{crate_name}` at that exact module path"
             ))
@@ -187,6 +187,7 @@ pub(super) fn parse_type_path(type_path: &str) -> Result<(String, String, String
 /// suffix matching: a request that does not name the exact module resolves to
 /// `None` rather than an arbitrary same-named type elsewhere in the crate
 /// (which would otherwise let `foo::Order` collide with `bar_foo::Order`).
+#[cfg(test)]
 fn select_type<'a>(
     schema: &'a SchemaExport,
     rustdoc_root: &str,
@@ -196,6 +197,30 @@ fn select_type<'a>(
     let expected = expected_module_segments(rustdoc_root, module);
     schema.types().iter().find(|type_info| {
         type_info.name() == name && module_segments(type_info.module_path()) == expected
+    })
+}
+
+/// Selects a type after translating the rustdoc target root to the catalogue
+/// package root through the shared identity canonicalizer.
+pub(super) fn select_type_for_resolution<'a>(
+    schema: &'a SchemaExport,
+    resolution: &crate::schema_export::bin_target::RustdocTargetResolution,
+    module: &str,
+    name: &str,
+) -> Option<&'a TypeInfo> {
+    let rustdoc_root = resolution.rustdoc_root_name().as_str();
+    let expected = expected_module_segments(resolution.package_name().as_str(), module)
+        .into_iter()
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    schema.types().iter().find(|type_info| {
+        let actual = module_segments(type_info.module_path())
+            .into_iter()
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        type_info.name() == name
+            && actual.first().map(String::as_str) == Some(rustdoc_root)
+            && resolution.canonicalize_rustdoc_path(&actual) == expected
     })
 }
 

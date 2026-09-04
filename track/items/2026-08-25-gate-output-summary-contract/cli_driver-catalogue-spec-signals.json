@@ -1,0 +1,41 @@
+{
+  "catalogue_declaration_hash": "66138994a8983cc8eb80110c38d96549efe0ba043e3c2c8c009f26cc6dae595d",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "3ef5561808c07c3f38530e4182fe57a1fe07fd60a8df7e572863cc7535e7bfa2",
+      "signal": "blue",
+      "type_name": "GateOutputDriver"
+    },
+    {
+      "entry_hash": "03a847aa59c5a3fce2c2a9d99cbe3a0b21fa9aafdfbf7451b0d19d0e27a33923",
+      "signal": "blue",
+      "type_name": "GateOutputInput"
+    },
+    {
+      "entry_hash": "66ea06a5ed7760eb0de12b1897b5a996b2ac5e7d23ab18e64fbcd8fbdef8b9d1",
+      "signal": "blue",
+      "type_name": "cli_driver::render::CommandOutcome"
+    },
+    {
+      "entry_hash": "8d717125d44220ec8f43dfb3ce70f900680f1b08ca85aec44d243d6e1d6e8048",
+      "signal": "blue",
+      "type_name": "cli_driver::gate_output::failure_excerpts"
+    },
+    {
+      "entry_hash": "612049c1bbb0fbf3a28c89d85a850f1e210325922e0320b58ecee4f6a564aa46",
+      "signal": "blue",
+      "type_name": "cli_driver::gate_output::is_failure_line"
+    },
+    {
+      "entry_hash": "a02c538161ce349604aa6f4c567bfbbb20303c6a749797a891dfac9206faedb0",
+      "signal": "blue",
+      "type_name": "cli_driver::gate_output::render_summary"
+    },
+    {
+      "entry_hash": "e4044850feb47731c8ede2f0bf995a846da2eaf002b06f6a5728dbfb7b97bad7",
+      "signal": "blue",
+      "type_name": "cli_driver::gate_output::truncate_line"
+    }
+  ]
+}

@@ -309,11 +309,34 @@ fn subtree_contains_todo_key(value: &Value) -> bool {
 #[derive(Debug, Default)]
 pub struct FsCatalogAdapter;
 
+#[cfg(test)]
+type TestImportResolver = fn(&Path, &str) -> Result<import_shape::ImportedShape, CatalogError>;
+
+#[cfg(test)]
+thread_local! {
+    /// Test-only import-shape resolver override. Kept outside the adapter so the
+    /// production shape stays the declared unit struct; each test thread owns its
+    /// own override.
+    static IMPORT_RESOLVER_OVERRIDE: std::cell::Cell<Option<TestImportResolver>> =
+        const { std::cell::Cell::new(None) };
+}
+
 impl FsCatalogAdapter {
     /// Construct a new [`FsCatalogAdapter`].
     #[must_use]
     pub fn new() -> Self {
         Self
+    }
+
+    #[cfg(test)]
+    fn with_import_resolver(resolver: TestImportResolver) -> Self {
+        IMPORT_RESOLVER_OVERRIDE.with(|cell| cell.set(Some(resolver)));
+        Self
+    }
+
+    #[cfg(test)]
+    fn import_resolver_override() -> Option<TestImportResolver> {
+        IMPORT_RESOLVER_OVERRIDE.with(std::cell::Cell::get)
     }
 }
 
@@ -341,6 +364,10 @@ impl CatalogPort for FsCatalogAdapter {
         items_dir: &Path,
         command: CatalogImportCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
+        #[cfg(test)]
+        if let Some(resolver) = Self::import_resolver_override() {
+            return verb_import::run_with_resolver(track_id.as_ref(), items_dir, command, resolver);
+        }
         verb_import::run(track_id.as_ref(), items_dir, command)
     }
 

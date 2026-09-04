@@ -11,7 +11,9 @@ mod type_ref;
 
 use std::collections::BTreeMap;
 
-use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, CatalogueEntryKey, CatalogueItemNamespace, CrateName, ModulePath,
+};
 use domain::tddd::{ContractMapRendererError, LayerId};
 
 // Re-export sub-module items so that emit.rs (which imports via `super::`) and
@@ -25,6 +27,51 @@ pub(crate) use type_ref::{
 };
 
 use emit::{EntryKind, emit_entry};
+
+/// Returns the placement represented by a catalogue key and its optional
+/// declaration-level module path.
+///
+/// A qualified key is itself an explicit placement even when the optional
+/// `module_path` field is omitted. Delegating this interpretation to the
+/// domain identity constructor keeps grouping, labels, and the node index on
+/// the same identity rules.
+pub(super) fn effective_entry_module_path(
+    crate_name: &str,
+    entry_name: &str,
+    declared_module_path: Option<&ModulePath>,
+    namespace: CatalogueItemNamespace,
+) -> Result<Option<ModulePath>, ContractMapRendererError> {
+    let crate_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
+        ContractMapRendererError::RenderFailed {
+            reason: format!("invalid catalogue crate name '{crate_name}': {error}"),
+        }
+    })?;
+    let key = CatalogueEntryKey::try_new(entry_name.to_owned()).map_err(|error| {
+        ContractMapRendererError::RenderFailed {
+            reason: format!("invalid catalogue entry key '{entry_name}': {error}"),
+        }
+    })?;
+    let identity = match namespace {
+        CatalogueItemNamespace::Type => {
+            domain::tddd::catalogue_v2::FullyQualifiedItemPath::from_type_catalogue_entry_key(
+                &crate_name,
+                &key,
+                declared_module_path,
+            )
+        }
+        CatalogueItemNamespace::Trait => {
+            domain::tddd::catalogue_v2::FullyQualifiedItemPath::from_trait_catalogue_entry_key(
+                &crate_name,
+                &key,
+                declared_module_path,
+            )
+        }
+    }
+    .map_err(|error| ContractMapRendererError::RenderFailed {
+        reason: format!("invalid catalogue identity '{entry_name}': {error}"),
+    })?;
+    Ok(identity.module_path().cloned())
+}
 
 // ---------------------------------------------------------------------------
 // Rendering helpers — node ID generators
@@ -204,6 +251,7 @@ pub(super) fn render_mermaid(
             // contract, not removed items.
             let mut module_first_segs: BTreeMap<String, Vec<EntryKind<'_>>> = BTreeMap::new();
             let mut root_entries: Vec<EntryKind<'_>> = Vec::new();
+            let mut unplaced_entries: Vec<EntryKind<'_>> = Vec::new();
 
             use domain::tddd::catalogue_v2::roles::ItemAction;
 
@@ -212,11 +260,18 @@ pub(super) fn render_mermaid(
                 if type_entry.action() == ItemAction::Delete {
                     continue; // deleted types must not appear in the rendered map
                 }
-                if type_entry.module_path().is_root() {
-                    root_entries.push(EntryKind::Type(type_name.as_str(), type_entry));
-                } else {
-                    let first_seg = type_entry
-                        .module_path()
+                let module_path = effective_entry_module_path(
+                    crate_str,
+                    type_name.as_str(),
+                    type_entry.module_path(),
+                    CatalogueItemNamespace::Type,
+                )?;
+                if let Some(module_path) = module_path.as_ref() {
+                    if module_path.is_root() {
+                        root_entries.push(EntryKind::Type(type_name.as_str(), type_entry));
+                        continue;
+                    }
+                    let first_seg = module_path
                         .segments()
                         .first()
                         .map(|s| s.as_str())
@@ -226,6 +281,8 @@ pub(super) fn render_mermaid(
                         .entry(first_seg)
                         .or_default()
                         .push(EntryKind::Type(type_name.as_str(), type_entry));
+                } else {
+                    unplaced_entries.push(EntryKind::Type(type_name.as_str(), type_entry));
                 }
             }
 
@@ -234,11 +291,18 @@ pub(super) fn render_mermaid(
                 if trait_entry.action() == ItemAction::Delete {
                     continue; // deleted traits must not appear in the rendered map
                 }
-                if trait_entry.module_path().is_root() {
-                    root_entries.push(EntryKind::Trait(trait_name.as_str(), trait_entry));
-                } else {
-                    let first_seg = trait_entry
-                        .module_path()
+                let module_path = effective_entry_module_path(
+                    crate_str,
+                    trait_name.as_str(),
+                    trait_entry.module_path(),
+                    CatalogueItemNamespace::Trait,
+                )?;
+                if let Some(module_path) = module_path.as_ref() {
+                    if module_path.is_root() {
+                        root_entries.push(EntryKind::Trait(trait_name.as_str(), trait_entry));
+                        continue;
+                    }
+                    let first_seg = module_path
                         .segments()
                         .first()
                         .map(|s| s.as_str())
@@ -248,6 +312,8 @@ pub(super) fn render_mermaid(
                         .entry(first_seg)
                         .or_default()
                         .push(EntryKind::Trait(trait_name.as_str(), trait_entry));
+                } else {
+                    unplaced_entries.push(EntryKind::Trait(trait_name.as_str(), trait_entry));
                 }
             }
 
@@ -275,6 +341,24 @@ pub(super) fn render_mermaid(
 
             // Emit root entries directly under the layer subgraph.
             for entry in &root_entries {
+                emit_entry(
+                    entry,
+                    &mut subgraph_lines,
+                    &mut edge_lines,
+                    &mut class_attach,
+                    style,
+                    &inherent_methods,
+                    &node_index,
+                    &trait_index,
+                    layer_str_doc,
+                    crate_str,
+                )?;
+            }
+
+            // Keep placement-unknown declarations separate from explicit crate-root
+            // declarations. They remain directly under the layer because no module
+            // subgraph can be chosen without inventing a placement.
+            for entry in &unplaced_entries {
                 emit_entry(
                     entry,
                     &mut subgraph_lines,
@@ -394,7 +478,8 @@ pub(super) fn render_mermaid(
 
 #[cfg(test)]
 mod tests {
-    use super::{layer_subgraph_id, module_subgraph_id, type_node_id};
+    use super::{effective_entry_module_path, layer_subgraph_id, module_subgraph_id, type_node_id};
+    use domain::tddd::catalogue_v2::CatalogueItemNamespace;
 
     #[test]
     fn test_container_ids_distinguish_separator_from_underscore() {
@@ -411,5 +496,29 @@ mod tests {
         let underscored = type_node_id("domain", "domain", "alpha__Shared");
 
         assert_ne!(qualified, underscored);
+    }
+
+    #[test]
+    fn test_effective_entry_module_path_uses_qualified_key_when_field_is_omitted() {
+        let result = effective_entry_module_path(
+            "domain",
+            "domain::alpha::Thing",
+            None,
+            CatalogueItemNamespace::Type,
+        );
+        assert!(result.is_ok(), "qualified catalogue key should be valid: {result:?}");
+        let module_path = result.unwrap_or_default();
+
+        assert_eq!(module_path.map(|path| path.to_string()), Some("alpha".to_owned()));
+    }
+
+    #[test]
+    fn test_effective_entry_module_path_keeps_bare_omitted_entry_unplaced() {
+        let result =
+            effective_entry_module_path("domain", "Thing", None, CatalogueItemNamespace::Type);
+        assert!(result.is_ok(), "bare catalogue key should be valid: {result:?}");
+        let module_path = result.unwrap_or_default();
+
+        assert_eq!(module_path, None);
     }
 }
