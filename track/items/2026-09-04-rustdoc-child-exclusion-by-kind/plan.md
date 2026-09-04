@@ -12,4 +12,4 @@ All six type catalogues are intentionally empty because this internal correction
 
 > Update libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs and its co-located tests for child-item traversal. IN-01; IN-02; OUT-01; OUT-02; OUT-03; CN-01; CN-02; AC-01; AC-02; AC-03.
 
-- [x] **T001**: Update libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs and its co-located tests for child-item traversal. Keep libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/phase16_check.rs and unrelated Id(0) uses unchanged. IN-01; IN-02; OUT-01; OUT-02; OUT-03; CN-01; CN-02; AC-01; AC-02; AC-03.
+- [x] **T001**: Update libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs and its co-located tests for child-item traversal. Keep libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder/phase16_check.rs and unrelated Id(0) uses unchanged. IN-01; IN-02; OUT-01; OUT-02; OUT-03; CN-01; CN-02; AC-01; AC-02; AC-03. (`2c975603360d0da7accb6d733d151b5965c943c0`)
