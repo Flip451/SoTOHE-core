@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-09-05T06:05:07Z",
+          "findings": [
+            {
+              "category": "Reassess When trigger missing or vacuous",
+              "file": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md",
+              "line": 63,
+              "message": "ADRに `## Reassess When` セクションがなく、決定を再評価する具体的なトリガーが記録されていません。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:6f196639cd4b964fff381147d5ec0f715854dc22d3447fa3a9dbae1105103077",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T06:13:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a160761e93537c214e82d8660e9facdcbb2a9c5ae5f0eb3a1a24ab0d63047c03",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T06:16:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a160761e93537c214e82d8660e9facdcbb2a9c5ae5f0eb3a1a24ab0d63047c03",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T06:32:44Z",
+          "findings": [
+            {
+              "category": "decision obscured by excess detail",
+              "file": "knowledge/adr/2026-09-05-0600-hook-explicit-host-input-contract.md",
+              "line": 47,
+              "message": "`シェルを実行できる環境で cargo make build-sotp により新バイナリを構築し` は導入手順であり、削除しても D4 の決定（新バイナリと接続設定を一組で切り替える）は変わりません。手順を ADR から削除してください。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:dbd7b46a645ca541b6be0e6efa9a8b3fe436278d46600b964d2c269991eaf2eb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-09-05T06:39:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd7b46a645ca541b6be0e6efa9a8b3fe436278d46600b964d2c269991eaf2eb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-09-05T06:43:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd7b46a645ca541b6be0e6efa9a8b3fe436278d46600b964d2c269991eaf2eb",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
